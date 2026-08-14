@@ -13,12 +13,11 @@ OUT.mkdir(parents=True, exist_ok=True)
 API = "https://api.ted.europa.eu/v3/notices/search"
 SCOPE = os.getenv("TED_SCOPE", "ACTIVE")
 LIMIT = min(250, int(os.getenv("TED_LIMIT", "250")))
-MAX_PAGES = int(os.getenv("TED_MAX_PAGES", "24"))
-LOOKBACK_DAYS = int(os.getenv("TED_LOOKBACK_DAYS", "120"))
+MAX_PAGES = int(os.getenv("TED_MAX_PAGES", "48"))
+LOOKBACK_DAYS = int(os.getenv("TED_LOOKBACK_DAYS", "10"))
 NOW = datetime.now(timezone.utc)
 START = NOW - timedelta(days=LOOKBACK_DAYS)
-# Keep recall broad inside a rolling freshness window. The date range itself makes
-# sorting unnecessary; iteration mode will retrieve the whole matching set.
+START_DAY = START.date()
 DEFAULT_QUERY = f"PD = ({START:%Y%m%d} <> {NOW:%Y%m%d}) AND form-type = competition"
 QUERY = os.getenv("TED_QUERY", DEFAULT_QUERY)
 
@@ -95,6 +94,24 @@ def parse_date(value):
         return None
 
 
+def publication_day(value):
+    if value is None:
+        return None
+    s = str(value).strip()
+    m = re.match(r"^(\d{4})-(\d{2})-(\d{2})", s)
+    if m:
+        try:
+            return datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)), tzinfo=timezone.utc).date()
+        except Exception:
+            return None
+    if re.fullmatch(r"\d{8}", s):
+        try:
+            return datetime.strptime(s, "%Y%m%d").date()
+        except Exception:
+            return None
+    return None
+
+
 def first_field(item: dict, *names):
     for name in names:
         if name in item and item[name] not in (None, "", [], {}):
@@ -108,13 +125,15 @@ def first_field(item: dict, *names):
 
 
 session = requests.Session()
-session.headers.update({"Content-Type": "application/json", "User-Agent": "Tender-Engine/2.1 public procurement research"})
+session.headers.update({"Content-Type": "application/json", "User-Agent": "Tender-Engine/2.2 public procurement research"})
 rows = []
 seen = set()
 token = None
 errors = []
 page_count = 0
 total_reported = None
+source_items_seen = 0
+truncated_by_page_cap = False
 
 for page_no in range(1, MAX_PAGES + 1):
     body = {
@@ -122,7 +141,6 @@ for page_no in range(1, MAX_PAGES + 1):
         "fields": FIELDS,
         "limit": LIMIT,
         "scope": SCOPE,
-        # Important: true is syntax-validation mode on TED and can yield no normal results.
         "checkQuerySyntax": False,
         "paginationMode": "ITERATION",
     }
@@ -142,6 +160,7 @@ for page_no in range(1, MAX_PAGES + 1):
     if not isinstance(items, list):
         errors.append({"page": page_no, "error": "unrecognized_items_shape", "keys": list(data.keys())})
         break
+    source_items_seen += len(items)
 
     for item in items:
         if not isinstance(item, dict):
@@ -156,8 +175,10 @@ for page_no in range(1, MAX_PAGES + 1):
         seen.add(str(pub))
 
         publication_date_raw = scalar(first_field(item, "publication-date"))
-        publication_date = parse_date(publication_date_raw)
-        if publication_date and publication_date < START:
+        pday = publication_day(publication_date_raw)
+        # Query is date-based, not timestamp-based. Compare calendar days only so
+        # TED values such as 2026-08-04+02:00 are not incorrectly discarded.
+        if pday and pday < START_DAY:
             continue
 
         deadline_values = []
@@ -208,6 +229,9 @@ for page_no in range(1, MAX_PAGES + 1):
     token = data.get("iterationNextToken") or data.get("nextToken") or data.get("nextPageToken")
     if not token or not items:
         break
+else:
+    if token:
+        truncated_by_page_cap = True
 
 with (OUT / "active.jsonl").open("w", encoding="utf-8") as f:
     for rec in rows:
@@ -223,14 +247,16 @@ stats = {
     "scope": SCOPE,
     "query": QUERY,
     "lookback_days": LOOKBACK_DAYS,
-    "window_start": START.isoformat(),
-    "window_end": NOW.isoformat(),
+    "window_start_day": START_DAY.isoformat(),
+    "window_end_day": NOW.date().isoformat(),
     "pages": page_count,
     "limit": LIMIT,
     "total_reported": total_reported,
+    "source_items_seen": source_items_seen,
     "materialized_unique": len(rows),
     "current_materialized": len(current_rows),
     "future_deadline_records": sum(1 for r in rows if r.get("has_future_deadline")),
+    "truncated_by_page_cap": truncated_by_page_cap,
     "errors": errors,
     "generated_at": NOW.isoformat(),
 }
