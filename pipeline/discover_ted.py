@@ -12,7 +12,8 @@ OUT = Path(os.getenv("DISCOVERY_OUT", "discovery/ted"))
 OUT.mkdir(parents=True, exist_ok=True)
 API = "https://api.ted.europa.eu/v3/notices/search"
 SCOPE = os.getenv("TED_SCOPE", "ACTIVE")
-QUERY = os.getenv("TED_QUERY", "OJ = ()")
+# Competition form covers contract notices/calls for competition rather than award/result/planning notices.
+QUERY = os.getenv("TED_QUERY", "form-type = competition")
 LIMIT = min(250, int(os.getenv("TED_LIMIT", "250")))
 MAX_PAGES = int(os.getenv("TED_MAX_PAGES", "24"))
 NOW = datetime.now(timezone.utc)
@@ -38,7 +39,6 @@ def scalar(value):
     if value is None:
         return None
     if isinstance(value, dict):
-        # Prefer English, then first textual value.
         for key in ("eng", "en", "EN", "value"):
             if key in value and value[key]:
                 return scalar(value[key])
@@ -143,7 +143,6 @@ for page_no in range(1, MAX_PAGES + 1):
             continue
         pub = scalar(first_field(item, "publication-number", "publicationNumber"))
         if not pub:
-            # URLs usually contain the publication number; use as a last-resort extraction.
             raw = json.dumps(item, ensure_ascii=False)
             m = re.search(r"\b\d{4,8}-20\d{2}\b", raw)
             pub = m.group(0) if m else None
@@ -158,6 +157,9 @@ for page_no in range(1, MAX_PAGES + 1):
         parsed_deadlines = [d for d in parsed_deadlines if d]
         future_deadlines = [d for d in parsed_deadlines if d >= NOW]
         deadline = min(future_deadlines).isoformat() if future_deadlines else (max(parsed_deadlines).isoformat() if parsed_deadlines else None)
+        # If TED exposes a deadline and every deadline is already past, this is not live for bidding.
+        # No-deadline competition notices remain visible because qualification systems / multi-stage calls may omit BT-131 here.
+        current = bool(not parsed_deadlines or future_deadlines)
 
         value_raw = scalar(first_field(item, "estimated-value-proc"))
         try:
@@ -179,7 +181,7 @@ for page_no in range(1, MAX_PAGES + 1):
                 "title": str(title or ""),
                 "buyer": str(buyer or "") or None,
                 "deadline": deadline,
-                "current": True,
+                "current": current,
                 "has_future_deadline": bool(future_deadlines),
                 "notice_url": notice_url,
                 "estimated_value": value,
@@ -203,6 +205,11 @@ with (OUT / "active.jsonl").open("w", encoding="utf-8") as f:
     for rec in rows:
         f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
+current_rows = [r for r in rows if r.get("current")]
+with (OUT / "current.jsonl").open("w", encoding="utf-8") as f:
+    for rec in current_rows:
+        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
 stats = {
     "source": "TED",
     "scope": SCOPE,
@@ -211,6 +218,7 @@ stats = {
     "limit": LIMIT,
     "total_reported": total_reported,
     "materialized_unique": len(rows),
+    "current_materialized": len(current_rows),
     "future_deadline_records": sum(1 for r in rows if r.get("has_future_deadline")),
     "errors": errors,
     "generated_at": NOW.isoformat(),
