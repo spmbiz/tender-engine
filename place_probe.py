@@ -19,39 +19,38 @@ with sync_playwright() as p:
                 page.get_by_role('link',name=re.compile('Dossier de consultation',re.I)).click(timeout=7000); page.wait_for_load_state('domcontentloaded',timeout=30000); page.wait_for_timeout(400)
             except Exception:
                 page.goto(f'https://www.marches-publics.gouv.fr/index.php?id={cid}&orgAcronyme={org}&page=Entreprise.EntrepriseDemandeTelechargementDce',wait_until='domcontentloaded',timeout=45000); page.wait_for_timeout(400)
-            (out/'download_page.html').write_text(page.content(),encoding='utf-8')
-            # Hidden styled inputs: set DOM state directly and fire events.
             for iid in ['ctl0_CONTENU_PAGE_EntrepriseFormulaireDemande_choixAnonyme','ctl0_CONTENU_PAGE_EntrepriseFormulaireDemande_accepterConditions']:
-                page.evaluate("id=>{const e=document.getElementById(id); e.checked=true; e.dispatchEvent(new Event('change',{bubbles:true})); e.dispatchEvent(new Event('click',{bubbles:true}));}",iid)
-            page.wait_for_timeout(250)
-            state={}
-            for iid in ['ctl0_CONTENU_PAGE_EntrepriseFormulaireDemande_choixTelechargement','ctl0_CONTENU_PAGE_EntrepriseFormulaireDemande_choixAnonyme','ctl0_CONTENU_PAGE_EntrepriseFormulaireDemande_accepterConditions']:
-                state[iid]=page.evaluate('id=>document.getElementById(id)?.checked',iid)
-            (out/'pre_submit_state.json').write_text(json.dumps(state,indent=2),encoding='utf-8')
-            got=False; btn=page.locator('#ctl0_CONTENU_PAGE_validateButton')
+                page.evaluate("id=>{const e=document.getElementById(id); e.checked=true; e.dispatchEvent(new Event('change',{bubbles:true}));}",iid)
+            got=False
             try:
-                with page.expect_download(timeout=9000) as di: btn.click(force=True)
+                with page.expect_download(timeout=7000) as di: page.locator('#ctl0_CONTENU_PAGE_validateButton').click(force=True)
                 r['files'].append(save(di.value,out)); got=True
-            except PlaywrightTimeout:
+            except Exception:
                 try: page.wait_for_load_state('domcontentloaded',timeout=15000)
                 except: pass
-                page.wait_for_timeout(1200)
-            except Exception as e: r['error']='submit:'+repr(e)
+                page.wait_for_timeout(900)
             r['after_url']=page.url
             try: (out/'after_submit.html').write_text(page.content(),encoding='utf-8'); (out/'after_submit.txt').write_text(page.locator('body').inner_text(timeout=10000),encoding='utf-8')
             except: pass
+            # Exact full-DCE Prado anchor on the listing page.
             if not got:
-                for sel in ["a[href*='Telecharg']","a[href*='telecharg']","a[href*='Download']","a[href*='download']","a[href*='.zip']","button","input[type=submit]"]:
-                    for i in range(min(page.locator(sel).count(),60)):
+                full=page.locator('#ctl0_CONTENU_PAGE_EntrepriseDownloadDce_completeDownload')
+                try:
+                    if full.count() and full.is_visible():
+                        with page.expect_download(timeout=30000) as di: full.click(force=True)
+                        r['files'].append(save(di.value,out)); got=True
+                except Exception as e: r['error']='full_dce:'+repr(e)
+            # Fallback: click individual document anchors containing download semantics.
+            if not got:
+                for sel in ["a[id*='Download']","a[id*='download']","a[id*='Telecharg']","a[id*='telecharg']","a[href*='Telecharg']","a[href*='telecharg']"]:
+                    for i in range(min(page.locator(sel).count(),80)):
                         el=page.locator(sel).nth(i)
                         try:
-                            tag=el.evaluate('(e)=>e.tagName'); txt=((el.inner_text() if tag!='INPUT' else el.get_attribute('value')) or ''); href=el.get_attribute('href') or ''
-                            if not re.search(r'(télé|tele|download|dossier|zip|valider)',txt+' '+href,re.I): continue
-                            with page.expect_download(timeout=12000) as di: el.click(force=True)
+                            with page.expect_download(timeout=10000) as di: el.click(force=True)
                             r['files'].append(save(di.value,out)); got=True; break
                         except: pass
                     if got: break
-            r['responses']=[x for x in responses if re.search(r'(telecharg|download|dce|zip|consultation)',x['url'],re.I)][-50:]; (out/'responses.json').write_text(json.dumps(r['responses'],indent=2,ensure_ascii=False),encoding='utf-8'); r['status']='DOWNLOADED_PUBLIC' if got else 'NO_DOWNLOAD'
+            r['responses']=[x for x in responses if re.search(r'(telecharg|download|dce|zip|consultation)',x['url'],re.I)][-100:]; (out/'responses.json').write_text(json.dumps(r['responses'],indent=2,ensure_ascii=False),encoding='utf-8'); r['status']='DOWNLOADED_PUBLIC' if got else 'NO_DOWNLOAD'
         except Exception as e: r['status']='ERROR'; r['error']=repr(e)
         finally:
             try: page.close()
