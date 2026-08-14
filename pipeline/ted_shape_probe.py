@@ -35,6 +35,7 @@ r.raise_for_status()
 data = r.json()
 (OUT/'response.json').write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding='utf-8')
 items = data.get('notices') or data.get('results') or data.get('items') or []
+first = items[0] if isinstance(items, list) and items and isinstance(items[0], dict) else None
 summary = {
     'query': query,
     'top_level_keys': list(data.keys()),
@@ -42,7 +43,9 @@ summary = {
     'items_type': type(items).__name__,
     'items_count': len(items) if isinstance(items, list) else None,
     'first_item_type': type(items[0]).__name__ if isinstance(items, list) and items else None,
-    'first_item_keys': list(items[0].keys()) if isinstance(items, list) and items and isinstance(items[0], dict) else None,
+    'first_item_keys': list(first.keys()) if first else None,
 }
 (OUT/'summary.json').write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding='utf-8')
 print(json.dumps(summary, indent=2, ensure_ascii=False))
+print('--- FIRST NOTICE RAW ---')
+print(json.dumps(first, indent=2, ensure_ascii=False)[:30000])
