@@ -1,0 +1,100 @@
+name: DCE Retry ePPS 2026-08-14
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'state/dce_retry_epps_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  retry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recover selected records from durable discovery harvest
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_TAG: discovery-harvest-31840648379
+          SOURCE_ASSET: supergreen-wide-read-31840648379-repaired.tar.gz
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p source-release source-discovery generated
+          gh release download "$SOURCE_TAG" --pattern "$SOURCE_ASSET" --dir source-release
+          tar -xzf "source-release/$SOURCE_ASSET" -C source-discovery
+          candidates="$(find source-discovery -type f -name current_candidates.jsonl -print -quit)"
+          test -n "$candidates"
+          python pipeline/materialize_dce_selection.py \
+            --candidates "$candidates" \
+            --selection queues/dce_retry_epps_2026-08-14.jsonl \
+            --out generated/dce_candidates.jsonl
+      - name: Create durable canonical retry release and persist exact queue first
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="dce-retry-epps-${GITHUB_RUN_ID}"
+          gh release create "$tag" --target "$GITHUB_SHA" \
+            --title "DCE Retry ePPS ${GITHUB_RUN_ID}" \
+            --notes "Canonical retry harvest for Cyprus/Lithuania ePPS routes after generic adapter addition. Original public procurement files and extracted evidence are durable Release assets; Actions artifacts are not canonical."
+          cp generated/dce_candidates.jsonl "dce-candidate-queue-${GITHUB_RUN_ID}.jsonl"
+          cp generated/dce_candidates.jsonl.summary.json "dce-candidate-queue-${GITHUB_RUN_ID}.summary.json"
+          cp queues/dce_retry_epps_2026-08-14.jsonl "dce-selection-${GITHUB_RUN_ID}.jsonl"
+          gh release upload "$tag" \
+            "dce-candidate-queue-${GITHUB_RUN_ID}.jsonl" \
+            "dce-candidate-queue-${GITHUB_RUN_ID}.summary.json" \
+            "dce-selection-${GITHUB_RUN_ID}.jsonl"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+      - name: Install retrieval and extraction dependencies
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check -q requests pypdf python-docx openpyxl python-pptx 'playwright>=1.46,<2'
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
+          command -v 7z >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq p7zip-full)
+      - name: Retrieve all three ePPS DCEs with bounded concurrency
+        env:
+          DCE_ITEM_RETRIES: '1'
+          DCE_ITEM_TIMEOUT_SECONDS: '180'
+          DCE_LOCAL_CONCURRENCY: '3'
+        run: python pipeline/dce_batch_worker.py --queue generated/dce_candidates.jsonl --lines '1,2,3' --out out --concurrency 3
+      - name: Extract corpus and mandatory gates
+        run: |
+          DCE_EXTRACT_WORKERS=3 python pipeline/extract_corpus.py --root out
+          DCE_GATE_WORKERS=3 python pipeline/extract_gates.py --root out
+      - name: Build canonical packs and deep-review handoff
+        run: |
+          python pipeline/durable_dce_pack.py --root out --out-dir durable
+          python pipeline/slim_dce_output.py --root out --out slim
+          python pipeline/aggregate_dce.py --root slim --out aggregate
+          tar -C aggregate -czf "dce-deep-review-${GITHUB_RUN_ID}.tar.gz" .
+          cp aggregate/summary.json "dce-summary-${GITHUB_RUN_ID}.json"
+      - name: Persist and verify every canonical output
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          assets=(durable/candidate-*.tar.gz durable/canonical_index.json "dce-deep-review-${GITHUB_RUN_ID}.tar.gz" "dce-summary-${GITHUB_RUN_ID}.json")
+          gh release upload "$RELEASE_TAG" "${assets[@]}" --clobber
+          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' > /tmp/assets.txt
+          for asset in "${assets[@]}"; do
+            grep -Fxq "$(basename "$asset")" /tmp/assets.txt || { echo "missing durable asset: $asset"; exit 1; }
+          done
+          echo "CANONICAL_VERIFIED $RELEASE_TAG" >> "$GITHUB_STEP_SUMMARY"
+          cat "dce-summary-${GITHUB_RUN_ID}.json" >> "$GITHUB_STEP_SUMMARY"
