@@ -83,6 +83,7 @@ def epps_route(url: str) -> dict:
 def classify_downstream(url: str):
     low = url.lower()
     parsed = urlparse(url)
+    host = parsed.netloc.lower().split(":")[0]
     qs = parse_qs(parsed.query)
     if "etenders.gov.ie" in low:
         return "IRELAND_ETENDERS", epps_route(url)
@@ -109,6 +110,20 @@ def classify_downstream(url: str):
     if "ungm.org" in low:
         m = re.search(r"/Notice/(\d+)", url, re.I)
         return "UNGM", {"notice_id": m.group(1) if m else None, "detail_url": url}
+
+    # High-volume TED downstream portals. These are kept as explicit portal keys so
+    # retrieval can be measured independently and barriers remain visible.
+    if host in {"www.dtvp.de", "dtvp.de"}:
+        return "DE_DTVP", {"detail_url": url}
+    if host.endswith("marches-publics.info") or host.endswith("aws-achat.info"):
+        return "FR_AWS", {"detail_url": url}
+    if host in {"www.publicprocurement.be", "publicprocurement.be", "eprocurement.gov.be", "www.eprocurement.gov.be"}:
+        return "BE_EPROC", {"detail_url": url}
+    if host in {"contrataciondelestado.es", "www.contrataciondelestado.es"}:
+        return "ES_PLACSP", {"detail_url": url}
+    if host in {"www.evergabe-online.de", "evergabe-online.de"}:
+        return "DE_EVERGABE", {"detail_url": url}
+
     if FILE_RE.search(url):
         return "DIRECT_HTTP", {"document_urls": [url]}
     return None, {"detail_url": url}
