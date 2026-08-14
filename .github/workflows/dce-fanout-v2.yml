@@ -7,6 +7,8 @@ on:
     paths:
       - 'queues/dce_candidates.jsonl'
       - 'pipeline/build_matrix.py'
+      - 'pipeline/build_dce_shards.py'
+      - 'pipeline/dce_batch_worker.py'
       - 'pipeline/dce_worker.py'
       - 'pipeline/dce_worker_v2.py'
       - 'pipeline/ted_resolver.py'
@@ -21,61 +23,67 @@ jobs:
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
       count: ${{ steps.matrix.outputs.count }}
+      shard_count: ${{ steps.matrix.outputs.shard_count }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - id: matrix
-        name: Compile candidate matrix from queue
-        run: python pipeline/build_matrix.py --queue queues/dce_candidates.jsonl --max-jobs 80
+        name: Compile two-runner shards from candidate queue
+        env:
+          DCE_SHARDS: 2
+          MAX_DCE_JOBS: 80
+        run: python pipeline/build_dce_shards.py --queue queues/dce_candidates.jsonl
       - uses: actions/upload-artifact@v4
         with:
-          name: dce-matrix-${{ github.run_id }}
+          name: dce-plan-${{ github.run_id }}
           path: |
-            matrix.json
-            matrix_skipped.json
+            dce_shards.json
+            dce_shards_skipped.json
           retention-days: 7
 
-  dce-worker:
+  dce-shard:
     needs: prepare
     if: needs.prepare.outputs.count != '0'
     runs-on: ubuntu-latest
-    timeout-minutes: 14
+    timeout-minutes: 30
     strategy:
       fail-fast: false
-      max-parallel: 12
+      max-parallel: 2
       matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install document extraction dependencies
+      - name: Install extraction/runtime dependencies once per shard
         run: pip install requests pypdf python-docx openpyxl python-pptx
-      - name: Install browser runtime when adapter needs it
+      - name: Install browser runtime once per shard when needed
         if: ${{ matrix.needs_browser }}
         run: |
           pip install 'playwright>=1.46,<2'
           python -m playwright install --with-deps chromium
-      - name: Ensure 7z exists
+      - name: Ensure 7z exists once per shard
         run: command -v 7z >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq p7zip-full)
-      - name: Resolve route and retrieve authoritative DCE
-        run: python pipeline/dce_worker_v2.py --queue queues/dce_candidates.jsonl --line ${{ matrix.line_no }} --out out
-      - name: Recursively unpack and extract corpus
+      - name: Resolve and retrieve shard DCEs with bounded local concurrency
+        env:
+          DCE_LOCAL_CONCURRENCY: 2
+        run: python pipeline/dce_batch_worker.py --queue queues/dce_candidates.jsonl --lines '${{ matrix.lines }}' --out out --concurrency 2
+      - name: Recursively unpack and extract all candidate corpora
         run: python pipeline/extract_corpus.py --root out
       - name: Extract mandatory-gate evidence snippets
         run: python pipeline/extract_gates.py --root out
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: dce-${{ matrix.slug }}
+          name: dce-shard-${{ matrix.shard }}
           path: out/
           if-no-files-found: error
           retention-days: 7
 
   aggregate:
-    needs: [prepare, dce-worker]
+    needs: [prepare, dce-shard]
     if: always() && needs.prepare.outputs.count != '0'
     runs-on: ubuntu-latest
     timeout-minutes: 8
@@ -83,7 +91,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          pattern: dce-*
+          pattern: dce-shard-*
           path: dce-artifacts
           merge-multiple: true
       - name: Build GPT deep-review queue
