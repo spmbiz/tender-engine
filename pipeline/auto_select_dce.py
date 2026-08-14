@@ -124,20 +124,21 @@ def select(records: Iterable[dict], minimum: int = 34, limit: int = 320, blocked
             continue
         scored.append((score, cid, reasons, rec))
 
-    # A merged source harvest can legitimately contain duplicate source identities
-    # (for example when source windows overlap or the upstream portal republishes a
-    # notice). Rank first, then keep only the best-scoring record per canonical ID.
+    # A merged source harvest can legitimately contain duplicate source identities.
+    # Rank with the full deterministic retrieval score, then keep one best record per
+    # canonical ID. The exported preliminary score is deliberately capped at 89:
+    # 90-100 belongs to the mandatory post-DCE/GPT evidence gate in this repository.
     scored.sort(key=lambda x: (-x[0], str(x[3].get("deadline") or "9999"), x[1]))
     out = []
     emitted: set[str] = set()
-    for score, cid, reasons, rec in scored:
+    for raw_score, cid, reasons, rec in scored:
         key = cid.casefold()
         if key in emitted:
             continue
         emitted.add(key)
         out.append({
             "candidate_id": cid,
-            "preliminary_score": score,
+            "preliminary_score": min(89, raw_score),
             "wide_read_run_id": rec.get("wide_read_run_id"),
             "status": "AUTO_DCE_PREFETCH",
             "selection_reason": "deterministic retrieval priority only; GPT final qualification still required | " + ", ".join(reasons[:8]),
