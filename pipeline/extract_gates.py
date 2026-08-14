@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 PATTERNS = {
@@ -109,14 +111,31 @@ def process(root: Path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default="out")
+    ap.add_argument("--workers", type=int, default=int(os.getenv("DCE_GATE_WORKERS", "2")))
     args = ap.parse_args()
     base = Path(args.root)
+    roots = sorted(set(p.parent for p in base.rglob("corpus.txt")))
+    workers = max(1, min(args.workers, len(roots) or 1))
     results = []
-    for corpus in base.rglob("corpus.txt"):
-        rec = process(corpus.parent)
-        if rec:
-            results.append(rec)
-    print(json.dumps(results, indent=2, ensure_ascii=False))
+
+    if workers == 1:
+        for root in roots:
+            rec = process(root)
+            if rec:
+                results.append(rec)
+    else:
+        with ProcessPoolExecutor(max_workers=workers) as pool:
+            futs = {pool.submit(process, root): root for root in roots}
+            for fut in as_completed(futs):
+                try:
+                    rec = fut.result()
+                except Exception as exc:
+                    rec = {"root": str(futs[fut]), "candidate_id": None, "error": repr(exc), "evidence_counts": {}}
+                if rec:
+                    results.append(rec)
+
+    results.sort(key=lambda r: r.get("root", ""))
+    print(json.dumps({"workers": workers, "candidates": len(roots), "results": results}, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":
