@@ -2,20 +2,6 @@ name: DCE Fanout V2
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'queues/dce_candidates.jsonl'
-      - 'pipeline/build_matrix.py'
-      - 'pipeline/build_dce_shards.py'
-      - 'pipeline/dce_batch_worker.py'
-      - 'pipeline/dce_worker.py'
-      - 'pipeline/dce_worker_v2.py'
-      - 'pipeline/ted_resolver.py'
-      - 'pipeline/extract_corpus.py'
-      - 'pipeline/extract_gates.py'
-      - 'pipeline/aggregate_dce.py'
-      - '.github/workflows/dce-fanout-v2.yml'
 
 concurrency:
   group: dce-fanout-v2
