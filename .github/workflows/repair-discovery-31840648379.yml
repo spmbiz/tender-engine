@@ -1,7 +1,11 @@
-name: Repair Discovery 31840648379 (Manual)
+name: Repair Discovery 31840648379
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'benchmarks/repair-discovery-trigger.json'
 
 permissions:
   contents: write
@@ -31,8 +35,8 @@ jobs:
         run: |
           set -euo pipefail
           tar -C discovery/ted-fixed -czf discovery-ted-fixed-attempt-${GITHUB_RUN_ID}.tar.gz .
-          gh release upload "$RELEASE_TAG" "discovery-ted-fixed-attempt-${GITHUB_RUN_ID}.tar.gz" --clobber
-          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | grep -Fxq "discovery-ted-fixed-attempt-${GITHUB_RUN_ID}.tar.gz"
+          gh release upload "$RELEASE_TAG" "discovery-ted-fixed-attempt-${GITHUB_RUN_ID}.tar.gz" --repo "$GITHUB_REPOSITORY" --clobber
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | grep -Fxq "discovery-ted-fixed-attempt-${GITHUB_RUN_ID}.tar.gz"
       - name: Require complete non-truncated TED harvest
         run: |
           python - <<'PY'
@@ -51,14 +55,14 @@ jobs:
         run: |
           set -euo pipefail
           cp "discovery-ted-fixed-attempt-${GITHUB_RUN_ID}.tar.gz" discovery-ted-fixed.tar.gz
-          gh release upload "$RELEASE_TAG" discovery-ted-fixed.tar.gz --clobber
+          gh release upload "$RELEASE_TAG" discovery-ted-fixed.tar.gz --repo "$GITHUB_REPOSITORY" --clobber
       - name: Download every durable source pack for original run
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           mkdir -p release-download discovery-download
-          gh release download "$RELEASE_TAG" --pattern 'discovery-*.tar.gz' --dir release-download
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern 'discovery-*.tar.gz' --dir release-download
           for archive in release-download/discovery-*.tar.gz; do
             base="$(basename "$archive" .tar.gz)"
             mkdir -p "discovery-download/$base"
@@ -76,18 +80,9 @@ jobs:
           set -euo pipefail
           tar -czf supergreen-wide-read-31840648379-repaired.tar.gz merged-repaired wide_read_packets_repaired
           cp merged-repaired/stats.json discovery-summary-31840648379-repaired.json
-          gh release upload "$RELEASE_TAG" \
+          gh release upload "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
             supergreen-wide-read-31840648379-repaired.tar.gz \
             discovery-summary-31840648379-repaired.json --clobber
-          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' > /tmp/assets.txt
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' > /tmp/assets.txt
           grep -Fxq supergreen-wide-read-31840648379-repaired.tar.gz /tmp/assets.txt
           grep -Fxq discovery-summary-31840648379-repaired.json /tmp/assets.txt
-      - name: Temporary transport copy for GPT consumption only
-        uses: actions/upload-artifact@v4
-        with:
-          name: repaired-wide-read-31840648379
-          path: |
-            merged-repaired/
-            wide_read_packets_repaired/
-          retention-days: 1
-          compression-level: 9
