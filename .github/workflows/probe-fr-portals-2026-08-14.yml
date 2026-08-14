@@ -49,13 +49,17 @@ jobs:
           chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
           if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
       - name: Probe public surface only
+        id: probe
+        continue-on-error: true
         run: python pipeline/public_portal_probe.py --label '${{ matrix.label }}' --url '${{ matrix.url }}' --out 'probe/${{ matrix.label }}'
       - name: Persist probe and any genuinely public download durably
+        if: always()
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.init.outputs.tag }}
         run: |
           set -euo pipefail
+          mkdir -p 'probe/${{ matrix.label }}'
           archive='probe-${{ matrix.label }}.tar.gz'
           tar -C 'probe/${{ matrix.label }}' -czf "$archive" .
           gh release upload "$TAG" "$archive" --clobber
