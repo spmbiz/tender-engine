@@ -33,9 +33,20 @@ Discovery fanout:
 
 The workflows reuse the preinstalled Chrome on `ubuntu-latest` and install Playwright only on browser-backed shards. Legacy/debug probes are manual-only.
 
+## Autonomous fleet
+
+Persistent orchestration is controlled by `control/desired_state.json` and `.github/workflows/autonomous-fleet.yml`.
+
+`pipeline/fleet_controller_v3.py` reconciles live capacity, transactional DCE leases, durable backlog state and provider refreshes. Failed or expired leased DCE batches return to the queue instead of being silently consumed.
+
+CircleCI is integrated as a second disposable compute pool through `.circleci/config.yml`. Its 30-way fanout is intentionally fail-closed until `FLEET_GITHUB_TOKEN` is configured in the CircleCI project so every valuable worker result can be persisted to the same canonical GitHub Release path.
+
+`pipeline/setup_circleci_bridge.py` is the one-time bootstrap helper for installing/replacing that CircleCI project environment variable when `CIRCLE_TOKEN` and `FLEET_GITHUB_TOKEN` are present locally.
+
 ## Super Green operating sources
 
-- `skills/supergreen-hunt/SKILL.md` — authoritative GPT/agent operating contract. GPT-wide-read and DCE-final-gate rules live here.
+- `skills/supergreen-hunt/SKILL.md` — authoritative GPT/agent contract for semantic wide-read, DCE-final-gate reasoning and final GREEN / SUPER GREEN classification.
+- `skills/autonomous-tender-fleet/SKILL.md` — authoritative orchestration contract for continuous mode, capacity, leases, persistence, CircleCI, recovery and GPT handoff.
 - `docs/SUPERGREEN_SYSTEM_V2.md` — implemented architecture, executors, handoffs and measured benchmarks.
 - `docs/SUPERGREEN_HUNT_RUNBOOK.md` — reproducible runbook capturing the process used to surface and verify fresh opportunities such as Barnagh.
 - `docs/PARALLELIZATION_AUDIT.md` — original performance audit and optimization rationale.
@@ -61,6 +72,8 @@ Production:
 
 - `.github/workflows/supergreen-discovery-v2.yml`
 - `.github/workflows/dce-fanout-v2.yml`
+- `.github/workflows/autonomous-fleet.yml`
+- `.circleci/config.yml`
 
 Preservation/maintenance:
 
