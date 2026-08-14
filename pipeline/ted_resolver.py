@@ -19,6 +19,61 @@ DIRECT_ROUTE_FIELDS = [
     "tool-url-part",
 ]
 
+# Empirically observed unresolved TED downstream domains from the 128-candidate
+# live A/B corpus. These receive a conservative public-page first pass in v4;
+# an unresolved generic pass remains explicitly distinguishable from proof that
+# no public DCE exists.
+WAVE2_GENERIC_HOSTS = {
+    "www.vergabe.metropoleruhr.de",
+    "www.meinauftrag.rib.de",
+    "www.marches-securises.fr",
+    "marches-securises.fr",
+    "www.vergabe24.de",
+    "landesverwaltung.vergabe.rlp.de",
+    "contractaciopublica.cat",
+    "community.vortal.biz",
+    "platformazakupowa.pl",
+    "riigihanked.riik.ee",
+    "tendsign.com",
+    "www.tenderned.nl",
+    "tenderned.nl",
+    "www.e-avrop.com",
+    "www.tender24.de",
+    "ausschreibungen.landbw.de",
+    "www.achatpublic.com",
+    "bi-medien.de",
+    "eu.eu-supply.com",
+    "ztmwaw.ezamawiajacy.pl",
+    "app.albofornitori.it",
+    "ausschreibungen.giz.de",
+    "bieterzugang.deutsche-evergabe.de",
+    "ezamowienia.gov.pl",
+    "lajunta.es",
+    "www.evergabe.de",
+    "parp.eb2b.com.pl",
+    "ausschreibungen.kfw.de",
+    "www.acquistinretepa.it",
+    "www.acingov.pt",
+    "hacienda.navarra.es",
+    "bieterportal.pd-g.e-va.eu",
+    "lwl.org",
+    "www.kommersannons.se",
+    "marches.maximilien.fr",
+    "www.contratacion.euskadi.eus",
+    "permalink.mercell.com",
+    "www.evergabe.nrw.de",
+    "cloud.3p.eu",
+    "bip.slaskie.pl",
+    "oisehabitatmarchespublics.safetender.com",
+    "vergabeplattform.bwi.de",
+    "gv.vergabeportal.at",
+    "juntadeandalucia.es",
+    "ec.europa.eu",
+    "bbg.vergabeportal.at",
+    "s2c.mercell.com",
+    "www.simap.ch",
+}
+
 
 def local(tag: str) -> str:
     return tag.rsplit("}", 1)[-1]
@@ -111,8 +166,8 @@ def classify_downstream(url: str):
         m = re.search(r"/Notice/(\d+)", url, re.I)
         return "UNGM", {"notice_id": m.group(1) if m else None, "detail_url": url}
 
-    # High-volume TED downstream portals. These are kept as explicit portal keys so
-    # retrieval can be measured independently and barriers remain visible.
+    # Wave 1: highest-volume TED downstream portals. Explicit keys let us measure
+    # retrieval uplift and preserve each barrier type rather than hiding failures.
     if host in {"www.dtvp.de", "dtvp.de"}:
         return "DE_DTVP", {"detail_url": url}
     if host.endswith("marches-publics.info") or host.endswith("aws-achat.info"):
@@ -123,6 +178,11 @@ def classify_downstream(url: str):
         return "ES_PLACSP", {"detail_url": url}
     if host in {"www.evergabe-online.de", "evergabe-online.de"}:
         return "DE_EVERGABE", {"detail_url": url}
+
+    # Wave 2: empirically observed long-tail portals. French e-marchespublics buyer
+    # subdomains share a public-page family and are included by suffix.
+    if host in WAVE2_GENERIC_HOSTS or host.endswith(".e-marchespublics.com"):
+        return "GENERIC_PUBLIC_PAGE", {"detail_url": url, "downstream_host": host}
 
     if FILE_RE.search(url):
         return "DIRECT_HTTP", {"document_urls": [url]}
