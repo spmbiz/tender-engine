@@ -3,6 +3,14 @@ name: DCE Fanout V2
 on:
   workflow_dispatch:
     inputs:
+      selection_path:
+        description: Repo path to compact candidate selection manifest
+        required: false
+        default: 'queues/dce_selection_31840648379.jsonl'
+      source_discovery_run:
+        description: Canonical discovery run ID containing selected candidates
+        required: false
+        default: '31840648379'
       max_jobs:
         description: Maximum queue candidates to materialize
         required: false
@@ -30,18 +38,54 @@ permissions:
 jobs:
   prepare:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
       count: ${{ steps.matrix.outputs.count }}
       shard_count: ${{ steps.matrix.outputs.shard_count }}
       max_parallel: ${{ steps.matrix.outputs.max_parallel }}
       release_tag: ${{ steps.release.outputs.tag }}
+      queue_asset: ${{ steps.materialize.outputs.queue_asset }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - id: materialize
+        name: Materialize selected queue from durable canonical discovery harvest
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ github.event.inputs.source_discovery_run || '31840648379' }}
+          SELECTION_PATH: ${{ github.event.inputs.selection_path || 'queues/dce_selection_31840648379.jsonl' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_tag="discovery-harvest-${SOURCE_RUN}"
+          mkdir -p source-release source-discovery generated
+          repaired="supergreen-wide-read-${SOURCE_RUN}-repaired.tar.gz"
+          normal="supergreen-wide-read-${SOURCE_RUN}.tar.gz"
+          assets="$(gh release view "$source_tag" --json assets --jq '.assets[].name')"
+          if grep -Fxq "$repaired" <<< "$assets"; then
+            source_asset="$repaired"
+          elif grep -Fxq "$normal" <<< "$assets"; then
+            source_asset="$normal"
+          else
+            echo "No canonical wide-read asset found in $source_tag" >&2
+            exit 1
+          fi
+          gh release download "$source_tag" --pattern "$source_asset" --dir source-release
+          tar -xzf "source-release/$source_asset" -C source-discovery
+          candidates="$(find source-discovery -type f -name current_candidates.jsonl -print -quit)"
+          [ -n "$candidates" ] || { echo 'current_candidates.jsonl missing from canonical source harvest'; exit 1; }
+          python pipeline/materialize_dce_selection.py \
+            --candidates "$candidates" \
+            --selection "$SELECTION_PATH" \
+            --out generated/dce_candidates.jsonl
+          queue_asset="dce-candidate-queue-${GITHUB_RUN_ID}.jsonl"
+          cp generated/dce_candidates.jsonl "$queue_asset"
+          cp generated/dce_candidates.jsonl.summary.json "${queue_asset}.summary.json"
+          cp "$SELECTION_PATH" "dce-selection-${GITHUB_RUN_ID}.jsonl"
+          echo "queue_asset=$queue_asset" >> "$GITHUB_OUTPUT"
       - id: matrix
         name: Compile deep dynamic browser/HTTP shard queue
         env:
@@ -51,7 +95,7 @@ jobs:
           MAX_DCE_JOBS: ${{ github.event.inputs.max_jobs || '320' }}
           DCE_BROWSER_LOCAL_CONCURRENCY: '1'
           DCE_HTTP_LOCAL_CONCURRENCY: '4'
-        run: python pipeline/build_dce_shards.py --queue queues/dce_candidates.jsonl
+        run: python pipeline/build_dce_shards.py --queue generated/dce_candidates.jsonl
       - id: release
         name: Create durable canonical harvest release
         if: steps.matrix.outputs.count != '0'
@@ -64,8 +108,25 @@ jobs:
           gh release create "$tag" \
             --target "$GITHUB_SHA" \
             --title "DCE Harvest ${GITHUB_RUN_ID}" \
-            --notes "Canonical durable DCE harvest. Original downloaded procurement files and extracted evidence are persisted as Release assets. GitHub Actions artifacts are not the canonical store."
+            --notes "Canonical durable DCE harvest. Candidate queue is derived from a durable discovery harvest + selection manifest. Original public procurement files and extracted evidence are persisted as Release assets. GitHub Actions artifacts are not the canonical store."
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
+      - name: Persist exact materialized queue and provenance durably
+        if: steps.matrix.outputs.count != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          QUEUE_ASSET: ${{ steps.materialize.outputs.queue_asset }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release upload "$RELEASE_TAG" \
+            "$QUEUE_ASSET" \
+            "${QUEUE_ASSET}.summary.json" \
+            "dce-selection-${GITHUB_RUN_ID}.jsonl" --clobber
+          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' > /tmp/assets.txt
+          grep -Fxq "$QUEUE_ASSET" /tmp/assets.txt
+          grep -Fxq "${QUEUE_ASSET}.summary.json" /tmp/assets.txt
+          grep -Fxq "dce-selection-${GITHUB_RUN_ID}.jsonl" /tmp/assets.txt
       - name: Publish plan to job summary
         run: |
           cat dce_plan.json
@@ -88,6 +149,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Recover exact durable candidate queue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
+          QUEUE_ASSET: ${{ needs.prepare.outputs.queue_asset }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p generated
+          gh release download "$RELEASE_TAG" --pattern "$QUEUE_ASSET" --dir generated
+          mv "generated/$QUEUE_ASSET" generated/dce_candidates.jsonl
       - name: Install only dependencies required by this shard
         shell: bash
         run: |
@@ -120,7 +192,7 @@ jobs:
           DCE_ITEM_TIMEOUT_SECONDS: '150'
         run: >-
           python pipeline/dce_batch_worker.py
-          --queue queues/dce_candidates.jsonl
+          --queue generated/dce_candidates.jsonl
           --lines '${{ matrix.lines }}'
           --out out
           --concurrency '${{ matrix.local_concurrency }}'
