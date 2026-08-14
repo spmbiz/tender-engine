@@ -159,7 +159,7 @@ jobs:
         run: |
           set -euo pipefail
           gh api --paginate "/repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
-            --jq '.artifacts[] | select(.workflow_run.id == env.GITHUB_RUN_ID|tonumber) | [.id,.name,.size_in_bytes] | @tsv' > /tmp/current-artifacts.tsv
+            --jq '.artifacts[] | select(.workflow_run.id == (env.GITHUB_RUN_ID | tonumber)) | [.id,.name,.size_in_bytes] | @tsv' > /tmp/current-artifacts.tsv
           deleted=0
           deleted_bytes=0
           while IFS=$'\t' read -r id name bytes; do
