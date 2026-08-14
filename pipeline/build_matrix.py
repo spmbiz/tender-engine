@@ -6,7 +6,9 @@ import os
 import re
 from pathlib import Path
 
+# TED is marked browser-capable because BT-15 can route to a browser-backed downstream portal.
 BROWSER_PORTALS = {
+    "TED",
     "IRELAND_ETENDERS",
     "FR_PLACE",
     "LUX_PMP",
