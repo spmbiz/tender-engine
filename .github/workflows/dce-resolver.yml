@@ -1,10 +1,30 @@
-name: DCE Resolver Test (Legacy)
+name: DCE Resolver Test (Legacy Manual)
 
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
+  init-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      release_tag: ${{ steps.release.outputs.tag }}
+    steps:
+      - id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="legacy-dce-resolver-${GITHUB_RUN_ID}"
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$tag" --notes "Durable legacy resolver probe outputs."
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
   route-map:
+    needs: init-release
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -18,21 +38,36 @@ jobs:
         run: python ted_search_probe.py
       - name: Extract TED BT-15 routes
         run: python ted_bt15_probe.py
-      - name: Upload TED route output only for debugging
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ted-routes-${{ github.run_id }}
-          path: |
-            ted_routes/
-            ted_search/
-          if-no-files-found: ignore
-          retention-days: 1
-          compression-level: 9
+      - name: Persist route-map outputs durably when present
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          paths=()
+          [ -d ted_routes ] && paths+=(ted_routes)
+          [ -d ted_search ] && paths+=(ted_search)
+          [ ${#paths[@]} -gt 0 ] || exit 0
+          tar -czf route-map.tar.gz "${paths[@]}"
+          gh release upload "$RELEASE_TAG" route-map.tar.gz --clobber
 
   browser-routes:
+    needs: init-release
+    name: browser-${{ matrix.name }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        include:
+          - {name: ungm, script: ungm_probe.py}
+          - {name: ireland, script: ireland_probe.py}
+          - {name: pcs, script: pcs_probe.py}
+          - {name: evergabe, script: evergabe_probe.py}
+          - {name: procontract, script: procontract_probe.py}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -48,24 +83,19 @@ jobs:
           else
             python -m playwright install --with-deps chromium
           fi
-      - name: UNGM public documents
-        run: python ungm_probe.py
-      - name: Ireland eTenders anonymous documents
-        run: python ireland_probe.py
-      - name: Public Contracts Scotland documents
-        run: python pcs_probe.py
-      - name: German e-Vergabe public documents
-        run: python evergabe_probe.py
-      - name: Resolve ProContract shortlist
-        run: python procontract_probe.py
-      - name: Upload resolver output only on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: dce-routes-${{ github.run_id }}
-          path: |
-            adapter_store/
-            procontract_store/
-          if-no-files-found: ignore
-          retention-days: 1
-          compression-level: 9
+      - run: python '${{ matrix.script }}'
+      - name: Persist probe output durably when present
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          paths=()
+          [ -d adapter_store ] && paths+=(adapter_store)
+          [ -d procontract_store ] && paths+=(procontract_store)
+          [ ${#paths[@]} -gt 0 ] || exit 0
+          archive="resolver-${{ matrix.name }}.tar.gz"
+          tar -czf "$archive" "${paths[@]}"
+          gh release upload "$RELEASE_TAG" "$archive" --clobber
