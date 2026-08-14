@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -15,6 +16,9 @@ SCOPE = os.getenv("TED_SCOPE", "ACTIVE")
 LIMIT = min(250, int(os.getenv("TED_LIMIT", "250")))
 MAX_PAGES = int(os.getenv("TED_MAX_PAGES", "48"))
 LOOKBACK_DAYS = int(os.getenv("TED_LOOKBACK_DAYS", "10"))
+REQUEST_RETRIES = max(1, int(os.getenv("TED_REQUEST_RETRIES", "7")))
+BACKOFF_BASE_SECONDS = max(0.5, float(os.getenv("TED_BACKOFF_BASE_SECONDS", "3")))
+PAGE_DELAY_SECONDS = max(0.0, float(os.getenv("TED_PAGE_DELAY_SECONDS", "0.25")))
 NOW = datetime.now(timezone.utc)
 START = NOW - timedelta(days=LOOKBACK_DAYS)
 START_DAY = START.date()
@@ -124,12 +128,23 @@ def first_field(item: dict, *names):
     return None
 
 
+def retry_after_seconds(resp, attempt: int) -> float:
+    raw = (resp.headers.get("Retry-After") if resp is not None else None) or ""
+    try:
+        explicit = float(raw)
+    except Exception:
+        explicit = 0.0
+    exponential = min(60.0, BACKOFF_BASE_SECONDS * (2 ** attempt))
+    return max(explicit, exponential)
+
+
 session = requests.Session()
-session.headers.update({"Content-Type": "application/json", "User-Agent": "Tender-Engine/2.2 public procurement research"})
+session.headers.update({"Content-Type": "application/json", "User-Agent": "Tender-Engine/3.0 public procurement research"})
 rows = []
 seen = set()
 token = None
 errors = []
+retry_events = []
 page_count = 0
 total_reported = None
 source_items_seen = 0
@@ -146,12 +161,53 @@ for page_no in range(1, MAX_PAGES + 1):
     }
     if token:
         body["iterationNextToken"] = token
-    try:
-        resp = session.post(API, data=json.dumps(body), timeout=60)
-        resp.raise_for_status()
-        data = resp.json()
-    except Exception as exc:
-        errors.append({"page": page_no, "error": repr(exc), "response": getattr(resp, "text", "")[:2000] if "resp" in locals() else None})
+
+    data = None
+    final_exc = None
+    final_response = None
+    for attempt in range(REQUEST_RETRIES):
+        resp = None
+        try:
+            resp = session.post(API, data=json.dumps(body), timeout=60)
+            final_response = resp
+            if resp.status_code == 429 or 500 <= resp.status_code < 600:
+                if attempt + 1 < REQUEST_RETRIES:
+                    wait = retry_after_seconds(resp, attempt)
+                    retry_events.append({
+                        "page": page_no,
+                        "attempt": attempt + 1,
+                        "status": resp.status_code,
+                        "wait_seconds": wait,
+                    })
+                    time.sleep(wait)
+                    continue
+            resp.raise_for_status()
+            data = resp.json()
+            break
+        except Exception as exc:
+            final_exc = exc
+            status = getattr(resp, "status_code", None)
+            retryable = status in (408, 425, 429) or (isinstance(status, int) and status >= 500) or status is None
+            if retryable and attempt + 1 < REQUEST_RETRIES:
+                wait = retry_after_seconds(resp, attempt)
+                retry_events.append({
+                    "page": page_no,
+                    "attempt": attempt + 1,
+                    "status": status,
+                    "wait_seconds": wait,
+                    "error": repr(exc),
+                })
+                time.sleep(wait)
+                continue
+            break
+
+    if data is None:
+        errors.append({
+            "page": page_no,
+            "error": repr(final_exc) if final_exc else "request_failed",
+            "status": getattr(final_response, "status_code", None),
+            "response": getattr(final_response, "text", "")[:2000] if final_response is not None else None,
+        })
         break
 
     page_count += 1
@@ -176,8 +232,6 @@ for page_no in range(1, MAX_PAGES + 1):
 
         publication_date_raw = scalar(first_field(item, "publication-date"))
         pday = publication_day(publication_date_raw)
-        # Query is date-based, not timestamp-based. Compare calendar days only so
-        # TED values such as 2026-08-04+02:00 are not incorrectly discarded.
         if pday and pday < START_DAY:
             continue
 
@@ -229,6 +283,8 @@ for page_no in range(1, MAX_PAGES + 1):
     token = data.get("iterationNextToken") or data.get("nextToken") or data.get("nextPageToken")
     if not token or not items:
         break
+    if PAGE_DELAY_SECONDS:
+        time.sleep(PAGE_DELAY_SECONDS)
 else:
     if token:
         truncated_by_page_cap = True
@@ -257,6 +313,10 @@ stats = {
     "current_materialized": len(current_rows),
     "future_deadline_records": sum(1 for r in rows if r.get("has_future_deadline")),
     "truncated_by_page_cap": truncated_by_page_cap,
+    "request_retries": REQUEST_RETRIES,
+    "page_delay_seconds": PAGE_DELAY_SECONDS,
+    "retry_events": retry_events,
+    "rate_limit_events": sum(1 for x in retry_events if x.get("status") == 429),
     "errors": errors,
     "generated_at": NOW.isoformat(),
 }
