@@ -1,10 +1,6 @@
-name: TED Shape Probe
+name: TED Shape Probe (Manual Test)
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'state/ted_shape_probe_trigger.txt'
   workflow_dispatch:
 
 permissions:
