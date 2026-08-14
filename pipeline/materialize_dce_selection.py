@@ -20,25 +20,32 @@ def load_jsonl(path: Path) -> list[dict]:
 
 
 def load_selection(path: Path) -> list[dict]:
+    text = path.read_text(encoding='utf-8', errors='replace').strip()
+    # Compact manifests are intentionally supported even with a .jsonl suffix so
+    # a large live selection can stay a tiny control-plane file.
+    if text.startswith('{'):
+        try:
+            obj = json.loads(text)
+        except json.JSONDecodeError:
+            obj = None
+        if isinstance(obj, dict) and isinstance(obj.get('candidate_ids'), list):
+            default_score = min(89, int(obj.get('default_preliminary_score', 84)))
+            default_status = str(obj.get('status') or 'DCE_PENDING')
+            default_run = obj.get('wide_read_run_id')
+            default_reason = obj.get('selection_reason')
+            out = []
+            for cid in obj['candidate_ids']:
+                rec = {'candidate_id': str(cid), 'preliminary_score': default_score, 'status': default_status}
+                if default_run is not None:
+                    rec['wide_read_run_id'] = default_run
+                if default_reason:
+                    rec['selection_reason'] = default_reason
+                out.append(rec)
+            return out
     if path.suffix.lower() == '.json':
-        obj = json.loads(path.read_text(encoding='utf-8', errors='replace'))
+        obj = json.loads(text)
         if isinstance(obj, list):
             return [x if isinstance(x, dict) else {'candidate_id': str(x)} for x in obj]
-        if not isinstance(obj, dict) or not isinstance(obj.get('candidate_ids'), list):
-            raise ValueError(f'{path}: expected object with candidate_ids list')
-        default_score = min(89, int(obj.get('default_preliminary_score', 84)))
-        default_status = str(obj.get('status') or 'DCE_PENDING')
-        default_run = obj.get('wide_read_run_id')
-        default_reason = obj.get('selection_reason')
-        out = []
-        for cid in obj['candidate_ids']:
-            rec = {'candidate_id': str(cid), 'preliminary_score': default_score, 'status': default_status}
-            if default_run is not None:
-                rec['wide_read_run_id'] = default_run
-            if default_reason:
-                rec['selection_reason'] = default_reason
-            out.append(rec)
-        return out
     return load_jsonl(path)
 
 
