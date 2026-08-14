@@ -3,11 +3,13 @@ import json,re,hashlib
 from playwright.sync_api import sync_playwright
 
 TARGETS=[
-    ('PUBLICART_EDITORIAL','8772739'),
-    ('HRB_DESIGN_PRINT_WEB','8766381'),
-    ('NENAGH_INTERPRETATION_AV','8806179'),
-    ('AI_UPSKILLING_ENGINEERS','8753790'),
-    ('DRCC_MEDIA_BUYING','8795608'),
+    ('AN_TOBAR_EDU_WEBSITE','8763200'),
+    ('BORD_BIA_TECH_VIDEO','8825829'),
+    ('DRCC_CREATIVE_DESIGN','8704981'),
+    ('ANIMATION_SOFTWARE','8670172'),
+    ('AHRRA_WEBSITE','8749146'),
+    ('HUMAN_CENTERED_DESIGN','8727892'),
+    ('DFA_STATIONERY_PRINT','8838028'),
 ]
 BASE=Path('fresh_store/IRELAND_ETENDERS'); BASE.mkdir(parents=True,exist_ok=True)
 results=[]
@@ -33,7 +35,6 @@ with sync_playwright() as p:
             txt=page.locator('body').inner_text(timeout=15000)
             r['page_text']=txt[:12000]
             (out/'page.txt').write_text(txt,encoding='utf-8')
-            # Preferred anonymous UI route.
             try:
                 with page.expect_popup(timeout=8000) as pi:
                     page.get_by_role('button',name=re.compile('Download Zip file',re.I)).click()
@@ -51,7 +52,6 @@ with sync_playwright() as p:
                 except Exception: pass
             except Exception as e:
                 r['error']='popup:'+repr(e)
-            # Deterministic public fallback exposed by the portal JS.
             if not r['files']:
                 endpoint=f'https://www.etenders.gov.ie/epps/cft/downloadCftResourceItems.do?resourceId={resource}&resourceType=ContractDocument&isContract=null'
                 try:
