@@ -17,6 +17,10 @@ on:
       - 'pipeline/aggregate_dce.py'
       - '.github/workflows/dce-fanout-v2.yml'
 
+concurrency:
+  group: dce-fanout-v2
+  cancel-in-progress: true
+
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -59,11 +63,19 @@ jobs:
           python-version: '3.12'
       - name: Install extraction/runtime dependencies once per shard
         run: pip install requests pypdf python-docx openpyxl python-pptx
-      - name: Install browser runtime once per shard when needed
+      - name: Prepare browser runtime once per shard when needed
         if: ${{ matrix.needs_browser }}
+        shell: bash
         run: |
           pip install 'playwright>=1.46,<2'
-          python -m playwright install --with-deps chromium
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "Using preinstalled browser: $chrome"
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            echo "No compatible system browser found; installing Playwright Chromium"
+            python -m playwright install --with-deps chromium
+          fi
       - name: Ensure 7z exists once per shard
         run: command -v 7z >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq p7zip-full)
       - name: Resolve and retrieve shard DCEs with bounded local concurrency
