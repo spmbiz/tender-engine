@@ -18,6 +18,7 @@ PAGE_START = int(os.getenv("PAGE_START", "1"))
 PAGE_END = int(os.getenv("PAGE_END", "50"))
 PAGE_SIZE = int(os.getenv("PAGE_SIZE", "100"))
 CONCURRENCY = int(os.getenv("IE_PAGE_CONCURRENCY", "6"))
+CHROME_BIN = os.getenv("CHROME_BIN", "").strip()
 NOW = datetime.now(ZoneInfo("Europe/Dublin"))
 
 DATE_RE = re.compile(
@@ -107,7 +108,10 @@ async def fetch_page(browser, sem: asyncio.Semaphore, pg: int):
 async def main_async():
     sem = asyncio.Semaphore(CONCURRENCY)
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        launch_kwargs = {"headless": True}
+        if CHROME_BIN and Path(CHROME_BIN).exists():
+            launch_kwargs["executable_path"] = CHROME_BIN
+        browser = await p.chromium.launch(**launch_kwargs)
         tasks = [fetch_page(browser, sem, pg) for pg in range(PAGE_START, PAGE_END + 1)]
         results = await asyncio.gather(*tasks)
         await browser.close()
@@ -136,6 +140,7 @@ async def main_async():
         "page_start": PAGE_START,
         "page_end": PAGE_END,
         "page_concurrency": CONCURRENCY,
+        "chrome_bin": CHROME_BIN or None,
         "raw_materialized": len(records),
         "current_materialized": len(current),
         "page_errors": len(errors),
