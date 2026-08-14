@@ -2,8 +2,19 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from collections import Counter
 from pathlib import Path
+
+
+PORTAL_GENERIC_FILE_PATTERNS = [
+    re.compile(r"^depot[-_ ]?pli\.pdf$", re.I),
+    re.compile(r"^CGU.*marches.*\.pdf$", re.I),
+    re.compile(r"^rib-tender-nutzungsbedingungen.*\.pdf$", re.I),
+    re.compile(r"^agb\.pdf$", re.I),
+    re.compile(r"^Datenschutzbestimmungen_Vergabe-Abteilung\.pdf$", re.I),
+    re.compile(r"^BOE-A-2017-12902-E\.pdf$", re.I),
+]
 
 
 def load(path: Path):
@@ -11,6 +22,22 @@ def load(path: Path):
         return json.loads(path.read_text(encoding="utf-8", errors="replace"))
     except Exception:
         return None
+
+
+def is_portal_generic_file(file_rec: dict) -> bool:
+    name = str((file_rec or {}).get("name") or "").strip()
+    return bool(name) and any(rx.search(name) for rx in PORTAL_GENERIC_FILE_PATTERNS)
+
+
+def classify_content_quality(raw_status: str, files: list[dict]) -> tuple[str, str]:
+    if raw_status != "DOWNLOADED_PUBLIC":
+        return raw_status, "NOT_APPLICABLE"
+    if not files:
+        return "DOWNLOADED_PUBLIC_EMPTY", "NO_FILES_RECORDED"
+    substantive = [f for f in files if not is_portal_generic_file(f)]
+    if not substantive:
+        return "PORTAL_GENERIC_ONLY", "ONLY_KNOWN_PORTAL_BOILERPLATE_FILES"
+    return "DOWNLOADED_PUBLIC", "SUBSTANTIVE_FILE_PRESENT"
 
 
 def quality_key(row: dict) -> tuple:
@@ -43,27 +70,32 @@ def main():
         gates = load(candidate_root / "gate_snippets.json") or {}
         doc_index = load(candidate_root / "document_index.json") or []
         corpus_path = candidate_root / "corpus.txt"
-        status = manifest.get("status") or "UNKNOWN"
+        raw_status = str(manifest.get("status") or "UNKNOWN")
+        files = manifest.get("files") or []
+        status, content_quality = classify_content_quality(raw_status, files)
         cid = str(manifest.get("candidate_id"))
         row = {
             "candidate_id": cid,
             "title": candidate.get("title"),
             "buyer": candidate.get("buyer"),
             "portal": manifest.get("portal"),
+            "raw_status": raw_status,
             "status": status,
+            "content_quality": content_quality,
             "deadline": candidate.get("deadline"),
             "estimated_value": candidate.get("estimated_value"),
             "currency": candidate.get("currency"),
             "notice_url": candidate.get("notice_url"),
             "preliminary_score": candidate.get("preliminary_score") or candidate.get("pre_score"),
-            "files": manifest.get("files") or [],
+            "files": files,
             "documents_extracted": len(doc_index) if isinstance(doc_index, list) else 0,
             "corpus_chars": corpus_path.stat().st_size if corpus_path.exists() else 0,
             "gate_evidence_counts": gates.get("evidence_counts") or {},
             "gate_snippets": gates.get("categories") or {},
             "artifact_relative_root": str(candidate_root.relative_to(root)),
             "gpt_instruction": (
-                "Read the full corpus for this candidate when status is DOWNLOADED_PUBLIC. "
+                "Read the full corpus only when status is DOWNLOADED_PUBLIC and content_quality is SUBSTANTIVE_FILE_PRESENT. "
+                "PORTAL_GENERIC_ONLY means the retrieved files are portal boilerplate, not authoritative DCE evidence. "
                 "Resolve mandatory gates as PASS/PASS_CONDITIONAL/FAIL_HARD/UNKNOWN/NOT_APPLICABLE. "
                 "No >=90 score without authoritative DCE evidence."
             ),
@@ -74,6 +106,7 @@ def main():
 
     rows = sorted(by_candidate.values(), key=lambda r: (str(r.get("candidate_id") or "")))
     counts = Counter(str(r.get("status") or "UNKNOWN") for r in rows)
+    raw_counts = Counter(str(r.get("raw_status") or "UNKNOWN") for r in rows)
 
     with (out / "deep_review_queue.jsonl").open("w", encoding="utf-8") as f:
         for row in rows:
@@ -101,9 +134,12 @@ def main():
         "candidates": len(rows),
         "raw_manifest_rows": raw_manifest_rows,
         "duplicate_manifest_rows_removed": max(0, raw_manifest_rows - len(rows)),
+        "raw_status_counts": dict(raw_counts),
         "status_counts": dict(counts),
-        "downloaded_public": counts.get("DOWNLOADED_PUBLIC", 0),
-        "fully_extracted": sum(1 for r in rows if r.get("corpus_chars", 0) > 0),
+        "raw_downloaded_public": raw_counts.get("DOWNLOADED_PUBLIC", 0),
+        "substantive_downloaded_public": counts.get("DOWNLOADED_PUBLIC", 0),
+        "portal_generic_only": counts.get("PORTAL_GENERIC_ONLY", 0),
+        "fully_extracted": sum(1 for r in rows if r.get("status") == "DOWNLOADED_PUBLIC" and r.get("corpus_chars", 0) > 0),
         "worker_retries": retries,
         "worker_failures": worker_failures,
         "rate_limit_signals": rate_limited,
