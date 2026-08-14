@@ -1,0 +1,37 @@
+name: Transport DCE Corpora 31842396655
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'state/transport_dce_corpora_31842396655_trigger.txt'
+
+permissions:
+  contents: read
+
+jobs:
+  transport:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Download canonical handoff packs from durable Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: dce-harvest-31842396655
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p canonical-handoffs
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'handoff-shard-*.tar.gz' \
+            --dir canonical-handoffs
+          count="$(find canonical-handoffs -type f -name 'handoff-shard-*.tar.gz' | wc -l)"
+          echo "handoff_count=$count"
+          test "$count" -eq 20
+      - uses: actions/upload-artifact@v4
+        with:
+          name: transport-dce-corpora-31842396655
+          path: canonical-handoffs/
+          retention-days: 1
+          compression-level: 0
