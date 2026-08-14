@@ -51,7 +51,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--queue", default="queues/dce_candidates.jsonl")
     ap.add_argument("--max-shards", type=int, default=int(os.getenv("DCE_MAX_SHARDS", str(MATRIX_JOB_LIMIT))))
-    ap.add_argument("--jobs-per-shard", type=int, default=int(os.getenv("DCE_TARGET_JOBS_PER_SHARD", "1")))
+    ap.add_argument("--jobs-per-shard", type=int, default=int(os.getenv("DCE_TARGET_JOBS_PER_SHARD", "2")))
     ap.add_argument("--max-jobs", type=int, default=int(os.getenv("MAX_DCE_JOBS", "320")))
     ap.add_argument("--max-parallel", type=int, default=int(os.getenv("DCE_MAX_PARALLEL", str(RUNNER_PARALLEL_LIMIT))))
     ap.add_argument("--browser-local-concurrency", type=int, default=int(os.getenv("DCE_BROWSER_LOCAL_CONCURRENCY", "1")))
@@ -59,8 +59,6 @@ def main():
     ap.add_argument("--out", default="dce_shards.json")
     args = ap.parse_args()
 
-    # Matrix depth and simultaneous runner count are deliberately separate.
-    # A deep queued matrix keeps the runner pool full as short shards finish.
     max_shards = max(1, min(MATRIX_JOB_LIMIT, args.max_shards))
     max_parallel = max(1, min(RUNNER_PARALLEL_LIMIT, args.max_parallel))
     jobs_per_shard = max(1, args.jobs_per_shard)
@@ -86,21 +84,23 @@ def main():
             skipped.append({"line": line_no, "candidate_id": candidate_id, "reason": "duplicate_candidate_id"})
             continue
         seen_candidates.add(dedupe_key)
-        jobs.append(
-            {
-                "line": line_no,
-                "candidate_id": candidate_id,
-                "portal": portal,
-                "needs_browser": portal in BROWSER_PORTALS,
-            }
-        )
+        jobs.append({"line": line_no, "candidate_id": candidate_id, "portal": portal, "needs_browser": portal in BROWSER_PORTALS})
         portal_counts[portal] += 1
         if len(jobs) >= max_jobs:
             break
 
     browser_jobs = [j for j in jobs if j["needs_browser"]]
     http_jobs = [j for j in jobs if not j["needs_browser"]]
-    desired = min(max_shards, max(1, math.ceil(len(jobs) / jobs_per_shard))) if jobs else 0
+
+    if jobs:
+        # Benchmarks on the real 33-candidate browser queue showed 20 active runners
+        # with ~2 candidates/shard beats both 2-way fanout and 1-candidate micro-shards.
+        # For larger queues we keep a deeper matrix so completed runners can backfill,
+        # while max_parallel remains capped independently at 20.
+        baseline = math.ceil(len(jobs) / jobs_per_shard)
+        desired = min(max_shards, len(jobs), max(min(max_parallel, len(jobs)), baseline))
+    else:
+        desired = 0
     browser_shards, http_shards = _allocate_shards(len(browser_jobs), len(http_jobs), desired)
 
     include: list[dict] = []
@@ -110,17 +110,15 @@ def main():
         ("http", _split_buckets(http_jobs, http_shards), max(1, args.http_local_concurrency)),
     ):
         for bucket in buckets:
-            include.append(
-                {
-                    "shard": shard_idx,
-                    "kind": kind,
-                    "lines": ",".join(str(x["line"]) for x in bucket),
-                    "count": len(bucket),
-                    "needs_browser": kind == "browser",
-                    "local_concurrency": min(local_concurrency, len(bucket)),
-                    "portals": ",".join(sorted({x["portal"] for x in bucket})),
-                }
-            )
+            include.append({
+                "shard": shard_idx,
+                "kind": kind,
+                "lines": ",".join(str(x["line"]) for x in bucket),
+                "count": len(bucket),
+                "needs_browser": kind == "browser",
+                "local_concurrency": min(local_concurrency, len(bucket)),
+                "portals": ",".join(sorted({x["portal"] for x in bucket})),
+            })
             shard_idx += 1
 
     payload = {"include": include}
