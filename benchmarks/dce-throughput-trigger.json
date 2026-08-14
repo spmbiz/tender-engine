@@ -1,9 +1,10 @@
 {
-  "benchmark": "dce-throughput-v2-release-backed-20way",
+  "benchmark": "dce-throughput-v3-deep-matrix-20parallel",
   "requested_parallelism": 20,
-  "max_shards": 20,
+  "max_shards": 256,
   "jobs_per_shard_target": 1,
   "queue": "queues/dce_candidates.jsonl",
   "preservation_contract": "release-assets-canonical-actions-artifacts-zero",
-  "triggered_at": "2026-08-14T23:04:00+02:00"
+  "goal": "33 one-candidate shards with max 20 simultaneous runners and natural queue backfill",
+  "triggered_at": "2026-08-14T23:12:00+02:00"
 }
