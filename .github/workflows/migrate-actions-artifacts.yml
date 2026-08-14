@@ -68,7 +68,7 @@ jobs:
             if ! curl -L --fail --retry 3 --retry-delay 1 \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${GH_TOKEN}" \
-              -H "X-GitHub-Api-Version: 2026-03-10" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
               "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}/zip" \
               -o "$file"; then
               echo "DOWNLOAD_FAILED $id"
@@ -77,13 +77,13 @@ jobs:
             fi
             local_size=$(stat -c '%s' "$file")
             sha=$(sha256sum "$file" | awk '{print $1}')
-            if ! gh release upload "$RELEASE_TAG" "$file" --clobber; then
+            if ! gh release upload "$RELEASE_TAG" "$file" --repo "$GITHUB_REPOSITORY" --clobber; then
               echo "RELEASE_UPLOAD_FAILED $id"
               rm -f "$file"
               failed=$((failed + 1))
               continue
             fi
-            remote_size=$(gh release view "$RELEASE_TAG" --json assets \
+            remote_size=$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets \
               --jq ".assets[] | select(.name == \"${asset}\") | .size" | head -n1)
             if [ -z "$remote_size" ] || [ "$remote_size" != "$local_size" ]; then
               echo "VERIFY_FAILED id=$id local=$local_size remote=${remote_size:-missing}"
@@ -106,7 +106,10 @@ jobs:
             rm -f "$file"
           done < /tmp/all-artifacts.tsv
           cp "$index" "migration-index-shard-${SHARD}.jsonl"
-          gh release upload "$RELEASE_TAG" "migration-index-shard-${SHARD}.jsonl" --clobber
+          if ! gh release upload "$RELEASE_TAG" "migration-index-shard-${SHARD}.jsonl" --repo "$GITHUB_REPOSITORY" --clobber; then
+            echo "INDEX_UPLOAD_FAILED shard=$SHARD; migrated artifacts already have verified durable copies"
+            failed=$((failed + 1))
+          fi
           echo "MIGRATION_RESULT shard=$SHARD total=$total migrated=$migrated failed=$failed deleted_bytes=$deleted_bytes"
           if [ "$failed" -gt 0 ]; then exit 1; fi
 
@@ -127,7 +130,7 @@ jobs:
             --jq '.artifacts[] | [.id,.name,.size_in_bytes] | @tsv' > /tmp/remaining.tsv
           count=$(wc -l < /tmp/remaining.tsv | tr -d ' ')
           bytes=$(awk -F '\t' '{s+=$3} END{printf "%.0f",s}' /tmp/remaining.tsv)
-          release_assets=$(gh release view "$RELEASE_TAG" --json assets --jq '.assets | length')
+          release_assets=$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets | length')
           echo "remaining_actions_artifacts=$count"
           echo "remaining_actions_bytes=$bytes"
           echo "durable_release_assets=$release_assets"
