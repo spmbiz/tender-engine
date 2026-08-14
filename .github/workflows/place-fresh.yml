@@ -21,10 +21,15 @@ jobs:
       - run: python -m playwright install --with-deps chromium
       - name: Download current PLACE DCEs
         run: python place_probe.py
-      - name: Unpack nested 7z DCEs
+      - name: Unpack nested PLACE archives
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq p7zip-full
+          sudo apt-get install -y -qq p7zip-full unzip
+          find fresh_store/FRANCE_PLACE -type f -name '*.zip' -print0 | while IFS= read -r -d '' f; do
+            out="${f%.zip}_unpacked"
+            mkdir -p "$out"
+            unzip -oq "$f" -d "$out" || true
+          done
           find fresh_store/FRANCE_PLACE -type f -name '*.7z' -print0 | while IFS= read -r -d '' f; do
             out="${f%.7z}_unpacked"
             mkdir -p "$out"
