@@ -1,0 +1,140 @@
+name: Migrate Actions Artifacts to Durable Releases
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'benchmarks/artifact-migration-trigger.json'
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  init-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      release_tag: ${{ steps.release.outputs.tag }}
+    steps:
+      - id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="actions-artifact-migration-${GITHUB_RUN_ID}"
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "Actions Artifact Migration ${GITHUB_RUN_ID}" \
+            --notes "Preservation migration. Every Actions artifact is copied to a durable GitHub Release asset and verified before the original artifact is deleted."
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  migrate:
+    needs: init-release
+    name: migration-shard-${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - name: Migrate assigned artifacts with verify-before-delete
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+          SHARD: ${{ matrix.shard }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p /tmp/migration
+          index="/tmp/migration-index-${SHARD}.jsonl"
+          : > "$index"
+          gh api --paginate "/repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
+            --jq '.artifacts[] | [.id,.name,.size_in_bytes,.workflow_run.id,.created_at,.expires_at] | @tsv' > /tmp/all-artifacts.tsv
+          total=0
+          migrated=0
+          failed=0
+          deleted_bytes=0
+          while IFS=$'\t' read -r id name bytes run_id created expires; do
+            [ $((id % 4)) -eq "$SHARD" ] || continue
+            total=$((total + 1))
+            safe="$(printf '%s' "$name" | tr -cs 'A-Za-z0-9._-' '-')"
+            file="/tmp/migration/artifact-${id}-${safe}.zip"
+            asset="$(basename "$file")"
+            echo "MIGRATE id=$id name=$name bytes=$bytes"
+            if ! curl -L --fail --retry 3 --retry-delay 1 \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "X-GitHub-Api-Version: 2026-03-10" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}/zip" \
+              -o "$file"; then
+              echo "DOWNLOAD_FAILED $id"
+              failed=$((failed + 1))
+              continue
+            fi
+            local_size=$(stat -c '%s' "$file")
+            sha=$(sha256sum "$file" | awk '{print $1}')
+            if ! gh release upload "$RELEASE_TAG" "$file" --clobber; then
+              echo "RELEASE_UPLOAD_FAILED $id"
+              rm -f "$file"
+              failed=$((failed + 1))
+              continue
+            fi
+            remote_size=$(gh release view "$RELEASE_TAG" --json assets \
+              --jq ".assets[] | select(.name == \"${asset}\") | .size" | head -n1)
+            if [ -z "$remote_size" ] || [ "$remote_size" != "$local_size" ]; then
+              echo "VERIFY_FAILED id=$id local=$local_size remote=${remote_size:-missing}"
+              rm -f "$file"
+              failed=$((failed + 1))
+              continue
+            fi
+            if ! gh api -X DELETE "/repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}" >/dev/null; then
+              echo "DELETE_FAILED_BUT_DURABLE_COPY_EXISTS $id"
+              rm -f "$file"
+              failed=$((failed + 1))
+              continue
+            fi
+            printf '{"artifact_id":%s,"original_name":%s,"original_size":%s,"workflow_run_id":%s,"created_at":%s,"expires_at":%s,"release_asset":%s,"release_asset_size":%s,"sha256":%s,"actions_deleted":true}\n' \
+              "$id" "$(jq -Rn --arg v "$name" '$v')" "$bytes" "$run_id" \
+              "$(jq -Rn --arg v "$created" '$v')" "$(jq -Rn --arg v "$expires" '$v')" \
+              "$(jq -Rn --arg v "$asset" '$v')" "$remote_size" "$(jq -Rn --arg v "$sha" '$v')" >> "$index"
+            migrated=$((migrated + 1))
+            deleted_bytes=$((deleted_bytes + bytes))
+            rm -f "$file"
+          done < /tmp/all-artifacts.tsv
+          cp "$index" "migration-index-shard-${SHARD}.jsonl"
+          gh release upload "$RELEASE_TAG" "migration-index-shard-${SHARD}.jsonl" --clobber
+          echo "MIGRATION_RESULT shard=$SHARD total=$total migrated=$migrated failed=$failed deleted_bytes=$deleted_bytes"
+          if [ "$failed" -gt 0 ]; then exit 1; fi
+
+  verify:
+    needs: [init-release, migrate]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Report remaining Actions storage and durable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --paginate "/repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
+            --jq '.artifacts[] | [.id,.name,.size_in_bytes] | @tsv' > /tmp/remaining.tsv
+          count=$(wc -l < /tmp/remaining.tsv | tr -d ' ')
+          bytes=$(awk -F '\t' '{s+=$3} END{printf "%.0f",s}' /tmp/remaining.tsv)
+          release_assets=$(gh release view "$RELEASE_TAG" --json assets --jq '.assets | length')
+          echo "remaining_actions_artifacts=$count"
+          echo "remaining_actions_bytes=$bytes"
+          echo "durable_release_assets=$release_assets"
+          {
+            echo "## Preservation migration result"
+            echo "- durable release: $RELEASE_TAG"
+            echo "- remaining Actions artifacts: $count"
+            echo "- remaining Actions bytes: $bytes"
+            echo "- durable release assets: $release_assets"
+          } >> "$GITHUB_STEP_SUMMARY"
