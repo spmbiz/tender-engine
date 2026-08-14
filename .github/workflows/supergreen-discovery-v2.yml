@@ -4,11 +4,31 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  actions: write
+  contents: write
 
 jobs:
+  init-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      release_tag: ${{ steps.release.outputs.tag }}
+    steps:
+      - id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="discovery-harvest-${GITHUB_RUN_ID}"
+          gh release create "$tag" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Discovery Harvest ${GITHUB_RUN_ID}" \
+            --notes "Canonical durable discovery harvest. Source datasets and consolidated wide-read outputs are persisted as Release assets; Actions artifacts are not the canonical store."
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
   ted-discovery:
+    needs: init-release
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -22,15 +42,19 @@ jobs:
           TED_SCOPE: ACTIVE
           TED_MAX_PAGES: '24'
         run: python pipeline/discover_ted.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: discovery-${{ github.run_id }}-ted
-          path: discovery/ted/
-          if-no-files-found: error
-          retention-days: 1
-          compression-level: 9
+      - name: Persist TED discovery durably
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -C discovery/ted -czf discovery-ted.tar.gz .
+          gh release upload "$RELEASE_TAG" discovery-ted.tar.gz --clobber
+          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | grep -Fxq discovery-ted.tar.gz
 
   contracts-finder-discovery:
+    needs: init-release
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -41,15 +65,19 @@ jobs:
       - run: python -m pip install --disable-pip-version-check -q requests
       - name: Enumerate Contracts Finder
         run: python pipeline/discover_contracts_finder.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: discovery-${{ github.run_id }}-contracts-finder
-          path: discovery/contracts_finder/
-          if-no-files-found: error
-          retention-days: 1
-          compression-level: 9
+      - name: Persist Contracts Finder discovery durably
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -C discovery/contracts_finder -czf discovery-contracts-finder.tar.gz .
+          gh release upload "$RELEASE_TAG" discovery-contracts-finder.tar.gz --clobber
+          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | grep -Fxq discovery-contracts-finder.tar.gz
 
   etenders-ireland:
+    needs: init-release
     name: ie-pages-${{ matrix.start }}-${{ matrix.end }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -91,52 +119,61 @@ jobs:
           PAGE_END: ${{ matrix.end }}
           IE_PAGE_CONCURRENCY: '1'
         run: python pipeline/discover_etenders_ie_async.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: discovery-${{ github.run_id }}-ie-${{ matrix.shard }}
-          path: discovery/ireland/shard-${{ matrix.shard }}/
-          if-no-files-found: error
-          retention-days: 1
-          compression-level: 9
+      - name: Persist Ireland shard durably
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="discovery-ie-${{ matrix.shard }}.tar.gz"
+          tar -C "discovery/ireland/shard-${{ matrix.shard }}" -czf "$archive" .
+          gh release upload "$RELEASE_TAG" "$archive" --clobber
+          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | grep -Fxq "$archive"
 
   wide-read-pack:
-    needs: [ted-discovery, contracts-finder-discovery, etenders-ireland]
-    if: always()
+    needs: [init-release, ted-discovery, contracts-finder-discovery, etenders-ireland]
+    if: always() && needs.init-release.result == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: discovery-${{ github.run_id }}-*
-          path: discovery-download
-          merge-multiple: true
+      - name: Download durable discovery source packs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-download discovery-download
+          gh release download "$RELEASE_TAG" --pattern 'discovery-*.tar.gz' --dir release-download
+          count=0
+          for archive in release-download/discovery-*.tar.gz; do
+            [ -e "$archive" ] || continue
+            base="$(basename "$archive" .tar.gz)"
+            mkdir -p "discovery-download/$base"
+            tar -xzf "$archive" -C "discovery-download/$base"
+            count=$((count + 1))
+          done
+          echo "source_packs=$count"
+          [ "$count" -ge 2 ]
       - name: Canonical merge and dedupe
         run: python pipeline/merge_discovery.py --root discovery-download --out merged
       - name: Build mandatory GPT wide-read packets
         run: python pipeline/wide_read_packets.py --input merged/current_candidates.jsonl --out wide_read_packets --packet-size 250
-      - uses: actions/upload-artifact@v4
-        with:
-          name: supergreen-wide-read-${{ github.run_id }}
-          path: |
-            merged/
-            wide_read_packets/
-          if-no-files-found: error
-          retention-days: 1
-          compression-level: 9
-      - name: Delete discovery handoff artifacts after consolidation
-        if: success()
-        shell: bash
+      - name: Persist consolidated discovery durably
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+        shell: bash
         run: |
           set -euo pipefail
-          gh api --paginate "/repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
-            --jq '.artifacts[] | select(.workflow_run.id == (env.GITHUB_RUN_ID | tonumber)) | [.id,.name] | @tsv' > /tmp/current.tsv
-          while IFS=$'\t' read -r id name; do
-            case "$name" in
-              discovery-${GITHUB_RUN_ID}-*)
-                gh api -X DELETE "/repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}" >/dev/null
-                ;;
-            esac
-          done < /tmp/current.tsv
+          tar -czf "supergreen-wide-read-${GITHUB_RUN_ID}.tar.gz" merged wide_read_packets
+          cp merged/stats.json "discovery-summary-${GITHUB_RUN_ID}.json"
+          gh release upload "$RELEASE_TAG" \
+            "supergreen-wide-read-${GITHUB_RUN_ID}.tar.gz" \
+            "discovery-summary-${GITHUB_RUN_ID}.json" --clobber
+          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' > /tmp/assets.txt
+          grep -Fxq "supergreen-wide-read-${GITHUB_RUN_ID}.tar.gz" /tmp/assets.txt
+          grep -Fxq "discovery-summary-${GITHUB_RUN_ID}.json" /tmp/assets.txt
+          echo "Durable canonical release: $RELEASE_TAG" >> "$GITHUB_STEP_SUMMARY"
