@@ -1,0 +1,33 @@
+name: DCE Resolver Test
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  resolve-luxembourg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'playwright>=1.46,<2'
+      - run: python -m playwright install --with-deps chromium
+      - name: Resolve Luxembourg DCE
+        env:
+          DCE_CONTACT_FIRST_NAME: Automation
+          DCE_CONTACT_LAST_NAME: Procurement
+          DCE_CONTACT_EMAIL: procurement@example.com
+          DCE_COMPANY_NAME: Test
+        run: python lux_test.py
+      - name: Upload DCE output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luxembourg-dce-test-${{ github.run_id }}
+          path: dce_store/
+          if-no-files-found: ignore
+          retention-days: 7
