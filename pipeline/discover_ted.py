@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import os
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
@@ -12,11 +12,18 @@ OUT = Path(os.getenv("DISCOVERY_OUT", "discovery/ted"))
 OUT.mkdir(parents=True, exist_ok=True)
 API = "https://api.ted.europa.eu/v3/notices/search"
 SCOPE = os.getenv("TED_SCOPE", "ACTIVE")
-# Competition form covers contract notices/calls for competition rather than award/result/planning notices.
-QUERY = os.getenv("TED_QUERY", "form-type = competition")
 LIMIT = min(250, int(os.getenv("TED_LIMIT", "250")))
 MAX_PAGES = int(os.getenv("TED_MAX_PAGES", "24"))
+LOOKBACK_DAYS = int(os.getenv("TED_LOOKBACK_DAYS", "120"))
 NOW = datetime.now(timezone.utc)
+START = NOW - timedelta(days=LOOKBACK_DAYS)
+# TED Expert Search supports publication-date ranges and SORT BY. Keep GPT recall broad
+# inside a freshness window, rather than iterating years-old DPS/framework competitions.
+DEFAULT_QUERY = (
+    f"PD = ({START:%Y%m%d} <> {NOW:%Y%m%d}) "
+    "AND form-type = competition SORT BY PD DESC"
+)
+QUERY = os.getenv("TED_QUERY", DEFAULT_QUERY)
 
 FIELDS = [
     "publication-number",
@@ -104,7 +111,7 @@ def first_field(item: dict, *names):
 
 
 session = requests.Session()
-session.headers.update({"Content-Type": "application/json", "User-Agent": "Tender-Engine/2.0 public procurement research"})
+session.headers.update({"Content-Type": "application/json", "User-Agent": "Tender-Engine/2.1 public procurement research"})
 rows = []
 seen = set()
 token = None
@@ -118,7 +125,7 @@ for page_no in range(1, MAX_PAGES + 1):
         "fields": FIELDS,
         "limit": LIMIT,
         "scope": SCOPE,
-        "checkQuerySyntax": False,
+        "checkQuerySyntax": page_no == 1,
         "paginationMode": "ITERATION",
     }
     if token:
@@ -150,6 +157,12 @@ for page_no in range(1, MAX_PAGES + 1):
             continue
         seen.add(str(pub))
 
+        publication_date_raw = scalar(first_field(item, "publication-date"))
+        publication_date = parse_date(publication_date_raw)
+        # Belt-and-suspenders local freshness guard in case Search API scope/query semantics change.
+        if publication_date and publication_date < START:
+            continue
+
         deadline_values = []
         for name in ("deadline", "deadline-receipt-request", "deadline-receipt-tender-date-lot"):
             deadline_values.extend(flatten_values(first_field(item, name)))
@@ -157,8 +170,6 @@ for page_no in range(1, MAX_PAGES + 1):
         parsed_deadlines = [d for d in parsed_deadlines if d]
         future_deadlines = [d for d in parsed_deadlines if d >= NOW]
         deadline = min(future_deadlines).isoformat() if future_deadlines else (max(parsed_deadlines).isoformat() if parsed_deadlines else None)
-        # If TED exposes a deadline and every deadline is already past, this is not live for bidding.
-        # No-deadline competition notices remain visible because qualification systems / multi-stage calls may omit BT-131 here.
         current = bool(not parsed_deadlines or future_deadlines)
 
         value_raw = scalar(first_field(item, "estimated-value-proc"))
@@ -187,7 +198,7 @@ for page_no in range(1, MAX_PAGES + 1):
                 "estimated_value": value,
                 "currency": str(currency or "") or None,
                 "description": str(desc),
-                "publication_date": scalar(first_field(item, "publication-date")),
+                "publication_date": publication_date_raw,
                 "procedure_type": scalar(first_field(item, "procedure-type")),
                 "notice_type": scalar(first_field(item, "notice-type")),
                 "form_type": scalar(first_field(item, "form-type")),
@@ -214,6 +225,9 @@ stats = {
     "source": "TED",
     "scope": SCOPE,
     "query": QUERY,
+    "lookback_days": LOOKBACK_DAYS,
+    "window_start": START.isoformat(),
+    "window_end": NOW.isoformat(),
     "pages": page_count,
     "limit": LIMIT,
     "total_reported": total_reported,
