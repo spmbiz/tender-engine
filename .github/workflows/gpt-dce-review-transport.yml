@@ -1,0 +1,61 @@
+name: GPT DCE Review Transport
+
+on:
+  workflow_dispatch:
+    inputs:
+      dce_run:
+        description: Canonical DCE run ID to transport for GPT review
+        required: false
+        default: '31849320928'
+  push:
+    branches: [main]
+    paths:
+      - 'benchmarks/gpt-dce-review-transport-trigger.json'
+
+permissions:
+  contents: read
+
+jobs:
+  transport:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      DCE_RUN: ${{ github.event.inputs.dce_run || '31849320928' }}
+    steps:
+      - name: Download canonical compact handoffs from durable Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="dce-harvest-${DCE_RUN}"
+          mkdir -p payload/handoffs
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern 'handoff-shard-*.tar.gz' --dir payload/handoffs
+          count=$(find payload/handoffs -name 'handoff-shard-*.tar.gz' | wc -l | tr -d ' ')
+          echo "TRANSPORT_SOURCE release=$tag handoffs=$count"
+          test "$count" -gt 0
+      - name: Expand handoffs for direct GPT file review
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p payload/extracted
+          for a in payload/handoffs/handoff-shard-*.tar.gz; do
+            b="$(basename "$a" .tar.gz)"
+            mkdir -p "payload/extracted/$b"
+            tar -xzf "$a" -C "payload/extracted/$b"
+          done
+          manifests=$(find payload/extracted -name manifest.json | wc -l | tr -d ' ')
+          downloaded=$(grep -R '"status": "DOWNLOADED_PUBLIC"' payload/extracted --include=manifest.json | wc -l | tr -d ' ')
+          echo "TRANSPORT_EXPANDED manifests=$manifests downloaded_public=$downloaded"
+          test "$manifests" -eq 128
+      - name: Remove nested transport archives after verified expansion
+        shell: bash
+        run: rm -rf payload/handoffs
+      - name: Upload temporary GPT transport only
+        uses: actions/upload-artifact@v4
+        with:
+          name: gpt-dce-review-${{ github.run_id }}
+          path: payload/extracted/
+          retention-days: 1
+          compression-level: 9
+          if-no-files-found: error
