@@ -9,20 +9,18 @@ with sync_playwright() as p:
     b=p.chromium.launch(headless=True); page=b.new_page(accept_downloads=True)
     try:
         page.goto('https://www.publiccontractsscotland.gov.uk/Search/show/Search_View.aspx?ID=FEB549835',wait_until='domcontentloaded',timeout=45000)
-        page.wait_for_timeout(1000)
-        z=page.locator('#ctl00_ContentPlaceHolder1_notice_add_docs1_lnkZip')
-        if z.count():
-            try:
-                with page.expect_download(timeout=30000) as di: z.click(force=True)
-                save(di.value)
-            except Exception as e: R['error']='zip:'+repr(e)
+        page.wait_for_timeout(700)
+        try:
+            with page.expect_download(timeout=30000) as di:
+                page.evaluate("__doPostBack('ctl00$ContentPlaceHolder1$notice_add_docs1$lnkZip','')")
+            save(di.value)
+        except Exception as e: R['error']='zip_postback:'+repr(e)
         if not R['files']:
-            d=page.locator('#ctl00_ContentPlaceHolder1_notice_add_docs1_grdDocuments_ctl02_Linkbutton1')
-            if d.count():
-                try:
-                    with page.expect_download(timeout=20000) as di: d.click(force=True)
-                    save(di.value)
-                except Exception as e: R['error']=(R['error'] or '')+' doc:'+repr(e)
+            try:
+                with page.expect_download(timeout=20000) as di:
+                    page.evaluate("__doPostBack('ctl00$ContentPlaceHolder1$notice_add_docs1$grdDocuments$ctl02$Linkbutton1','')")
+                save(di.value)
+            except Exception as e: R['error']=(R['error'] or '')+' doc_postback:'+repr(e)
         R['status']='DOWNLOADED_PUBLIC' if R['files'] else 'PUBLIC_POSTBACK_NO_DOWNLOAD'
     except Exception as e: R['status']='ERROR'; R['error']=repr(e)
     b.close()
