@@ -9,6 +9,15 @@ import requests
 
 TED_SEARCH = "https://api.ted.europa.eu/v3/notices/search"
 FILE_RE = re.compile(r"\.(?:pdf|zip|docx?|xlsx?|xls|pptx?|csv|7z)(?:$|[?#])", re.I)
+DIRECT_ROUTE_FIELDS = [
+    "document-url-lot",
+    "document-url-part",
+    "document-restricted-url-lot",
+    "document-restricted-url-part",
+    "submission-url-lot",
+    "tool-atypical-url-lot",
+    "tool-url-part",
+]
 
 
 def local(tag: str) -> str:
@@ -55,8 +64,7 @@ def extract_bt15(xml_bytes: bytes):
                 rec["uris"].append(text)
         if rec["uris"]:
             refs.append(rec)
-    dedup = list(dict.fromkeys(all_uris))
-    return refs, dedup
+    return refs, list(dict.fromkeys(all_uris))
 
 
 def classify_downstream(url: str):
@@ -93,6 +101,20 @@ def classify_downstream(url: str):
     return None, {"detail_url": url}
 
 
+def append_downstream(result: dict, urls):
+    existing = {x.get("url") for x in result["downstream"]}
+    for url in urls:
+        if not url or url in existing:
+            continue
+        low = url.lower()
+        # Ignore TED notice-format links; they are transport formats, not procurement document portals.
+        if "ted.europa.eu" in low and re.search(r"/notice/|/en/notice", low):
+            continue
+        portal, subroute = classify_downstream(url)
+        result["downstream"].append({"url": url, "portal": portal, "route": subroute})
+        existing.add(url)
+
+
 def resolve_ted_candidate(candidate: dict, timeout: int = 60) -> dict:
     route = candidate.get("route") or {}
     publication_number = str(
@@ -103,6 +125,8 @@ def resolve_ted_candidate(candidate: dict, timeout: int = 60) -> dict:
     result = {
         "publication_number": publication_number,
         "search_api_status": None,
+        "search_api_document_urls": [],
+        "search_api_submission_urls": [],
         "xml_candidates": [],
         "xml_url_used": None,
         "bt15": [],
@@ -118,26 +142,46 @@ def resolve_ted_candidate(candidate: dict, timeout: int = 60) -> dict:
     session.headers.update({"User-Agent": "Tender-Engine/2.0 public procurement research"})
     body = {
         "query": f"publication-number = {publication_number}",
-        "fields": ["publication-number"],
+        "fields": ["publication-number", *DIRECT_ROUTE_FIELDS],
         "page": 1,
         "limit": 10,
         "scope": "ALL",
         "checkQuerySyntax": False,
         "paginationMode": "PAGE_NUMBER",
     }
+    data = None
     try:
         r = session.post(TED_SEARCH, json=body, timeout=timeout)
         result["search_api_status"] = r.status_code
         if r.ok:
             data = r.json()
+            notices = data.get("notices") or []
+            if notices:
+                notice = notices[0]
+                doc_urls = []
+                submission_urls = []
+                for field in DIRECT_ROUTE_FIELDS:
+                    vals = collect_urls(notice.get(field))
+                    if field.startswith("document-"):
+                        doc_urls.extend(vals)
+                    else:
+                        submission_urls.extend(vals)
+                result["search_api_document_urls"] = list(dict.fromkeys(doc_urls))
+                result["search_api_submission_urls"] = list(dict.fromkeys(submission_urls))
+                append_downstream(result, result["search_api_document_urls"])
+                # Submission/tool URLs are a fallback portal clue when BT-15 is missing.
+                if not result["downstream"]:
+                    append_downstream(result, result["search_api_submission_urls"])
             urls = collect_urls(data)
-            # Prefer explicit XML links returned by Search API.
             xmls = [u for u in urls if re.search(r"(?:/xml(?:$|[?#])|\.xml(?:$|[?#]))", u, re.I)]
             result["xml_candidates"].extend(xmls)
     except Exception as exc:
         result["error"] = f"search_api:{exc!r}"
 
-    # Official canonical fallback. Search API links are tried first because some runners saw zero-byte direct XML.
+    # If Search API directly exposed BT-15/downstream route, no XML fetch is needed.
+    if result["downstream"]:
+        return result
+
     result["xml_candidates"].append(f"https://ted.europa.eu/en/notice/{publication_number}/xml")
     result["xml_candidates"] = list(dict.fromkeys(result["xml_candidates"]))
 
@@ -154,7 +198,7 @@ def resolve_ted_candidate(candidate: dict, timeout: int = 60) -> dict:
             continue
 
     if not xml_bytes:
-        result["error"] = (result["error"] + "; " if result["error"] else "") + "no_parseable_xml"
+        result["error"] = (result["error"] + "; " if result["error"] else "") + "no_direct_bt15_and_no_parseable_xml"
         return result
 
     try:
@@ -165,19 +209,9 @@ def resolve_ted_candidate(candidate: dict, timeout: int = 60) -> dict:
         result["error"] = (result["error"] + "; " if result["error"] else "") + f"xml_parse:{exc!r}"
         return result
 
-    # BT-15 first, then other eForms URIs as fallback. Ignore TED's own notice-format URLs.
     ordered = []
     for ref in result["bt15"]:
         ordered.extend(ref.get("uris") or [])
     ordered.extend(result["all_uris"])
-    seen = set()
-    for url in ordered:
-        if not url or url in seen:
-            continue
-        seen.add(url)
-        low = url.lower()
-        if "ted.europa.eu" in low and re.search(r"/notice/|/en/notice", low):
-            continue
-        portal, subroute = classify_downstream(url)
-        result["downstream"].append({"url": url, "portal": portal, "route": subroute})
+    append_downstream(result, ordered)
     return result
