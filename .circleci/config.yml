@@ -1,45 +1,72 @@
 version: 2.1
-setup: true
-
-orbs:
-  continuation: circleci/continuation@1.1.0
 
 jobs:
-  fleet-gate:
+  durable-bridge:
+    docker:
+      - image: cimg/base:stable
+    resource_class: small
+    steps:
+      - checkout
+      - run:
+          name: Verify durable GitHub persistence bridge
+          command: |
+            set -euo pipefail
+            if [ -z "${FLEET_GITHUB_TOKEN:-}" ]; then
+              echo 'FLEET_GITHUB_TOKEN is not configured in CircleCI.' >&2
+              echo 'Refusing to fan out 30 harvest workers because CircleCI artifacts are not canonical storage.' >&2
+              echo 'Add a GitHub token with Contents write access to this public repository as FLEET_GITHUB_TOKEN in the CircleCI project environment.' >&2
+              exit 1
+            fi
+            echo 'Durable GitHub persistence bridge present.'
+
+  contracts-finder-shards:
+    parallelism: 30
     docker:
       - image: cimg/python:3.12
     resource_class: small
     steps:
       - checkout
       - run:
-          name: Decide whether this commit is an intentional CircleCI fleet tick
-          command: |
-            set -euo pipefail
-            enabled="$(python - <<'PY'
-            import json
-            d=json.load(open('control/desired_state.json'))
-            print('true' if d.get('enabled') and d.get('continuous') and d.get('circleci',{}).get('desired_enabled') else 'false')
-            PY
-            )"
-            changed=""
-            if git rev-parse HEAD^ >/dev/null 2>&1; then
-              changed="$(git diff --name-only HEAD^ HEAD)"
-            fi
-            if [ "$enabled" = "true" ] && grep -Fxq 'control/circleci_tick.txt' <<< "$changed"; then
-              if [ -z "${FLEET_GITHUB_TOKEN:-}" ]; then
-                cp .circleci/missing-bridge.yml generated-circleci.yml
-              else
-                cp .circleci/continue-harvest.yml generated-circleci.yml
-              fi
-            else
-              cp .circleci/continue-idle.yml generated-circleci.yml
-            fi
-            echo 'Continuation config:'
-            cat generated-circleci.yml
-      - continuation/continue:
-          configuration_path: generated-circleci.yml
+          name: Install minimal worker dependency
+          command: python -m pip install --disable-pip-version-check -q requests
+      - run:
+          name: Harvest non-overlapping Contracts Finder publication window
+          command: >-
+            python pipeline/circleci_contracts_worker.py
+            --index "$CIRCLE_NODE_INDEX"
+            --total "$CIRCLE_NODE_TOTAL"
+            --history-days 360
+            --out "circle-out/shard-$CIRCLE_NODE_INDEX"
+
+  aggregate-circle-harvest:
+    docker:
+      - image: cimg/python:3.12
+    resource_class: small
+    steps:
+      - checkout
+      - run:
+          name: Install minimal aggregate dependency
+          command: python -m pip install --disable-pip-version-check -q requests
+      - run:
+          name: Single-writer canonical merge and DCE handoff
+          command: python pipeline/circleci_aggregate.py
 
 workflows:
-  setup-fleet:
+  circleci-harvest:
     jobs:
-      - fleet-gate
+      - durable-bridge:
+          filters:
+            branches:
+              only: circleci-fleet
+      - contracts-finder-shards:
+          requires:
+            - durable-bridge
+          filters:
+            branches:
+              only: circleci-fleet
+      - aggregate-circle-harvest:
+          requires:
+            - contracts-finder-shards
+          filters:
+            branches:
+              only: circleci-fleet
