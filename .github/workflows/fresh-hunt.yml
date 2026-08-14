@@ -6,12 +6,13 @@ on:
     branches: [main]
     paths:
       - 'fresh_ireland_probe.py'
+      - 'etenders_scan.py'
       - '.github/workflows/fresh-hunt.yml'
 
 jobs:
   fresh-ireland:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,6 +20,8 @@ jobs:
           python-version: '3.12'
       - run: pip install 'playwright>=1.46,<2'
       - run: python -m playwright install --with-deps chromium
+      - name: Scan current eTenders pages
+        run: python etenders_scan.py
       - name: Download fresh eTenders DCEs
         run: python fresh_ireland_probe.py
       - name: Upload fresh DCE output
