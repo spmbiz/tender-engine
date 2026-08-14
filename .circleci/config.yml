@@ -1,0 +1,45 @@
+version: 2.1
+setup: true
+
+orbs:
+  continuation: circleci/continuation@1.1.0
+
+jobs:
+  fleet-gate:
+    docker:
+      - image: cimg/python:3.12
+    resource_class: small
+    steps:
+      - checkout
+      - run:
+          name: Decide whether this commit is an intentional CircleCI fleet tick
+          command: |
+            set -euo pipefail
+            enabled="$(python - <<'PY'
+            import json
+            d=json.load(open('control/desired_state.json'))
+            print('true' if d.get('enabled') and d.get('continuous') and d.get('circleci',{}).get('desired_enabled') else 'false')
+            PY
+            )"
+            changed=""
+            if git rev-parse HEAD^ >/dev/null 2>&1; then
+              changed="$(git diff --name-only HEAD^ HEAD)"
+            fi
+            if [ "$enabled" = "true" ] && grep -Fxq 'control/circleci_tick.txt' <<< "$changed"; then
+              if [ -z "${FLEET_GITHUB_TOKEN:-}" ]; then
+                cp .circleci/missing-bridge.yml generated-circleci.yml
+              else
+                cp .circleci/continue-harvest.yml generated-circleci.yml
+              fi
+            else
+              cp .circleci/continue-idle.yml generated-circleci.yml
+            fi
+            echo 'Continuation config:'
+            cat generated-circleci.yml
+      - continuation/continue:
+          configuration_path: generated-circleci.yml
+
+workflows:
+  setup-fleet:
+    jobs:
+      - fleet-gate
