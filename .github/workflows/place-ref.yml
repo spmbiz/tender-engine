@@ -1,12 +1,10 @@
-name: PLACE Reference Probe
+name: PLACE Reference Probe (Legacy Manual)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'place_ref_probe.py'
-      - '.github/workflows/place-ref.yml'
+
+permissions:
+  contents: write
 
 jobs:
   probe:
@@ -17,19 +15,32 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install 'playwright>=1.46,<2'
-      - run: python -m playwright install --with-deps chromium
+      - run: python -m pip install --disable-pip-version-check -q 'playwright>=1.46,<2'
+      - name: Reuse runner Chrome
+        shell: bash
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
       - run: python place_ref_probe.py
       - name: Unpack DCE
+        shell: bash
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq p7zip-full unzip
+          command -v 7z >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq p7zip-full)
           find fresh_store/FRANCE_PLACE_REF -type f -name '*.zip' -print0 | while IFS= read -r -d '' f; do mkdir -p "${f%.zip}_unpacked"; unzip -oq "$f" -d "${f%.zip}_unpacked" || true; done
           find fresh_store/FRANCE_PLACE_REF -type f -name '*.7z' -print0 | while IFS= read -r -d '' f; do mkdir -p "${f%.7z}_unpacked"; 7z x -y "$f" -o"${f%.7z}_unpacked" || true; done
-      - if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: place-ref-${{ github.run_id }}
-          path: fresh_store/FRANCE_PLACE_REF/
-          if-no-files-found: ignore
-          retention-days: 7
+      - name: Persist harvested output durably
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [ -d fresh_store/FRANCE_PLACE_REF ] || exit 0
+          tag="legacy-place-ref-${GITHUB_RUN_ID}"
+          tar -czf "$tag.tar.gz" fresh_store/FRANCE_PLACE_REF
+          gh release create "$tag" --target "$GITHUB_SHA" --title "$tag" --notes "Durable legacy PLACE reference harvest."
+          gh release upload "$tag" "$tag.tar.gz"
