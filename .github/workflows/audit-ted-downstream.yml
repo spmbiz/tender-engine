@@ -6,7 +6,7 @@ on:
       dce_run:
         description: DCE Fanout run ID whose canonical Release should be audited
         required: false
-        default: '31844708410'
+        default: '31849320928'
   push:
     branches: [main]
     paths:
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      DCE_RUN: ${{ github.event.inputs.dce_run || '31844708410' }}
+      DCE_RUN: ${{ github.event.inputs.dce_run || '31849320928' }}
     steps:
       - uses: actions/checkout@v4
       - name: Download all compact handoffs from canonical Release
