@@ -2,6 +2,10 @@ name: DCE Fanout V2
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'queues/dce_candidates.jsonl'
 
 concurrency:
   group: dce-fanout-v2
