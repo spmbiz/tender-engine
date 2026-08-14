@@ -23,6 +23,9 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
+      - name: Snapshot main before reconciliation
+        shell: bash
+        run: echo "FLEET_START_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -32,9 +35,30 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: python pipeline/fleet_controller.py
+      - name: Trigger isolated CircleCI fleet branch only after an intentional tick
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="$GITHUB_REPOSITORY"
+          after="$(gh api "repos/$repo/commits/main" --jq .sha)"
+          msg="$(gh api "repos/$repo/commits/$after" --jq .commit.message)"
+          if [ "$after" != "$FLEET_START_SHA" ] && [[ "$msg" == Trigger\ CircleCI\ autonomous\ refresh* ]]; then
+            if gh api "repos/$repo/git/ref/heads/circleci-fleet" >/dev/null 2>&1; then
+              gh api --method PATCH "repos/$repo/git/refs/heads/circleci-fleet" -f sha="$after" -F force=true >/dev/null
+            else
+              gh api --method POST "repos/$repo/git/refs" -f ref="refs/heads/circleci-fleet" -f sha="$after" >/dev/null
+            fi
+            echo "CircleCI fleet branch synced to $after"
+          else
+            echo 'No CircleCI tick emitted during this controller cycle.'
+          fi
       - name: Controller summary
         if: always()
         run: |
           echo 'Persistent desired state: control/desired_state.json' >> "$GITHUB_STEP_SUMMARY"
           echo 'Durable live status: Release fleet-state / fleet-status-latest.json' >> "$GITHUB_STEP_SUMMARY"
           echo 'GPT handoff: Release fleet-state / gpt-latest-summary.json' >> "$GITHUB_STEP_SUMMARY"
+          echo 'CircleCI heavy compute trigger: branch circleci-fleet only' >> "$GITHUB_STEP_SUMMARY"
