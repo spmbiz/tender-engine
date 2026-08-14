@@ -1,10 +1,15 @@
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urljoin
+
+import requests
 
 import dce_worker as base
 from ted_resolver import resolve_ted_candidate
@@ -23,15 +28,48 @@ def optimized_browser_context():
     return pw, browser, context
 
 
-# Existing portal adapters call dce_worker.browser_context dynamically; replace it once here.
+def optimized_ungm(candidate: dict, out: Path, manifest: dict):
+    session = requests.Session()
+    session.headers.update({"User-Agent": "Tender-Engine/2.0 public procurement research"})
+    route = candidate.get("route") or {}
+    notice_id = str(route.get("notice_id") or candidate.get("notice_id") or "").strip()
+    notice_url = candidate.get("notice_url") or (f"https://www.ungm.org/Public/Notice/{notice_id}" if notice_id else None)
+    if notice_url and not notice_id:
+        m = re.search(r"/Notice/(\d+)", notice_url, re.I)
+        notice_id = m.group(1) if m else ""
+    if not notice_url:
+        manifest["status"] = "ROUTE_INCOMPLETE"
+        return
+    try:
+        page = session.get(notice_url, timeout=45)
+        page.raise_for_status()
+    except Exception as exc:
+        manifest["status"] = "ERROR_RETRYABLE"
+        manifest["error"] = repr(exc)
+        return
+    text = html.unescape(page.text)
+    urls = set()
+    for u in re.findall(r"href=[\"']([^\"']*DownloadDocument[^\"']+)", text, re.I):
+        urls.add(urljoin(notice_url, u.replace("&amp;", "&")))
+    for u in re.findall(r"https?://[^\s\"'<>]+DownloadDocument[^\s\"'<>]+", text, re.I):
+        urls.add(u.replace("&amp;", "&"))
+    if notice_id:
+        for m in re.finditer(r"documentId=([A-Za-z0-9_-]+)", text):
+            urls.add(f"https://www.ungm.org/Public/Notice/DownloadDocument?noticeId={notice_id}&documentId={m.group(1)}")
+    for url in sorted(urls):
+        rec = base.direct_download(url, out, session)
+        if rec:
+            manifest["files"].append(rec)
+    manifest["status"] = "DOWNLOADED_PUBLIC" if manifest["files"] else "NO_PUBLIC_FILE"
+
+
 base.browser_context = optimized_browser_context
+base.ADAPTERS["UNGM"] = optimized_ungm
 
 
 def run_ted(candidate: dict, files_dir: Path, manifest: dict, root: Path):
     resolution = resolve_ted_candidate(candidate)
-    (root / "ted_resolution.json").write_text(
-        json.dumps(resolution, indent=2, ensure_ascii=False), encoding="utf-8"
-    )
+    (root / "ted_resolution.json").write_text(json.dumps(resolution, indent=2, ensure_ascii=False), encoding="utf-8")
     manifest["ted_resolution"] = {
         "publication_number": resolution.get("publication_number"),
         "xml_url_used": resolution.get("xml_url_used"),
@@ -66,29 +104,9 @@ def run_ted(candidate: dict, files_dir: Path, manifest: dict, root: Path):
         old_error = manifest.get("error")
         try:
             base.ADAPTERS[portal](sub, files_dir, manifest)
-            attempts.append(
-                {
-                    "index": idx,
-                    "portal": portal,
-                    "url": url,
-                    "route": route,
-                    "status": manifest.get("status"),
-                    "files_added": len(manifest["files"]) - before,
-                    "error": manifest.get("error"),
-                }
-            )
+            attempts.append({"index": idx, "portal": portal, "url": url, "route": route, "status": manifest.get("status"), "files_added": len(manifest["files"]) - before, "error": manifest.get("error")})
         except Exception as exc:
-            attempts.append(
-                {
-                    "index": idx,
-                    "portal": portal,
-                    "url": url,
-                    "route": route,
-                    "status": "ERROR_RETRYABLE",
-                    "files_added": 0,
-                    "error": repr(exc),
-                }
-            )
+            attempts.append({"index": idx, "portal": portal, "url": url, "route": route, "status": "ERROR_RETRYABLE", "files_added": 0, "error": repr(exc)})
             manifest["status"] = old_status
             manifest["error"] = old_error
         if len(manifest["files"]) > before:
@@ -101,15 +119,7 @@ def run_ted(candidate: dict, files_dir: Path, manifest: dict, root: Path):
         manifest["status"] = "DOWNLOADED_PUBLIC"
     elif attempts:
         statuses = [a.get("status") for a in attempts if a.get("status")]
-        priority = [
-            "CAPTCHA_REQUIRED",
-            "AUTH_REQUIRED",
-            "INTEREST_RECORDING_REQUIRED",
-            "PUBLIC_POSTBACK_NO_DOWNLOAD",
-            "NO_PUBLIC_FILE",
-            "DOWNSTREAM_PORTAL_OR_NO_PUBLIC_FILE",
-            "ERROR_RETRYABLE",
-        ]
+        priority = ["CAPTCHA_REQUIRED", "AUTH_REQUIRED", "INTEREST_RECORDING_REQUIRED", "PUBLIC_POSTBACK_NO_DOWNLOAD", "NO_PUBLIC_FILE", "DOWNSTREAM_PORTAL_OR_NO_PUBLIC_FILE", "ERROR_RETRYABLE"]
         manifest["status"] = next((s for s in priority if s in statuses), statuses[-1] if statuses else "TED_DCE_NOT_DOWNLOADED")
     else:
         manifest["status"] = "TED_DOWNSTREAM_ADAPTER_PENDING"
@@ -155,18 +165,7 @@ def main():
         manifest["error"] = repr(exc)
     manifest["finished_at"] = datetime.now(timezone.utc).isoformat()
     (root / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(
-        json.dumps(
-            {
-                "candidate_id": cid,
-                "portal": portal,
-                "status": manifest["status"],
-                "files": len(manifest["files"]),
-                "root": str(root),
-            },
-            indent=2,
-        )
-    )
+    print(json.dumps({"candidate_id": cid, "portal": portal, "status": manifest["status"], "files": len(manifest["files"]), "root": str(root)}, indent=2))
 
 
 if __name__ == "__main__":
