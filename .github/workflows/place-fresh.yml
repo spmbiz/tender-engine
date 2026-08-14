@@ -1,0 +1,31 @@
+name: Fresh France PLACE Hunt
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'place_probe.py'
+      - '.github/workflows/place-fresh.yml'
+
+jobs:
+  place:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'playwright>=1.46,<2'
+      - run: python -m playwright install --with-deps chromium
+      - name: Download current PLACE DCEs
+        run: python place_probe.py
+      - name: Upload PLACE output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fresh-place-${{ github.run_id }}
+          path: fresh_store/FRANCE_PLACE/
+          if-no-files-found: ignore
+          retention-days: 7
