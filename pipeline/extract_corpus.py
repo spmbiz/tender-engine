@@ -3,10 +3,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import tarfile
 import zipfile
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 
@@ -64,7 +66,6 @@ def recursive_unpack(files_root: Path, max_rounds: int = 5):
 def extract_pdf(path: Path) -> str:
     try:
         from pypdf import PdfReader
-
         reader = PdfReader(str(path))
         return "\n".join((page.extract_text() or "") for page in reader.pages)
     except Exception as exc:
@@ -74,7 +75,6 @@ def extract_pdf(path: Path) -> str:
 def extract_docx(path: Path) -> str:
     try:
         from docx import Document
-
         doc = Document(str(path))
         chunks = [p.text for p in doc.paragraphs if p.text]
         for table in doc.tables:
@@ -88,7 +88,6 @@ def extract_docx(path: Path) -> str:
 def extract_xlsx(path: Path) -> str:
     try:
         from openpyxl import load_workbook
-
         wb = load_workbook(path, read_only=True, data_only=True)
         chunks = []
         for ws in wb.worksheets:
@@ -105,7 +104,6 @@ def extract_xlsx(path: Path) -> str:
 def extract_pptx(path: Path) -> str:
     try:
         from pptx import Presentation
-
         prs = Presentation(str(path))
         chunks = []
         for idx, slide in enumerate(prs.slides, 1):
@@ -158,7 +156,6 @@ def process_candidate(root: Path):
         }
         docs.append(rec)
         if text:
-            # Keep enough text for full GPT deep read while preventing pathological files from exploding artifacts.
             if len(text) > 1_500_000:
                 text = text[:1_500_000] + "\n[TRUNCATED_AT_1_500_000_CHARS]"
             corpus_chunks.extend([f"\n===== FILE: {rel} =====\n", text, "\n"])
@@ -171,15 +168,31 @@ def process_candidate(root: Path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default="out")
+    ap.add_argument("--workers", type=int, default=int(os.getenv("DCE_EXTRACT_WORKERS", "2")))
     args = ap.parse_args()
     base = Path(args.root)
+    candidates = sorted(set(p.parent for p in base.rglob("manifest.json")))
+    workers = max(1, min(args.workers, len(candidates) or 1))
     results = []
-    candidates = [p.parent for p in base.rglob("manifest.json")]
-    for root in sorted(set(candidates)):
-        rec = process_candidate(root)
-        if rec:
-            results.append(rec)
-    print(json.dumps(results, indent=2, ensure_ascii=False))
+
+    if workers == 1:
+        for root in candidates:
+            rec = process_candidate(root)
+            if rec:
+                results.append(rec)
+    else:
+        with ProcessPoolExecutor(max_workers=workers) as pool:
+            futs = {pool.submit(process_candidate, root): root for root in candidates}
+            for fut in as_completed(futs):
+                try:
+                    rec = fut.result()
+                except Exception as exc:
+                    rec = {"root": str(futs[fut]), "error": repr(exc), "documents": 0, "corpus_chars": 0}
+                if rec:
+                    results.append(rec)
+
+    results.sort(key=lambda r: r.get("root", ""))
+    print(json.dumps({"workers": workers, "candidates": len(candidates), "results": results}, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":
