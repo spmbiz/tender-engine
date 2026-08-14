@@ -16,6 +16,8 @@ jobs:
           python-version: '3.12'
       - name: Validate portal route registry
         run: python route_matrix_probe.py
+      - name: TED Search API route fallback
+        run: python ted_search_probe.py
       - name: Extract TED BT-15 routes
         run: python ted_bt15_probe.py
       - name: Upload TED route output
@@ -23,7 +25,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ted-routes-${{ github.run_id }}
-          path: ted_routes/
+          path: |
+            ted_routes/
+            ted_search/
           if-no-files-found: ignore
           retention-days: 7
 
