@@ -2,6 +2,10 @@ name: SuperGreen Discovery V2
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'state/discovery_trigger.txt'
 
 permissions:
   contents: write
