@@ -1,0 +1,183 @@
+from __future__ import annotations
+
+import json
+import re
+import xml.etree.ElementTree as ET
+from urllib.parse import parse_qs, urlparse
+
+import requests
+
+TED_SEARCH = "https://api.ted.europa.eu/v3/notices/search"
+FILE_RE = re.compile(r"\.(?:pdf|zip|docx?|xlsx?|xls|pptx?|csv|7z)(?:$|[?#])", re.I)
+
+
+def local(tag: str) -> str:
+    return tag.rsplit("}", 1)[-1]
+
+
+def collect_urls(value):
+    out = []
+    if isinstance(value, str):
+        if value.startswith(("http://", "https://")):
+            out.append(value)
+    elif isinstance(value, dict):
+        for v in value.values():
+            out.extend(collect_urls(v))
+    elif isinstance(value, list):
+        for v in value:
+            out.extend(collect_urls(v))
+    return out
+
+
+def extract_bt15(xml_bytes: bytes):
+    root = ET.fromstring(xml_bytes)
+    refs = []
+    all_uris = []
+    for el in root.iter():
+        if local(el.tag) == "URI" and el.text:
+            text = el.text.strip()
+            if text.startswith(("http://", "https://")):
+                all_uris.append(text)
+    for ref in root.iter():
+        if local(ref.tag) != "CallForTendersDocumentReference":
+            continue
+        rec = {"document_types": [], "ids": [], "uris": []}
+        for x in ref.iter():
+            name = local(x.tag)
+            text = (x.text or "").strip()
+            if not text:
+                continue
+            if name == "DocumentType":
+                rec["document_types"].append(text)
+            elif name == "ID":
+                rec["ids"].append(text)
+            elif name == "URI" and text.startswith(("http://", "https://")):
+                rec["uris"].append(text)
+        if rec["uris"]:
+            refs.append(rec)
+    dedup = list(dict.fromkeys(all_uris))
+    return refs, dedup
+
+
+def classify_downstream(url: str):
+    low = url.lower()
+    parsed = urlparse(url)
+    qs = parse_qs(parsed.query)
+    if "etenders.gov.ie" in low:
+        rid = (qs.get("resourceId") or qs.get("resourceid") or [None])[0]
+        if not rid:
+            m = re.search(r"resourceId=(\d+)", url, re.I)
+            rid = m.group(1) if m else None
+        return "IRELAND_ETENDERS", {"resource_id": rid} if rid else {"detail_url": url}
+    if "marches-publics.gouv.fr" in low:
+        m = re.search(r"/consultation/(\d+)", url)
+        consultation_id = m.group(1) if m else (qs.get("id") or [None])[0]
+        org = (qs.get("orgAcronyme") or qs.get("orgacronyme") or [None])[0]
+        route = {"detail_url": url}
+        if consultation_id:
+            route["consultation_id"] = consultation_id
+        if org:
+            route["org_acronym"] = org
+        if "telechargementdce" in low or "demandetelechargementdce" in low:
+            route["documents_url"] = url
+        return "FR_PLACE", route
+    if "pmp.b2g.etat.lu" in low:
+        return "LUX_PMP", {"documents_url": url}
+    if "publiccontractsscotland.gov.uk" in low:
+        return "SCOTLAND_PCS", {"detail_url": url}
+    if "ungm.org" in low:
+        m = re.search(r"/Notice/(\d+)", url, re.I)
+        return "UNGM", {"notice_id": m.group(1) if m else None, "detail_url": url}
+    if FILE_RE.search(url):
+        return "DIRECT_HTTP", {"document_urls": [url]}
+    return None, {"detail_url": url}
+
+
+def resolve_ted_candidate(candidate: dict, timeout: int = 60) -> dict:
+    route = candidate.get("route") or {}
+    publication_number = str(
+        route.get("publication_number")
+        or candidate.get("publication_number")
+        or str(candidate.get("candidate_id") or "").removeprefix("TED:")
+    ).strip()
+    result = {
+        "publication_number": publication_number,
+        "search_api_status": None,
+        "xml_candidates": [],
+        "xml_url_used": None,
+        "bt15": [],
+        "all_uris": [],
+        "downstream": [],
+        "error": None,
+    }
+    if not publication_number:
+        result["error"] = "missing_publication_number"
+        return result
+
+    session = requests.Session()
+    session.headers.update({"User-Agent": "Tender-Engine/2.0 public procurement research"})
+    body = {
+        "query": f"publication-number = {publication_number}",
+        "fields": ["publication-number"],
+        "page": 1,
+        "limit": 10,
+        "scope": "ALL",
+        "checkQuerySyntax": False,
+        "paginationMode": "PAGE_NUMBER",
+    }
+    try:
+        r = session.post(TED_SEARCH, json=body, timeout=timeout)
+        result["search_api_status"] = r.status_code
+        if r.ok:
+            data = r.json()
+            urls = collect_urls(data)
+            # Prefer explicit XML links returned by Search API.
+            xmls = [u for u in urls if re.search(r"(?:/xml(?:$|[?#])|\.xml(?:$|[?#]))", u, re.I)]
+            result["xml_candidates"].extend(xmls)
+    except Exception as exc:
+        result["error"] = f"search_api:{exc!r}"
+
+    # Official canonical fallback. Search API links are tried first because some runners saw zero-byte direct XML.
+    result["xml_candidates"].append(f"https://ted.europa.eu/en/notice/{publication_number}/xml")
+    result["xml_candidates"] = list(dict.fromkeys(result["xml_candidates"]))
+
+    xml_bytes = None
+    for xml_url in result["xml_candidates"]:
+        try:
+            rr = session.get(xml_url, timeout=timeout, allow_redirects=True)
+            if rr.ok and rr.content and b"<" in rr.content[:500]:
+                ET.fromstring(rr.content)
+                xml_bytes = rr.content
+                result["xml_url_used"] = rr.url
+                break
+        except Exception:
+            continue
+
+    if not xml_bytes:
+        result["error"] = (result["error"] + "; " if result["error"] else "") + "no_parseable_xml"
+        return result
+
+    try:
+        refs, uris = extract_bt15(xml_bytes)
+        result["bt15"] = refs
+        result["all_uris"] = uris
+    except Exception as exc:
+        result["error"] = (result["error"] + "; " if result["error"] else "") + f"xml_parse:{exc!r}"
+        return result
+
+    # BT-15 first, then other eForms URIs as fallback. Ignore TED's own notice-format URLs.
+    ordered = []
+    for ref in result["bt15"]:
+        ordered.extend(ref.get("uris") or [])
+    ordered.extend(result["all_uris"])
+    seen = set()
+    for url in ordered:
+        if not url or url in seen:
+            continue
+        seen.add(url)
+        low = url.lower()
+        if "ted.europa.eu" in low and re.search(r"/notice/|/en/notice", low):
+            continue
+        portal, subroute = classify_downstream(url)
+        result["downstream"].append({"url": url, "portal": portal, "route": subroute})
+    return result
