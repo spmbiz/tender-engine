@@ -1,0 +1,44 @@
+name: GPT Wide Read Transport
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'benchmarks/gpt-wide-read-transport-trigger.json'
+
+permissions:
+  contents: read
+
+jobs:
+  transport:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download canonical repaired wide-read pack from durable Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release download discovery-harvest-31840648379 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern 'supergreen-wide-read-31840648379-repaired.tar.gz' \
+            --dir .
+          mkdir payload
+          tar -xzf supergreen-wide-read-31840648379-repaired.tar.gz -C payload
+          test -f payload/merged-repaired/current_candidates.jsonl
+          test -d payload/wide_read_packets_repaired
+          packets=$(find payload/wide_read_packets_repaired -name 'packet_*.jsonl' | wc -l | tr -d ' ')
+          rows=$(wc -l < payload/merged-repaired/current_candidates.jsonl | tr -d ' ')
+          echo "TRANSPORT_SOURCE release=discovery-harvest-31840648379 packets=$packets rows=$rows"
+          test "$packets" -eq 58
+          test "$rows" -eq 14370
+      - name: Upload temporary GPT transport only
+        uses: actions/upload-artifact@v4
+        with:
+          name: gpt-wide-read-transport-${{ github.run_id }}
+          path: payload/
+          retention-days: 1
+          compression-level: 9
+          if-no-files-found: error
