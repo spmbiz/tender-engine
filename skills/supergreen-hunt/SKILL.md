@@ -1,318 +1,318 @@
-# Super Green Tender Hunt — Agent Skill
+# Super Green Tender Hunt — Agent Skill V2
 
 ## Purpose
 
-Find **new, currently actionable public procurement opportunities** that a very small AI-native digital operator can realistically bid and deliver, then verify the full procurement pack before promoting any opportunity to FINAL SUPER GREEN.
+Find **new, currently actionable public procurement opportunities** that a tiny AI-native digital operator can realistically bid and deliver. Preserve high recall: GPT should materially inspect the broad live opportunity pool before deterministic rules narrow it to DCE downloads.
 
-This skill is the authoritative operating contract for GPT/Codex/agent-assisted live tender hunting in this repository.
+This skill is the authoritative operating contract for GPT/Codex/agent-assisted tender hunting in this repository.
 
-## Non-negotiable truth rule
+## Two non-negotiable truth rules
 
-**No opportunity may receive FINAL SUPER GREEN / score >= 90 until the DCE, RFQ, RFT, tender brief, or equivalent authoritative procurement pack has actually been retrieved and read for mandatory gates.**
+1. **GPT WIDE READ:** GPT must materially read every generated live-discovery packet before the DCE shortlist is finalized. Do not use keyword/CPV filters to hide unusual opportunities from GPT merely because their title does not resemble the known target categories.
+2. **DCE GATE:** No opportunity may receive FINAL SUPER GREEN / score >= 90 until the DCE, RFQ, RFT, tender brief, or equivalent authoritative procurement pack has actually been retrieved and read for mandatory gates.
 
-UNKNOWN stays UNKNOWN. Do not infer eligibility from the notice title, CPV, estimated value, or marketing summary.
+UNKNOWN stays UNKNOWN. Never invent throughput, eligibility, values, references, insurance requirements, or document content.
 
-## Target operator profile
+## Target operator
 
-Optimize for a tiny Brussels-based, AI-native operator that can deliver or coordinate:
+Optimize for a tiny Brussels-based AI-native operator that can directly deliver or coordinate:
 
 - websites / CMS / lightweight software
-- WebAR / interactive digital experiences when technically bounded
+- WebAR / interactive experiences when bounded
 - graphic design / layout / publishing / illustration
 - video / animation / editing / AI-assisted visual production
 - OCR / digitization / document workflows
 - translation / transcription / localization
 - dashboards / automation / lightweight integrations
-- print brokerage only when operational and eligibility burden are lean
+- commodity subcontracting or brokerage when eligibility and operational burden remain lean
 
-Deprioritize or reject:
+Potentially attractive opportunities may have unexpected titles. Semantic reasoning beats a narrow keyword allowlist.
 
-- construction / heavy physical works
-- large hardware procurement
-- mandatory local workforce or frequent onsite presence
-- impossible turnover / audited-account gates
-- mandatory certifications not presently attainable
-- enterprise support burden disproportionate to value
-- large mandatory reference counts the operator cannot evidence
-- controlled / restricted documents that cannot lawfully be accessed
+Hard warning signals include construction/heavy physical work, impossible turnover gates, mandatory reference history that cannot be evidenced, enterprise-scale SLA/support, mandatory local workforce, unattainable certifications, controlled documents, or disproportionate onsite burden.
 
-## Freshness rule
+## Freshness and canonical identity
 
-A fresh hunt must exclude opportunities already materially analyzed, rejected, expired, or shortlisted in previous project runs unless explicitly performing a re-check.
+Previously analyzed opportunities remain visible to the wide-read stage but must be marked `seen_before=true`. Do not present them as new unless explicitly rechecking a change/amendment.
 
-Use canonical identifiers whenever available:
+Prefer canonical identifiers:
 
 - TED publication number
 - OCDS OCID / notice ID
 - eTenders resourceId
 - PCS notice reference
-- PLACE consultation ID / procurement reference
+- PLACE consultation ID/reference
 - portal-specific tender ID
 
-Do not count the same opportunity twice across aggregators or mirrors.
+Use `state/seen_candidates.jsonl` plus canonical dedupe. Mirrors/aggregators must not create duplicate opportunities.
 
-## End-to-end pipeline
+# V2 operating pipeline
 
-### Stage 1 — Broad discovery
+## Stage A — Parallel bulk discovery
 
-Run official/public bulk sources in parallel where possible.
+Run public/official sources concurrently. Materialize identities, titles/descriptions, buyer, deadline, value when available, notice URL, portal, route identifiers, and source metadata.
 
-Preferred sources include:
+Current V2 executors include:
 
-- TED Search API / eForms
-- UK Contracts Finder OCDS
-- UK Find a Tender
+- TED Search API: `pipeline/discover_ted.py`
+- UK Contracts Finder OCDS: `pipeline/discover_contracts_finder.py`
+- Ireland eTenders sharded browser enumerator: `pipeline/discover_etenders_ie.py`
+
+Add more official source adapters over time rather than replacing high-recall discovery with generic web search.
+
+Discovery output is raw material. Do **not** assign final eligibility here.
+
+## Stage B — Canonical merge, dedupe, freshness annotation
+
+Use:
+
+`pipeline/merge_discovery.py`
+
+Permitted deterministic operations before GPT wide-read:
+
+- canonical dedupe
+- normalization
+- mark expired/current when reliable
+- mark `seen_before`
+- remove malformed rows with no material identity
+
+Do not silently remove an unusual live opportunity solely because keywords/CPV/value heuristics think it is irrelevant.
+
+## Stage C — GPT WIDE READ
+
+Use:
+
+`pipeline/wide_read_packets.py`
+
+Default packet size: 250 materially enumerated opportunities.
+
+GPT must read **every packet** generated for the live run. Parallelize packet reading across independent GPT agents/chats when useful, then merge decisions canonically.
+
+For each opportunity, GPT may output:
+
+- `QUEUE_DCE`
+- `PASS_LOW_PRIORITY`
+- `REJECT_OBVIOUS`
+- `SEEN_NO_RECHECK`
+- `UNCERTAIN_RESEARCH`
+
+The purpose is semantic high-recall screening. GPT should actively look for non-obvious business models: subcontractable work, tiny lots inside large procedures, AI-fulfillable deliverables, brokerage, unusual digital/creative scopes, and small RFQs hidden behind generic titles.
+
+Selected candidates must be emitted as JSONL following `queues/gpt_selections.example.jsonl`, for example:
+
+```json
+{"candidate_id":"IE:8670172","decision":"QUEUE_DCE","preliminary_score":88,"reason":"Bounded WebAR scope; verify DCE gates","packet":1}
+```
+
+Compile selections into the DCE queue with:
+
+`pipeline/build_dce_queue_from_gpt.py`
+
+## Stage D — Queue-driven DCE fan-out
+
+Canonical queue:
+
+`queues/dce_candidates.jsonl`
+
+The queue must contain route data, not hardcoded Python `TARGETS=[...]` edits.
+
+`.github/workflows/dce-fanout-v2.yml` compiles a dynamic GitHub Actions matrix with `pipeline/build_matrix.py` and fans independent candidates out concurrently.
+
+`pipeline/dce_worker.py` selects the portal adapter from the candidate record.
+
+Currently supported V2 adapters:
+
 - Ireland eTenders
-- Public Contracts Scotland
-- France PLACE / BOAMP-compatible routes / AWS where lawful
-- Luxembourg PMP
-- UNGM
-- Belgian e-Procurement
-- TenderNed
-- e-Vergabe
-- Quebec SEAO open data
-- CanadaBuys
-- SAM.gov
-- AusTender
+- France PLACE/Prado-style public DCE route
+- Luxembourg PMP/Prado-style route
+- Public Contracts Scotland public ZIP/postback route
+- UNGM public document route
+- direct HTTP / Contracts Finder attachments
 
-Discovery is high-recall. It may use keyword / CPV / value / deadline / SME / procedure filters, but must not assign final eligibility.
+Unsupported/auth/CAPTCHA routes must return explicit states rather than fabricate success.
 
-### Stage 2 — Cheap screen
+## Stage E — Recursive document materialization
 
-Reject obvious misses before browser-heavy work:
+Every downloaded DCE is persisted with filename, byte size, SHA-256, source URL and retrieval status.
 
-- expired deadline
-- clearly out-of-scope physical work
-- clearly excessive value/complexity when correlated with enterprise burden
-- explicit domestic-only eligibility
-- duplicate canonical ID
-- already analyzed project ID
+Use:
 
-Rank remaining candidates using preliminary fit only.
+`pipeline/extract_corpus.py`
 
-Useful positive signals:
+It recursively unpacks ZIP/7z/tar when possible and extracts text from PDF, DOCX, XLSX, PPTX and text-like files into:
 
-- below-threshold / RFQ / quotation
-- SME-friendly
-- low or moderate value
-- remote delivery
-- public documents
-- design / web / video / content / software / automation scope
-- short, bounded deliverables
+- `candidate.json`
+- `manifest.json`
+- `document_index.json`
+- `corpus.txt`
 
-### Stage 3 — Canonical notice resolution
+The full corpus remains available for GPT. Do not replace full reading with snippets alone.
 
-Resolve the authoritative notice and buyer reference before document retrieval.
+## Stage F — Gate evidence extraction
 
-Never guess DCE URLs.
+Use:
 
-Use `portal_routes.py` and `DCE_ROUTE_MATRIX.md` to classify the portal and route.
+`pipeline/extract_gates.py`
 
-### Stage 4 — DCE retrieval
-
-Retrieve the actual procurement pack.
-
-Order of operations:
-
-1. direct/public document URL
-2. anonymous portal adapter
-3. exact-reference/title/buyer public mirror search
-4. legitimate authenticated supplier session if required
-5. stop and classify CAPTCHA/MFA/controlled access rather than bypassing it
-
-Every successfully retrieved file must be persisted with:
-
-- canonical opportunity ID
-- portal
-- source URL
-- filename
-- byte size
-- SHA-256
-- retrieval timestamp
-- manifest status
-
-Recursively unpack ZIP/7z archives where safe and lawful.
-
-### Stage 5 — Document extraction
-
-Extract text/tables from all relevant procurement files before GPT qualification.
-
-Prioritize:
-
-- instructions to tenderers / RFQ / RFT
-- selection questionnaire / ESPD requirements
-- terms and conditions
-- specification / scope / deliverables
-- pricing schedule
-- award criteria
-- clarifications / FAQ
-
-Do not rely on a single document if the pack contains multiple files that can change eligibility.
-
-### Stage 6 — Mandatory-gate analysis
-
-For every candidate, explicitly resolve:
+It extracts multilingual evidence windows for:
 
 - turnover / financial capacity
-- audited accounts requirements
-- number / age / value / nature of references
-- mandatory CVs / team size / named roles
-- insurance types and minimum limits
+- references / similar projects
+- insurance
+- tax clearance
+- CVs / team
+- languages
+- certifications
+- onsite/geographic burden
+- subcontracting/consortium
+- hosting/security/GDPR
+- award criteria
+- payment
+- submission/deadline
+- deliverables/scope
+
+These snippets are retrieval aids, **not verdicts**.
+
+## Stage G — GPT DEEP READ
+
+`pipeline/aggregate_dce.py` produces `deep_review_queue.jsonl`.
+
+For every successfully materialized candidate, GPT must read the relevant full `corpus.txt` and cross-check the gate snippets.
+
+Resolve every material gate as one of:
+
+- `PASS`
+- `PASS_CONDITIONAL`
+- `FAIL_HARD`
+- `UNKNOWN`
+- `NOT_APPLICABLE`
+
+Explicitly inspect:
+
+- turnover / accounts
+- references and reference age/value/nature
+- team/CVs
+- insurance limits
 - tax clearance timing
-- certifications / accreditations
-- language requirements
-- geographic / onsite requirements
-- subcontracting / consortium / reliance rules
-- IP / licensing obligations
-- hosting / SLA / support burden
-- data protection / security requirements
-- mandatory deliverables
-- award criteria and minimum qualitative thresholds
-- submission format and deadline
+- certifications
+- languages
+- onsite/locality
+- subcontracting / consortium / reliance
+- IP/licensing
+- hosting/security/GDPR
+- SLA/support
+- deliverables
+- award criteria and minimum thresholds
+- submission format
+- deadline
+- payment terms when specified
 
-Each gate must be one of:
+## Stage H — Targeted research only for unresolved facts
 
-- PASS
-- PASS_CONDITIONAL
-- FAIL_HARD
-- UNKNOWN
-- NOT_APPLICABLE
+Web/research is a fallback cognition layer, not the primary bulk enumerator.
 
-### Stage 7 — Delivery-fit analysis
+Use it for:
 
-Separately assess whether the work can actually be shipped by the operator with AI, Codex, freelancers, subcontractors, or commodity tools.
+- unknown portal route discovery
+- amendments/clarifications
+- buyer mirrors
+- legal/tax/insurance interpretation
+- exact-reference public document mirrors
+- questions left unresolved by authoritative tender documents
 
-Do not confuse legal eligibility with delivery ease.
+Once a portal route is solved and encoded in `portal_routes.py` / `DCE_ROUTE_MATRIX.md`, reuse the adapter instead of researching the same download path again.
 
-Example: an opportunity can be legally easy to bid but technically novel; score those dimensions separately.
+## Stage I — Final classification
 
-### Stage 8 — Final classification
+Separate **legal/selection eligibility** from **delivery difficulty**.
 
-Recommended classes:
+Recommended final classes:
 
-- `SUPER_GREEN_VERIFIED` — >=90, DCE read, mandatory gates pass, delivery realistically bounded
-- `GREEN_VERIFIED` — 80–89, DCE read, viable with manageable caveats
-- `CONDITIONAL` — potentially attractive but one or more material gates unresolved
-- `REJECT_HARD` — explicit disqualifying gate or unacceptable delivery burden
-- `DCE_PENDING` — notice attractive but authoritative pack not yet read
+- `SUPER_GREEN_VERIFIED` — >=90; DCE read; mandatory gates pass; delivery bounded
+- `GREEN_VERIFIED` — 80–89; DCE read; viable with manageable caveats
+- `CONDITIONAL` — materially attractive but unresolved gate(s)
+- `REJECT_HARD` — explicit blocker or unacceptable burden
+- `DCE_PENDING`
 - `AUTH_REQUIRED`
+- `INTEREST_RECORDING_REQUIRED`
 - `CAPTCHA_REQUIRED`
 - `ERROR_RETRYABLE`
 
-Never force a quota of Super Greens.
+Never force a positive quota.
 
-## GPT vs GitHub vs web-research responsibilities
+# Parallelism contract
 
-### GitHub Actions / scripts
+Parallelize independent work at all layers:
 
-Use for deterministic, parallel, high-volume work:
+1. source discovery jobs
+2. source page/shard enumeration
+3. GPT wide-read packets
+4. DCE candidates
+5. extraction per candidate
+6. GPT deep-review candidates
+7. targeted research tasks
 
-- API/feed ingestion
-- pagination
-- canonicalization
-- deadline filtering
+Do not serialize unrelated portals.
+
+Keep bounded portal-level concurrency to avoid throttling. If GitHub hosted-runner startup dominates wall time, prefer fewer warm browser jobs with intra-job concurrency rather than hundreds of tiny browser jobs.
+
+# Responsibility split
+
+## GitHub / deterministic code
+
+Own:
+
+- bulk API/feed ingestion
+- page enumeration
+- normalization
 - dedupe
+- freshness annotation
+- packet construction
+- candidate queues
 - portal routing
 - DCE downloads
 - archive extraction
 - hashing/manifests
 - text extraction
-- candidate queues
+- evidence snippet extraction
+- throughput telemetry
 
-### GPT / reasoning agent
+## GPT
 
-Use for high-value cognition after deterministic preprocessing:
+Own:
 
-- semantic fit
-- interpretation of mandatory clauses
-- cross-document contradiction resolution
+- reading the broad opportunity pool, including unusual candidates
+- semantic shortlist selection
+- mandatory-clause interpretation
+- cross-document reasoning
 - delivery architecture
+- subcontracting/brokerage insight
 - risk assessment
-- final score/classification
+- final scoring/classification
 - bid strategy
 
-GPT should not manually browse hundreds of list pages when a script/API can do it.
+GPT should not be used to click repetitive list pages or unzip files when scripts can do it, but it **should** be allowed to read thousands of normalized opportunities because semantic breadth can expose non-obvious gems.
 
-### Web research
+# Run integrity / telemetry
 
-Use selectively for:
+Report exact counts and elapsed time:
 
-- official portal route discovery
-- missing authoritative procurement pages
-- buyer clarifications / amendments
-- legal/tax/insurance questions
-- exact-reference public mirrors
-
-Do not use general web search as the primary high-volume discovery engine when official bulk interfaces exist.
-
-## Parallelism contract
-
-Parallelize by **independent unit of work**:
-
-1. discovery source
-2. portal family
-3. candidate/DCE
-4. document extraction
-5. GPT qualification batch
-
-Do not serialize independent portals inside one browser job.
-
-Use bounded concurrency to avoid portal throttling. Default targets:
-
-- API discovery: 4–12 concurrent requests per source, respecting source limits
-- browser retrieval: 2–5 concurrent candidates per portal
-- cross-portal GitHub matrix: one job per portal shard
-- DCE text extraction: CPU-parallel where safe
-
-## Queue contract
-
-A candidate handed to the resolver should contain at minimum:
-
-```json
-{
-  "candidate_id": "canonical-id",
-  "source": "IRELAND_ETENDERS",
-  "notice_url": "https://...",
-  "title": "...",
-  "buyer": "...",
-  "deadline": "2026-08-17T10:00:00+01:00",
-  "estimated_value": 50000,
-  "currency": "EUR",
-  "portal_key": "IRELAND_ETENDERS",
-  "portal_ref": "8670172",
-  "pre_score": 78,
-  "fresh": true
-}
-```
-
-Resolver output must add evidence/status rather than overwrite unknowns with guesses.
-
-## Throughput reporting
-
-Every run must report real counts:
-
-- raw records enumerated
+- raw identities materialized per source
 - canonical unique
-- cheap-screen rejects
-- fresh candidates
-- candidates queued for DCE
-- DCE retrieval successes
-- DCE retrieval gated/errors
-- DCEs fully extracted
+- current/live unique
+- wide-read packets and opportunities actually read
+- GPT selections
+- DCE queue count
+- DCE successes / gated / errors
+- files downloaded and bytes
+- corpora extracted
 - hard rejects after DCE
-- conditional opportunities
-- verified greens
-- verified Super Greens
-- elapsed time per stage / portal
+- conditional
+- green
+- Super Green
+- stage and portal wall-clock times
 
-Never report dataset headline totals as processed records unless identities were materially enumerated.
+Never claim a dataset headline count was processed unless the records were materially enumerated.
 
-## Stop condition
+# Stop condition
 
-A hunt may stop when:
-
-- the requested workload floor is complete, or
-- sources are exhausted, or
-- a legitimate terminal blocker is proven.
-
-Do not stop merely because the first attractive candidate was found.
+A run may stop only when the requested workload is complete, sources are exhausted, or a legitimate terminal blocker is proven. Finding one attractive candidate is not a stop condition.
