@@ -1,0 +1,62 @@
+name: Reaggregate DCE Content Quality
+
+on:
+  workflow_dispatch:
+    inputs:
+      dce_run:
+        description: Canonical DCE run ID to reaggregate with current content-quality rules
+        required: false
+        default: '31849320928'
+  push:
+    branches: [main]
+    paths:
+      - 'benchmarks/reaggregate-dce-quality-trigger.json'
+
+permissions:
+  contents: write
+
+jobs:
+  reaggregate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      DCE_RUN: ${{ github.event.inputs.dce_run || '31849320928' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Recover compact canonical handoffs from durable Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="dce-harvest-${DCE_RUN}"
+          echo "RELEASE_TAG=$tag" >> "$GITHUB_ENV"
+          mkdir -p release-handoff dce-artifacts
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern 'handoff-shard-*.tar.gz' --dir release-handoff
+          count=0
+          for archive in release-handoff/handoff-shard-*.tar.gz; do
+            [ -e "$archive" ] || continue
+            base="$(basename "$archive" .tar.gz)"
+            mkdir -p "dce-artifacts/$base"
+            tar -xzf "$archive" -C "dce-artifacts/$base"
+            count=$((count+1))
+          done
+          echo "handoffs=$count"
+          test "$count" -gt 0
+      - name: Reaggregate with substantive-DCE quality gate
+        run: python pipeline/aggregate_dce.py --root dce-artifacts --out dce-quality-aggregate
+      - name: Persist corrected quality view without deleting original harvest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp dce-quality-aggregate/summary.json "dce-quality-summary-${DCE_RUN}.json"
+          tar -C dce-quality-aggregate -czf "dce-deep-review-quality-${DCE_RUN}.tar.gz" .
+          gh release upload "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            "dce-quality-summary-${DCE_RUN}.json" \
+            "dce-deep-review-quality-${DCE_RUN}.tar.gz" --clobber
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' > /tmp/assets.txt
+          grep -Fxq "dce-quality-summary-${DCE_RUN}.json" /tmp/assets.txt
+          grep -Fxq "dce-deep-review-quality-${DCE_RUN}.tar.gz" /tmp/assets.txt
+          cat "dce-quality-summary-${DCE_RUN}.json"
