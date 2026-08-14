@@ -1,6 +1,6 @@
 from pathlib import Path
 import json,re,hashlib
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
 TARGETS=[
  ('MUSEE_ARMEE_MULTIMEDIA','3026854','g7h'),
@@ -19,62 +19,66 @@ with sync_playwright() as p:
     ctx=b.new_context(accept_downloads=True,locale='fr-FR')
     for key,cid,org in TARGETS:
         out=BASE/key; out.mkdir(parents=True,exist_ok=True)
-        r={'key':key,'cid':cid,'status':'UNKNOWN','files':[],'error':None}
+        r={'key':key,'cid':cid,'status':'UNKNOWN','files':[],'error':None,'after_url':None,'responses':[]}
         page=ctx.new_page()
+        responses=[]
+        page.on('response',lambda resp: responses.append({'url':resp.url,'status':resp.status,'ct':resp.headers.get('content-type',''),'cd':resp.headers.get('content-disposition','')}))
         try:
             detail=f'https://www.marches-publics.gouv.fr/app.php/entreprise/consultation/{cid}?orgAcronyme={org}'
-            page.goto(detail,wait_until='domcontentloaded',timeout=45000); page.wait_for_timeout(800)
+            page.goto(detail,wait_until='domcontentloaded',timeout=45000); page.wait_for_timeout(600)
             (out/'detail.txt').write_text(page.locator('body').inner_text(),encoding='utf-8')
-            (out/'detail.html').write_text(page.content(),encoding='utf-8')
-            # Click Dossier de consultation if possible; fallback direct legacy request page.
             try:
                 page.get_by_role('link',name=re.compile('Dossier de consultation',re.I)).click(timeout=7000)
-                page.wait_for_load_state('domcontentloaded',timeout=30000); page.wait_for_timeout(500)
+                page.wait_for_load_state('domcontentloaded',timeout=30000); page.wait_for_timeout(400)
             except Exception:
                 u=f'https://www.marches-publics.gouv.fr/index.php?id={cid}&orgAcronyme={org}&page=Entreprise.EntrepriseDemandeTelechargementDce'
-                page.goto(u,wait_until='domcontentloaded',timeout=45000); page.wait_for_timeout(500)
-            (out/'download_page.txt').write_text(page.locator('body').inner_text(),encoding='utf-8')
+                page.goto(u,wait_until='domcontentloaded',timeout=45000); page.wait_for_timeout(400)
             (out/'download_page.html').write_text(page.content(),encoding='utf-8')
-            # anonymous radio/checkbox
-            anon=page.get_by_text(re.compile('télécharger anonymement',re.I))
-            try: anon.click(timeout=5000)
-            except Exception:
-                for el in page.locator('input[type=radio]').all():
-                    try:
-                        val=(el.get_attribute('value') or '')+' '+(el.get_attribute('id') or '')+' '+(el.get_attribute('name') or '')
-                        if 'anon' in val.lower(): el.check(force=True); break
-                    except Exception: pass
-            # accept CGU checkbox(es)
-            for i in range(page.locator('input[type=checkbox]').count()):
-                el=page.locator('input[type=checkbox]').nth(i)
-                try:
-                    if el.is_visible(): el.check(force=True)
-                except Exception: pass
+            # Exact anonymous option; text click previously selected wrong default option.
+            page.locator('#ctl0_CONTENU_PAGE_EntrepriseFormulaireDemande_choixAnonyme').check(force=True)
+            page.locator('#ctl0_CONTENU_PAGE_EntrepriseFormulaireDemande_accepterConditions').check(force=True)
             page.wait_for_timeout(300)
-            # Save controls for debugging
-            controls=[]
-            for sel in ['button','input[type=submit]','a']:
-                for i in range(min(page.locator(sel).count(),80)):
-                    el=page.locator(sel).nth(i)
-                    try: controls.append({'tag':sel,'text':el.inner_text()[:200] if sel!='input[type=submit]' else '', 'value':el.get_attribute('value'),'id':el.get_attribute('id'),'name':el.get_attribute('name'),'href':el.get_attribute('href')})
-                    except Exception: pass
-            (out/'controls.json').write_text(json.dumps(controls,indent=2,ensure_ascii=False),encoding='utf-8')
-            candidates=[]
-            for pattern in ['Télécharger','Valider','Continuer','Download']:
-                try:
-                    loc=page.get_by_role('button',name=re.compile(pattern,re.I))
-                    for i in range(loc.count()): candidates.append(loc.nth(i))
-                except Exception: pass
-            for i in range(page.locator('input[type=submit]').count()): candidates.append(page.locator('input[type=submit]').nth(i))
+            state={}
+            for iid in ['ctl0_CONTENU_PAGE_EntrepriseFormulaireDemande_choixTelechargement','ctl0_CONTENU_PAGE_EntrepriseFormulaireDemande_choixAnonyme','ctl0_CONTENU_PAGE_EntrepriseFormulaireDemande_accepterConditions']:
+                el=page.locator('#'+iid); state[iid]=el.is_checked()
+            (out/'pre_submit_state.json').write_text(json.dumps(state,indent=2),encoding='utf-8')
+            btn=page.locator('#ctl0_CONTENU_PAGE_validateButton')
             got=False
-            for el in candidates:
+            # Submission can either download immediately or navigate to a document list.
+            try:
+                with page.expect_download(timeout=8000) as di:
+                    btn.click(force=True)
+                r['files'].append(save(di.value,out)); got=True
+            except PlaywrightTimeout:
                 try:
-                    if not el.is_visible(): continue
-                    with page.expect_download(timeout=20000) as di:
-                        el.click(force=True)
-                    r['files'].append(save(di.value,out)); got=True; break
-                except Exception as e:
-                    r['error']='click:'+repr(e)
+                    page.wait_for_load_state('domcontentloaded',timeout=15000)
+                except Exception: pass
+                page.wait_for_timeout(1500)
+            except Exception as e:
+                r['error']='submit:'+repr(e)
+            r['after_url']=page.url
+            try: (out/'after_submit.html').write_text(page.content(),encoding='utf-8')
+            except: pass
+            try: (out/'after_submit.txt').write_text(page.locator('body').inner_text(timeout=10000),encoding='utf-8')
+            except: pass
+            # If a list/confirmation page is displayed, locate actual package links/buttons.
+            if not got:
+                locs=[]
+                for sel in ["a[href*='Telecharg']","a[href*='telecharg']","a[href*='Download']","a[href*='download']","a[href*='.zip']","button","input[type=submit]"]:
+                    try:
+                        for i in range(min(page.locator(sel).count(),60)): locs.append(page.locator(sel).nth(i))
+                    except: pass
+                for el in locs:
+                    try:
+                        txt=((el.inner_text() if el.evaluate('(e)=>e.tagName')!='INPUT' else el.get_attribute('value')) or '')
+                        href=el.get_attribute('href') or ''
+                        if not re.search(r'(télé|tele|download|dossier|zip|valider)',txt+' '+href,re.I): continue
+                        with page.expect_download(timeout=12000) as di:
+                            el.click(force=True)
+                        r['files'].append(save(di.value,out)); got=True; break
+                    except Exception: pass
+            r['responses']=[x for x in responses if re.search(r'(telecharg|download|dce|zip|consultation)',x['url'],re.I)][-50:]
+            (out/'responses.json').write_text(json.dumps(r['responses'],indent=2,ensure_ascii=False),encoding='utf-8')
             r['status']='DOWNLOADED_PUBLIC' if got else 'NO_DOWNLOAD'
         except Exception as e:
             r['status']='ERROR'; r['error']=repr(e)
