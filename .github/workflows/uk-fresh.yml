@@ -1,0 +1,28 @@
+name: Fresh UK Contracts Finder
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'contracts_finder_fresh.py'
+      - '.github/workflows/uk-fresh.yml'
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install requests
+      - run: python contracts_finder_fresh.py
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uk-fresh-${{ github.run_id }}
+          path: uk_fresh/
+          if-no-files-found: ignore
+          retention-days: 7
