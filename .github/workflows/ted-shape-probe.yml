@@ -1,0 +1,32 @@
+name: TED Shape Probe
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'state/ted_shape_probe_trigger.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - run: python pipeline/ted_shape_probe.py
+      - name: Persist public TED probe durably
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="ted-shape-probe-${GITHUB_RUN_ID}"
+          gh release create "$tag" --target "$GITHUB_SHA" --title "TED Shape Probe ${GITHUB_RUN_ID}" --notes "Public TED Search API response-shape probe."
+          tar -C ted-shape-probe -czf ted-shape-probe.tar.gz .
+          gh release upload "$tag" ted-shape-probe.tar.gz
