@@ -1,0 +1,100 @@
+from __future__ import annotations
+
+import argparse
+import json
+import shutil
+from collections import Counter
+from pathlib import Path
+
+KEEP_FILES = {
+    "candidate.json",
+    "manifest.json",
+    "ted_resolution.json",
+    "document_index.json",
+    "corpus.txt",
+    "gate_snippets.json",
+}
+ROOT_KEEP = {"batch_results.json", "batch_summary.json"}
+
+
+def tree_bytes(root: Path) -> int:
+    return sum(p.stat().st_size for p in root.rglob("*") if p.is_file()) if root.exists() else 0
+
+
+def load_json(path: Path):
+    try:
+        return json.loads(path.read_text(encoding="utf-8", errors="replace"))
+    except Exception:
+        return None
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--root", default="out")
+    ap.add_argument("--out", default="slim")
+    args = ap.parse_args()
+
+    root = Path(args.root)
+    out = Path(args.out)
+    if out.exists():
+        shutil.rmtree(out)
+    out.mkdir(parents=True, exist_ok=True)
+
+    raw_bytes = tree_bytes(root)
+    statuses = Counter()
+    candidates = 0
+    copied_files = 0
+
+    for manifest_path in sorted(root.rglob("manifest.json")):
+        candidate_root = manifest_path.parent
+        try:
+            rel_root = candidate_root.relative_to(root)
+        except ValueError:
+            continue
+        target_root = out / rel_root
+        target_root.mkdir(parents=True, exist_ok=True)
+        manifest = load_json(manifest_path) or {}
+        statuses[str(manifest.get("status") or "UNKNOWN")] += 1
+        candidates += 1
+
+        for name in KEEP_FILES:
+            src = candidate_root / name
+            if src.is_file():
+                shutil.copy2(src, target_root / name)
+                copied_files += 1
+
+        # Portal page text is only useful when no DCE corpus was obtained. Cap it so
+        # an unexpected HTML/text dump cannot become another artifact-storage problem.
+        corpus = candidate_root / "corpus.txt"
+        portal_page = candidate_root / "portal_page.txt"
+        if (not corpus.exists() or corpus.stat().st_size == 0) and portal_page.is_file():
+            text = portal_page.read_text(encoding="utf-8", errors="replace")[:250_000]
+            (target_root / "portal_page.txt").write_text(text, encoding="utf-8")
+            copied_files += 1
+
+    for name in ROOT_KEEP:
+        src = root / name
+        if src.is_file():
+            shutil.copy2(src, out / name)
+            copied_files += 1
+
+    slim_bytes_before_metrics = tree_bytes(out)
+    metrics = {
+        "candidates": candidates,
+        "status_counts": dict(statuses),
+        "raw_worker_tree_bytes": raw_bytes,
+        "slim_handoff_bytes_before_metrics": slim_bytes_before_metrics,
+        "bytes_removed": max(0, raw_bytes - slim_bytes_before_metrics),
+        "reduction_ratio": round((1 - slim_bytes_before_metrics / raw_bytes) if raw_bytes else 0, 6),
+        "copied_files": copied_files,
+        "raw_archives_retained_in_artifact": False,
+        "contract": "handoff keeps manifests, extracted corpus, document index, gate snippets and batch metrics; raw DCE files stay runner-local",
+    }
+    (out / "_shard_metrics.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")
+    metrics["slim_handoff_bytes"] = tree_bytes(out)
+    (out / "_shard_metrics.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")
+    print(json.dumps(metrics, indent=2))
+
+
+if __name__ == "__main__":
+    main()
