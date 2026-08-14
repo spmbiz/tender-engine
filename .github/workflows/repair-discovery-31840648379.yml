@@ -1,7 +1,11 @@
-name: Repair Discovery 31840648379 (Manual)
+name: Repair Discovery 31840648379
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'state/repair_discovery_31840648379_trigger.txt'
 
 permissions:
   contents: write
@@ -9,7 +13,7 @@ permissions:
 jobs:
   repair:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       RELEASE_TAG: discovery-harvest-31840648379
     steps:
@@ -21,10 +25,18 @@ jobs:
       - name: Re-harvest only TED with corrected complete fresh window
         env:
           TED_SCOPE: ACTIVE
-          TED_MAX_PAGES: '48'
+          TED_MAX_PAGES: '80'
           TED_LOOKBACK_DAYS: '10'
           DISCOVERY_OUT: discovery/ted-fixed
         run: python pipeline/discover_ted.py
+      - name: Persist TED harvest durably BEFORE completeness validation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tar -C discovery/ted-fixed -czf discovery-ted-fixed-attempt-${GITHUB_RUN_ID}.tar.gz .
+          gh release upload "$RELEASE_TAG" "discovery-ted-fixed-attempt-${GITHUB_RUN_ID}.tar.gz" --clobber
+          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | grep -Fxq "discovery-ted-fixed-attempt-${GITHUB_RUN_ID}.tar.gz"
       - name: Require complete non-truncated TED harvest
         run: |
           python - <<'PY'
@@ -34,15 +46,16 @@ jobs:
           assert s['materialized_unique'] > 1000, s
           assert not s['errors'], s
           assert not s['truncated_by_page_cap'], s
+          if s.get('total_reported') is not None:
+              assert s['source_items_seen'] >= s['total_reported'], s
           PY
-      - name: Persist corrected TED pack durably
+      - name: Publish canonical corrected TED alias after validation
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          tar -C discovery/ted-fixed -czf discovery-ted-fixed.tar.gz .
+          cp "discovery-ted-fixed-attempt-${GITHUB_RUN_ID}.tar.gz" discovery-ted-fixed.tar.gz
           gh release upload "$RELEASE_TAG" discovery-ted-fixed.tar.gz --clobber
-          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | grep -Fxq discovery-ted-fixed.tar.gz
       - name: Download every durable source pack for original run
         env:
           GH_TOKEN: ${{ github.token }}
@@ -73,3 +86,12 @@ jobs:
           gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' > /tmp/assets.txt
           grep -Fxq supergreen-wide-read-31840648379-repaired.tar.gz /tmp/assets.txt
           grep -Fxq discovery-summary-31840648379-repaired.json /tmp/assets.txt
+      - name: Temporary transport copy for GPT consumption only
+        uses: actions/upload-artifact@v4
+        with:
+          name: repaired-wide-read-31840648379
+          path: |
+            merged-repaired/
+            wide_read_packets_repaired/
+          retention-days: 1
+          compression-level: 9
