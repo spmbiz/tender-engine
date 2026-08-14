@@ -1,44 +1,34 @@
-name: Actions Artifact GC
+name: Actions Artifact Inventory
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/artifact-gc.yml'
 
 permissions:
   contents: read
-  actions: write
+  actions: read
 
 jobs:
-  gc:
+  inventory:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - name: Delete reconstructible DCE intermediate and legacy-route artifacts
+      - name: Inventory Actions artifacts without deleting data
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          before=0
-          deleted=0
-          deleted_bytes=0
           gh api --paginate "/repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
-            --jq '.artifacts[] | [.id,.name,.size_in_bytes] | @tsv' > /tmp/artifacts.tsv
-          while IFS=$'\t' read -r id name bytes; do
-            before=$((before + bytes))
-            case "$name" in
-              dce-shard-*|dce-plan-*|dce-routes-*|ted-routes-*)
-                echo "DELETE $id $name $bytes"
-                gh api -X DELETE "/repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}" >/dev/null
-                deleted=$((deleted + 1))
-                deleted_bytes=$((deleted_bytes + bytes))
-                ;;
-            esac
-          done < /tmp/artifacts.tsv
-          echo "artifacts_seen_bytes=$before" >> "$GITHUB_STEP_SUMMARY"
-          echo "artifacts_deleted=$deleted" >> "$GITHUB_STEP_SUMMARY"
-          echo "deleted_bytes=$deleted_bytes" >> "$GITHUB_STEP_SUMMARY"
-          echo "GC_RESULT artifacts_deleted=$deleted deleted_bytes=$deleted_bytes"
+            --jq '.artifacts[] | [.id,.name,.size_in_bytes,.workflow_run.id,.created_at,.expires_at] | @tsv' > /tmp/artifacts.tsv
+          count=$(wc -l < /tmp/artifacts.tsv | tr -d ' ')
+          bytes=$(awk -F '\t' '{s+=$3} END{printf "%.0f",s}' /tmp/artifacts.tsv)
+          echo "Actions artifact inventory only. NO DELETE performed."
+          echo "artifact_count=$count"
+          echo "artifact_bytes=$bytes"
+          {
+            echo "## Actions artifact inventory"
+            echo
+            echo "- artifacts: $count"
+            echo "- bytes: $bytes"
+            echo "- deletion policy: **disabled unless a separate migration workflow proves durable canonical copies first**"
+          } >> "$GITHUB_STEP_SUMMARY"
