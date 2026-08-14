@@ -7,7 +7,7 @@ import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import requests
 
@@ -63,8 +63,97 @@ def optimized_ungm(candidate: dict, out: Path, manifest: dict):
     manifest["status"] = "DOWNLOADED_PUBLIC" if manifest["files"] else "NO_PUBLIC_FILE"
 
 
+def optimized_epps(candidate: dict, out: Path, manifest: dict):
+    """Generic public ePPS downloader used by Ireland-like procurement portals.
+
+    Cyprus eProcurement and Lithuania CVP IS expose the same list/download endpoints
+    as eTenders Ireland. Visit the canonical document page first for cookies/session,
+    then invoke the anonymous contract-document ZIP endpoint.
+    """
+    route = candidate.get("route") or {}
+    detail_url = route.get("detail_url") or candidate.get("notice_url")
+    resource = str(route.get("resource_id") or candidate.get("resource_id") or candidate.get("portal_ref") or "").strip()
+    if not resource and detail_url:
+        m = re.search(r"resourceId=(\d+)", detail_url, re.I)
+        resource = m.group(1) if m else ""
+    base_url = str(route.get("base_url") or "").rstrip("/")
+    if not base_url and detail_url:
+        parsed = urlparse(detail_url)
+        base_url = f"{parsed.scheme}://{parsed.netloc}"
+    if not resource or not base_url:
+        manifest["status"] = "ROUTE_INCOMPLETE"
+        return
+
+    document_page = detail_url or f"{base_url}/epps/cft/listContractDocuments.do?resourceId={resource}"
+    endpoint = f"{base_url}/epps/cft/downloadCftResourceItems.do?resourceId={resource}&resourceType=ContractDocument&isContract=null"
+    pw, browser, context = optimized_browser_context()
+    page = context.new_page()
+    try:
+        page.goto(document_page, wait_until="domcontentloaded", timeout=45000)
+        page.wait_for_timeout(500)
+        body = ""
+        try:
+            body = page.locator("body").inner_text(timeout=15000)
+            (out / "portal_page.txt").write_text(body, encoding="utf-8")
+        except Exception:
+            pass
+
+        got = False
+        try:
+            with page.expect_download(timeout=30000) as dl_info:
+                page.evaluate("u => window.location.href = u", endpoint)
+            manifest["files"].append(base.persist_download(out, dl_info.value, endpoint))
+            got = True
+        except Exception as exc:
+            manifest["error"] = repr(exc)
+
+        if not got:
+            # Localized portals may still expose the standard ZIP button. Use a broad
+            # regex and then follow the anonymous popup path if available.
+            try:
+                button = page.get_by_role("button", name=re.compile(r"zip|download|atsisi|λήψη", re.I)).first
+                with page.expect_popup(timeout=7000) as popup_info:
+                    button.click(force=True)
+                popup = popup_info.value
+                popup.wait_for_load_state("domcontentloaded", timeout=20000)
+                try:
+                    anon = popup.get_by_role("button", name=re.compile(r"without association|anonymous|continue|proceed|tęsti|συνέχεια", re.I)).first
+                    with popup.expect_download(timeout=30000) as dl_info:
+                        anon.click(force=True)
+                    manifest["files"].append(base.persist_download(out, dl_info.value, popup.url))
+                    got = True
+                finally:
+                    try:
+                        popup.close()
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+
+        if got:
+            manifest["status"] = "DOWNLOADED_PUBLIC"
+        elif re.search(r"captcha|security code|verification code", body, re.I):
+            manifest["status"] = "CAPTCHA_REQUIRED"
+        elif re.search(r"login|sign in|log in|prisijung|σύνδεση", body, re.I):
+            manifest["status"] = "AUTH_REQUIRED"
+        else:
+            manifest["status"] = "NO_PUBLIC_FILE"
+    except Exception as exc:
+        manifest["status"] = "ERROR_RETRYABLE"
+        manifest["error"] = repr(exc)
+    finally:
+        try:
+            page.close()
+        except Exception:
+            pass
+        browser.close()
+        pw.stop()
+
+
 base.browser_context = optimized_browser_context
 base.ADAPTERS["UNGM"] = optimized_ungm
+base.ADAPTERS["CYPRUS_EPPS"] = optimized_epps
+base.ADAPTERS["LITHUANIA_EPPS"] = optimized_epps
 
 
 def run_ted(candidate: dict, files_dir: Path, manifest: dict, root: Path):
