@@ -17,12 +17,9 @@ MAX_PAGES = int(os.getenv("TED_MAX_PAGES", "24"))
 LOOKBACK_DAYS = int(os.getenv("TED_LOOKBACK_DAYS", "120"))
 NOW = datetime.now(timezone.utc)
 START = NOW - timedelta(days=LOOKBACK_DAYS)
-# TED Expert Search supports publication-date ranges and SORT BY. Keep GPT recall broad
-# inside a freshness window, rather than iterating years-old DPS/framework competitions.
-DEFAULT_QUERY = (
-    f"PD = ({START:%Y%m%d} <> {NOW:%Y%m%d}) "
-    "AND form-type = competition SORT BY PD DESC"
-)
+# Keep recall broad inside a rolling freshness window. The date range itself makes
+# sorting unnecessary; iteration mode will retrieve the whole matching set.
+DEFAULT_QUERY = f"PD = ({START:%Y%m%d} <> {NOW:%Y%m%d}) AND form-type = competition"
 QUERY = os.getenv("TED_QUERY", DEFAULT_QUERY)
 
 FIELDS = [
@@ -125,7 +122,8 @@ for page_no in range(1, MAX_PAGES + 1):
         "fields": FIELDS,
         "limit": LIMIT,
         "scope": SCOPE,
-        "checkQuerySyntax": page_no == 1,
+        # Important: true is syntax-validation mode on TED and can yield no normal results.
+        "checkQuerySyntax": False,
         "paginationMode": "ITERATION",
     }
     if token:
@@ -159,7 +157,6 @@ for page_no in range(1, MAX_PAGES + 1):
 
         publication_date_raw = scalar(first_field(item, "publication-date"))
         publication_date = parse_date(publication_date_raw)
-        # Belt-and-suspenders local freshness guard in case Search API scope/query semantics change.
         if publication_date and publication_date < START:
             continue
 
