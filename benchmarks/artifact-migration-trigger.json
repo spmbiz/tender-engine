@@ -1,8 +1,9 @@
 {
-  "migration": "actions-artifacts-to-durable-release-v2",
+  "migration": "actions-artifacts-to-durable-release-v3",
   "policy": "verify remote release asset size before deleting source Actions artifact",
   "parallel_shards": 4,
   "preserve_unique_data": true,
-  "fix": "explicit repository targeting for release upload and verification",
-  "triggered_at": "2026-08-14T23:18:00+02:00"
+  "release_tag": "actions-artifact-migration-31841602643",
+  "fix": "reuse already-created durable release; explicit repository targeting",
+  "triggered_at": "2026-08-14T23:20:00+02:00"
 }
