@@ -10,7 +10,7 @@ on:
       max_parallel:
         description: Maximum GitHub shard runners in parallel (1-20)
         required: false
-        default: '16'
+        default: '20'
       max_shards:
         description: Maximum dynamic shards (1-20)
         required: false
@@ -18,7 +18,7 @@ on:
       jobs_per_shard:
         description: Target candidates per shard before the 20-shard cap
         required: false
-        default: '2'
+        default: '1'
   push:
     branches: [main]
     paths:
@@ -46,8 +46,8 @@ jobs:
         name: Compile dynamic browser/HTTP shards
         env:
           DCE_MAX_SHARDS: ${{ github.event.inputs.max_shards || '20' }}
-          DCE_MAX_PARALLEL: ${{ github.event.inputs.max_parallel || '16' }}
-          DCE_TARGET_JOBS_PER_SHARD: ${{ github.event.inputs.jobs_per_shard || '2' }}
+          DCE_MAX_PARALLEL: ${{ github.event.inputs.max_parallel || '20' }}
+          DCE_TARGET_JOBS_PER_SHARD: ${{ github.event.inputs.jobs_per_shard || '1' }}
           MAX_DCE_JOBS: ${{ github.event.inputs.max_jobs || '320' }}
           DCE_BROWSER_LOCAL_CONCURRENCY: '1'
           DCE_HTTP_LOCAL_CONCURRENCY: '4'
