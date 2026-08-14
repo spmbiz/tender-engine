@@ -19,6 +19,29 @@ def load_jsonl(path: Path) -> list[dict]:
     return rows
 
 
+def load_selection(path: Path) -> list[dict]:
+    if path.suffix.lower() == '.json':
+        obj = json.loads(path.read_text(encoding='utf-8', errors='replace'))
+        if isinstance(obj, list):
+            return [x if isinstance(x, dict) else {'candidate_id': str(x)} for x in obj]
+        if not isinstance(obj, dict) or not isinstance(obj.get('candidate_ids'), list):
+            raise ValueError(f'{path}: expected object with candidate_ids list')
+        default_score = min(89, int(obj.get('default_preliminary_score', 84)))
+        default_status = str(obj.get('status') or 'DCE_PENDING')
+        default_run = obj.get('wide_read_run_id')
+        default_reason = obj.get('selection_reason')
+        out = []
+        for cid in obj['candidate_ids']:
+            rec = {'candidate_id': str(cid), 'preliminary_score': default_score, 'status': default_status}
+            if default_run is not None:
+                rec['wide_read_run_id'] = default_run
+            if default_reason:
+                rec['selection_reason'] = default_reason
+            out.append(rec)
+        return out
+    return load_jsonl(path)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument('--candidates', required=True)
@@ -27,7 +50,7 @@ def main() -> None:
     args = ap.parse_args()
 
     candidates = load_jsonl(Path(args.candidates))
-    selection = load_jsonl(Path(args.selection))
+    selection = load_selection(Path(args.selection))
     by_id = {str(r.get('candidate_id')): r for r in candidates if r.get('candidate_id')}
 
     selected = []
@@ -47,11 +70,11 @@ def main() -> None:
             missing.append(cid)
             continue
         rec = dict(base)
-        # Selection metadata is authoritative only for analysis-control fields;
-        # discovery/source fields remain the canonical harvested record.
         for key in ('preliminary_score', 'wide_read_run_id', 'status', 'selection_reason'):
             if key in sel:
                 rec[key] = sel[key]
+        if int(rec.get('preliminary_score') or 0) > 89:
+            raise SystemExit(f'Pre-DCE score exceeds 89 for {cid}')
         rec['selection_manifest_candidate_id'] = cid
         selected.append(rec)
 
@@ -73,6 +96,7 @@ def main() -> None:
         'selection_manifest_records': len(selection),
         'materialized_queue_records': len(selected),
         'coverage_ok': True,
+        'max_preliminary_score': max((int(r.get('preliminary_score') or 0) for r in selected), default=0),
         'source_run_ids': sorted({str(r.get('wide_read_run_id')) for r in selected if r.get('wide_read_run_id') is not None}),
     }
     summary_path = out.with_suffix(out.suffix + '.summary.json')
