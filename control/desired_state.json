@@ -1,0 +1,29 @@
+{
+  "enabled": true,
+  "mode": "maximum",
+  "continuous": true,
+  "target_utilization": 0.95,
+  "auto_scale": true,
+  "auto_retry": true,
+  "auto_refill_backlog": true,
+  "gpt_required_for_harvest": false,
+  "discovery": {
+    "enabled": true,
+    "min_interval_minutes": 45,
+    "minimum_free_github_slots": 4
+  },
+  "dce": {
+    "enabled": true,
+    "max_candidates_per_cycle": 320,
+    "minimum_retrieval_priority": 34,
+    "minimum_free_github_slots": 3
+  },
+  "circleci": {
+    "desired_enabled": true,
+    "max_parallel": 30,
+    "history_days": 360,
+    "refresh_interval_minutes": 1440,
+    "trigger_file": "control/circleci_tick.txt",
+    "write_bridge_secret": "FLEET_GITHUB_TOKEN"
+  }
+}
