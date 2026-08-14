@@ -3,12 +3,12 @@ name: SuperGreen Discovery V2
 on:
   workflow_dispatch:
 
-concurrency:
-  group: supergreen-discovery-v2
-  cancel-in-progress: true
+permissions:
+  contents: read
+  actions: write
 
 jobs:
-  api-discovery:
+  ted-discovery:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -16,68 +16,91 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install requests
-      - name: Enumerate TED and Contracts Finder concurrently without keyword prefilter
-        shell: bash
-        run: |
-          set +e
-          TED_SCOPE=ACTIVE TED_MAX_PAGES=24 python pipeline/discover_ted.py > ted.log 2>&1 &
-          p1=$!
-          python pipeline/discover_contracts_finder.py > contracts_finder.log 2>&1 &
-          p2=$!
-          wait $p1; s1=$?
-          wait $p2; s2=$?
-          echo '--- TED ---'; cat ted.log
-          echo '--- Contracts Finder ---'; cat contracts_finder.log
-          if [ $s1 -ne 0 ] || [ $s2 -ne 0 ]; then exit 1; fi
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Enumerate TED without keyword prefilter
+        env:
+          TED_SCOPE: ACTIVE
+          TED_MAX_PAGES: '24'
+        run: python pipeline/discover_ted.py
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: discovery-api
-          path: |
-            discovery/ted/
-            discovery/contracts_finder/
-            ted.log
-            contracts_finder.log
+          name: discovery-${{ github.run_id }}-ted
+          path: discovery/ted/
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 1
+          compression-level: 9
+
+  contracts-finder-discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Enumerate Contracts Finder
+        run: python pipeline/discover_contracts_finder.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: discovery-${{ github.run_id }}-contracts-finder
+          path: discovery/contracts_finder/
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 9
 
   etenders-ireland:
+    name: ie-pages-${{ matrix.start }}-${{ matrix.end }}
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        include:
+          - {shard: 0, start: 1, end: 5}
+          - {shard: 1, start: 6, end: 10}
+          - {shard: 2, start: 11, end: 15}
+          - {shard: 3, start: 16, end: 20}
+          - {shard: 4, start: 21, end: 25}
+          - {shard: 5, start: 26, end: 30}
+          - {shard: 6, start: 31, end: 35}
+          - {shard: 7, start: 36, end: 40}
+          - {shard: 8, start: 41, end: 45}
+          - {shard: 9, start: 46, end: 50}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install 'playwright>=1.46,<2' beautifulsoup4
-      - name: Reuse runner Chrome or install Playwright Chromium as fallback
+      - run: python -m pip install --disable-pip-version-check -q 'playwright>=1.46,<2' beautifulsoup4
+      - name: Reuse runner Chrome
         shell: bash
         run: |
+          set -euo pipefail
           chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
           if [ -n "$chrome" ]; then
-            echo "Using preinstalled browser: $chrome"
             echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
           else
-            echo "No compatible system browser found; installing Playwright Chromium"
             python -m playwright install --with-deps chromium
           fi
-      - name: Enumerate 50 eTenders pages with one warm Chromium
+      - name: Enumerate independent eTenders page shard
         env:
-          PAGE_START: 1
-          PAGE_END: 50
-          IE_PAGE_CONCURRENCY: 6
+          DISCOVERY_OUT: discovery/ireland/shard-${{ matrix.shard }}
+          PAGE_START: ${{ matrix.start }}
+          PAGE_END: ${{ matrix.end }}
+          IE_PAGE_CONCURRENCY: '1'
         run: python pipeline/discover_etenders_ie_async.py
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: discovery-ie
-          path: discovery/ireland/
+          name: discovery-${{ github.run_id }}-ie-${{ matrix.shard }}
+          path: discovery/ireland/shard-${{ matrix.shard }}/
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 1
+          compression-level: 9
 
   wide-read-pack:
-    needs: [api-discovery, etenders-ireland]
+    needs: [ted-discovery, contracts-finder-discovery, etenders-ireland]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 8
@@ -85,7 +108,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          pattern: discovery-*
+          pattern: discovery-${{ github.run_id }}-*
           path: discovery-download
           merge-multiple: true
       - name: Canonical merge and dedupe
@@ -99,4 +122,21 @@ jobs:
             merged/
             wide_read_packets/
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 1
+          compression-level: 9
+      - name: Delete discovery handoff artifacts after consolidation
+        if: success()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api --paginate "/repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
+            --jq '.artifacts[] | select(.workflow_run.id == (env.GITHUB_RUN_ID | tonumber)) | [.id,.name] | @tsv' > /tmp/current.tsv
+          while IFS=$'\t' read -r id name; do
+            case "$name" in
+              discovery-${GITHUB_RUN_ID}-*)
+                gh api -X DELETE "/repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}" >/dev/null
+                ;;
+            esac
+          done < /tmp/current.tsv
