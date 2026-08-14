@@ -42,6 +42,8 @@ jobs:
           TED_SCOPE: ACTIVE
           TED_MAX_PAGES: '80'
           TED_LOOKBACK_DAYS: '10'
+          TED_REQUEST_RETRIES: '7'
+          TED_PAGE_DELAY_SECONDS: '0.25'
         run: python pipeline/discover_ted.py
       - name: Persist TED discovery durably BEFORE completeness validation
         env:
@@ -68,26 +70,39 @@ jobs:
 
   contracts-finder-discovery:
     needs: init-release
+    name: cf-window-${{ matrix.shard }}
     runs-on: ubuntu-latest
     timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check -q requests
-      - name: Enumerate Contracts Finder
+      - name: Enumerate independent Contracts Finder time window
+        env:
+          DISCOVERY_OUT: discovery/contracts_finder/shard-${{ matrix.shard }}
+          CF_WINDOW_INDEX: ${{ matrix.shard }}
+          CF_WINDOW_TOTAL: '8'
+          LOOKBACK_DAYS: '365'
+          CF_REQUEST_RETRIES: '4'
         run: python pipeline/discover_contracts_finder.py
-      - name: Persist Contracts Finder discovery durably
+      - name: Persist Contracts Finder shard durably
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
         shell: bash
         run: |
           set -euo pipefail
-          tar -C discovery/contracts_finder -czf discovery-contracts-finder.tar.gz .
-          gh release upload "$RELEASE_TAG" discovery-contracts-finder.tar.gz --clobber
-          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | grep -Fxq discovery-contracts-finder.tar.gz
+          archive="discovery-contracts-finder-${{ matrix.shard }}.tar.gz"
+          tar -C "discovery/contracts_finder/shard-${{ matrix.shard }}" -czf "$archive" .
+          gh release upload "$RELEASE_TAG" "$archive" --clobber
+          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | grep -Fxq "$archive"
 
   etenders-ireland:
     needs: init-release
