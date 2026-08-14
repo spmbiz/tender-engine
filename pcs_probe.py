@@ -13,14 +13,14 @@ with sync_playwright() as p:
         z=page.locator('#ctl00_ContentPlaceHolder1_notice_add_docs1_lnkZip')
         if z.count():
             try:
-                with page.expect_download(timeout=30000) as di: z.click()
+                with page.expect_download(timeout=30000) as di: z.click(force=True)
                 save(di.value)
             except Exception as e: R['error']='zip:'+repr(e)
         if not R['files']:
             d=page.locator('#ctl00_ContentPlaceHolder1_notice_add_docs1_grdDocuments_ctl02_Linkbutton1')
             if d.count():
                 try:
-                    with page.expect_download(timeout=20000) as di: d.click()
+                    with page.expect_download(timeout=20000) as di: d.click(force=True)
                     save(di.value)
                 except Exception as e: R['error']=(R['error'] or '')+' doc:'+repr(e)
         R['status']='DOWNLOADED_PUBLIC' if R['files'] else 'PUBLIC_POSTBACK_NO_DOWNLOAD'
