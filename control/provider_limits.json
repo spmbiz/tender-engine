@@ -1,0 +1,24 @@
+{
+  "verified_at": "2026-08-14",
+  "providers": {
+    "github": {
+      "enabled": true,
+      "repo_public": true,
+      "standard_hosted_concurrency_limit": 20,
+      "limit_basis": "GitHub Free standard hosted concurrency limit, verified against current GitHub Actions limits documentation",
+      "public_standard_runner_minutes": "free_and_unlimited",
+      "ubuntu_latest_public": {"vcpus": 4, "ram_gb": 16},
+      "runtime_override_env": "GITHUB_CONCURRENCY_LIMIT"
+    },
+    "circleci": {
+      "desired_enabled": true,
+      "connected_to_repo": true,
+      "free_plan_advertised_concurrency": 30,
+      "public_open_source_linux_credits_per_month": 400000,
+      "open_source_credit_condition": "repository public AND CircleCI organization on Free plan",
+      "free_plan_verified_for_this_org": false,
+      "durable_write_bridge": "requires FLEET_GITHUB_TOKEN in CircleCI project environment",
+      "auto_purchase_credits": false
+    }
+  }
+}
