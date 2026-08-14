@@ -18,7 +18,7 @@ on:
       jobs_per_shard:
         description: Target candidates per shard before the 256-shard cap
         required: false
-        default: '1'
+        default: '2'
   push:
     branches: [main]
     paths:
@@ -47,7 +47,7 @@ jobs:
         env:
           DCE_MAX_SHARDS: ${{ github.event.inputs.max_shards || '256' }}
           DCE_MAX_PARALLEL: ${{ github.event.inputs.max_parallel || '20' }}
-          DCE_TARGET_JOBS_PER_SHARD: ${{ github.event.inputs.jobs_per_shard || '1' }}
+          DCE_TARGET_JOBS_PER_SHARD: ${{ github.event.inputs.jobs_per_shard || '2' }}
           MAX_DCE_JOBS: ${{ github.event.inputs.max_jobs || '320' }}
           DCE_BROWSER_LOCAL_CONCURRENCY: '1'
           DCE_HTTP_LOCAL_CONCURRENCY: '4'
