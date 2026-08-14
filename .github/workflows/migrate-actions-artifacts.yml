@@ -11,27 +11,11 @@ permissions:
   contents: write
   actions: write
 
-jobs:
-  init-release:
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
-    outputs:
-      release_tag: ${{ steps.release.outputs.tag }}
-    steps:
-      - id: release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          tag="actions-artifact-migration-${GITHUB_RUN_ID}"
-          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title "Actions Artifact Migration ${GITHUB_RUN_ID}" \
-            --notes "Preservation migration. Every Actions artifact is copied to a durable GitHub Release asset and verified before the original artifact is deleted."
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+env:
+  MIGRATION_RELEASE_TAG: actions-artifact-migration-31841602643
 
+jobs:
   migrate:
-    needs: init-release
     name: migration-shard-${{ matrix.shard }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -44,7 +28,7 @@ jobs:
       - name: Migrate assigned artifacts with verify-before-delete
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+          RELEASE_TAG: ${{ env.MIGRATION_RELEASE_TAG }}
           SHARD: ${{ matrix.shard }}
         shell: bash
         run: |
@@ -114,7 +98,7 @@ jobs:
           if [ "$failed" -gt 0 ]; then exit 1; fi
 
   verify:
-    needs: [init-release, migrate]
+    needs: migrate
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 8
@@ -122,7 +106,7 @@ jobs:
       - name: Report remaining Actions storage and durable release
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+          RELEASE_TAG: ${{ env.MIGRATION_RELEASE_TAG }}
         shell: bash
         run: |
           set -euo pipefail
