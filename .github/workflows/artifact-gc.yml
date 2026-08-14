@@ -1,0 +1,44 @@
+name: Actions Artifact GC
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/artifact-gc.yml'
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  gc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Delete reconstructible DCE intermediate and legacy-route artifacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          before=0
+          deleted=0
+          deleted_bytes=0
+          gh api --paginate "/repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
+            --jq '.artifacts[] | [.id,.name,.size_in_bytes] | @tsv' > /tmp/artifacts.tsv
+          while IFS=$'\t' read -r id name bytes; do
+            before=$((before + bytes))
+            case "$name" in
+              dce-shard-*|dce-plan-*|dce-routes-*|ted-routes-*)
+                echo "DELETE $id $name $bytes"
+                gh api -X DELETE "/repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}" >/dev/null
+                deleted=$((deleted + 1))
+                deleted_bytes=$((deleted_bytes + bytes))
+                ;;
+            esac
+          done < /tmp/artifacts.tsv
+          echo "artifacts_seen_bytes=$before" >> "$GITHUB_STEP_SUMMARY"
+          echo "artifacts_deleted=$deleted" >> "$GITHUB_STEP_SUMMARY"
+          echo "deleted_bytes=$deleted_bytes" >> "$GITHUB_STEP_SUMMARY"
+          echo "GC_RESULT artifacts_deleted=$deleted deleted_bytes=$deleted_bytes"
