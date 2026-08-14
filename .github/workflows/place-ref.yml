@@ -1,0 +1,35 @@
+name: PLACE Reference Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'place_ref_probe.py'
+      - '.github/workflows/place-ref.yml'
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'playwright>=1.46,<2'
+      - run: python -m playwright install --with-deps chromium
+      - run: python place_ref_probe.py
+      - name: Unpack DCE
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq p7zip-full unzip
+          find fresh_store/FRANCE_PLACE_REF -type f -name '*.zip' -print0 | while IFS= read -r -d '' f; do mkdir -p "${f%.zip}_unpacked"; unzip -oq "$f" -d "${f%.zip}_unpacked" || true; done
+          find fresh_store/FRANCE_PLACE_REF -type f -name '*.7z' -print0 | while IFS= read -r -d '' f; do mkdir -p "${f%.7z}_unpacked"; 7z x -y "$f" -o"${f%.7z}_unpacked" || true; done
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: place-ref-${{ github.run_id }}
+          path: fresh_store/FRANCE_PLACE_REF/
+          if-no-files-found: ignore
+          retention-days: 7
