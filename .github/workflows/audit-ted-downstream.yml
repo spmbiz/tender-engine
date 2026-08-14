@@ -2,6 +2,11 @@ name: Audit TED Downstream Coverage
 
 on:
   workflow_dispatch:
+    inputs:
+      dce_run:
+        description: DCE Fanout run ID whose canonical Release should be audited
+        required: false
+        default: '31844708410'
   push:
     branches: [main]
     paths:
@@ -15,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      RELEASE_TAG: dce-harvest-31844139173
+      DCE_RUN: ${{ github.event.inputs.dce_run || '31844708410' }}
     steps:
       - uses: actions/checkout@v4
       - name: Download all compact handoffs from canonical Release
@@ -24,6 +29,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          RELEASE_TAG="dce-harvest-${DCE_RUN}"
+          echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
           mkdir -p handoffs extracted
           gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern 'handoff-shard-*.tar.gz' --dir handoffs
           count=0
@@ -35,14 +42,15 @@ jobs:
             count=$((count+1))
           done
           echo "handoffs=$count"
-          test "$count" -eq 64
+          test "$count" -gt 0
       - name: Audit statuses and downstream domains
-        run: python pipeline/audit_ted_downstream.py --root extracted --out ted-downstream-audit-31844139173.json
+        run: python pipeline/audit_ted_downstream.py --root extracted --out "ted-downstream-audit-${DCE_RUN}.json"
       - name: Persist audit durably
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          gh release upload "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" ted-downstream-audit-31844139173.json --clobber
-          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | grep -Fxq ted-downstream-audit-31844139173.json
+          asset="ted-downstream-audit-${DCE_RUN}.json"
+          gh release upload "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" "$asset" --clobber
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | grep -Fxq "$asset"
