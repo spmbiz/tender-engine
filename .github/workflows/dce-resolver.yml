@@ -27,9 +27,9 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-  resolve-procontract:
+  browser-routes:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -37,13 +37,17 @@ jobs:
           python-version: '3.12'
       - run: pip install 'playwright>=1.46,<2'
       - run: python -m playwright install --with-deps chromium
+      - name: Probe public portal document routes
+        run: python public_portal_probe.py
       - name: Resolve ProContract shortlist
         run: python procontract_probe.py
-      - name: Upload resolver output
+      - name: Upload browser resolver output
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: procontract-${{ github.run_id }}
-          path: procontract_store/
+          name: browser-routes-${{ github.run_id }}
+          path: |
+            public_portal_store/
+            procontract_store/
           if-no-files-found: ignore
           retention-days: 7
