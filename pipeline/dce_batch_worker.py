@@ -47,7 +47,7 @@ def run_one(queue: str, line_no: int, out: str, retries: int, timeout_seconds: i
     for attempt in range(1, retries + 2):
         cmd = [
             sys.executable,
-            "pipeline/dce_worker_v2.py",
+            "pipeline/dce_worker_v3.py",
             "--queue",
             queue,
             "--line",
@@ -85,7 +85,6 @@ def run_one(queue: str, line_no: int, out: str, retries: int, timeout_seconds: i
         retryable = returncode != 0 or status in RETRYABLE_STATUSES or rate_limited
         if not retryable or attempt > retries:
             break
-        # Small jitter avoids synchronized re-hits when many shards see a transient source failure.
         time.sleep(min(4.0, 0.75 * attempt + random.random()))
 
     final = attempts[-1]
@@ -154,7 +153,6 @@ def main():
         "local_concurrency": max(1, min(args.concurrency, len(lines) or 1)),
     }
     Path(args.out, "batch_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    # Individual worker failures do not suppress successful candidates; aggregate metrics preserve them for retry/triage.
     print(json.dumps(summary, indent=2))
 
 
