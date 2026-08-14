@@ -1,0 +1,36 @@
+name: Transport DCE 31842396655
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'state/transport_dce_31842396655_trigger.txt'
+
+permissions:
+  contents: read
+
+jobs:
+  transport:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Download already-canonical deep-review assets from Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: dce-harvest-31842396655
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'dce-deep-review-31842396655.tar.gz' \
+            --pattern 'dce-summary-31842396655.json' \
+            --dir transport
+          test -s transport/dce-deep-review-31842396655.tar.gz
+          test -s transport/dce-summary-31842396655.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: transport-dce-31842396655
+          path: transport/
+          retention-days: 1
+          compression-level: 0
