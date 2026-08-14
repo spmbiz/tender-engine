@@ -1,0 +1,31 @@
+name: Fresh Tender Hunt
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'fresh_ireland_probe.py'
+      - '.github/workflows/fresh-hunt.yml'
+
+jobs:
+  fresh-ireland:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'playwright>=1.46,<2'
+      - run: python -m playwright install --with-deps chromium
+      - name: Download fresh eTenders DCEs
+        run: python fresh_ireland_probe.py
+      - name: Upload fresh DCE output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fresh-dce-${{ github.run_id }}
+          path: fresh_store/
+          if-no-files-found: ignore
+          retention-days: 7
