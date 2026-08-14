@@ -1,10 +1,6 @@
-name: Repair Discovery 31840648379
+name: Repair Discovery 31840648379 (Manual)
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'state/repair_discovery_31840648379_trigger.txt'
   workflow_dispatch:
 
 permissions:
@@ -39,7 +35,7 @@ jobs:
           assert not s['errors'], s
           assert not s['truncated_by_page_cap'], s
           PY
-      - name: Persist corrected TED pack without overwriting failed diagnostic pack
+      - name: Persist corrected TED pack durably
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -64,7 +60,7 @@ jobs:
           python pipeline/merge_discovery.py --root discovery-download --out merged-repaired
           python pipeline/wide_read_packets.py --input merged-repaired/current_candidates.jsonl --out wide_read_packets_repaired --packet-size 250
           cat merged-repaired/stats.json
-      - name: Persist repaired consolidated pack durably
+      - name: Persist repaired consolidated pack durably and verify
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -77,12 +73,3 @@ jobs:
           gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' > /tmp/assets.txt
           grep -Fxq supergreen-wide-read-31840648379-repaired.tar.gz /tmp/assets.txt
           grep -Fxq discovery-summary-31840648379-repaired.json /tmp/assets.txt
-      - name: Temporary transport copy for GPT consumption only
-        uses: actions/upload-artifact@v4
-        with:
-          name: repaired-wide-read-31840648379
-          path: |
-            merged-repaired/
-            wide_read_packets_repaired/
-          retention-days: 1
-          compression-level: 9
