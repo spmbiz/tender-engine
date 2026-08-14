@@ -49,16 +49,14 @@ try:
         page.wait_for_timeout(1500)
         (OUT/'page.html').write_text(page.content(), encoding='utf-8')
 
-        # Exact portal controls: anonymous mode + terms + submit.
-        page.locator(ANON).check(force=True)
+        # Exact portal controls. They are visually hidden, so set checked state via DOM and dispatch events.
+        for selector in [ANON, TERMS]:
+            page.locator(selector).evaluate("el => { el.checked = true; el.dispatchEvent(new Event('input', {bubbles:true})); el.dispatchEvent(new Event('change', {bubbles:true})); }")
         page.wait_for_timeout(500)
-        page.locator(TERMS).check(force=True)
-        page.wait_for_timeout(300)
 
         downloaded = False
         errors = []
 
-        # Some versions answer with a browser download event.
         try:
             with page.expect_download(timeout=12000) as info:
                 page.locator(VALIDATE).click(force=True)
@@ -71,7 +69,6 @@ try:
         except Exception as e:
             errors.append('download_event: '+str(e))
 
-        # The PMP often serves the bundle as a normal HTTP response/navigation instead.
         if not downloaded:
             page.wait_for_timeout(3000)
             for resp in list(responses):
@@ -84,7 +81,6 @@ try:
                 except Exception as e:
                     errors.append('response_body: '+str(e))
 
-        # If submit navigated to a page containing the actual file link, fetch it in-session.
         if not downloaded:
             try:
                 for a in page.locator('a[href]').all():
