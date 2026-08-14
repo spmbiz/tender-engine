@@ -1,12 +1,12 @@
 {
-  "benchmark": "dce-freshness-run-31840648379-selection-33",
+  "benchmark": "dce-live-post-wide-read-31840648379-selection-128",
   "requested_parallelism": 20,
   "max_shards": 256,
   "jobs_per_shard_target": 2,
   "selection_manifest": "queues/dce_selection_31840648379.jsonl",
   "source_discovery_release": "discovery-harvest-31840648379",
-  "queue_mode": "derive-from-canonical-discovery-release",
+  "queue_mode": "derive-from-canonical-discovery-release-and-exact-dedupe",
   "preservation_contract": "release-assets-canonical-actions-artifacts-zero",
-  "goal": "materialize exact 33 selected records from durable 14370-live pool, retrieve authoritative DCEs, preserve originals plus evidence durably, then deep-adjudicate without forced 90+",
-  "triggered_at": "2026-08-14T23:24:00+02:00"
+  "goal": "materialize 128 post-wide-read candidates, exact-dedupe against canonical prior DCE queue, fan out up to 20 runners, retrieve authoritative DCEs, preserve original procurement files and extracted evidence durably, never assign 90+ before DCE gates",
+  "triggered_at": "2026-08-14T23:34:00+02:00"
 }
