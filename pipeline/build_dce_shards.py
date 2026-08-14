@@ -9,13 +9,15 @@ from pathlib import Path
 
 from build_matrix import BROWSER_PORTALS, SUPPORTED, load_lines
 
+MATRIX_JOB_LIMIT = 256
+RUNNER_PARALLEL_LIMIT = 20
+
 
 def _split_buckets(jobs: list[dict], count: int) -> list[list[dict]]:
     if not jobs or count <= 0:
         return []
     count = min(count, len(jobs))
     buckets = [[] for _ in range(count)]
-    # Stable portal/line order + round-robin gives deterministic, reasonably balanced shards.
     ordered = sorted(jobs, key=lambda j: (j["portal"], j["line"]))
     for i, job in enumerate(ordered):
         buckets[i % count].append(job)
@@ -31,14 +33,10 @@ def _allocate_shards(browser_n: int, http_n: int, desired: int) -> tuple[int, in
     if http_n == 0:
         return min(desired, browser_n), 0
 
-    # Keep browser and HTTP work in different runners so HTTP-only shards do not pay
-    # Playwright startup cost and can safely use higher local concurrency.
     browser_share = max(1, round(desired * browser_n / total))
     http_share = max(1, desired - browser_share)
     browser_share = min(browser_share, browser_n)
     http_share = min(http_share, http_n)
-
-    # Redistribute any unused slots to the side that can still consume them.
     while browser_share + http_share < desired:
         if browser_share < browser_n:
             browser_share += 1
@@ -52,17 +50,19 @@ def _allocate_shards(browser_n: int, http_n: int, desired: int) -> tuple[int, in
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--queue", default="queues/dce_candidates.jsonl")
-    ap.add_argument("--max-shards", type=int, default=int(os.getenv("DCE_MAX_SHARDS", "20")))
-    ap.add_argument("--jobs-per-shard", type=int, default=int(os.getenv("DCE_TARGET_JOBS_PER_SHARD", "2")))
+    ap.add_argument("--max-shards", type=int, default=int(os.getenv("DCE_MAX_SHARDS", str(MATRIX_JOB_LIMIT))))
+    ap.add_argument("--jobs-per-shard", type=int, default=int(os.getenv("DCE_TARGET_JOBS_PER_SHARD", "1")))
     ap.add_argument("--max-jobs", type=int, default=int(os.getenv("MAX_DCE_JOBS", "320")))
-    ap.add_argument("--max-parallel", type=int, default=int(os.getenv("DCE_MAX_PARALLEL", "16")))
+    ap.add_argument("--max-parallel", type=int, default=int(os.getenv("DCE_MAX_PARALLEL", str(RUNNER_PARALLEL_LIMIT))))
     ap.add_argument("--browser-local-concurrency", type=int, default=int(os.getenv("DCE_BROWSER_LOCAL_CONCURRENCY", "1")))
     ap.add_argument("--http-local-concurrency", type=int, default=int(os.getenv("DCE_HTTP_LOCAL_CONCURRENCY", "4")))
     ap.add_argument("--out", default="dce_shards.json")
     args = ap.parse_args()
 
-    max_shards = max(1, min(20, args.max_shards))
-    max_parallel = max(1, min(20, args.max_parallel))
+    # Matrix depth and simultaneous runner count are deliberately separate.
+    # A deep queued matrix keeps the runner pool full as short shards finish.
+    max_shards = max(1, min(MATRIX_JOB_LIMIT, args.max_shards))
+    max_parallel = max(1, min(RUNNER_PARALLEL_LIMIT, args.max_parallel))
     jobs_per_shard = max(1, args.jobs_per_shard)
     max_jobs = max(1, args.max_jobs)
 
@@ -131,6 +131,7 @@ def main():
         "shard_count": len(include),
         "max_parallel": min(max_parallel, max(1, len(include))) if include else 0,
         "max_shards": max_shards,
+        "matrix_job_limit": MATRIX_JOB_LIMIT,
         "jobs_per_shard_target": jobs_per_shard,
         "browser_candidates": len(browser_jobs),
         "http_candidates": len(http_jobs),
