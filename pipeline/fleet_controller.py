@@ -90,7 +90,6 @@ def download_asset(rel: dict, name: str) -> bytes | None:
 
 
 def upload_asset(rel: dict, name: str, data: bytes, content_type="application/octet-stream"):
-    # Replace the tiny mutable status asset. Harvested data is never handled here.
     for a in rel.get("assets", []):
         if a.get("name") == name:
             api(f"/repos/{REPO}/releases/assets/{a['id']}", method="DELETE")
@@ -129,10 +128,19 @@ def is_workflow_active(workflow: str):
     return False
 
 
-def latest_successful_discovery():
-    for r in workflow_runs("supergreen-discovery-v2.yml", status="completed", limit=20):
-        if r.get("conclusion") == "success":
-            return r
+def latest_usable_discovery():
+    # Correctness is based on durable data, not merely the workflow badge. A source
+    # validation job may fail after the consolidated pack has already been safely written.
+    for run in workflow_runs("supergreen-discovery-v2.yml", status="completed", limit=30):
+        rid = str(run.get("id") or "")
+        if not rid:
+            continue
+        rel = get_release(f"discovery-harvest-{rid}")
+        if not rel:
+            continue
+        names = {a.get("name") for a in rel.get("assets", [])}
+        if f"supergreen-wide-read-{rid}-repaired.tar.gz" in names or f"supergreen-wide-read-{rid}.tar.gz" in names:
+            return run
     return None
 
 
@@ -142,12 +150,12 @@ def public_fleet_jobs():
     targets = [x for x in repos if not x.get("private") and (x.get("name") == NAME or patterns.search(x.get("name", "")))]
     active_jobs = queued_jobs = 0
     detail = []
-    for repo in targets[:20]:
+    for repo in targets[:30]:
         full = repo["full_name"]
         aruns = []
         try:
             for status in ("in_progress", "queued"):
-                rr = api(f"/repos/{full}/actions/runs?status={status}&per_page=20").json().get("workflow_runs", [])
+                rr = api(f"/repos/{full}/actions/runs?status={status}&per_page=30").json().get("workflow_runs", [])
                 aruns.extend(rr)
             r_active = r_queued = 0
             for run in aruns:
@@ -164,6 +172,26 @@ def public_fleet_jobs():
         except Exception as exc:
             detail.append({"repo": full, "visibility": "public", "capacity_read": "unavailable", "error": str(exc)[:300]})
     return active_jobs, queued_jobs, detail
+
+
+def circleci_commit_status():
+    try:
+        ref = api(f"/repos/{REPO}/git/ref/heads/circleci-fleet").json()
+        sha = ref.get("object", {}).get("sha")
+        if not sha:
+            return {"state": "unknown"}
+        data = api(f"/repos/{REPO}/commits/{sha}/status").json()
+        matches = [s for s in data.get("statuses", []) if "circleci" in str(s.get("context", "")).lower()]
+        if not matches:
+            return {"state": "no_status", "sha": sha}
+        return {
+            "state": matches[0].get("state"),
+            "context": matches[0].get("context"),
+            "sha": sha,
+            "target_url": matches[0].get("target_url"),
+        }
+    except Exception as exc:
+        return {"state": "unavailable", "error": str(exc)[:300]}
 
 
 def dispatch(workflow: str, inputs: dict[str, str] | None = None):
@@ -246,21 +274,22 @@ def main():
     enabled = bool(desired.get("enabled")) and bool(desired.get("continuous"))
     limit = int(os.getenv("GITHUB_CONCURRENCY_LIMIT") or providers.get("providers", {}).get("github", {}).get("standard_hosted_concurrency_limit", 20))
     active, queued, fleet_detail = public_fleet_jobs()
-    # The controller itself is active and can release its slot before fanout starts.
     effective_active_after_controller = max(0, active - 1)
     available_after_controller = max(0, limit - effective_active_after_controller)
+    capacity_budget = available_after_controller
 
     actions = []
     errors = []
     selection_stats = None
 
     if enabled:
-        # 1) Consume a completed discovery into deterministic DCE prefetch without waiting for GPT.
-        latest = latest_successful_discovery()
+        # 1) Use spare capacity for deterministic DCE prefetch. If discovery is still
+        # running, this naturally work-steals only the slots it has not occupied.
+        latest = latest_usable_discovery()
         processed_runs = set(str(x) for x in state.get("processed_discovery_runs", []))
         dce_cfg = desired.get("dce", {})
         if latest and dce_cfg.get("enabled", True) and str(latest["id"]) not in processed_runs and not is_workflow_active("dce-fanout-v2.yml"):
-            if available_after_controller >= int(dce_cfg.get("minimum_free_github_slots", 3)):
+            if capacity_budget >= int(dce_cfg.get("minimum_free_github_slots", 3)):
                 selected, selection_stats = select_from_discovery(
                     str(latest["id"]),
                     int(dce_cfg.get("minimum_retrieval_priority", 34)),
@@ -270,7 +299,7 @@ def main():
                 if selected:
                     text = "".join(json.dumps(x, ensure_ascii=False, separators=(",", ":")) + "\n" for x in selected)
                     update_repo_text(AUTO_QUEUE_PATH, text, f"Autonomous DCE queue from discovery {latest['id']}")
-                    max_parallel = max(1, min(limit, available_after_controller))
+                    max_parallel = max(1, min(limit, capacity_budget))
                     dispatch("dce-fanout-v2.yml", {
                         "selection_path": AUTO_QUEUE_PATH,
                         "source_discovery_run": str(latest["id"]),
@@ -279,22 +308,28 @@ def main():
                         "max_shards": "256",
                         "jobs_per_shard": "2",
                     })
+                    capacity_budget = max(0, capacity_budget - max_parallel)
                     state["processed_candidate_ids"] = (state.get("processed_candidate_ids", []) + [x["candidate_id"] for x in selected])[-10000:]
                     actions.append({"type": "dce_dispatch", "source_run": latest["id"], "candidates": len(selected), "max_parallel": max_parallel})
                 state["processed_discovery_runs"] = (state.get("processed_discovery_runs", []) + [str(latest["id"])])[-500:]
 
-        # 2) Refill discovery on a bounded restartable cadence.
+        # 2) Discovery now has 1 TED + 8 Contracts Finder + 10 Ireland jobs at peak.
+        # Do not deliberately enqueue it behind a full DCE fanout; use idle slots later.
         disc = desired.get("discovery", {})
         last = parse_ts(state.get("last_discovery_dispatch_at"))
         due = last is None or NOW - last >= timedelta(minutes=int(disc.get("min_interval_minutes", 45)))
+        expected_slots = int(disc.get("expected_parallel_slots", 19))
+        min_slots = int(disc.get("minimum_free_github_slots", 4))
+        discovery_capacity_ok = capacity_budget >= min(expected_slots, limit)
         if disc.get("enabled", True) and due and not is_workflow_active("supergreen-discovery-v2.yml"):
-            if available_after_controller >= int(disc.get("minimum_free_github_slots", 4)):
+            if discovery_capacity_ok or (capacity_budget >= min_slots and bool(disc.get("allow_queue_when_partially_free", False))):
                 dispatch("supergreen-discovery-v2.yml")
+                capacity_budget = max(0, capacity_budget - min(expected_slots, limit))
                 state["last_discovery_dispatch_at"] = NOW.isoformat()
-                actions.append({"type": "discovery_dispatch"})
+                actions.append({"type": "discovery_dispatch", "expected_peak_slots": expected_slots})
 
-        # 3) Intentionally tick CircleCI on its own slower refresh cadence. The CircleCI setup
-        # workflow refuses 30-way fanout unless its durable GitHub write bridge secret exists.
+        # 3) CircleCI is a separate capacity pool, but heavy fanout only happens on the
+        # isolated branch and only if its durable GitHub write bridge is present.
         cc = desired.get("circleci", {})
         last_cc = parse_ts(state.get("last_circleci_tick_at"))
         cc_due = last_cc is None or NOW - last_cc >= timedelta(minutes=int(cc.get("refresh_interval_minutes", 1440)))
@@ -307,17 +342,26 @@ def main():
     state["updated_at"] = NOW.isoformat()
     state["enabled"] = enabled
     state["mode"] = desired.get("mode", "maximum")
+    circle_status = circleci_commit_status()
 
     status = {
         "generated_at": NOW.isoformat(),
         "enabled": enabled,
         "mode": desired.get("mode", "maximum"),
-        "github": {"limit": limit, "active_jobs_observed": active, "queued_jobs_observed": queued, "available_after_controller": available_after_controller, "fleet_detail": fleet_detail},
+        "github": {
+            "limit": limit,
+            "active_jobs_observed": active,
+            "queued_jobs_observed": queued,
+            "available_after_controller": available_after_controller,
+            "planned_capacity_remaining": capacity_budget,
+            "fleet_detail": fleet_detail,
+        },
         "circleci": {
             "desired_enabled": desired.get("circleci", {}).get("desired_enabled", False),
             "advertised_max_parallel": desired.get("circleci", {}).get("max_parallel", 30),
             "write_bridge_secret_required": desired.get("circleci", {}).get("write_bridge_secret", "FLEET_GITHUB_TOKEN"),
             "free_plan_verified_for_this_org": providers.get("providers", {}).get("circleci", {}).get("free_plan_verified_for_this_org", False),
+            "latest_status": circle_status,
         },
         "actions": actions,
         "selection": selection_stats,
@@ -330,6 +374,7 @@ def main():
         "actions": actions,
         "github_active_jobs": active,
         "github_queued_jobs": queued,
+        "circleci_status": circle_status,
         "latest_discovery_processed": state.get("processed_discovery_runs", [])[-1:] or [],
         "gpt_role": "review only ambiguous/high-value/final mandatory-gate evidence; deterministic discovery/DCE prefetch continues autonomously",
     }
