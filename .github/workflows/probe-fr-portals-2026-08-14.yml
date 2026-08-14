@@ -1,0 +1,62 @@
+name: Probe FR Portals 2026-08-14
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'state/probe_fr_portals_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.r.outputs.tag }}
+    steps:
+      - id: r
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="fr-portal-probe-${GITHUB_RUN_ID}"
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "FR Portal Probe ${GITHUB_RUN_ID}" --notes "Durable public-surface probe. No CAPTCHA bypass and no authenticated/restricted material."
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  probe:
+    needs: init
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - label: seine-maritime-ux-rgaa
+            url: 'https://www.marches-publics.info/mpiaws/index.cfm?fuseaction=dematEnt.login&type=DCE&IDM=1857823'
+          - label: anact-design
+            url: 'https://www.achatpublic.com/sdm/ent/gen/ent_detail.do?PCSLID=CSL_2026_9F_Og6L9K1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q 'playwright>=1.46,<2'
+      - name: Reuse runner Chrome
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
+      - name: Probe public surface only
+        run: python pipeline/public_portal_probe.py --label '${{ matrix.label }}' --url '${{ matrix.url }}' --out 'probe/${{ matrix.label }}'
+      - name: Persist probe and any genuinely public download durably
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.init.outputs.tag }}
+        run: |
+          set -euo pipefail
+          archive='probe-${{ matrix.label }}.tar.gz'
+          tar -C 'probe/${{ matrix.label }}' -czf "$archive" .
+          gh release upload "$TAG" "$archive" --clobber
+          gh release view "$TAG" --json assets --jq '.assets[].name' | grep -Fxq "$archive"
