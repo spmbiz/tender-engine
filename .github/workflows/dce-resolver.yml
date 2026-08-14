@@ -43,6 +43,8 @@ jobs:
         run: python ireland_probe.py
       - name: Public Contracts Scotland documents
         run: python pcs_probe.py
+      - name: German e-Vergabe public documents
+        run: python evergabe_probe.py
       - name: Resolve ProContract shortlist
         run: python procontract_probe.py
       - name: Upload resolver output
