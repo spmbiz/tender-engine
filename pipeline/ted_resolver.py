@@ -67,16 +67,29 @@ def extract_bt15(xml_bytes: bytes):
     return refs, list(dict.fromkeys(all_uris))
 
 
+def epps_route(url: str) -> dict:
+    parsed = urlparse(url)
+    qs = parse_qs(parsed.query)
+    rid = (qs.get("resourceId") or qs.get("resourceid") or [None])[0]
+    if not rid:
+        m = re.search(r"resourceId=(\d+)", url, re.I)
+        rid = m.group(1) if m else None
+    route = {"detail_url": url, "base_url": f"{parsed.scheme}://{parsed.netloc}"}
+    if rid:
+        route["resource_id"] = rid
+    return route
+
+
 def classify_downstream(url: str):
     low = url.lower()
     parsed = urlparse(url)
     qs = parse_qs(parsed.query)
     if "etenders.gov.ie" in low:
-        rid = (qs.get("resourceId") or qs.get("resourceid") or [None])[0]
-        if not rid:
-            m = re.search(r"resourceId=(\d+)", url, re.I)
-            rid = m.group(1) if m else None
-        return "IRELAND_ETENDERS", {"resource_id": rid} if rid else {"detail_url": url}
+        return "IRELAND_ETENDERS", epps_route(url)
+    if "eprocurement.gov.cy" in low and "/epps/" in low:
+        return "CYPRUS_EPPS", epps_route(url)
+    if "viesiejipirkimai.lt" in low and "/epps/" in low:
+        return "LITHUANIA_EPPS", epps_route(url)
     if "marches-publics.gouv.fr" in low:
         m = re.search(r"/consultation/(\d+)", url)
         consultation_id = m.group(1) if m else (qs.get("id") or [None])[0]
@@ -107,7 +120,6 @@ def append_downstream(result: dict, urls):
         if not url or url in existing:
             continue
         low = url.lower()
-        # Ignore TED notice-format links; they are transport formats, not procurement document portals.
         if "ted.europa.eu" in low and re.search(r"/notice/|/en/notice", low):
             continue
         portal, subroute = classify_downstream(url)
@@ -169,7 +181,6 @@ def resolve_ted_candidate(candidate: dict, timeout: int = 60) -> dict:
                 result["search_api_document_urls"] = list(dict.fromkeys(doc_urls))
                 result["search_api_submission_urls"] = list(dict.fromkeys(submission_urls))
                 append_downstream(result, result["search_api_document_urls"])
-                # Submission/tool URLs are a fallback portal clue when BT-15 is missing.
                 if not result["downstream"]:
                     append_downstream(result, result["search_api_submission_urls"])
             urls = collect_urls(data)
@@ -178,7 +189,6 @@ def resolve_ted_candidate(candidate: dict, timeout: int = 60) -> dict:
     except Exception as exc:
         result["error"] = f"search_api:{exc!r}"
 
-    # If Search API directly exposed BT-15/downstream route, no XML fetch is needed.
     if result["downstream"]:
         return result
 
