@@ -1,0 +1,36 @@
+name: Autonomous Tender Fleet
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: autonomous-tender-fleet-controller
+  cancel-in-progress: false
+
+jobs:
+  controller:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install controller dependency only
+        run: python -m pip install --disable-pip-version-check -q requests
+      - name: Reconcile desired state with live capacity and dispatch useful work
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python pipeline/fleet_controller.py
+      - name: Controller summary
+        if: always()
+        run: |
+          echo 'Persistent desired state: control/desired_state.json' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Durable live status: Release fleet-state / fleet-status-latest.json' >> "$GITHUB_STEP_SUMMARY"
+          echo 'GPT handoff: Release fleet-state / gpt-latest-summary.json' >> "$GITHUB_STEP_SUMMARY"
