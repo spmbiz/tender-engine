@@ -1,13 +1,10 @@
-name: Fresh Tender Hunt
+name: Fresh Tender Hunt (Legacy Manual)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'fresh_ireland_probe.py'
-      - 'etenders_scan.py'
-      - '.github/workflows/fresh-hunt.yml'
+
+permissions:
+  contents: write
 
 jobs:
   fresh-ireland:
@@ -18,17 +15,29 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install 'playwright>=1.46,<2'
-      - run: python -m playwright install --with-deps chromium
+      - run: python -m pip install --disable-pip-version-check -q 'playwright>=1.46,<2'
+      - name: Reuse runner Chrome
+        shell: bash
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
       - name: Scan current eTenders pages
         run: python etenders_scan.py
       - name: Download fresh eTenders DCEs
         run: python fresh_ireland_probe.py
-      - name: Upload fresh DCE output
+      - name: Persist harvested output durably
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: fresh-dce-${{ github.run_id }}
-          path: fresh_store/
-          if-no-files-found: ignore
-          retention-days: 7
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [ -d fresh_store ] || exit 0
+          tag="legacy-fresh-ireland-${GITHUB_RUN_ID}"
+          tar -czf "$tag.tar.gz" fresh_store
+          gh release create "$tag" --target "$GITHUB_SHA" --title "$tag" --notes "Durable legacy Ireland harvest."
+          gh release upload "$tag" "$tag.tar.gz"
