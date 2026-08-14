@@ -12,20 +12,28 @@ with sync_playwright() as p:
         page.wait_for_timeout(1000)
         with page.expect_popup(timeout=15000) as pi:
             page.get_by_role('button',name=re.compile('Download Zip file',re.I)).click()
-        pop=pi.value; pop.wait_for_load_state('domcontentloaded',timeout=30000); pop.wait_for_timeout(1000)
+        pop=pi.value; pop.wait_for_load_state('domcontentloaded',timeout=30000); pop.wait_for_timeout(700)
         txt=pop.locator('body').inner_text(timeout=10000); R['popup_text']=txt[:5000]
         (OUT/'popup.html').write_text(pop.content(),encoding='utf-8'); (OUT/'popup.txt').write_text(txt,encoding='utf-8')
-        controls=pop.locator('button, input[type=submit], a')
-        for i in range(min(controls.count(),80)):
-            el=controls.nth(i)
+        proceed=pop.get_by_text(re.compile('PROCEED WITHOUT ASSOCIATION',re.I),exact=False)
+        if proceed.count():
             try:
-                label=((el.inner_text() or '')+' '+(el.get_attribute('value') or '')).lower()
-            except Exception: continue
-            if not any(x in label for x in ['download','accept','continue']): continue
-            try:
-                with pop.expect_download(timeout=10000) as di: el.click()
-                save(di.value); break
-            except Exception: pass
+                with pop.expect_download(timeout=30000) as di:
+                    proceed.first.click(force=True)
+                save(di.value)
+            except Exception as e:
+                R['error']='proceed:'+repr(e)
+        if not R['files']:
+            controls=pop.locator('button, input[type=submit], a')
+            for i in range(min(controls.count(),100)):
+                el=controls.nth(i)
+                try: label=((el.inner_text() or '')+' '+(el.get_attribute('value') or '')).lower()
+                except Exception: continue
+                if 'proceed without association' not in label: continue
+                try:
+                    with pop.expect_download(timeout=30000) as di: el.click(force=True)
+                    save(di.value); break
+                except Exception as e: R['error']=(R['error'] or '')+' fallback:'+repr(e)
         R['status']='DOWNLOADED_PUBLIC' if R['files'] else 'ANONYMOUS_ROUTE_FORM_REACHED'
         pop.close()
     except Exception as e: R['status']='ERROR'; R['error']=repr(e)
