@@ -1,0 +1,29 @@
+name: Deep eTenders Scan
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'etenders_deep_scan.py'
+      - '.github/workflows/deep-scan.yml'
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'playwright>=1.46,<2'
+      - run: python -m playwright install --with-deps chromium
+      - run: python etenders_deep_scan.py
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deep-scan-${{ github.run_id }}
+          path: deep_scan/
+          if-no-files-found: ignore
+          retention-days: 7
