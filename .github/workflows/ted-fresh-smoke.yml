@@ -1,10 +1,6 @@
-name: TED Fresh Smoke
+name: TED Fresh Smoke (Manual Test)
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'state/ted_fresh_smoke_trigger.txt'
   workflow_dispatch:
 
 permissions:
@@ -40,6 +36,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
           tag="ted-fresh-smoke-${GITHUB_RUN_ID}"
           gh release create "$tag" --target "$GITHUB_SHA" --title "TED Fresh Smoke ${GITHUB_RUN_ID}" --notes "Durable validation of the TED freshness query."
           tar -C discovery/ted-smoke -czf ted-fresh-smoke.tar.gz .
