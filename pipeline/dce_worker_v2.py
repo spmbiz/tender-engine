@@ -2,11 +2,29 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
 import dce_worker as base
 from ted_resolver import resolve_ted_candidate
+
+
+def optimized_browser_context():
+    from playwright.sync_api import sync_playwright
+
+    pw = sync_playwright().start()
+    launch_kwargs = {"headless": True}
+    chrome_bin = os.getenv("CHROME_BIN", "").strip()
+    if chrome_bin and Path(chrome_bin).exists():
+        launch_kwargs["executable_path"] = chrome_bin
+    browser = pw.chromium.launch(**launch_kwargs)
+    context = browser.new_context(accept_downloads=True)
+    return pw, browser, context
+
+
+# Existing portal adapters call dce_worker.browser_context dynamically; replace it once here.
+base.browser_context = optimized_browser_context
 
 
 def run_ted(candidate: dict, files_dir: Path, manifest: dict, root: Path):
@@ -40,7 +58,6 @@ def run_ted(candidate: dict, files_dir: Path, manifest: dict, root: Path):
         sub["source"] = portal
         sub["notice_url"] = url
         sub["route"] = route
-        # Direct-file adapter expects documents/route document_urls.
         if portal == "DIRECT_HTTP":
             sub["documents"] = [{"url": url}]
             sub["route"] = {"document_urls": [url]}
@@ -83,7 +100,6 @@ def run_ted(candidate: dict, files_dir: Path, manifest: dict, root: Path):
     if manifest["files"]:
         manifest["status"] = "DOWNLOADED_PUBLIC"
     elif attempts:
-        # Preserve the most informative downstream status if available.
         statuses = [a.get("status") for a in attempts if a.get("status")]
         priority = [
             "CAPTCHA_REQUIRED",
@@ -122,6 +138,7 @@ def main():
         "finished_at": None,
         "files": [],
         "error": None,
+        "chrome_bin": os.getenv("CHROME_BIN") or None,
     }
     (root / "candidate.json").write_text(json.dumps(candidate, indent=2, ensure_ascii=False), encoding="utf-8")
     try:
