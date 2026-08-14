@@ -1,15 +1,11 @@
-name: Canonicalize Current Mega DCE Run
+name: Canonicalize Current Mega DCE Run (Legacy Manual)
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'state/canonicalize_trigger.txt'
   workflow_dispatch:
 
 permissions:
   actions: read
-  contents: read
+  contents: write
 
 jobs:
   canonicalize:
@@ -20,14 +16,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Download source artifact from previous run
+      - name: Download exact source artifact from previous run
         env:
           GH_TOKEN: ${{ github.token }}
           ARTIFACT_ID: '9233483215'
         shell: bash
         run: |
           set -euo pipefail
-          curl -fL \
+          curl -fL --retry 3 \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
@@ -36,7 +32,7 @@ jobs:
           mkdir -p source
           unzip -q source_artifact.zip -d source
           echo "source_zip_bytes=$(stat -c%s source_artifact.zip)"
-      - name: Repack exact canonical data into Drive-sized chunks
+      - name: Repack exact canonical data into durable chunks
         run: |
           python pipeline/repack_canonical_chunks.py \
             --root source \
@@ -45,39 +41,18 @@ jobs:
             --source-artifact-id 9233483215 \
             --source-artifact-sha256 0ff9dd6c94b09bd56d458f401b91fa5d88a188bc485b5be790086a734096a487
           cat canonical_chunks/canonical_manifest.json
-          for f in canonical_chunks/canonical_chunk_*.zip; do stat -c '%n %s bytes' "$f"; done
-      - uses: actions/upload-artifact@v4
-        with:
-          name: canonical-31838467001-chunk-00
-          path: canonical_chunks/canonical_chunk_00.zip
-          retention-days: 1
-          compression-level: 0
-      - uses: actions/upload-artifact@v4
-        with:
-          name: canonical-31838467001-chunk-01
-          path: canonical_chunks/canonical_chunk_01.zip
-          retention-days: 1
-          compression-level: 0
-      - uses: actions/upload-artifact@v4
-        with:
-          name: canonical-31838467001-chunk-02
-          path: canonical_chunks/canonical_chunk_02.zip
-          retention-days: 1
-          compression-level: 0
-      - uses: actions/upload-artifact@v4
-        with:
-          name: canonical-31838467001-chunk-03
-          path: canonical_chunks/canonical_chunk_03.zip
-          retention-days: 1
-          compression-level: 0
-      - uses: actions/upload-artifact@v4
-        with:
-          name: canonical-31838467001-chunk-04
-          path: canonical_chunks/canonical_chunk_04.zip
-          retention-days: 1
-          compression-level: 0
-      - uses: actions/upload-artifact@v4
-        with:
-          name: canonical-31838467001-manifest
-          path: canonical_chunks/canonical_manifest.json
-          retention-days: 1
+      - name: Persist canonical chunks durably and verify
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="canonical-dce-31838467001-${GITHUB_RUN_ID}"
+          gh release create "$tag" --target "$GITHUB_SHA" --title "$tag" \
+            --notes "Durable canonical repack of legacy DCE run 31838467001. No Actions artifact is used as canonical storage."
+          assets=(canonical_chunks/canonical_chunk_*.zip canonical_chunks/canonical_manifest.json)
+          gh release upload "$tag" "${assets[@]}"
+          gh release view "$tag" --json assets --jq '.assets[].name' > /tmp/assets.txt
+          for asset in "${assets[@]}"; do
+            grep -Fxq "$(basename "$asset")" /tmp/assets.txt
+          done
