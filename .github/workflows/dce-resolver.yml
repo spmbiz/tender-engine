@@ -6,6 +6,27 @@ on:
   workflow_dispatch:
 
 jobs:
+  route-map:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate portal route registry
+        run: python route_matrix_probe.py
+      - name: Extract TED BT-15 routes
+        run: python ted_bt15_probe.py
+      - name: Upload TED route output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ted-routes-${{ github.run_id }}
+          path: ted_routes/
+          if-no-files-found: ignore
+          retention-days: 7
+
   resolve-procontract:
     runs-on: ubuntu-latest
     timeout-minutes: 20
