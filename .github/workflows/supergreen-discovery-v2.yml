@@ -5,6 +5,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'pipeline/discover_ted.py'
       - 'pipeline/discover_etenders_ie.py'
       - 'pipeline/discover_contracts_finder.py'
       - 'pipeline/merge_discovery.py'
@@ -13,6 +14,28 @@ on:
       - '.github/workflows/supergreen-discovery-v2.yml'
 
 jobs:
+  ted:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install requests
+      - name: Enumerate TED active scope without keyword prefilter
+        env:
+          TED_SCOPE: ACTIVE
+          TED_MAX_PAGES: 24
+        run: python pipeline/discover_ted.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: discovery-ted
+          path: discovery/ted/
+          if-no-files-found: error
+          retention-days: 7
+
   contracts-finder:
     runs-on: ubuntu-latest
     timeout-minutes: 12
@@ -66,7 +89,7 @@ jobs:
           retention-days: 7
 
   wide-read-pack:
-    needs: [contracts-finder, etenders-ireland]
+    needs: [ted, contracts-finder, etenders-ireland]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 8
