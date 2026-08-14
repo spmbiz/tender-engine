@@ -4,6 +4,8 @@ import argparse
 import json
 import math
 import os
+import re
+import unicodedata
 from collections import Counter
 from pathlib import Path
 
@@ -11,6 +13,33 @@ from build_matrix import BROWSER_PORTALS, SUPPORTED, load_lines
 
 MATRIX_JOB_LIMIT = 256
 RUNNER_PARALLEL_LIMIT = 20
+
+
+def _norm(value: object) -> str:
+    s = unicodedata.normalize("NFKD", str(value or "")).encode("ascii", "ignore").decode().lower()
+    return re.sub(r"[^a-z0-9]+", " ", s).strip()
+
+
+def _identity_keys(rec: dict) -> tuple[str, tuple[str, str] | None]:
+    cid = str(rec.get("candidate_id") or "").strip().casefold()
+    title = _norm(rec.get("title"))
+    buyer = _norm(rec.get("buyer"))
+    title_buyer = (title, buyer) if title and buyer else None
+    return cid, title_buyer
+
+
+def _load_exclusions(path: Path | None) -> tuple[set[str], set[tuple[str, str]]]:
+    ids: set[str] = set()
+    title_buyers: set[tuple[str, str]] = set()
+    if not path or not path.exists():
+        return ids, title_buyers
+    for _, rec in load_lines(path):
+        cid, tb = _identity_keys(rec)
+        if cid:
+            ids.add(cid)
+        if tb:
+            title_buyers.add(tb)
+    return ids, title_buyers
 
 
 def _split_buckets(jobs: list[dict], count: int) -> list[list[dict]]:
@@ -32,7 +61,6 @@ def _allocate_shards(browser_n: int, http_n: int, desired: int) -> tuple[int, in
         return 0, min(desired, http_n)
     if http_n == 0:
         return min(desired, browser_n), 0
-
     browser_share = max(1, round(desired * browser_n / total))
     http_share = max(1, desired - browser_share)
     browser_share = min(browser_share, browser_n)
@@ -50,6 +78,7 @@ def _allocate_shards(browser_n: int, http_n: int, desired: int) -> tuple[int, in
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--queue", default="queues/dce_candidates.jsonl")
+    ap.add_argument("--exclude-queue", default=os.getenv("DCE_EXCLUDE_QUEUE", ""))
     ap.add_argument("--max-shards", type=int, default=int(os.getenv("DCE_MAX_SHARDS", str(MATRIX_JOB_LIMIT))))
     ap.add_argument("--jobs-per-shard", type=int, default=int(os.getenv("DCE_TARGET_JOBS_PER_SHARD", "2")))
     ap.add_argument("--max-jobs", type=int, default=int(os.getenv("MAX_DCE_JOBS", "320")))
@@ -63,10 +92,13 @@ def main():
     max_parallel = max(1, min(RUNNER_PARALLEL_LIMIT, args.max_parallel))
     jobs_per_shard = max(1, args.jobs_per_shard)
     max_jobs = max(1, args.max_jobs)
+    exclude_path = Path(args.exclude_queue) if args.exclude_queue else None
+    excluded_ids, excluded_title_buyers = _load_exclusions(exclude_path)
 
     jobs: list[dict] = []
     skipped: list[dict] = []
     seen_candidates: set[str] = set()
+    seen_title_buyers: set[tuple[str, str]] = set()
     portal_counts: Counter[str] = Counter()
 
     for line_no, rec in load_lines(Path(args.queue)):
@@ -79,11 +111,16 @@ def main():
             skipped.append({"line": line_no, "candidate_id": rec.get("candidate_id"), "reason": f"unsupported:{portal}"})
             continue
         candidate_id = str(rec.get("candidate_id") or f"line-{line_no}").strip()
-        dedupe_key = candidate_id.casefold()
-        if dedupe_key in seen_candidates:
-            skipped.append({"line": line_no, "candidate_id": candidate_id, "reason": "duplicate_candidate_id"})
+        cid_key, tb_key = _identity_keys(rec)
+        if cid_key in excluded_ids or (tb_key and tb_key in excluded_title_buyers):
+            skipped.append({"line": line_no, "candidate_id": candidate_id, "reason": "already_in_exclude_queue_exact_identity"})
             continue
-        seen_candidates.add(dedupe_key)
+        if cid_key in seen_candidates or (tb_key and tb_key in seen_title_buyers):
+            skipped.append({"line": line_no, "candidate_id": candidate_id, "reason": "duplicate_exact_identity_in_queue"})
+            continue
+        seen_candidates.add(cid_key)
+        if tb_key:
+            seen_title_buyers.add(tb_key)
         jobs.append({"line": line_no, "candidate_id": candidate_id, "portal": portal, "needs_browser": portal in BROWSER_PORTALS})
         portal_counts[portal] += 1
         if len(jobs) >= max_jobs:
@@ -91,12 +128,7 @@ def main():
 
     browser_jobs = [j for j in jobs if j["needs_browser"]]
     http_jobs = [j for j in jobs if not j["needs_browser"]]
-
     if jobs:
-        # Benchmarks on the real 33-candidate browser queue showed 20 active runners
-        # with ~2 candidates/shard beats both 2-way fanout and 1-candidate micro-shards.
-        # For larger queues we keep a deeper matrix so completed runners can backfill,
-        # while max_parallel remains capped independently at 20.
         baseline = math.ceil(len(jobs) / jobs_per_shard)
         desired = min(max_shards, len(jobs), max(min(max_parallel, len(jobs)), baseline))
     else:
@@ -110,35 +142,14 @@ def main():
         ("http", _split_buckets(http_jobs, http_shards), max(1, args.http_local_concurrency)),
     ):
         for bucket in buckets:
-            include.append({
-                "shard": shard_idx,
-                "kind": kind,
-                "lines": ",".join(str(x["line"]) for x in bucket),
-                "count": len(bucket),
-                "needs_browser": kind == "browser",
-                "local_concurrency": min(local_concurrency, len(bucket)),
-                "portals": ",".join(sorted({x["portal"] for x in bucket})),
-            })
+            include.append({"shard": shard_idx, "kind": kind, "lines": ",".join(str(x["line"]) for x in bucket), "count": len(bucket), "needs_browser": kind == "browser", "local_concurrency": min(local_concurrency, len(bucket)), "portals": ",".join(sorted({x["portal"] for x in bucket}))})
             shard_idx += 1
 
     payload = {"include": include}
     Path(args.out).write_text(json.dumps(payload, indent=2), encoding="utf-8")
     Path("dce_shards_skipped.json").write_text(json.dumps(skipped, indent=2), encoding="utf-8")
-    plan = {
-        "candidate_count": len(jobs),
-        "shard_count": len(include),
-        "max_parallel": min(max_parallel, max(1, len(include))) if include else 0,
-        "max_shards": max_shards,
-        "matrix_job_limit": MATRIX_JOB_LIMIT,
-        "jobs_per_shard_target": jobs_per_shard,
-        "browser_candidates": len(browser_jobs),
-        "http_candidates": len(http_jobs),
-        "portal_counts": dict(sorted(portal_counts.items())),
-        "skipped_count": len(skipped),
-        "matrix": payload,
-    }
+    plan = {"candidate_count": len(jobs), "shard_count": len(include), "max_parallel": min(max_parallel, max(1, len(include))) if include else 0, "max_shards": max_shards, "matrix_job_limit": MATRIX_JOB_LIMIT, "jobs_per_shard_target": jobs_per_shard, "browser_candidates": len(browser_jobs), "http_candidates": len(http_jobs), "portal_counts": dict(sorted(portal_counts.items())), "skipped_count": len(skipped), "exclude_queue": str(exclude_path) if exclude_path else None, "matrix": payload}
     Path("dce_plan.json").write_text(json.dumps(plan, indent=2), encoding="utf-8")
-
     gh = os.getenv("GITHUB_OUTPUT")
     if gh:
         with open(gh, "a", encoding="utf-8") as f:
