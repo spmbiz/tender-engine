@@ -8,6 +8,8 @@ on:
       - 'queues/dce_candidates.jsonl'
       - 'pipeline/build_matrix.py'
       - 'pipeline/dce_worker.py'
+      - 'pipeline/dce_worker_v2.py'
+      - 'pipeline/ted_resolver.py'
       - 'pipeline/extract_corpus.py'
       - 'pipeline/extract_gates.py'
       - 'pipeline/aggregate_dce.py'
@@ -58,8 +60,8 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Ensure 7z exists
         run: command -v 7z >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq p7zip-full)
-      - name: Retrieve authoritative DCE
-        run: python pipeline/dce_worker.py --queue queues/dce_candidates.jsonl --line ${{ matrix.line_no }} --out out
+      - name: Resolve route and retrieve authoritative DCE
+        run: python pipeline/dce_worker_v2.py --queue queues/dce_candidates.jsonl --line ${{ matrix.line_no }} --out out
       - name: Recursively unpack and extract corpus
         run: python pipeline/extract_corpus.py --root out
       - name: Extract mandatory-gate evidence snippets
