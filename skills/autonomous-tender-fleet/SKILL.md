@@ -1,3 +1,8 @@
+---
+name: autonomous-tender-fleet
+description: Operate the Tender Engine as a persistent self-healing CI fleet across GitHub Actions and CircleCI with durable state, transactional DCE leases, capacity management, retries, and GPT handoff.
+---
+
 # Autonomous Tender Fleet — Agent Skill V1
 
 ## Purpose
