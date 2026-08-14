@@ -12,11 +12,11 @@ on:
         required: false
         default: '20'
       max_shards:
-        description: Maximum dynamic shards (1-20)
+        description: Maximum queued matrix shards (1-256)
         required: false
-        default: '20'
+        default: '256'
       jobs_per_shard:
-        description: Target candidates per shard before the 20-shard cap
+        description: Target candidates per shard before the 256-shard cap
         required: false
         default: '1'
   push:
@@ -43,9 +43,9 @@ jobs:
         with:
           python-version: '3.12'
       - id: matrix
-        name: Compile dynamic browser/HTTP shards
+        name: Compile deep dynamic browser/HTTP shard queue
         env:
-          DCE_MAX_SHARDS: ${{ github.event.inputs.max_shards || '20' }}
+          DCE_MAX_SHARDS: ${{ github.event.inputs.max_shards || '256' }}
           DCE_MAX_PARALLEL: ${{ github.event.inputs.max_parallel || '20' }}
           DCE_TARGET_JOBS_PER_SHARD: ${{ github.event.inputs.jobs_per_shard || '1' }}
           MAX_DCE_JOBS: ${{ github.event.inputs.max_jobs || '320' }}
