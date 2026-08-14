@@ -1,0 +1,29 @@
+name: Tullie RFQ Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'tullie_probe.py'
+      - '.github/workflows/tullie-fresh.yml'
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'playwright>=1.46,<2'
+      - run: python -m playwright install --with-deps chromium
+      - run: python tullie_probe.py
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tullie-rfq-${{ github.run_id }}
+          path: fresh_store/UK_TULLIE/
+          if-no-files-found: ignore
+          retention-days: 7
