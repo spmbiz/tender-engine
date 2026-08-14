@@ -9,8 +9,11 @@
   "gpt_required_for_harvest": false,
   "discovery": {
     "enabled": true,
-    "min_interval_minutes": 5,
-    "minimum_free_github_slots": 4
+    "min_interval_minutes": 360,
+    "expected_parallel_slots": 19,
+    "minimum_free_github_slots": 4,
+    "allow_queue_when_partially_free": false,
+    "allow_refresh_while_backlog": false
   },
   "dce": {
     "enabled": true,
