@@ -113,19 +113,28 @@ def retrieval_score(rec: dict) -> tuple[int, list[str]]:
 
 
 def select(records: Iterable[dict], minimum: int = 34, limit: int = 320, blocked_ids: set[str] | None = None) -> list[dict]:
-    blocked_ids = blocked_ids or set()
+    blocked_norm = {str(x).strip().casefold() for x in (blocked_ids or set()) if str(x).strip()}
     scored = []
     for rec in records:
         cid = str(rec.get("candidate_id") or "").strip()
-        if not cid or cid in blocked_ids:
+        if not cid or cid.casefold() in blocked_norm:
             continue
         score, reasons = retrieval_score(rec)
         if score < minimum:
             continue
         scored.append((score, cid, reasons, rec))
+
+    # A merged source harvest can legitimately contain duplicate source identities
+    # (for example when source windows overlap or the upstream portal republishes a
+    # notice). Rank first, then keep only the best-scoring record per canonical ID.
     scored.sort(key=lambda x: (-x[0], str(x[3].get("deadline") or "9999"), x[1]))
     out = []
-    for score, cid, reasons, rec in scored[:limit]:
+    emitted: set[str] = set()
+    for score, cid, reasons, rec in scored:
+        key = cid.casefold()
+        if key in emitted:
+            continue
+        emitted.add(key)
         out.append({
             "candidate_id": cid,
             "preliminary_score": score,
@@ -133,6 +142,8 @@ def select(records: Iterable[dict], minimum: int = 34, limit: int = 320, blocked
             "status": "AUTO_DCE_PREFETCH",
             "selection_reason": "deterministic retrieval priority only; GPT final qualification still required | " + ", ".join(reasons[:8]),
         })
+        if len(out) >= limit:
+            break
     return out
 
 
