@@ -21,10 +21,15 @@ CONCURRENCY = int(os.getenv("IE_PAGE_CONCURRENCY", "6"))
 CHROME_BIN = os.getenv("CHROME_BIN", "").strip()
 NOW = datetime.now(ZoneInfo("Europe/Dublin"))
 
-DATE_RE = re.compile(
+TEXT_DATE_RE = re.compile(
     r"\b(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s+"
     r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+"
     r"(\d{1,2})\s+(\d{2}:\d{2}:\d{2})\s+(?:IST|GMT|UTC)\s+(\d{4})\b"
+)
+NUMERIC_DATETIME_RE = re.compile(r"\b(\d{2}/\d{2}/\d{4}\s+\d{2}:\d{2}:\d{2})\b")
+VALUE_AFTER_STATUS_RE = re.compile(
+    r"Open\s+Tender\s+Submission\s+([0-9][0-9,]*(?:\.\d{1,2})?)\s+(?:\d+)?\s*$",
+    re.I,
 )
 
 
@@ -33,13 +38,46 @@ def clean(value: str) -> str:
 
 
 def parse_deadline(text: str):
-    hits = DATE_RE.findall(text or "")
-    if not hits:
+    # Current eTenders table format, e.g. 07/08/2026 21:25:26 11/09/2026 13:00:00.
+    numeric = NUMERIC_DATETIME_RE.findall(text or "")
+    if numeric:
+        try:
+            dt = datetime.strptime(numeric[-1], "%d/%m/%Y %H:%M:%S")
+            return dt.replace(tzinfo=ZoneInfo("Europe/Dublin"))
+        except ValueError:
+            pass
+    # Historical renderer fallback.
+    hits = TEXT_DATE_RE.findall(text or "")
+    if hits:
+        mon, day, tm, year = hits[-1]
+        try:
+            dt = datetime.strptime(f"{mon} {day} {year} {tm}", "%b %d %Y %H:%M:%S")
+            return dt.replace(tzinfo=ZoneInfo("Europe/Dublin"))
+        except ValueError:
+            pass
+    return None
+
+
+def infer_buyer(text: str, rid: str, title: str | None):
+    # In the current table the buyer sits between resourceId and the first datetime.
+    marker = str(rid)
+    pos = text.find(marker)
+    if pos < 0:
         return None
-    mon, day, tm, year = hits[-1]
+    tail = text[pos + len(marker) :].strip()
+    m = NUMERIC_DATETIME_RE.search(tail)
+    if not m:
+        return None
+    buyer = clean(tail[: m.start()])
+    return buyer or None
+
+
+def infer_value(text: str):
+    m = VALUE_AFTER_STATUS_RE.search(text or "")
+    if not m:
+        return None
     try:
-        dt = datetime.strptime(f"{mon} {day} {year} {tm}", "%b %d %Y %H:%M:%S")
-        return dt.replace(tzinfo=ZoneInfo("Europe/Dublin"))
+        return float(m.group(1).replace(",", ""))
     except ValueError:
         return None
 
@@ -65,6 +103,8 @@ def parse_page_html(html: str, page_url: str, pg: int):
         if not rid:
             continue
         deadline = parse_deadline(text)
+        buyer = infer_buyer(text, rid, title)
+        estimated_value = infer_value(text)
         rows.append(
             {
                 "candidate_id": f"IE:{rid}",
@@ -72,11 +112,11 @@ def parse_page_html(html: str, page_url: str, pg: int):
                 "portal": "IRELAND_ETENDERS",
                 "resource_id": rid,
                 "title": title or text[:240],
-                "buyer": None,
+                "buyer": buyer,
                 "deadline": deadline.isoformat() if deadline else None,
                 "current": bool(deadline is None or deadline >= NOW),
                 "notice_url": notice_url,
-                "estimated_value": None,
+                "estimated_value": estimated_value,
                 "currency": "EUR",
                 "description": text,
                 "route": {"resource_id": rid},
@@ -143,6 +183,9 @@ async def main_async():
         "chrome_bin": CHROME_BIN or None,
         "raw_materialized": len(records),
         "current_materialized": len(current),
+        "deadline_parsed": sum(1 for r in records if r.get("deadline")),
+        "buyer_parsed": sum(1 for r in records if r.get("buyer")),
+        "value_parsed": sum(1 for r in records if r.get("estimated_value") is not None),
         "page_errors": len(errors),
         "errors": errors,
         "generated_at": NOW.isoformat(),
