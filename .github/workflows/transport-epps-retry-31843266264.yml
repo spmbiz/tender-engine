@@ -1,0 +1,37 @@
+name: Transport ePPS Retry 31843266264
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'state/transport_epps_retry_31843266264_trigger.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  transport:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Download already-canonical candidate packs from Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: dce-retry-epps-31843266264
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p transport
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'candidate-TED-550737-2026.tar.gz' \
+            --pattern 'candidate-TED-559433-2026.tar.gz' \
+            --pattern 'candidate-TED-546646-2026.tar.gz' \
+            --dir transport
+          test "$(find transport -type f -name 'candidate-*.tar.gz' | wc -l)" -eq 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: transport-epps-retry-31843266264
+          path: transport/
+          retention-days: 1
+          compression-level: 0
