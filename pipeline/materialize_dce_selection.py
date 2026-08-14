@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
+import unicodedata
 from pathlib import Path
 
 
 def load_jsonl(path: Path) -> list[dict]:
     rows = []
+    if not path.exists():
+        return rows
     with path.open('r', encoding='utf-8', errors='replace') as f:
         for line_no, line in enumerate(f, 1):
             line = line.strip()
@@ -19,10 +23,20 @@ def load_jsonl(path: Path) -> list[dict]:
     return rows
 
 
+def norm(value: object) -> str:
+    s = unicodedata.normalize('NFKD', str(value or '')).encode('ascii', 'ignore').decode().lower()
+    return re.sub(r'[^a-z0-9]+', ' ', s).strip()
+
+
+def identity(rec: dict) -> tuple[str, tuple[str, str] | None]:
+    cid = str(rec.get('candidate_id') or '').strip().casefold()
+    title = norm(rec.get('title'))
+    buyer = norm(rec.get('buyer'))
+    return cid, ((title, buyer) if title and buyer else None)
+
+
 def load_selection(path: Path) -> list[dict]:
     text = path.read_text(encoding='utf-8', errors='replace').strip()
-    # Compact manifests are intentionally supported even with a .jsonl suffix so
-    # a large live selection can stay a tiny control-plane file.
     if text.startswith('{'):
         try:
             obj = json.loads(text)
@@ -54,16 +68,28 @@ def main() -> None:
     ap.add_argument('--candidates', required=True)
     ap.add_argument('--selection', required=True)
     ap.add_argument('--out', required=True)
+    ap.add_argument('--exclude-queue', default='queues/dce_candidates.jsonl')
     args = ap.parse_args()
 
     candidates = load_jsonl(Path(args.candidates))
     selection = load_selection(Path(args.selection))
     by_id = {str(r.get('candidate_id')): r for r in candidates if r.get('candidate_id')}
+    exclude_rows = load_jsonl(Path(args.exclude_queue)) if args.exclude_queue else []
+    excluded_ids = set()
+    excluded_tb = set()
+    for rec in exclude_rows:
+        cid, tb = identity(rec)
+        if cid:
+            excluded_ids.add(cid)
+        if tb:
+            excluded_tb.add(tb)
 
     selected = []
     missing = []
     duplicate_selection = []
+    excluded_existing = []
     seen = set()
+    seen_tb = set()
     for sel in selection:
         cid = str(sel.get('candidate_id') or '').strip()
         if not cid:
@@ -76,6 +102,15 @@ def main() -> None:
         if not base:
             missing.append(cid)
             continue
+        cid_key, tb_key = identity(base)
+        if cid_key in excluded_ids or (tb_key and tb_key in excluded_tb):
+            excluded_existing.append(cid)
+            continue
+        if tb_key and tb_key in seen_tb:
+            duplicate_selection.append(cid)
+            continue
+        if tb_key:
+            seen_tb.add(tb_key)
         rec = dict(base)
         for key in ('preliminary_score', 'wide_read_run_id', 'status', 'selection_reason'):
             if key in sel:
@@ -88,9 +123,9 @@ def main() -> None:
     if missing:
         raise SystemExit('Selection candidates missing from canonical discovery pool: ' + ', '.join(missing))
     if duplicate_selection:
-        raise SystemExit('Duplicate candidate IDs in selection manifest: ' + ', '.join(duplicate_selection))
-    if len(selected) != len(selection):
-        raise SystemExit(f'Coverage mismatch: selected={len(selected)} selection={len(selection)}')
+        raise SystemExit('Duplicate exact identities in selection manifest: ' + ', '.join(duplicate_selection))
+    if len(selected) + len(excluded_existing) != len(selection):
+        raise SystemExit(f'Coverage mismatch: selected={len(selected)} existing={len(excluded_existing)} selection={len(selection)}')
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -101,6 +136,8 @@ def main() -> None:
     summary = {
         'canonical_candidate_pool': len(candidates),
         'selection_manifest_records': len(selection),
+        'excluded_as_existing_exact_identity': len(excluded_existing),
+        'excluded_existing_candidate_ids': excluded_existing,
         'materialized_queue_records': len(selected),
         'coverage_ok': True,
         'max_preliminary_score': max((int(r.get('preliminary_score') or 0) for r in selected), default=0),
