@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import time
 from datetime import datetime, timedelta, timezone
@@ -12,34 +13,66 @@ import requests
 OUT = Path(os.getenv("DISCOVERY_OUT", "discovery/contracts_finder"))
 OUT.mkdir(parents=True, exist_ok=True)
 LOOKBACK_DAYS = int(os.getenv("LOOKBACK_DAYS", "365"))
-PAGE_LIMIT = int(os.getenv("PAGE_LIMIT", "100"))
+WINDOW_INDEX = max(0, int(os.getenv("CF_WINDOW_INDEX", "0")))
+WINDOW_TOTAL = max(1, int(os.getenv("CF_WINDOW_TOTAL", "1")))
+PAGE_LIMIT = min(100, max(1, int(os.getenv("PAGE_LIMIT", "100"))))
 MAX_PAGES = int(os.getenv("MAX_PAGES", "120"))
+REQUEST_RETRIES = max(1, int(os.getenv("CF_REQUEST_RETRIES", "4")))
 NOW = datetime.now(timezone.utc)
-START = NOW - timedelta(days=LOOKBACK_DAYS)
+HISTORY_START = NOW - timedelta(days=LOOKBACK_DAYS)
+SPAN_DAYS = max(1, math.ceil(LOOKBACK_DAYS / WINDOW_TOTAL))
+END = NOW - timedelta(days=WINDOW_INDEX * SPAN_DAYS)
+START = max(HISTORY_START, END - timedelta(days=SPAN_DAYS))
 BASE = "https://www.contractsfinder.service.gov.uk/"
 
 s = requests.Session()
-s.headers.update({"User-Agent": "Tender-Engine/2.0 public procurement research"})
+s.headers.update({"User-Agent": "Tender-Engine/3.0 public procurement research"})
 url = (
     BASE
     + "Published/Notices/OCDS/Search?"
     + f"publishedFrom={START.isoformat().replace('+00:00','Z')}&"
-    + f"publishedTo={NOW.isoformat().replace('+00:00','Z')}&stages=tender&limit={PAGE_LIMIT}"
+    + f"publishedTo={END.isoformat().replace('+00:00','Z')}&stages=tender&limit={PAGE_LIMIT}"
 )
 
 seen: set[str] = set()
 records: list[dict] = []
 pages = 0
 errors: list[dict] = []
+retry_events: list[dict] = []
 
 for _ in range(MAX_PAGES):
-    try:
-        r = s.get(url, timeout=45)
-        r.raise_for_status()
-        data = r.json()
-        pages += 1
-    except Exception as exc:
-        errors.append({"url": url, "error": repr(exc)})
+    data = None
+    last_exc = None
+    last_response = None
+    for attempt in range(REQUEST_RETRIES):
+        try:
+            r = s.get(url, timeout=45)
+            last_response = r
+            if r.status_code == 429 or r.status_code >= 500:
+                if attempt + 1 < REQUEST_RETRIES:
+                    wait = min(30.0, 1.5 * (2 ** attempt))
+                    try:
+                        wait = max(wait, float(r.headers.get("Retry-After", "0")))
+                    except Exception:
+                        pass
+                    retry_events.append({"url": url, "attempt": attempt + 1, "status": r.status_code, "wait_seconds": wait})
+                    time.sleep(wait)
+                    continue
+            r.raise_for_status()
+            data = r.json()
+            pages += 1
+            break
+        except Exception as exc:
+            last_exc = exc
+            status = getattr(last_response, "status_code", None)
+            if attempt + 1 < REQUEST_RETRIES and (status in (408, 425, 429) or status is None or (isinstance(status, int) and status >= 500)):
+                wait = min(30.0, 1.5 * (2 ** attempt))
+                retry_events.append({"url": url, "attempt": attempt + 1, "status": status, "wait_seconds": wait, "error": repr(exc)})
+                time.sleep(wait)
+                continue
+            break
+    if data is None:
+        errors.append({"url": url, "error": repr(last_exc) if last_exc else "request_failed", "status": getattr(last_response, "status_code", None)})
         break
 
     for rel in data.get("releases") or []:
@@ -56,10 +89,7 @@ for _ in range(MAX_PAGES):
                 deadline = datetime.fromisoformat(deadline_raw.replace("Z", "+00:00"))
             except Exception:
                 pass
-        if deadline and deadline < NOW:
-            current = False
-        else:
-            current = True
+        current = not deadline or deadline >= NOW
         parties = rel.get("parties") or []
         buyers = [p.get("name") for p in parties if "buyer" in (p.get("roles") or []) and p.get("name")]
         docs = []
@@ -94,6 +124,8 @@ for _ in range(MAX_PAGES):
                 "suitability": tender.get("suitability") or {},
                 "documents": docs,
                 "route": {"document_urls": [d["url"] for d in docs]},
+                "published_window_start": START.isoformat(),
+                "published_window_end": END.isoformat(),
                 "discovered_at": NOW.isoformat(),
             }
         )
@@ -106,7 +138,7 @@ for _ in range(MAX_PAGES):
                 BASE
                 + "Published/Notices/OCDS/Search?"
                 + f"publishedFrom={START.isoformat().replace('+00:00','Z')}&"
-                + f"publishedTo={NOW.isoformat().replace('+00:00','Z')}&stages=tender&limit={PAGE_LIMIT}&cursor={cursor}"
+                + f"publishedTo={END.isoformat().replace('+00:00','Z')}&stages=tender&limit={PAGE_LIMIT}&cursor={cursor}"
             )
     if not nxt:
         break
@@ -125,10 +157,16 @@ with (OUT / "current.jsonl").open("w", encoding="utf-8") as f:
 
 stats = {
     "source": "UK_CONTRACTS_FINDER",
+    "window_index": WINDOW_INDEX,
+    "window_total": WINDOW_TOTAL,
+    "window_start": START.isoformat(),
+    "window_end": END.isoformat(),
     "pages": pages,
     "raw_materialized": len(records),
     "current_materialized": len(current),
     "lookback_days": LOOKBACK_DAYS,
+    "retry_events": retry_events,
+    "rate_limit_events": sum(1 for x in retry_events if x.get("status") == 429),
     "errors": errors,
     "generated_at": NOW.isoformat(),
 }
