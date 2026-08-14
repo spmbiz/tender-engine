@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  resolve-luxembourg:
+  resolve-batch:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -16,18 +16,15 @@ jobs:
           python-version: '3.12'
       - run: pip install 'playwright>=1.46,<2'
       - run: python -m playwright install --with-deps chromium
-      - name: Resolve Luxembourg DCE
-        env:
-          DCE_CONTACT_FIRST_NAME: Automation
-          DCE_CONTACT_LAST_NAME: Procurement
-          DCE_CONTACT_EMAIL: procurement@example.com
-          DCE_COMPANY_NAME: Test
-        run: python lux_test.py
-      - name: Upload DCE output
+      - name: Probe all shortlisted DCEs
+        run: python batch_probe.py
+      - name: Upload batch output
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: luxembourg-dce-test-${{ github.run_id }}
-          path: dce_store/
+          name: dce-batch-${{ github.run_id }}
+          path: |
+            batch_store/
+            dce_store/
           if-no-files-found: ignore
           retention-days: 7
