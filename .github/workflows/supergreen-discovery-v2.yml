@@ -1,0 +1,82 @@
+name: SuperGreen Discovery V2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  contracts-finder:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install requests
+      - name: Enumerate Contracts Finder without keyword prefilter
+        run: python pipeline/discover_contracts_finder.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: discovery-uk
+          path: discovery/contracts_finder/
+          if-no-files-found: error
+          retention-days: 7
+
+  etenders-ireland:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        shard:
+          - { start: 1, end: 10 }
+          - { start: 11, end: 20 }
+          - { start: 21, end: 30 }
+          - { start: 31, end: 40 }
+          - { start: 41, end: 50 }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'playwright>=1.46,<2'
+      - run: python -m playwright install --with-deps chromium
+      - name: Enumerate eTenders rows without keyword prefilter
+        env:
+          PAGE_START: ${{ matrix.shard.start }}
+          PAGE_END: ${{ matrix.shard.end }}
+        run: python pipeline/discover_etenders_ie.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: discovery-ie-${{ matrix.shard.start }}-${{ matrix.shard.end }}
+          path: discovery/ireland/
+          if-no-files-found: error
+          retention-days: 7
+
+  wide-read-pack:
+    needs: [contracts-finder, etenders-ireland]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: discovery-*
+          path: discovery-download
+          merge-multiple: true
+      - name: Canonical merge and dedupe
+        run: python pipeline/merge_discovery.py --root discovery-download --out merged
+      - name: Build mandatory GPT wide-read packets
+        run: python pipeline/wide_read_packets.py --input merged/current_candidates.jsonl --out wide_read_packets --packet-size 250
+      - uses: actions/upload-artifact@v4
+        with:
+          name: supergreen-wide-read-${{ github.run_id }}
+          path: |
+            merged/
+            wide_read_packets/
+          if-no-files-found: error
+          retention-days: 7
