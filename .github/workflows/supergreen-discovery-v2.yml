@@ -6,15 +6,15 @@ on:
     branches: [main]
     paths:
       - 'pipeline/discover_ted.py'
-      - 'pipeline/discover_etenders_ie.py'
       - 'pipeline/discover_contracts_finder.py'
+      - 'pipeline/discover_etenders_ie_async.py'
       - 'pipeline/merge_discovery.py'
       - 'pipeline/wide_read_packets.py'
       - 'state/seen_candidates.jsonl'
       - '.github/workflows/supergreen-discovery-v2.yml'
 
 jobs:
-  ted:
+  api-discovery:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -23,73 +23,57 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install requests
-      - name: Enumerate TED active scope without keyword prefilter
-        env:
-          TED_SCOPE: ACTIVE
-          TED_MAX_PAGES: 24
-        run: python pipeline/discover_ted.py
+      - name: Enumerate TED and Contracts Finder concurrently without keyword prefilter
+        shell: bash
+        run: |
+          set +e
+          TED_SCOPE=ACTIVE TED_MAX_PAGES=24 python pipeline/discover_ted.py > ted.log 2>&1 &
+          p1=$!
+          python pipeline/discover_contracts_finder.py > contracts_finder.log 2>&1 &
+          p2=$!
+          wait $p1; s1=$?
+          wait $p2; s2=$?
+          echo '--- TED ---'; cat ted.log
+          echo '--- Contracts Finder ---'; cat contracts_finder.log
+          if [ $s1 -ne 0 ] || [ $s2 -ne 0 ]; then exit 1; fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: discovery-ted
-          path: discovery/ted/
-          if-no-files-found: error
-          retention-days: 7
-
-  contracts-finder:
-    runs-on: ubuntu-latest
-    timeout-minutes: 12
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: pip install requests
-      - name: Enumerate Contracts Finder without keyword prefilter
-        run: python pipeline/discover_contracts_finder.py
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: discovery-uk
-          path: discovery/contracts_finder/
+          name: discovery-api
+          path: |
+            discovery/ted/
+            discovery/contracts_finder/
+            ted.log
+            contracts_finder.log
           if-no-files-found: error
           retention-days: 7
 
   etenders-ireland:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      max-parallel: 5
-      matrix:
-        shard:
-          - { start: 1, end: 10 }
-          - { start: 11, end: 20 }
-          - { start: 21, end: 30 }
-          - { start: 31, end: 40 }
-          - { start: 41, end: 50 }
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install 'playwright>=1.46,<2'
+      - run: pip install 'playwright>=1.46,<2' beautifulsoup4
       - run: python -m playwright install --with-deps chromium
-      - name: Enumerate eTenders rows without keyword prefilter
+      - name: Enumerate 50 eTenders pages with one warm Chromium
         env:
-          PAGE_START: ${{ matrix.shard.start }}
-          PAGE_END: ${{ matrix.shard.end }}
-        run: python pipeline/discover_etenders_ie.py
+          PAGE_START: 1
+          PAGE_END: 50
+          IE_PAGE_CONCURRENCY: 6
+        run: python pipeline/discover_etenders_ie_async.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: discovery-ie-${{ matrix.shard.start }}-${{ matrix.shard.end }}
+          name: discovery-ie
           path: discovery/ireland/
           if-no-files-found: error
           retention-days: 7
 
   wide-read-pack:
-    needs: [ted, contracts-finder, etenders-ireland]
+    needs: [api-discovery, etenders-ireland]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 8
