@@ -2,16 +2,6 @@ name: SuperGreen Discovery V2
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'pipeline/discover_ted.py'
-      - 'pipeline/discover_contracts_finder.py'
-      - 'pipeline/discover_etenders_ie_async.py'
-      - 'pipeline/merge_discovery.py'
-      - 'pipeline/wide_read_packets.py'
-      - 'state/seen_candidates.jsonl'
-      - '.github/workflows/supergreen-discovery-v2.yml'
 
 concurrency:
   group: supergreen-discovery-v2
