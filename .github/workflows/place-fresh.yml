@@ -1,12 +1,10 @@
-name: Fresh France PLACE Hunt
+name: Fresh France PLACE Hunt (Legacy Manual)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'place_probe.py'
-      - '.github/workflows/place-fresh.yml'
+
+permissions:
+  contents: write
 
 jobs:
   place:
@@ -17,29 +15,37 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install 'playwright>=1.46,<2'
-      - run: python -m playwright install --with-deps chromium
+      - run: python -m pip install --disable-pip-version-check -q 'playwright>=1.46,<2'
+      - name: Reuse runner Chrome
+        shell: bash
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
       - name: Download current PLACE DCEs
         run: python place_probe.py
-      - name: Unpack nested PLACE archives
+      - name: Unpack nested PLACE archives using runner tools
+        shell: bash
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq p7zip-full unzip
+          command -v 7z >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq p7zip-full)
           find fresh_store/FRANCE_PLACE -type f -name '*.zip' -print0 | while IFS= read -r -d '' f; do
-            out="${f%.zip}_unpacked"
-            mkdir -p "$out"
-            unzip -oq "$f" -d "$out" || true
+            out="${f%.zip}_unpacked"; mkdir -p "$out"; unzip -oq "$f" -d "$out" || true
           done
           find fresh_store/FRANCE_PLACE -type f -name '*.7z' -print0 | while IFS= read -r -d '' f; do
-            out="${f%.7z}_unpacked"
-            mkdir -p "$out"
-            7z x -y "$f" -o"$out"
+            out="${f%.7z}_unpacked"; mkdir -p "$out"; 7z x -y "$f" -o"$out" || true
           done
-      - name: Upload PLACE output
+      - name: Persist harvested output durably
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: fresh-place-${{ github.run_id }}
-          path: fresh_store/FRANCE_PLACE/
-          if-no-files-found: ignore
-          retention-days: 7
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [ -d fresh_store/FRANCE_PLACE ] || exit 0
+          tag="legacy-place-${GITHUB_RUN_ID}"
+          tar -czf "$tag.tar.gz" fresh_store/FRANCE_PLACE
+          gh release create "$tag" --target "$GITHUB_SHA" --title "$tag" --notes "Durable legacy PLACE harvest."
+          gh release upload "$tag" "$tag.tar.gz"
