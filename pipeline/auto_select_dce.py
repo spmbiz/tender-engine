@@ -8,6 +8,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
+from materialize_dce_selection import identity
+
 POSITIVE = {
     "website": 38, "web site": 38, "web portal": 35, "portal": 20, "cms": 30,
     "digital": 15, "seo": 28, "hosting": 20, "maintenance": 14,
@@ -113,29 +115,39 @@ def retrieval_score(rec: dict) -> tuple[int, list[str]]:
 
 
 def select(records: Iterable[dict], minimum: int = 34, limit: int = 320, blocked_ids: set[str] | None = None) -> list[dict]:
+    rows = list(records)
     blocked_norm = {str(x).strip().casefold() for x in (blocked_ids or set()) if str(x).strip()}
+    blocked_tb: set[tuple[str, str]] = set()
+    for rec in rows:
+        cid_key, tb_key = identity(rec)
+        if cid_key in blocked_norm and tb_key:
+            blocked_tb.add(tb_key)
+
     scored = []
-    for rec in records:
+    for rec in rows:
         cid = str(rec.get("candidate_id") or "").strip()
-        if not cid or cid.casefold() in blocked_norm:
+        cid_key, tb_key = identity(rec)
+        if not cid or cid_key in blocked_norm or (tb_key and tb_key in blocked_tb):
             continue
         score, reasons = retrieval_score(rec)
         if score < minimum:
             continue
-        scored.append((score, cid, reasons, rec))
+        scored.append((score, cid, reasons, rec, cid_key, tb_key))
 
-    # A merged source harvest can legitimately contain duplicate source identities.
-    # Rank with the full deterministic retrieval score, then keep one best record per
-    # canonical ID. The exported preliminary score is deliberately capped at 89:
-    # 90-100 belongs to the mandatory post-DCE/GPT evidence gate in this repository.
+    # Use the exact same identity semantics as materialize_dce_selection.py so a
+    # selector batch cannot pass one notion of uniqueness and fail the next gate.
+    # Rank with full deterministic retrieval score; export <=89 because 90-100 is
+    # reserved for post-DCE/GPT evidence.
     scored.sort(key=lambda x: (-x[0], str(x[3].get("deadline") or "9999"), x[1]))
     out = []
-    emitted: set[str] = set()
-    for raw_score, cid, reasons, rec in scored:
-        key = cid.casefold()
-        if key in emitted:
+    emitted_ids: set[str] = set()
+    emitted_tb: set[tuple[str, str]] = set()
+    for raw_score, cid, reasons, rec, cid_key, tb_key in scored:
+        if cid_key in emitted_ids or (tb_key and tb_key in emitted_tb):
             continue
-        emitted.add(key)
+        emitted_ids.add(cid_key)
+        if tb_key:
+            emitted_tb.add(tb_key)
         out.append({
             "candidate_id": cid,
             "preliminary_score": min(89, raw_score),
