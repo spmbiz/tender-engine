@@ -24,6 +24,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Resolve strict print-DCE authority count
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.load(open('control/historical_boamp_dce_review_v2/summary.json',encoding='utf-8'))
+          assert s['contract']=='HISTORICAL_SUBNICHE_DCE_GATE_RESEARCH_V1',s
+          expected=sum(int(v.get('gate_ready') or 0) for k,v in (s.get('subniches') or {}).items() if ('print' in k.casefold() or 'brochure' in k.casefold()))
+          assert expected>0,(expected,s.get('subniches'))
+          Path('/tmp/expected_print_dce_count').write_text(str(expected),encoding='utf-8')
+          print('STRICT_TRUE_PRINT_DCES',expected)
+          PY
       - name: Recover latest fail-closed BOAMP DCE worker bundle
         env:
           GH_TOKEN: ${{ github.token }}
@@ -36,12 +48,14 @@ jobs:
           tar -xzf source/historical-boamp-dce-worker-v2.tar.gz -C extracted
       - name: Build strict evidence-backed print brief
         run: python pipeline/build_historical_print_dce_brief.py --root extracted --out brief
-      - name: Validate research contract
+      - name: Validate research contract against strict authority
         run: |
           python - <<'PY'
           import json,os
           s=json.load(open('brief/summary.json',encoding='utf-8'))
+          expected=int(open('/tmp/expected_print_dce_count').read().strip())
           assert s['contract']=='HISTORICAL_PRINT_DCE_BUSINESS_BRIEF_V1',s
+          assert s['true_gate_ready_print_dces']==expected,(s['true_gate_ready_print_dces'],expected)
           assert s['final_verdict_allowed'] is False
           assert os.path.isfile('brief/print_dce_briefs.jsonl')
           print(json.dumps(s,indent=2,ensure_ascii=False))
@@ -56,7 +70,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add control/historical_print_dce_business_brief_v1/
-          git commit -m 'tenders: persist historical print DCE business brief v1' || true
+          git commit -m 'tenders: persist strict historical print DCE business brief v1' || true
           for i in 1 2 3 4 5; do
             if git pull --rebase origin main && git push origin HEAD:main; then break; fi
             git rebase --abort >/dev/null 2>&1 || true
