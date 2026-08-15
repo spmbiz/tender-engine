@@ -43,9 +43,12 @@ jobs:
           jobs="$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$rid/jobs?per_page=100")"
           expected="$(jq '[.jobs[] | select(.name|startswith("shard-"))] | length' <<< "$jobs")"
           success="$(jq '[.jobs[] | select((.name|startswith("shard-")) and .status=="completed" and .conclusion=="success")] | length' <<< "$jobs")"
-          echo "source_run=$rid expected_shards=$expected successful_shards=$success"
+          echo "source_run=$rid expected_shards=$expected api_successful_shards=$success"
           [ "$expected" -gt 0 ]
-          [ "$success" -eq "$expected" ] || { echo 'Source shard set is not fully successful'; exit 1; }
+          # GitHub's jobs endpoint can lag matrix completion. Do not gate durable
+          # recovery on this eventually-consistent counter. The next step requires
+          # exactly one immutable handoff artifact per expected shard; that is the
+          # stronger execution/durability proof.
           echo "id=$rid" >> "$GITHUB_OUTPUT"
           echo "expected=$expected" >> "$GITHUB_OUTPUT"
       - name: Recover all completed shard artifacts from source run
@@ -57,7 +60,7 @@ jobs:
           pattern: dce-shard-*
           path: shard-transport
           merge-multiple: true
-      - name: Verify exact shard completeness and unpack compact handoffs
+      - name: Verify exact immutable shard completeness and unpack handoffs
         shell: bash
         env:
           EXPECTED: ${{ steps.resolve.outputs.expected }}
@@ -65,15 +68,20 @@ jobs:
           set -euo pipefail
           mkdir -p dce-artifacts
           count=0
+          duplicates=0
+          declare -A seen
           for archive in shard-transport/handoff-shard-*.tar.gz; do
             [ -e "$archive" ] || continue
+            name="$(basename "$archive")"
+            if [ "${seen[$name]:-0}" = 1 ]; then duplicates=$((duplicates + 1)); continue; fi
+            seen[$name]=1
             base="$(basename "$archive" .tar.gz)"
             mkdir -p "dce-artifacts/$base"
             tar -xzf "$archive" -C "dce-artifacts/$base"
             count=$((count + 1))
           done
-          echo "expected_shards=$EXPECTED recovered_shards=$count"
-          [ "$count" -eq "$EXPECTED" ] || { echo 'Artifact completeness failure'; exit 1; }
+          echo "expected_shards=$EXPECTED recovered_unique_handoffs=$count duplicate_handoffs=$duplicates"
+          [ "$count" -eq "$EXPECTED" ] || { echo 'Artifact completeness failure; refusing partial aggregate'; exit 1; }
       - name: Canonical aggregate and benchmark metrics
         run: python pipeline/aggregate_dce.py --root dce-artifacts --out dce-aggregate
       - name: Build bounded deterministic durable bundles
