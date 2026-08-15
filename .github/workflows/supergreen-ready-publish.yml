@@ -12,8 +12,7 @@ on:
         default: ''
   push:
     branches: [main]
-    paths:
-      - 'control/supergreen_review_trigger.txt'
+    paths: ['control/supergreen_review_trigger.txt']
 
 permissions:
   contents: write
@@ -25,98 +24,110 @@ jobs:
   publish:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: main
+        with: {ref: main}
       - id: resolve
-        name: Resolve canonical DCE run
-        shell: bash
+        name: Resolve anchor DCE run
         env:
           GH_TOKEN: ${{ github.token }}
           INPUT_RUN: ${{ github.event.inputs.dce_run }}
           EVENT_RUN: ${{ github.event.workflow_run.id }}
+        shell: bash
         run: |
           set -euo pipefail
           rid=''
-          if [[ "${INPUT_RUN:-}" =~ ^[0-9]+$ ]]; then
-            rid="$INPUT_RUN"
-          elif [[ "${EVENT_RUN:-}" =~ ^[0-9]+$ ]] && gh release view "dce-harvest-${EVENT_RUN}" --repo "$GH_REPO" >/dev/null 2>&1; then
-            rid="$EVENT_RUN"
-          else
-            # Recovery and parent-stale runs can finish via a durable Release even when workflow_run is not reliable.
-            # Resolve the newest DCE Release that actually contains a deep-review aggregate.
+          if [[ "${INPUT_RUN:-}" =~ ^[0-9]+$ ]]; then rid="$INPUT_RUN"; fi
+          if [[ -z "$rid" && "${EVENT_RUN:-}" =~ ^[0-9]+$ ]] && gh release view "dce-harvest-${EVENT_RUN}" --repo "$GH_REPO" >/dev/null 2>&1; then rid="$EVENT_RUN"; fi
+          if [[ -z "$rid" ]]; then
             while IFS=$'\t' read -r tag _; do
               [[ "$tag" =~ ^dce-harvest-([0-9]+)$ ]] || continue
-              candidate="${BASH_REMATCH[1]}"
-              if gh release view "$tag" --repo "$GH_REPO" --json assets --jq '.assets[].name' | grep -Fxq "dce-deep-review-${candidate}.tar.gz"; then
-                rid="$candidate"; break
-              fi
-            done < <(gh release list --repo "$GH_REPO" --limit 100 --json tagName,publishedAt --jq '.[] | [.tagName,.publishedAt] | @tsv')
+              x="${BASH_REMATCH[1]}"
+              if gh release view "$tag" --repo "$GH_REPO" --json assets --jq '.assets[].name' | grep -Fxq "dce-deep-review-${x}.tar.gz"; then rid="$x"; break; fi
+            done < <(gh release list --repo "$GH_REPO" --limit 100 --json tagName,publishedAt --jq '.[]|[.tagName,.publishedAt]|@tsv')
           fi
-          [[ "$rid" =~ ^[0-9]+$ ]] || { echo "No durable DCE deep-review Release found" >&2; exit 1; }
+          [[ "$rid" =~ ^[0-9]+$ ]] || { echo 'No durable DCE review Release found' >&2; exit 1; }
           echo "dce_run=$rid" >> "$GITHUB_OUTPUT"
-          echo "Resolved canonical DCE run: $rid"
-      - name: Download canonical DCE review aggregate
-        shell: bash
+      - name: Collect rolling durable DCE reviews
         env:
           GH_TOKEN: ${{ github.token }}
-          DCE_RUN: ${{ steps.resolve.outputs.dce_run }}
+          ANCHOR_RUN: ${{ steps.resolve.outputs.dce_run }}
+          ROLLING_RUNS: '12'
+        shell: bash
         run: |
           set -euo pipefail
-          tag="dce-harvest-${DCE_RUN}"
-          mkdir -p payload
-          gh release download "$tag" --repo "$GH_REPO" --pattern "dce-deep-review-${DCE_RUN}.tar.gz" --dir payload
-          mkdir -p dce-aggregate
-          tar -xzf "payload/dce-deep-review-${DCE_RUN}.tar.gz" -C dce-aggregate
-          test -s dce-aggregate/deep_review_queue.jsonl
-          test -s dce-aggregate/summary.json
-      - name: Build curated GPT Supergreen-ready pack
+          mkdir -p rolling combined
+          : > combined/deep_review_queue.jsonl
+          count=0
+          printf '{"anchor_dce_run":%s,"included_runs":[' "$ANCHOR_RUN" > combined/rolling_sources.json
+          first=1
+          while IFS=$'\t' read -r tag _; do
+            [[ "$tag" =~ ^dce-harvest-([0-9]+)$ ]] || continue
+            rid="${BASH_REMATCH[1]}"; asset="dce-deep-review-${rid}.tar.gz"
+            assets="$(gh release view "$tag" --repo "$GH_REPO" --json assets --jq '.assets[].name' 2>/dev/null || true)"
+            grep -Fxq "$asset" <<< "$assets" || continue
+            mkdir -p "rolling/$rid"
+            if ! gh release download "$tag" --repo "$GH_REPO" --pattern "$asset" --dir "rolling/$rid" >/dev/null 2>&1; then continue; fi
+            tar -xzf "rolling/$rid/$asset" -C "rolling/$rid"
+            q="rolling/$rid/deep_review_queue.jsonl"
+            [[ -s "$q" ]] || continue
+            python - "$q" "$rid" >> combined/deep_review_queue.jsonl <<'PY'
+          import json,sys
+          path,rid=sys.argv[1],sys.argv[2]
+          for line in open(path,encoding='utf-8',errors='replace'):
+              try: x=json.loads(line)
+              except Exception: continue
+              if isinstance(x,dict):
+                  x['source_dce_run']=int(rid)
+                  print(json.dumps(x,ensure_ascii=False))
+          PY
+            [[ $first -eq 1 ]] || printf ',' >> combined/rolling_sources.json
+            first=0; printf '%s' "$rid" >> combined/rolling_sources.json
+            count=$((count+1)); [[ $count -ge $ROLLING_RUNS ]] && break
+          done < <(gh release list --repo "$GH_REPO" --limit 100 --json tagName,publishedAt --jq '.[]|[.tagName,.publishedAt]|@tsv')
+          printf ']}' >> combined/rolling_sources.json
+          [[ $count -ge 1 ]] || { echo 'No rolling DCE reviews collected' >&2; exit 1; }
+          test -s combined/deep_review_queue.jsonl
+          echo "rolling_dce_runs=$count" >> "$GITHUB_STEP_SUMMARY"
+      - name: Build rolling GPT Supergreen-ready pack
         run: |
-          python pipeline/build_supergreen_ready_pack.py \
-            --input dce-aggregate/deep_review_queue.jsonl \
-            --summary dce-aggregate/summary.json \
-            --out supergreen-ready \
-            --limit 250
-      - name: Validate pack contract
+          python pipeline/build_supergreen_ready_pack.py --input combined/deep_review_queue.jsonl --summary combined/rolling_sources.json --out supergreen-ready --limit 500
+      - name: Validate rolling contract
         shell: bash
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
           m=json.loads(Path('supergreen-ready/manifest.json').read_text())
-          assert m['contract']=='GPT_SUPERGREEN_READY_PACK_V1',m
-          rows=sum(1 for _ in Path('supergreen-ready/supergreen_ready.jsonl').open())
-          assert rows==m['ready_rows'],(rows,m)
-          assert all(json.loads(x).get('gate_readiness') for x in Path('supergreen-ready/supergreen_ready.jsonl').read_text().splitlines() if x.strip())
+          assert m['contract']=='GPT_SUPERGREEN_READY_PACK_V2_ROLLING',m
+          rows=[json.loads(x) for x in Path('supergreen-ready/supergreen_ready.jsonl').read_text().splitlines() if x.strip()]
+          assert len(rows)==m['ready_rows']
+          assert len({r['candidate_id'] for r in rows})==len(rows)
+          assert all(r.get('gate_readiness') for r in rows)
           print(json.dumps(m,indent=2))
           PY
-      - name: Persist on canonical DCE Release and stable latest Release
-        shell: bash
+      - name: Persist stable latest rolling pack
         env:
           GH_TOKEN: ${{ github.token }}
-          DCE_RUN: ${{ steps.resolve.outputs.dce_run }}
+          ANCHOR_RUN: ${{ steps.resolve.outputs.dce_run }}
+        shell: bash
         run: |
           set -euo pipefail
-          asset="supergreen-ready-${DCE_RUN}.tar.gz"
+          asset="supergreen-ready-rolling-${ANCHOR_RUN}.tar.gz"
           tar -C supergreen-ready -czf "$asset" .
-          gh release upload "dce-harvest-${DCE_RUN}" "$asset" --repo "$GH_REPO" --clobber
-          latest_tag="supergreen-ready-latest"
+          gh release upload "dce-harvest-${ANCHOR_RUN}" "$asset" --repo "$GH_REPO" --clobber || true
+          latest_tag='supergreen-ready-latest'
           if ! gh release view "$latest_tag" --repo "$GH_REPO" >/dev/null 2>&1; then
-            gh release create "$latest_tag" --repo "$GH_REPO" --target main \
-              --title "Latest Supergreen-ready Tender Pack" \
-              --notes "Stable pointer to the latest curated DCE-backed GPT review pack. This asset contains review-ready candidates, not pre-declared final Supergreens."
+            gh release create "$latest_tag" --repo "$GH_REPO" --target main --title 'Latest Supergreen-ready Tender Pack' --notes 'Stable rolling pointer to DCE-backed GPT review candidates. Review-ready is not pre-declared final Supergreen.'
           fi
           cp "$asset" latest-supergreen-ready.tar.gz
-          printf '{"dce_run":%s,"asset":"%s","contract":"GPT_SUPERGREEN_READY_PACK_V1"}\n' "$DCE_RUN" "$asset" > latest-supergreen-ready.json
+          cp combined/rolling_sources.json latest-supergreen-ready.json
           gh release upload "$latest_tag" --repo "$GH_REPO" latest-supergreen-ready.tar.gz latest-supergreen-ready.json --clobber
-          echo "Stable latest pack: release=$latest_tag dce_run=$DCE_RUN" >> "$GITHUB_STEP_SUMMARY"
           cat supergreen-ready/manifest.json >> "$GITHUB_STEP_SUMMARY"
-      - name: Publish one-day ChatGPT transport artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: supergreen-ready-${{ steps.resolve.outputs.dce_run }}-${{ github.run_id }}
+          name: supergreen-ready-rolling-${{ steps.resolve.outputs.dce_run }}-${{ github.run_id }}
           path: supergreen-ready/
           retention-days: 1
           compression-level: 9
