@@ -1,0 +1,53 @@
+name: GPT Recall Surface
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/build_gpt_recall_surface.py'
+      - '.github/workflows/gpt-recall-surface.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: engine
+      - uses: actions/checkout@v4
+        with:
+          ref: live-snapshot
+          path: snapshot
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build compact high-recall surface for GPT review
+        working-directory: engine
+        run: |
+          python pipeline/build_gpt_recall_surface.py \
+            --packets '../snapshot/gpt-packets/*.jsonl' \
+            --out control/gpt_recall_surface_latest.jsonl \
+            --summary control/gpt_recall_surface_latest.summary.json \
+            --per-bucket 450 \
+            --max-total 1800
+          cat control/gpt_recall_surface_latest.summary.json
+      - name: Persist recall surface on main
+        working-directory: engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/gpt_recall_surface_latest.jsonl control/gpt_recall_surface_latest.summary.json
+          git commit -m 'tenders: refresh GPT recall surface' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
