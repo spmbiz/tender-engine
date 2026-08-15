@@ -1,5 +1,5 @@
 {
-  "verified_at": "2026-08-14",
+  "verified_at": "2026-08-15",
   "providers": {
     "github": {
       "enabled": true,
@@ -8,16 +8,35 @@
       "limit_basis": "GitHub Free standard hosted concurrency limit, verified against current GitHub Actions limits documentation",
       "public_standard_runner_minutes": "free_and_unlimited",
       "ubuntu_latest_public": {"vcpus": 4, "ram_gb": 16},
-      "runtime_override_env": "GITHUB_CONCURRENCY_LIMIT"
+      "runtime_override_env": "GITHUB_CONCURRENCY_LIMIT",
+      "observed_live_capacity": {
+        "observed_at": "2026-08-15T00:28:45Z",
+        "benchmark_workflow_run": 31853732491,
+        "parallel_jobs_provisioned": 19,
+        "logical_cpus_per_job": 4,
+        "configured_parallel_vcpus": 76,
+        "benchmark_result": "PASS",
+        "note": "19 matrix jobs were observed provisioned concurrently; shard 0 saturated all 4 logical CPUs successfully. One slot intentionally left outside the benchmark for fleet/controller work."
+      }
     },
     "circleci": {
       "desired_enabled": true,
       "connected_to_repo": true,
+      "connection_evidence": "A prior say-hello job succeeded and CircleCI build #11 was triggered on circleci-fleet, proving the project was connected.",
       "free_plan_advertised_concurrency": 30,
       "public_open_source_linux_credits_per_month": 400000,
       "open_source_credit_condition": "repository public AND CircleCI organization on Free plan",
       "free_plan_verified_for_this_org": false,
+      "configured_worker_resource_class": "medium",
+      "configured_vcpus_per_worker": 2,
+      "configured_max_parallel_workers": 30,
+      "configured_parallel_vcpus": 60,
       "durable_write_bridge": "requires FLEET_GITHUB_TOKEN in CircleCI project environment",
+      "durable_bridge_last_observed": "FAILURE_ON_EARLIER_CIRCLECI_FLEET_RUN",
+      "trigger_state": "DEGRADED_UNVERIFIED",
+      "trigger_diagnostic": "Build #11 triggered, then later circleci-fleet and minimal diagnostic branch pushes produced no GitHub CircleCI status contexts. This points to a CircleCI project trigger/plan/credit state rather than repository YAML alone.",
+      "historical_route": "Contracts Finder official daily CSV endpoint; 360 dates sharded across 30 workers",
+      "historical_route_rate_limit": "HTTP 403 means stop requests for 5 minutes per Contracts Finder official documentation",
       "auto_purchase_credits": false
     }
   }
