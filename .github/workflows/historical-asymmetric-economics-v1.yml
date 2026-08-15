@@ -1,0 +1,57 @@
+name: Historical Asymmetric Economics v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - historical_lab/asymmetric_economics_v1.py
+      - .github/workflows/historical-asymmetric-economics-v1.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Download branch authorities
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input out
+          gh release download historical-information-work-pure-core-v3-1 --repo "$GITHUB_REPOSITORY" --pattern market_matrix.csv --dir input/global --clobber
+          gh release download historical-usa-network-intermediary-v3-2 --repo "$GITHUB_REPOSITORY" --pattern family_intermediation_scorecard.csv --dir input/usa --clobber
+          gh release download historical-australia-review-evaluation-v3-2 --repo "$GITHUB_REPOSITORY" --pattern market_matrix.csv --dir input/au --clobber
+          gh release download historical-open-world-broker-qa-v4 --repo "$GITHUB_REPOSITORY" --pattern broker_candidates_qa.csv --dir input/broker --clobber
+      - name: Build empirical economics profiles
+        run: |
+          python historical_lab/asymmetric_economics_v1.py \
+            --global-matrix input/global/market_matrix.csv \
+            --usa-score input/usa/family_intermediation_scorecard.csv \
+            --au-matrix input/au/market_matrix.csv \
+            --broker input/broker/broker_candidates_qa.csv \
+            --out out
+      - name: Persist economics authority
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-asymmetric-economics-v1
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target main --title 'Historical Asymmetric Economics v1' --notes 'Cross-branch historical economics profiles. Native currencies are never mixed; model compression/friction scores are separate hypotheses, not margin estimates.'
+          gh release upload "$TAG" out/summary.json out/REPORT.md out/economic_profiles.csv out/broker_structural_profiles.csv --repo "$GITHUB_REPOSITORY" --clobber
+          mkdir -p control/historical_asymmetric_economics_v1
+          cp out/summary.json out/REPORT.md control/historical_asymmetric_economics_v1/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_asymmetric_economics_v1/
+          git commit -m 'historical: persist asymmetric economics v1' || exit 0
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
