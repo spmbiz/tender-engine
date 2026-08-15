@@ -27,25 +27,23 @@ jobs:
           from pipeline.broker_resell_prefilter import classify
           p=load(); assert p and p['status']=='READY'
 
-          # Missing explicit country must not leak France printing prior onto a US record.
           us_print={'candidate_id':'US-SAM:x','title':'Printing services for agency publications'}
           d,r=adjustment(us_print,p); print('us-print-prior',d,r); assert d==0,(d,r)
 
-          # Pure software title remains valid and receives only the cross-country broker prior.
           pure={'candidate_id':'US-SAM:y','title':'Adobe Software License Renewal','type':'Solicitation','set_aside':'Unrestricted'}
-          x=classify(pure,p); print('pure-software',x); assert x and x[1]=='Software licences / SaaS resale'; assert x[6]==2,x
+          x=classify(pure,p); print('pure-software',x); assert x and x[1]=='Software licences / SaaS resale'; assert x[7]==2,x
 
-          # Incidental software licensing in body cannot convert medical equipment to SaaS.
           medical={'candidate_id':'US-SAM:z','title':'Steris Innowave Ultra Sonic Irrigator','description':'Includes embedded software licensing and annual license support','type':'Solicitation','set_aside':'Unrestricted'}
           x=classify(medical,p); print('medical-incidental',x); assert x is None
 
-          # Physical mixed procurement is excluded from pure software lane.
           kiosk={'candidate_id':'IE:1','country':'IRELAND','title':'Self-Service Kiosk Terminals, Kiosk OS Integration, and Associated Software Licensing'}
           x=classify(kiosk,p); print('kiosk-mixed',x); assert x is None
 
-          # Sole-source SAM notice is excluded even if title says software subscription.
           sole={'candidate_id':'US-SAM:s','title':'Notice of Intent to Sole Source Software Subscription Renewal','type':'Special Notice','set_aside':'Unrestricted'}
           x=classify(sole,p); print('sole-source',x); assert x is None
+
+          generic_saas={'candidate_id':'IE:2','country':'IRELAND','title':'Provision of a SaaS Case Management System'}
+          x=classify(generic_saas,p); print('generic-saas-vendor',x); assert x is None
 
           promo={'candidate_id':'FR:p','country':'FRANCE','title':'Fourniture et livraison d objets publicitaires personnalisés'}
           x=classify(promo,p); print('promo',x); assert x and x[1]=='Promotional merchandise'
