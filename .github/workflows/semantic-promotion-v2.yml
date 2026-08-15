@@ -1,0 +1,63 @@
+name: SPM Semantic Promotion QA v2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/semantic_promotion_v2.py'
+      - '.github/workflows/semantic-promotion-v2.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: spm-semantic-promotion-v2
+  cancel-in-progress: false
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Download canonical Global Core v4 facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern historical_tenders.parquet --dir source --clobber
+          gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern awards.parquet --dir source --clobber
+      - name: Run strict semantic promotion gate
+        run: |
+          python pipeline/semantic_promotion_v2.py \
+            --historical source/historical_tenders.parquet \
+            --awards source/awards.parquet \
+            --out out
+      - name: Persist QA outputs
+        run: |
+          rm -f out/qa.duckdb out/qa.duckdb.wal
+          mkdir -p control/semantic_promotion_v2
+          cp out/PROMOTION_REPORT.md control/semantic_promotion_v2/PROMOTION_REPORT.md
+          cp out/promotion_manifest.json control/semantic_promotion_v2/promotion_manifest.json
+          cp out/promotion_decisions.csv control/semantic_promotion_v2/promotion_decisions.csv
+          cp out/lane_qa_summary.csv control/semantic_promotion_v2/lane_qa_summary.csv
+          cp out/strict_cohorts.csv control/semantic_promotion_v2/strict_cohorts.csv
+          cp out/manual_review_samples.csv control/semantic_promotion_v2/manual_review_samples.csv
+          cp out/rejected_false_positive_samples.csv control/semantic_promotion_v2/rejected_false_positive_samples.csv
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/semantic_promotion_v2/
+          git commit -m 'tenders: persist semantic promotion QA v2' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
