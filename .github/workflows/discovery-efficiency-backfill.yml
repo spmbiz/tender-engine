@@ -1,0 +1,106 @@
+name: Tender Discovery Efficiency Backfill
+
+on:
+  workflow_dispatch:
+    inputs:
+      current_run_id:
+        description: Current completed discovery run ID
+        required: true
+      previous_run_id:
+        description: Immediately previous comparable discovery run ID
+        required: true
+  push:
+    branches: [main]
+    paths:
+      - 'control/discovery_efficiency_backfill.txt'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: tender-discovery-efficiency-writer
+  cancel-in-progress: false
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - id: ids
+        shell: bash
+        env:
+          INPUT_CURRENT: ${{ github.event.inputs.current_run_id }}
+          INPUT_PREVIOUS: ${{ github.event.inputs.previous_run_id }}
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = 'workflow_dispatch' ]; then
+            cur="$INPUT_CURRENT"; prev="$INPUT_PREVIOUS"
+          else
+            cur="$(sed -nE 's/^current_run_id=([0-9]+).*$/\1/p' control/discovery_efficiency_backfill.txt | tail -1)"
+            prev="$(sed -nE 's/^previous_run_id=([0-9]+).*$/\1/p' control/discovery_efficiency_backfill.txt | tail -1)"
+          fi
+          [[ "$cur" =~ ^[0-9]+$ && "$prev" =~ ^[0-9]+$ ]] || exit 1
+          echo "current=$cur" >> "$GITHUB_OUTPUT"
+          echo "previous=$prev" >> "$GITHUB_OUTPUT"
+      - name: Rehydrate only compact canonical wide-read harvests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CUR: ${{ steps.ids.outputs.current }}
+          PREV: ${{ steps.ids.outputs.previous }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for spec in "current:$CUR" "previous:$PREV"; do
+            label="${spec%%:*}"; rid="${spec##*:}"; tag="discovery-harvest-$rid"
+            mkdir -p "$label-release" "$label"
+            assets="$(gh release view "$tag" --json assets --jq '.assets[].name')"
+            normal="supergreen-wide-read-$rid.tar.gz"
+            repaired="supergreen-wide-read-$rid-repaired.tar.gz"
+            if grep -Fxq "$repaired" <<< "$assets"; then archive="$repaired"; else archive="$normal"; fi
+            gh release download "$tag" --pattern "$archive" --dir "$label-release"
+            tar -xzf "$label-release/$archive" -C "$label"
+            test -s "$label/merged/current_candidates.jsonl"
+          done
+      - name: Measure canonical novelty
+        env:
+          CUR: ${{ steps.ids.outputs.current }}
+        run: |
+          python pipeline/discovery_novelty_metrics.py \
+            --current current/merged/current_candidates.jsonl \
+            --previous previous/merged/current_candidates.jsonl \
+            --out "discovery-novelty-$CUR.json"
+      - name: Measure exact hosted runner cost
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CUR: ${{ steps.ids.outputs.current }}
+        run: |
+          python -m pip install --disable-pip-version-check -q requests
+          python pipeline/discovery_runner_metrics.py \
+            --repo "$GITHUB_REPOSITORY" \
+            --run-id "$CUR" \
+            --novelty "discovery-novelty-$CUR.json" \
+            --out "discovery-efficiency-$CUR.json"
+      - name: Persist immutable benchmark on current discovery Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CUR: ${{ steps.ids.outputs.current }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="discovery-harvest-$CUR"
+          gh release upload "$tag" \
+            "discovery-novelty-$CUR.json" \
+            "discovery-efficiency-$CUR.json" --clobber
+          echo '### Discovery novelty' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat "discovery-novelty-$CUR.json" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo '### Discovery runner efficiency' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat "discovery-efficiency-$CUR.json" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
