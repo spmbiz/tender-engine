@@ -1,0 +1,46 @@
+# Manual sample — Office supplies / consumables resale
+
+Samples: 40
+
+|#|Source|Country|Route|Title|Scope excerpt|
+|---:|---|---|---|---|---|
+|1|Belgium|BE|UNKNOWN|Accord-cadre de fournitures de bureaux et cloisons acoustiques||
+|2|Belgium|BE|UNKNOWN|Centrale d'achat - Livraison de fournitures, papeterie, et petit matériel de bureau||
+|3|Belgium|BE|UNKNOWN|Fournitures de bureau||
+|4|Belgium|BE|UNKNOWN|Acquisition de fournitures de bureau||
+|5|Belgium|BE|UNKNOWN|Fourniture d’équipements de protection individuelles, de fournitures de bureau, de vêtements de travail et d'accessoires||
+|6|Belgium|BE|UNKNOWN|EXTERNALISATION DE LA GESTION DU COURRIER SORTANT ET FOURNITURE DE PAPETERIE IMPRIMEE||
+|7|Belgium|BE|UNKNOWN|Livraison de fournitures de bureau et consommables informatiques||
+|8|Belgium|BE|UNKNOWN|Accord-cadre relatif à l'impression et à la livraison de supports de communication et de papeterie/d'objets siglés "IFAPME"||
+|9|Canada federal|CANADA|OPEN_PUBLIC|Inmate Purchasing Plan|This is a republication of this notice and not an amendment. Access the original notice at https://canadabuys.canada.ca/en/tender-opportunities/tender-notice/pw-21-00974352. If you are currently subscribed to notifications about this tender, you need to re-subscribe by following this new notice. This is a public notice to advise the supplier community that t|
+|10|Canada federal|CANADA|OPEN_PUBLIC|Stamps, Seal Embossers, and Associated Accessories|House of Commons Notice of Proposed Procurement Request for Proposal/Request for Quotation reference number: 2024074 Description: This requirement is for: House of Commons (HoC) The House of Commons (HoC) requires, on an as-and-when required basis, the provision of customized stamps, seal embossers, and associated accessories for Members of Parliament (MP), |
+|11|Canada federal|CANADA|OPEN_PUBLIC|RCMP Forms, Publications and Warehousing|Canada is seeking offers from Offerors to provide complete printing and logistical services for the supply of a variety of forms, publications, stationery items, and specialty items to clients to the Royal Canadian Mounted Police. To view the documents, please go to https://discovery.ariba.com/rfx/23137702|
+|12|Canada federal|CANADA|OPEN_PUBLIC|Equipment and Appliances for 40 Elgin|Notice of Proposed Procurement (NPP) 1. Public Services and Procurement Canada has a requirement for the supply, delivery and installation of commercially available equipment and appliances to 40 Elgin St, Ottawa ON K1P 5C4 2. There are 5 separate categories which are as follows: Category 1 – Office Supplies Category 2 – Material Handling and Janitorial Cate|
+|13|Canada federal|CANADA|OPEN_PUBLIC|RFI E60PD-24OSFB - Office Supplies and Paper Greening Initiative|This Request for Information (RFI) invites suppliers to respond to a series of questions related to office supplies and paper products to assist Canada in refining its approach to procuring these goods. This RFI is not a solicitation nor will it be used to pre-qualify or otherwise restrict participation in any future procurement process (e.g. Request for Sta|
+|14|Canada federal|CANADA|OPEN_PUBLIC|Feminine Hygiene Product Dispensers|This requirement is to supply and deliver Feminine Hygiende Dispenser Units to 1770 Pink Road, J9J 3N7, Gatineau, Québec. Please find the solicitation documents using this link Feminine Hygiene Product Dispensers|
+|15|Canada federal|CANADA|OPEN_PUBLIC|21C31-259008 - H-shaped metal sheet fasteners|PWGSC, on behalf of Correctional Service Canada, is issuing this request for standing offer (RFSO) for the acquisition of H-shaped metal sheet fasteners and delivery located in La Macaza, QC, as detailed in Annex Statement of Requirement.|
+|16|Canada federal|CANADA|OPEN_PUBLIC|OFFICE SUPPLIES|The Senate of Canada (Senate) is seeking to establish a contract with an external Supplier a contract for Office Supplies, as defined in Annex “A” - Statement of Work, for three (3) years from August 1, 2025, with the option to renew for up to two (2) additional one-year (1) periods.|
+|17|France|FRANCE|OPEN_PUBLIC|FOURNITURE DE PAPIER DE REPROGRAPHIE|FOURNITURE DE PAPIER DE REPROGRAPHIE|
+|18|France|FRANCE|OPEN_PUBLIC|Fournitures de bureau et cartes de visites.|Fournitures de bureau et cartes de visites.|
+|19|France|FRANCE|OPEN_PUBLIC|ACCORD-CADRE ACHAT ET LIVRAISON DE FOURNITURES SCOLAIRES, PÉDAGOGIQUES ET DE LIBRAIRIE POUR LES ÉCOLES DE LA COMMUNE DE MAMOUDZOU|ACCORD-CADRE ACHAT ET LIVRAISON DE FOURNITURES SCOLAIRES, PÉDAGOGIQUES ET DE LIBRAIRIE POUR LES ÉCOLES DE LA COMMUNE DE MAMOUDZOU|
+|20|France|FRANCE|OPEN_PUBLIC|Fourniture De Papier Reprographie En Ramettes Et D'Enveloppes Et De Pochettes Sur Le Departement Des Hautes-Alpes Pour La Centrale D'Achat It05|Ce marché a pour objet l'achat de papier, d'enveloppes et de pochettes pour les besoins des adhérents de l'Ingénierie départementale des Hautes-Alpes dénommée It05.L'accord-cadre sera exécuté par l'émission de bons de commande.Chaque lot fera l'objet d'une attribution séparée.Les prestations sont réglées par des prix unitaires.Les montants estimatifs sont in|
+|21|France|FRANCE|OPEN_PUBLIC|Acquisition de produits papetiers à destination des services et des écoles-.|Acquisition de produits papetiers à destination des services et des écoles-.|
+|22|France|FRANCE|OPEN_PUBLIC|Fourniture de papeterie pour le Département de Saône-et-Loire|Fourniture de papeterie pour le Département de Saône-et-Loire|
+|23|France|FRANCE|OPEN_PUBLIC|Accord-cadre à bons de commande de papier pour les besoins des services départementaux au titre de la période 2025 - 2029|Accord-cadre à bons de commande de papier pour les besoins des services départementaux au titre de la période 2025 - 2029|
+|24|France|FRANCE|OPEN_PUBLIC|FOURNITURE DE PAPIER POUR PHOTOCOPIEURS|Le marché a pour objet la fourniture de papier pour photocopieurs. Il s'effectue dans le cadre d'un groupement de commandes avec le Centre Communal d'Action Sociale de Gravelines. Il s'agit d'un accord-cadre mono attributaire à bons de commande d'une durée initiale d'1 an à compter du 1er janvier 2026. Il pourra être renouvelé 3 fois un an.|
+|25|Ireland|IRELAND|COMPETITIVE_OTHER|2532 - Supply of Postage Stamps And Thermal Stamp Labels|2532 - Supply of Postage Stamps And Thermal Stamp Labels|
+|26|Ireland|IRELAND|OPEN_PUBLIC|Call for Tenders for the provision of schoolbooks through the Junior Cycle Schoolbook Scheme funded by the Department of Education to The Donahies Community School, Roll No: 91318U|Call for Tenders for the provision of schoolbooks through the Junior Cycle Schoolbook Scheme funded by the Department of Education to The Donahies Community School, Roll No: 91318U|
+|27|Ireland|IRELAND|OPEN_PUBLIC|Printing of Secure Certificate Templates for QQI by an externally accredited security print company/organisation|Printing of Secure Certificate Templates for QQI by an externally accredited security print company/organisation|
+|28|Ireland|IRELAND|OPEN_PUBLIC|Media Monitoring Services for SEAI|Media Monitoring Services for SEAI|
+|29|Ireland|IRELAND|OPEN_PUBLIC|Call for Tenders for the design, production, translation and printing of Annual Reports and ad hoc design services.|Call for Tenders for the design, production, translation and printing of Annual Reports and ad hoc design services.|
+|30|Ireland|IRELAND|OPEN_PUBLIC|Coláiste Muire Máthair 68405J|Coláiste Muire Máthair 68405J|
+|31|Ireland|IRELAND|OPEN_PUBLIC|Call for Tenders for the provision of schoolbooks through the Junior Cycle Schoolbook Scheme funded by the Department of Education to Oatlands College 60050E|Call for Tenders for the provision of schoolbooks through the Junior Cycle Schoolbook Scheme funded by the Department of Education to Oatlands College 60050E|
+|32|Ireland|IRELAND|OPEN_PUBLIC|Call for Tenders for the provision of schoolbooks through the Junior Cycle Schoolbook Scheme funded by the Department of Education to Coláiste Rís 63880O|Call for Tenders for the provision of schoolbooks through the Junior Cycle Schoolbook Scheme funded by the Department of Education to Coláiste Rís 63880O|
+|33|Quebec|CANADA - QUEBEC|DIRECT_NONCOMPETITIVE|Impression de la papeterie des juges|Impression de la papeterie des juges|
+|34|Quebec|CANADA - QUEBEC|OPEN_PUBLIC|Achat et livraison de fournitures de bureau|Achat et livraison de fournitures de bureau|
+|35|Quebec|CANADA - QUEBEC|DIRECT_NONCOMPETITIVE|Fournitures de bureau 2023|Fournitures de bureau 2023|
+|36|Quebec|CANADA - QUEBEC|DIRECT_NONCOMPETITIVE|Fournitures de bureau hors CAG|Fournitures de bureau hors CAG|
+|37|Quebec|CANADA - QUEBEC|LIMITED_INVITATION|Acquisition de fournitures de bureau et de papier d'impression - 2024-2025|Acquisition de fournitures de bureau et de papier d'impression - 2024-2025|
+|38|Quebec|CANADA - QUEBEC|DIRECT_NONCOMPETITIVE|Achats de fournitures de bureau pour tous les services de la ville|Achats de fournitures de bureau pour tous les services de la ville|
+|39|Quebec|CANADA - QUEBEC|DIRECT_NONCOMPETITIVE|Service d'impression de la papeterie des juges|Service d'impression de la papeterie des juges|
+|40|Quebec|CANADA - QUEBEC|OPEN_PUBLIC|Fourniture et livraison de papeteries imprimées pour la Ville|Fourniture et livraison de papeteries imprimées pour la Ville|
