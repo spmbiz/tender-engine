@@ -169,7 +169,39 @@ import fleet_controller_v3 as v3  # noqa: E402
 _original_reconcile_pending = v3._reconcile_pending
 
 
+def _release_successful_zero_shard_lease(state: dict, actions: list[dict]) -> bool:
+    pending = state.get("pending_dce_batch")
+    if not isinstance(pending, dict) or not pending.get("candidate_ids"):
+        return False
+    run = v3._match_pending_run(pending)
+    if not run:
+        return False
+    if str(run.get("status") or "") != "completed" or str(run.get("conclusion") or "") != "success":
+        return False
+    run_id = str(run.get("id") or "")
+    health = v4._run_job_state(run_id) if run_id else None
+    if not health or int(health.get("shards") or 0) != 0:
+        return False
+    leased = [str(x) for x in pending.get("candidate_ids") or []]
+    actions.append({
+        "type": "dce_zero_shard_lease_released_immediately",
+        "workflow_run_id": run_id,
+        "source_run": pending.get("source_run"),
+        "leased_candidates": len(leased),
+        "job_health": health,
+        "reason": "prepare-only successful run executed zero DCE shards; all leased candidates returned to durable queue",
+    })
+    state["pending_dce_batch"] = None
+    return True
+
+
 def _reconcile_pending_with_orphans(state: dict, actions: list[dict]) -> bool:
+    # A successful prepare-only DCE run is an admission defer, not execution.
+    # Release its entire lease immediately so the next controller cycle can
+    # redispatch as soon as runner capacity is available.
+    if _release_successful_zero_shard_lease(state, actions):
+        return False
+
     last = fc.parse_ts(state.get("last_orphan_reconcile_at"))
     due = last is None or fc.NOW - last >= timedelta(minutes=ORPHAN_RECONCILE_INTERVAL_MINUTES)
     if due:
