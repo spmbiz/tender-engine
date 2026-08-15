@@ -34,19 +34,19 @@ jobs:
           from pathlib import Path
           p='core/historical_tenders.parquet'; con=duckdb.connect();con.execute("SET threads=4")
           cols={r[0] for r in con.execute('DESCRIBE SELECT * FROM read_parquet(?)',[p]).fetchall()}
-          source='Warehouse_Source'; proc='Procedure'; title='Title'
-          assert source in cols and proc in cols and title in cols,sorted(cols)
+          source_col='Warehouse_Source'; proc_col='Procedure'; title_col='Title'
+          assert source_col in cols and proc_col in cols and title_col in cols,sorted(cols)
           rows=con.execute(f'''WITH x AS (
-            SELECT trim(cast("{source}" as varchar)) source,
-                   coalesce(nullif(trim(cast("{proc}" as varchar)),''),'UNKNOWN') procedure,
+            SELECT trim(cast("{source_col}" as varchar)) src,
+                   coalesce(nullif(trim(cast("{proc_col}" as varchar)),''),'UNKNOWN') proc_value,
                    count(*) n
             FROM read_parquet(?) GROUP BY 1,2
           ), r AS (
-            SELECT *, row_number() over(partition by source order by n desc,procedure) rn,
-                   sum(n) over(partition by source) source_total
+            SELECT *, row_number() over(partition by src order by n desc,proc_value) rn,
+                   sum(n) over(partition by src) src_total
             FROM x
-          ) SELECT source,procedure,n,source_total,round(100.0*n/source_total,3) pct
-            FROM r WHERE rn<=40 ORDER BY source,n DESC''',[p]).fetchall()
+          ) SELECT src,proc_value,n,src_total,round(100.0*n/src_total,3) pct
+            FROM r WHERE rn<=40 ORDER BY src,n DESC''',[p]).fetchall()
           out=[{'source':r[0],'procedure':r[1],'n':r[2],'source_total':r[3],'pct':r[4]} for r in rows]
           Path('control/market_intelligence_routes/procedure_values.json').write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding='utf-8')
           md=['# Historical procurement procedure values','','Top raw `Procedure` values by warehouse source.']
