@@ -22,7 +22,7 @@ jobs:
         run: |
           set -euo pipefail
           tag="discovery-harvest-${GITHUB_RUN_ID}"
-          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Discovery Harvest ${GITHUB_RUN_ID}" --notes "Canonical durable discovery harvest. Source datasets and consolidated wide-read outputs are persisted as Release assets; Actions artifacts are not canonical."
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Discovery Harvest ${GITHUB_RUN_ID}" --notes "Canonical durable discovery harvest. Source datasets and consolidated wide-read outputs are persisted as Release assets; Actions artifacts are not canonical. Coverage status is measured explicitly and PARTIAL_WORLD_COVERAGE must never be represented as exhaustive worldwide coverage."
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
   ted-discovery:
@@ -170,12 +170,24 @@ jobs:
           mkdir -p release-download discovery-download;gh release download "$RELEASE_TAG" --pattern 'discovery-*.tar.gz' --dir release-download
           count=0;for archive in release-download/discovery-*.tar.gz; do [ -e "$archive" ] || continue;base="$(basename "$archive" .tar.gz)";mkdir -p "discovery-download/$base";tar -xzf "$archive" -C "discovery-download/$base";count=$((count + 1));done
           echo "source_packs=$count";[ "$count" -ge 2 ]
+      - name: Measure configured world-source coverage before claiming worldwide scope
+        run: python pipeline/source_coverage_guard.py --root discovery-download --out merged/source_coverage.json
       - name: Canonical merge and dedupe
         run: python pipeline/merge_discovery.py --root discovery-download --out merged
       - name: Build mandatory GPT wide-read packets
         run: python pipeline/wide_read_packets.py --input merged/current_candidates.jsonl --out wide_read_packets --packet-size 250
+      - name: Publish coverage truth to job summary
+        shell: bash
+        run: |
+          echo '### Source coverage' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat merged/source_coverage.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
       - name: Persist consolidated discovery durably
         env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
         run: |
           set -euo pipefail
-          tar -czf "supergreen-wide-read-${GITHUB_RUN_ID}.tar.gz" merged wide_read_packets;cp merged/stats.json "discovery-summary-${GITHUB_RUN_ID}.json";gh release upload "$RELEASE_TAG" "supergreen-wide-read-${GITHUB_RUN_ID}.tar.gz" "discovery-summary-${GITHUB_RUN_ID}.json" --clobber
+          tar -czf "supergreen-wide-read-${GITHUB_RUN_ID}.tar.gz" merged wide_read_packets
+          cp merged/stats.json "discovery-summary-${GITHUB_RUN_ID}.json"
+          cp merged/source_coverage.json "discovery-coverage-${GITHUB_RUN_ID}.json"
+          gh release upload "$RELEASE_TAG" "supergreen-wide-read-${GITHUB_RUN_ID}.tar.gz" "discovery-summary-${GITHUB_RUN_ID}.json" "discovery-coverage-${GITHUB_RUN_ID}.json" --clobber
