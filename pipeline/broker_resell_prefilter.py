@@ -4,15 +4,20 @@ from __future__ import annotations
 """High-precision broker/resell prefilter for live procurement discovery.
 
 Separate from CORE_DIGITAL / SOLO_LEAN. Only manually QA-promoted motions:
-  * Software licences / SaaS resale
+  * Software licence/subscription resale
   * Promotional merchandise
 
-Fail-closed changes after first live scan QA:
+Generic "provide a SaaS platform/system" procurements are deliberately NOT treated
+as resale: they normally require the bidder to be the software vendor/integrator.
+They may be interesting for a future vendor-partner motion, but they do not enter
+this automatic broker DCE queue.
+
+Fail-closed rules:
 * broker intent must be explicit in the procurement TITLE;
+* software resale requires licence/subscription/renewal semantics, not bare SaaS;
 * pure-software lane rejects hardware/medical/physical-product title collisions;
-* US SAM.gov non-bid stages, sole-source notices and restricted set-asides are
-  excluded for this Belgium-based general-open broker motion;
-* historical country priors are applied only after deterministic country resolution.
+* US SAM.gov non-bid stages, sole-source notices and restricted set-asides are excluded;
+* historical country priors apply only after deterministic country resolution.
 
 A high score means only "retrieve DCE and validate economics/channel constraints".
 It never means eligible, profitable, or GREEN.
@@ -32,8 +37,9 @@ except ImportError:
 
 SOFTWARE_TITLE_PATTERNS = [
     r"software licen[cs](?:e|es|ing)", r"software subscription", r"software licensing",
-    r"software licencing", r"licences? logicielles?", r"saas(?: subscription| licence| license| renewal)?",
+    r"software licencing", r"licences? logicielles?", r"saas (?:subscription|licence|license|renewal)",
     r"subscription renewal", r"software renewal", r"software subscriptions?",
+    r"software licence renewal", r"software license renewal",
 ]
 PROMO_TITLE_PATTERNS = [
     r"promotional merchandise", r"branded merchandise", r"promotional items?",
@@ -45,14 +51,13 @@ SOFTWARE_NEG = [
     r"custom software development", r"application development", r"software development services",
     r"system integration", r"systems integration", r"implementation project", r"migration project",
     r"managed service", r"penetration test", r"cybersecurity services", r"consultancy-only",
+    r"mise en oeuvre d.une solution", r"implementazione di un sistema", r"migraci[oó]n .* saas",
 ]
 PROMO_NEG = [
     r"full service marketing", r"event management services", r"campaign management services",
     r"advertising agency services", r"media buying",
 ]
 
-# Pure-software resale should not be inferred from a licence line buried inside a
-# physical system/device procurement. High precision is more valuable than recall.
 SOFTWARE_TITLE_COLLISIONS = [
     r"medical", r"clinical", r"device", r"equipment", r"hardware", r"terminal", r"kiosk",
     r"rack system", r"irrigator", r"ventilat", r"oxygen generation", r"transmitter system",
@@ -154,7 +159,7 @@ def classify(r, priors):
     if any(re.search(p,text,re.I) for p in HARD_NEG):return None
     c=cid(r); sf=source_family(r,c)
     if sf=="US_SAM":
-        ok,why=us_open_market_ok(r,title)
+        ok,_=us_open_market_ok(r,title)
         if not ok:return None
 
     candidates=[]
@@ -162,15 +167,15 @@ def classify(r, priors):
     spos=[p for p in SOFTWARE_TITLE_PATTERNS if re.search(p,title,re.I)]
     if spos and not any(re.search(p,title,re.I) for p in SOFTWARE_TITLE_COLLISIONS):
         sneg=[p for p in SOFTWARE_NEG if re.search(p,text,re.I)]
-        score=48 + min(12,4*(len(spos)-1)) - 16*len(sneg)
+        score=48 + min(12,4*(len(spos)-1)) - 18*len(sneg)
         v=numeric_value(r)
         if v is not None and v>0:
             if 5_000<=v<=150_000:score+=16
             elif v<=400_000:score+=10
             elif v<=1_000_000:score+=2
             elif v>3_000_000:score-=18
-        if re.search(r"framework|accord-cadre|rahmenvertrag|supply arrangement|qualification system",text,re.I):score-=5
-        channel=bool(re.search(r"renewal|support|cisco|adobe|microsoft|splunk|palo alto|ibm|esri|autocad|nutanix|oracle|vmware",title,re.I))
+        if re.search(r"framework|accord-cadre|rahmenvertrag|supply arrangement|qualification system|\brfsa\b",text,re.I):score-=8
+        channel=bool(re.search(r"renewal|support|cisco|adobe|microsoft|splunk|palo alto|ibm|esri|autocad|autodesk|nutanix|oracle|vmware",title,re.I))
         if channel:score-=4
         hd,hr=historical_adjustment(r,priors or {})
         score+=hd
@@ -222,7 +227,7 @@ def main():
                 "estimated_value":val,"channel_authorization_risk":channel_risk,
                 "working_capital_risk":"CHECK_DCE_AND_PAYMENT_TERMS","positive_patterns":pos,"negative_patterns":neg,
                 "historical_priority_adjustment":hist_delta,"historical_priority_reasons":hist_reasons,
-                "semantic_basis":"TITLE_ANCHORED_MANUAL_QA_V2","decision":"DCE_ECONOMICS_REVIEW_ONLY"
+                "semantic_basis":"TITLE_ANCHORED_PURE_RESALE_V3","decision":"DCE_ECONOMICS_REVIEW_ONLY"
             })
     ranked.sort(key=lambda x:(x["broker_score"],-(x.get("estimated_value") or 10**18)),reverse=True)
     top=ranked[:a.top];Path(a.out).parent.mkdir(parents=True,exist_ok=True)
@@ -235,8 +240,8 @@ def main():
         if len(selected)>=a.select:break
     manifest={
         "wide_read_run_id":a.run_id,"default_preliminary_score":78,"status":"DCE_PENDING",
-        "commercial_motion":"BROKER_RESELL","semantic_policy":"TITLE_ANCHORED_MANUAL_QA_V2",
-        "selection_reason":"Manually QA-promoted broker lanes only. DCE and supplier economics/channel validation required before any pursuit decision.",
+        "commercial_motion":"BROKER_RESELL","semantic_policy":"TITLE_ANCHORED_PURE_RESALE_V3",
+        "selection_reason":"Pure licence/subscription resale or promotional merchandise only. Generic SaaS vendor/implementation procurements excluded. DCE and supplier economics/channel validation required.",
         "candidate_ids":[x["candidate_id"] for x in selected]
     }
     Path(a.selection).write_text(json.dumps(manifest,ensure_ascii=False)+"\n",encoding="utf-8")
