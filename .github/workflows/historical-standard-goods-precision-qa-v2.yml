@@ -1,0 +1,82 @@
+name: Historical Standard Goods Precision QA v2
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Historical Standard Goods Precision v2']
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/historical-standard-goods-precision-qa-v2.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-standard-goods-precision-qa-v2
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download precision evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source
+          TAG=historical-standard-goods-precision-v2
+          for f in market_matrix.csv examples.csv top_winners.csv; do
+            gh release download "$TAG" --repo walidgdg1-ai/tender-engine --pattern "$f" --dir source --clobber
+          done
+      - name: Build QA packet for high-signal title-led buckets
+        run: |
+          python - <<'PY'
+          import csv,json
+          from collections import defaultdict
+          from pathlib import Path
+          def rd(p):
+            with open(p,encoding='utf-8',errors='replace',newline='') as f:return list(csv.DictReader(f))
+          m=rd('source/market_matrix.csv');e=rd('source/examples.csv');w=rd('source/top_winners.csv')
+          ei=defaultdict(list);wi=defaultdict(list)
+          for r in e:ei[(r['goods_family'],r['country'],r['currency'])].append(r)
+          for r in w:wi[(r['goods_family'],r['country'],r['currency'])].append(r)
+          priority=['WORKWEAR_PPE_SUPPLY','OFFICE_STATIONERY','OFFICE_FURNITURE','SCHOOL_ART_SUPPLIES','SIGNAGE_SUPPLY_INSTALL','TONER_INK','PAPER_ENVELOPES','WORKWEAR_MANAGED_RENTAL','SCHOOL_FURNITURE','MOBILE_DEVICES','PROMOTIONAL_MERCH','UNIFORMS','IT_PERIPHERALS','PACKAGING_MATERIALS','AV_EQUIPMENT','WASTE_BAGS_SACKS']
+          chosen=[]
+          for fam in priority:
+            ss=[r for r in m if r['goods_family']==fam and int(float(r.get('records') or 0))>=8]
+            ss.sort(key=lambda r:(-int(float(r['records'])),-int(float(r['buyers']))))
+            chosen.extend(ss[:7])
+          out=Path('control/historical_standard_goods_precision_qa_v2');out.mkdir(parents=True,exist_ok=True)
+          lines=['# Standard Goods Precision v2 — Semantic QA Packet','',
+                 'Historical-only. Classification is already title-led; this packet verifies representative titles before Atlas promotion.','']
+          pack=[]
+          for r in chosen:
+            k=(r['goods_family'],r['country'],r['currency'])
+            lines += [f"## {r['goods_family']} — {r['country']} / {r['currency']}",
+                      f"- records **{r['records']}** · buyers **{r['buyers']}** · repeat **{r['repeat_buyers']}** · median **{r.get('median_value') or 'UNKNOWN'}** · bidders **{r.get('median_bidders') or 'UNKNOWN'}** · suppliers **{r.get('suppliers') or 'UNKNOWN'}** · top share **{r.get('top_supplier_share') or 'UNKNOWN'}**",'- representative titles:']
+            for x in ei.get(k,[])[:8]: lines.append(f"  - {x.get('buyer') or 'UNKNOWN'} — {x.get('title') or ''} — value {x.get('reference_value') or 'UNKNOWN'}")
+            if wi.get(k):
+                lines.append('- top historical winners:')
+                for x in wi[k][:5]: lines.append(f"  - {x.get('supplier')} — weight {x.get('weighted_awards')} — share {x.get('supplier_share')}")
+            lines.append('')
+            pack.append({'market':r,'examples':ei.get(k,[])[:8],'winners':wi.get(k,[])[:5]})
+          (out/'QA_PACKET.md').write_text('\n'.join(lines),encoding='utf-8')
+          (out/'qa_packet.json').write_text(json.dumps(pack,indent=2,ensure_ascii=False),encoding='utf-8')
+          (out/'summary.json').write_text(json.dumps({'buckets_reviewed':len(pack),'historical_only':True,'title_led_source':True,'manual_verdicts_applied':False},indent=2),encoding='utf-8')
+          PY
+      - name: Persist QA packet
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_standard_goods_precision_qa_v2/
+          git commit -m 'historical: persist standard goods precision QA v2' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
