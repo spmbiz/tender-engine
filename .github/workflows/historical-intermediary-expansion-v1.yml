@@ -1,0 +1,105 @@
+name: Historical Intermediary Expansion v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/historical-intermediary-expansion-v1.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-intermediary-expansion-v1
+  cancel-in-progress: true
+
+jobs:
+  global-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Download canonical Global Core notice-first archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source
+          gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern historical_tenders.parquet --dir source --clobber
+      - name: Expand explicit broker/reseller/intermediary signatures
+        run: |
+          python - <<'PY'
+          import duckdb,json,csv
+          from pathlib import Path
+          con=duckdb.connect()
+          con.execute("SET threads=4")
+          rel="read_parquet('source/historical_tenders.parquet')"
+          # Strict explicit-intermediary patterns plus a few empirically discovered adjacent lanes.
+          patterns={
+            'SOFTWARE_BROKER_EXPLICIT': r'(?i)(softwarebroker|software[ -]broker|licentiemakelaar|licentie[ -]broker|logiciel.*revendeur|revendeur.*logiciel|software.*reseller|reseller.*software|lizenzbroker|softwarelizenz.*wiederverk|wiederverk.*softwarelizenz)',
+            'SOFTWARE_CLOUD_RESALE_EXPLICIT': r'(?i)(jälleenmyynti|återförsälj.*(programvara|licens)|licens.*återförsälj|revenda.*software|revendedor.*software|resale.*software|software.*resale)',
+            'CONSULTANT_BROKER_EXPLICIT': r'(?i)(konsultmäklare|konsultförmedl|consultant broker|consultancy broker|consultant brokerage|courtier.*consultant|intermédiation.*consultant|intermediation.*consultant)',
+            'STAFFING_INTERMEDIARY_EXPLICIT': r'(?i)(labou?r hire|temporary personnel services|temporary staffing|staffing services|personalvermittlung|personaldienstleist|intérim|interim staffing|agence.*intérim|uitzend|detacher)',
+            'POSTAL_OFFICIAL_FULFILMENT': r'(?i)(postzustellungsauftrag|zustellung von bescheiden|official notice delivery|postal fulfil|postal fulfillment|mise sous pli|routage postal|courrier.*distribution)',
+            'CLEANING_CONSUMABLE_SUPPLY': r'(?i)(puhtaanapidon tarvikkeet|cleaning supplies|cleaning consumables|produits d.?entretien|fournitures.*nettoyage|reinigungsmittel.*liefer|hygiene supplies)',
+          }
+          cases='CASE '+ ' '.join([f"WHEN regexp_matches(txt,{json.dumps(p)}) THEN '{k}'" for k,p in patterns.items()]) + " ELSE NULL END"
+          con.execute(f"""
+          CREATE TABLE x AS
+          SELECT *, lower(concat_ws(' ',coalesce(Title,''),coalesce(Scope_Summary,''),coalesce(Raw_CPV_Description,''),coalesce(Subcategory,''))) txt,
+                 try_cast(Official_Estimated_Value as double) val,
+                 try_cast(Official_Bidder_Count as double) bidders
+          FROM {rel}
+          """)
+          con.execute(f"CREATE TABLE hits AS SELECT *, {cases} family FROM x WHERE {cases} IS NOT NULL")
+          out=Path('control/historical_intermediary_expansion_v1');out.mkdir(parents=True,exist_ok=True)
+          groups=con.execute("""
+            SELECT family,Country,Currency,count(*) records,count(distinct nullif(Buyer_Name,'')) buyers,
+                   count(distinct nullif(Buyer_Name,'')) FILTER (WHERE Buyer_Name IN (SELECT Buyer_Name FROM hits h2 WHERE h2.family=hits.family GROUP BY Buyer_Name HAVING count(*)>=2)) repeat_buyers,
+                   quantile_cont(val,.25) FILTER(WHERE val>=0) p25_value,
+                   median(val) FILTER(WHERE val>=0) median_value,
+                   quantile_cont(val,.75) FILTER(WHERE val>=0) p75_value,
+                   median(bidders) FILTER(WHERE bidders>=0) median_bidders
+            FROM hits GROUP BY 1,2,3 ORDER BY records DESC
+          """).fetchall()
+          header=['family','country','currency','records','buyers','repeat_buyers','p25_value','median_value','p75_value','median_bidders']
+          with open(out/'market_matrix.csv','w',newline='',encoding='utf-8') as f:
+            w=csv.writer(f);w.writerow(header);w.writerows(groups)
+          examples=con.execute("""
+            WITH r AS (
+              SELECT family,Country,Currency,Historical_Tender_ID,Buyer_Name,Title,val,bidders,Procedure,
+                     row_number() over(partition by family,Country,Currency order by val desc nulls last,Publication_Date desc nulls last) rn
+              FROM hits)
+            SELECT * FROM r WHERE rn<=12 ORDER BY family,Country,Currency,rn
+          """).fetchall()
+          eh=['family','country','currency','tender_id','buyer','title','value','bidders','procedure','rn']
+          with open(out/'examples.csv','w',newline='',encoding='utf-8') as f:
+            w=csv.writer(f);w.writerow(eh);w.writerows(examples)
+          lines=['# Historical Intermediary Expansion v1','',
+                 'Strict historical keyword expansion over all **2,250,547 Global Core notice-first records**. No live/DCE evidence. Explicit intermediary wording is preferred over inferred resale.','']
+          by={(r[0],r[1],r[2]):r for r in groups}
+          exmap={}
+          for e in examples: exmap.setdefault((e[0],e[1],e[2]),[]).append(e)
+          for key,r in sorted(by.items(),key=lambda kv:-kv[1][3]):
+            lines += [f"## {r[0]} — {r[1]} / {r[2]}",f"- records **{r[3]}** · buyers **{r[4]}** · repeat buyers **{r[5]}** · median **{r[7] if r[7] is not None else 'UNKNOWN'}** · median bidders **{r[9] if r[9] is not None else 'UNKNOWN'}**",'- examples:']
+            for e in exmap.get(key,[])[:6]: lines.append(f"  - {e[4] or 'UNKNOWN'} — {e[5]} — {e[6] if e[6] is not None else 'UNKNOWN'}")
+            lines.append('')
+          (out/'REPORT.md').write_text('\n'.join(lines),encoding='utf-8')
+          summary={'archive_records_scanned':2250547,'matched_records':con.execute('select count(*) from hits').fetchone()[0],'families':con.execute('select count(distinct family) from hits').fetchone()[0],'historical_only':True,'live_used':False,'dce_used':False}
+          (out/'summary.json').write_text(json.dumps(summary,indent=2),encoding='utf-8')
+          PY
+      - name: Persist expansion
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_intermediary_expansion_v1/
+          git commit -m 'historical: persist intermediary expansion v1' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
