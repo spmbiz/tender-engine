@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 from datetime import timedelta
 
@@ -8,6 +9,7 @@ import fleet_controller_v3 as v3
 
 STATE_SCHEMA_VERSION = 4
 MAX_DEFERRED_DISCOVERY_RUNS = 1_000
+BUNDLE_MANIFEST_ASSET = "dce-canonical-packs-manifest.json"
 v3.STATE_SCHEMA_VERSION = STATE_SCHEMA_VERSION
 
 
@@ -21,18 +23,18 @@ def _slugify(value: str) -> str:
 
 
 def _executed_candidate_ids(dce_run_id: str, leased_candidate_ids: list[str]) -> list[str] | None:
-    """Resolve the exact candidates that produced durable candidate packs.
+    """Resolve exact candidates backed by durable canonical execution evidence.
 
-    A successful workflow badge is not enough: matrix compilation can legitimately
-    skip rows. The canonical candidate-*.tar.gz Release assets are the durable proof
-    that a candidate worker actually executed. Return None only when GitHub evidence
-    could not be read, never when the executed set is genuinely empty.
+    Legacy DCE runs persisted one candidate-*.tar.gz Release asset per candidate.
+    Single-writer runs persist a small number of bounded TAR bundles plus a manifest
+    whose members retain each immutable candidate archive and sha256. Support both
+    forms so controller reconciliation remains transactional across the migration.
     """
     try:
         rel = fc.get_release(f"dce-harvest-{dce_run_id}")
         if not rel:
             return None
-        asset_names: set[str] = set()
+        asset_rows: list[dict] = []
         page = 1
         while page <= 20:
             rows = fc.api(
@@ -42,15 +44,33 @@ def _executed_candidate_ids(dce_run_id: str, leased_candidate_ids: list[str]) ->
                 return None
             if not rows:
                 break
-            asset_names.update(str(x.get("name") or "") for x in rows if isinstance(x, dict))
+            asset_rows.extend(x for x in rows if isinstance(x, dict))
             if len(rows) < 100:
                 break
             page += 1
+
+        asset_names = {str(x.get("name") or "") for x in asset_rows}
         executed_slugs = {
             name[len("candidate-") : -len(".tar.gz")]
             for name in asset_names
             if name.startswith("candidate-") and name.endswith(".tar.gz")
         }
+
+        # New single-writer contract: use the durable bundle manifest as execution
+        # evidence rather than requiring hundreds of Release assets/API mutations.
+        if BUNDLE_MANIFEST_ASSET in asset_names:
+            manifest_blob = fc.download_asset({**rel, "assets": asset_rows}, BUNDLE_MANIFEST_ASSET)
+            if manifest_blob is None:
+                return None
+            manifest = json.loads(manifest_blob.decode("utf-8"))
+            if manifest.get("contract") != "DCE_SINGLE_WRITER_RELEASE_BUNDLE_V1":
+                return None
+            for bundle in manifest.get("bundles") or []:
+                for member in bundle.get("members") or []:
+                    name = str(member.get("name") or "")
+                    if name.startswith("candidate-") and name.endswith(".tar.gz"):
+                        executed_slugs.add(name[len("candidate-") : -len(".tar.gz")])
+
         return [cid for cid in leased_candidate_ids if _slugify(cid) in executed_slugs]
     except Exception:
         return None
