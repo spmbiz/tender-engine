@@ -82,6 +82,16 @@ def _buyer(rec: dict) -> str:
     return _norm(rec.get("buyer") or rec.get("buyer_name") or rec.get("authority"))
 
 
+def _title_text(rec: dict) -> str:
+    """Title/name only for high-precision lane rules.
+
+    Micro-Niche v2 showed that description/scope fields can mention unrelated
+    work and contaminate otherwise attractive historical cohorts. Rules may now
+    opt into match_field=title to fail closed on that failure mode.
+    """
+    return _norm(rec.get("title") or rec.get("name") or "")
+
+
 def _search_text(rec: dict) -> str:
     vals = []
     for key in (
@@ -132,9 +142,9 @@ def _country_matches(rule_country: str, record_country: str) -> bool:
 
 
 def _lane_adjustment(rec: dict, priors: dict) -> tuple[int, list[str]]:
-    text = _search_text(rec)
+    broad_text = _search_text(rec)
     country = _country(rec)
-    if not text:
+    if not broad_text:
         return 0, []
     best = 0
     reason = ""
@@ -149,6 +159,16 @@ def _lane_adjustment(rec: dict, priors: dict) -> tuple[int, list[str]]:
             continue
         rcountry = str(rule.get("country") or "").strip().upper()
         if not _country_matches(rcountry, country):
+            continue
+        match_field = str(rule.get("match_field") or "search_text").strip().casefold()
+        if match_field == "title":
+            text = _title_text(rec)
+        elif match_field in {"search_text", "broad", "all"}:
+            text = broad_text
+        else:
+            # Unknown match modes fail closed instead of silently broadening.
+            continue
+        if not text:
             continue
         pats = [str(x) for x in (rule.get("patterns") or []) if str(x).strip()]
         negs = [str(x) for x in (rule.get("negative_patterns") or []) if str(x).strip()]
