@@ -50,8 +50,10 @@ def main():
         c = load(candidate / "candidate.json") or {}
         m = load(candidate / "manifest.json") or {}
         q = load(candidate / "evidence_quality.json") or {}
+        a = load(candidate / "authority_conflicts.json") or {}
         g = load(candidate / "gate_snippets.json") or {}
         cid = c.get("candidate_id") or g.get("candidate_id") or m.get("candidate_id") or candidate.name
+        deadline_authority = a.get("deadline") if isinstance(a, dict) else {}
         rec = {
             "candidate_id": cid,
             "title": c.get("title"),
@@ -66,6 +68,9 @@ def main():
             "content_quality": q.get("content_quality"),
             "gate_readiness": bool(q.get("gate_readiness")),
             "evidence_quality": q,
+            "authority_conflicts": a,
+            "deadline_authority_status": deadline_authority.get("status") if isinstance(deadline_authority, dict) else None,
+            "deadline_conflict": bool(deadline_authority.get("conflict")) if isinstance(deadline_authority, dict) else False,
             "resolution": m.get("resolution"),
             "files": [{"name":x.get("name"),"size":x.get("size"),"source":x.get("source") or x.get("url") or x.get("source_url")} for x in (m.get("files") or []) if isinstance(x,dict)],
             "corpus_chars": g.get("corpus_chars"),
@@ -75,6 +80,7 @@ def main():
             "review_template": {},
             "review_contract": (
                 "Do not adjudicate mandatory gates unless gate_readiness is true. Fill each canonical gate with PASS/PASS_CONDITIONAL/FAIL_HARD/UNKNOWN/NOT_APPLICABLE and authoritative evidence. "
+                "A deadline conflict or unknown DCE deadline must be explicitly reconciled in authority_conflicts before finalization. "
                 "Do not assign score >=90 or FINAL_SUPER_GREEN until all potentially disqualifying gates are resolved with evidence."
             ),
         }
@@ -95,7 +101,12 @@ def main():
         out.append(rec)
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     Path(args.out).write_text(json.dumps({"candidate_count":len(out),"candidates":out},ensure_ascii=False,indent=2),encoding="utf-8")
-    print(json.dumps({"candidate_count":len(out),"gate_ready":sum(1 for x in out if x['gate_readiness']),"out":args.out},indent=2))
+    print(json.dumps({
+        "candidate_count":len(out),
+        "gate_ready":sum(1 for x in out if x['gate_readiness']),
+        "deadline_conflicts":sum(1 for x in out if x['deadline_conflict']),
+        "out":args.out
+    },indent=2))
 
 if __name__ == "__main__":
     main()
