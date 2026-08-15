@@ -1,0 +1,130 @@
+name: Broker Resell World Scan
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_discovery_run:
+        description: Discovery run containing canonical wide-read asset
+        required: false
+        default: '31893462184'
+  push:
+    branches: [main]
+    paths:
+      - 'control/broker_resell_trigger.json'
+      - '.github/workflows/broker-resell-world-scan.yml'
+      - 'pipeline/broker_resell_prefilter.py'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: broker-resell-world-scan
+  cancel-in-progress: true
+
+jobs:
+  rank:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Resolve source discovery run
+        id: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            run='${{ github.event.inputs.source_discovery_run }}'
+          else
+            run="$(python - <<'PY'
+          import json
+          print(json.load(open('control/broker_resell_trigger.json'))['source_discovery_run'])
+          PY
+          )"
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+      - name: Download canonical worldwide candidate universe
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ steps.source.outputs.run }}
+        run: |
+          set -euo pipefail
+          mkdir -p source-release source-discovery out queues
+          tag="discovery-harvest-${SOURCE_RUN}"
+          normal="supergreen-wide-read-${SOURCE_RUN}.tar.gz"
+          repaired="supergreen-wide-read-${SOURCE_RUN}-repaired.tar.gz"
+          assets="$(gh release view "$tag" --json assets --jq '.assets[].name')"
+          if grep -Fxq "$repaired" <<< "$assets"; then asset="$repaired"; else asset="$normal"; fi
+          gh release download "$tag" --pattern "$asset" --dir source-release --clobber
+          tar -xzf "source-release/$asset" -C source-discovery
+          find source-discovery -type f -name current_candidates.jsonl -print -quit | tee /tmp/candidate_path
+          test -s /tmp/candidate_path
+      - name: Rank only manually promoted broker/resell lanes
+        env:
+          SOURCE_RUN: ${{ steps.source.outputs.run }}
+        run: |
+          candidates="$(cat /tmp/candidate_path)"
+          python pipeline/broker_resell_prefilter.py \
+            --input "$candidates" \
+            --out out/broker_resell_rank.jsonl \
+            --selection queues/broker_resell_selection_latest.jsonl \
+            --run-id "$SOURCE_RUN" \
+            --top 300 --select 100 --max-per-source 25
+      - name: Persist compact live broker snapshot and queue
+        env:
+          SOURCE_RUN: ${{ steps.source.outputs.run }}
+        run: |
+          mkdir -p control/broker_resell_latest
+          cp out/broker_resell_rank.jsonl control/broker_resell_latest/broker_resell_rank.jsonl
+          cp out/broker_resell_rank.jsonl.summary.json control/broker_resell_latest/summary.json
+          cp queues/broker_resell_selection_latest.jsonl control/broker_resell_latest/selection.jsonl
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.load(open('control/broker_resell_latest/summary.json'))
+          lines=['# Broker / Resell live scan','',
+                 f"Source discovery run: **{s['source_run']}**",f"Eligible high-precision broker candidates: **{s['eligible']}**",f"Selected for DCE/economics review: **{s['selected']}**",'',
+                 'This is a separate commercial motion from CORE_DIGITAL. High ranking does not prove reseller authorization, margin, working capital, payment terms, delivery feasibility or eligibility.','',
+                 '## Selected by lane','']
+          for k,v in sorted(s.get('by_lane',{}).items(),key=lambda x:x[1],reverse=True):lines.append(f'- {k}: {v}')
+          lines += ['','## First candidates','', '|Score|Lane|Source|Title|Buyer|Value|Channel risk|','|---:|---|---|---|---|---:|---|']
+          for r in s.get('sample',[])[:30]:
+              title=str(r.get('title') or '').replace('|','/')[:120];buyer=str(r.get('buyer') or '').replace('|','/')[:80]
+              lines.append(f"|{r.get('broker_score','')}|{r.get('broker_lane','')}|{r.get('source_family','')}|{title}|{buyer}|{r.get('estimated_value') or ''}|{'YES' if r.get('channel_authorization_risk') else 'CHECK'}|")
+          Path('control/broker_resell_latest/REPORT.md').write_text('\n'.join(lines),encoding='utf-8')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/broker_resell_latest/ queues/broker_resell_selection_latest.jsonl
+          git commit -m "tenders: persist broker-resell scan ${SOURCE_RUN}" || true
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Publish durable broker scan
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="broker-resell-${GITHUB_RUN_ID}"
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target main --title "Broker Resell Scan ${GITHUB_RUN_ID}" --notes "Separate SPM broker/resell motion. DCE/economics validation required."
+          gh release upload "$tag" control/broker_resell_latest/summary.json control/broker_resell_latest/REPORT.md control/broker_resell_latest/broker_resell_rank.jsonl control/broker_resell_latest/selection.jsonl --repo "$GITHUB_REPOSITORY" --clobber
+      - name: Dispatch bounded DCE fanout for broker candidates
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ steps.source.outputs.run }}
+        run: |
+          selected="$(python - <<'PY'
+          import json
+          x=json.loads(open('queues/broker_resell_selection_latest.jsonl').readline())
+          print(len(x.get('candidate_ids') or []))
+          PY
+          )"
+          if [ "$selected" -gt 0 ]; then
+            gh workflow run dce-fanout-v2.yml --repo "$GITHUB_REPOSITORY" \
+              -f selection_path=queues/broker_resell_selection_latest.jsonl \
+              -f source_discovery_run="$SOURCE_RUN" \
+              -f max_jobs="$( [ "$selected" -lt 80 ] && echo "$selected" || echo 80 )" \
+              -f max_parallel=10 \
+              -f max_shards=40
+          fi
