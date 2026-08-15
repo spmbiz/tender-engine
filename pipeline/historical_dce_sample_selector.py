@@ -3,17 +3,14 @@ from __future__ import annotations
 
 """Select a bounded, stratified historical DCE sample for gate-prevalence research.
 
+Input may be canonical historical_tenders.parquet, .csv, or .csv.gz. Parquet is
+streamed through DuckDB in batches so the 2M+ row Global Core can be sampled
+without duplicating a large CSV export or loading the full table into RAM.
+
 This does NOT download DCEs and does NOT label old notices green. It turns a
 canonical historical notice table into an immutable sample manifest that the same
 live DCE resolver/gate pipeline can later consume when old public documents remain
 available.
-
-Selection goals:
-- prioritize SPM-relevant service categories without only taking keyword hits;
-- preserve country/CPV/buyer diversity;
-- prefer records with authoritative source URLs and usable dates;
-- avoid one repeat buyer/source monopolizing the sample;
-- never mix award-first reconstructed lanes into original-notice gate prevalence.
 """
 
 import argparse
@@ -25,7 +22,7 @@ import math
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Iterable
+from typing import Iterator
 
 LEAN_TERMS = {
     "website": 12, "web site": 12, "web portal": 10, "cms": 10,
@@ -48,13 +45,45 @@ def _open_csv(path: Path):
     return path.open("r", encoding="utf-8-sig", errors="replace", newline="")
 
 
+def _iter_rows(path: Path, batch_size: int = 10_000) -> Iterator[dict]:
+    if path.suffix.casefold() == ".parquet":
+        try:
+            import duckdb
+        except ImportError as exc:
+            raise SystemExit("duckdb is required for parquet historical sampling") from exc
+        con = duckdb.connect(database=":memory:")
+        con.execute("PRAGMA threads=4")
+        cur = con.execute("SELECT * FROM read_parquet(?)", [str(path)])
+        columns = [d[0] for d in cur.description]
+        while True:
+            rows = cur.fetchmany(batch_size)
+            if not rows:
+                break
+            for values in rows:
+                yield dict(zip(columns, values))
+        con.close()
+        return
+    with _open_csv(path) as f:
+        yield from csv.DictReader(f)
+
+
 def _norm(s: object) -> str:
     return re.sub(r"\s+", " ", str(s or "").strip())
 
 
 def _first(row: dict, *keys: str) -> str:
+    # Exact-name first, then case-insensitive fallback for cross-source schemas.
     for key in keys:
-        value = _norm(row.get(key))
+        if key in row:
+            value = _norm(row.get(key))
+            if value and value.upper() not in {"UNKNOWN", "NULL", "NONE", "N/A"}:
+                return value
+    lower = {str(k).casefold(): k for k in row}
+    for key in keys:
+        actual = lower.get(key.casefold())
+        if actual is None:
+            continue
+        value = _norm(row.get(actual))
         if value and value.upper() not in {"UNKNOWN", "NULL", "NONE", "N/A"}:
             return value
     return ""
@@ -125,7 +154,7 @@ def _canonical(row: dict, score: int, reasons: list[str]) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--input", required=True, help="Canonical historical_tenders.csv or .csv.gz")
+    ap.add_argument("--input", required=True, help="Canonical historical_tenders.parquet, .csv or .csv.gz")
     ap.add_argument("--out", required=True)
     ap.add_argument("--limit", type=int, default=10_000)
     ap.add_argument("--min-score", type=int, default=5)
@@ -134,24 +163,24 @@ def main() -> None:
     args = ap.parse_args()
 
     path = Path(args.input)
+    if not path.is_file():
+        raise SystemExit(f"missing input: {path}")
     candidates: list[tuple[int, dict]] = []
     raw_rows = excluded_award_first = 0
-    with _open_csv(path) as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            raw_rows += 1
-            source = _first(row, "source", "lane", "source_name", "portal").upper()
-            evidence = _first(row, "evidence_grain", "evidence_lane", "grain").casefold()
-            if source in EXCLUDE_LANES or "award-first" in evidence or "award_first" in evidence:
-                excluded_award_first += 1
-                continue
-            score, reasons = _score(row)
-            if score < args.min_score:
-                continue
-            rec = _canonical(row, score, reasons)
-            if not rec["primary_source_url"]:
-                continue
-            candidates.append((score, rec))
+    for row in _iter_rows(path):
+        raw_rows += 1
+        source = _first(row, "source", "lane", "source_name", "portal").upper()
+        evidence = _first(row, "evidence_grain", "evidence_lane", "grain").casefold()
+        if source in EXCLUDE_LANES or "award-first" in evidence or "award_first" in evidence:
+            excluded_award_first += 1
+            continue
+        score, reasons = _score(row)
+        if score < args.min_score:
+            continue
+        rec = _canonical(row, score, reasons)
+        if not rec["primary_source_url"]:
+            continue
+        candidates.append((score, rec))
 
     candidates.sort(key=lambda x: (-x[0], x[1]["country"], x[1]["candidate_id"]))
     country_cap = max(50, math.ceil(args.limit * args.country_cap_share))
@@ -198,6 +227,7 @@ def main() -> None:
             f.write(json.dumps(rec, ensure_ascii=False, separators=(",", ":")) + "\n")
     summary = {
         "contract": "HISTORICAL_DCE_SAMPLE_V1",
+        "input_format": path.suffix.casefold().lstrip("."),
         "raw_rows": raw_rows,
         "excluded_award_first": excluded_award_first,
         "eligible_candidates": len(candidates),
