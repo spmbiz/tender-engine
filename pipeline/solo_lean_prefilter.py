@@ -6,6 +6,11 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
+try:
+    from pipeline.historical_market_priors import load as load_historical_priors, adjustment as historical_adjustment
+except ImportError:
+    from historical_market_priors import load as load_historical_priors, adjustment as historical_adjustment
+
 # Retrieval prior only. Final SOLO requires substantive DCE + every mandatory gate.
 STRONG = [
     (40,["digital printing","print services","printing services","impression","imprimerie","druckleistung","brochure","leaflet","flyer","booklet"]),
@@ -97,9 +102,9 @@ def deadline_ok(r):
         return d>datetime.now(timezone.utc)
     except:return True
 
-def score(r):
+def score(r, priors=None):
     text=business_text(r); c=cid(r); sf=source(r,c); pts=0; pos=[]; neg=[]
-    if not text:return -999,[],[],None,sf
+    if not text:return -999,[],[],None,sf,0,[]
     for w,terms in STRONG:
         f=[t for t in terms if t in text]
         if f:pts+=w+min(8,2*(len(f)-1));pos.extend(f[:3])
@@ -126,10 +131,13 @@ def score(r):
         if any(x in nt for x in ["sources sought","special notice","presolicitation","justification","award"]):pts-=80;neg.append("sam-non-live-bid")
         if sa and sa not in {"none","n/a","na","not applicable","no set aside used","no set-aside used","not set aside","unrestricted","full and open competition"}:pts-=100;neg.append("sam-set-aside")
     if r.get("seen_before") is True:pts-=50
-    return pts,sorted(set(pos)),sorted(set(neg)),v,sf
+    hist_delta,hist_reasons=historical_adjustment(r,priors or {})
+    pts+=hist_delta
+    return pts,sorted(set(pos)),sorted(set(neg)),v,sf,hist_delta,hist_reasons
 
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument("--input",required=True);ap.add_argument("--out",required=True);ap.add_argument("--selection",required=True);ap.add_argument("--run-id",type=int,required=True);ap.add_argument("--top",type=int,default=500);ap.add_argument("--select",type=int,default=80);ap.add_argument("--max-per-source",type=int,default=12);a=ap.parse_args()
+    priors=load_historical_priors()
     ranked=[]; seen_tb=set()
     for line in open(a.input,encoding="utf-8",errors="replace"):
         if not line.strip():continue
@@ -140,10 +148,10 @@ def main():
         title=first(r,["title","name","tender_title","notice_title"]);buyer=first(r,["buyer","buyer_name","authority","contracting_authority","organisation","organization"])
         tb=(norm(title),norm(buyer))
         if tb[0] and tb in seen_tb:continue
-        s,p,n,v,sf=score(r)
+        s,p,n,v,sf,hd,hr=score(r,priors)
         if s<25:continue
         seen_tb.add(tb)
-        ranked.append({"candidate_id":c,"solo_lean_prior":s,"source_family":sf,"title":title,"buyer":buyer,"deadline":first(r,["deadline","submission_deadline","closing_date","close_date"]),"estimated_value":v,"positive_hits":p,"risk_hits":n})
+        ranked.append({"candidate_id":c,"solo_lean_prior":s,"source_family":sf,"title":title,"buyer":buyer,"deadline":first(r,["deadline","submission_deadline","closing_date","close_date"]),"estimated_value":v,"positive_hits":p,"risk_hits":n,"historical_priority_adjustment":hd,"historical_priority_reasons":hr})
     ranked.sort(key=lambda x:(x["solo_lean_prior"],-(x.get("estimated_value") or 10**18)),reverse=True);top=ranked[:a.top]
     Path(a.out).parent.mkdir(parents=True,exist_ok=True)
     with open(a.out,"w",encoding="utf-8") as f:
@@ -154,8 +162,8 @@ def main():
         if counts[sf]>=a.max_per_source:continue
         selected.append(x);counts[sf]+=1
         if len(selected)>=a.select:break
-    manifest={"wide_read_run_id":a.run_id,"default_preliminary_score":80,"status":"DCE_PENDING","selection_reason":"SOLO_LEAN proof prefilter only. Final requires substantive DCE and every mandatory gate; partnerable/borrowed capacity forbidden.","candidate_ids":[x["candidate_id"] for x in selected]}
+    manifest={"wide_read_run_id":a.run_id,"default_preliminary_score":80,"status":"DCE_PENDING","selection_reason":"SOLO_LEAN proof prefilter with bounded QA-clean historical priors only. Final requires substantive DCE and every mandatory gate; partnerable/borrowed capacity forbidden.","historical_priors_status":priors.get('status') if priors else 'UNAVAILABLE',"candidate_ids":[x["candidate_id"] for x in selected]}
     Path(a.selection).write_text(json.dumps(manifest,ensure_ascii=False)+"\n",encoding="utf-8")
-    summary={"source_run":a.run_id,"eligible":len(ranked),"selected":len(selected),"by_source":dict(counts),"top_sample":selected[:30],"generated_at":datetime.now(timezone.utc).isoformat()}
+    summary={"source_run":a.run_id,"eligible":len(ranked),"selected":len(selected),"by_source":dict(counts),"historical_priors_status":priors.get('status') if priors else 'UNAVAILABLE',"historically_adjusted_selected":sum(1 for x in selected if x.get('historical_priority_adjustment')),"top_sample":selected[:30],"generated_at":datetime.now(timezone.utc).isoformat()}
     Path(a.out+".summary.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding="utf-8");print(json.dumps(summary,ensure_ascii=False,indent=2))
 if __name__=="__main__":main()
