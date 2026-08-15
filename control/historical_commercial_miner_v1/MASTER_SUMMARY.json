@@ -1,0 +1,95 @@
+{
+  "version": "SPM_HISTORICAL_COMMERCIAL_MINER_MASTER_V1",
+  "status": "PASS",
+  "scope": "HISTORICAL_ONLY_NO_LIVE_NO_DCE",
+  "procurement_records_scanned": 18271075,
+  "award_rows_scanned": 20307312,
+  "award_supplier_links_scanned": 19958186,
+  "sources": [
+    {
+      "version": "SPM_HISTORICAL_COMMERCIAL_MINER_V1",
+      "generated_at": "2026-08-15T21:23:04.263081+00:00",
+      "label": "GLOBAL_CORE_V4",
+      "grain": "NOTICE_FIRST_TENDER",
+      "counts": {
+        "procurement_records_scanned": 2250547,
+        "distinct_procurement_ids": 2250547,
+        "award_rows_scanned": 4286784,
+        "award_supplier_links_scanned": 3937663,
+        "commercial_clusters": 1972566,
+        "clusters_with_3plus_records": 31684,
+        "multi_buyer_repeat_markets": 446,
+        "singleton_clusters": 1820424
+      },
+      "integrity": {
+        "expected_tenders": 2250547,
+        "scan_ordinal_min": 1,
+        "scan_ordinal_max": 2250547,
+        "status": "PASS"
+      },
+      "method": {
+        "ontology_free_cluster_key": "country + currency + route + native code + normalized title/scope signature",
+        "supplier_weights": "fractionalized per award when multiple supplier links exist",
+        "currency_rule": "percentile scoring partitioned by country and currency; no FX mixing",
+        "score_role": "market-structure triage only; not SPM feasibility and not live eligibility"
+      }
+    },
+    {
+      "version": "SPM_HISTORICAL_COMMERCIAL_MINER_V1",
+      "generated_at": "2026-08-15T21:21:29.861134+00:00",
+      "label": "AUSTENDER_V1",
+      "grain": "AWARD_FIRST_PROCUREMENT",
+      "counts": {
+        "procurement_records_scanned": 178211,
+        "distinct_procurement_ids": 178211,
+        "award_rows_scanned": 178211,
+        "award_supplier_links_scanned": 178211,
+        "commercial_clusters": 80687,
+        "clusters_with_3plus_records": 5874,
+        "multi_buyer_repeat_markets": 122,
+        "singleton_clusters": 69315
+      },
+      "integrity": {
+        "expected_tenders": 178211,
+        "scan_ordinal_min": 1,
+        "scan_ordinal_max": 178211,
+        "status": "PASS"
+      },
+      "method": {
+        "ontology_free_cluster_key": "country + currency + route + native code + normalized title/scope signature",
+        "supplier_weights": "fractionalized per award when multiple supplier links exist",
+        "currency_rule": "percentile scoring partitioned by country and currency; no FX mixing",
+        "score_role": "market-structure triage only; not SPM feasibility and not live eligibility"
+      }
+    },
+    {
+      "version": "SPM_HISTORICAL_COMMERCIAL_MINER_V1",
+      "generated_at": "2026-08-15T21:29:14.821771+00:00",
+      "label": "USASPENDING_V1",
+      "grain": "AWARD_FIRST_PROCUREMENT",
+      "counts": {
+        "procurement_records_scanned": 15842317,
+        "distinct_procurement_ids": 15842317,
+        "award_rows_scanned": 15842317,
+        "award_supplier_links_scanned": 15842312,
+        "commercial_clusters": 1797811,
+        "clusters_with_3plus_records": 280940,
+        "multi_buyer_repeat_markets": 1086,
+        "singleton_clusters": 1374295
+      },
+      "integrity": {
+        "expected_tenders": 15842317,
+        "scan_ordinal_min": 1,
+        "scan_ordinal_max": 15842317,
+        "status": "PASS"
+      },
+      "method": {
+        "ontology_free_cluster_key": "country + currency + route + native code + normalized title/scope signature",
+        "supplier_weights": "fractionalized per award when multiple supplier links exist",
+        "currency_rule": "percentile scoring partitioned by country and currency; no FX mixing",
+        "score_role": "market-structure triage only; not SPM feasibility and not live eligibility"
+      }
+    }
+  ],
+  "interpretation": "Empirical market-structure discovery. Cohort scores are historical triage, never live eligibility or bid/no-bid."
+}
