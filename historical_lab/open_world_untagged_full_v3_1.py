@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse,json,re
+import argparse,json
 from pathlib import Path
-from historical_lab.open_world_next_wave_v3 import PATTERNS,RX,read_jsonl,blob
+from open_world_next_wave_v3 import RX,read_jsonl,blob
 
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--semantic',required=True);ap.add_argument('--code-only',required=True);ap.add_argument('--out',required=True);ap.add_argument('--semantic-start',type=int,default=1000);ap.add_argument('--semantic-end',type=int,default=3000);a=ap.parse_args();out=Path(a.out);out.mkdir(parents=True,exist_ok=True)
