@@ -1,0 +1,51 @@
+name: Semantic Promotion Manual Sample Split
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'control/semantic_promotion_v2/manual_review_samples.csv'
+      - '.github/workflows/semantic-promotion-sample-split.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  split:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - name: Build small review files per lane
+        run: |
+          python - <<'PY'
+          import csv,re
+          from collections import defaultdict
+          from pathlib import Path
+          src=Path('control/semantic_promotion_v2/manual_review_samples.csv')
+          rows=list(csv.DictReader(src.open(encoding='utf-8',newline='')))
+          by=defaultdict(list)
+          for r in rows: by[r['lane']].append(r)
+          out=Path('control/semantic_promotion_v2/manual_lane_reviews');out.mkdir(parents=True,exist_ok=True)
+          for lane,rs in sorted(by.items()):
+              slug=re.sub(r'[^a-z0-9]+','-',lane.casefold()).strip('-')
+              # deterministic diversity: first 40 already stratified upstream by source/country
+              rs=rs[:40]
+              lines=[f'# Manual sample — {lane}','',f'Samples: {len(rs)}','',
+                     '|#|Source|Country|Route|Title|Scope excerpt|','|---:|---|---|---|---|---|']
+              for i,r in enumerate(rs,1):
+                  title=(r.get('title') or '').replace('|','/')[:180]
+                  scope=re.sub(r'\s+',' ',r.get('scope') or '').replace('|','/')[:360]
+                  lines.append(f"|{i}|{r.get('source','')}|{r.get('country','')}|{r.get('route','')}|{title}|{scope}|")
+              (out/f'{slug}.md').write_text('\n'.join(lines),encoding='utf-8')
+          PY
+      - name: Persist review splits
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/semantic_promotion_v2/manual_lane_reviews/
+          git commit -m 'tenders: persist per-lane semantic QA review samples' || exit 0
+          git restore . || true
+          git pull --rebase origin main
+          git push origin HEAD:main
