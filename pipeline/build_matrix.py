@@ -6,16 +6,21 @@ import os
 import re
 from pathlib import Path
 
+# Portals in this set require Playwright/browser-capable shards for their primary
+# DCE route. US_SAM/US_SAM_BULK deliberately are NOT here: live no-Playwright
+# canary 31914758322 proved SAM's public v3 resources endpoint can resolve and
+# download real public attachments directly over HTTP.
 BROWSER_PORTALS = {
     "TED","IRELAND_ETENDERS","FR_PLACE","LUX_PMP","SCOTLAND_PCS",
     "CA_CANADABUYS","QC_SEAO","DE_DOE","FR_BOAMP","NZ_GETS","AU_AUSTENDER",
-    "US_SAM","US_SAM_BULK","NL_TENDERNED","NL_TENDERNED_RSS","CH_SIMAP","LV_IUB",
+    "NL_TENDERNED","NL_TENDERNED_RSS","CH_SIMAP","LV_IUB",
     "NO_DOFFIN","PL_EZAMOWIENIA","PL_BZP","GR_KHMDHS","ES_PLACSP","FI_HILMA",
     "PT_BASE_OPEN","PT_BASE","DK_UDBUD","DK_UDBUD_PUBLIC","CZ_ZAKAZKY_GOV","CZ_NIPEZ",
     "CYPRUS_EPPS","LITHUANIA_EPPS","MALTA_EPPS",
     "SI_EJN","SK_UVO",
 }
 SUPPORTED = BROWSER_PORTALS | {
+    "US_SAM","US_SAM_BULK",
     "UNGM","DIRECT_HTTP","UK_CONTRACTS_FINDER","GENERIC_EPPS","GENERIC_PUBLIC_PAGE","TED_PUBLIC_PAGE_FAST",
 }
 
