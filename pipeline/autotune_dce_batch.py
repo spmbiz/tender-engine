@@ -17,7 +17,8 @@ from pathlib import Path
 LADDER = [320, 640, 1000]
 MIN_KEEP_RATIO = 0.92
 MIN_ADVANCE_RATIO = 0.97
-MAX_FAILURE_RATE = 0.01
+MAX_SHARD_FAILURE_RATE = 0.01
+MAX_CANDIDATE_RETRYABLE_FAILURE_RATE = 0.01
 MAX_RATE_LIMIT_SIGNALS = 0
 
 
@@ -40,10 +41,17 @@ def main() -> None:
     current_yield = float(metrics.get("useful_per_runner_minute_exact") or 0.0)
     useful = int(metrics.get("gate_ready_substantive_dce") or metrics.get("gate_ready") or 0)
     runner_minutes = float(metrics.get("runner_minutes_exact") or 0.0)
-    failures = int(metrics.get("worker_failures") or 0)
     rate_limits = int(metrics.get("rate_limit_signals") or 0)
+
     shard_jobs = max(1, int(metrics.get("shard_jobs") or 1))
-    failure_rate = failures / shard_jobs
+    shard_failures = int(metrics.get("shard_job_failures") or 0)
+    shard_failure_rate = float(metrics.get("shard_job_failure_rate") or (shard_failures / shard_jobs))
+
+    candidates = max(1, int(metrics.get("candidates") or useful or 1))
+    candidate_retryables = int(metrics.get("candidate_retryable_failures") or metrics.get("worker_failures") or 0)
+    candidate_retryable_failure_rate = float(
+        metrics.get("candidate_retryable_failure_rate") or (candidate_retryables / candidates)
+    )
 
     basis = dce.get("benchmark_basis") or {}
     reference_size = int(basis.get("previous_batch_candidates") or 0)
@@ -56,7 +64,8 @@ def main() -> None:
     healthy = (
         useful > 0
         and runner_minutes > 0
-        and failure_rate <= MAX_FAILURE_RATE
+        and shard_failure_rate <= MAX_SHARD_FAILURE_RATE
+        and candidate_retryable_failure_rate <= MAX_CANDIDATE_RETRYABLE_FAILURE_RATE
         and rate_limits <= MAX_RATE_LIMIT_SIGNALS
     )
 
@@ -65,15 +74,18 @@ def main() -> None:
     reason = "benchmark neutral/healthy"
 
     if not healthy or ratio < MIN_KEEP_RATIO:
-        # Return to the last accepted benchmark rung whenever it is a valid lower
-        # rung. Never promote the failed observation to the new reference.
         if reference_size in LADDER and reference_size < current:
             next_size = reference_size
         else:
             lower = [x for x in LADDER if x < current]
             next_size = max(lower) if lower else current
         action = "ROLLBACK" if next_size < current else "KEEP"
-        reason = f"unhealthy or yield ratio {ratio:.3f} below keep floor {MIN_KEEP_RATIO:.2f}"
+        reason = (
+            f"unhealthy or yield ratio {ratio:.3f} below keep floor {MIN_KEEP_RATIO:.2f}; "
+            f"shard_failure_rate={shard_failure_rate:.4f}, "
+            f"candidate_retryable_failure_rate={candidate_retryable_failure_rate:.4f}, "
+            f"rate_limits={rate_limits}"
+        )
     elif current in LADDER and ratio >= MIN_ADVANCE_RATIO:
         higher = [x for x in LADDER if x > current]
         if higher:
@@ -84,7 +96,7 @@ def main() -> None:
             reason = "top tested batch-size rung reached"
 
     decision = {
-        "contract": "DCE_BATCH_AUTOTUNE_V2",
+        "contract": "DCE_BATCH_AUTOTUNE_V3",
         "at": datetime.now(timezone.utc).isoformat(),
         "action": action,
         "current_batch_size": current,
@@ -95,14 +107,14 @@ def main() -> None:
         "yield_ratio": round(ratio, 6),
         "gate_ready_substantive_dce": useful,
         "runner_minutes_exact": runner_minutes,
-        "worker_failure_rate": round(failure_rate, 6),
+        "shard_job_failure_rate": round(shard_failure_rate, 6),
+        "candidate_retryable_failure_rate": round(candidate_retryable_failure_rate, 6),
         "rate_limit_signals": rate_limits,
+        "healthy": healthy,
         "reason": reason,
     }
 
     if action == "ADVANCE":
-        # A healthy current rung becomes the accepted baseline for testing the
-        # next rung.
         dce["max_candidates_per_cycle"] = next_size
         dce["benchmark_basis"] = {
             "previous_batch_candidates": current,
@@ -113,8 +125,6 @@ def main() -> None:
         }
     elif action == "ROLLBACK":
         dce["max_candidates_per_cycle"] = next_size
-        # Keep the last accepted reference exactly as-is. The failed larger rung
-        # is recorded only in the immutable autotune decision, never as baseline.
         dce["benchmark_basis"] = basis
     else:
         dce.setdefault("benchmark_basis", basis)
