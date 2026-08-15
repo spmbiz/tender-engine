@@ -1,0 +1,106 @@
+name: SPM Market Intelligence v5
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'MARKET_INTELLIGENCE_V5_TRIGGER.txt'
+      - 'pipeline/build_market_intelligence_v5.py'
+      - '.github/workflows/market-intelligence-v5.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: spm-market-intelligence-v5
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install DuckDB
+        run: python -m pip install --disable-pip-version-check -q duckdb
+
+      - name: Download canonical Global Core v4 from public warehouse repo
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p core intel
+          SRC_REPO='walidgdg1-ai/coldemailtool'
+          TAG='tender-normalized-global-core-v4'
+          for asset in historical_tenders.parquet awards.parquet award_suppliers.parquet data_quality.json evidence_lanes.json; do
+            gh release download "$TAG" --repo "$SRC_REPO" --pattern "$asset" --dir core --clobber
+            test -s "core/$asset"
+          done
+          python - <<'PY'
+          import json
+          q=json.load(open('core/data_quality.json',encoding='utf-8'))
+          assert q.get('status')=='PASS', q
+          print('GLOBAL_CORE_V4_QA_PASS')
+          print(json.dumps(q,indent=2))
+          PY
+
+      - name: Build SPM historical market intelligence
+        run: |
+          set -euo pipefail
+          python pipeline/build_market_intelligence_v5.py \
+            --historical core/historical_tenders.parquet \
+            --awards core/awards.parquet \
+            --award-suppliers core/award_suppliers.parquet \
+            --out intel
+
+      - name: Validate output contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os
+          s=json.load(open('intel/market_summary.json',encoding='utf-8'))
+          assert s['status']=='PASS', s
+          assert s['canonical_counts']['historical_tenders'] >= 2_000_000, s['canonical_counts']
+          assert s['canonical_counts']['awards'] >= 4_000_000, s['canonical_counts']
+          must=[
+            'micro_niche_rank.csv','weird_money_rank.csv','repeat_buyers.csv',
+            'supplier_fragmentation.csv','winner_archetypes.csv','price_bands.csv',
+            'seasonality.csv','historical_examples.csv','cohort_facts.csv',
+            'cpv4_micro_niche_rank.csv','market_summary.json','run_manifest.json'
+          ]
+          for f in must:
+            p='intel/'+f
+            assert os.path.isfile(p) and os.path.getsize(p)>0,p
+          assert s['outputs']['micro_niche_rank.csv']>100, s['outputs']
+          assert s['outputs']['weird_money_rank.csv']>20, s['outputs']
+          print(json.dumps({
+            'canonical_counts':s['canonical_counts'],
+            'outputs':s['outputs'],
+            'top10':s['top_100_weird_money'][:10],
+          },indent=2,ensure_ascii=False))
+          PY
+
+      - name: Publish compact intelligence Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG='market-intelligence-v5'
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" \
+              --title 'SPM Public Tender Market Intelligence v5' \
+              --notes 'Historical notice-first analysis of Global Core v4: micro-niches, repeat buyers, supplier fragmentation, winner archetypes, price bands, competition evidence, seasonality, representative awarded examples and weird-money exploration. Derived historical intelligence only; never satisfies live DCE eligibility gates.'
+          fi
+          find intel -maxdepth 1 -type f -print0 | while IFS= read -r -d '' f; do
+            gh release upload "$TAG" "$f" --clobber
+          done
+          gh release view "$TAG" --json tagName,url,assets
