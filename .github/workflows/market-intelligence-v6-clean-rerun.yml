@@ -1,0 +1,93 @@
+name: SPM Market Intelligence v6 Clean Rerun
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/market-intelligence-v6-clean-rerun.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: spm-market-intelligence-v6-clean-rerun
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install DuckDB
+        run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Patch reserved SQL alias in v6 builder
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('pipeline/build_market_intelligence_v6_clean.py')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('{proc} procedure,','{proc} procurement_procedure,')
+          s=s.replace('t.procedure,t.official_url','t.procurement_procedure,t.official_url')
+          p.write_text(s,encoding='utf-8')
+          assert '{proc} procedure,' not in s
+          PY
+      - name: Download canonical Global Core v4
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p core clean-v6
+          for asset in historical_tenders.parquet awards.parquet award_suppliers.parquet data_quality.json; do
+            gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern "$asset" --dir core --clobber
+          done
+          python - <<'PY'
+          import json
+          q=json.load(open('core/data_quality.json',encoding='utf-8'))
+          assert q.get('status')=='PASS' and q['counts_notice_first']['historical_tenders']==2250547,q
+          PY
+      - name: Build strict clean-lane intelligence
+        run: |
+          python pipeline/build_market_intelligence_v6_clean.py --historical core/historical_tenders.parquet --awards core/awards.parquet --award-suppliers core/award_suppliers.parquet --out clean-v6
+      - name: QA and show top lanes
+        run: |
+          python - <<'PY'
+          import json,csv,os
+          s=json.load(open('clean-v6/clean_summary.json',encoding='utf-8'))
+          assert s['version']=='SPM_MARKET_INTELLIGENCE_V6_CLEAN'
+          assert len(s['top_50'])>=20,len(s['top_50'])
+          print(json.dumps({'top10':[x['cohort'] for x in s['top_50'][:10]]},ensure_ascii=False,indent=2,default=str))
+          PY
+      - name: Publish v6 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG='market-intelligence-v6-clean'
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title 'SPM Market Intelligence v6 — Clean lanes' --notes 'Strict multilingual lean-service reclassification of Global Core v4. Generic communication/balayage/interpretation false positives removed; frameworks/DPS separated from direct-like metrics. Historical derived evidence only.'
+          fi
+          find clean-v6 -maxdepth 1 -type f -print0 | while IFS= read -r -d '' f; do gh release upload "$TAG" "$f" --clobber; done
+      - name: Persist GPT-readable report
+        run: |
+          set -euo pipefail
+          mkdir -p control/market_intelligence_v6
+          cp clean-v6/REPORT.md control/market_intelligence_v6/REPORT.md
+          cp clean-v6/clean_summary.json control/market_intelligence_v6/snapshot.json
+          git checkout -- pipeline/build_market_intelligence_v6_clean.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/market_intelligence_v6/REPORT.md control/market_intelligence_v6/snapshot.json
+          git commit -m 'tenders: persist clean Market Intelligence v6 snapshot' || exit 0
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((attempt*3))"
+          done
+          exit 1
