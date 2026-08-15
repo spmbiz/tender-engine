@@ -58,7 +58,6 @@ def main():
     ]
     family_case=classifier('txt',families,'NO_MATCH')
 
-    # Context-sensitive subfamilies. Heavy/regulatory variants remain visible rather than being silently dropped.
     sw_vendor=[('MICROSOFT',r'(?i)(microsoft|azure|m365|office 365|office365)'),('ADOBE',r'(?i)adobe'),('RED_HAT',r'(?i)red[ -]?hat|openshift'),('VMWARE_BROADCOM',r'(?i)(vmware|broadcom)'),('VEEAM',r'(?i)veeam'),('ORACLE',r'(?i)oracle'),('IBM_HCL',r'(?i)(\bibm\b|\bhcl\b)'),('SAP',r'(?i)\bsap\b'),('ATLASSIAN',r'(?i)atlassian|jira|confluence'),('GOOGLE_CLOUD',r'(?i)(google cloud|gcp)'),('AWS',r'(?i)(amazon web services|\baws\b)'),('CITRIX',r'(?i)citrix'),('NUTANIX',r'(?i)nutanix'),('SECURITY_SOFTWARE',r'(?i)(darktrace|security software|cybersecurity|antivirus|endpoint protection)'),('VIRTUALIZATION',r'(?i)(virtuali[sz]ation|hypervisor)'),]
     staff=[('HEALTH_CLINICAL',r'(?i)(nurs|nurse|nursing|médical|medical|médecin|doctor|physician|care staff|health)'),('IT_DIGITAL',r'(?i)(\bit\b|ict|computer|application support|developer|software|data|cyber|technical writer|business analyst)'),('PROJECT_PROGRAM',r'(?i)(project manager|program manager|programme manager|project support|pm[o ]|project officer)'),('EDUCATION',r'(?i)(teacher|teaching|education|school)'),('LEGAL',r'(?i)(legal|lawyer|solicitor|jurist)'),('CLEANING_FACILITY',r'(?i)(cleaning|entretien ménager|entretien menager|facility|facilities|horeca|catering)'),('ADMIN_OFFICE',r'(?i)(administrative|office|clerical|secretar|advisor|adviser|support staff)'),]
     consult=[('IT_CONSULTANTS',r'(?i)(\bit\b|ict|software|digital|cyber|data)'),('ENGINEERING_PROJECT',r'(?i)(engineer|engineering|projektingenjör|teknikingenjör)'),('LEADERSHIP_MANAGEMENT',r'(?i)(management|leadership|chef|ledarskap)'),]
@@ -71,7 +70,6 @@ def main():
     clean_case=classifier('txt',cleaning,'GENERIC_CLEANING_CONSUMABLES')
     sub_case=f"CASE WHEN intermediary_family='SOFTWARE_BROKER' THEN {software_case} WHEN intermediary_family='STAFFING_INTERMEDIARY' THEN {staff_case} WHEN intermediary_family='CONSULTANT_BROKER' THEN {consult_case} WHEN intermediary_family='POSTAL_FULFILMENT' THEN {postal_case} WHEN intermediary_family='CLEANING_CONSUMABLES' THEN {clean_case} ELSE 'OTHER' END"
 
-    # Tender-level award values and supplier links.
     if atid:
         at=text_expr(atid);av=double_expr(aval)
         con.execute(f"CREATE TABLE award_stats AS SELECT {at} tender_id, median({av}) FILTER(WHERE {av}>=0) median_award_value FROM {arel} GROUP BY 1")
@@ -89,7 +87,7 @@ def main():
 
     con.execute(f"""
     CREATE TABLE proc0 AS
-    SELECT {tid} tender_id,{cty} country,{currency} currency,{b} buyer_name,{t} title,{proc} procedure,{est} estimated_value,{bid} bidder_count,{txt} txt,{family_case} intermediary_family
+    SELECT {tid} tender_id,{cty} country,{currency} currency,{b} buyer_name,{t} title,{proc} procedure_text,{est} estimated_value,{bid} bidder_count,{txt} txt,{family_case} intermediary_family
     FROM {hrel}
     """)
     con.execute(f"""
@@ -99,10 +97,8 @@ def main():
     WHERE intermediary_family<>'NO_MATCH'
     """)
 
-    # Buyer recurrence.
     con.execute("CREATE TABLE buyer_stats0 AS SELECT intermediary_family,subfamily,country,currency,buyer_name,count(*) n FROM proc WHERE buyer_name<>'' GROUP BY 1,2,3,4,5")
     con.execute("CREATE TABLE buyer_stats AS SELECT intermediary_family,subfamily,country,currency,count(*) FILTER(WHERE n>=2) repeat_buyers,max(n) top_buyer_records FROM buyer_stats0 GROUP BY 1,2,3,4")
-    # Supplier concentration is fractionalized and based only on linked awards.
     con.execute("""
     CREATE TABLE supplier_sub AS
     SELECT p.intermediary_family,p.subfamily,p.country,p.currency,ts.supplier_id,any_value(ts.supplier_name) supplier_name,sum(ts.supplier_weight) weighted_awards
@@ -144,7 +140,7 @@ def main():
     """).fetchall()
     write_csv(out/'top_buyers.csv',['family','subfamily','country','currency','buyer_name','records'],buyers)
     examples=con.execute("""
-    SELECT intermediary_family,subfamily,country,currency,tender_id,buyer_name,title,reference_value,bidder_count,procedure
+    SELECT intermediary_family,subfamily,country,currency,tender_id,buyer_name,title,reference_value,bidder_count,procedure_text
     FROM proc
     QUALIFY row_number() over(partition by intermediary_family,subfamily,country,currency order by reference_value desc nulls last,tender_id)<=5
     ORDER BY intermediary_family,subfamily,country,currency,reference_value DESC NULLS LAST
@@ -153,7 +149,6 @@ def main():
 
     summary={'version':'SPM_HISTORICAL_MIDDLEMAN_DECOMPOSITION_V1','generated_at':datetime.now(timezone.utc).isoformat(),'historical_records_scanned':con.execute(f'SELECT count(*) FROM {hrel}').fetchone()[0],'matched_records':con.execute('SELECT count(*) FROM proc').fetchone()[0],'submarkets':len(matrix),'families':dict(con.execute('SELECT intermediary_family,count(*) FROM proc GROUP BY 1 ORDER BY 2 DESC').fetchall()),'historical_only':True,'live_used':False,'dce_used':False,'supplier_weights':'fractionalized per award','currency_mixing':False}
     (out/'summary.json').write_text(json.dumps(summary,indent=2,ensure_ascii=False),encoding='utf-8')
-    # Compact report with highest-volume submarkets.
     lines=['# Historical Middleman Decomposition v1','',f"- Raw Global Core records scanned: **{summary['historical_records_scanned']:,}**",f"- Strict middleman-family matches: **{summary['matched_records']:,}**",f"- Country/currency/subfamily markets: **{summary['submarkets']:,}**",'', 'Historical-only. Supplier concentration is fractionalized over linked award-supplier evidence. Missing supplier/bidder/value evidence stays UNKNOWN.','']
     for r in matrix[:160]:
         fam,sub,country,currency,records,buyers,p25,med,p75,mb,rb,sup,linked,share=r
