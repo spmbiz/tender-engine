@@ -17,9 +17,9 @@ jobs:
     timeout-minutes: 22
     strategy:
       fail-fast: false
-      max-parallel: 16
+      max-parallel: 17
       matrix:
-        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP, NO_DOFFIN, IT_ANAC_DELTA, IT_ANAC_OCDS_BULK]
+        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP, NO_DOFFIN, FI_HILMA, IT_ANAC_DELTA, IT_ANAC_OCDS_BULK]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -44,6 +44,7 @@ jobs:
             LV_IUB) python pipeline/discover_lv_iub.py ;;
             CH_SIMAP) python pipeline/discover_ch_simap.py ;;
             NO_DOFFIN) python pipeline/discover_no_doffin.py ;;
+            FI_HILMA) python pipeline/discover_fi_hilma_public.py ;;
             IT_ANAC_DELTA) python pipeline/discover_it_anac_delta.py ;;
             IT_ANAC_OCDS_BULK) python pipeline/discover_it_anac_ocds_bulk.py ;;
             *) python pipeline/discover_global_official.py ;;
