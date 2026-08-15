@@ -1,0 +1,116 @@
+name: SPM Micro-Niche Intelligence v2 Precision
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/spm-micro-niche-intelligence-v2-precision.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: spm-micro-niche-intelligence-v2-precision
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Download canonical Global Core v4
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p source out
+          for asset in historical_tenders.parquet awards.parquet award_suppliers.parquet; do
+            gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern "$asset" --dir source --clobber
+          done
+      - name: Build precision classifier from audited v1 code
+        shell: bash
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          p=Path('pipeline/build_spm_micro_niche_intelligence_v1.py')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('VERSION = "SPM_MICRO_NICHE_INTELLIGENCE_V1"','VERSION = "SPM_MICRO_NICHE_INTELLIGENCE_V2_TITLE_PRECISION"')
+          s=re.sub(r'\bsource\b','warehouse_source',s)
+          s=s.replace('aw_tender at USING','aw_tender awt USING')
+          s=s.replace('at.median_bidders','awt.median_bidders').replace('at.bidder_rows','awt.bidder_rows').replace('at.one_bid_rows','awt.one_bid_rows')
+          # Main semantic hardening: micro-niche assignment is title-led. Scope and CPV
+          # may explain context but no longer create a niche by themselves.
+          s=s.replace('{text}', '{title_l}')
+          old="AND NOT regexp_matches({title_l}, '(architect|engineering|construction|ma[iî]trise d.oeuvre)')"
+          new="AND NOT regexp_matches({title_l}, '(architect|engineering|construction|ma[iî]trise d.oeuvre|sc[eé]nograph|mus[eé]ograph|exposition|travaux|stand)')"
+          if old not in s: raise SystemExit('graphic-design hardening anchor missing')
+          s=s.replace(old,new)
+          old="AND NOT regexp_matches({title_l}, '(translational medicine|translationale medizin|translationnelle)')"
+          new="AND NOT regexp_matches({title_l}, '(translational medicine|translationale medizin|translationnelle|mat[eé]riel.{0,30}traduction|translation.{0,30}equipment|audiovisuel.{0,30}traduction)')"
+          if old not in s: raise SystemExit('translation hardening anchor missing')
+          s=s.replace(old,new)
+          old="AND NOT regexp_matches({title_l}, '(geotech|g[eé]otech|soil|drilling|borehole|sondage de sol)')"
+          new="AND NOT regexp_matches({title_l}, '(geotech|g[eé]otech|soil|drilling|borehole|sondage de sol|p[eé]dolog|pavage|voirie|topograph|lidar|orthograph|ecolog|ornitholog|r[eé]seau|amiante|\\bhap\\b|enrob[eé]|inspection|structure)')"
+          if old not in s: raise SystemExit('survey hardening anchor missing')
+          s=s.replace(old,new)
+          old="AND NOT regexp_matches({title_l}, '(3d print|printer maintenance|managed print|photocopier|imprimante)')"
+          new="AND NOT regexp_matches({title_l}, '(3d print|printer maintenance|managed print|photocopier|imprimante|copieur|syst[eè]me.{0,30}impression|presse num[eé]rique|location.{0,30}(presse|copieur)|maintenance.{0,30}(presse|copieur)|transformation.{0,30}imprimerie)')"
+          if old not in s: raise SystemExit('printing hardening anchor missing')
+          s=s.replace(old,new)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Run full-corpus v2 precision intelligence
+        run: |
+          python pipeline/build_spm_micro_niche_intelligence_v1.py \
+            --historical source/historical_tenders.parquet \
+            --awards source/awards.parquet \
+            --bridge source/award_suppliers.parquet \
+            --out out
+      - name: Persist compact precision authority files
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f out/work.duckdb out/work.duckdb.wal
+          mkdir -p control/micro_niche_intelligence_v2_precision
+          cp out/REPORT.md control/micro_niche_intelligence_v2_precision/REPORT.md
+          cp out/manifest.json control/micro_niche_intelligence_v2_precision/manifest.json
+          cp out/micro_niche_rank.csv control/micro_niche_intelligence_v2_precision/micro_niche_rank.csv
+          cp out/open_bid_micro_niche_rank.csv control/micro_niche_intelligence_v2_precision/open_bid_micro_niche_rank.csv
+          cp out/direct_buyer_micro_niche_rank.csv control/micro_niche_intelligence_v2_precision/direct_buyer_micro_niche_rank.csv
+          git restore pipeline/build_spm_micro_niche_intelligence_v1.py || true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/micro_niche_intelligence_v2_precision/
+          git commit -m 'tenders: persist micro-niche precision v2' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
+      - name: Publish full v2 precision bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag='market-intelligence-micro-niche-v2-precision'
+          if ! gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target main \
+              --title 'SPM Market Intelligence — Micro-Niche v2 Precision' \
+              --notes 'Title-led, manually hardened micro-niche intelligence over canonical Global Core v4 notice-first facts. Historical/retrieval prior only; DCE remains mandatory.'
+          fi
+          gh release upload "$tag" --repo "$GITHUB_REPOSITORY" \
+            out/REPORT.md out/manifest.json out/micro_niche_rank.csv \
+            out/open_bid_micro_niche_rank.csv out/direct_buyer_micro_niche_rank.csv \
+            out/repeat_buyers_micro_niche.csv out/top_winners_micro_niche.csv out/representative_examples.csv --clobber
