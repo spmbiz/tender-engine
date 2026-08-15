@@ -17,9 +17,9 @@ jobs:
     timeout-minutes: 15
     strategy:
       fail-fast: false
-      max-parallel: 6
+      max-parallel: 7
       matrix:
-        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE]
+        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -44,9 +44,12 @@ jobs:
             QC_SEAO) python pipeline/discover_qc_seao_latest.py ;;
             DE_DOE) python pipeline/discover_de_doe_csv.py ;;
             AU_AUSTENDER) python pipeline/discover_austender_browser.py ;;
+            ES_PLACSP) python pipeline/discover_es_placsp_atom.py ;;
             *) python pipeline/discover_global_official.py ;;
           esac
           rc=$?
           echo "adapter_exit_code=$rc"
           cat "discovery/global/${{ matrix.source }}/stats.json" || true
+          echo 'sample_current:'
+          head -n 2 "discovery/global/${{ matrix.source }}/current.jsonl" || true
           exit 0
