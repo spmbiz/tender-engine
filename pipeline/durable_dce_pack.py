@@ -7,6 +7,8 @@ import json
 import tarfile
 from pathlib import Path
 
+from authority_conflicts import process as process_authority_conflicts
+
 METADATA_FILES = {
     "candidate.json",
     "manifest.json",
@@ -15,6 +17,7 @@ METADATA_FILES = {
     "corpus.txt",
     "evidence_quality.json",
     "gate_snippets.json",
+    "authority_conflicts.json",
     "portal_page.txt",
 }
 ROOT_FILES = {"batch_results.json", "batch_summary.json"}
@@ -75,6 +78,10 @@ def build_candidate_pack(candidate_root: Path, out_dir: Path) -> dict:
     manifest_path = candidate_root / "manifest.json"
     manifest = load_json(manifest_path) or {}
     evidence = load_json(candidate_root / "evidence_quality.json") or {}
+    try:
+        authority = process_authority_conflicts(candidate_root)
+    except Exception:
+        authority = load_json(candidate_root / "authority_conflicts.json") or {}
     cid = str(manifest.get("candidate_id") or candidate_root.name)
     archive = out_dir / f"candidate-{slugify(cid)}.tar.gz"
     inventory: list[dict] = []
@@ -88,16 +95,19 @@ def build_candidate_pack(candidate_root: Path, out_dir: Path) -> dict:
         for p in originals:
             add_file(tar, p, str(Path("originals") / p.name), inventory, "original_download")
 
+        deadline = authority.get("deadline") if isinstance(authority, dict) else {}
         payload = {
-            "contract": "CANONICAL_DCE_RELEASE_PACK_V2",
+            "contract": "CANONICAL_DCE_RELEASE_PACK_V3",
             "candidate_id": cid,
             "original_download_count": len(originals),
             "inventory_count": len(inventory),
             "evidence_quality": evidence.get("content_quality"),
             "gate_readiness": evidence.get("gate_readiness", False),
             "derived_status": evidence.get("derived_status") or manifest.get("status"),
+            "deadline_authority_status": deadline.get("status") if isinstance(deadline, dict) else None,
+            "deadline_conflict": bool(deadline.get("conflict")) if isinstance(deadline, dict) else False,
             "inventory": inventory,
-            "note": "Original downloaded procurement files + normalized evidence + evidence-quality verdict. Recursive unpack duplicates excluded because reconstructible from originals.",
+            "note": "Original downloaded procurement files + normalized evidence + evidence-quality verdict + authority-conflict record. Recursive unpack duplicates excluded because reconstructible from originals.",
         }
         raw = json.dumps(payload, indent=2, ensure_ascii=False).encode("utf-8")
         info = tarfile.TarInfo("_canonical_pack_manifest.json")
@@ -106,6 +116,7 @@ def build_candidate_pack(candidate_root: Path, out_dir: Path) -> dict:
 
     if archive.stat().st_size >= MAX_RELEASE_ASSET_BYTES:
         raise RuntimeError(f"Canonical candidate asset exceeds safe GitHub Release limit: {archive} {archive.stat().st_size}")
+    deadline = authority.get("deadline") if isinstance(authority, dict) else {}
     return {
         "candidate_id": cid,
         "archive": str(archive),
@@ -117,6 +128,8 @@ def build_candidate_pack(candidate_root: Path, out_dir: Path) -> dict:
         "evidence_quality": evidence.get("content_quality"),
         "gate_readiness": evidence.get("gate_readiness", False),
         "derived_status": evidence.get("derived_status") or manifest.get("status"),
+        "deadline_authority_status": deadline.get("status") if isinstance(deadline, dict) else None,
+        "deadline_conflict": bool(deadline.get("conflict")) if isinstance(deadline, dict) else False,
     }
 
 
@@ -138,10 +151,11 @@ def main():
         if p.is_file():
             batch_payload[name] = load_json(p)
     index = {
-        "contract": "CANONICAL_DCE_RELEASE_INDEX_V2",
+        "contract": "CANONICAL_DCE_RELEASE_INDEX_V3",
         "candidate_count": len(packs),
         "gate_ready_count": sum(1 for p in packs if p.get("gate_readiness")),
         "gate_blocked_count": sum(1 for p in packs if not p.get("gate_readiness")),
+        "deadline_conflict_count": sum(1 for p in packs if p.get("deadline_conflict")),
         "original_download_count": sum(p["original_download_count"] for p in packs),
         "total_archive_bytes": sum(p["archive_size"] for p in packs),
         "packs": packs,
