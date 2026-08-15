@@ -1,0 +1,80 @@
+name: Tender Portal Yield Backfill
+
+on:
+  workflow_dispatch:
+    inputs:
+      dce_run_id:
+        description: Completed DCE Fanout run ID whose durable handoffs should be re-aggregated
+        required: true
+  push:
+    branches: [main]
+    paths:
+      - 'control/portal_yield_backfill.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - id: resolve
+        env:
+          INPUT_RUN: ${{ github.event.inputs.dce_run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = 'workflow_dispatch' ] && [[ "${INPUT_RUN:-}" =~ ^[0-9]+$ ]]; then
+            rid="$INPUT_RUN"
+          else
+            rid="$(sed -nE 's/^dce_run_id=([0-9]+).*$/\1/p' control/portal_yield_backfill.txt | tail -1)"
+          fi
+          [[ "$rid" =~ ^[0-9]+$ ]] || { echo "Invalid DCE run id: $rid" >&2; exit 1; }
+          echo "id=$rid" >> "$GITHUB_OUTPUT"
+      - name: Rehydrate compact durable shard handoffs only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RID: ${{ steps.resolve.outputs.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="dce-harvest-$RID"
+          mkdir -p release-handoff dce-artifacts
+          gh release download "$tag" --pattern 'handoff-shard-*.tar.gz' --dir release-handoff
+          count=0
+          for archive in release-handoff/handoff-shard-*.tar.gz; do
+            [ -e "$archive" ] || continue
+            base="$(basename "$archive" .tar.gz)"
+            mkdir -p "dce-artifacts/$base"
+            tar -xzf "$archive" -C "dce-artifacts/$base"
+            count=$((count+1))
+          done
+          test "$count" -gt 0
+          echo "rehydrated_shards=$count"
+      - name: Recompute scheduler-grade portal yield without retrieval work
+        env:
+          RID: ${{ steps.resolve.outputs.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/aggregate_dce.py --root dce-artifacts --out backfill
+          cp backfill/portal_yield.json "portal-yield-$RID.json"
+          cp backfill/summary.json "dce-yield-summary-$RID.json"
+          cat "portal-yield-$RID.json"
+      - name: Persist measured portal yield beside immutable DCE harvest
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RID: ${{ steps.resolve.outputs.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="dce-harvest-$RID"
+          gh release upload "$tag" "portal-yield-$RID.json" "dce-yield-summary-$RID.json" --clobber
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat "dce-yield-summary-$RID.json" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
