@@ -64,7 +64,10 @@ def _split_buckets(jobs: list[dict], count: int) -> list[list[dict]]:
         return []
     count = min(count, len(jobs))
     buckets = [[] for _ in range(count)]
-    ordered = sorted(jobs, key=lambda j: (j["portal"], j["line"]))
+    # Selection input is already ranked. Preserve that ordering so the first
+    # active shards receive the highest-value candidates rather than letting
+    # portal-name sorting delay a top-ranked opportunity behind lower ranks.
+    ordered = sorted(jobs, key=lambda j: j["line"])
     for i, job in enumerate(ordered):
         buckets[i % count].append(job)
     return [b for b in buckets if b]

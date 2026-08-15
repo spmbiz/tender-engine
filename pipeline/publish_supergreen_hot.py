@@ -12,13 +12,10 @@ from pathlib import Path
 import requests
 
 GREEN_CLASSES = {"FINAL_SUPER_GREEN", "GREEN", "GREEN_PARTNERABLE"}
-REVIEW_CLASSES = {"MODEL_REVIEW_REQUIRED", "YELLOW"}
 CLASS_RANK = {
     "FINAL_SUPER_GREEN": 4,
     "GREEN": 3,
     "GREEN_PARTNERABLE": 2,
-    "MODEL_REVIEW_REQUIRED": 1,
-    "YELLOW": 0,
 }
 
 
@@ -49,7 +46,7 @@ def compact(rec: dict, run_id: str, shard: str, published_at: str) -> dict:
         if isinstance(item, dict):
             statuses[str(name)] = str(item.get("status") or "UNKNOWN").upper()
     resolved = {"PASS", "PASS_CONDITIONAL", "NOT_APPLICABLE"}
-    classification = str(rec.get("classification") or "MODEL_REVIEW_REQUIRED").upper()
+    classification = str(rec.get("classification") or "").upper()
     return {
         "candidate_id": rec.get("candidate_id"),
         "title": rec.get("title"),
@@ -88,19 +85,21 @@ def sort_key(rec: dict):
     )
 
 
-def merge_pointer(existing: dict, incoming: list[dict], run_id: str, shard: str, max_green: int, max_review: int) -> dict:
+def merge_pointer(existing: dict, incoming: list[dict], run_id: str, shard: str, max_green: int) -> dict:
     merged: dict[str, dict] = {}
-    for bucket in ("final_supergreens", "greens", "review_required_top"):
+    for bucket in ("final_supergreens", "greens"):
         for rec in existing.get(bucket) or []:
             if isinstance(rec, dict):
                 merged[item_key(rec)] = rec
     for rec in incoming:
-        merged[item_key(rec)] = rec
+        key = item_key(rec)
+        current = merged.get(key)
+        if current is None or sort_key(rec) >= sort_key(current):
+            merged[key] = rec
 
     items = sorted(merged.values(), key=sort_key, reverse=True)
     finals = [x for x in items if x.get("classification") == "FINAL_SUPER_GREEN"][:max_green]
     greens = [x for x in items if x.get("classification") in {"GREEN", "GREEN_PARTNERABLE"}][:max_green]
-    review = [x for x in items if x.get("classification") in REVIEW_CLASSES][:max_review]
 
     source_runs = []
     for value in [run_id] + list(existing.get("source_runs") or []):
@@ -118,12 +117,10 @@ def merge_pointer(existing: dict, incoming: list[dict], run_id: str, shard: str,
         "counts": {
             "final_supergreen": len(finals),
             "green_or_partnerable": len(greens),
-            "review_required_top": len(review),
         },
         "final_supergreens": finals,
         "greens": greens,
-        "review_required_top": review,
-        "rule": "Hot cache only. FINAL_SUPER_GREEN remains valid only when produced from authoritative DCE evidence and accepted by final_verdict_guard.py. Canonical immutable evidence remains in DCE Release assets.",
+        "rule": "Hot green cache only. FINAL_SUPER_GREEN remains valid only when produced from authoritative DCE evidence and accepted by final_verdict_guard.py. Canonical immutable evidence remains in DCE Release assets.",
     }
 
 
@@ -133,7 +130,7 @@ def github_get(repo: str, path: str, branch: str, token: str) -> tuple[dict, str
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "tender-supergreen-hot/1.0",
+        "User-Agent": "tender-supergreen-hot/1.1",
     }
     r = requests.get(url, headers=headers, params={"ref": branch}, timeout=30)
     if r.status_code == 404:
@@ -154,7 +151,7 @@ def github_put(repo: str, path: str, branch: str, token: str, payload: dict, sha
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "tender-supergreen-hot/1.0",
+        "User-Agent": "tender-supergreen-hot/1.1",
     }
     body = {
         "message": message,
@@ -175,7 +172,6 @@ def main() -> None:
     ap.add_argument("--branch", default="main")
     ap.add_argument("--path", default="control/supergreen_hot.json")
     ap.add_argument("--max-green", type=int, default=200)
-    ap.add_argument("--max-review", type=int, default=60)
     ap.add_argument("--attempts", type=int, default=12)
     ap.add_argument("--out", default="supergreen_hot_candidate.json")
     args = ap.parse_args()
@@ -185,12 +181,25 @@ def main() -> None:
     incoming = [
         compact(rec, args.run_id, args.shard, published_at)
         for rec in records
-        if str(rec.get("classification") or "").upper() in GREEN_CLASSES | REVIEW_CLASSES
+        if str(rec.get("classification") or "").upper() in GREEN_CLASSES
     ]
+
+    # No guarded green delta means no repo write. This is important at scale:
+    # hundreds of shards may produce only yellow/review rows, and those should not
+    # create hundreds of commits or trigger unrelated main-branch automation.
+    if not incoming:
+        Path(args.out).write_text(json.dumps({
+            "schema": "SUPERGREEN_HOT_NO_DELTA_V1",
+            "run_id": args.run_id,
+            "shard": args.shard,
+            "green_delta": 0,
+        }, indent=2) + "\n", encoding="utf-8")
+        print(json.dumps({"published": False, "reason": "no_guarded_green_delta", "incoming": 0}))
+        return
 
     token = (os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN") or "").strip()
     if not args.repo or not token:
-        payload = merge_pointer({}, incoming, args.run_id, args.shard, args.max_green, args.max_review)
+        payload = merge_pointer({}, incoming, args.run_id, args.shard, args.max_green)
         Path(args.out).write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         print(json.dumps({"published": False, "reason": "missing repo/token", "incoming": len(incoming)}, ensure_ascii=False))
         return
@@ -199,7 +208,7 @@ def main() -> None:
     for attempt in range(1, max(1, args.attempts) + 1):
         try:
             existing, sha = github_get(args.repo, args.path, args.branch, token)
-            payload = merge_pointer(existing, incoming, args.run_id, args.shard, args.max_green, args.max_review)
+            payload = merge_pointer(existing, incoming, args.run_id, args.shard, args.max_green)
             Path(args.out).write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             r = github_put(
                 args.repo,
@@ -208,7 +217,7 @@ def main() -> None:
                 token,
                 payload,
                 sha,
-                f"tender: hot supergreen DCE {args.run_id} shard {args.shard}",
+                f"tender: hot green DCE {args.run_id} shard {args.shard}",
             )
             if r.status_code in {200, 201}:
                 print(json.dumps({
