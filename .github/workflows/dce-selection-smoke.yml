@@ -76,6 +76,40 @@ jobs:
             --minimum 34 \
             --limit 320
           test "$(wc -l < smoke/selection.jsonl)" -gt 0
+      - name: Assert controller-requested parallel capacity beats legacy fallback
+        env:
+          DCE_REQUESTED_MAX_PARALLEL: '19'
+          DCE_MAX_PARALLEL: '10'
+          DCE_MAX_SHARDS: '256'
+          DCE_TARGET_JOBS_PER_SHARD: '0'
+          DCE_TARGET_WAVES: '1'
+          DCE_BROWSER_MAX_JOBS_PER_SHARD: '12'
+          DCE_HTTP_MAX_JOBS_PER_SHARD: '32'
+          DCE_BROWSER_LOCAL_CONCURRENCY: '2'
+          DCE_HTTP_LOCAL_CONCURRENCY: '8'
+          MAX_DCE_JOBS: '320'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/materialize_dce_selection.py \
+            --candidates smoke/current_candidates.jsonl \
+            --selection smoke/selection.jsonl \
+            --out smoke/dce_candidates.jsonl
+          python pipeline/build_dce_shards.py \
+            --queue smoke/dce_candidates.jsonl \
+            --out smoke/dce_shards.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          plan=json.loads(Path('dce_plan.json').read_text())
+          print(json.dumps({'candidate_count':plan['candidate_count'],'max_parallel':plan['max_parallel'],'shard_count':plan['shard_count'],'skipped_count':plan['skipped_count']},indent=2))
+          if plan['candidate_count'] != 320:
+              raise SystemExit(f"Expected 320 materialized DCE candidates, got {plan['candidate_count']}")
+          if plan['skipped_count'] != 0:
+              raise SystemExit(f"Expected zero DCE matrix skips, got {plan['skipped_count']}")
+          if plan['max_parallel'] != 19:
+              raise SystemExit(f"Dynamic parallel budget regression: expected 19, got {plan['max_parallel']}")
+          PY
       - name: Regression assertions and report
         shell: bash
         run: |
@@ -89,6 +123,7 @@ jobs:
           total=len(rows)
           max_portal,max_count=(counts.most_common(1)[0] if counts else ('NONE',0))
           sam=counts.get('US_SAM',0)+counts.get('US_SAM_BULK',0)
+          plan=json.loads(Path('dce_plan.json').read_text())
           report={
               'selected':total,
               'portal_counts':dict(counts),
@@ -98,6 +133,9 @@ jobs:
               'max_portal_share':round(max_count/max(1,total),6),
               'sam_count':sam,
               'sam_share':round(sam/max(1,total),6),
+              'dce_materialized':plan.get('candidate_count'),
+              'dce_skipped':plan.get('skipped_count'),
+              'dynamic_max_parallel':plan.get('max_parallel'),
           }
           Path('smoke/regression-report.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
           print(json.dumps(report,indent=2))
