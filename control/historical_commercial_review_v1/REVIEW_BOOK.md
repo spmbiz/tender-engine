@@ -6,1265 +6,1265 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
 
 ## GLOBAL CORE NOTICE-FIRST — 140 reviewable cohorts
 
-### 1. Canada - Quebec · `NO_CODE` · programme d aide aux employés programme d aide aux employés other
-- Structure: **99.91** · records **17** · buyers **15** · repeat buyers **2**
-- Route `OPEN_PUBLIC` · currency `CAD` · p25 **653199.0** · median **653199.0** · p75 **653199.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `MULTI_BUYER_MARKET`
+### 1. Germany · `NO_CODE` · baumeisterarbeiten baumeisterarbeiten other
+- Structure: **99.76** · records **43** · buyers **7** · repeat buyers **1**
+- Route `OPEN_PUBLIC` · currency `EUR` · p25 **3660996.425** · median **4342336.85** · p75 **5023677.275**
+- Median bidders **0.0** · suppliers **4** · top supplier share **25.0%** · shape `MULTI_BUYER_MARKET`
 - Historical examples:
-  - Centre de services scolaire de la Pointe-de-l'Île — Programme d'aide aux employés — value 653199.0
-  - Centre de services scolaire des Rives-du-Saguenay — Programme d'aide aux employés — value UNKNOWN
-  - Centre de services scolaire de l'Énergie — Programme d'aide aux employés — value UNKNOWN
+  - Landeshauptstadt München, Baureferat — Baumeisterarbeiten — value 5705017.7
+  - Stadt Weilheim i. OB — Baumeisterarbeiten — value 2979656.0
+  - UNKNOWN BUYER — Baumeisterarbeiten — value UNKNOWN
 
-### 2. Canada - Quebec · `NO_CODE` · services professionnels en architecture services professionnels en architecture other
-- Structure: **99.91** · records **11** · buyers **10** · repeat buyers **1**
-- Route `OPEN_PUBLIC` · currency `CAD` · p25 **6684999.0** · median **6684999.0** · p75 **6684999.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `MULTI_BUYER_MARKET`
+### 2. France · `NO_CODE` · acheminement et fourniture d électricité acheminement et fourniture d électricité other
+- Structure: **99.74** · records **8** · buyers **5** · repeat buyers **1**
+- Route `OPEN_PUBLIC` · currency `EUR` · p25 **10000000.0** · median **20000000.0** · p75 **40642934.5**
+- Median bidders **UNKNOWN** · suppliers **4** · top supplier share **25.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - Société du Palais des Congrès de Montréal — Services professionnels en architecture — value 6684999.0
-  - Université du Québec (Siège social) — Services professionnels en architecture — value 6684999.0
-  - École de technologie supérieure — Services professionnels en architecture — value UNKNOWN
+  - Territoire d'Énergie des Bouches du Rhône (13) — Acheminement et fourniture d'électricité — value 61285869.0
+  - Syndicat d'Irrigation Drômois — Acheminement et fourniture d'électricité — value 20000000.0
+  - Alès Agglomération — Acheminement et fourniture d'électricité — value 0.0
 
-### 3. France · `NO_CODE` · concours restreint de maîtrise d oeuvre concours restreint de maîtrise d oeuvre other
-- Structure: **99.91** · records **4** · buyers **4** · repeat buyers **0**
-- Route `COMPETITIVE_OTHER` · currency `EUR` · p25 **18000.0** · median **18000.0** · p75 **18000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 3. France · `NO_CODE` · service relatif à la prestation d assurance des risques statutaires pour les collectivités et établissements affiliés et non affiliés au centre de gestion et pour lui même service 
+- Structure: **99.68** · records **6** · buyers **4** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **16612500.0** · median **23501471.5** · p75 **35443268.0**
+- Median bidders **UNKNOWN** · suppliers **3** · top supplier share **33.3%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - CNRS Rhône Auvergne — Concours restreint de maîtrise d'oeuvre — value 18000.0
-  - Commune de Villebarou (41) — Concours restreint de maîtrise d'oeuvre — value UNKNOWN
-  - CFA du Roannais — Concours restreint de Maîtrise d'Oeuvre — value UNKNOWN
+  - Centre de Gestion de la Fonction Publique Territoriale de la Vendée (85) — Marché de service relatif à la prestation d'assurance des Risques statutaires pour les collectivités et établissements affiliés et non affiliés au Centre de Gestion et pour lui-même — value 67214243.0
+  - CDG16 — Marché de service relatif à la prestation d'assurance des Risques statutaires pour les collectivités et établissements affiliés et non affiliés au Centre de Gestion et pour lui-même — value 24852943.0
+  - CDG 37 — Marché de service relatif à la prestation d'assurance des risques statutaires pour les collectivités et établissements affiliés et non affiliés au Centre de Gestion et pour lui-même — value 22150000.0
 
-### 4. Canada - Quebec · `NO_CODE` · services d entretien ménager services d entretien ménager other
-- Structure: **99.9** · records **10** · buyers **9** · repeat buyers **1**
-- Route `OPEN_PUBLIC` · currency `CAD` · p25 **553999.0** · median **3785549.0** · p75 **10207924.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `MULTI_BUYER_MARKET`
+### 4. France · `NO_CODE` · mise à disposition de personnels intérimaires mise à disposition de personnels intérimaires other
+- Structure: **99.66** · records **14** · buyers **13** · repeat buyers **1**
+- Route `OPEN_PUBLIC` · currency `EUR` · p25 **8100000.0** · median **8100000.0** · p75 **8100000.0**
+- Median bidders **UNKNOWN** · suppliers **9** · top supplier share **20.0%** · shape `MULTI_BUYER_MARKET`
 - Historical examples:
-  - Université McGill — Services d'entretien ménager — value 19999999.0
-  - Cégep Marie-Victorin — Services d'entretien ménager — value 6943899.0
-  - Centre de services Scolaire des Phares. — Services d'entretien ménager — value 627199.0
+  - Bureau de Recherche en Géologie Minière (BRGM) — MISE À DISPOSITION DE PERSONNELS INTÉRIMAIRES — value 8100000.0
+  - SPL Energies Reunion — MISE À DISPOSITION DE PERSONNELS INTÉRIMAIRES — value UNKNOWN
+  - GRAND PORT MARITIME DE BORDEAUX — Mise à disposition de personnels intérimaires — value UNKNOWN
 
-### 5. ESP · `85143000` · servicio de transporte sanitario other
-- Structure: **99.89** · records **4** · buyers **3** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **17038366.165** · median **1194958185.4199998** · p75 **2375063709.1225**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 5. France · `NO_CODE` · convention de concession pour le service public du développement et de l exploitation du réseau de distribution d électricité et de la fourniture d énergie électrique aux tarifs ré
+- Structure: **99.63** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `EUR` · p25 **283181000.0** · median **555454000.0** · p75 **827727000.0**
+- Median bidders **UNKNOWN** · suppliers **3** · top supplier share **33.3%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Sistema d'Emergències Mèdiques, SA — Servicio de transporte sanitario — value 2382717127.57
-  - Sistema d'Emergències Mèdiques — Servicio de transporte sanitario — value 2372512569.64
-  - Área Sanitaria da Coruña e Cee - Servicio Gallego de Salud — Servicio de transporte sanitario — value 17403801.2
+  - SDESM (77) — Convention de concession pour le service public du développement et de l’exploitation du réseau de distribution d’électricité et de la fourniture d’énergie électrique aux tarifs réglementés de vente — value 1100000000.0
+  - Ville de Saverne — Convention de concession pour le service public du développement et de l'exploitation du réseau de distribution d'électricité et de la fourniture d'énergie électrique aux tarifs réglementés de vente — value 10908000.0
+  - VILLE DE PARIS — Convention de concession pour le service public du développement et de l'exploitation du réseau de distribution d'électricité et de la fourniture d'énergie électrique aux tarifs réglementés de vente e — value UNKNOWN
 
-### 6. United Kingdom · `NO_CODE` · transport technology crown commercial service as the authority intends to put in place an agreement for the transport technologies for use by central government and uk public secto
-- Structure: **99.83** · records **4** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `GBP` · p25 **3498000000.0** · median **3498000000.0** · p75 **3498000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 6. Netherlands · `79622000-0` · hulp bij het huishouden other
+- Structure: **99.62** · records **7** · buyers **4** · repeat buyers **2**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **20600000.0** · median **20600000.0** · p75 **20600000.0**
+- Median bidders **UNKNOWN** · suppliers **10** · top supplier share **16.7%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - The Minister for the Cabinet Office acting through Crown Commercial Service — Transport Technology — value 3498000000.0
-  - The Minister for the Cabinet Office acting through Crown Commercial Service — Transport Technology — value 3498000000.0
-  - Crown Commercial Service — Transport Technology — value 3498000000.0
+  - Gemeente Heusden — Hulp bij het Huishouden — value 20600000.0
+  - Gemeente Diemen, Gemeente Uithoorn, Gemeente Ouder-Amstel (DUO gemeenten) (Openbaar Lichaam op basis van gemeenschappelijke regeling) — Hulp bij het huishouden — value UNKNOWN
+  - Gemeente Diemen, Gemeente Uithoorn, Gemeente Ouder-Amstel (DUO gemeenten) (Openbaar Lichaam op basis van gemeenschappelijke regeling) — Hulp bij het Huishouden — value UNKNOWN
 
-### 7. Canada - Quebec · `NO_CODE` · service de déneigement service de déneigement other
-- Structure: **99.82** · records **13** · buyers **13** · repeat buyers **0**
-- Route `OPEN_PUBLIC` · currency `CAD` · p25 **334399.0** · median **334399.0** · p75 **334399.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `MULTI_BUYER_MARKET`
+### 7. France · `NO_CODE` · acheminement et fourniture d électricité et de gaz naturel acheminement et fourniture d électricité et de gaz naturel other
+- Structure: **99.62** · records **6** · buyers **5** · repeat buyers **1**
+- Route `OPEN_PUBLIC` · currency `EUR` · p25 **45000000.0** · median **45000000.0** · p75 **45000000.0**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **50.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - Bibliothèque et Archives nationales du Québec — SERVICE DE DÉNEIGEMENT — value 334399.0
-  - Buanderie centrale de Montréal — Service de déneigement — value UNKNOWN
-  - École Nationale de Police du Québec — Service de déneigement — value UNKNOWN
+  - Syndicat Intercommunal d'Energie d'Indre et Loire — Acheminement et fourniture d'électricité et de gaz naturel — value 45000000.0
+  - SIEDS — Acheminement et fourniture d'électricité et de gaz naturel — value UNKNOWN
+  - Collectivité — Acheminement et fourniture d'électricité et de gaz naturel.-. — value UNKNOWN
 
-### 8. Canada - Quebec · `NO_CODE` · entretien des espaces verts entretien des espaces verts other
-- Structure: **99.81** · records **10** · buyers **9** · repeat buyers **1**
-- Route `OPEN_PUBLIC` · currency `CAD` · p25 **334399.0** · median **334399.0** · p75 **334399.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `MULTI_BUYER_MARKET`
+### 8. France · `NO_CODE` · convention de participation couvrant le risque prévoyance convention de participation couvrant le risque prévoyance other
+- Structure: **99.61** · records **5** · buyers **4** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **43186711.61** · median **48788631.22** · p75 **54390550.83**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **50.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - Centre de services scolaire des Découvreurs. — Entretien des espaces verts — value 334399.0
-  - Centre de services scolaire de l'Énergie — Entretien des espaces verts — value UNKNOWN
-  - Ville Saint-Rémi — Entretien des espaces verts — value UNKNOWN
+  - Centre de Gestion de la fonction publique territoriale de Meurthe-et-Moselle — Convention de participation couvrant le risque « Prévoyance » — value 59992470.44
+  - Centre de Gestion F.P.T. du Haut-Rhin — Convention de participation couvrant le risque « Prévoyance » — value 37584792.0
+  - CDC Ardèche Rhône Coiron — Convention de participation couvrant le risque Prévoyance — value UNKNOWN
 
-### 9. Canada - Quebec · `NO_CODE` · agence de sécurité agence de sécurité other
-- Structure: **99.81** · records **5** · buyers **4** · repeat buyers **1**
-- Route `OPEN_PUBLIC` · currency `CAD` · p25 **6943899.0** · median **6943899.0** · p75 **6943899.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+### 9. France · `NO_CODE` · restauration collective restauration collective other
+- Structure: **99.57** · records **7** · buyers **6** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **20292000.0** · median **20292000.0** · p75 **20292000.0**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **50.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - Université du Québec à Chicoutimi . — Agence de sécurité — value 6943899.0
-  - SQI-Direction immobilière Sud de Montréal — Agence de sécurité — value UNKNOWN
-  - SQI-Direction immobilière Sud de Montréal — Agence de sécurité — value UNKNOWN
+  - Ville de Cholet — Restauration collective — value 20292000.0
+  - COMMUNE DE TOURNUS — RESTAURATION COLLECTIVE — value UNKNOWN
+  - Ville de COMINES — Restauration collective — value UNKNOWN
 
-### 10. Germany · `NO_CODE` · herstellung lieferung und ausgabe von schulmittagessen cpv code <n> 9 herstellung lieferung und ausgabe von schulmittagessen einschlie lich eines täglichen rohkostanteils und eines
-- Structure: **99.81** · records **4** · buyers **2** · repeat buyers **1**
-- Route `OPEN_PUBLIC` · currency `EUR` · p25 **16294540.8875** · median **17598676.13** · p75 **24538773.005000003**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 10. France · `NO_CODE` · concession du service public d assainissement concession du service public d assainissement other
+- Structure: **99.57** · records **4** · buyers **4** · repeat buyers **0**
+- Route `UNKNOWN` · currency `EUR` · p25 **17964115.5** · median **32628231.0** · p75 **51495816.0**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Bezirksamt Tempelhof-Schöneberg von Berlin — Herstellung, Lieferung und Ausgabe von Schulmittagessen- CPV-Code 55524000-9 — value 41458759.88
-  - Land Berlin vertr. durch BA Mitte v. Berlin — Herstellung, Lieferung und Ausgabe von Schulmittagessen - CPV-Code 55524000-9 — value 18898777.38
-  - Land Berlin vertr. durch BA Mitte v. Berlin — Herstellung, Lieferung und Ausgabe von Schulmittagessen - CPV-Code 55524000-9 — value 16298574.88
+  - Cholet Agglomération — CONCESSION DU SERVICE PUBLIC D'ASSAINISSEMENT — value 70363401.0
+  - Les Sables d'Olonne Agglomération — Concession du Service Public d'Assainissement — value 32628231.0
+  - SIA de la Région d'Orgerus — Concession du Service Public d'Assainissement — value 3300000.0
 
-### 11. United Kingdom · `NO_CODE` · extension of existing dynamic purchasing system dps for the temporary accommodation this is a further extension to the council s dynamic purchasing system dps for temporary accommo
-- Structure: **99.81** · records **4** · buyers **4** · repeat buyers **0**
-- Route `COMPETITIVE_OTHER` · currency `GBP` · p25 **284768750.0** · median **331012494.5** · p75 **445087491.75**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 11. Netherlands · `79620000-6` · inhuur flexibele arbeidskrachten other
+- Structure: **99.48** · records **8** · buyers **7** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **9500000.0** · median **9500000.0** · p75 **9500000.0**
+- Median bidders **UNKNOWN** · suppliers **11** · top supplier share **16.7%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - London Borough of Newham — Extension of existing Dynamic Purchasing System (DPS) for the Supply of Temporary Accommodation — value 714600000.0
-  - London Borough of Enfield — Extension of existing Dynamic Purchasing System (DPS) for the Supply of Temporary Accommodation — value 355249989.0
-  - London Borough of Redbridge — Extension of existing Dynamic Purchasing System (DPS) for the Supply of Temporary Accommodation — value 306775000.0
+  - Cyclus N.V. — Inhuur flexibele arbeidskrachten — value 9500000.0
+  - Centraal Bureau Stichting OZHW — Inhuur Flexibele Arbeidskrachten — value UNKNOWN
+  - Provincie Groningen — Inhuur Flexibele Arbeidskrachten — value UNKNOWN
 
-### 12. France · `NO_CODE` · concours restreint de maîtrise d oeuvre sur esquisse pour l extension et la réhabilitation du complexe piscine patinoire de mercières à compiègne concours restreint de maîtrise d o
-- Structure: **99.8** · records **3** · buyers **3** · repeat buyers **0**
-- Route `COMPETITIVE_OTHER` · currency `EUR` · p25 **65000.0** · median **65000.0** · p75 **65000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 12. NOR · `63510000` · travel agency services other
+- Structure: **99.31** · records **4** · buyers **3** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **120000000.0** · median **120000000.0** · p75 **120000000.0**
+- Median bidders **0.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Agglomération de la Région de Compiègne — Concours restreint de maîtrise d'oeuvre sur esquisse pour l'extension et la réhabilitation du complexe "Piscine Patinoire de Mercières" à Compiègne — value 65000.0
-  - Agglomération Région Compiègne — Concours restreint de maîtrise d'oeuvre sur esquisse pour l'extension et la réhabilitation du complexe "Piscine Patinoire de Mercières" à Compiègne — value UNKNOWN
-  - AGGLOMERATION REGION DE COMPIEGNE — Concours restreint de maîtrise d'oeuvre sur esquisse pour l'extension et la réhabilitation du complexe "Piscine Patinoire de Mercières" à Compiègne — value UNKNOWN
+  - Stortinget — Travel agency services. — value 120000000.0
+  - Anskaffelser i Akershus, Buskerud og Østfold KO — Travel agency services — value UNKNOWN
+  - Anskaffelser i Akershus, Buskerud og Østfold KO — Travel agency services — value UNKNOWN
 
-### 13. United Kingdom · `NO_CODE` · housing regeneration and demolition h3 framework lhcpg is seeking to establish a multi supplier the housing regeneration demolition remediation and enabling works across the united
-- Structure: **99.8** · records **3** · buyers **3** · repeat buyers **0**
-- Route `OPEN_PUBLIC` · currency `GBP` · p25 **537500000.0** · median **1000000000.0** · p75 **1125000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 13. Netherlands · `33196000-0` · wmo hulpmiddelen other
+- Structure: **99.3** · records **13** · buyers **13** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **5031449.25** · median **21600000.0** · p75 **57150000.0**
+- Median bidders **UNKNOWN** · suppliers **4** · top supplier share **36.4%** · shape `MULTI_BUYER_MARKET`
 - Historical examples:
-  - LHC Procurement Group for the Scottish Procurement Alliance (SPA) — Housing, Regeneration and Demolition (H3) Framework — value 1250000000.0
-  - LHC Procurement Group — Housing, Regeneration and Demolition (H3) Framework — value 1000000000.0
-  - LHC Procurement Group for the Welsh Procurement Alliance (WPA) — Housing, Regeneration and Demolition (H3) Framework — value 75000000.0
+  - Gemeente Den Haag — Wmo-hulpmiddelen — value 105000000.0
+  - Gemeente 's-Hertogenbosch — WMO Hulpmiddelen — value 65000000.0
+  - Gemeente Almere — Wmo hulpmiddelen — value 33600000.0
 
-### 14. United Kingdom · `NO_CODE` · public buildings construction and infrastructure this framework covers a broad range of construction related public buildings across multiple value bands it includes new build proj
-- Structure: **99.79** · records **3** · buyers **3** · repeat buyers **0**
-- Route `OPEN_PUBLIC` · currency `GBP` · p25 **425000000.0** · median **750000000.0** · p75 **875000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - LHC Procurement Group for the Scottish Procurement Alliance (SPA) — Public Buildings Construction and Infrastructure — value 1000000000.0
-  - LHC Procurement Group — Public Buildings Construction and Infrastructure — value 750000000.0
-  - LHC Procurement Group for the Welsh Procurement Alliance (WPA) — Public Buildings Construction and Infrastructure — value 100000000.0
-
-### 15. Canada - Quebec · `NO_CODE` · services professionnels en gestion de projets de construction services professionnels en gestion de projets de construction other
-- Structure: **99.78** · records **5** · buyers **4** · repeat buyers **1**
-- Route `OPEN_PUBLIC` · currency `CAD` · p25 **6684999.0** · median **6684999.0** · p75 **6684999.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - Société du Palais des Congrès de Montréal — Services professionnels en gestion de projets de construction — value 6684999.0
-  - CIUSSS du Nord-de-l'Île-de-Montréal — SERVICES PROFESSIONNELS EN GESTION DE PROJETS DE CONSTRUCTION — value UNKNOWN
-  - CIUSSS du Nord-de-l'Île-de-Montréal — SERVICES PROFESSIONNELS EN GESTION DE PROJETS DE CONSTRUCTION — value UNKNOWN
-
-### 16. United Kingdom · `NO_CODE` · west midlands independent fostering agency framework this framework is for the foster care services across the west midlands region coventry city council is the lead local authorit
-- Structure: **99.76** · records **3** · buyers **2** · repeat buyers **1**
-- Route `OPEN_PUBLIC` · currency `GBP` · p25 **2750000000.0** · median **2750000000.0** · p75 **2750000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Coventry City Council — West Midlands Independent Fostering Agency Framework — value 2750000000.0
-  - Coventry City Council — West Midlands Independent Fostering Agency Framework — value UNKNOWN
-  - COVENTRY CITY COUNCIL — West Midlands Independent Fostering Agency Framework — value UNKNOWN
-
-### 17. Germany · `NO_CODE` · rohbauarbeiten rohbauarbeiten other
-- Structure: **99.75** · records **72** · buyers **19** · repeat buyers **1**
-- Route `OPEN_PUBLIC` · currency `EUR` · p25 **1692125.0** · median **2094750.0** · p75 **2497375.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `MULTI_BUYER_MARKET`
-- Historical examples:
-  - Lernen plus gGmbH Schloss Schönefeld — Rohbauarbeiten — value 2900000.0
-  - Diakonische Stiftung Wittekindshof — Rohbauarbeiten — value 1289500.0
-  - Landratsamt Wartburgkreis — Rohbauarbeiten — value UNKNOWN
-
-### 18. Canada - Quebec · `NO_CODE` · gaz propane gaz propane other
-- Structure: **99.75** · records **8** · buyers **4** · repeat buyers **1**
-- Route `OPEN_PUBLIC` · currency `CAD` · p25 **334399.0** · median **334399.0** · p75 **334399.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - Comité de négociations d'achats regroupés de Chaudière-Appalaches (CNAR 03-12) — Fourniture de gaz propane — value 334399.0
-  - Centre d'acquisitions gouvernementales — Gaz Propane — value UNKNOWN
-  - Municipalité de Val-des-Monts — Fourniture de gaz propane — value UNKNOWN
-
-### 19. CZE · `33600000` · dynamický nákupní systém na dodávky lé ivých p ípravk other
-- Structure: **99.73** · records **10** · buyers **8** · repeat buyers **2**
-- Route `UNKNOWN` · currency `CZK` · p25 **300000000.0** · median **900000000.0** · p75 **2100000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `MULTI_BUYER_MARKET`
-- Historical examples:
-  - Krajská zdravotní, a.s. — Dynamický nákupní systém na dodávky léčivých přípravků — value 16000000000.0
-  - Fakultní nemocnice Olomouc — Dynamický nákupní systém na dodávky léčivých přípravků — value 2500000000.0
-  - Fakultní nemocnice Olomouc — Dynamický nákupní systém na dodávky léčivých přípravků — value 2500000000.0
-
-### 20. AUT · `72000000` · it dienstleistungen <n> automation software
-- Structure: **99.73** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **140200000.0** · median **235400000.0** · p75 **237700000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Auftraggeber sind die Republik Österreich (Bund), die Bundesbeschaffung GmbH sowie alle weiteren Auftraggeber gemäß der den Ausschreibungsunterlagen beiliegenden Kundenliste. — IT-Dienstleistungen 2025 — value 240000000.0
-  - Auftraggeber sind die Republik Österreich (Bund), die Bundesbeschaffung GmbH sowie alle weiteren Auftraggeber gemäß der den Ausschreibungsunterlagen beiliegenden Kundenliste, im Vergabeverfahren alle vertreten durch die Bundesbeschaffung GmbH. — IT-Dienstleistungen 2026 — value 235400000.0
-  - IT-Services der Sozialversicherung GmbH — IT-Dienstleistungen 2024 — value 45000000.0
-
-### 21. Germany · `NO_CODE` · kooperationspartnerschaften für klassen zur flexiblen berufsvorbereitung bv flexi des kooperativen berufsvorbereitungsjahrs bvj k sowie für berufsintegrationsklassen bik an staatli
-- Structure: **99.71** · records **3** · buyers **2** · repeat buyers **1**
-- Route `OPEN_PUBLIC` · currency `EUR` · p25 **62354445.0** · median **76242102.0** · p75 **78696498.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Freistaat Bayern vertreten durch das Bayer. Landesamt für Schule — Kooperationspartnerschaften für Klassen zur flexiblen Berufsvorbereitung (BV-Flexi), des kooperativen Berufsvorbereitungsjahrs (BVJ/k) sowie für Berufsintegrationsklassen (BIK) an staatlichen Berufsschulen in Bayern (Rahmenvereinbarung) — value 81150894.0
-  - Bayerisches Landesamt für Schule — Kooperationspartnerschaften für Klassen zur flexiblen Berufsvorbereitung (BV-Flexi), des kooperativen Berufsvorbereitungsjahrs (BVJ/k) sowie für Berufsintegrationsklassen (BIK) an staatlichen Berufsschulen in Bayern (Rahmenvereinbarung) — value 76242102.0
-  - Freistaat Bayern vertreten durch das Bayer. Landesamt für Schule — Kooperationspartnerschaften für Klassen zur flexiblen Berufsvorbereitung (BV-Flexi), des kooperativen Berufsvorbereitungsjahrs (BVJ/k) sowie für Berufsintegrationsklassen (BIK) an staatlichen Berufsschulen in Bayern (Rahmenvereinbarung) — value 48466788.0
-
-### 22. CZ · `45233100` · rámcová dohoda na zhotovitele souvislých oprav ivi ných povrch silnic v majetku ústeckého kraje other
-- Structure: **99.7** · records **25** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `CZK` · p25 **1800000000.0** · median **1800000000.0** · p75 **1800000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - Správa a údržba silnic Ústeckého kraje, příspěvková organizace — Rámcová dohoda na zhotovitele souvislých oprav živičných povrchů silnic v majetku Ústeckého kraje — value 2750000000.0
-  - Správa a údržba silnic Ústeckého kraje — Rámcová dohoda na zhotovitele souvislých oprav živičných povrchů silnic v majetku Ústeckého kraje — value 1800000000.0
-  - Správa a údržba silnic Ústeckého kraje — Rámcová dohoda na zhotovitele souvislých oprav živičných povrchů silnic v majetku Ústeckého kraje — value 1800000000.0
-
-### 23. ESP · `90911200` · contrato de servicios contr <n> <n> other
-- Structure: **99.7** · records **4** · buyers **3** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **37696101.715** · median **83811703.25999999** · p75 **126450100.0225**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Servicio Andaluz de Salud. Complejo Hospitalario Torrecárdenas. — Contrato de Servicios (CONTR 2025 0000426008) — value 131548386.04
-  - Servicio Andaluz de Salud. Área Hospitalaria Virgen del Rocío. — Contrato de Servicios (CONTR 2025 0001154765) — value 124750671.35
-  - Servicio Andaluz de Salud. Hospital Universitario Virgen del Rocío — Contrato de Servicios (CONTR 2024 0001122645) — value 42872735.17
-
-### 24. Germany · `NO_CODE` · kooperationspartnerschaften für deutschklassen dk bs a dk bs anker dk bs flexi und berufsintegrationsvorklassen bikv an staatlichen berufsschulen in bayern rahmenvereinbarung an de
-- Structure: **99.7** · records **3** · buyers **2** · repeat buyers **1**
-- Route `OPEN_PUBLIC` · currency `EUR` · p25 **38948437.5** · median **45126054.0** · p75 **63562515.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Bayerisches Landesamt für Schule — Kooperationspartnerschaften für Deutschklassen (DK-BS-A, DK-BS-AnkER, DK-BS-Flexi) und Berufsintegrationsvorklassen (BIKV) an staatlichen Berufsschulen in Bayern (Rahmenvereinbarung) — value 81998976.0
-  - Freistaat Bayern vertreten durch das Bayer. Landesamt für Schule — Kooperationspartnerschaften für Deutschklassen (DK-BS-A, DK-BS-AnkER, DK-BS-Flexi) und Berufsintegrationsvorklassen (BIKV) an staatlichen Berufsschulen in Bayern (Rahmenvereinbarung) — value 45126054.0
-  - Freistaat Bayern vertreten durch das Bayer. Landesamt für Schule — Kooperationspartnerschaften für Deutschklassen (DK-BS-A, DK-BS-AnkER, DK-BS-Flexi) und Berufsintegrationsvorklassen (BIKV) an staatlichen Berufsschulen in Bayern (Rahmenvereinbarung) — value 32770821.0
-
-### 25. HUN · `09123000` · földgáz beszerzése a <n> <n> gázévre other
-- Structure: **99.69** · records **6** · buyers **3** · repeat buyers **2**
-- Route `UNKNOWN` · currency `HUF` · p25 **191576977.0** · median **35117416748.5** · p75 **70000000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+### 14. HUN · `09123000` · földgáz beszerzése a <n> <n> gázévre other
+- Structure: **99.27** · records **6** · buyers **3** · repeat buyers **2**
+- Route `UNKNOWN` · currency `HUF` · p25 **98126518.5** · median **35058980205.5** · p75 **70000000000.0**
+- Median bidders **1.0** · suppliers **17** · top supplier share **5.9%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
   - Magyar Földgáztároló Zártkörűen Működő Részvénytársaság — Földgáz beszerzése a 2026/2027. gázévre — value 70000000000.0
   - Magyar Földgáztároló Zártkörűen Működő Részvénytársaság — Földgáz beszerzése a 2025/2026. gázévre — value 70000000000.0
   - Magyar Földgáztároló Zártkörűen Működő Részvénytársaság — Földgáz beszerzése a 2024/2025. gázévre — value 70000000000.0
 
-### 26. ESP · `50000000` · servicios de conservación y mantenimiento de las redes de saneamiento periférico gestionadas por canal de isabel ii s a m p other
-- Structure: **99.67** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **257163237.43** · median **285736930.5** · p75 **285736930.5**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 15. Germany · `NO_CODE` · erweiterung sap maxattention erweiterung des bestehenden sap maxattention vertrags automation software
+- Structure: **99.21** · records **4** · buyers **3** · repeat buyers **1**
+- Route `DIRECT_NONCOMPETITIVE` · currency `EUR` · p25 **6664110.0** · median **7665480.0** · p75 **7680610.0**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - CANAL DE ISABEL II, S.A. M.P. — SERVICIOS DE CONSERVACIÓN Y MANTENIMIENTO DE LAS REDES DE SANEAMIENTO PERIFÉRICO GESTIONADAS POR CANAL DE ISABEL II, S.A., M.P. — value 285736930.5
-  - CANAL DE ISABEL II, S.A., M.P, — SERVICIOS DE CONSERVACIÓN Y MANTENIMIENTO DE LAS REDES DE SANEAMIENTO PERIFÉRICO GESTIONADAS POR CANAL DE ISABEL II, S.A., M.P. — value 285736930.5
-  - CANAL DE ISABEL II SOCIEDAD ANÓNIMA, M.P. — SERVICIOS DE CONSERVACIÓN Y MANTENIMIENTO DE LAS REDES DE SANEAMIENTO PERIFÉRICO GESTIONADAS POR CANAL DE ISABEL II, S.A., M.P. — value 228589544.36
+  - Landeshauptstadt München, IT@M-BO4, Vergabemanagement — Erweiterung SAP-MaxAttention — value 7726000.0
+  - Landeshauptstadt München, IT@M-GL4, Vergabemanagement — Erweiterung SAP-MaxAttention — value 7665480.0
+  - Landeshauptstadt München, IT@M-GL4, Vergabemanagement — Erweiterung SAP-MaxAttention — value 7665480.0
 
-### 27. Germany · `NO_CODE` · rahmenvereinbarung über die zustellung von bescheiden mittels postzustellungsauftrag rahmenvereinbarung über die zustellung von bescheiden mittels postzustellungsauftrag other
-- Structure: **99.65** · records **3** · buyers **2** · repeat buyers **1**
-- Route `OPEN_PUBLIC` · currency `EUR` · p25 **7480957.5** · median **12025665.0** · p75 **16570372.5**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 16. Netherlands · `79620000-6` · inhuur uitzendkrachten other
+- Structure: **99.16** · records **7** · buyers **7** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **16000000.0** · median **16000000.0** · p75 **16000000.0**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Bayer. Polizeiverwaltungsamt — Rahmenvereinbarung über die Zustellung von Bescheiden mittels Postzustellungsauftrag — value 21115080.0
+  - RWM N.V. — Inhuur uitzendkrachten — value 16000000.0
+  - Erasmus Universiteit Rotterdam — Inhuur Uitzendkrachten — value UNKNOWN
+  - KempenPlus — Inhuur uitzendkrachten — value UNKNOWN
+
+### 17. Netherlands · `79620000-6` · inhuur tijdelijk personeel other
+- Structure: **99.11** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **45000000.0** · median **45000000.0** · p75 **45000000.0**
+- Median bidders **UNKNOWN** · suppliers **4** · top supplier share **25.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Gemeente Midden-Drenthe — Inhuur tijdelijk personeel — value 45000000.0
+  - Gemeente Stadskanaal — Inhuur tijdelijk personeel — value UNKNOWN
+  - Stichting Lentiz Onderwijsgroep — Inhuur Tijdelijk Personeel — value UNKNOWN
+
+### 18. Canada - Quebec · `NO_CODE` · sureté du québec sureté du québec other
+- Structure: **99.05** · records **5** · buyers **2** · repeat buyers **1**
+- Route `DIRECT_NONCOMPETITIVE` · currency `CAD` · p25 **6281198.0** · median **6603546.0** · p75 **6976706.0**
+- Median bidders **1.0** · suppliers **4** · top supplier share **40.0%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - Ville de Salaberry-de-Valleyfield — Sureté du Québec — value 7496341.0
+  - Ville de Salaberry-de-Valleyfield — Sureté du Québec — value 6976706.0
+  - Ville de Salaberry-de-Valleyfield — Sureté du Québec — value 6603546.0
+
+### 19. Germany · `NO_CODE` · kooperationspartnerschaften für deutschklassen dk bs a dk bs anker dk bs flexi und berufsintegrationsvorklassen bikv an staatlichen berufsschulen in bayern rahmenvereinbarung an de
+- Structure: **98.9** · records **3** · buyers **2** · repeat buyers **1**
+- Route `OPEN_PUBLIC` · currency `EUR` · p25 **858377.75** · median **1197144.0** · p75 **1213662.0**
+- Median bidders **1.0** · suppliers **30** · top supplier share **37.9%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Freistaat Bayern vertreten durch das Bayer. Landesamt für Schule — Kooperationspartnerschaften für Deutschklassen (DK-BS-A, DK-BS-AnkER, DK-BS-Flexi) und Berufsintegrationsvorklassen (BIKV) an staatlichen Berufsschulen in Bayern (Rahmenvereinbarung) — value 1230180.0
+  - Freistaat Bayern vertreten durch das Bayer. Landesamt für Schule — Kooperationspartnerschaften für Deutschklassen (DK-BS-A, DK-BS-AnkER, DK-BS-Flexi) und Berufsintegrationsvorklassen (BIKV) an staatlichen Berufsschulen in Bayern (Rahmenvereinbarung) — value 1197144.0
+  - Bayerisches Landesamt für Schule — Kooperationspartnerschaften für Deutschklassen (DK-BS-A, DK-BS-AnkER, DK-BS-Flexi) und Berufsintegrationsvorklassen (BIKV) an staatlichen Berufsschulen in Bayern (Rahmenvereinbarung) — value 519611.5
+
+### 20. Germany · `NO_CODE` · rahmenvereinbarung über die zustellung von bescheiden mittels postzustellungsauftrag rahmenvereinbarung über die zustellung von bescheiden mittels postzustellungsauftrag other
+- Structure: **98.88** · records **3** · buyers **2** · repeat buyers **1**
+- Route `OPEN_PUBLIC` · currency `EUR` · p25 **2473156.0** · median **2936250.0** · p75 **9406062.0**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Bayer. Polizeiverwaltungsamt — Rahmenvereinbarung über die Zustellung von Bescheiden mittels Postzustellungsauftrag — value 15875874.0
   - Bayer. Polizeiverwaltungsamt — Rahmenvereinbarung über die Zustellung von Bescheiden mittels Postzustellungsauftrag — value 2936250.0
-  - Bayerisches Polizeiverwaltungsamt — Rahmenvereinbarung über die Zustellung von Bescheiden mittels Postzustellungsauftrag — value UNKNOWN
+  - Bayerisches Polizeiverwaltungsamt — Rahmenvereinbarung über die Zustellung von Bescheiden mittels Postzustellungsauftrag — value 2010062.0
 
-### 28. Germany · `NO_CODE` · kita ringstra e neubau einer 6 gruppigen kindertagesstätte other
-- Structure: **99.64** · records **10** · buyers **3** · repeat buyers **1**
-- Route `OPEN_PUBLIC` · currency `EUR` · p25 **922463.75** · median **1214285.0** · p75 **1214285.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `MULTI_BUYER_MARKET`
+### 21. Canada - Quebec · `NO_CODE` · location d une infrastructure de télécommunications radio voix p <n> sous forme de temps d ondes et services location d une infrastructure de télécommunications radio voix p <n> so
+- Structure: **98.86** · records **5** · buyers **5** · repeat buyers **0**
+- Route `UNKNOWN` · currency `CAD` · p25 **2801075.43** · median **13903310.39** · p75 **13903310.39**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Stadt Waiblingen -GB Hochbau und Gebäudemanagement- — Kita Ringstraße — value 1214285.0
-  - Stadt Waiblingen -FB Hochbau und Gebäudemanagement- — Kita Ringstraße — value 1214285.0
-  - Stadt Waiblingen -FB Hochbau und Gebäudemanagement- — Kita Ringstraße — value 1214285.0
+  - Ville de Sainte-Thérèse. — Location d'une infrastructure de télécommunications radio-voix P25 sous forme de temps d'ondes et services — value 13903310.39
+  - Ville de Boisbriand. — Location d'une infrastructure de télécommunications radio-voix P25 sous forme de temps d'ondes et services — value 13903310.39
+  - Ville de Repentigny. — Location d'une infrastructure de télécommunications radio-voix P25 sous forme de temps d'ondes et services — value 13903310.39
 
-### 29. ESP · `33652100` · suministro sucesivo del medicamento axicabtagen ciloleucel other
-- Structure: **99.6** · records **48** · buyers **2** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **71940000.0** · median **71940000.0** · p75 **71940000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - Servizo Galego de Saúde. Área Sanitaria de Vigo — Suministro sucesivo del medicamento Axicabtagen Ciloleucel — value 71940000.0
-  - Servizo Galego de Saúde. Área Sanitaria de Vigo — Suministro sucesivo del medicamento Axicabtagen Ciloleucel — value 71940000.0
-  - Área Sanitaria da Coruña e Cee - Servicio Gallego de Salud — Suministro sucesivo del medicamento "Axicabtagen Ciloleucel" — value 71940000.0
-
-### 30. Germany · `NO_CODE` · gebäudereinigungsleistungen gegenstand der vom ag ausgeschriebenen leistung ist die unterhalts und grundreinigung von <n> objekten mit einer jahresreinigungsfläche von ca <n> <n> <
-- Structure: **99.6** · records **3** · buyers **2** · repeat buyers **1**
-- Route `OPEN_PUBLIC` · currency `EUR` · p25 **6896280.65** · median **6896280.65** · p75 **6896280.65**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Land Berlin vertr. durch BA Mitte v. Berlin — Gebäudereinigungsleistungen — value 6896280.65
-  - Land Berlin vertr. durch BA Mitte v. Berlin — Gebäudereinigungsleistungen — value UNKNOWN
-  - Landkreis Gifhorn — Gebäudereinigungsleistungen — value UNKNOWN
-
-### 31. Germany · `NO_CODE` · freianlagen die vorliegende beinhaltet die herstellung der freianlagen im bereich des hauptgebäudes im zuge der hochbauma nahmen im strandbad müggelsee fürstenwalder damm <n> in <n
-- Structure: **99.57** · records **4** · buyers **2** · repeat buyers **1**
-- Route `COMPETITIVE_OTHER` · currency `EUR` · p25 **1600000.0** · median **1600000.0** · p75 **1600000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Land Berlin, vertreten durch das Bezirksamt Treptow-Köpenick von Berlin — Freianlagen — value 1600000.0
-  - Land Berlin, vertreten durch das Bezirksamt Treptow-Köpenick von Berlin — Freianlagen — value 1600000.0
-  - Land Berlin, vertreten durch das Bezirksamt Treptow-Köpenick von Berlin — Freianlagen — value 1600000.0
-
-### 32. SVN · `33600000` · nakup zdravil other
-- Structure: **99.57** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **89807388.125** · median **178044000.0** · p75 **581378042.155**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - UNIVERZITETNI KLINIČNI CENTER LJUBLJANA — NAKUP ZDRAVIL — value 984712084.31
-  - ONKOLOŠKI INŠTITUT LJUBLJANA — Nakup zdravil — value 178044000.0
-  - ZDRAVSTVENI DOM LJUBLJANA — Nakup zdravil — value 1570776.25
-
-### 33. United Kingdom · `NO_CODE` · energy efficiency renewable technology dps this dynamic purchasing system dps has been established to support the inspection repair and replacement of energy efficiency measures an
-- Structure: **99.46** · records **3** · buyers **3** · repeat buyers **0**
-- Route `OPEN_PUBLIC` · currency `GBP` · p25 **40000000.0** · median **50000000.0** · p75 **62500000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - LHC Procurement Group — Energy Efficiency & Renewable Technology DPS — value 75000000.0
-  - LHC Procurement Group for the Welsh Procurement Alliance (WPA) — Energy Efficiency & Renewable Technology DPS — value 50000000.0
-  - LHC Procurement Group for the Scottish Procurement Alliance (SPA) — Energy Efficiency & Renewable Technology DPS — value 30000000.0
-
-### 34. ESP · `09310000` · suministro de energía eléctrica a las instalaciones de canal de isabel ii s a m p <n> <n> other
-- Structure: **99.45** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **123061382.775** · median **123927445.29** · p75 **123927445.29**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - CANAL DE ISABEL II, S.A., M.P. — SUMINISTRO DE ENERGÍA ELÉCTRICA A LAS INSTALACIONES DE CANAL DE ISABEL II, S.A., M.P. (2025-2026) — value 123927445.29
-  - CANAL DE ISABEL II, S.A., M.P, — SUMINISTRO DE ENERGÍA ELÉCTRICA A LAS INSTALACIONES DE CANAL DE ISABEL II, S.A., M.P. (2025-2026) — value 123927445.29
-  - CANAL DE ISABEL II, S.A., M.P. — SUMINISTRO DE ENERGÍA ELÉCTRICA A LAS INSTALACIONES DE CANAL DE ISABEL II, S.A., M.P. (2027-2029) — value 122195320.26
-
-### 35. ESP · `33600000` · fármacos exclusivos other
-- Structure: **99.38** · records **5** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **41842426.8** · median **41842426.8** · p75 **41842426.8**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - CONSORCIO CORPORACIÓ SANITÀRIA PARC TAULÍ DE SABADELL — FÁRMACOS EXCLUSIVOS — value 41842426.8
-  - CONSORCIO CORPORACIÓ SANITÀRIA PARC TAULÍ DE SABADELL — FÁRMACOS EXCLUSIVOS — value 41842426.8
-  - CONSORCIO CORPORACIÓ SANITÀRIA PARC TAULÍ DE SABADELL — FÁRMACOS EXCLUSIVOS — value 41842426.8
-
-### 36. ESP · `85100000` · contrato acuerdo marco de servicios contr <n> <n> other
-- Structure: **99.38** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **45097908.58** · median **50876383.36** · p75 **88839533.52000001**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Servicio Andaluz de Salud. Área Hospitalaria Virgen del Rocío. — Contrato Acuerdo Marco de Servicios (CONTR 2025 0000697024) — value 126802683.68
-  - Servicio Andaluz de Salud. Hospital Universitario de Jaén. — Contrato Acuerdo Marco de Servicios (CONTR 2025 0000703722) — value 50876383.36
-  - Servicio Andaluz de Salud. Hospital Universitario Juan Ramón Jiménez — Contrato Acuerdo Marco de Servicios (CONTR 2025 0000690800) — value 39319433.8
-
-### 37. PL · `77200000` · wykonywanie us ug z zakresu gospodarki le nej na terenie wybranych nadle nictw regionalnej dyrekcji lasów pa stwowych w szczecinie w latach <n> <n> other
-- Structure: **99.32** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `PLN` · p25 **287128417.745** · median **535553076.45** · p75 **535553076.45**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Skarb Państwa – Państwowe Gospodarstwo Leśne Lasy Państwowe Regionalna Dyrekcja Lasów Panstwowych w Szczecinie, Pełnomocnik — Wykonywanie usług z zakresu gospodarki leśnej na terenie wybranych Nadleśnictw Regionalnej Dyrekcji Lasów Państwowych w Szczecinie w latach 2024, 2025 — value 535553076.45
-  - Skarb Państwa – Państwowe Gospodarstwo Leśne Lasy Państwowe Regionalna Dyrekcja Lasów Panstwowych w Szczecinie - pełnomocnik zamawiających — Wykonywanie usług z zakresu gospodarki leśnej na terenie wybranych Nadleśnictw Regionalnej Dyrekcji Lasów Państwowych w Szczecinie w latach 2024, 2025 — value 535553076.45
-  - Skarb Państwa Państwowe Gospodarstwo Leśne Lasy Państwowe Nadleśnictwo Dębno — „Wykonywanie usług z zakresu gospodarki leśnej na terenie wybranych Nadleśnictw Regionalnej Dyrekcji Lasów Państwowych w Szczecinie w latach 2024, 2025” — value 38703759.04
-
-### 38. ESP · `85100000` · servicio contr <n> <n> other
-- Structure: **99.27** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **38609895.165** · median **39133794.94** · p75 **63508395.745**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Servicio Andaluz de Salud. Hospital Universitario Virgen del Rocío — Servicio CONTR 2024 0000141087 — value 87882996.55
-  - Servicio Andaluz de Salud. Hospital Universitario de Torrecárdenas. — Servicio CONTR 2024 0000131818 — value 39133794.94
-  - Servicio Andaluz de Salud. Hospital Universitario Puerta del Mar — Servicio CONTR 2024 0000144518 — value 38085995.39
-
-### 39. United Kingdom · `NO_CODE` · competitive land design and build framework for all nihe regions the project is for the delivery of social housing units in nihe north south and belfast regions by means of a land 
-- Structure: **99.23** · records **3** · buyers **3** · repeat buyers **0**
-- Route `OPEN_PUBLIC` · currency `GBP` · p25 **20000000.0** · median **20000000.0** · p75 **20000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - ALPHA HOUSING (NORTHERN IRELAND) LIMITED — Provision of Competitive Land, Design and Build Framework for all NIHE Regions — value 20000000.0
-  - Alpha Housing NI Ltd — Provision of Competitive Land, Design and Build Framework for all NIHE Regions — value 20000000.0
-  - Alpha Housing (Northern Ireland) Limited — Provision of Competitive Land, Design and Build Framework for all NIHE Regions — value UNKNOWN
-
-### 40. ES · `09310000` · suministro contr <n> <n> other
-- Structure: **99.22** · records **10** · buyers **10** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **11351241.0225** · median **17104172.415** · p75 **26611432.58**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `MULTI_BUYER_MARKET`
-- Historical examples:
-  - SERVICIO ANDALUZ DE SALUD. ÁREA HOSPITALARIA VIRGEN DEL ROCÍO — Suministro CONTR 2023 0000989968 — value 56457674.32
-  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO REGIONAL DE MÁLAGA — Suministro CONTR 2023 0000990082 — value 34520668.58
-  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO VIRGEN DE LAS NIEVES — Suministro CONTR 2023 0000989774 — value 27751626.65
-
-### 41. ESP · `33600000` · acuerdo marco suministro contr <n> <n> other
-- Structure: **99.18** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **42378681.93** · median **43810734.91** · p75 **61309446.629999995**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - SERVICIO ANDALUZ DE SALUD. SERVICIOS CENTRALES — Acuerdo Marco Suministro (CONTR 2022 0000954216) — value 78808158.35
-  - Servicio Andaluz de Salud. Hospital Universitario de Jaén. — Acuerdo Marco Suministro (CONTR 2023 0001044970) — value 43810734.91
-  - Servicio Andaluz de Salud. Hospital Universitario de Jaén. — Acuerdo Marco Suministro (CONTR 2023 0001153871) — value 40946628.95
-
-### 42. United Kingdom · `NO_CODE` · competitive land design and build framework for nihe belfast north and south regions the project is for the delivery of social housing units in nihe belfast north and south regions
-- Structure: **99.16** · records **3** · buyers **2** · repeat buyers **1**
-- Route `OPEN_PUBLIC` · currency `GBP` · p25 **20000000.0** · median **20000000.0** · p75 **20000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Arbour Housing Ltd — Provision of Competitive Land, Design and Build Framework for NIHE Belfast, North and South Regions — value 20000000.0
-  - Arbour Housing Ltd — Provision of Competitive Land, Design and Build Framework for NIHE Belfast, North and South Regions — value 20000000.0
-  - Arbour Housing — Provision of Competitive Land, Design and Build Framework for NIHE Belfast, North and South Regions — value UNKNOWN
-
-### 43. CZE · `45000000` · výstavba dobíjecích stanic other
-- Structure: **99.16** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `CZK` · p25 **500000000.0** · median **500000000.0** · p75 **675000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - ORLEN Unipetrol RPA s.r.o. — Výstavba dobíjecích stanic — value 850000000.0
-  - ČEZ, a. s. — Výstavba dobíjecích stanic — value 500000000.0
-  - ČEZ, a. s. — Výstavba dobíjecích stanic — value 500000000.0
-
-### 44. ESP · `85100000` · contrato de servicios contr <n> <n> other
-- Structure: **99.14** · records **7** · buyers **5** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **9767799.605** · median **21373432.64** · p75 **32503843.34**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - Servicio Andaluz de Salud. Hospital Universitario de Jaén. — Contrato de Servicios (CONTR 2025 0000557846) — value 193727100.04
-  - Servicio Andaluz de Salud. Hospital Universitario Virgen de las Nieves. — Contrato de Servicios (CONTR 2025 0000383635) — value 42887520.0
-  - Servicio Andaluz de Salud. Hospital Universitario de Jaén. — Contrato de Servicios (CONTR 2025 0000703722) — value 22120166.68
-
-### 45. HUN · `34600000` · vasúti járm alkatrészek beszerzése other
-- Structure: **99.14** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `HUF` · p25 **19149416927.0** · median **27650000000.0** · p75 **41468770026.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - MÁV-START Vasúti Személyszállító Zrt. — Vasúti járműalkatrészek beszerzése — value 55287540052.0
-  - MÁV-START Vasúti Személyszállító Zrt. — Vasúti járműalkatrészek beszerzése — value 27650000000.0
-  - MÁV Személyszállítási Zártkörűen Működő Részvénytársaság — Vasúti járműalkatrészek beszerzése — value 10648833854.0
-
-### 46. CZ · `45233280` · odstra ování následk nehod na bezpe nostním za ízení a vybavení other
-- Structure: **99.13** · records **34** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `CZK` · p25 **295000000.0** · median **295000000.0** · p75 **295000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - Ředitelství silnic a dálnic s. p. — Odstraňování následků nehod na bezpečnostním zařízení a vybavení — value 295000000.0
-  - Ředitelství silnic a dálnic ČR — Odstraňování následků nehod na bezpečnostním zařízení a vybavení — value 295000000.0
-  - Ředitelství silnic a dálnic ČR — Odstraňování následků nehod na bezpečnostním zařízení a vybavení — value 295000000.0
-
-### 47. LTU · `77200000` · mi kininkyst s paslaug pirkimas other
-- Structure: **99.12** · records **4** · buyers **2** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **3502499.5424999995** · median **5142535.55** · p75 **9480178.532499999**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Valstybės įmonė Valstybinių miškų urėdija — Miškininkystės paslaugų pirkimas — value 21075499.0
-  - Valstybės įmonė Valstybinių miškų urėdija — Miškininkystės paslaugų pirkimas — value 5615071.71
-  - Valstybės įmonė Valstybinių miškų urėdija (PV) — Miškininkystės paslaugų pirkimas — value 4669999.39
-
-### 48. CZE · `44423400` · dodávky tabulek registra ních zna ek other
-- Structure: **99.12** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `CZK` · p25 **462000000.0** · median **462000000.0** · p75 **718475000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - STÁTNÍ TISKÁRNA CENIN, státní podnik — Dodávky tabulek registračních značek — value 974950000.0
-  - Ministerstvo dopravy — Dodávky tabulek registračních značek — value 462000000.0
-  - Ministerstvo dopravy — Dodávky tabulek registračních značek — value 462000000.0
-
-### 49. ITA · `85311000` · gara europea a procedura aperta per la conclusione di un accordo quadro per l affidamento dei servizi di gestione di centri di accoglienza costituiti da singole unità abitative oth
-- Structure: **99.06** · records **7** · buyers **3** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **21494850.0** · median **48117037.5** · p75 **48117037.5**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - Prefettura di Brescia — Gara europea a procedura aperta per la conclusione di un accordo quadro per l’affidamento dei servizi di gestione di centri di accoglienza costituiti da singole unità abitative — value 79291687.5
-  - PREFETTURA DI BRESCIA — Gara europea a procedura aperta per la conclusione di un accordo quadro per l’affidamento dei servizi di gestione di centri di accoglienza costituiti da singole unità abitative — value 48117037.5
-  - PREFETTURA DI BRESCIA — Gara europea a procedura aperta per la conclusione di un accordo quadro per l’affidamento dei servizi di gestione di centri di accoglienza costituiti da singole unità abitative — value 48117037.5
-
-### 50. ITA · `85311000` · gara europea a procedura aperta per la conclusione di un accordo quadro per l affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità recettiva massima
-- Structure: **99.06** · records **6** · buyers **3** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **16293600.0** · median **51393825.0** · p75 **67884525.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - Prefettura di Genova - Ufficio Territoriale del Governo — Gara europea a procedura aperta per la conclusione di un accordo quadro per l’affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità recettiva massima di 50 posti — value 150463950.0
-  - PREFETTURA DI BRESCIA — Gara europea a procedura aperta per la conclusione di un accordo quadro per l’affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità recettiva massima di 50 posti — value 73381425.0
-  - PREFETTURA DI BRESCIA — Gara europea a procedura aperta per la conclusione di un accordo quadro per l’affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità recettiva massima di 50 posti — value 51393825.0
-
-### 51. ESP · `85300000` · licitación servicio teleasistencia domiciliaria other
-- Structure: **99.06** · records **4** · buyers **2** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **25758000.0** · median **25758000.0** · p75 **25758000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Pleno de la Diputación Provincial de Valencia — Licitación servicio Teleasistencia domiciliaria. — value 25758000.0
-  - Pleno de la Diputación Provincial de Valencia — Licitación servicio Teleasistencia domiciliaria. — value 25758000.0
-  - Presidencia de la Diputación Provincial de Valencia — Licitación servicio Teleasistencia domiciliaria. — value 25758000.0
-
-### 52. ROU · `33652000` · acord cadru furnizare medicamente oncologice other
-- Structure: **99.06** · records **4** · buyers **4** · repeat buyers **0**
-- Route `UNKNOWN` · currency `RON` · p25 **31991270.78** · median **151201411.925** · p75 **400623363.6**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - RTC Radiology Therapeutic Center — Acord cadru furnizare medicamente oncologice — value 794727284.4
-  - Institutul de Fonoaudiologie si Chirurgie Functionala - O.R.L. Prof. Dr. D. Hociota — Acord cadru furnizare „Medicamente oncologice „ — value 269255390.0
-  - RTC RADIOLOGY THERAPEUTIC CENTER — Acord cadru furnizare medicamente oncologice — value 33147433.85
-
-### 53. HRV · `90910000` · usluge i enja prostorija other
-- Structure: **99.04** · records **13** · buyers **2** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **39577900.0** · median **39577900.0** · p75 **39577900.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - Središnji državni ured za središnju javnu nabavu — USLUGE ČIŠĆENJA PROSTORIJA — value 47500000.0
-  - Središnji državni ured za središnju javnu nabavu — Usluge čišćenja prostorija — value 39577900.0
-  - Središnji državni ured za središnju javnu nabavu — Usluge čišćenja prostorija — value 39577900.0
-
-### 54. ITA · `85311000` · gara europea a procedura aperta per la conclusione di un accordo quadro per l affidamento dei servizi di gestione di centri collettivi di accoglienza con capacit recettiva massima 
-- Structure: **99.01** · records **6** · buyers **6** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **22053300.0** · median **44106600.0** · p75 **45423311.25**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - PREFETTURA DI BRESCIA — Gara europea a procedura aperta per la conclusione di un accordo quadro per l?affidamento dei servizi di gestione di centri collettivi di accoglienza con capacit� recettiva massima di 50 posti — value 73381425.0
-  - PREFETTURA SALERNO — Gara europea a procedura aperta per la conclusione di un accordo quadro per l?affidamento dei servizi di gestione di centri collettivi di accoglienza con capacit� recettiva massima di 50 posti ? per complessivi 400 posti — value 45862215.0
-  - PREFETTURA UTG DI BARLETTA ANDRIA TRANI — Gara europea a procedura aperta per la conclusione di un accordo quadro per l?affidamento dei servizi di gestione di centri collettivi di accoglienza con capacit� recettiva massima di 50 posti — value 44106600.0
-
-### 55. ITA · `55524000` · procedura aperta per la conclusione di un accordo quadro ai sensi art <n> co 3 dlgs <n> <n> e ss mm ii con un unico operatore in relazione a ciascun lotto <n> lotti per il servizio
-- Structure: **99.0** · records **17** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **775124204.18** · median **775124204.18** · p75 **775124204.18**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - ROMA CAPITALE — Procedura aperta per la conclusione di un accordo quadro, ai sensi art. 59 co 3 DLgs 36/23 e ss.mm.ii. con un unico operatore in relazione a ciascun lotto 15 lotti per il servizio di ristorazione scolastica nei nidi capitolini nelle sezioni ponte nelle scuole dell infanzia comunali e statali primarie e secondarie di I grado di Roma Capitale in conformita ai CAM di cui al DM 65/20 - 48 mesi — value 775124204.18
-  - ROMA CAPITALE — Procedura aperta per la conclusione di un accordo quadro, ai sensi art. 59 co 3 DLgs 36/23 e ss.mm.ii. con un unico operatore in relazione a ciascun lotto 15 lotti per il servizio di ristorazione scolastica nei nidi capitolini nelle sezioni ponte nelle scuole dell infanzia comunali e statali primarie e secondarie di I grado di Roma Capitale in conformita ai CAM di cui al DM 65/20 - 48 mesi — value 775124204.18
-  - ROMA CAPITALE — Procedura aperta per la conclusione di un accordo quadro, ai sensi art. 59 co 3 DLgs 36/23 e ss.mm.ii. con un unico operatore in relazione a ciascun lotto 15 lotti per il servizio di ristorazione scolastica nei nidi capitolini nelle sezioni ponte nelle scuole dell infanzia comunali e statali primarie e secondarie di I grado di Roma Capitale in conformita ai CAM di cui al DM 65/20 - 48 mesi — value 775124204.18
-
-### 56. SE · `15000000` · livsmedel grossist other
-- Structure: **98.98** · records **4** · buyers **4** · repeat buyers **0**
-- Route `UNKNOWN` · currency `SEK` · p25 **80750000.0** · median **228500000.0** · p75 **446500000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Skellefteå Kommun — Livsmedel Grossist — value 676000000.0
-  - Jönköpings kommun — Livsmedel grossist — value 370000000.0
-  - Tranås kommun — Livsmedel grossist — value 87000000.0
-
-### 57. ITA · `45233140` · procedura aperta ex art <n> d lgs n <n> <n> con applicazione del criterio dell oepv finalizzata alla conclusione di <n> contratti di accordo quadro con un solo operatore economico 
-- Structure: **98.97** · records **15** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **589680000.0** · median **589680000.0** · p75 **589680000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - ROMA CAPITALE — Procedura aperta ex art. 71 D.Lgs. n. 36/2023, con applicazione del criterio dell'OEPV, finalizzata alla conclusione di 15 contratti di accordo quadro con un solo operatore economico ex art. 59, comma 3 del D. Lgs. n. 36/2023, per la Sorveglianza, Pronto Intervento e Manutenzione delle strade di competenza di Roma Capitale, suddiviso in 15 lotti - Durata tre anni. — value 589680000.0
-  - ROMA CAPITALE — Procedura aperta ex art. 71 D.Lgs. n. 36/2023, con applicazione del criterio dell'OEPV, finalizzata alla conclusione di 15 contratti di accordo quadro con un solo operatore economico ex art. 59, comma 3 del D. Lgs. n. 36/2023, per la Sorveglianza, Pronto Intervento e Manutenzione delle strade di competenza di Roma Capitale, suddiviso in 15 lotti - Durata tre anni. — value 589680000.0
-  - ROMA CAPITALE — Procedura aperta ex art. 71 D.Lgs. n. 36/2023, con applicazione del criterio dell'OEPV, finalizzata alla conclusione di 15 contratti di accordo quadro con un solo operatore economico ex art. 59, comma 3 del D. Lgs. n. 36/2023, per la Sorveglianza, Pronto Intervento e Manutenzione delle strade di competenza di Roma Capitale, suddiviso in 15 lotti - Durata tre anni. — value 589680000.0
-
-### 58. ESP · `50230000` · servicio para la realización de operaciones de conservación en la red viaria provincial años <n> <n> other
-- Structure: **98.94** · records **4** · buyers **2** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **22214876.03** · median **22214876.03** · p75 **22214876.03**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Junta de Gobierno de la Diputación Provincial de Jaén — Servicio para la realización de operaciones de conservación en la Red Viaria Provincial años 2026-2028 — value 22214876.03
-  - Junta de Gobierno de la Diputación Provincial de Jaén — Servicio para la realización de operaciones de conservación en la Red Viaria Provincial años 2026-2028 — value 22214876.03
-  - Presidencia de la Diputación Provincial de Jaén — Servicio para la realización de operaciones de conservación en la Red Viaria Provincial años 2026-2028 — value 22214876.03
-
-### 59. ESP · `33100000` · acuerdo marco suministro contr <n> <n> other
-- Structure: **98.93** · records **4** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **11320486.25** · median **21622618.705** · p75 **45674538.807500005**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - SERVICIO ANDALUZ DE SALUD. SERVICIOS CENTRALES — Acuerdo Marco Suministro CONTR 2023 0000716678 — value 96821888.0
-  - Servicio Andaluz de Salud. Complejo Hospitalario Torrecárdenas. — Acuerdo Marco Suministro (CONTR 2025 0000320553) — value 28625422.41
-  - SERVICIO ANDALUZ DE SALUD. SERVICIOS CENTRALES — Acuerdo Marco Suministro CONTR 2023 0000623014 — value 14619815.0
-
-### 60. ITA · `34110000` · accordo quadro veicoli edizione 3 id <n> other
-- Structure: **98.92** · records **11** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **368333250.0** · median **368333250.0** · p75 **368333250.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - CONSIP SPA — Accordo Quadro Veicoli, edizione 3 ID 2740 — value 368333250.0
-  - CONSIP SPA — Accordo Quadro Veicoli, edizione 3 ID 2740 — value 368333250.0
-  - CONSIP SPA — Accordo Quadro Veicoli, edizione 3 ID 2740 — value 368333250.0
-
-### 61. SWE · `72000000` · konsultmäklare automation software
-- Structure: **98.91** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `SEK` · p25 **458500000.0** · median **517000000.0** · p75 **833500000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - E-hälsomyndigheten — Konsultmäklare — value 1150000000.0
-  - Sigtuna kommun — Konsultmäklare — value 517000000.0
-  - Almi AB — Konsultmäklare — value 400000000.0
-
-### 62. ITA · `85311000` · gara europea a procedura aperta per la conclusione di un accordo quadro per l affidamento dei servizi di gestione di centri collettivi di accoglienza con capacit ricettiva compresa
-- Structure: **98.87** · records **5** · buyers **5** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **40098900.0** · median **40098900.0** · p75 **56521162.5**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - PREFETTURA SALERNO — Gara europea a procedura aperta per la conclusione di un accordo quadro per l?affidamento dei servizi di gestione di centri collettivi di accoglienza con capacit� ricettiva compresa tra 101 a 300 posti per complessivi 800 posti — value 72807630.0
-  - PREFETTURA DI BRESCIA — Gara europea a procedura aperta per la conclusione di un accordo quadro per l?affidamento dei servizi di gestione di centri collettivi di accoglienza con capacit� ricettiva compresa tra 51 a 100 posti — value 56521162.5
-  - PREFETTURA-UTG DI BARLETTA ANDRIA TRANI — Gara europea a procedura aperta per la conclusione di un accordo quadro per l?affidamento dei servizi di gestione di centri collettivi di accoglienza con capacit� ricettiva compresa tra 51 a 300 posti — value 40098900.0
-
-### 63. DNK · `60000000` · a <n> udbud af almindelig rutekørsel other
+### 22. Germany · `NO_CODE` · kooperationspartnerschaften für klassen zur flexiblen berufsvorbereitung bv flexi des kooperativen berufsvorbereitungsjahrs bvj k sowie für berufsintegrationsklassen bik an staatli
 - Structure: **98.86** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `DKK` · p25 **329680001.0** · median **501187712.0** · p75 **3153093856.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+- Route `OPEN_PUBLIC` · currency `EUR` · p25 **802292.54** · median **1147744.08** · p75 **1283170.7775**
+- Median bidders **1.0** · suppliers **30** · top supplier share **43.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - MOVIA — A23 - udbud af almindelig rutekørsel — value 5805000000.0
-  - Trafikselskabet Movia — A24 - udbud af almindelig rutekørsel — value 501187712.0
-  - MOVIA — A25 - Udbud af almindelig rutekørsel — value 158172290.0
+  - Freistaat Bayern vertreten durch das Bayer. Landesamt für Schule — Kooperationspartnerschaften für Klassen zur flexiblen Berufsvorbereitung (BV-Flexi), des kooperativen Berufsvorbereitungsjahrs (BVJ/k) sowie für Berufsintegrationsklassen (BIK) an staatlichen Berufsschulen in Bayern (Rahmenvereinbarung) — value 1418597.475
+  - Freistaat Bayern vertreten durch das Bayer. Landesamt für Schule — Kooperationspartnerschaften für Klassen zur flexiblen Berufsvorbereitung (BV-Flexi), des kooperativen Berufsvorbereitungsjahrs (BVJ/k) sowie für Berufsintegrationsklassen (BIK) an staatlichen Berufsschulen in Bayern (Rahmenvereinbarung) — value 1147744.08
+  - Bayerisches Landesamt für Schule — Kooperationspartnerschaften für Klassen zur flexiblen Berufsvorbereitung (BV-Flexi), des kooperativen Berufsvorbereitungsjahrs (BVJ/k) sowie für Berufsintegrationsklassen (BIK) an staatlichen Berufsschulen in Bayern (Rahmenvereinbarung) — value 456841.0
 
-### 64. ROU · `33652100` · acord cadru de achizi ie public de medicamente divizat pe <n> loturi other
-- Structure: **98.85** · records **18** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `RON` · p25 **37247231.92** · median **114090165.33** · p75 **139251813.2**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+### 23. Netherlands · `72510000-3` · outsourcing it infrastructuur en beheerdiensten automation software
+- Structure: **98.84** · records **5** · buyers **5** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **3467803.5** · median **4235607.0** · p75 **6705343.0**
+- Median bidders **UNKNOWN** · suppliers **3** · top supplier share **33.3%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - SPITALUL CLINIC JUDETEAN DE URGENTA"SFANTUL IOAN CEL NOU"SUCEAVA — Acord-cadru de achiziție publică de medicamente divizat pe 47 loturi — value 177025163.15
-  - SPITALUL CLINIC JUDETEAN DE URGENTA"SFANTUL IOAN CEL NOU"SUCEAVA — Acord-cadru de achiziție publică de medicamente divizat pe 47 loturi — value 177025163.15
-  - SPITALUL CLINIC JUDETEAN DE URGENTA"SFANTUL IOAN CEL NOU"SUCEAVA — Acord-cadru de achiziție publică de medicamente divizat pe 65 loturi — value 152297788.2
+  - ICT WBW — Outsourcing IT-infrastructuur- en beheerdiensten — value 9175079.0
+  - gemeente Doetinchem — Outsourcing IT-infrastructuur- en beheerdiensten — value 4235607.0
+  - Gemeente Houten — Outsourcing IT-infrastructuur en -beheerdiensten — value 2700000.0
 
-### 65. ITA · `90511100` · cdc per unicam ambito di raccolta ottimale aro 4 bari affidamento del servizio di spazzamento raccolta e trasporto dei rifiuti solidi urbani per l intero territorio dell aro 4 bari
-- Structure: **98.85** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **206376550.3** · median **209235304.05** · p75 **209235304.05**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 24. Canada - Quebec · `NO_CODE` · service de transport adapté par minibus service de transport adapté par minibus other
+- Structure: **98.84** · records **3** · buyers **2** · repeat buyers **1**
+- Route `DIRECT_NONCOMPETITIVE` · currency `CAD` · p25 **6643767.75** · median **13230048.0** · p75 **13230048.0**
+- Median bidders **1.0** · suppliers **3** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - INVITALIA Agenzia nazionale per l’attrazione degli investimenti e lo sviluppo d’ impresa SpA — CdC per UNICAM - AMBITO DI RACCOLTA OTTIMALE - ARO 4 BARI - AFFIDAMENTO DEL SERVIZIO DI “SPAZZAMENTO, RACCOLTA E TRASPORTO DEI RIFIUTI SOLIDI URBANI PER L’INTERO TERRITORIO DELL’ARO 4 BARI – PROVINCIA DI BARI" - B916CCBDA1 — value 209235304.05
-  - INVITALIA Agenzia nazionale per l'attrazione degli investimenti e lo sviluppo d'impresa SpA — CdC per UNICAM - AMBITO DI RACCOLTA OTTIMALE - ARO 4 BARI - AFFIDAMENTO DEL SERVIZIO DI “SPAZZAMENTO, RACCOLTA E TRASPORTO DEI RIFIUTI SOLIDI URBANI PER L’INTERO TERRITORIO DELL’ARO 4 BARI – PROVINCIA DI BARI" - B916CCBDA1 — value 209235304.05
-  - INVITALIA Agenzia nazionale per l’attrazione degli investimenti e lo sviluppo d’impresa SpA — CdC per UNICAM - AMBITO DI RACCOLTA OTTIMALE - ARO 4 BARI - AFFIDAMENTO DEL SERVIZIO DI “SPAZZAMENTO, RACCOLTA E TRASPORTO DEI RIFIUTI SOLIDI URBANI PER L’INTERO TERRITORIO DELL’ARO 4 BARI – PROVINCIA DI BARI" — value 203517796.55
+  - Société de Transport de l'Outaouais. — SERVICE DE TRANSPORT ADAPTÉ PAR MINIBUS — value 13230048.0
+  - Société de Transport de l'Outaouais. — SERVICE DE TRANSPORT ADAPTÉ PAR MINIBUS — value 13230048.0
+  - Réseau de transport de la Capitale. — Service de transport adapté par minibus — value 57487.5
 
-### 66. ITA · `60640000` · procedura aperta per l affidamento in concessione del servizio pubblico di trasporto marittimo di passeggeri veicoli e merci per la continuità territoriale tra la sardegna e le iso
-- Structure: **98.83** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **176149272.0** · median **188871882.0** · p75 **188871882.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 25. Netherlands · `42968100-0` · warme drankenvoorziening automation software
+- Structure: **98.83** · records **8** · buyers **6** · repeat buyers **2**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **6000000.0** · median **6000000.0** · p75 **6000000.0**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **50.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - REGIONE AUTONOMA DELLA SARDEGNA ASSESSORATO TRASPORTI — Procedura aperta per l’affidamento in concessione del servizio pubblico di trasporto marittimo di passeggeri, veicoli e merci per la continuità territoriale tra la Sardegna e le isole minori di La Maddalena, San Pietro e Asinara suddivisa in due lotti: Lotto 1 - Isole di La Maddalena e San Pietro (CIG: B4FB9CE5C7), Lotto 2 – Isola dell’Asinara (CIG: B4FB9CF69A). CUP: E49I24000970003. — value 188871882.0
-  - REGIONE AUTONOMA DELLA SARDEGNA - ASSESSORATO TRASPORTI — Procedura aperta per l’affidamento in concessione del servizio pubblico di trasporto marittimo di passeggeri, veicoli e merci per la continuità territoriale tra la Sardegna e le isole minori di La Maddalena, San Pietro e Asinara — value 188871882.0
-  - Regione Autonoma della Sardegna Assessorato dei Trasporti — Procedura aperta per l’affidamento in concessione del servizio pubblico di trasporto marittimo di passeggeri, veicoli e merci per la continuità territoriale tra la Sardegna e le isole minori di La Maddalena, San Pietro e Asinara — value 163426662.0
+  - Leids Universitair Medisch Centrum (LUMC) — Warme drankenvoorziening — value 6000000.0
+  - Waterschap Vechtstromen — Warme Drankenvoorziening — value UNKNOWN
+  - Waterschap Drents Overijsselse Delta — Warme drankenvoorziening — value UNKNOWN
 
-### 67. ITA · `45231300` · lavori di manutenzione pronto intervento estendimento ed allacciamento su reti e impianti other
-- Structure: **98.82** · records **5** · buyers **2** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **638780000.0** · median **638780000.0** · p75 **709300000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+### 26. Canada - Quebec · `NO_CODE` · services professionnels en évaluation foncière services professionnels en évaluation foncière other
+- Structure: **98.81** · records **23** · buyers **23** · repeat buyers **0**
+- Route `OPEN_PUBLIC` · currency `CAD` · p25 **771214.3575** · median **1533051.94** · p75 **2741130.815**
+- Median bidders **1.0** · suppliers **7** · top supplier share **23.5%** · shape `MULTI_BUYER_MARKET`
 - Historical examples:
-  - IREN S.p.A. in nome e per conto di: a valere per il Lotto 1, IREN ACQUA REGGIO S.r.l. e IRETI GAS S.p.A.; a valere per il Lotto 2, IRETI S.p.A. e IRETI GAS S.p.A.; a valere per il Lotto 3, IRETI S.p.A., IRETI GAS S.p.A. e IREN ACQUA PIACENZA S.r.l.; a valere per il Lotto 4, ASM VERCELLI S.p.A. — LAVORI DI MANUTENZIONE, PRONTO INTERVENTO, ESTENDIMENTO ED ALLACCIAMENTO SU RETI E IMPIANTI — value 709300000.0
-  - IREN S.p.A. in nome e per conto di: a valere per il Lotto 1, IREN ACQUA REGGIO S.r.l. e IRETI GAS S.p.A.; a valere per il Lotto 2, IRETI S.p.A. e IRETI GAS S.p.A.; a valere per il Lotto 3, IRETI S.p.A., IRETI GAS S.p.A. e IREN ACQUA PIACENZA S.r.l.; a valere per il Lotto 4, ASM VERCELLI S.p.A. — LAVORI DI MANUTENZIONE, PRONTO INTERVENTO, ESTENDIMENTO ED ALLACCIAMENTO SU RETI E IMPIANTI — value 709300000.0
-  - IREN S.p.A. in nome e per conto di: a valere per il Lotto 1, IRETI S.p.A., IRETI GAS S.p.A. e IREN ACQUA TIGULLIO S.p.A.; a valere per il Lotto 2, IRETI S.p.A. e IRETI GAS S.p.A.; a valere per i Lotti 3 e 4, ACAM ACQUE S.p.A. — LAVORI DI MANUTENZIONE, PRONTO INTERVENTO, ESTENDIMENTO ED ALLACCIAMENTO SU RETI E IMPIANTI — value 638780000.0
+  - MRC de Vaudreuil-Soulanges — Services professionnels en évaluation foncière — value 11372087.57
+  - MRC des Maskoutains — SERVICES PROFESSIONNELS EN ÉVALUATION FONCIÈRE — value 3509885.42
+  - Ville de Thetford Mines. — Services professionnels en évaluation foncière — value 3089378.25
 
-### 68. ITA · `33124110` · procedura aperta other
-- Structure: **98.82** · records **4** · buyers **4** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **31452062.5** · median **50125000.0** · p75 **59037500.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 27. Germany · `NO_CODE` · lieferung von ökostrom lieferung von elektrischer energie aus erneuerbaren energien ökostrom für die liegenschaften des deutschen bundestages other
+- Structure: **98.79** · records **4** · buyers **3** · repeat buyers **0**
+- Route `OPEN_PUBLIC` · currency `EUR` · p25 **11184013.75** · median **11768702.5** · p75 **12353391.25**
+- Median bidders **2.0** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Azienda Sanitaria Provinciale di Ragusa — PROCEDURA APERTA — value 59037500.0
-  - ASP RAGUSA — PROCEDURA APERTA — value 59037500.0
-  - ASP DI RAGUSA — PROCEDURA APERTA — value 41212500.0
+  - Deutscher Bundestag, Verwaltung, Referat ZR 3 - Vergaben — Lieferung von Ökostrom — value 12938080.0
+  - Deutscher Bundestag - Vergabereferat — Lieferung von Ökostrom — value 10599325.0
+  - Deutscher Bundestag, Referat ZR 3, Vergaben — Lieferung von Ökostrom — value UNKNOWN
 
-### 69. ROU · `33652100` · medicamente oncologice other
-- Structure: **98.82** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `RON` · p25 **280727433.4** · median **532948528.8** · p75 **948225941.1**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 28. Germany · `NO_CODE` · lieferung von ökostrom lieferung von ökostrom other
+- Structure: **98.67** · records **3** · buyers **3** · repeat buyers **0**
+- Route `OPEN_PUBLIC` · currency `EUR` · p25 **1365854.62** · median **1365854.62** · p75 **1365854.62**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - SPITALUL CLINIC DE PNEUMOFTIZIOLOGIE CONSTANTA — MEDICAMENTE ONCOLOGICE — value 1363503353.4
-  - SPITALUL CLINIC DE PNEUMOFTIZIOLOGIE CONSTANTA — MEDICAMENTE ONCOLOGICE — value 532948528.8
-  - SPITALUL JUDETEAN DE URGENTA ZALAU — Medicamente Oncologice — value 28506338.0
+  - Bayerische Staatsforsten AöR — Lieferung von Ökostrom — value 1365854.62
+  - Stadt Kalkar - Vergabestelle — Lieferung von Ökostrom — value UNKNOWN
+  - Zweckverband Klärwerk Steinhäule — Lieferung von Ökostrom — value UNKNOWN
 
-### 70. ESP · `33600000` · contrato de suministros contr <n> <n> other
-- Structure: **98.8** · records **18** · buyers **6** · repeat buyers **3**
-- Route `UNKNOWN` · currency `EUR` · p25 **7736597.202500001** · median **14609208.9** · p75 **20550900.825**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `MULTI_BUYER_MARKET`
+### 29. Netherlands · `90900000-6` · schoonmaakdienstverlening en glasbewassing other
+- Structure: **98.62** · records **5** · buyers **5** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **2250000.75** · median **4500000.5** · p75 **6750000.25**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Servicio Andaluz de Salud. Área Hospitalaria Virgen del Rocío. — Contrato de suministros CONTR 2025 0000436509 — value 194855998.23
-  - Servicio Andaluz de Salud. Área Hospitalaria Virgen del Rocío. — Contrato de suministros CONTR 2024 0000475163 — value 53805915.23
-  - Servicio Andaluz de Salud. Hospital Universitario Puerta del Mar — Contrato de suministros CONTR 2022 699706 — value 30225996.39
+  - Stichting Breda University of Applied Sciences — Schoonmaakdienstverlening en glasbewassing — value 9000000.0
+  - Gemeente Borger-Odoorn — Schoonmaakdienstverlening en glasbewassing — value 1.0
+  - Koningin Wilhelmina College, locatie Beethovenlaan — Schoonmaakdienstverlening en Glasbewassing — value UNKNOWN
 
-### 71. Netherlands · `72000000-5` · softwarebroker automation software
-- Structure: **98.79** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **14300000.0** · median **19600000.0** · p75 **19800000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 30. Netherlands · `79710000-4` · beveiliging opvanglocaties other
+- Structure: **98.6** · records **4** · buyers **4** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **2918562.0** · median **5445708.0** · p75 **7972854.0**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Gemeente Dronten — Softwarebroker — value 20000000.0
-  - Gemeente Hardenberg — Softwarebroker — value 19600000.0
-  - Gemeente Halderberge — Softwarebroker — value 9000000.0
+  - Gemeente Venlo — Beveiliging opvanglocaties — value 10500000.0
+  - Gemeente Altena — Beveiliging opvanglocaties — value 391416.0
+  - gemeente Aalten — Beveiliging opvanglocaties — value UNKNOWN
 
-### 72. POL · `80320000` · kompleksowa us uga edukacyjna polegaj ca na realizacji kursów specjalizacyjnych dla lekarzy uczestnicz cych w procesie kszta cenia specjalizacyjnego other
-- Structure: **98.78** · records **12** · buyers **2** · repeat buyers **2**
-- Route `UNKNOWN` · currency `PLN` · p25 **41370630.0** · median **41670630.0** · p75 **41670630.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+### 31. Netherlands · `79620000-6` · inhuur personeel other
+- Structure: **98.59** · records **14** · buyers **13** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **1200000.0** · median **2000000.0** · p75 **4800000.0**
+- Median bidders **UNKNOWN** · suppliers **17** · top supplier share **25.0%** · shape `MULTI_BUYER_MARKET`
 - Historical examples:
-  - Centrum Medycznego Kształcenia Podyplomowego — Kompleksowa usługa edukacyjna polegająca na realizacji kursów specjalizacyjnych dla lekarzy uczestniczących w procesie kształcenia specjalizacyjnego — value 41670630.0
-  - Centrum Medycznego Kształcenia Podyplomowego — Kompleksowa usługa edukacyjna polegająca na realizacji kursów specjalizacyjnych dla lekarzy uczestniczących w procesie kształcenia specjalizacyjnego — value 41670630.0
-  - Centrum Medycznego Kształcenia Podyplomowego — Kompleksowa usługa edukacyjna polegająca na realizacji kursów specjalizacyjnych dla lekarzy uczestniczących w procesie kształcenia specjalizacyjnego — value 41670630.0
+  - Ons Middelbaar Onderwijs — Inhuur Personeel — value 36000000.0
+  - Stichting Eduvier Onderwijsgroep — Inhuur Personeel — value 5000000.0
+  - Media College — Inhuur Personeel — value 4800000.0
 
-### 73. ESP · `80110000` · servicio para la gestión de escuelas infantiles 2 5 5 dividido en 5 lotes other
-- Structure: **98.78** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **22114088.4** · median **22284926.4** · p75 **22284926.4**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 32. ESP · `90911200` · contrato de servicios contr <n> <n> other
+- Structure: **98.52** · records **4** · buyers **3** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **37696101.715** · median **84330892.725** · p75 **127348110.22000001**
+- Median bidders **1.0** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - CONSEJERÍA DE EDUCACIÓN, CIENCIA Y UNIVERSIDADES - COMUNIDAD DE MADRID — SERVICIO PARA LA GESTIÓN DE ESCUELAS INFANTILES 2-5-5 DIVIDIDO EN 5 LOTES — value 22284926.4
-  - CONSEJERÍA DE EDUCACIÓN, CIENCIA Y UNIVERSIDADES - COMUNIDAD DE MADRID — SERVICIO PARA LA GESTIÓN DE ESCUELAS INFANTILES 2-5-5 DIVIDIDO EN 5 LOTES — value 22284926.4
-  - CONSEJERÍA DE EDUCACIÓN, CIENCIA Y UNIVERSIDADES (COMUNIDAD DE MADRID) — Servicio para la gestión de Escuelas Infantiles 2-5-5, dividido en 5 lotes — value 21943250.4
+  - Servicio Andaluz de Salud. Complejo Hospitalario Torrecárdenas. — Contrato de Servicios (CONTR 2025 0000426008) — value 132025290.04
+  - Servicio Andaluz de Salud. Área Hospitalaria Virgen del Rocío. — Contrato de Servicios (CONTR 2025 0001154765) — value 125789050.28
+  - Servicio Andaluz de Salud. Hospital Universitario Virgen del Rocío — Contrato de Servicios (CONTR 2024 0001122645) — value 42872735.17
 
-### 74. FIN · `48000000` · ohjelmisto ja pilvipalvelulisenssien jälleenmyynti automation software
-- Structure: **98.77** · records **4** · buyers **3** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **5487500.0** · median **26500000.0** · p75 **46000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 33. Netherlands · `48000000-8` · student informatie systeem automation software
+- Structure: **98.46** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **9100000.0** · median **9400000.0** · p75 **9700000.0**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Helsingin yliopisto — Ohjelmisto- ja pilvipalvelulisenssien jälleenmyynti — value 46000000.0
-  - Helsingin yliopisto — Ohjelmisto- ja pilvipalvelulisenssien jälleenmyynti — value 46000000.0
-  - Oulun yliopisto — Ohjelmisto- ja pilvipalvelulisenssien jälleenmyynti — value 7000000.0
+  - Koning Willem I College — Student Informatie Systeem — value 10000000.0
+  - Media College — Student Informatie Systeem — value 8800000.0
+  - MBO Amersfoort — Student Informatie Systeem — value UNKNOWN
 
-### 75. SWE · `66515000` · samordnad upphandling <n> other
-- Structure: **98.77** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `SEK` · p25 **1125000000.0** · median **1250000000.0** · p75 **1300000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 34. Germany · `NO_CODE` · gebäudeautomation gebäudeautomation other
+- Structure: **98.45** · records **21** · buyers **11** · repeat buyers **2**
+- Route `OPEN_PUBLIC` · currency `EUR` · p25 **374047.77** · median **388538.15** · p75 **895956.075**
+- Median bidders **1.0** · suppliers **6** · top supplier share **28.6%** · shape `MULTI_BUYER_REPEAT_MARKET`
 - Historical examples:
-  - S & P Assurans Offentlig AB — Samordnad upphandling 2025 — value 1350000000.0
-  - Söderberg & Partners — Samordnad upphandling 2026 — value 1250000000.0
-  - S & P Assurans Offentlig AB — Samordnad upphandling 2024 — value 1000000000.0
+  - Landkreis Fürstenfeldbruck, vertreten durch den kreiseigenen Hochbau — Gebäudeautomation — value 1403374.0
+  - Wirtschaftsförderung Bremen GmbH — Gebäudeautomation — value 388538.15
+  - OPG Offenbacher Projektentwicklungsgesellschaft mbH im Namen und Rechnung des Magistrates der Stadt Offenbach am Main — Gebäudeautomation — value 359557.39
 
-### 76. ES · `33184100` · acuerdo marco suministro contr <n> <n> other
-- Structure: **98.76** · records **7** · buyers **5** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **8186836.18** · median **10914346.15** · p75 **12598346.055**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+### 35. ESP · `85100000` · contrato de servicios contr <n> <n> other
+- Structure: **98.44** · records **7** · buyers **5** · repeat buyers **2**
+- Route `UNKNOWN` · currency `EUR` · p25 **3705115.545** · median **16313739.0** · p75 **32130476.32**
+- Median bidders **1.0** · suppliers **7** · top supplier share **27.3%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO VIRGEN DE LAS NIEVES — Acuerdo Marco Suministro (CONTR 2023 0000724879) — value 22828794.32
-  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO VIRGEN DE LAS NIEVES — Acuerdo Marco Suministro CONTR 2023 0000799546 — value 13463812.07
-  - H.U. de Jaén. Central Provincial de Compras de Jaén — Acuerdo Marco Suministro (CONTR 2023 0000732356) — value 11732880.04
+  - Servicio Andaluz de Salud. Hospital Universitario de Jaén. — Contrato de Servicios (CONTR 2025 0000557846) — value 161727786.7
+  - Servicio Andaluz de Salud. Hospital Universitario Virgen de las Nieves. — Contrato de Servicios (CONTR 2025 0000383635) — value 42887520.0
+  - Servicio Andaluz de Salud. Área Hospitalaria Virgen del Rocío. — Contrato de Servicios (CONTR 2026 0000145405) — value 21373432.64
 
-### 77. SWE · `33600000` · läkemedel på rekvisition <n> sll <n> other
-- Structure: **98.76** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `SEK` · p25 **1100000000.0** · median **1200000000.0** · p75 **1600000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 36. Canada - Quebec · `NO_CODE` · offres infonuagiques de solutions iaas paas et saas reliées offres infonuagiques de solutions iaas paas et saas reliées automation software
+- Structure: **98.44** · records **5** · buyers **4** · repeat buyers **1**
+- Route `DIRECT_NONCOMPETITIVE` · currency `CAD` · p25 **270000.0** · median **1400000.0** · p75 **1400000.0**
+- Median bidders **1.0** · suppliers **4** · top supplier share **40.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - Region Stockholm - Serviceförvaltningen — Läkemedel på rekvisition 2026 SLL450 — value 2000000000.0
-  - Region Stockholm - Fastighets- och servicenämnden/Inköpscentralen — Läkemedel på rekvisition 2027 SLL450 — value 1200000000.0
-  - Region Stockholm - Serviceförvaltningen — Läkemedel på rekvisition 2025 SLL450 — value 1000000000.0
+  - Ministère du Tourisme — Offres infonuagiques de solutions IAAS, PAAS et SAAS reliées — value 1418279.08
+  - Société de télédiffusion du Québec. — Offres infonuagiques de solutions IAAS, PAAS ET SAAS RELIÉES — value 1400000.0
+  - Société de télédiffusion du Québec. — Offres infonuagiques de solutions IAAS, PAAS ET SAAS RELIÉES — value 1400000.0
 
-### 78. NOR · `32420000` · network equipment other
-- Structure: **98.75** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `NOK` · p25 **323500000.0** · median **600000000.0** · p75 **600000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 37. MKD · `09310000` · electrical energy other
+- Structure: **98.43** · records **4** · buyers **4** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **20000000.0** · median **20000000.0** · p75 **20000000.0**
+- Median bidders **3.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Oslo kommune v/ Utviklings- og kompetanseetaten — Procurement of network equipment — value 600000000.0
-  - Oslo kommune v/ Utviklings- og kompetanseetaten — Procurement of network equipment — value 600000000.0
-  - Stavanger kommune — Network Equipment — value 47000000.0
+  - Ministry of Finance — Electrical energy — value 20000000.0
+  - Customs Administration of Republic of North Macedonia — Electrical Energy — value UNKNOWN
+  - Ministry of economy and labor — Procurement of electrical energy — value UNKNOWN
 
-### 79. ESP · `33141000` · acuerdo marco suministro contr <n> <n> other
-- Structure: **98.74** · records **4** · buyers **4** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **1910658.6225** · median **15034271.040000001** · p75 **33075432.86**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 38. Canada - Quebec · `NO_CODE` · services de la sûreté du québec pour l année <n> services de la sûreté du québec pour l année <n> other
+- Structure: **98.43** · records **3** · buyers **3** · repeat buyers **0**
+- Route `DIRECT_NONCOMPETITIVE` · currency `CAD` · p25 **1427471.0** · median **2343594.0** · p75 **2829625.5**
+- Median bidders **1.0** · suppliers **3** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Servicio Andaluz de Salud. Hospital Universitario Virgen del Rocío — Acuerdo Marco Suministro (CONTR 2024 0000261856) — value 48437333.12
-  - SERVICIO ANDALUZ DE SALUD. SERVICIOS CENTRALES — Acuerdo Marco Suministro (CONTR 2022 0001159784) — value 27954799.44
-  - H.U. de Jaén. Central Provincial de Compras de Jaén — Acuerdo Marco Suministro CONTR 2023 0000856877 — value 2113742.64
+  - Ville de Rivière-du-Loup. — Services de la Sûreté du Québec pour l'année 2026 — value 3315657.0
+  - Ville de Mont-Laurier. — Services de la Sûreté du Québec pour l'année 2025 — value 2343594.0
+  - Ville de La Pocatière. — Services de la Sûreté du Québec pour l'année 2024 — value 511348.0
 
-### 80. ES · `85312110` · servicio de comedores escolares suministro de productos de alimentación y materias primas y prestaciones complementarias para el funcionamiento de los comedores de modalidad in sit
-- Structure: **98.73** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **10128020.434999999** · median **11403801.43** · p75 **28371037.05**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 39. Netherlands · `79620000-6` · inhuur onderwijzend personeel op other
+- Structure: **98.42** · records **4** · buyers **4** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **1776859.75** · median **2561983.5** · p75 **3347107.25**
+- Median bidders **UNKNOWN** · suppliers **6** · top supplier share **33.3%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Eusko Jaurlaritza-Gobierno Vasco — Servicio de comedores escolares, suministro de productos de alimentación y materias primas, y prestaciones complementarias para el funcionamiento de los comedores de modalidad in situ en Bizkaia — value 45338272.67
-  - Gobierno Vasco - Departamento de Educación — Servicio de comedores escolares, suministro de productos de alimentación y materias primas y prestaciones complementarias para el funcionamiento de los comedores de modalidad in situ en Gipuzkoa — value 11403801.43
-  - Gobierno Vasco — Servicio de comedores escolares, suministro de productos de alimentación y materias primas, y prestaciones complementarias para el funcionamiento de los comedores de modalidad “in situ” de ARABA. — value 8852239.44
+  - Yonder — Inhuur Onderwijzend Personeel (OP) — value 4132231.0
+  - Scholengemeenschap De Rooi Pannen — Inhuur Onderwijzend personeel (OP) — value 991736.0
+  - Stichting Lokaal en Internationaal Funderend Onderwijs (SILFO) — Inhuur Onderwijzend Personeel (OP) — value UNKNOWN
 
-### 81. PRT · `72400000` · aquisição de serviços de conectividade para disponibilização aos alunos beneficiários da ação social escolar que frequentem escolas públicas e estabelecimentos de ensino particular
-- Structure: **98.72** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **13506750.0** · median **14833500.0** · p75 **14916730.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 40. Canada - Quebec · `NO_CODE` · hydro québec hydro québec other
+- Structure: **98.37** · records **7** · buyers **4** · repeat buyers **2**
+- Route `DIRECT_NONCOMPETITIVE` · currency `CAD` · p25 **71218.0** · median **2961154.11** · p75 **2995654.85**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - Direção-Geral dos Estabelecimentos Escolares — Aquisição de serviços de conectividade para disponibilização aos alunos beneficiários da ação social escolar que frequentem escolas públicas e estabelecimentos de ensino particulares e cooperativos abrangidos por contratos de associação com o Estado — value 14999960.0
-  - Secretaria-Geral da Educação e Ciência — Aquisição de serviços de conectividade para disponibilização aos alunos beneficiários da Ação Social Escolar que frequentem escolas públicas e estabelecimentos de ensino particulares e cooperativos abrangidos por contratos de associação com o Estado, bem como aos docentes dos ensinos básico e secundário dos estabelecimentos de ensino públicos, até final do ano letivo 2023/2024 — value 14833500.0
-  - Agência para a Gestão do Sistema Educativo, IP — Aquisição de serviços de conectividade para disponibilização aos alunos beneficiários da Ação Social Escolar que frequentem escolas públicas e estabelecimentos de ensino particulares e cooperativos abrangidos por contratos de associação com o Estado, bem como aos alunos abrangidos pelo projeto piloto "Manuais Digitais", aos alunos que realizem provas em suporte digital e em cada sala de aula de um — value 12180000.0
+  - Ville de Salaberry-de-Valleyfield — Hydro-Québec — value 3126327.42
+  - Ville de Salaberry-de-Valleyfield — Hydro-Québec — value 2995654.85
+  - Ville de Salaberry-de-Valleyfield — Hydro-Québec — value 2961154.11
 
-### 82. ESP · `33184100` · acuerdo marco suministro contr <n> <n> other
-- Structure: **98.7** · records **13** · buyers **5** · repeat buyers **3**
-- Route `UNKNOWN` · currency `EUR` · p25 **10914346.15** · median **13463812.07** · p75 **27484100.01**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `MULTI_BUYER_MARKET`
+### 41. Canada - Quebec · `NO_CODE` · collecte et transport des matières résiduelles <n> <n> collecte et transport des matières résiduelles <n> <n> other
+- Structure: **98.32** · records **3** · buyers **3** · repeat buyers **0**
+- Route `OPEN_PUBLIC` · currency `CAD` · p25 **1650550.3199999998** · median **1988122.49** · p75 **7097071.069999999**
+- Median bidders **1.0** · suppliers **3** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Servicio Andaluz de Salud. Complejo Hospitalario Torrecárdenas. — Acuerdo Marco Suministro (CONTR 2025 0000353157) — value 32010349.68
-  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO REGIONAL DE MÁLAGA — Acuerdo Marco Suministro (CONTR 2023 0000615361) — value 31808740.0
-  - SERVICIO ANDALUZ DE SALUD. ÁREA HOSPITALARIA VIRGEN DEL ROCÍO — Acuerdo Marco Suministro (CONTR 2023 0000657852) — value 28182000.0
+  - Ville de Thetford Mines. — Collecte et transport des matières résiduelles 2024-2028 — value 12206019.649999999
+  - Ville de Rivière-du-Loup. — Collecte et transport des matières résiduelles (2024-2029) — value 1988122.49
+  - Municipalité du Canton de Potton — Collecte et transport des matières résiduelles 2024 (2025) — value 1312978.15
 
-### 83. ITA · `15890000` · procedura aperta in ambito europeo finalizzata alla conclusione di un contratto per l affidamento dell appalto di fornitura del vitto dei detenuti ed internati ristretti negli isti
-- Structure: **98.7** · records **5** · buyers **3** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **34825324.22** · median **34825324.22** · p75 **51026042.22**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+### 42. PL · `09300000` · dostawa energii elektrycznej dla potrzeb podmiotów nale cych do grupy zakupowej w okresie <n> <n> <n> r <n> <n> <n> r other
+- Structure: **98.28** · records **6** · buyers **4** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **33206504.94** · median **33206504.94** · p75 **33206504.94**
+- Median bidders **1.5** · suppliers **2** · top supplier share **50.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - Provveditorato Regione Sicilia Amministrazione Penitenziaria — Procedura aperta, in ambito europeo, finalizzata alla conclusione di un contratto per l’affidamento dell’Appalto di fornitura del Vitto dei detenuti ed internati ristretti negli Istituti penitenziari per adulti della Sicilia — value 51026042.22
-  - Provveditorato Regione Sicilia Amministrazione Penitenziaria — Procedura aperta, in ambito europeo, finalizzata alla conclusione di un contratto per l’affidamento dell’Appalto di fornitura del Vitto dei detenuti ed internati ristretti negli Istituti penitenziari per adulti della Sicilia — value 51026042.22
-  - Provveditorato Regione Toscana e Umbria Amministrazione Penitenziaria — Procedura aperta, in ambito europeo, finalizzata alla conclusione di un contratto per l’affidamento dell’Appalto di fornitura del Vitto dei detenuti ed internati ristretti negli Istituti penitenziari per adulti della Toscana e Umbria, da svolgersi mediante l’approvvigionamento e consegna di derrate alimentari necessarie al confezionamento di pasti giornalieri completi (colazione, pranzo e cena), a — value 34825324.22
+  - Gmina Goniądz — Dostawa energii elektrycznej dla potrzeb podmiotów należących do grupy zakupowej w okresie 01.01.2024 r. – 31.12.2026 r. — value 33206504.94
+  - Gmina-Miasto Działdowo — Dostawa energii elektrycznej dla potrzeb podmiotów należących do grupy zakupowej w okresie 01.01.2025 r. – 31.12.2026 r. — value UNKNOWN
+  - Gmina-Miasto Działdowo — Dostawa energii elektrycznej dla potrzeb podmiotów należących do grupy zakupowej w okresie 01.01.2024 r. – 31.12.2024 r. — value UNKNOWN
 
-### 84. PRT · `72230000` · cpi <n> <n> cpi cd ecossistema de serviços digitais prr <n> <n> automation software
-- Structure: **98.7** · records **4** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **23963417.4** · median **31741794.4** · p75 **31741794.4**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 43. Netherlands · `72260000-5` · software broker automation software
+- Structure: **98.21** · records **5** · buyers **4** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **6409812.62** · median **6409812.62** · p75 **6409812.62**
+- Median bidders **UNKNOWN** · suppliers **1** · top supplier share **100.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - Agência para a Modernização Administrativa, I. P. — CPI 184/2023/CPI/CD/ECOSSISTEMA DE SERVIÇOS DIGITAIS PRR 2024-2026 — value 31741794.4
-  - Agência para a Modernização Administrativa, I. P. — CPI 184/2023/CPI/CD/ECOSSISTEMA DE SERVIÇOS DIGITAIS PRR 2024-2026 — value 31741794.4
-  - Agência para a Modernização Administrativa, I. P. — CPI 184/2023/CPI/CD/ECOSSISTEMA DE SERVIÇOS DIGITAIS PRR 2024-2026 — value 31741794.4
+  - Gemeente Den Haag — Software Broker — value 6409812.62
+  - Alliander N.V. — Software Broker — value UNKNOWN
+  - Gemeente Stichtse Vecht — Software Broker — value UNKNOWN
 
-### 85. ESP · `85300000` · servicio de atención domiciliaria other
-- Structure: **98.69** · records **4** · buyers **4** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **7754997.8875** · median **14345442.795** · p75 **21251711.342499997**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 44. Netherlands · `48000000-8` · microsoft licenties automation software
+- Structure: **98.18** · records **4** · buyers **4** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **1487500.0** · median **1825000.0** · p75 **2162500.0**
+- Median bidders **UNKNOWN** · suppliers **3** · top supplier share **33.3%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Ajuntament de Sabadell — Servicio de atención domiciliaria — value 26584886.02
-  - Ayuntamiento de Sant Cugat del Vallès — Servicio de atención domiciliaria — value 19473986.45
-  - Consell Comarcal del Baix Llobregat — Servicio de atención domiciliaria — value 9216899.14
+  - De Bedrijfsvoeringspartner (Barendrecht, Albrandswaard, Ridderkerk, De Bedrijfsvoeringspartner) — Microsoft licenties — value 2500000.0
+  - Werkbedrijf Lucrato — Microsoft Licenties — value 1150000.0
+  - Gemeente Oost Gelre — Microsoft Licenties — value UNKNOWN
 
-### 86. ITA · `85311000` · gara europea a procedura aperta per la conclusione di un accordo quadro per l affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità ricettiva massima
-- Structure: **98.63** · records **4** · buyers **3** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **25377993.75** · median **41039368.75** · p75 **55092462.5**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 45. United Kingdom · `NO_CODE` · pathology services pathology services other
+- Structure: **98.16** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `GBP` · p25 **21000000.0** · median **39000000.0** · p75 **57000000.0**
+- Median bidders **1.0** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Prefettura di Pescara — Gara europea a procedura aperta per la conclusione di un accordo quadro per l’affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità ricettiva massima di 50 posti. Periodo 2025-2028 — value 55092462.5
-  - Prefettura di Pescara — Gara europea a procedura aperta per la conclusione di un accordo quadro per l’affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità ricettiva massima di 50 posti. Periodo 2025-2028 — value 55092462.5
-  - PREFETTURA - UFFICIO TERRITORIALE DEL GOVERNO DI PISA — gara europea a procedura aperta per la conclusione di un accordo quadro per l'affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità ricettiva massima da 101 a 300 posti - triennio 2024-2027 — value 26986275.0
+  - WARRINGTON AND HALTON TEACHING HOSPITALS NHS FOUNDATION TRUST — Pathology Services — value 75000000.0
+  - Berkshire Healthcare NHS Foundation Trust — Pathology Services — value 3000000.0
+  - WARRINGTON AND HALTON TEACHING HOSPITALS NHS FOUNDATION TRUST — Pathology Services — value UNKNOWN
 
-### 87. AUT · `48000000` · security software <n> automation software
-- Structure: **98.62** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **63000000.0** · median **66000000.0** · p75 **115500000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 46. NOR · `79540000` · interpretation and translation services language
+- Structure: **98.12** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **80000000.0** · median **80000000.0** · p75 **80000000.0**
+- Median bidders **1.5** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Auftraggeber sind die Republik Österreich (Bund), die Bundesbeschaffung GmbH sowie alle weiteren Auftraggeber gemäß der den Ausschreibungsunterlagen beiliegenden Kundenliste. — Security Software 2025 — value 165000000.0
-  - Auftraggeber sind die Republik Österreich (Bund), die Bundesbeschaffung GmbH sowie alle weiteren Auftraggeber gemäß der den Ausschreibungsunterlagen beiliegenden Kundenliste, im Vergabeverfahren alle vertreten durch die Bundesbeschaffung GmbH. — Security Software 2026 — value 66000000.0
-  - Auftraggeber sind die Republik Österreich (Bund), die Bundesbeschaffung GmbH sowie alle weiteren Auftraggeber gemäß der den Ausschreibungsunterlagen beiliegenden Kundenliste. — Security Software 2024 — value 60000000.0
+  - Bærum kommune — Interpretation and translation services — value 80000000.0
+  - Anskaffelser i Akershus, Buskerud og Østfold KO — Interpretation and translation services — value UNKNOWN
+  - Anskaffelser i Akershus, Buskerud og Østfold KO — Interpretation and translation services — value UNKNOWN
 
-### 88. CZE · `15000000` · dynamický nákupní systém na dodávky potravin a nápoj other
-- Structure: **98.62** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `CZK` · p25 **192900000.0** · median **231000000.0** · p75 **231000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 47. DNK · `35000000` · night vision equipment agreement other
+- Structure: **98.08** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **680000000.0** · median **680000000.0** · p75 **680000000.0**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Fakultní nemocnice Brno — Dynamický nákupní systém na dodávky potravin a nápojů — value 231000000.0
-  - Fakultní nemocnice Brno — Dynamický nákupní systém na dodávky potravin a nápojů — value 231000000.0
-  - Fakultní nemocnice Královské Vinohrady — Dynamický nákupní systém na dodávky potravin a nápojů — value 154800000.0
+  - Danish Ministry of Defence Acquisition and Logistics Organisation — Night Vision Equipment Agreement — value 680000000.0
+  - Forsvarsministeriets Materiel- og Indkøbsstyrelse — Night Vision Equipment Agreement — value UNKNOWN
+  - Danish Ministry of Defence Acquisition and Logistics Organisation — Night Vision Equipment Agreement — value UNKNOWN
 
-### 89. ESP · `33600000` · acuerdo marco de suministro contr <n> <n> other
-- Structure: **98.6** · records **4** · buyers **3** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **9654953.704999998** · median **13368335.2** · p75 **15273601.04**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 48. Netherlands · `72000000-5` · service management tool automation software
+- Structure: **98.06** · records **5** · buyers **3** · repeat buyers **2**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **5517740.0** · median **5517740.0** · p75 **5517740.0**
+- Median bidders **UNKNOWN** · suppliers **1** · top supplier share **100.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO REINA SOFÍA — Acuerdo Marco de suministro (CONTR 2023 0000714922) — value 19202709.8
-  - SERVICIO ANDALUZ DE SALUD. ÁREA HOSPITALARIA VIRGEN DEL ROCÍO — Acuerdo Marco de Suministro (CONTR 2023 0000031723) — value 13963898.12
-  - Servicio Andaluz de Salud. Hospital Universitario Reina Sofía. — Acuerdo marco de suministro (CONTR 2024 0000233712) — value 12772772.28
+  - Provincie Noord-Brabant — Service Management Tool — value 5517740.0
+  - Hogeschool Leiden — Service Management Tool — value UNKNOWN
+  - Hogeschool Leiden — Service Management Tool — value UNKNOWN
 
-### 90. ITA · `34114200` · fornitura in acquisto di veicoli per le forze di sicurezza id <n> other
-- Structure: **98.6** · records **4** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **514252500.0** · median **517711800.0** · p75 **517711800.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 49. Netherlands · `72000000-5` · softwarebroker automation software
+- Structure: **98.02** · records **8** · buyers **7** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **3600000.0** · median **3600000.0** · p75 **3600000.0**
+- Median bidders **UNKNOWN** · suppliers **1** · top supplier share **100.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - CONSIP SPA — Fornitura in acquisto di veicoli per le Forze di Sicurezza – (ID 2876) — value 517711800.0
-  - CONSIP SPA — Fornitura in acquisto di veicoli per le Forze di Sicurezza – (ID 2876) — value 517711800.0
-  - CONSIP SPA — Fornitura in acquisto di veicoli per le Forze di Sicurezza – (ID 2876) — value 517711800.0
+  - Senzer — Softwarebroker — value 3600000.0
+  - Bedrijfsvoeringseenheid Bommelerwaard — Softwarebroker — value UNKNOWN
+  - Gemeente Utrecht — Softwarebroker — value UNKNOWN
 
-### 91. LTU · `63510000` · tarnybini kelioni organizavimo paslaug pirkimas other
-- Structure: **98.6** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **1301652.89** · median **2066115.7** · p75 **2983057.85**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 50. Netherlands · `30200000-1` · ict hardware other
+- Structure: **97.99** · records **13** · buyers **12** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **429375.0** · median **923750.0** · p75 **1525000.0**
+- Median bidders **UNKNOWN** · suppliers **9** · top supplier share **20.0%** · shape `MULTI_BUYER_MARKET`
 - Historical examples:
-  - VšĮ Europos socialinio fondo agentūra — Tarnybinių kelionių organizavimo paslaugų pirkimas — value 3900000.0
-  - Lietuvos Respublikos valstybės saugumo departamentas — Tarnybinių kelionių organizavimo paslaugų pirkimas — value 2066115.7
-  - Viešoji įstaiga CPO LT — Tarnybinių kelionių organizavimo paslaugų pirkimas — value 537190.08
+  - Gemeente Alkmaar — ICT Hardware — value 2400000.0
+  - Sportbedrijf Rotterdam B.V. — ICT Hardware — value 1600000.0
+  - Het Baken Almere — ICT-Hardware — value 1300000.0
 
-### 92. ESP · `50400000` · contrato de servicios contr <n> <n> other
-- Structure: **98.55** · records **5** · buyers **4** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **3103549.24** · median **12174233.59** · p75 **13252711.91**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+### 51. HRV · `45000000` · izvo enje gra evinskih radova na lokaciji zagreb other
+- Structure: **97.97** · records **9** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **64269726.24** · median **64876833.36** · p75 **66451385.1**
+- Median bidders **UNKNOWN** · suppliers **4** · top supplier share **25.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
+  - INSTITUT RUĐER BOŠKOVIĆ — Izvođenje građevinskih radova na lokaciji Zagreb — value 67505405.09
+  - INSTITUT RUĐER BOŠKOVIĆ — Izvođenje građevinskih radova na lokaciji Zagreb — value 66797673.41
+  - INSTITUT RUĐER BOŠKOVIĆ — Izvođenje građevinskih radova na lokaciji Zagreb — value 66451385.1
+
+### 52. Netherlands · `72260000-5` · softwarebroker automation software
+- Structure: **97.96** · records **8** · buyers **6** · repeat buyers **2**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **2675000.0** · median **2950000.0** · p75 **3225000.0**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **66.7%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - Veiligheidsregio Hollands Midden — Softwarebroker — value 3500000.0
+  - Gemeente De Fryske Marren — Softwarebroker — value 2400000.0
+  - HTM Personenvervoer N.V. — Softwarebroker — value UNKNOWN
+
+### 53. Netherlands · `37535200-9` · speel en sporttoestellen other
+- Structure: **97.94** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **1600000.0** · median **1900000.0** · p75 **2200000.0**
+- Median bidders **UNKNOWN** · suppliers **7** · top supplier share **25.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Gemeente Vlaardingen — Speel- en sporttoestellen — value 2500000.0
+  - Gemeente Almelo — Speel- en Sporttoestellen — value 1300000.0
+  - Gemeente Wassenaar — Speel- en sporttoestellen — value UNKNOWN
+
+### 54. Netherlands · `77320000-9` · onderhoud sportvelden other
+- Structure: **97.9** · records **4** · buyers **4** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **708660.315** · median **1167500.0** · p75 **1233750.0**
+- Median bidders **UNKNOWN** · suppliers **4** · top supplier share **25.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Gemeente Heerenveen — Onderhoud sportvelden — value 1300000.0
+  - Gemeente Den Helder — Onderhoud sportvelden — value 1167500.0
+  - Gemeente Waddinxveen — Onderhoud sportvelden — value 249820.63
+
+### 55. Netherlands · `33196000-0` · wmo hulpmiddelen <n> other
+- Structure: **97.88** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **9000000.0** · median **9000000.0** · p75 **9000000.0**
+- Median bidders **UNKNOWN** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Gemeente Lansingerland — Wmo-hulpmiddelen 2025 — value 9000000.0
+  - Gemeente Goeree-Overflakkee — Wmo hulpmiddelen 2026 — value UNKNOWN
+  - Gemeente Krimpen aan den IJssel — WMO Hulpmiddelen 2024 — value UNKNOWN
+
+### 56. ESP · `45215100` · contrato de obras contr <n> <n> other
+- Structure: **97.86** · records **8** · buyers **5** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **7435789.8675** · median **8030605.609999999** · p75 **11450593.157499999**
+- Median bidders **1.0** · suppliers **4** · top supplier share **25.0%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - Servicio Andaluz de Salud. Servicios Centrales — Contrato de Obras (CONTR 2025 0000517965) — value 82640649.13
+  - Servicio Andaluz de Salud. Hospital Universitario Regional de Málaga. — Contrato de Obras (CONTR 2025 0000662599) — value 13883963.53
+  - Servicio Andaluz de Salud. Hospital Universitario Puerta del Mar — Contrato de Obras (CONTR 2026 0000116657) — value 10639469.7
+
+### 57. NOR · `90510000` · transport and treatment of food waste other
+- Structure: **97.84** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **24070000.0** · median **44000000.0** · p75 **68628224.0**
+- Median bidders **2.0** · suppliers **2** · top supplier share **66.7%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Romerike Avfallsfordeling IKS — Transport and treatment of Food Waste — value 93256448.0
+  - Agder Renovasjon IKS — Transport and treatment of food waste — value 44000000.0
+  - Interkommunalt Renovasjonsselskap i Midt- og Aust-Telemark AS — Transport and treatment of food waste — value 4140000.0
+
+### 58. ESP · `50400000` · contrato de servicios contr <n> <n> other
+- Structure: **97.83** · records **5** · buyers **4** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **12174233.59** · median **13252711.91** · p75 **39925430.68**
+- Median bidders **1.0** · suppliers **2** · top supplier share **50.0%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - Servicio Andaluz de Salud. Hospital Universitario de Málaga — Contrato de Servicios (CONTR 2025 0000450938) — value 310354924.0
   - Servicio Andaluz de Salud. Hospital Universitario Puerta del Mar. — Contrato de Servicios (CONTR 2026 00000159625) — value 39925430.68
   - Servicio Andaluz de Salud. Hospital Universitario Virgen de las Nieves. — Contrato de Servicios (CONTR 2026 0000017263) — value 13252711.91
-  - Servicio Andaluz de Salud. Hospital Universitario Virgen de las Nieves. — Contrato de Servicios (CONTR 2026 0000019191) — value 12174233.59
 
-### 93. PRT · `45234100` · empreitada l norte pk <n> a <n> desnivelamentos para supressão de passagens de nivel execução other
-- Structure: **98.53** · records **4** · buyers **2** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **17000000.0** · median **19000000.0** · p75 **21750000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 59. United Kingdom · `NO_CODE` · ophthalmology services nhs lincolnshire icb has utilised direct award process b of the provider selection regime regulations to award a the ophthalmology services other
+- Structure: **97.81** · records **4** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `GBP` · p25 **6863864.4275** · median **10250000.0** · p75 **12795163.75**
+- Median bidders **1.0** · suppliers **4** · top supplier share **25.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Infraestruturas de Portugal, S. A. — Empreitada L. NORTE - PK 69 A 84 - DESNIVELAMENTOS PARA SUPRESSÃO DE PASSAGENS DE NIVEL - EXECUÇÃO — value 30000000.0
-  - Infraestruturas de Portugal, SA — Empreitada L. NORTE - PK 60 A 66 - DESNIVELAMENTOS PARA SUPRESSÃO DE PASSAGENS DE NIVEL - EXECUÇÃO — value 19000000.0
-  - Infraestruturas de Portugal, S. A. — Empreitada L. NORTE - PK 60 A 66 - DESNIVELAMENTOS PARA SUPRESSÃO DE PASSAGENS DE NIVEL - EXECUÇÃO — value 19000000.0
+  - NHS LINCOLNSHIRE INTEGRATED ACRE BOARD — Ophthalmology Services — value 16680655.0
+  - NHS LINCOLNSHIRE INTEGRATED CARE BOARD — Ophthalmology Services — value 11500000.0
+  - NHS LINCOLNSHIRE INTEGRATED CARE BOARD — Ophthalmology Services — value 9000000.0
 
-### 94. PRT · `90513000` · prc <n> <n> dex aquisição de serviços de gestão de lamas de etar para a águas do norte s a other
-- Structure: **98.52** · records **4** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **14392225.0** · median **18528000.0** · p75 **20766750.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 60. Netherlands · `48000000-8` · software broker automation software
+- Structure: **97.81** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **4200000.0** · median **4200000.0** · p75 **4200000.0**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Águas do Norte, S. A. — PRC_0134/2025_DEX - Aquisição de serviços de gestão de lamas de ETAR para a Águas do Norte, S.A. — value 27483000.0
-  - Águas do Norte, SA — PRC_0399/2025_DEX - Aquisição de serviços de gestão de lamas de ETAR para a Águas do Norte, S.A. — value 18528000.0
-  - Águas do Norte, S. A. — PRC_0399/2025_DEX - Aquisição de serviços de gestão de lamas de ETAR para a Águas do Norte, S.A. — value 18528000.0
+  - Veiligheidsregio Drenthe — Software Broker — value 4200000.0
+  - Veiligheidsregio Drenthe — Software Broker — value UNKNOWN
+  - Gemeente Schiedam — Software Broker — value UNKNOWN
 
-### 95. ITA · `85311000` · procedura aperta other
-- Structure: **98.5** · records **7** · buyers **4** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **14469745.0** · median **24861539.0** · p75 **58382580.375**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+### 61. Netherlands · `71300000-1` · raamovereenkomst ingenieursdiensten other
+- Structure: **97.78** · records **7** · buyers **5** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **400000.75** · median **800000.5** · p75 **1200000.25**
+- Median bidders **UNKNOWN** · suppliers **5** · top supplier share **20.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - PREFETTURA UTG L'AQUILA — PROCEDURA APERTA — value 68525100.0
-  - PREFETTURA UTG L'AQUILA — PROCEDURA APERTA — value 68525100.0
-  - Prefettura - Ufficio Territoriale del Governo di Ragusa — Procedura aperta — value 48240060.75
+  - Gemeente Hilversum — Raamovereenkomst Ingenieursdiensten — value 1600000.0
+  - Gemeente Urk — Raamovereenkomst Ingenieursdiensten — value 1.0
+  - Gemeente Tilburg — Raamovereenkomst Ingenieursdiensten — value UNKNOWN
 
-### 96. CZE · `34100000` · dodávky nákladních vozidel other
-- Structure: **98.5** · records **4** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `CZK` · p25 **174900000.0** · median **174900000.0** · p75 **174900000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 62. SWE · `45000000` · mark och anläggningsarbeten other
+- Structure: **97.76** · records **5** · buyers **4** · repeat buyers **1**
+- Route `UNKNOWN` · currency `SEK` · p25 **110000000.0** · median **160000000.0** · p75 **600000000.0**
+- Median bidders **0.0** · suppliers **1** · top supplier share **100.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - ČEZ, a. s. — Dodávky nákladních vozidel — value 174900000.0
-  - ČEZ, a. s. — Dodávky nákladních vozidel — value 174900000.0
-  - ČEZ, a. s. — Dodávky nákladních vozidel — value 174900000.0
+  - Alingsås Energi AB — Mark- och anläggningsarbeten — value 600000000.0
+  - Alingsås Energi AB — Mark- och anläggningsarbeten — value 600000000.0
+  - Aktiebolaget Stora Tunabyggen — Mark- och anläggningsarbeten — value 160000000.0
 
-### 97. ESP · `72222300` · contrato de servicios contr <n> <n> automation software
-- Structure: **98.49** · records **7** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **9232020.0** · median **12917826.72** · p75 **23669100.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+### 63. United Kingdom · `NO_CODE` · pathology managed service for midlands east 2 network the midlands and east 2 network the me2 network is a network wide pathology collaboration in the midlands and east 2 region co
+- Structure: **97.74** · records **6** · buyers **6** · repeat buyers **0**
+- Route `UNKNOWN` · currency `GBP` · p25 **26750000.0** · median **32000000.0** · p75 **41750000.0**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - SERVICIO ANDALUZ DE SALUD. SERVICIOS CENTRALES — Contrato de Servicios (CONTR 2023 0000541135) — value 75049497.6
-  - Servicio Andaluz de Salud. Servicios Centrales — Contrato de Servicios (CONTR 2025 0000528153) — value 29396808.0
-  - Servicio Andaluz de Salud. Servicios Centrales — Contrato de Servicios (CONTR 2025 0000541335) — value 17941392.0
+  - NORTHERN LINCOLNSHIRE AND GOOLE NHS FOUNDATION TRUST — Pathology Managed Service for Midlands & East 2 Network — value 58000000.0
+  - UNIVERSITY HOSPITALS OF DERBY AND BURTON NHS FOUNDATION TRUST — Pathology Managed Service for Midlands & East 2 Network — value 45000000.0
+  - SHERWOOD FOREST HOSPITALS NHS FOUNDATION TRUST — Pathology Managed Service for Midlands & East 2 Network — value 32000000.0
 
-### 98. DNK · `45200000` · udbud af dynamisk indkøbssystem for fjernvarmearbejder other
-- Structure: **98.49** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `DKK` · p25 **250000000.0** · median **300000000.0** · p75 **450000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 64. ITA · `72500000` · procedura aperta telematica ex art <n> d lgs n <n> <n> per l acquisizione di servizi di gestione delle infrastrutture it e sicurezza informatica della regione del veneto giunta reg
+- Structure: **97.74** · records **5** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **45164256.0** · median **45164256.0** · p75 **45164256.0**
+- Median bidders **0.5** · suppliers **6** · top supplier share **16.7%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - SERVIA A.M.B.A. — UDBUD AF DYNAMISK INDKØBSSYSTEM FOR FJERNVARMEARBEJDER — value 600000000.0
-  - FORSYNING HELSINGØR VARME A/S — Udbud af dynamisk indkøbssystem for fjernvarmearbejder — value 300000000.0
-  - HILLERØD VARME A/S — Udbud af dynamisk indkøbssystem for fjernvarmearbejder — value 200000000.0
+  - AREA - AREA RISORSE FINANZIARIE, STRUMENTALI, ICT ED ENTI LOCALI - DIREZIONE - ICT, AGENDA DIGITALE E SOS AFFIDAMENTO SERVIZI E FORNITURE ICT — Procedura aperta telematica, ex art. 71 D.lgs. n. 36/2023, per l'acquisizione di servizi di gestione delle infrastrutture IT e sicurezza informatica della Regione del Veneto - Giunta regionale. — value 45340583.14
+  - AREA - AREA RISORSE FINANZIARIE, STRUMENTALI, ICT ED ENTI LOCALI - DIREZIONE - ICT, AGENDA DIGITALE E SOS AFFIDAMENTO SERVIZI E FORNITURE ICT — Procedura aperta telematica, ex art. 71 D.lgs. n. 36/2023, per l'acquisizione di servizi di gestione delle infrastrutture IT e sicurezza informatica della Regione del Veneto - Giunta regionale. — value 45164256.0
+  - AREA - AREA RISORSE FINANZIARIE, STRUMENTALI, ICT ED ENTI LOCALI - DIREZIONE - ICT, AGENDA DIGITALE E SOS AFFIDAMENTO SERVIZI E FORNITURE ICT — Procedura aperta telematica, ex art. 71 D.lgs. n. 36/2023, per l'acquisizione di servizi di gestione delle infrastrutture IT e sicurezza informatica della Regione del Veneto - Giunta regionale. — value 45164256.0
 
-### 99. ITA · `31712113` · fornitura di carte nazionali dei servizi con funzione di tessera sanitaria di tipo ts e di tipo ts cns id <n> other
-- Structure: **98.47** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **69966000.0** · median **69966000.0** · p75 **69966000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 65. Netherlands · `44115600-5` · wmo trapliften other
+- Structure: **97.74** · records **4** · buyers **4** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **3200000.0** · median **3200000.0** · p75 **3200000.0**
+- Median bidders **UNKNOWN** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - CONSIP SPA — Fornitura di carte nazionali dei servizi con funzione di tessera sanitaria di tipo TS e di tipo TS CNS ID 2713 — value 69966000.0
-  - Consip S.p.A. — Fornitura di carte nazionali dei servizi con funzione di tessera sanitaria di tipo TS e di tipo TS CNS ID 2713 — value 69966000.0
-  - CONSIP S.p.A. — Fornitura di carte nazionali dei servizi con funzione di tessera sanitaria di tipo TS e di tipo TS CNS ID 2713 — value 69966000.0
+  - Gemeente 's-Hertogenbosch — WMO Trapliften — value 3200000.0
+  - Intergemeentelijke Sociale Dienst (ISD) Bollenstreek — Wmo trapliften — value UNKNOWN
+  - Rogplus — Wmo Trapliften — value UNKNOWN
 
-### 100. ESP · `33140000` · contrato de suministro contr <n> <n> other
-- Structure: **98.46** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **11141959.985** · median **15702458.27** · p75 **16110589.135**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 66. United Kingdom · `NO_CODE` · bus service route <n> n <n> qc <n> other
+- Structure: **97.72** · records **25** · buyers **2** · repeat buyers **2**
+- Route `COMPETITIVE_OTHER` · currency `GBP` · p25 **7447803.0** · median **8822548.0** · p75 **10737963.0**
+- Median bidders **1.0** · suppliers **10** · top supplier share **20.8%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - Servicio Andaluz de Salud. Hospital Universitario de Jaén. — Contrato de Suministro (CONTR 2025 0000696845) — value 16518720.0
-  - Servicio Andaluz de Salud. Hospital Universitario de Jaén — Contrato de Suministro (CONTR 2025 0000496854) — value 15702458.27
-  - Servicio Andaluz de Salud. Hospital Universitario de Jaén. — Contrato de Suministro (CONTR 2026 0000097748) — value 6581461.7
+  - Transport for London — Provision of bus service - Route 29/N29 — value 15555082.0
+  - Transport for London — Provision of bus service - Route 207/N207 — value 11624673.0
+  - Transport for London — Provision of bus service - Route 453/N453 — value 11429115.0
 
-### 101. SE · `45000000` · ramavtal mark och anläggningsarbeten other
-- Structure: **98.46** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `SEK` · p25 **140000000.0** · median **160000000.0** · p75 **380000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 67. FIN · `72720000` · tietoliikennepalvelut automation software
+- Structure: **97.69** · records **4** · buyers **3** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **2085085.5** · median **3279752.0** · p75 **4474418.5**
+- Median bidders **1.0** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Upplands-Bro kommun — Ramavtal Mark- och Anläggningsarbeten — value 600000000.0
-  - Täby kommun — Ramavtal Mark och anläggningsarbeten — value 160000000.0
-  - Ekerö kommun — Ramavtal Mark- och anläggningsarbeten — value 120000000.0
+  - HPK Palvelut Oy — Tietoliikennepalvelut — value 5669085.0
+  - Tuusulan kunta — Tietoliikennepalvelut — value 890419.0
+  - LapIT Oy — Tietoliikennepalvelut — value UNKNOWN
 
-### 102. SWE · `45000000` · ramavtal byggtjänster other
-- Structure: **98.44** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `SEK` · p25 **184250000.0** · median **300000000.0** · p75 **382500000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 68. Netherlands · `42968100-0` · warme dranken automation software
+- Structure: **97.66** · records **4** · buyers **4** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **1359810.8** · median **1359810.8** · p75 **1359810.8**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Sjöfartsverket — Ramavtal- Byggtjänster — value 465000000.0
-  - Östersunds kommun — Ramavtal byggtjänster — value 300000000.0
-  - Ljungby kommun — Ramavtal Byggtjänster — value 68500000.0
+  - Veiligheidsregio Noord Holland Noord — Warme dranken — value 1359810.8
+  - Stichting NHL Stenden Hogeschool — Warme dranken — value UNKNOWN
+  - Gemeente Hof van Twente — Warme dranken — value UNKNOWN
 
-### 103. PRT · `38421100` · fornecimento instalação e manutenção de rede de telemetria software de gestão do parque de contadores e da rede a instalar e fornecimento de contadores ultrassónicos com telemetria
-- Structure: **98.43** · records **4** · buyers **2** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **15294098.54** · median **15294098.54** · p75 **15294098.54**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 69. Netherlands · `79620000-6` · europese aanbesteding flexibele arbeid other
+- Structure: **97.53** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `EUR` · p25 **5500000.0** · median **7500000.0** · p75 **16250000.0**
+- Median bidders **UNKNOWN** · suppliers **5** · top supplier share **25.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - AGERE- Empresa de Águas Efluentes e Resíduos de Braga, EM — FORNECIMENTO, INSTALAÇÃO E MANUTENÇÃO DE REDE DE TELEMETRIA, SOFTWARE DE GESTÃO DO PARQUE DE CONTADORES E DA REDE A INSTALAR E FORNECIMENTO DE CONTADORES ULTRASSÓNICOS COM TELEMETRIA INCORPORADA — value 15294098.54
-  - AGERE- Empresa de Águas Efluentes e Resíduos de Braga, EM — FORNECIMENTO, INSTALAÇÃO E MANUTENÇÃO DE REDE DE TELEMETRIA, SOFTWARE DE GESTÃO DO PARQUE DE CONTADORES E DA REDE A INSTALAR E FORNECIMENTO DE CONTADORES ULTRASSÓNICOS COM TELEMETRIA INCORPORADA — value 15294098.54
-  - AGERE- Empresa de Águas Efluentes e Resíduos de Braga, E. M. — FORNECIMENTO, INSTALAÇÃO E MANUTENÇÃO DE REDE DE TELEMETRIA, SOFTWARE DE GESTÃO DO PARQUE DE CONTADORES E DA REDE A INSTALAR E FORNECIMENTO DE CONTADORES ULTRASSÓNICOS COM TELEMETRIA INCORPORADA — value 15294098.54
+  - Veiligheidsregio IJsselland — Europese aanbesteding Flexibele Arbeid — value 25000000.0
+  - Luchtverkeersleiding Nederland — Europese Aanbesteding Flexibele Arbeid — value 7500000.0
+  - De Nederlandsche Bank N.V. — Europese aanbesteding: Flexibele arbeid — value 3500000.0
 
-### 104. ITA · `85311000` · accordo quadro per il servizio di gestione di centri di accoglienza costituiti da centri collettivi con capacità ricettiva fino a <n> posti per n <n> posti per la prefettura utg di
-- Structure: **98.42** · records **7** · buyers **3** · repeat buyers **2**
+### 70. Netherlands · `90400000-1` · rioolreiniging en inspectie <n> <n> other
+- Structure: **97.52** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **1625000.0** · median **1750000.0** · p75 **1875000.0**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Gemeente Zeist — Rioolreiniging en inspectie 2026 - 2029 — value 2000000.0
+  - Gemeente Berkelland — Rioolreiniging en inspectie 2025 - 2029 — value 1500000.0
+  - Gemeente Doesburg — Rioolreiniging en inspectie 2026 - 2029 — value UNKNOWN
+
+### 71. Netherlands · `15860000-4` · warme drankenautomaten automation software
+- Structure: **97.51** · records **6** · buyers **4** · repeat buyers **2**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **1900000.0** · median **1900000.0** · p75 **1900000.0**
+- Median bidders **UNKNOWN** · suppliers **1** · top supplier share **100.0%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - Stichting Regionaal Opleidingencentrum van Twente — Warme Drankenautomaten — value 1900000.0
+  - Veiligheidsregio Zuid-Holland Zuid — Warme drankenautomaten — value UNKNOWN
+  - Laborijn — Warme Drankenautomaten — value UNKNOWN
+
+### 72. Netherlands · `48000000-8` · burgerzaken software automation software
+- Structure: **97.43** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **776236.775** · median **1552472.55** · p75 **2328708.325**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Regionale ICT-Dienst Utrecht — Burgerzaken software — value 3104944.1
+  - Gemeente Waalwijk — Burgerzaken software — value 1.0
+  - Gemeente Bronckhorst — Burgerzaken-software — value UNKNOWN
+
+### 73. NOR · `79100000` · legal services other
+- Structure: **97.41** · records **4** · buyers **3** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **18000000.0** · median **18000000.0** · p75 **18000000.0**
+- Median bidders **2.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Fredrikstad kommune — Legal Services — value 18000000.0
+  - Tromsø kommune — Framework agreement for legal services — value UNKNOWN
+  - Statnett SF — Framework Agreement for Legal Services — value UNKNOWN
+
+### 74. Netherlands · `79000000-4` · communicatieadvies creative communications
+- Structure: **97.38** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **2100000.0** · median **2100000.0** · p75 **2100000.0**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Gemeente Maastricht — Communicatieadvies — value 2100000.0
+  - Gemeente Maastricht — Communicatieadvies — value UNKNOWN
+  - Gemeente Uithoorn — Communicatieadvies — value UNKNOWN
+
+### 75. MDA · `09100000` · produse petroliere other
+- Structure: **97.36** · records **5** · buyers **2** · repeat buyers **2**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **3056100.0** · median **3056100.0** · p75 **3056100.0**
+- Median bidders **UNKNOWN** · suppliers **3** · top supplier share **60.0%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - Serviciul de Protecție și Pază de Stat — Produse petroliere — value 3056100.0
+  - Serviciul de Protecție și Pază de Stat — Produse petroliere — value UNKNOWN
+  - Inspectoratul General al Poliției — Produse petroliere — value UNKNOWN
+
+### 76. PRT · `33140000` · <n> aquisição de cateteres de ablação para eletrofisiologia para a ulslo epe other
+- Structure: **97.36** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `EUR` · p25 **2855862.5** · median **5697325.0** · p75 **5871737.5**
+- Median bidders **1.0** · suppliers **4** · top supplier share **50.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Unidade Local de Saúde de Lisboa Ocidental EPE — 142004025 – Aquisição de Cateteres de Ablação para Eletrofisiologia, para a ULSLO, EPE — value 6046150.0
+  - Unidade Local de Saúde de Lisboa Ocidental, EPE — 142004126 - Aquisição de Cateteres de Ablação para Eletrofisiologia para a ULSLO EPE — value 5697325.0
+  - Unidade Local de Saúde de Lisboa Ocidental, E. P. E. — 142004025 – Aquisição de Cateteres de Ablação para Eletrofisiologia, para a ULSLO, EPE — value 14400.0
+
+### 77. PL · `09310000` · sprzeda energii elektrycznej w <n> roku odbiorcom ko cowym xii grupy zakupowej energetycznej zwi zku gmin l ska opolskiego other
+- Structure: **97.28** · records **11** · buyers **11** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **273253.7525** · median **722430.7** · p75 **1168946.52**
+- Median bidders **1.0** · suppliers **4** · top supplier share **45.5%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - Gmina Wołczyn — Sprzedaż energii elektrycznej w 2024 roku odbiorcom końcowym XII Grupy Zakupowej Energetycznej Związku Gmin Śląska Opolskiego — value 2908701.0
+  - Gmina Bierawa — Sprzedaż energii elektrycznej w 2024 roku odbiorcom końcowym XII Grupy Zakupowej Energetycznej Związku Gmin Śląska Opolskiego — value 1329439.12
+  - TUŁOWICKI OŚRODEK KULTURY — Sprzedaż energii elektrycznej w 2024 roku odbiorcom końcowym XII Grupy Zakupowej Energetycznej Związku Gmin Śląska Opolskiego — value 1168946.52
+
+### 78. FIN · `15500000` · maito ja maitotaloustuotteet other
+- Structure: **97.26** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **130000000.0** · median **130000000.0** · p75 **130000000.0**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Sansia Oy — Maito ja maitotaloustuotteet — value 130000000.0
+  - Sansia Oy — Maito ja maitotaloustuotteet — value UNKNOWN
+  - Jyväskylän kaupunki — Maito- ja maitotaloustuotteet — value UNKNOWN
+
+### 79. Netherlands · `50232100-1` · onderhoud openbare verlichting other
+- Structure: **97.25** · records **8** · buyers **8** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **1122525.63** · median **1122525.63** · p75 **1122525.63**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **66.7%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Gemeente Meppel — Onderhoud openbare verlichting — value 1122525.63
+  - gemeente Het Hogeland — Onderhoud Openbare Verlichting — value UNKNOWN
+  - Gemeente Hardenberg — Onderhoud openbare verlichting — value UNKNOWN
+
+### 80. Netherlands · `79997000-9` · internationale dienstreizen other
+- Structure: **97.25** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **2600000.0** · median **2600000.0** · p75 **2600000.0**
+- Median bidders **UNKNOWN** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Luchtverkeersleiding Nederland — Internationale dienstreizen — value 2600000.0
+  - Universitair Medisch Centrum Utrecht — Internationale Dienstreizen — value UNKNOWN
+  - Erasmus Universiteit Rotterdam — Internationale Dienstreizen — value UNKNOWN
+
+### 81. Netherlands · `79710000-4` · beveiliging opvanglocatie oekraïense vluchtelingen other
+- Structure: **97.24** · records **4** · buyers **3** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **1275062.8875** · median **1562637.775** · p75 **1850212.6624999999**
+- Median bidders **UNKNOWN** · suppliers **2** · top supplier share **66.7%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Gemeente Capelle aan den IJssel — Beveiliging opvanglocatie Oekraïense vluchtelingen — value 2137787.55
+  - Gemeente Capelle aan den IJssel — Beveiliging opvanglocatie Oekraïense vluchtelingen — value 987488.0
+  - Gemeente Bodegraven - Reeuwijk — Beveiliging Opvanglocatie Oekraïense Vluchtelingen — value UNKNOWN
+
+### 82. NOR · `33140000` · medical consumables other
+- Structure: **97.21** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **16200000.0** · median **16200000.0** · p75 **16200000.0**
+- Median bidders **2.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Fredrikstad kommune — Medical consumables — value 16200000.0
+  - GKI Grenlandskommunenes Innkjøpsenhet — Medical consumables — value UNKNOWN
+  - Øvre Romerike Innkjøpssamarbeid — Medical consumables — value UNKNOWN
+
+### 83. Netherlands · `72000000-5` · raadsinformatiesysteem automation software
+- Structure: **97.16** · records **4** · buyers **4** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **308814.0** · median **617627.0** · p75 **621313.5**
+- Median bidders **UNKNOWN** · suppliers **3** · top supplier share **33.3%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Gemeente Gooise Meren — Raadsinformatiesysteem — value 625000.0
+  - Gemeente Lochem — Raadsinformatiesysteem — value 617627.0
+  - Gemeente Dongen — Raadsinformatiesysteem — value 1.0
+
+### 84. Netherlands · `15860000-4` · warme dranken voorziening other
+- Structure: **97.16** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **2271000.0** · median **2271000.0** · p75 **2271000.0**
+- Median bidders **UNKNOWN** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Stichting Saxion — Warme dranken voorziening — value 2271000.0
+  - Gemeente Heerenveen — Warme dranken voorziening — value UNKNOWN
+  - Stichting Pantar Amsterdam — Warme dranken voorziening — value UNKNOWN
+
+### 85. HRV · `45231300` · izgradnja linijskih objekata aglomeracije karlovac duga resa other
+- Structure: **97.13** · records **5** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **10035091.56** · median **13569525.93** · p75 **13679704.89**
+- Median bidders **UNKNOWN** · suppliers **8** · top supplier share **14.3%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - VODOVOD I KANALIZACIJA d.o.o. Karlovac — Izgradnja linijskih objekata aglomeracije Karlovac - Duga Resa — value 14200735.09
+  - VODOVOD I KANALIZACIJA d.o.o. Karlovac — Izgradnja linijskih objekata aglomeracije Karlovac - Duga Resa — value 13679704.89
+  - VODOVOD I KANALIZACIJA d.o.o. Karlovac — Izgradnja linijskih objekata aglomeracije Karlovac - Duga Resa — value 13569525.93
+
+### 86. Canada · `NO_CODE` · television signal services this requirement is for the correctional service of canada ontario region trade agreement canadian free trade agreement cfta canada free trade agreements
+- Structure: **97.12** · records **3** · buyers **2** · repeat buyers **1**
+- Route `OPEN_PUBLIC` · currency `CAD` · p25 **923537.7** · median **923537.7** · p75 **923537.7**
+- Median bidders **UNKNOWN** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Correctional Service of Canada (CSC) — Television Signal Services — value 923537.7
+  - Correctional Service Canada — Television Signal Services — value UNKNOWN
+  - Correctional Service Canada — Television Signal Services — value UNKNOWN
+
+### 87. ITA · `33140000` · procedura telematica aperta ex art <n> del d lgs n <n> <n> di rilevanza comunitaria articolata in n <n> lotti per la fornitura quadriennale in somministrazione di materiale di cons
+- Structure: **97.11** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **13933836.82** · median **27765081.64** · p75 **27765081.64**
+- Median bidders **0.0** · suppliers **28** · top supplier share **11.1%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - ARNAS GARIBALDI — Procedura telematica aperta, ex art. 71 del D.lgs. n. 36/2023, di rilevanza comunitaria, articolata in n. 75 lotti, per la fornitura quadriennale, in somministrazione, di materiale di consumo dedicato alle apparecchiature in dotazione alle Unità Operative dei Presidi dell’ARNAS — value 27765081.64
+  - ARNAS GARIBALDI DI CATANIA — Procedura telematica aperta, ex art. 71 del D.lgs. n. 36/2023, di rilevanza comunitaria, articolata in n. 75 lotti, per la fornitura quadriennale, in somministrazione, di materiale di consumo dedicato alle apparecchiature in dotazione alle Unità Operative dei Presidi dell’ARNAS — value 27765081.64
+  - ARNAS GARIBALDI — Procedura telematica aperta, ex art. 71 del D.lgs. n. 36/2023, di rilevanza comunitaria, articolata in n. 75 lotti, per la fornitura quadriennale, in somministrazione, di materiale di consumo dedicato alle apparecchiature in dotazione alle Unità Operative dei Presidi dell’ARNAS — value 102592.0
+
+### 88. United Kingdom · `NO_CODE` · insurance services insurance services other
+- Structure: **97.06** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `GBP` · p25 **12500000.0** · median **12500000.0** · p75 **12500000.0**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Oxford City Council — Insurance Services — value 12500000.0
+  - SANCTUARY HOUSING ASSOCIATION — Insurance Services — value UNKNOWN
+  - LIVEWEST HOMES LIMITED — Insurance Services — value UNKNOWN
+
+### 89. ESP · `85300000` · licitación servicio teleasistencia domiciliaria other
+- Structure: **97.05** · records **4** · buyers **2** · repeat buyers **2**
+- Route `UNKNOWN` · currency `EUR` · p25 **22538250.0** · median **25758000.0** · p75 **25758000.0**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Pleno de la Diputación Provincial de Valencia — Licitación servicio Teleasistencia domiciliaria. — value 25758000.0
+  - Presidencia de la Diputación Provincial de Valencia — Licitación servicio Teleasistencia domiciliaria. — value 25758000.0
+  - Presidencia de la Diputación Provincial de Valencia — Licitación servicio Teleasistencia domiciliaria. — value 25758000.0
+
+### 90. PRT · `60410000` · exploração dos serviços aéreos regulares em regime de concessão nas rotas lisboa horta lisboa funchal ponta delgada funchal lisboa santa maria lisboa lisboa pico lisboa e funchal t
+- Structure: **96.83** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **53749861.0** · median **62499722.0** · p75 **62499861.0**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Gabinete do Secretário de Estado das Infraestruturas — Exploração dos serviços aéreos regulares, em regime de concessão, nas rotas Lisboa/ Horta/Lisboa, Funchal/Ponta Delgada/Funchal, Lisboa/Santa Maria/Lisboa, Lisboa/Pico/Lisboa e Funchal/Terceira/Funchal — value 62500000.0
+  - Gabinete do Secretário de Estado das Infraestruturas — Exploração dos serviços aéreos regulares, em regime de concessão, nas rotas Lisboa/ Horta/Lisboa, Funchal/Ponta Delgada/Funchal, Lisboa/Santa Maria/Lisboa, Lisboa/Pico/Lisboa e Funchal/Terceira/Funchal — value 62499722.0
+  - Gabinete do Secretário de Estado Adjunto e das Infraestruturas — Exploração dos serviços aéreos regulares, em regime de concessão, nas rotas Lisboa/Horta/Lisboa, Funchal/Ponta Delgada/Funchal, Lisboa/Santa Maria/Lisboa, Lisboa/Pico/Lisboa e Funchal/Terceira/Funchal — value 45000000.0
+
+### 91. ESP · `34100000` · arrendamiento de vehículos con destino a las distintas consejerías de la comunidad de madrid other
+- Structure: **96.73** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `EUR` · p25 **4346040.995** · median **8152561.99** · p75 **8152561.99**
+- Median bidders **0.0** · suppliers **2** · top supplier share **66.7%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Consejería de Economía, Hacienda y Empleo — Arrendamiento de vehículos con destino a las distintas consejerías de la Comunidad de Madrid — value 8152561.99
+  - Consejería de Economía, Hacienda y Empleo. — Arrendamiento de vehículos con destino a las distintas Consejerías de la Comunidad de Madrid — value 8152561.99
+  - Comunidad de Madrid - Consejería de Economía, Hacienda y Empleo — Arrendamiento de vehículos con destino a las distintas Consejerías de la Comunidad de Madrid — value 539520.0
+
+### 92. HRV · `45454100` · izvedba radova na rekonstrukciji i cjelovitoj obnovi od potresa odvojena grupa grupa 1 za potrebe objekta na lokaciji rooseveltov trg 6 zagreb other
+- Structure: **96.72** · records **4** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **14361537.055000002** · median **18997763.94** · p75 **19006494.455000002**
+- Median bidders **UNKNOWN** · suppliers **6** · top supplier share **22.2%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - SVEUČILIŠTE U ZAGREBU PRIRODOSLOVNO-MATEMATIČKI FAKULTET — Izvedba radova na rekonstrukciji i cjelovitoj obnovi od potresa (odvojena grupa) - GRUPA 1. - za potrebe objekta na lokaciji Rooseveltov trg 6, Zagreb — value 19032686.0
+  - SVEUČILIŠTE U ZAGREBU PRIRODOSLOVNO-MATEMATIČKI FAKULTET — Izvedba radova na rekonstrukciji i cjelovitoj obnovi od potresa (odvojena grupa) - GRUPA 1. - za potrebe objekta na lokaciji Rooseveltov trg 6, Zagreb — value 18997763.94
+  - SVEUČILIŠTE U ZAGREBU PRIRODOSLOVNO-MATEMATIČKI FAKULTET — Izvedba radova na rekonstrukciji i cjelovitoj obnovi od potresa (odvojena grupa) - GRUPA 1. - za potrebe objekta na lokaciji Rooseveltov trg 6, Zagreb — value 18997763.94
+
+### 93. PL · `32420000` · dostawa urz dze sieciowych other
+- Structure: **96.67** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **967463.0** · median **967463.0** · p75 **967463.0**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Gdyńskie Centrum Informatyki — Dostawa urządzeń sieciowych. — value 967463.0
+  - Uniwersytet Jana Kochanowskiego w Kielcach — Dostawa urządzeń sieciowych — value UNKNOWN
+  - Centrum Projektów Polska Cyfrowa — Dostawa urządzeń sieciowych — value UNKNOWN
+
+### 94. LVA · `98310000` · ve as mazg anas un misk s t r anas pakalpojumu nodro in ana other
+- Structure: **96.53** · records **14** · buyers **5** · repeat buyers **4**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **175345.2** · median **530000.0** · p75 **967271.38**
+- Median bidders **1.0** · suppliers **16** · top supplier share **29.2%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - VSIA „Paula Stradiņa klīniskā universitātes slimnīca” — VEĻAS MAZGĀŠANAS UN ĶĪMISKĀS TĪRĪŠANAS PAKALPOJUMU NODROŠINĀŠANA — value 1090909.0
+  - SIA „Rīgas Austrumu klīniskā universitātes slimnīca” — Veļas mazgāšanas un ķīmiskās tīrīšanas pakalpojumu nodrošināšana — value 971044.8
+  - SIA „Rīgas Austrumu klīniskā universitātes slimnīca” — Veļas mazgāšanas un ķīmiskās tīrīšanas pakalpojumu nodrošināšana — value 963497.96
+
+### 95. Canada · `NO_CODE` · elder services an advanced contract award notice acan is a public notice indicating to the supplier community that a department or agency intends to award a goods services or const
+- Structure: **96.47** · records **34** · buyers **5** · repeat buyers **4**
+- Route `DIRECT_NONCOMPETITIVE` · currency `CAD` · p25 **225833.34250000003** · median **323397.475** · p75 **360814.9375**
+- Median bidders **UNKNOWN** · suppliers **4** · top supplier share **33.3%** · shape `MULTI_BUYER_REPEAT_MARKET`
+- Historical examples:
+  - Correctional Service of Canada (CSC) — Elder Services — value 2488917.91
+  - Correctional Service of Canada (CSC) — Elder Services — value 366610.2
+  - Correctional Service of Canada (CSC) — Elder Services — value 343429.15
+
+### 96. ROU · `33652100` · acord cadru de achizi ie public de medicamente divizat pe <n> loturi other
+- Structure: **96.45** · records **18** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `RON` · p25 **131777.82** · median **31393759.79** · p75 **119056940.63250001**
+- Median bidders **1.0** · suppliers **20** · top supplier share **21.6%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - SPITALUL CLINIC JUDETEAN DE URGENTA"SFANTUL IOAN CEL NOU"SUCEAVA — Acord-cadru de achiziție publică de medicamente divizat pe 47 loturi — value 177025163.15
+  - SPITALUL CLINIC JUDETEAN DE URGENTA "SFANTUL IOAN CEL NOU" SUCEAVA — Acord-cadru de achiziție publică de medicamente divizat pe 65 loturi — value 152297788.2
+  - SPITALUL CLINIC JUDETEAN DE URGENTA"SFANTUL IOAN CEL NOU"SUCEAVA — Acord-cadru de achiziție publică de medicamente divizat pe 63 loturi — value 139251813.2
+
+### 97. NOR · `33000000` · medical consumables other
+- Structure: **96.38** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **7000000.0** · median **7000000.0** · p75 **7000000.0**
+- Median bidders **2.0** · suppliers **2** · top supplier share **75.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - OsloMet - storbyuniversitetet — Medical consumables — value 7000000.0
+  - Sarpsborg kommune — Medical consumables — value UNKNOWN
+  - Øvre Romerike Innkjøpssamarbeid — Medical consumables — value UNKNOWN
+
+### 98. PRT · `66510000` · celebração de contrato de seguros de saúde e aquisição de serviços de corretagem para as empresas do grupo águas de portugal <n> <n> cp other
+- Structure: **96.37** · records **6** · buyers **2** · repeat buyers **2**
+- Route `UNKNOWN` · currency `EUR` · p25 **2554047.7624999997** · median **2587215.025** · p75 **2643129.3675**
+- Median bidders **1.0** · suppliers **4** · top supplier share **37.5%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - AdP - Águas de Portugal, SGPS, S. A. — Celebração de contrato de seguros de saúde e aquisição de serviços de corretagem para as empresas do Grupo Águas de Portugal (2025_012CP) — value 2791563.18
+  - Águas do Douro e Paiva, S. A. — Celebração de contrato de seguros de saúde e aquisição de serviços de corretagem para as empresas do Grupo Águas de Portugal (2024_008CP) — value 2656901.44
+  - AdP - Águas de Portugal, SGPS, S. A. — Celebração de contrato de seguros de saúde e aquisição de serviços de corretagem para as empresas do Grupo Águas de Portugal (2024_009CP) — value 2601813.15
+
+### 99. ESP · `85312000` · servicio de ayuda en el hogar other
+- Structure: **96.35** · records **4** · buyers **4** · repeat buyers **0**
+- Route `UNKNOWN` · currency `EUR` · p25 **2779033.29** · median **4621051.72** · p75 **7610511.470000001**
+- Median bidders **1.0** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Ayuntamiento de Santiago de Compostela — Servicio de Ayuda en el Hogar — value 12722468.72
+  - Pleno del Ayuntamiento de Sada — Servicio de ayuda en el hogar — value 5906525.72
+  - Pleno del Ayuntamiento de Vilagarcía de Arousa — Servicio de ayuda en el hogar — value 3335577.72
+
+### 100. SVK · `90500000` · zabezpe enie slu ieb v odpadovom hospodárstve other
+- Structure: **96.3** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `EUR` · p25 **3480329.16** · median **5907844.84** · p75 **8136824.17**
+- Median bidders **1.0** · suppliers **3** · top supplier share **33.3%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Mesto Kysucké Nové Mesto — Zabezpečenie služieb v odpadovom hospodárstve — value 10365803.5
+  - Ponitrianske združenie obcí pre separovaný zber a nakladanie s odpadmi — Zabezpečenie služieb v odpadovom hospodárstve — value 5907844.84
+  - Obec Dolný Ohaj — Zabezpečenie služieb v odpadovom hospodárstve — value 1052813.48
+
+### 101. Canada · `NO_CODE` · npp s <n> ths sa one 1 computer application support temporary help services against the supply arrangement for the national capital region ncr temporary help services requirement t
+- Structure: **96.28** · records **57** · buyers **3** · repeat buyers **3**
+- Route `COMPETITIVE_OTHER` · currency `CAD` · p25 **105118.56** · median **273374.69** · p75 **310574.0**
+- Median bidders **UNKNOWN** · suppliers **14** · top supplier share **11.8%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - Department of National Defence (DND) — NPP – S5732129 - THS SA – One (1) Computer Application Support. Temporary Help Services against the Supply Arrangement for the National Capital Region (NCR). — value 397647.0
+  - Department of National Defence (DND) — NPP – S5777769 - THS SA – One (1) Computer Application Support. Temporary Help Services against the Supply Arrangement for the National Capital Region (NCR). — value 385951.5
+  - Department of National Defense — NPP – S4536659 - THS SA – One (1) Computer Application Support. Temporary Help Services against the Supply Arrangement for the National Capital Region (NCR). — value 346328.33
+
+### 102. LTU · `34144910` · nauj elektra varom autobus pirkimas other
+- Structure: **96.27** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **1657167.6** · median **1657167.6** · p75 **1657167.6**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Uždaroji akcinė bendrovė „Kėdbusas" "(KD)" — Naujų elektra varomų autobusų pirkimas — value 1657167.6
+  - UAB "Ukmergės autobusų parkas" — Naujų elektra varomų autobusų pirkimas — value UNKNOWN
+  - UAB "Ukmergės autobusų parkas" — Naujų elektra varomų autobusų pirkimas — value UNKNOWN
+
+### 103. United Kingdom · `NO_CODE` · northamptonshire children s trust for the homes for children and young people in our care independent fostering arrangements and children s homes northamptonshire children s trust 
+- Structure: **96.26** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `GBP` · p25 **77250000.0** · median **135500000.0** · p75 **193750000.0**
+- Median bidders **3.0** · suppliers **11** · top supplier share **16.7%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - North Northamptonshire Council — Northamptonshire Children's Trust for the Provision of Homes for Children and Young People in our Care Independent Fostering Arrangements and Children's Homes — value 252000000.0
+  - Northamptonshire Children's Trust — Northamptonshire Children's Trust for the Provision of Homes for Children and Young People in our Care Independent Fostering Arrangements and Children's Homes — value 135500000.0
+  - Northamptonshire Children's Trust — Northamptonshire Children's Trust for the Provision of Homes for Children and Young People in our Care Independent Fostering Arrangements and Children's Homes — value 19000000.0
+
+### 104. PL · `77200000` · wykonywanie us ug z zakresu gospodarki le nej na terenie wybranych nadle nictw regionalnej dyrekcji lasów pa stwowych w szczecinie w latach <n> <n> other
+- Structure: **96.26** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `PLN` · p25 **3511437.6500000004** · median **4045999.85** · p75 **269799538.15**
+- Median bidders **1.0** · suppliers **66** · top supplier share **6.2%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Skarb Państwa – Państwowe Gospodarstwo Leśne Lasy Państwowe Regionalna Dyrekcja Lasów Panstwowych w Szczecinie, Pełnomocnik — Wykonywanie usług z zakresu gospodarki leśnej na terenie wybranych Nadleśnictw Regionalnej Dyrekcji Lasów Państwowych w Szczecinie w latach 2024, 2025 — value 535553076.45
+  - Skarb Państwa Państwowe Gospodarstwo Leśne Lasy Państwowe Nadleśnictwo Dębno — „Wykonywanie usług z zakresu gospodarki leśnej na terenie wybranych Nadleśnictw Regionalnej Dyrekcji Lasów Państwowych w Szczecinie w latach 2024, 2025” — value 4045999.85
+  - Skarb Państwa – Państwowe Gospodarstwo Leśne Lasy Państwowe Regionalna Dyrekcja Lasów Panstwowych w Szczecinie - pełnomocnik zamawiających — Wykonywanie usług z zakresu gospodarki leśnej na terenie wybranych Nadleśnictw Regionalnej Dyrekcji Lasów Państwowych w Szczecinie w latach 2024, 2025 — value 2976875.45
+
+### 105. Canada · `NO_CODE` · npp s <n> ths sa one 1 special advisor temporary help services against the supply arrangement for the national capital region ncr temporary help services requirement this requireme
+- Structure: **96.21** · records **46** · buyers **3** · repeat buyers **3**
+- Route `COMPETITIVE_OTHER` · currency `CAD` · p25 **243829.565** · median **267690.5** · p75 **299027.41500000004**
+- Median bidders **UNKNOWN** · suppliers **9** · top supplier share **18.2%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - Department of National Defense — NPP – S5228810 - THS SA – One (1) Special Advisor. Temporary Help Services against the Supply Arrangement for the National Capital Region (NCR). — value 360611.25
+  - Department of National Defence (DND) — NPP – S5624569 - THS SA – One (1) Special Advisor. Temporary Help Services against the Supply Arrangement for the National Capital Region (NCR) — value 319677.0
+  - Department of National Defense — NPP – S5060649 - THS SA – One (1) Special Advisor. Temporary Help Services against the Supply Arrangement for the National Capital Region (NCR). — value 306938.58
+
+### 106. ESP · `33600000` · suministro del medicamento exclusivo emicizumab hemlibra other
+- Structure: **96.2** · records **4** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **2898477.74** · median **2898477.74** · p75 **2898477.74**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Hospital Universitario La Paz — SUMINISTRO DEL MEDICAMENTO EXCLUSIVO: EMICIZUMAB (HEMLIBRA). — value 2898477.74
+  - Hospital Universitario La Paz — SUMINISTRO DEL MEDICAMENTO EXCLUSIVO: EMICIZUMAB (HEMLIBRA). — value 2898477.74
+  - Hospital Universitario La Paz — SUMINISTRO DEL MEDICAMENTO EXCLUSIVO: EMICIZUMAB (HEMLIBRA). — value 2898477.74
+
+### 107. ESP · `66510000` · servicio de asistencia sanitaria para el personal laboral en el exterior de la secretaría de estado de comercio subdirección general de oficinas económicas y comerciales en el exte
+- Structure: **96.13** · records **4** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **6036945.0** · median **8445756.0** · p75 **9214992.0**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Junta de Contratación del Ministerio de Economía, Comercio y Empresa — Servicio de asistencia sanitaria para el personal laboral en el exterior de la Secretaría de Estado de Comercio-Subdirección General de Oficinas Económicas y Comerciales en el exterior y Red Territorial de Comercio, e ICEX España exportación e inversiones E.P.E., y sus beneficiarios — value 9214992.0
+  - Junta de Contratación del Ministerio de Economía, Comercio y Empresa — Servicio de asistencia sanitaria para el personal laboral en el exterior de la Secretaría de Estado de Comercio-Subdirección General de Oficinas Económicas y Comerciales en el exterior y Red Territorial de Comercio, e ICEX España exportación e inversiones E.P.E., y sus beneficiarios — value 9214992.0
+  - Junta de Contratación del Ministerio de Economía, Comercio y Empresa — Servicio de asistencia sanitaria para el personal laboral en el exterior de la Secretaría de Estado de Comercio-Subdirección General de Oficinas Económicas y Comerciales en el Exterior y Red Territorial de Comercio, e ICEX España exportación e inversiones, E.P.E., y sus beneficiarios. — value 7676520.0
+
+### 108. HRV · `45231300` · novogradnja i rekonstrukcija sustava odvodnje u okviru eu projekta pobolj anje sustava odvodnje i pro i avanja otpadnih voda u aglomeracijama umag savudrija novigrad istarski other
+- Structure: **96.06** · records **5** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **12942916.07** · median **16323459.03** · p75 **16323459.03**
+- Median bidders **UNKNOWN** · suppliers **5** · top supplier share **33.3%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - 6. MAJ ODVODNJA d.o.o. — NOVOGRADNJA I REKONSTRUKCIJA SUSTAVA ODVODNJE u okviru EU projekta POBOLJŠANJE SUSTAVA ODVODNJE I PROČIŠĆAVANJA OTPADNIH VODA U AGLOMERACIJAMA UMAG – SAVUDRIJA - NOVIGRAD ISTARSKI — value 16503467.72
+  - 6. MAJ ODVODNJA d.o.o. — NOVOGRADNJA I REKONSTRUKCIJA SUSTAVA ODVODNJE u okviru EU projekta POBOLJŠANJE SUSTAVA ODVODNJE I PROČIŠĆAVANJA OTPADNIH VODA U AGLOMERACIJAMA UMAG – SAVUDRIJA - NOVIGRAD ISTARSKI — value 16323459.03
+  - 6. MAJ ODVODNJA d.o.o. — NOVOGRADNJA I REKONSTRUKCIJA SUSTAVA ODVODNJE u okviru EU projekta POBOLJŠANJE SUSTAVA ODVODNJE I PROČIŠĆAVANJA OTPADNIH VODA U AGLOMERACIJAMA UMAG – SAVUDRIJA - NOVIGRAD ISTARSKI — value 16323459.03
+
+### 109. PL · `66113000` · zaci gni cie kredytu d ugoterminowego other
+- Structure: **96.04** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **2965999.975** · median **3128837.7** · p75 **3291675.425**
+- Median bidders **2.5** · suppliers **3** · top supplier share **50.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Urząd Gminy Wolanów — ,,Zaciągnięcie kredytu długoterminowego” — value 3454513.15
+  - Gmina Czarne — Zaciągnięcie kredytu długoterminowego — value 2803162.25
+  - Urząd Gminy Wolanów — ,,Zaciągnięcie kredytu długoterminowego” — value UNKNOWN
+
+### 110. NOR · `98395000` · framework agreement locks and fittings other
+- Structure: **95.96** · records **4** · buyers **4** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **4410000.0** · median **4410000.0** · p75 **4410000.0**
+- Median bidders **2.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Lier Eiendomsselskap KF — Framework agreement locks and fittings — value 4410000.0
+  - Vestland fylkeskommune — Framework agreement locks and fittings — value UNKNOWN
+  - Oslo kommune v/ Vann- og avløpsetaten — Framework agreement locks and fittings — value UNKNOWN
+
+### 111. FIN · `60600000` · yhteysalusliikennepalvelu parainen <n> <n> other
+- Structure: **95.96** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **2162907.0** · median **2162907.0** · p75 **2162907.0**
+- Median bidders **0.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Lounais-Suomen elinvoimakeskus — Yhteysalusliikennepalvelu, Parainen (2026-2028) — value 2162907.0
+  - Varsinais-Suomen elinkeino-, liikenne- ja ympäristökeskus — Yhteysalusliikennepalvelu, Parainen (2026-2028) — value UNKNOWN
+  - Varsinais-Suomen elinkeino-, liikenne- ja ympäristökeskus — Yhteysalusliikennepalvelu, Parainen, 2026-2028 — value UNKNOWN
+
+### 112. Canada · `NO_CODE` · npp s <n> ths sa one 1 computer application support temporary help services against the supply arrangement for the national capital region temporary help services requirement this 
+- Structure: **95.95** · records **9** · buyers **2** · repeat buyers **2**
+- Route `COMPETITIVE_OTHER` · currency `CAD` · p25 **223983.535** · median **267416.255** · p75 **313723.51**
+- Median bidders **UNKNOWN** · suppliers **4** · top supplier share **25.0%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - Department of National Defense — NPP – S5073113- THS SA – One (1) Computer Application Support. Temporary Help Services against the Supply Arrangement for the National Capital Region. — value 395984.65
+  - Department of National Defense — NPP – S5021894- THS SA – One (1) Computer Application Support. Temporary Help Services against the Supply Arrangement for the National Capital Region. — value 286303.13
+  - Department of National Defense — NPP – S4977602- THS SA – One (1) Computer Application Support. Temporary Help Services against the Supply Arrangement for the National Capital Region — value 248529.38
+
+### 113. ES · `33141000` · suministro contr <n> <n> other
+- Structure: **95.93** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `EUR` · p25 **3537052.915** · median **6534298.58** · p75 **6877827.8**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO PUERTA DEL MAR — Suministro CONTR 2023 0000608096 — value 7221357.02
+  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO VIRGEN DE LAS NIEVES — Suministro (CONTR 2023 0000724649) — value 6534298.58
+  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO REGIONAL DE MÁLAGA — Suministro CONTR 2023 0000514272 — value 539807.25
+
+### 114. ITA · `45211340` · proposta di partenariato pubblico privato per l efficientamento energetico del patrimonio immobiliare di edilizia residenziale pubblica erp di proprietà dello i a c p di catania at
+- Structure: **95.9** · records **10** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **11305071.8375** · median **15790770.36** · p75 **17873863.71**
+- Median bidders **1.0** · suppliers **5** · top supplier share **40.0%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - Istituto autonomo case popolari di Catania — Proposta di Partenariato Pubblico Privato per l’efficientamento energetico del patrimonio immobiliare di Edilizia Residenziale Pubblica (ERP) di proprietà dello I.A.C.P. di Catania, attraverso il ricorso alla Misura PNRR REPowerEU Missione 7 - Investimento 17 - per n. 3 edifici ERP siti a Catania — value 18378725.26
+  - Istituto Autonomo Case Popolari di Catania — Proposta di Partenariato Pubblico Privato per l’efficientamento energetico del patrimonio immobiliare di Edilizia Residenziale Pubblica (ERP) di proprietà dello I.A.C.P. di Catania, attraverso il ricorso alla Misura PNRR REPowerEU Missione 7 - Investimento 17 - per n. 9 edifici ERP siti in provincia di Catania — value 18365881.14
+  - Istituto Autonomo Case Popolari di Catania — Proposta di Partenariato Pubblico Privato per l’efficientamento energetico del patrimonio immobiliare di Edilizia Residenziale Pubblica (ERP) di proprietà dello I.A.C.P. di Catania, attraverso il ricorso alla Misura PNRR REPowerEU Missione 7 - Investimento 17 — value 18140276.03
+
+### 115. BIH · `33100000` · sophisticated medical equipment stereotactic linear accelerator linac other
+- Structure: **95.89** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **2589998.0** · median **2589998.0** · p75 **2589998.0**
+- Median bidders **2.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - University Clinical Hospital Mostar — Procurement of sophisticated medical equipment - stereotactic linear accelerator – LINAC — value 2589998.0
+  - University clinical hospital Mostar (UCHM) — Procurement of sophisticated medical equipment - stereotactic linear accelerator – LINAC — value UNKNOWN
+  - University Clinical Hospital Mostar (UCHM) — Procurement of sophisticated medical equipment - stereotactic linear accelerator – LINAC — value UNKNOWN
+
+### 116. ITA · `85311000` · accordo quadro per il servizio di gestione di centri di accoglienza costituiti da centri collettivi con capacità ricettiva fino a <n> posti per n <n> posti per la prefettura utg di
+- Structure: **95.86** · records **7** · buyers **3** · repeat buyers **2**
 - Route `UNKNOWN` · currency `EUR` · p25 **24116006.25** · median **24116006.25** · p75 **40357539.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+- Median bidders **2.0** · suppliers **2** · top supplier share **50.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
   - PROVINCIA DI PISTOIA - STAZIONE UNICA APPALTANTE — ACCORDO QUADRO per il Servizio di gestione di centri di accoglienza costituiti da centri collettivi con capacità ricettiva fino a 50 posti per n.. 300 posti per la Prefettura UTG di Pistoia. — value 40357539.0
   - PROVINCIA DI PISTOIA - STAZIONE UNICA APPALTANTE — ACCORDO QUADRO per il Servizio di gestione di centri di accoglienza costituiti da centri collettivi con capacità ricettiva fino a 50 posti per n.. 300 posti per la Prefettura UTG di Pistoia. — value 40357539.0
   - PROVINCIA DI PISTOIA - STAZIONE UNICA APPALTANTE — ACCORDO QUADRO per il Servizio di gestione di centri di accoglienza costituiti da centri collettivi con capacità ricettiva fino a 50 posti per n.. 300 posti per la Prefettura UTG di Pistoia. — value 40357539.0
 
-### 105. ITA · `45210000` · accordo quadro manutentore unico puglia e basilicata annualità <n> <n> other
-- Structure: **98.42** · records **5** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **88485000.0** · median **88485000.0** · p75 **88485000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+### 117. POL · `90500000` · odbiór transport i zagospodarowanie odpadów komunalnych pochodz cych z nieruchomo ci zamieszka ych po o onych na terenie gminy miejskiej turek monitoring research
+- Structure: **95.85** · records **7** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **6420293.317500001** · median **7424335.65** · p75 **8539223.504999999**
+- Median bidders **1.0** · suppliers **3** · top supplier share **33.3%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - DIREZIONE REGIONALE PUGLIA E BASILICATA — Accordo Quadro Manutentore Unico Puglia e Basilicata annualità 2026-2028 — value 88485000.0
-  - DIREZIONE REGIONALE PUGLIA E BASILICATA — Accordo Quadro Manutentore Unico Puglia e Basilicata annualità 2026-2028 — value 88485000.0
-  - DIREZIONE REGIONALE PUGLIA E BASILICATA — Accordo Quadro Manutentore Unico Puglia e Basilicata annualità 2026-2028 — value 88485000.0
+  - GMINA MIEJSKA TUREK — ODBIÓR, TRANSPORT I ZAGOSPODAROWANIE ODPADÓW KOMUNALNYCH POCHODZĄCYCH Z NIERUCHOMOŚCI ZAMIESZKAŁYCH POŁOŻONYCH NA TERENIE GMINY MIEJSKIEJ TUREK — value 9654111.36
+  - Gmina Miejska Turek — ODBIÓR, TRANSPORT I ZAGOSPODAROWANIE ODPADÓW KOMUNALNYCH POCHODZĄCYCH Z NIERUCHOMOŚCI ZAMIESZKAŁYCH POŁOŻONYCH NA TERENIE GMINY MIEJSKIEJ TUREK — value 7424335.65
+  - Gmina Miejska Turek — ODBIÓR, TRANSPORT I ZAGOSPODAROWANIE ODPADÓW KOMUNALNYCH POCHODZĄCYCH Z NIERUCHOMOŚCI ZAMIESZKAŁYCH POŁOŻONYCH NA TERENIE GMINY MIEJSKIEJ TUREK — value 5416250.985
 
-### 106. PL · `33690000` · dostawa produktów leczniczych nr pn <n> <n> tm other
-- Structure: **98.41** · records **5** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `PLN` · p25 **6740014.9** · median **26150808.5** · p75 **165322319.1**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+### 118. ESP · `33140000` · contrato de suministro contr <n> <n> other
+- Structure: **95.82** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **1545251.855** · median **2700500.0** · p75 **9201479.135**
+- Median bidders **1.0** · suppliers **8** · top supplier share **12.5%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Narodowy Instytut Onkologii im. Marii Skłodowskiej–Curie - Państwowy Instytut Badawczy — Dostawa produktów leczniczych, nr PN-169/23/TM — value 307232711.0
-  - Narodowy Instytut Onkologii im. Marii Skłodowskiej-Curie-Państwowy Instytut Badawczy — Dostawa produktów leczniczych, nr PN-188/23/TM — value 165322319.1
-  - Narodowy Instytut Onkologii im. Marii Skłodowskiej–Curie - Państwowy Instytut Badawczy — Dostawa produktów leczniczych, nr PN-243/23/TM — value 26150808.5
+  - Servicio Andaluz de Salud. Hospital Universitario de Jaén — Contrato de Suministro (CONTR 2025 0000496854) — value 15702458.27
+  - Servicio Andaluz de Salud. Hospital Universitario de Jaén. — Contrato de Suministro (CONTR 2025 0000696845) — value 2700500.0
+  - Servicio Andaluz de Salud. Hospital Universitario de Jaén. — Contrato de Suministro (CONTR 2026 0000097748) — value 390003.70999999996
 
-### 107. FIN · `85147000` · työterveyshuollon palveluiden hankinta other
-- Structure: **98.4** · records **3** · buyers **2** · repeat buyers **1**
+### 119. FIN · `85147000` · työterveyshuollon palveluiden hankinta other
+- Structure: **95.81** · records **3** · buyers **2** · repeat buyers **1**
 - Route `UNKNOWN` · currency `EUR` · p25 **19500000.0** · median **27000000.0** · p75 **27000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
 - Historical examples:
   - Vantaan kaupunki — Työterveyshuollon palveluiden hankinta — value 27000000.0
   - Vantaan kaupunki — Työterveyshuollon palveluiden hankinta — value 27000000.0
   - Vantaan ja Keravan hyvinvointialue — Työterveyshuollon palveluiden hankinta — value 12000000.0
 
-### 108. PRT · `48200000` · concurso público com publicação de anúncio no jornal oficial da união europeia joue para aquisição de licenciamento de software microsoft e serviços conexos para as entidades do sn
-- Structure: **98.39** · records **4** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **12790570.932500001** · median **14098295.945** · p75 **14725912.780000001**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 120. LTU · `09134220` · degal <n> mark s benzinas ir dyzelinas sigijimas i degalini other
+- Structure: **95.79** · records **4** · buyers **2** · repeat buyers **2**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **230265.79125** · median **443593.17250000004** · p75 **656920.5537500001**
+- Median bidders **1.0** · suppliers **5** · top supplier share **58.3%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Serviços Partilhados do Ministério da Saúde, EPE — Concurso Público com publicação de anúncio no Jornal Oficial da União Europeia | JOUE para aquisição de Licenciamento de Software Microsoft e Serviços Conexos para as Entidades do SNS e Ministério da — value 15929010.88
-  - SPMS - Serviços Partilhados do Ministério da Saúde, E. P. E. — Concurso Público com publicação de anúncio no Jornal Oficial da União Europeia | JOUE para aquisição de Licenciamento de Software Microsoft e Serviços Conexos para as Entidades do SNS e Ministério da Saúde. — value 14324880.08
-  - SPMS - Serviços Partilhados do Ministério da Saúde, E. P. E. — Concurso Público com publicação de anúncio no Jornal Oficial da União Europeia | JOUE para aquisição de Licenciamento de Software Microsoft e Serviços Conexos para as Entidades do SNS e Ministério da Saúde. — value 13871711.81
+  - Gynybos resursų agentūra prie Krašto apsaugos ministerijos — DEGALŲ (95 MARKĖS BENZINAS IR DYZELINAS) ĮSIGIJIMAS IŠ DEGALINIŲ — value 870247.935
+  - GYNYBOS RESURSŲ AGENTŪRA PRIE KAM — Degalų (95 markės benzinas ir dyzelinas) įsigijimas iš degalinių — value 16938.41
+  - GYNYBOS RESURSŲ AGENTŪRA PRIE KAM — Degalų (95 markės benzinas ir dyzelinas) įsigijimas iš degalinių — value UNKNOWN
 
-### 109. PRT · `60410000` · exploração dos serviços aéreos regulares em regime de concessão nas rotas lisboa horta lisboa funchal ponta delgada funchal lisboa santa maria lisboa lisboa pico lisboa e funchal t
-- Structure: **98.39** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **53750000.0** · median **62500000.0** · p75 **62500000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 121. FIN · `66000000` · omaisuus ja keskeytysvakuutusten hankinta other
+- Structure: **95.79** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **1647400.0** · median **2431600.0** · p75 **3215800.0**
+- Median bidders **2.0** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Gabinete do Secretário de Estado das Infraestruturas — Exploração dos serviços aéreos regulares, em regime de concessão, nas rotas Lisboa/ Horta/Lisboa, Funchal/Ponta Delgada/Funchal, Lisboa/Santa Maria/Lisboa, Lisboa/Pico/Lisboa e Funchal/Terceira/Funchal — value 62500000.0
-  - Gabinete do Secretário de Estado das Infraestruturas — Exploração dos serviços aéreos regulares, em regime de concessão, nas rotas Lisboa/ Horta/Lisboa, Funchal/Ponta Delgada/Funchal, Lisboa/Santa Maria/Lisboa, Lisboa/Pico/Lisboa e Funchal/Terceira/Funchal — value 62500000.0
-  - Gabinete do Secretário de Estado Adjunto e das Infraestruturas — Exploração dos serviços aéreos regulares, em regime de concessão, nas rotas Lisboa/Horta/Lisboa, Funchal/Ponta Delgada/Funchal, Lisboa/Santa Maria/Lisboa, Lisboa/Pico/Lisboa e Funchal/Terceira/Funchal — value 45000000.0
+  - Tampereen Energia Oy — OMAISUUS- JA KESKEYTYSVAKUUTUSTEN HANKINTA — value 4000000.0
+  - Kotkan Energia Oy — Omaisuus-ja keskeytysvakuutusten hankinta — value 863200.0
+  - Tampereen Energia Oy — Omaisuus- ja keskeytysvakuutusten hankinta — value UNKNOWN
 
-### 110. FIN · `39800000` · puhtaanapidon tarvikkeet other
-- Structure: **98.37** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **14903612.5** · median **26199225.0** · p75 **26199225.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 122. Canada · `NO_CODE` · elder helper services an advanced contract award notice acan is a public notice indicating to the supplier community that a department or agency intends to award a goods services o
+- Structure: **95.76** · records **12** · buyers **4** · repeat buyers **2**
+- Route `DIRECT_NONCOMPETITIVE` · currency `CAD` · p25 **298362.5** · median **298362.5** · p75 **298362.5**
+- Median bidders **UNKNOWN** · suppliers **1** · top supplier share **100.0%** · shape `MULTI_BUYER_MARKET`
 - Historical examples:
-  - Sarastia Oy — Puhtaanapidon tarvikkeet — value 26199225.0
-  - Sarastia Oy — Puhtaanapidon tarvikkeet — value 26199225.0
-  - Länsi-Uudenmaan hyvinvointialue — Puhtaanapidon tarvikkeet — value 3608000.0
+  - Correctional Service of Canada (CSC) — Elder Helper Services — value 298362.5
+  - Correctional Service of Canada (CSC) — Elder Helper Services — value UNKNOWN
+  - Correctional Service Canada — Elder Helper Services — value UNKNOWN
 
-### 111. ITA · `45210000` · procedura aperta telematica ai sensi dellart <n> d lgs <n> <n> per l affidamento di un accordo quadro per lavori di manutenzione ordinaria e straordinaria sugli immobili in uso all
-- Structure: **98.36** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **57290000.0** · median **57290000.0** · p75 **70720000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 123. PRT · `85111100` · prestação de serviços cirúrgicos às hérnias other
+- Structure: **95.75** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `EUR` · p25 **1018240.0** · median **1742080.0** · p75 **1786165.0**
+- Median bidders **0.0** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Direzione regionale Campania — PROCEDURA APERTA TELEMATICA AI SENSI DELLART. 71 D.LGS. 36/2023 PER L'AFFIDAMENTO DI UN ACCORDO QUADRO PER LAVORI DI MANUTENZIONE ORDINARIA E STRAORDINARIA SUGLI IMMOBILI IN USO ALLE AMMINISTRAZIONI DELLO STATO, NONCHE' SU QUELLI I CUI INTERVENTI SONO GESTITI DALLAGENZIA DEL DEMANIO, EX ART. 12, CO. 5, D.L. 98/2011 E SS.MM.II., COMPRESI NEL TERRITORIO DI COMPETENZA DELLA DIREZIONE REGIONALE CAMPAN — value 84150000.0
-  - Direzione Regionale Emilia Romagna — PROCEDURA APERTA TELEMATICA AI SENSI DELLART. 71 D.LGS. 36/2023 PER L'AFFIDAMENTO DI UN ACCORDO QUADRO PER LAVORI DI MANUTENZIONE ORDINARIA E STRAORDINARIA SUGLI IMMOBILI IN USO ALLE AMMINISTRAZIONI DELLO STATO, NONCHE' SU QUELLI I CUI INTERVENTI SONO GESTITI DALLAGENZIA DEL DEMANIO, EX ART. 12, CO. 5, D.L. 98/2011 E SS.MM.II., COMPRESI NEL TERRITORIO DI COMPETENZA DELLA DIREZIONE REGIONALE EMILIA — value 57290000.0
-  - Direzione Regionale Emilia Romagna dell'Agenzia del demanio — PROCEDURA APERTA TELEMATICA AI SENSI DELLART. 71 D.LGS. 36/2023 PER L'AFFIDAMENTO DI UN ACCORDO QUADRO PER LAVORI DI MANUTENZIONE ORDINARIA E STRAORDINARIA SUGLI IMMOBILI IN USO ALLE AMMINISTRAZIONI DELLO STATO, NONCHE' SU QUELLI I CUI INTERVENTI SONO GESTITI DALLAGENZIA DEL DEMANIO, EX ART. 12, CO. 5, D.L. 98/2011 E SS.MM.II., COMPRESI NEL TERRITORIO DI COMPETENZA DELLA D.R. EMILIA — value 57290000.0
+  - Serviço de Saúde da Região Autónoma da Madeira, EPERAM (SESARAM, EPERAM) — PRESTAÇÃO DE SERVIÇOS CIRÚRGICOS ÀS HÉRNIAS — value 1830250.0
+  - SERVIÇO DE SAÚDE DA REGIÃO AUTÓNOMA DA MADEIRA, EPERAM — PRESTAÇÃO DE SERVIÇOS CIRÚRGICOS ÀS HÉRNIAS — value 1742080.0
+  - Serviço de Saúde da Região Autónoma da Madeira, EPE-RAM — PRESTAÇÃO DE SERVIÇOS CIRÚRGICOS ÀS HÉRNIAS — value 294400.0
 
-### 112. HRV · `09000000` · naftni derivati other
-- Structure: **98.32** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **27170822.63** · median **54017645.26** · p75 **61727213.105000004**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 124. ITA · `44163120` · fornitura tubazioni preisolate per impianti di teleriscaldamento other
+- Structure: **95.74** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **6000000.0** · median **6000000.0** · p75 **6000000.0**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - GRAD ZAGREB — NAFTNI DERIVATI — value 69436780.95
-  - GRAD ZAGREB — NAFTNI DERIVATI — value 54017645.26
-  - Zavod za hitnu medicinu Ličko-senjske županije — Naftni derivati — value 324000.0
+  - UNARETI SPA - A2A SPA APPROVVIGIONAMENTI MANDATARIA INCARICATA — Fornitura tubazioni preisolate per impianti di teleriscaldamento — value 6000000.0
+  - UNARETI S.P.A. — FORNITURA TUBAZIONI PREISOLATE PER IMPIANTI DI TELERISCALDAMENTO — value 6000000.0
+  - UNARETI SPA - A2A SPA APPROVVIGIONAMENTI MANDATARIA INCARICATA — Fornitura tubazioni preisolate per impianti di teleriscaldamento — value UNKNOWN
 
-### 113. POL · `77200000` · wykonywanie us ug z zakresu gospodarki le nej na terenie nadle nictwa sulechów w roku <n> other
-- Structure: **98.31** · records **5** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `PLN` · p25 **31359961.37** · median **31593541.05** · p75 **31593681.87**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - Skarb Państwa - Państwowe Gospodarstwo Leśne Lasy Państwowe Nadleśnictwo Sulechów — Wykonywanie usług z zakresu gospodarki leśnej na terenie Nadleśnictwa Sulechów w roku 2024 — value 31819091.51
-  - Skarb Państwa - Państwowe Gospodarstwo Leśne Lasy Państwowe Nadleśnictwo Sulechów — Wykonywanie usług z zakresu gospodarki leśnej na terenie Nadleśnictwa Sulechów w roku 2026. — value 31593681.87
-  - Skarb Państwa Państwowe Gospodarstwo Leśne Lasy Państwowe Nadleśnictwo Sulechów — Wykonywanie usług z zakresu gospodarki leśnej na terenie Nadleśnictwa Sulechów w roku 2026. — value 31593541.05
-
-### 114. ESP · `50700000` · servicios contr <n> <n> other
-- Structure: **98.29** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **7176837.295** · median **13402021.29** · p75 **23342917.009999998**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Servicio Andaluz de Salud. Hospital Universitario Virgen del Rocío — Servicios (CONTR 2025 0000407265) — value 33283812.73
-  - Servicio Andaluz de Salud. Complejo Hospitalario Torrecárdenas. — Servicios (CONTR 2025 0000184729) — value 13402021.29
-  - Servicio Andaluz de Salud. Complejo Hospitalario Torrecárdenas. — Servicios (CONTR 2024 0000691574) — value 951653.3
-
-### 115. PL · `33600000` · ez <n> <n> <n> dostawa produktów leczniczych dla wwcoit im m kopernika w odzi prowadzonego w trybie przetargu nieograniczonego o warto ci powy ej <n> <n> <n> euro other
-- Structure: **98.28** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `PLN` · p25 **18009264.6** · median **29191029.0** · p75 **45887198.730000004**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - WWCOiT im. M. Kopernika w Łodzi — EZ.28.132.2023 Dostawa produktów leczniczych dla WWCOiT im. M. Kopernika w Łodzi prowadzonego w trybie przetargu nieograniczonego o wartości powyżej 10 000 000 Euro — value 62583368.46
-  - Wojewódzkie Wielospecjalistyczne Centrum Onkologii i Traumatologii im. M. Kopernika w Łodzi — EZ.28.88.2023 Dostawa produktów leczniczych dla WWCOiT im. M. Kopernika w Łodzi prowadzonego w trybie przetargu nieograniczonego o wartości powyżej 10 000 000 Euro — value 29191029.0
-  - Wojewódzkie Wielospecjalistyczne Centrum Onkologii i Traumatologii im. M. Kopernika w Łodzi — EZ.28.99.2023 Dostawa produktów leczniczych dla WWCOiT im. M. Kopernika w Łodzi prowadzonego w trybie przetargu nieograniczonego o wartości powyżej 10 000 000 Euro — value 6827500.2
-
-### 116. SWE · `71000000` · dynamiskt inköpssystem tekniska konsulter other
-- Structure: **98.26** · records **7** · buyers **5** · repeat buyers **2**
-- Route `UNKNOWN` · currency `SEK` · p25 **27500000.0** · median **170000000.0** · p75 **690000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - Telge Inköp AB — Dynamiskt inköpssystem Tekniska konsulter — value 1200000000.0
-  - Telge Inköp AB — Dynamiskt inköpssystem Tekniska konsulter — value 1200000000.0
-  - Värmdö kommun — Dynamiskt inköpssystem tekniska konsulter — value 180000000.0
-
-### 117. ESP · `50700000` · contrato de servicios contr <n> <n> other
-- Structure: **98.25** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **11336803.75** · median **11730284.11** · p75 **15537351.205**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Servicio Andaluz de Salud. Hospital Universitario de Málaga — Contrato de Servicios (CONTR 2025 0000327965) — value 19344418.3
-  - Servicio Andaluz de Salud. Hospital Regional Universitario de Málaga — Contrato de Servicios (CONTR 2026 0000156727) — value 11730284.11
-  - Servicio Andaluz de Salud. Hospital Universitario Virgen del Rocío — Contrato de Servicios (CONTR 2024 0001160143) — value 10943323.39
-
-### 118. ESP · `33700000` · acuerdo marco suministro contr <n> <n> other
-- Structure: **98.25** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **8933890.845** · median **11693331.89** · p75 **21727133.075000003**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - SERVICIO ANDALUZ DE SALUD. SERVICIOS CENTRALES — Acuerdo Marco Suministro (CONTR 2022/0001024061) — value 31760934.26
-  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO REGIONAL DE MÁLAGA — Acuerdo Marco Suministro CONTR 2023 0000851595 — value 11693331.89
-  - Servicio Andaluz de Salud. Hospital Universitario de Jaén — Acuerdo Marco Suministro (CONTR 2025 0000118812) — value 6174449.8
-
-### 119. ITA · `15890000` · procedura aperta in ambito europeo finalizzata alla conclusione di un accordo quadro per la fornitura del vitto dei detenuti ed internati ristretti negli istituti penitenziari per 
-- Structure: **98.24** · records **7** · buyers **2** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **37252658.760000005** · median **52749805.2** · p75 **65837267.4**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - Ministero della giustizia Dipartimento dell’amministrazione penitenziaria Provveditorato Regionale per la Lombardia — Procedura aperta, in ambito europeo, finalizzata alla conclusione di un Accordo quadro per la fornitura del Vitto dei detenuti ed internati ristretti negli Istituti penitenziari per adulti della Lombardia, mediante approvvigionamento e consegna di derrate alimentari necessarie al confezionamento di pasti giornalieri completi (colazione, pranzo e cena) — value 78924729.6
-  - Ministero della giustizia Dipartimento dell’amministrazione penitenziaria Provveditorato Regionale per la Lombardia — Procedura aperta, in ambito europeo, finalizzata alla conclusione di un Accordo quadro per la fornitura del Vitto dei detenuti ed internati ristretti negli Istituti penitenziari per adulti della Lombardia, mediante approvvigionamento e consegna di derrate alimentari necessarie al confezionamento di pasti giornalieri completi (colazione, pranzo e cena) — value 78924729.6
-  - Provveditorato Regionale dell'Amministrazione Penitenziaria del Piemonte, Liguria e Valle d'Aosta — Procedura aperta, in ambito europeo, finalizzata alla conclusione di un Accordo quadro per la fornitura del Vitto dei detenuti ed internati ristretti negli Istituti penitenziari per adulti del Piemonte, Liguria e Valle d’Aosta, mediante approvvigionamento e consegna di derrate alimentari necessarie al confezionamento di pasti giornalieri completi (colazione, pranzo e cena) — value 52749805.2
-
-### 120. ESP · `90911200` · servicio de limpieza multifuncional para diversas residencias propias be <n> <n> other
-- Structure: **98.24** · records **4** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **9919217.700000001** · median **11469300.84** · p75 **11967962.46**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Departamento de Drets Socials i Inclusió — Servicio de limpieza multifuncional para diversas residencias propias (BE-2024-46) — value 13297873.2
-  - Departamento de Drets Socials i Inclusió — Servicio de limpieza multifuncional para diversas residencias propias (BE-2025-34) — value 11524658.88
-  - Departamento de Drets Socials — Servicio de limpieza multifuncional para diversas residencias propias (BE-2024-45) — value 11413942.8
-
-### 121. ROU · `33140000` · furnizare consumabile medicale other
-- Structure: **98.21** · records **7** · buyers **3** · repeat buyers **1**
-- Route `UNKNOWN` · currency `RON` · p25 **23907038.5** · median **55164104.0** · p75 **86973767.45**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - Institutul Oncologic Prof. Dr. I. Chiricuta Cluj-Napoca — Furnizare consumabile medicale — value 227371865.6
-  - Institutul Oncologic Prof. Dr. I. Chiricuta Cluj-Napoca — Furnizare Consumabile medicale — value 94647586.5
-  - Institutul Oncologic Prof. Dr. I. Chiricuta Cluj-Napoca — Furnizare consumabile medicale — value 79299948.4
-
-### 122. SWE · `92610000` · drift av simhall other
-- Structure: **98.21** · records **4** · buyers **2** · repeat buyers **2**
-- Route `UNKNOWN` · currency `SEK` · p25 **90000000.0** · median **295000000.0** · p75 **500000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Sollentuna kommun — Drift av simhall — value 500000000.0
-  - Sollentuna kommun — Drift av simhall — value 500000000.0
-  - Upplands Väsby kommun — Drift av simhall — value 90000000.0
-
-### 123. POL · `77200000` · wykonywanie us ug z zakresu gospodarki le nej na terenie nadle nictwa babimost w roku <n> other
-- Structure: **98.18** · records **5** · buyers **3** · repeat buyers **1**
-- Route `UNKNOWN` · currency `PLN` · p25 **22296776.95** · median **23378168.0** · p75 **24724995.96**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - Skarb Państwa Państwowe Gospodarstwo Leśne Lasy Państwowe Nadleśnictwo Babimost — Wykonywanie usług z zakresu gospodarki leśnej na terenie Nadleśnictwa Babimost w roku 2026 — value 24892423.2
-  - Nadleśnictwo Babimost — Wykonywanie usług z zakresu gospodarki leśnej na terenie Nadleśnictwa Babimost w roku 2026 — value 24724995.96
-  - Skarb Państwa - Państwowe Gospodarstwo Leśne Lasy Państwowe Nadleśnictwo Babimost — Wykonywanie usług z zakresu gospodarki leśnej na terenie Nadleśnictwa Babimost w roku 2024 — value 23378168.0
-
-### 124. ITA · `90511000` · affidamento del servizio di raccolta e trasporto dei rifiuti urbani differenziati servizi di igiene urbana e complementari a ridotto impatto ambientale other
-- Structure: **98.17** · records **4** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **80487833.85** · median **82079339.745** · p75 **83670845.64**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - SETTORE IGIENE AMBIENTALE — AFFIDAMENTO DEL SERVIZIO DI RACCOLTA E TRASPORTO DEI RIFIUTI URBANI DIFFERENZIATI, SERVIZI DI IGIENE URBANA E COMPLEMENTARI A RIDOTTO IMPATTO AMBIENTALE — value 83670845.64
-  - Comune di Catanzaro — AFFIDAMENTO DEL SERVIZIO DI RACCOLTA E TRASPORTO DEI RIFIUTI URBANI DIFFERENZIATI, SERVIZI DI IGIENE URBANA E COMPLEMENTARI A RIDOTTO IMPATTO AMBIENTALE — value 83670845.64
-  - SETTORE IGIENE AMBIENTALE — AFFIDAMENTO DEL SERVIZIO DI RACCOLTA E TRASPORTO DEI RIFIUTI URBANI DIFFERENZIATI, SERVIZI DI IGIENE URBANA E COMPLEMENTARI A RIDOTTO IMPATTO AMBIENTALE — value 80487833.85
-
-### 125. ES · `45215100` · obras contr <n> <n> other
-- Structure: **98.17** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **6724859.32** · median **7414973.0** · p75 **7616804.390000001**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO REGIONAL DE MÁLAGA — Obras CONTR 2023 0000572981 — value 7818635.78
-  - SERVICIO ANDALUZ DE SALUD. SERVICIOS CENTRALES — Obras (CONTR 2022 0001173379) — value 7414973.0
-  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO PUERTA DEL MAR — Obras CONTR 2023 0000764644 — value 6034745.64
-
-### 126. PRT · `90513800` · aquisição de serviços para valorização de lamas das fábricas de água da tejo atlântico por lotes other
-- Structure: **98.16** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **13867500.0** · median **19965000.0** · p75 **31282500.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Águas do Tejo Atlântico, S. A. — Aquisição de Serviços para Valorização de Lamas das Fábricas de Água da Tejo Atlântico, por Lotes — value 42600000.0
-  - Águas do Tejo Atlântico, S. A. — Aquisição de Serviços para Valorização de Lamas das Fábricas de Água da Tejo Atlântico, por Lotes — value 19965000.0
-  - Águas do Tejo Atlântico, SA — Aquisição de Serviços para Valorização de Lamas das Fábricas de Água da Tejo Atlântico, por Lotes — value 7770000.0
-
-### 127. CZE · `09310000` · nákup sdru ených slu eb dodávek elektrické energie v hladin nízkého nap tí a vysokého nap tí resortu na rok <n> other
-- Structure: **98.16** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `CZK` · p25 **155500000.0** · median **155500000.0** · p75 **159500000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Moravská galerie v Brně — Nákup sdružených služeb dodávek elektrické energie v hladině nízkého napětí a vysokého napětí resortu na rok 2025 — value 163500000.0
-  - Uměleckoprůmyslové museum v Praze — Nákup sdružených služeb dodávek elektrické energie v hladině nízkého napětí a vysokého napětí resortu na rok 2027 — value 155500000.0
-  - Uměleckoprůmyslové museum v Praze — Nákup sdružených služeb dodávek elektrické energie v hladině nízkého napětí a vysokého napětí resortu na rok 2026 — value 155500000.0
-
-### 128. ITA · `34110000` · accordo quadro veicoli in noleggio id <n> other
-- Structure: **98.12** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **746723700.0** · median **746723700.0** · p75 **746723700.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Consip S.p.A. — Accordo Quadro veicoli in noleggio (ID 2879) — value 746723700.0
-  - Consip S.p.A. — Accordo Quadro veicoli in noleggio (ID 2879) — value 746723700.0
-  - CONSIP S.p.A. — Accordo Quadro veicoli in noleggio - ID 2879 — value 746723700.0
-
-### 129. ESP · `33184100` · contrato de suministro contr <n> <n> other
-- Structure: **98.11** · records **6** · buyers **3** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **7818868.217499999** · median **9319981.835** · p75 **12524899.4175**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
-- Historical examples:
-  - Servicio Andaluz de Salud. Hospital Universitario Juan Ramón Jiménez — Contrato de Suministro (CONTR 2025 0000362786) — value 14683892.05
-  - Servicio Andaluz de Salud. Hospital Universitario Juan Ramón Jiménez — Contrato de Suministro CONTR 2024 0001119076 — value 13400493.15
-  - Servicio Andaluz de Salud. Hospital Universitario Puerta del Mar. — Contrato de Suministro (CONTR 2025 0000739902) — value 9898118.22
-
-### 130. ITA · `55500000` · procedura aperta europea per l appalto del servizio di ristorazione catering completo catering veicolato presso edrc del ministero della difesa other
-- Structure: **98.11** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **381389668.165** · median **724583265.75** · p75 **724583265.75**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - DIREZIONE GENERALE COMMISSARIATO E SERVIZI GENERALI — Procedura aperta europea per l’appalto del servizio di ristorazione, catering completo, catering veicolato presso EDRC del Ministero della Difesa — value 724583265.75
-  - DIREZIONE GENERALE COMMISSARIATO E SERVIZI GENERALI — Procedura aperta europea per l’appalto del servizio di ristorazione, catering completo, catering veicolato presso EDRC del Ministero della Difesa — value 724583265.75
-  - DIREZIONE GENERALE DEL COMMISSARIATO E DEI SERVIZI GENERALI — Procedura aperta europea per l’appalto del servizio di ristorazione, catering completo, catering veicolato presso EDRC del Ministero della Difesa — value 38196070.58
-
-### 131. HRV · `33140000` · testovi i potro ni materijal za patologiju i citologiju za zdravstvene ustanove u republici hrvatskoj other
-- Structure: **98.09** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **15395990.31** · median **28880559.1** · p75 **28880559.1**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Klinički bolnički centar Rijeka — Testovi i potrošni materijal za patologiju i citologiju za zdravstvene ustanove u Republici Hrvatskoj — value 28880559.1
-  - Klinički bolnički centar Rijeka — Testovi i potrošni materijal za patologiju i citologiju za zdravstvene ustanove u Republici Hrvatskoj — value 28880559.1
-  - KLINIČKI BOLNIČKI CENTAR RIJEKA — Testovi i potrošni materijal za patologiju i citologiju za zdravstvene ustanove u Republici Hrvatskoj — value 1911421.52
-
-### 132. SVK · `09123000` · zemný plyn other
-- Structure: **98.09** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **8166653.215** · median **15649706.43** · p75 **775774853.215**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Žilinský samosprávny kraj — ZEMNÝ PLYN — value 1535900000.0
-  - Žilinský samosprávny kraj — ZEMNÝ PLYN — value 15649706.43
-  - Národný ústav tuberkulózy, pľúcnych chorôb a hrudníkovej chirurgie Vyšné Hágy — Zemný plyn — value 683600.0
-
-### 133. ITA · `66512000` · procedura aperta ai sensi dell art <n> del d lgs <n> <n> per l affidamento di una copertura assicurativa finalizzata alla pre stazione del servizio di assistenza sanitaria integrat
-- Structure: **98.09** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **510000000.0** · median **510000000.0** · p75 **510000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - EMAPI — PROCEDURA APERTA AI SENSI DELL’ART. 71 DEL D.LGS. 36/2023 PER L’AFFIDAMENTO DI UNA COPERTURA ASSICURATIVA FINALIZZATA ALLA PRE-STAZIONE DEL SERVIZIO DI ASSISTENZA SANITARIA INTEGRATIVA (ASI), IN FORMA DI CONVENZIONE, A FAVORE DEGLI ISCRITTI AGLI ENTI PREVIDENZIALI ASSOCIATI A EMAPI — value 510000000.0
-  - EMAPI - Ente di Mutua Assistenza per i Professionisti Italiani — PROCEDURA APERTA AI SENSI DELL’ART. 71 DEL D.LGS. 36/2023 PER L’AFFIDAMENTO DI UNA COPERTURA ASSICURATIVA FINALIZZATA ALLA PRE-STAZIONE DEL SERVIZIO DI ASSISTENZA SANITARIA INTEGRATIVA (ASI), IN FORMA DI CONVENZIONE, A FAVORE DEGLI ISCRITTI AGLI ENTI PREVIDENZIALI ASSOCIATI A EMAPI — value 510000000.0
-  - EMAPI - Ente di Mutua Assistenza per i Professionisti Italiani — PROCEDURA APERTA AI SENSI DELL’ART. 71 DEL D.LGS. 36/2023 PER L’AFFIDAMENTO DI UNA COPERTURA ASSICURATIVA FINALIZZATA ALLA PRE-STAZIONE DEL SERVIZIO DI ASSISTENZA SANITARIA INTEGRATIVA (ASI), IN FORMA DI CONVENZIONE, A FAVORE DEGLI ISCRITTI AGLI ENTI PREVIDENZIALI ASSOCIATI A EMAPI — value 510000000.0
-
-### 134. SWE · `15000000` · livsmedel huvudgrossist other
-- Structure: **98.05** · records **8** · buyers **8** · repeat buyers **0**
-- Route `UNKNOWN` · currency `SEK` · p25 **40000000.0** · median **145000000.0** · p75 **362500000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 125. SWE · `15000000` · livsmedel huvudgrossist other
+- Structure: **95.73** · records **8** · buyers **8** · repeat buyers **0**
+- Route `UNKNOWN` · currency `SEK` · p25 **24417439.0** · median **145000000.0** · p75 **362500000.0**
+- Median bidders **2.0** · suppliers **3** · top supplier share **57.1%** · shape `RECURRING_NICHE`
 - Historical examples:
   - Västerviks kommun — Livsmedel huvudgrossist — value 700000000.0
   - Helsingborgs stad — Livsmedel Huvudgrossist — value 400000000.0
   - Botkyrka kommun — Livsmedel (HuvudGrossist) — value 350000000.0
 
-### 135. ITA · `85311000` · gara aperta other
-- Structure: **98.05** · records **4** · buyers **2** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **50483880.0** · median **64544227.5** · p75 **106282068.75**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 126. ITA · `85311000` · gara europea a procedura aperta per la conclusione di un accordo quadro per l affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità recettiva massima
+- Structure: **95.73** · records **6** · buyers **3** · repeat buyers **2**
+- Route `UNKNOWN` · currency `EUR` · p25 **16293600.0** · median **51393825.0** · p75 **67884525.0**
+- Median bidders **3.0** · suppliers **4** · top supplier share **37.5%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - PREFETTURA DI PADOVA — gara aperta — value 189314550.0
-  - PREFETTURA DI PADOVA — gara aperta — value 78604575.0
-  - PREFETTURA UTG DI TRIESTE — gara aperta — value 50483880.0
+  - Prefettura di Genova - Ufficio Territoriale del Governo — Gara europea a procedura aperta per la conclusione di un accordo quadro per l’affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità recettiva massima di 50 posti — value 150463950.0
+  - PREFETTURA DI BRESCIA — Gara europea a procedura aperta per la conclusione di un accordo quadro per l’affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità recettiva massima di 50 posti — value 73381425.0
+  - PREFETTURA DI BRESCIA — Gara europea a procedura aperta per la conclusione di un accordo quadro per l’affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità recettiva massima di 50 posti — value 51393825.0
 
-### 136. ITA · `64212000` · gara a procedura aperta ai sensi del d lgs <n> <n> e s m i per l affidamento dei servizi di telefonia mobile ed <n> per le pubbliche amministrazioni ai sensi dell art <n> legge n <
-- Structure: **98.05** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **317525499.47** · median **335050998.94** · p75 **335050998.94**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 127. PL · `66113000` · udzielenie i obs uga kredytu d ugoterminowego other
+- Structure: **95.67** · records **4** · buyers **4** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **2480102.42** · median **2480102.42** · p75 **2480102.42**
+- Median bidders **3.5** · suppliers **2** · top supplier share **50.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Consip S.p.A. — Gara a procedura aperta ai sensi del D.Lgs. 36/2023 e s.m.i., per l’affidamento dei servizi di Telefonia Mobile (Ed. 10) per le pubbliche amministrazioni ai sensi dell’art. 26 legge n. 488/1999 e s.m.i. e dell’art. 58 legge n. 388/2000 – ID 2780 — value 335050998.94
-  - Consip S.p.A. — Gara a procedura aperta ai sensi del D.Lgs. 36/2023 e s.m.i., per l’affidamento dei servizi di Telefonia Mobile (Ed. 10) per le pubbliche amministrazioni ai sensi dell’art. 26 legge n. 488/1999 e s.m.i. e dell’art. 58 legge n. 388/2000 – ID 2780 — value 335050998.94
-  - CONSIP S.p.A. — Gara a procedura aperta ai sensi del D.Lgs. 36/2023 e s.m.i., per l’affidamento dei servizi di Telefonia Mobile (Ed. 10) per le pubbliche amministrazioni ai sensi dell’art. 26 legge n. 488/1999 e s.m.i. e dell’art. 58 legge n. 388/2000 – ID 2780 — value 300000000.0
+  - Powiat Namysłowski — Udzielenie i obsługa kredytu długoterminowego — value 2480102.42
+  - Gmina Trąbki Wielkie — Udzielenie i obsługa kredytu długoterminowego — value UNKNOWN
+  - Gmina Pierzchnica — Udzielenie i obsługa kredytu długoterminowego — value UNKNOWN
 
-### 137. ITA · `72500000` · procedura aperta telematica ex art <n> d lgs n <n> <n> per l acquisizione di servizi di gestione delle infrastrutture it e sicurezza informatica della regione del veneto giunta reg
-- Structure: **98.04** · records **5** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **45164256.0** · median **45164256.0** · p75 **45340583.14**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+### 128. SWE · `92610000` · drift av simhall other
+- Structure: **95.64** · records **4** · buyers **2** · repeat buyers **2**
+- Route `UNKNOWN` · currency `SEK` · p25 **67500000.25** · median **295000000.0** · p75 **500000000.0**
+- Median bidders **2.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - AREA - AREA RISORSE FINANZIARIE, STRUMENTALI, ICT ED ENTI LOCALI - DIREZIONE - ICT, AGENDA DIGITALE E SOS AFFIDAMENTO SERVIZI E FORNITURE ICT — Procedura aperta telematica, ex art. 71 D.lgs. n. 36/2023, per l'acquisizione di servizi di gestione delle infrastrutture IT e sicurezza informatica della Regione del Veneto - Giunta regionale. — value 45340583.14
-  - AREA - AREA RISORSE FINANZIARIE, STRUMENTALI, ICT ED ENTI LOCALI - DIREZIONE - ICT, AGENDA DIGITALE E SOS AFFIDAMENTO SERVIZI E FORNITURE ICT — Procedura aperta telematica, ex art. 71 D.lgs. n. 36/2023, per l'acquisizione di servizi di gestione delle infrastrutture IT e sicurezza informatica della Regione del Veneto - Giunta regionale. — value 45340583.14
-  - AREA - AREA RISORSE FINANZIARIE, STRUMENTALI, ICT ED ENTI LOCALI - DIREZIONE - ICT, AGENDA DIGITALE E SOS AFFIDAMENTO SERVIZI E FORNITURE ICT — Procedura aperta telematica, ex art. 71 D.lgs. n. 36/2023, per l'acquisizione di servizi di gestione delle infrastrutture IT e sicurezza informatica della Regione del Veneto - Giunta regionale. — value 45164256.0
+  - Sollentuna kommun — Drift av simhall — value 500000000.0
+  - Sollentuna kommun — Drift av simhall — value 500000000.0
+  - Upplands Väsby kommun — Drift av simhall — value 90000000.0
 
-### 138. ESP · `33184100` · suministro contr <n> <n> other
-- Structure: **98.03** · records **7** · buyers **5** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **3496238.955** · median **8784325.2** · p75 **12721268.9**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+### 129. United Kingdom · `NO_CODE` · cph <n> adult integrated drug and alcohol treatment and recovery service other
+- Structure: **95.63** · records **9** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `GBP` · p25 **54600229.09** · median **54767029.09** · p75 **57458100.08**
+- Median bidders **2.0** · suppliers **1** · top supplier share **100.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO VIRGEN DE LAS NIEVES — Suministro CONTR 2021 0001230260 — value 15723636.79
-  - Servicio Andaluz de Salud. Hospital Universitario de Jaén — Suministro (CONTR 2025 0000354386) — value 13306301.8
-  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO VIRGEN DE LAS NIEVES — Suministro (CONTR 2023 0000464986) — value 12136236.0
+  - Derbyshire County Council — CPH083 Provision of Adult Integrated Drug and Alcohol Treatment and Recovery Service — value 58049391.2
+  - Derbyshire County Council — CPH083 Provision of Adult Integrated Drug and Alcohol Treatment and Recovery Service — value 57943377.6
+  - Derbyshire County Council — CPH083 Provision of Adult Integrated Drug and Alcohol Treatment and Recovery Service — value 57458100.08
 
-### 139. PRT · `90513600` · aquisição de serviços de recolha transporte e armazenamento valorização de lamas other
-- Structure: **98.03** · records **5** · buyers **3** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **3402000.0** · median **4266000.0** · p75 **12702000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `REPEAT_BUYER_NICHE`
+### 130. Canada · `NO_CODE` · air charter services rotary wing background water survey of canada wsc of environment and climate change canada eccc collects water quantity data as the equipment that collects the
+- Structure: **95.61** · records **6** · buyers **3** · repeat buyers **1**
+- Route `OPEN_PUBLIC` · currency `CAD` · p25 **283500.0** · median **283500.0** · p75 **283500.0**
+- Median bidders **UNKNOWN** · suppliers **1** · top supplier share **100.0%** · shape `REPEAT_BUYER_NICHE`
 - Historical examples:
-  - Águas do Algarve, SA — Aquisição de serviços de recolha, transporte e armazenamento/valorização de lamas — value 15138000.0
-  - Águas do Algarve, S. A. — Aquisição de serviços de recolha, transporte e armazenamento/valorização de lamas — value 12702000.0
-  - Águas do Algarve, S.A. — Aquisição de serviços de recolha, transporte e armazenamento/valorização de lamas — value 4266000.0
+  - Environment and Climate Change Canada — Air charter Services – Rotary Wing — value 283500.0
+  - Department of the Environment (ECCC ) — Air charter Services – Rotary Wing — value UNKNOWN
+  - Environment Climate Change Canada — Air Charter Services - Rotary Wing — value UNKNOWN
 
-### 140. POL · `77200000` · wykonywanie us ug z zakresu gospodarki le nej na terenie nadle nictwa lipinki w roku <n> other
-- Structure: **98.02** · records **4** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `PLN` · p25 **27331965.0975** · median **28694667.9** · p75 **30768915.6675**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+### 131. FIN · `33700000` · inkontinenssituotteet seniorisäätiölle other
+- Structure: **95.6** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **1600000.0** · median **1600000.0** · p75 **1600000.0**
+- Median bidders **0.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
 - Historical examples:
-  - Skarb Państwa - Państwowe Gospodarstwo Leśne Lasy Państwowe Nadleśnictwo Torzym — Wykonywanie usług z zakresu gospodarki leśnej na terenie Nadleśnictwa Lipinki w roku 2024 — value 32903599.44
-  - Państwowe Gospodarstwo Leśne Lasy Państwowe Nadleśnictwo Lipinki — Wykonywanie usług z zakresu gospodarki leśnej na terenie Nadleśnictwa Lipinki w roku 2025 — value 30057354.41
-  - Państwowe Gospodarstwo Leśne Lasy Państwowe Nadleśnictwo Lipinki — Wykonywanie usług z zakresu gospodarki leśnej na terenie Nadleśnictwa Lipinki w roku 2026 — value 27331981.39
+  - Helsingin seniorisäätiö sr — Inkontinenssituotteet Seniorisäätiölle — value 1600000.0
+  - Helsingin Seniorisäätiö sr — Inkontinenssituotteet Seniorisäätiölle — value UNKNOWN
+  - Helsingin Seniorisäätiö sr — Inkontinenssituotteet Seniorisäätiölle — value UNKNOWN
+
+### 132. POL · `90000000` · odbiór i zagospodarowanie odpadów na terenie miasta zakopane other
+- Structure: **95.58** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **19653833.165** · median **20979621.2** · p75 **22276762.75**
+- Median bidders **1.0** · suppliers **3** · top supplier share **33.3%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Gmina Miasto Zakopane - Urząd Miasta Zakopane — ODBIÓR I ZAGOSPODAROWANIE ODPADÓW NA TERENIE MIASTA ZAKOPANE — value 23573904.3
+  - Gmina Miasto Zakopane - Urząd Miasta Zakopane — ODBIÓR I ZAGOSPODAROWANIE ODPADÓW NA TERENIE MIASTA ZAKOPANE — value 20979621.2
+  - Gmina Miasto Zakopane — ODBIÓR I ZAGOSPODAROWANIE ODPADÓW NA TERENIE MIASTA ZAKOPANE — value 18328045.13
+
+### 133. PL · `09300000` · dostawa energii elektrycznej other
+- Structure: **95.57** · records **5** · buyers **5** · repeat buyers **0**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **3138735.44** · median **3138735.44** · p75 **3138735.44**
+- Median bidders **4.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Gmina Skawina - Urząd Miasta i Gminy w Skawinie — Dostawa energii elektrycznej — value 3138735.44
+  - 20 Wojskowy Szpital Uzdrowiskowo-Rehabilitacyjny SPZOZ w Krynicy-ZdrojuSP ZOZ w Krynicy-Zdroju — Dostawa energii elektrycznej — value UNKNOWN
+  - Rejonowy Zarząd Infrastruktury Bydgoszcz — dostawa energii elektrycznej — value UNKNOWN
+
+### 134. ITA · `90000000` · gara sua <n> <n> other
+- Structure: **95.56** · records **4** · buyers **3** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **4906390.9625** · median **9596079.095** · p75 **13435928.38**
+- Median bidders **8.0** · suppliers **3** · top supplier share **50.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - PROVINCIA DI FROSINONE — GARA SUA 40/2023 — value 14413377.88
+  - provincia di frosinone — GARA SUA 168/2023 — value 13110111.88
+  - comune di ponza — GARA SUA 170/2023 - — value 6082046.31
+
+### 135. PRT · `31600000` · fornecimento de peças e materiais necessários à manutenção dos equipamentos da central térmica da vitória naves ii e iii e da central térmica do porto santo e prestação de serviços
+- Structure: **95.56** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **4696174.05** · median **4850348.1** · p75 **4866172.279999999**
+- Median bidders **1.0** · suppliers **1** · top supplier share **100.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - EEM - Empresa de Electricidade da Madeira, S.A. — Fornecimento de Peças e Materiais Necessários à Manutenção dos Equipamentos da Central Térmica da Vitória (Naves II e III) e da Central Térmica do Porto Santo e Prestação de Serviços de Manutenção — value 4881996.46
+  - EEM - Empresa de Electricidade da Madeira, S.A. — Fornecimento de Peças e Materiais Necessários à Manutenção dos Equipamentos da Central Térmica da Vitória (Naves II e III) e da Central Térmica do Porto Santo e Prestação de Serviços de Manutenção — value 4850348.1
+  - EEM - Empresa de Electricidade da Madeira, S. A. — Fornecimento de peças e materiais necessários à manutenção dos equipamentos da Central Térmica da Vitória (Naves II e III) e da Central Térmica do Porto Santo e prestação de serviços de manutenção — value 4542000.0
+
+### 136. SWE · `15000000` · livsmedel grossist other
+- Structure: **95.51** · records **11** · buyers **11** · repeat buyers **0**
+- Route `UNKNOWN` · currency `SEK` · p25 **82000000.0** · median **102000000.0** · p75 **365000000.0**
+- Median bidders **2.0** · suppliers **3** · top supplier share **50.0%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - Inköps- och upphandlingsförvaltningen — Livsmedel- Grossist — value 2200000000.0
+  - Serviceförvaltningen — Livsmedel - Grossist — value 2155600000.0
+  - Kalmar kommun — Livsmedel grossist — value 430000000.0
+
+### 137. NOR · `60120000` · taxi services other
+- Structure: **95.49** · records **12** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `UNKNOWN` · p25 **52000000.0** · median **52000000.0** · p75 **52000000.0**
+- Median bidders **UNKNOWN** · suppliers **1** · top supplier share **100.0%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - Politiets fellestjenester — Taxi services — value 52000000.0
+  - Politiets fellestjenester — Taxi services — value 52000000.0
+  - Politiets fellestjenester — Taxi services — value 52000000.0
+
+### 138. ITA · `33190000` · <n> pre <n> prodotti per la terapia del dolore other
+- Structure: **95.37** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **10345347.06** · median **19825623.12** · p75 **20043873.12**
+- Median bidders **1.0** · suppliers **8** · top supplier share **35.7%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Azienda Regionale di Coordinamento per la Salute (ARCS) — 24PRE006 - PRODOTTI PER LA TERAPIA DEL DOLORE — value 20262123.12
+  - Azienda Regionale di Coordinamento per la Salute (ARCS) — 24PRE006 - PRODOTTI PER LA TERAPIA DEL DOLORE — value 19825623.12
+  - ARCS — 24PRE006 - PRODOTTI PER LA TERAPIA DEL DOLORE — value 865071.0
+
+### 139. CZE · `09310000` · nákup sdru ených slu eb dodávek elektrické energie v hladin nízkého nap tí a vysokého nap tí resortu na rok <n> other
+- Structure: **95.33** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `CZK` · p25 **82338513.75** · median **83081428.0** · p75 **98362720.0**
+- Median bidders **1.0** · suppliers **2** · top supplier share **60.0%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Moravská galerie v Brně — Nákup sdružených služeb dodávek elektrické energie v hladině nízkého napětí a vysokého napětí resortu na rok 2025 — value 113644012.0
+  - Uměleckoprůmyslové museum v Praze — Nákup sdružených služeb dodávek elektrické energie v hladině nízkého napětí a vysokého napětí resortu na rok 2027 — value 83081428.0
+  - Uměleckoprůmyslové museum v Praze — Nákup sdružených služeb dodávek elektrické energie v hladině nízkého napětí a vysokého napětí resortu na rok 2026 — value 81595599.5
+
+### 140. HUN · `34600000` · vasúti járm alkatrészek beszerzése other
+- Structure: **95.29** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `HUF` · p25 **7151193097.0** · median **10921575700.0** · p75 **33104557876.0**
+- Median bidders **1.0** · suppliers **3** · top supplier share **44.4%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - MÁV-START Vasúti Személyszállító Zrt. — Vasúti járműalkatrészek beszerzése — value 55287540052.0
+  - MÁV-START Vasúti Személyszállító Zrt. — Vasúti járműalkatrészek beszerzése — value 10921575700.0
+  - MÁV Személyszállítási Zártkörűen Működő Részvénytársaság — Vasúti járműalkatrészek beszerzése — value 3380810494.0
 
 ## AUSTENDER AWARD-FIRST — 35 reviewable cohorts
 
