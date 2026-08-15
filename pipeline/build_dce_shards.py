@@ -10,6 +10,7 @@ from collections import Counter
 from pathlib import Path
 
 from build_matrix import BROWSER_PORTALS, SUPPORTED, load_lines
+from global_admission import dynamic_tender_parallel
 
 MATRIX_JOB_LIMIT = 256
 RUNNER_PARALLEL_LIMIT = 20
@@ -121,7 +122,9 @@ def main():
     args = ap.parse_args()
 
     max_shards = max(1, min(MATRIX_JOB_LIMIT, args.max_shards))
-    max_parallel = max(1, min(RUNNER_PARALLEL_LIMIT, args.max_parallel))
+    requested_parallel = max(0, min(RUNNER_PARALLEL_LIMIT, args.max_parallel))
+    admitted_parallel, admission = dynamic_tender_parallel(requested_parallel)
+    max_parallel = max(0, min(RUNNER_PARALLEL_LIMIT, admitted_parallel))
     max_jobs = max(1, args.max_jobs)
     target_waves = max(1, args.target_waves)
     browser_cap = max(1, args.browser_max_jobs_per_shard)
@@ -159,6 +162,33 @@ def main():
         portal_counts[portal] += 1
         if len(jobs) >= max_jobs:
             break
+
+    # Zero admission is a deliberate defer, not a failure: preserve the durable
+    # source selection and let the next controller cycle retry after capacity frees.
+    if jobs and max_parallel <= 0:
+        payload = {"include": []}
+        Path(args.out).write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        Path("dce_shards_skipped.json").write_text(json.dumps(skipped, indent=2), encoding="utf-8")
+        plan = {
+            "candidate_count": 0,
+            "deferred_candidate_count": len(jobs),
+            "shard_count": 0,
+            "max_parallel": 0,
+            "requested_parallel": requested_parallel,
+            "admission": admission,
+            "sizing_mode": "deferred_global_admission",
+            "matrix": payload,
+        }
+        Path("dce_plan.json").write_text(json.dumps(plan, indent=2), encoding="utf-8")
+        gh = os.getenv("GITHUB_OUTPUT")
+        if gh:
+            with open(gh, "a", encoding="utf-8") as f:
+                f.write("matrix=" + json.dumps(payload, separators=(",", ":")) + "\n")
+                f.write("count=0\n")
+                f.write("shard_count=0\n")
+                f.write("max_parallel=0\n")
+        print(json.dumps(plan, indent=2))
+        return
 
     browser_jobs = [j for j in jobs if j["needs_browser"]]
     http_jobs = [j for j in jobs if not j["needs_browser"]]
@@ -214,6 +244,8 @@ def main():
         "candidate_count": len(jobs),
         "shard_count": len(include),
         "max_parallel": min(max_parallel, max(1, len(include))) if include else 0,
+        "requested_parallel": requested_parallel,
+        "admission": admission,
         "max_shards": max_shards,
         "matrix_job_limit": MATRIX_JOB_LIMIT,
         "sizing_mode": sizing_mode,
