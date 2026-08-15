@@ -77,8 +77,8 @@ def main():
     """).fetchall()
     write(out/'market_matrix.csv',['family','country','currency','records','buyers','p25_value','median_value','p75_value','repeat_buyers','suppliers','linked_weight','top_supplier_share'],matrix)
     winners=con.execute("""
-      SELECT market_family,country,currency,sname,n,n/nullif(sum(n) over(partition by market_family,country,currency),0) supplier_share
-      FROM ss0 QUALIFY row_number() over(partition by market_family,country,currency order by n desc,sname)<=10
+      SELECT market_family,country,currency,supplier,n,n/nullif(sum(n) over(partition by market_family,country,currency),0) supplier_share
+      FROM ss0 QUALIFY row_number() over(partition by market_family,country,currency order by n desc,supplier)<=10
       ORDER BY market_family,country,currency,n DESC
     """).fetchall(); write(out/'top_winners.csv',['family','country','currency','supplier','weighted_awards','supplier_share'],winners)
     buyers=con.execute("""
