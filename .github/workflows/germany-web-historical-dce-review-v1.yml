@@ -62,7 +62,8 @@ jobs:
             elif re.search(r'(relaunch|neugestaltung|entwicklung|redesign)',tl): niche='DE · Website relaunch / development'
             else: niche='DE · Website maintenance / support'
             url='https://oeffentlichevergabe.de/ui/de/search/details?noticeId='+str(nid).strip()
-            chosen.append({'candidate_id':'de-hist:'+hashlib.sha256(str(tid).encode()).hexdigest()[:18],'historical':True,'historical_sub_niche':niche,'source':'Germany','portal':'DE_DOE','country':'GERMANY','buyer':buyer or '', 'title':title or '', 'publication_date':pub.isoformat() if pub else '', 'official_notice_id':str(nid),'primary_source_url':url,'notice_url':url,'route':{'detail_url':url},'final_verdict_allowed':False})
+            pub_s = pub.isoformat() if hasattr(pub,'isoformat') else str(pub or '')
+            chosen.append({'candidate_id':'de-hist:'+hashlib.sha256(str(tid).encode()).hexdigest()[:18],'historical':True,'historical_sub_niche':niche,'source':'Germany','portal':'DE_DOE','country':'GERMANY','buyer':buyer or '', 'title':title or '', 'publication_date':pub_s, 'official_notice_id':str(nid),'primary_source_url':url,'notice_url':url,'route':{'detail_url':url},'final_verdict_allowed':False})
             if len(chosen)>=9: break
           assert len(chosen)>=6,len(chosen)
           with open('source/germany_queue.jsonl','w',encoding='utf-8') as f:
