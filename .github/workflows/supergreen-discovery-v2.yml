@@ -84,13 +84,14 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check -q requests
-      - name: Enumerate independent Contracts Finder time window
+      - name: Enumerate recent Contracts Finder window only
         env:
           DISCOVERY_OUT: discovery/contracts_finder/shard-${{ matrix.shard }}
           CF_WINDOW_INDEX: ${{ matrix.shard }}
           CF_WINDOW_TOTAL: '8'
-          LOOKBACK_DAYS: '365'
+          LOOKBACK_DAYS: '30'
           CF_REQUEST_RETRIES: '4'
+          CF_403_COOLDOWN_SECONDS: '300'
         run: python pipeline/discover_contracts_finder.py
       - name: Persist Contracts Finder shard durably
         env:
