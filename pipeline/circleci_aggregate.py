@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import concurrent.futures
 import io
 import json
 import os
@@ -19,6 +20,7 @@ REPO = os.environ.get("CIRCLE_PROJECT_USERNAME", "") + "/" + os.environ.get("CIR
 HEADERS = {"Authorization": f"Bearer {TOKEN}", "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
 SOURCE_RUN = "circle-" + os.environ.get("CIRCLE_WORKFLOW_ID", "unknown")
 TAG = "discovery-harvest-" + SOURCE_RUN
+DOWNLOAD_WORKERS = max(1, min(16, int(os.environ.get("CIRCLE_AGG_DOWNLOAD_WORKERS", "8"))))
 
 
 def rel():
@@ -34,7 +36,7 @@ def upload(name: str, data: bytes, ctype="application/octet-stream"):
             requests.delete(f"{GH}/repos/{REPO}/releases/assets/{a['id']}", headers=HEADERS, timeout=30).raise_for_status()
     h = dict(HEADERS)
     h["Content-Type"] = ctype
-    r = requests.post(release["upload_url"].split("{")[0], headers=h, params={"name": name}, data=data, timeout=120)
+    r = requests.post(release["upload_url"].split("{")[0], headers=h, params={"name": name}, data=data, timeout=180)
     if r.status_code != 201:
         raise RuntimeError(f"upload {name}: {r.status_code} {r.text[:500]}")
 
@@ -64,16 +66,28 @@ def dispatch(selection_path: str, count: int):
         "inputs": {
             "selection_path": selection_path,
             "source_discovery_run": SOURCE_RUN,
-            "max_jobs": str(count),
+            "max_jobs": str(min(count, 320)),
             "max_parallel": "20",
             "max_shards": "256",
-            "jobs_per_shard": "2",
+            "jobs_per_shard": "adaptive",
         },
     }
     r = requests.post(f"{GH}/repos/{REPO}/actions/workflows/dce-fanout-v2.yml/dispatches", headers=HEADERS, json=payload, timeout=30)
     if r.status_code != 204:
         raise RuntimeError(f"DCE dispatch: {r.status_code} {r.text[:700]}")
     return {"dispatched": True, "max_parallel": 20}
+
+
+def download_asset(asset: dict, root: Path) -> tuple[str, int]:
+    h = dict(HEADERS)
+    h["Accept"] = "application/octet-stream"
+    b = requests.get(asset["url"], headers=h, timeout=180)
+    b.raise_for_status()
+    dest = root / asset["name"].removesuffix(".tar.gz")
+    dest.mkdir(parents=True, exist_ok=True)
+    with tarfile.open(fileobj=io.BytesIO(b.content), mode="r:gz") as tf:
+        tf.extractall(dest, filter="data")
+    return asset["name"], len(b.content)
 
 
 def main():
@@ -86,26 +100,29 @@ def main():
     with tempfile.TemporaryDirectory() as td:
         root = Path(td) / "input"
         root.mkdir()
-        for a in assets:
-            h = dict(HEADERS)
-            h["Accept"] = "application/octet-stream"
-            b = requests.get(a["url"], headers=h, timeout=120)
-            b.raise_for_status()
-            dest = root / a["name"].removesuffix(".tar.gz")
-            dest.mkdir()
-            with tarfile.open(fileobj=io.BytesIO(b.content), mode="r:gz") as tf:
-                tf.extractall(dest, filter="data")
+        downloads = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(DOWNLOAD_WORKERS, len(assets))) as pool:
+            futures = [pool.submit(download_asset, a, root) for a in assets]
+            for fut in concurrent.futures.as_completed(futures):
+                downloads.append(fut.result())
+
         merged = Path(td) / "merged"
         subprocess.run(["python", "pipeline/merge_discovery.py", "--root", str(root), "--out", str(merged)], check=True)
         packets = Path(td) / "wide_read_packets"
         subprocess.run(["python", "pipeline/wide_read_packets.py", "--input", str(merged / "current_candidates.jsonl"), "--out", str(packets), "--packet-size", "250"], check=True)
         buf = io.BytesIO()
-        with tarfile.open(fileobj=buf, mode="w:gz") as tf:
+        with tarfile.open(fileobj=buf, mode="w:gz", compresslevel=5) as tf:
             tf.add(merged, arcname="merged")
             tf.add(packets, arcname="wide_read_packets")
         upload(f"supergreen-wide-read-{SOURCE_RUN}.tar.gz", buf.getvalue(), "application/gzip")
         summary = json.loads((merged / "stats.json").read_text())
-        summary.update({"provider": "circleci", "source_run": SOURCE_RUN, "shard_assets": len(assets)})
+        summary.update({
+            "provider": "circleci",
+            "source_run": SOURCE_RUN,
+            "shard_assets": len(assets),
+            "aggregate_download_workers": DOWNLOAD_WORKERS,
+            "downloaded_bytes": sum(size for _, size in downloads),
+        })
         upload(f"discovery-summary-{SOURCE_RUN}.json", json.dumps(summary, indent=2).encode(), "application/json")
         rows = list(load_jsonl(merged / "current_candidates.jsonl"))
         for r in rows:
