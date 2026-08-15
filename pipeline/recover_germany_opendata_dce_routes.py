@@ -26,7 +26,7 @@ BAD_HOSTS = {
 
 
 def norm_url(raw: str) -> str:
-    u=(raw or '').strip().strip('.,;:)\]}>')
+    u=(raw or '').strip().rstrip('.,;:)]}>')
     return u.replace('&amp;','&')
 
 
@@ -63,12 +63,10 @@ def iter_zip_members(blob: bytes, prefix=''):
 
 def extract_urls(name: str, data: bytes) -> list[dict]:
     out={}
-    # Raw extraction survives malformed namespaces/HTML entities.
     text=data.decode('utf-8',errors='replace')
     for m in re.finditer(r'https?://[^\s<>\"\']+',text,re.I):
         u=norm_url(m.group(0)); ctx=text[max(0,m.start()-220):m.end()+220]
         if u: out[u]=max(out.get(u,-999),score_url(u,ctx))
-    # XML-path context gives better scoring for eForms URI fields.
     try:
         root=ET.fromstring(data)
         for elem in root.iter():
@@ -107,7 +105,7 @@ def main():
             nid=str(c.get('official_notice_id') or '').strip(); nidb=nid.casefold().encode()
             matches=[]
             for name,data in members:
-                if nidb in data.casefold(): matches.append((name,data))
+                if nidb in data.lower(): matches.append((name,data))
             urls=[]
             for name,data in matches:
                 safe=re.sub(r'[^A-Za-z0-9._-]+','_',str(c.get('candidate_id') or 'candidate'))[:90]
@@ -115,14 +113,12 @@ def main():
                 target=out/'matched'/f'{safe}__{len(urls)}{ext}'
                 if not target.exists(): target.write_bytes(data)
                 urls.extend(extract_urls(name,data))
-            # Deduplicate URL candidates keeping best score.
             best={}
             for x in urls:
                 u=x['url']; prev=best.get(u)
                 if prev is None or x['score']>prev['score']: best[u]=x
             ranked=sorted(best.values(),key=lambda x:(-x['score'],x['url']))
             results.append({'candidate':c,'matched':bool(matches),'matched_members':[n for n,_ in matches],'urls':ranked[:60]})
-    # Build resolver queue: only positive-scoring external URLs become document/page hints.
     resolver=[]
     for res in results:
         c=dict(res['candidate']); ranked=[x for x in res['urls'] if x['score']>0]
