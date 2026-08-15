@@ -61,7 +61,7 @@ jobs:
         run: |
           set -euo pipefail
           source_tag="discovery-harvest-${SOURCE_RUN}"
-          mkdir -p source-release source-discovery generated
+          mkdir -p source-release source-discovery generated queue-transport
           repaired="supergreen-wide-read-${SOURCE_RUN}-repaired.tar.gz"
           normal="supergreen-wide-read-${SOURCE_RUN}.tar.gz"
           assets="$(gh release view "$source_tag" --json assets --jq '.assets[].name')"
@@ -85,6 +85,7 @@ jobs:
           cp generated/dce_candidates.jsonl "$queue_asset"
           cp generated/dce_candidates.jsonl.summary.json "${queue_asset}.summary.json"
           cp "$SELECTION_PATH" "dce-selection-${GITHUB_RUN_ID}.jsonl"
+          cp "$queue_asset" queue-transport/
           echo "queue_asset=$queue_asset" >> "$GITHUB_OUTPUT"
       - id: matrix
         name: Compile adaptive browser/HTTP shard queue
@@ -125,7 +126,7 @@ jobs:
           gh release create "$tag" \
             --target "$GITHUB_SHA" \
             --title "DCE Harvest ${GITHUB_RUN_ID}" \
-            --notes "Canonical durable DCE harvest. DOWNLOADED_PUBLIC is transport success only; evidence_quality.json determines whether retrieved material is authoritative enough for gate review. Original public procurement files and extracted evidence are persisted as Release assets."
+            --notes "Canonical durable DCE harvest. Worker transport uses short-lived Actions artifacts; only the aggregate job writes durable Release bundles. DOWNLOADED_PUBLIC is transport success only; evidence_quality.json determines whether retrieved material is authoritative enough for gate review."
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
       - name: Persist exact materialized queue and provenance durably
         if: steps.matrix.outputs.count != '0'
@@ -140,10 +141,15 @@ jobs:
             "$QUEUE_ASSET" \
             "${QUEUE_ASSET}.summary.json" \
             "dce-selection-${GITHUB_RUN_ID}.jsonl" --clobber
-          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' > /tmp/assets.txt
-          grep -Fxq "$QUEUE_ASSET" /tmp/assets.txt
-          grep -Fxq "${QUEUE_ASSET}.summary.json" /tmp/assets.txt
-          grep -Fxq "dce-selection-${GITHUB_RUN_ID}.jsonl" /tmp/assets.txt
+      - name: Publish exact queue for worker transport
+        if: steps.matrix.outputs.count != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dce-queue-${{ github.run_id }}
+          path: queue-transport/
+          retention-days: 1
+          if-no-files-found: error
+          compression-level: 0
       - name: Publish plan to job summary
         run: |
           cat dce_plan.json
@@ -166,16 +172,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Recover exact durable candidate queue
+      - name: Recover exact candidate queue from short-lived workflow transport
+        uses: actions/download-artifact@v4
+        with:
+          name: dce-queue-${{ github.run_id }}
+          path: generated
+      - name: Normalize worker queue path
         env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
           QUEUE_ASSET: ${{ needs.prepare.outputs.queue_asset }}
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p generated
-          gh release download "$RELEASE_TAG" --pattern "$QUEUE_ASSET" --dir generated
+          test -s "generated/$QUEUE_ASSET"
           mv "generated/$QUEUE_ASSET" generated/dce_candidates.jsonl
       - name: Install only dependencies required by this shard
         shell: bash
@@ -223,7 +231,7 @@ jobs:
         env:
           DCE_GATE_WORKERS: '4'
         run: python pipeline/extract_gates.py --root out
-      - name: Build canonical durable packs and compact aggregate handoff
+      - name: Build canonical immutable packs and compact handoff
         shell: bash
         run: |
           set -euo pipefail
@@ -231,40 +239,39 @@ jobs:
           python pipeline/slim_dce_output.py --root out --out slim
           mv durable/canonical_index.json "canonical-index-shard-${{ matrix.shard }}.json"
           tar -C slim -czf "handoff-shard-${{ matrix.shard }}.tar.gz" .
-      - name: Persist shard data durably to GitHub Release
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
-        run: |
-          set -euo pipefail
-          assets=(durable/candidate-*.tar.gz "canonical-index-shard-${{ matrix.shard }}.json" "handoff-shard-${{ matrix.shard }}.tar.gz")
-          gh release upload "$RELEASE_TAG" "${assets[@]}" --clobber
-          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' > /tmp/release-assets.txt
-          for asset in "${assets[@]}"; do
-            name="$(basename "$asset")"
-            grep -Fxq "$name" /tmp/release-assets.txt || { echo "Durability verification failed for $name"; exit 1; }
-          done
-          echo "Verified durable release upload for shard ${{ matrix.shard }}"
+          mkdir -p shard-transport
+          cp durable/candidate-*.tar.gz shard-transport/
+          cp "canonical-index-shard-${{ matrix.shard }}.json" shard-transport/
+          cp "handoff-shard-${{ matrix.shard }}.tar.gz" shard-transport/
+      - name: Publish shard output as short-lived immutable transport
+        uses: actions/upload-artifact@v4
+        with:
+          name: dce-shard-${{ matrix.shard }}
+          path: shard-transport/
+          retention-days: 1
+          if-no-files-found: error
+          compression-level: 0
 
   aggregate:
     needs: [prepare, dce-shard]
     if: always() && needs.prepare.outputs.count != '0'
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Download compact shard handoffs from durable Release
+      - name: Recover every shard from short-lived workflow transport
+        uses: actions/download-artifact@v4
+        with:
+          pattern: dce-shard-*
+          path: shard-transport
+          merge-multiple: true
+      - name: Verify shard completeness and unpack compact handoffs
         shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
         run: |
           set -euo pipefail
-          mkdir -p release-handoff dce-artifacts
-          gh release download "$RELEASE_TAG" --pattern 'handoff-shard-*.tar.gz' --dir release-handoff
+          mkdir -p dce-artifacts
           count=0
-          for archive in release-handoff/handoff-shard-*.tar.gz; do
+          for archive in shard-transport/handoff-shard-*.tar.gz; do
             [ -e "$archive" ] || continue
             base="$(basename "$archive" .tar.gz)"
             mkdir -p "dce-artifacts/$base"
@@ -272,26 +279,47 @@ jobs:
             count=$((count + 1))
           done
           expected='${{ needs.prepare.outputs.shard_count }}'
+          echo "expected_shards=$expected recovered_shards=$count"
           if [ "$count" -ne "$expected" ]; then
             echo "Expected $expected shard handoffs, got $count"
             exit 1
           fi
       - name: Canonical aggregate and benchmark metrics
         run: python pipeline/aggregate_dce.py --root dce-artifacts --out dce-aggregate
-      - name: Persist consolidated deep-review pack durably
+      - name: Build bounded durable Release bundles
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-bundles
+          python pipeline/bundle_dce_release.py --root shard-transport --out release-bundles --max-bytes 1200000000
+          cp dce-aggregate/summary.json "dce-summary-${GITHUB_RUN_ID}.json"
+          tar -C dce-aggregate -czf "dce-deep-review-${GITHUB_RUN_ID}.tar.gz" .
+          indexes=(shard-transport/canonical-index-shard-*.json)
+          if [ -e "${indexes[0]}" ]; then
+            tar -cf "release-bundles/dce-shard-indexes-${GITHUB_RUN_ID}.tar" "${indexes[@]}"
+          fi
+      - name: Persist all DCE data through the single durable Release writer
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
         run: |
           set -euo pipefail
-          cp dce-aggregate/summary.json "dce-summary-${GITHUB_RUN_ID}.json"
-          tar -C dce-aggregate -czf "dce-deep-review-${GITHUB_RUN_ID}.tar.gz" .
-          gh release upload "$RELEASE_TAG" \
-            "dce-summary-${GITHUB_RUN_ID}.json" \
-            "dce-deep-review-${GITHUB_RUN_ID}.tar.gz" --clobber
+          assets=(release-bundles/* "dce-summary-${GITHUB_RUN_ID}.json" "dce-deep-review-${GITHUB_RUN_ID}.tar.gz")
+          for attempt in 1 2 3 4 5; do
+            if gh release upload "$RELEASE_TAG" "${assets[@]}" --clobber; then
+              break
+            fi
+            if [ "$attempt" -eq 5 ]; then
+              echo "Single-writer Release upload failed after bounded retries" >&2
+              exit 1
+            fi
+            sleep "$((attempt * attempt * 15))"
+          done
           gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' > /tmp/release-assets.txt
-          grep -Fxq "dce-summary-${GITHUB_RUN_ID}.json" /tmp/release-assets.txt
-          grep -Fxq "dce-deep-review-${GITHUB_RUN_ID}.tar.gz" /tmp/release-assets.txt
+          for asset in "${assets[@]}"; do
+            name="$(basename "$asset")"
+            grep -Fxq "$name" /tmp/release-assets.txt || { echo "Durability verification failed for $name"; exit 1; }
+          done
           echo "Durable canonical release: $RELEASE_TAG" >> "$GITHUB_STEP_SUMMARY"
           cat "dce-summary-${GITHUB_RUN_ID}.json" >> "$GITHUB_STEP_SUMMARY"
