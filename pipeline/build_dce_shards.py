@@ -22,6 +22,22 @@ def _norm(value: object) -> str:
     return re.sub(r"[^a-z0-9]+", " ", s).strip()
 
 
+def _requested_parallel_default() -> int:
+    # The autonomous controller computes the actually available global runner
+    # capacity and exports it as DCE_REQUESTED_MAX_PARALLEL. Prefer that live
+    # budget over the workflow's legacy DCE_MAX_PARALLEL fallback. A hard cap of
+    # RUNNER_PARALLEL_LIMIT is still enforced below.
+    for key in ("DCE_REQUESTED_MAX_PARALLEL", "DCE_MAX_PARALLEL"):
+        raw = os.getenv(key)
+        if not raw:
+            continue
+        try:
+            return int(raw)
+        except Exception:
+            continue
+    return RUNNER_PARALLEL_LIMIT
+
+
 def _identity_keys(rec: dict) -> tuple[str, tuple[str, str] | None]:
     cid = str(rec.get("candidate_id") or "").strip().casefold()
     title = _norm(rec.get("title"))
@@ -98,7 +114,7 @@ def main():
     ap.add_argument("--browser-max-jobs-per-shard", type=int, default=int(os.getenv("DCE_BROWSER_MAX_JOBS_PER_SHARD", str(DEFAULT_BROWSER_MAX_JOBS_PER_SHARD))))
     ap.add_argument("--http-max-jobs-per-shard", type=int, default=int(os.getenv("DCE_HTTP_MAX_JOBS_PER_SHARD", str(DEFAULT_HTTP_MAX_JOBS_PER_SHARD))))
     ap.add_argument("--max-jobs", type=int, default=int(os.getenv("MAX_DCE_JOBS", "320")))
-    ap.add_argument("--max-parallel", type=int, default=int(os.getenv("DCE_MAX_PARALLEL", str(RUNNER_PARALLEL_LIMIT))))
+    ap.add_argument("--max-parallel", type=int, default=_requested_parallel_default())
     ap.add_argument("--browser-local-concurrency", type=int, default=int(os.getenv("DCE_BROWSER_LOCAL_CONCURRENCY", "2")))
     ap.add_argument("--http-local-concurrency", type=int, default=int(os.getenv("DCE_HTTP_LOCAL_CONCURRENCY", "8")))
     ap.add_argument("--out", default="dce_shards.json")
