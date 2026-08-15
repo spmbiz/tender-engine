@@ -1,0 +1,12 @@
+
+window.onload = function () {
+  window.ui = SwaggerUIBundle({
+    url: "/documentation/api/opendata",
+    dom_id: '#swagger-ui',
+    deepLinking: true,
+    validatorUrl: null,
+    presets: [
+      SwaggerUIBundle.presets.apis
+    ]
+  });
+};
