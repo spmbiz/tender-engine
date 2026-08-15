@@ -14,7 +14,6 @@ controller state safe when the installation token is temporarily rate-limited:
 """
 
 import json
-import os
 import random
 import time
 from datetime import datetime, timezone
@@ -106,6 +105,14 @@ def _parse_updated_at(blob: bytes | None) -> float:
         return 0.0
 
 
+def _semantic_state(obj: dict) -> dict:
+    # updated_at is observability, not lease/progress state. Ignoring it prevents a
+    # five-minute controller tick from producing a Git commit when nothing changed.
+    out = dict(obj)
+    out.pop("updated_at", None)
+    return out
+
+
 def _read_checkpoint() -> bytes | None:
     try:
         if CHECKPOINT.is_file() and CHECKPOINT.stat().st_size > 0:
@@ -120,9 +127,15 @@ def _write_checkpoint(data: bytes) -> None:
         obj = json.loads(data.decode("utf-8"))
     except Exception:
         return
+    existing_blob = _read_checkpoint()
+    if existing_blob:
+        try:
+            existing = json.loads(existing_blob.decode("utf-8"))
+            if _semantic_state(existing) == _semantic_state(obj):
+                return
+        except Exception:
+            pass
     CHECKPOINT.parent.mkdir(parents=True, exist_ok=True)
-    # Keep the exact logical state. The workflow commits this file only when the
-    # semantic contents differ from main, so idle ticks do not create Git churn.
     CHECKPOINT.write_text(json.dumps(obj, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
@@ -212,9 +225,6 @@ def install(fc: Any) -> None:
             rel["assets"] = [a for a in rel.get("assets", []) if a.get("name") != name] + [new_asset]
             return new_asset
         except RateLimitDeferred:
-            # controller-state.json remains durable through the checked-out semantic
-            # checkpoint; status/history are best-effort observability and must not
-            # crash the harvesting organism during an API exhaustion event.
             print(json.dumps({
                 "github_state_transport": {
                     "asset": name,
