@@ -1,0 +1,114 @@
+name: QA SPM Hunt Sub-Niches v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qa-spm-hunt-subniches-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download derived bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p qa-source
+          gh release download market-intelligence-hunt-subniches-v1 \
+            --pattern 'open_hunt_subniches.csv' \
+            --pattern 'representative_examples_subniche.csv' \
+            --pattern 'top_winners_subniche.csv' \
+            --pattern 'repeat_buyers_subniche.csv' \
+            --dir qa-source --clobber
+
+      - name: Build semantic and business-model QA
+        shell: bash
+        run: |
+          python - <<'PY'
+          import csv,json,re
+          from collections import defaultdict
+          from pathlib import Path
+          def rows(name): return list(csv.DictReader(open('qa-source/'+name,encoding='utf-8')))
+          ranks=rows('open_hunt_subniches.csv'); ex=rows('representative_examples_subniche.csv'); winners=rows('top_winners_subniche.csv'); buyers=rows('repeat_buyers_subniche.csv')
+          exg=defaultdict(list); wg=defaultdict(list); bg=defaultdict(list)
+          def key(r): return (r['sub_niche'],r['warehouse_source'],r['route'],r['currency'])
+          for r in ex: exg[key(r)].append(r)
+          for r in winners: wg[key(r)].append(r)
+          for r in buyers: bg[key(r)].append(r)
+          checks={
+            'FR · Human interpreting':(r'(interprétariat|interprétation)',r'(matériel|équipement|audiovisuel|location)'),
+            'DE · Website maintenance / support':(r'(website|webseite|internetauftritt|webauftritt)',r'(straße|bauarbeiten|construction)'),
+            'FR · General graphic design':(r'(graphique|graphisme|design)',r'(scénograph|muséograph|architecture|exposition|stand)'),
+            'FR · Written translation':(r'traduction',r'(matériel|équipement|audiovisuel|location|translationnelle)'),
+            'FR · Website maintenance / hosting / support':(r'(site web|site internet|website|portail web)',r'(construction|matériel)'),
+            'FR · Publication layout / DTP':(r'(mise en page|pao|infographie|desktop publishing)',r'(scénograph|muséograph|architecture|exposition)'),
+            'CA · Written translation':(r'(translation|english to french|french to english)',r'(equipment|hardware|translational)'),
+            'FR · Meeting / debate transcription':(r'(transcription|retranscription)',r'(adn|dna|gene|gène)'),
+            'QC · General commercial print production':(r'impression',r'(imprimante|copieur|photocop|3d)'),
+            'FR · Communication collateral printing':(r'(impression|imprimer)',r'(imprimante|copieur|photocop|3d)'),
+            'FR · Website redesign / development':(r'(site web|site internet|website|portail web)',r'(construction|hardware|matériel)'),
+            'FR · Forms / stationery / cards printing':(r'(impression|imprimer|fourniture)',r'(imprimante|copieur|photocop|3d)'),
+            'FR · General commercial print production':(r'(impression|imprimer)',r'(imprimante|copieur|photocop|presse numérique|transformation.*imprimerie|3d)'),
+            'FR · Mailing / routing / fulfilment':(r'(routage|mise sous pli|publipostage|mailing)',r'$^'),
+            'CA · Interpretation / sign-language services':(r'(asl|lsq|sign language|interpret|interpreting)',r'(equipment|hardware|audiovisual)'),
+            'DE · Website relaunch / development':(r'(website|webseite|internetauftritt|webportal)',r'(straße|bauarbeiten|construction)'),
+            'FR · Promotional objects / branded goods':(r'(publicitaire|promotionnel|goodies)',r'$^'),
+            'FR · Municipal/public magazine printing':(r'(journal|magazine|bulletin)',r'(imprimante|copieur|photocop)'),
+            'FR · Brochure / publication / book printing':(r'(brochure|publication|livret|ouvrage|catalogue|agenda)',r'(imprimante|copieur|photocop)'),
+            'QC · Permits / forms / stationery printing':(r'(vignette|permis|carte|papeterie|formulaire|papier filigrané)',r'(imprimante|copieur|photocop)'),
+          }
+          reviews=[]; report=['# SPM Hunt Sub-Niches v1 — QA review','', 'Automatic semantic screening plus business-model flags. Historical evidence only; DCE remains authoritative.','']
+          for r in ranks[:40]:
+            k=key(r); sample=exg.get(k,[]); pos,neg=checks.get(r['sub_niche'],(None,None)); flags=[]
+            bad=[]
+            if pos:
+              for e in sample:
+                t=e['title'].lower()
+                if not re.search(pos,t,re.I) or re.search(neg,t,re.I): bad.append(e['title'])
+              if bad: flags.append('SEMANTIC_SAMPLE_REVIEW')
+            if not r.get('median_bidders'): flags.append('NO_BIDDER_EVIDENCE')
+            try:
+              if float(r.get('top_supplier_share_pct') or 0)>=25: flags.append('WINNER_CONCENTRATION_REVIEW')
+            except: pass
+            if any(x in r['sub_niche'] for x in ['Human interpreting','Stenotypy','sign-language']): flags.append('HUMAN_STAFFING_OR_ONSITE_GATE')
+            if 'PRINT' in r['parent_lane'] or 'PROMO' in r['parent_lane']: flags.append('WORKING_CAPITAL_AND_LOGISTICS_GATE')
+            decision='PROMOTE_CANDIDATE'
+            if 'SEMANTIC_SAMPLE_REVIEW' in flags: decision='HOLD_SEMANTIC_QA'
+            elif 'HUMAN_STAFFING_OR_ONSITE_GATE' in flags: decision='HOLD_STAFFING_MODEL'
+            elif 'WINNER_CONCENTRATION_REVIEW' in flags: decision='WATCH_CONCENTRATION'
+            reviews.append({'sub_niche':r['sub_niche'],'country':r['country'],'route':r['route'],'records':int(r['records']),'buyers':int(r['buyers']),'repeat_buyers':int(r['repeat_buyers']),'median_award_value':r['median_award_value'],'median_bidders':r['median_bidders'] or None,'hunt_score':float(r['spm_hunt_score']),'flags':flags,'decision':decision,'bad_sample_titles':bad})
+            report += [f"## {r['sub_niche']} — {r['country']} / {r['route']}",f"Records **{r['records']}** · buyers **{r['buyers']}** · repeat **{r['repeat_buyers']}** · median award **{r['currency']} {r['median_award_value'] or 'UNKNOWN'}** · bidders **{r['median_bidders'] or 'UNKNOWN'}** · hunt score **{r['spm_hunt_score']}**",f"Decision: `{decision}` · flags: `{', '.join(flags) if flags else 'NONE'}`",'', 'Representative titles:']
+            for e in sample[:6]: report.append('- '+e['title'])
+            report += ['', 'Top observed winners:']
+            for z in wg.get(k,[])[:5]: report.append(f"- {z['supplier']}: {z['fractional_awards']} fractional awards ({z['share_pct']}%)")
+            report += ['', 'Top repeat buyers:']
+            for b in sorted(bg.get(k,[]),key=lambda x:int(x['procurements']),reverse=True)[:5]: report.append(f"- {b['buyer']}: {b['procurements']} procurements")
+            report.append('')
+          Path('control/spm_hunt_subniches_v1/QA_REVIEW.md').write_text('\n'.join(report)+'\n',encoding='utf-8')
+          summary={'reviewed_cohorts':len(reviews),'promote_candidates':sum(x['decision']=='PROMOTE_CANDIDATE' for x in reviews),'held_semantic':sum(x['decision']=='HOLD_SEMANTIC_QA' for x in reviews),'held_staffing':sum(x['decision']=='HOLD_STAFFING_MODEL' for x in reviews),'watch_concentration':sum(x['decision']=='WATCH_CONCENTRATION' for x in reviews),'reviews':reviews}
+          Path('control/spm_hunt_subniches_v1/qa_summary.json').write_text(json.dumps(summary,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print(json.dumps({k:v for k,v in summary.items() if k!='reviews'},indent=2))
+          PY
+
+      - name: Persist QA pack
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/spm_hunt_subniches_v1/QA_REVIEW.md control/spm_hunt_subniches_v1/qa_summary.json
+          git commit -m 'tenders: QA SPM hunt subniches v1' || exit 0
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
