@@ -1,0 +1,97 @@
+name: SPM Market Intelligence v9 Final QA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/market-intelligence-v9-final-qa.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: spm-market-intelligence-v9-final-qa
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Build v9 classifier from route-aware v8
+        run: |
+          cp pipeline/build_market_intelligence_v8_route_aware.py /tmp/v9.py
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('/tmp/v9.py');s=p.read_text(encoding='utf-8')
+          s=s.replace('SPM_MARKET_INTELLIGENCE_V8_ROUTE_AWARE','SPM_MARKET_INTELLIGENCE_V9_FINAL_QA')
+          old="AND NOT regexp_matches({t}, '(3d print|additive manufactur|impression 3d)')"
+          new="AND NOT regexp_matches({t}, '(3d print|additive manufactur|impression 3d|systèmes? d.impression|systemes? d.impression|parc.{0,30}impression|solutions? d.impression|gestion.{0,20}impression|imprimantes?|photocop|multifonction|managed print|print management|maintenance.{0,40}impression)')"
+          if old not in s: raise SystemExit('printing exclusion block not found')
+          s=s.replace(old,new)
+          s=s.replace('# SPM Market Intelligence v8 — Route Aware','# SPM Market Intelligence v9 — Final QA')
+          p.write_text(s,encoding='utf-8')
+          assert 'photocop' in s and 'SPM_MARKET_INTELLIGENCE_V9_FINAL_QA' in s
+          PY
+      - name: Download canonical Global Core v4
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p core v9
+          for asset in historical_tenders.parquet awards.parquet award_suppliers.parquet data_quality.json; do
+            gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern "$asset" --dir core --clobber
+          done
+          python - <<'PY'
+          import json
+          q=json.load(open('core/data_quality.json',encoding='utf-8'))
+          assert q.get('status')=='PASS' and q['counts_notice_first']['historical_tenders']==2250547,q
+          PY
+      - name: Run final-QA route-aware intelligence
+        run: |
+          python /tmp/v9.py --historical core/historical_tenders.parquet --awards core/awards.parquet --award-suppliers core/award_suppliers.parquet --out v9
+      - name: Validate false-positive removal
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('v9/route_aware_summary.json',encoding='utf-8'))
+          assert s['version']=='SPM_MARKET_INTELLIGENCE_V9_FINAL_QA',s['version']
+          text=open('v9/REPORT.md',encoding='utf-8').read().casefold()
+          bad=['maintenance du parc de systèmes d\'impression','maintenance et acquisition d\'accessoires pour le parc de systèmes d\'impression']
+          for x in bad: assert x not in text,x
+          print(json.dumps({'top_open':[x['cohort'] for x in s['open_bid_top30'][:12]],'top_direct':[x['cohort'] for x in s['direct_buyer_top30'][:10]]},ensure_ascii=False,indent=2))
+          PY
+      - name: Publish v9 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG='market-intelligence-v9-final-qa'
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title 'SPM Market Intelligence v9 — Final QA' --notes 'Route-aware Global Core v4 analysis with title-precision service lanes and final printing-hardware false-positive removal. OPEN_PUBLIC and DIRECT_NONCOMPETITIVE remain separate commercial motions. Historical priors only.'
+          fi
+          find v9 -maxdepth 1 -type f -print0 | while IFS= read -r -d '' f; do gh release upload "$TAG" "$f" --clobber; done
+      - name: Persist final GPT snapshot
+        run: |
+          set -euo pipefail
+          mkdir -p control/market_intelligence_v9
+          cp v9/REPORT.md control/market_intelligence_v9/REPORT.md
+          cp v9/route_aware_summary.json control/market_intelligence_v9/snapshot.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/market_intelligence_v9/
+          git commit -m 'tenders: persist final-QA Market Intelligence v9 snapshot' || exit 0
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((attempt*3))"
+          done
+          exit 1
