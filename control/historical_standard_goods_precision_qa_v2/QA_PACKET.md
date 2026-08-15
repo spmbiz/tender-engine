@@ -3,22 +3,22 @@
 Historical-only. Classification is already title-led; this packet verifies representative titles before Atlas promotion.
 
 ## WORKWEAR_PPE_SUPPLY — France / EUR
-- records **919** · buyers **744** · repeat **132** · median **240000.0** · bidders **UNKNOWN** · suppliers **339** · top share **0.011811023622047251**
+- records **829** · buyers **681** · repeat **111** · median **207766.79499999998** · bidders **UNKNOWN** · suppliers **303** · top share **0.013333333333333346**
 - representative titles:
   - Ville de Paris — Accords-cadres à bons de commande de fourniture et de maintenance d'équipements de protection individuelle en 6 lots séparés pour les services de la Ville de Paris et de l'Établissement Public Paris M — value 74100000.0
-  - Conseil départemental 13 — FOURNITURE DE PRODUITS D'EPICERIE DESTINES AUX SERVICES DE RESTAURATION SCOLAIRE DES COLLEGES DU DEPARTEMENT ADHERENTS DE LA CENTRALE D'ACHAT — value 5721154.76
-  - CA LANNION-TREGOR COMMUNAUTE — Accord-cadre à bons de commande pour la fourniture de titres restaurant dématérialisés (groupement de commandes: Lannion-Trégor Communauté, CIAS de Lannion-Trégor Communauté, Epic de Tourisme de Lanni — value 4000000.0
   - Mairie de Colombes — Fourniture et livraison de vêtements professionnels, chaussures et d'équipements de protection individuelle (EPI) — value 4000000.0
   - Tisséo Voyageurs — Fourniture de vêtements de travail pour le personnel d'exploitation — value 3750000.0
-  - REGIE PERIBUS — Fourniture de carburant (gasoil) pour les véhicules bus et voitures de l'Epic Périmouv' — value 3400000.0
   - CHU DE POITIERS — fourniture de linge, vêtements de travail et articles chaussants pour le GHT de la Vienne — value 3350389.0
   - Conseil départemental du Gard — Fourniture et la livraison de divers équipements de protection individuelle pour les agents du Département du Gard (F) — value 2400000.0
+  - Régie des Transports Métropolitains, Département Achats Marchés Approvisionnements — FOURNITURE DE VETEMENTS DE TRAVAIL POUR LE PERSONNEL TECHNIQUE DE LA RTM ET PRESTATIONS ASSOCIEES — value 2100000.0
+  - GRANDLYON Métropole — FOURNITURE D'EPI POUR LES AGENTS DE LA METROPOLE DE LYON ET LES ADHERENTS A LA CENTRALE D'ACHAT LOT 1 : GANTS LOT 2 : CHAUSSURES LOT 3 : VETEMENTS TECHNIQUES — value 2000000.0
+  - Ville de Creil — Fourniture et livraison de vêtements de travail et d'équipements de protection individuelle pour les agents municipaux — value 2000000.0
 - top historical winners:
-  - TECHNIDIS DOCKS MARITIMES — weight 3.0 — share 0.011811023622047258
-  - ACTUEL VET — weight 2.5 — share 0.00984251968503938
-  - ETABLISSEMENTS DESCOURS ET CABAUD RHONE ALPES AUVERGNE,ETABLISSEMENTS DESCOURS ET CABAUD RHONE ALPES AUVERGNE — weight 2.0 — share 0.007874015748031505
-  - EURL KAKI — weight 2.0 — share 0.007874015748031505
-  - LEGALLAIS — weight 2.0 — share 0.007874015748031505
+  - TECHNIDIS DOCKS MARITIMES — weight 3.0 — share 0.01333333333333335
+  - ACTUEL VET — weight 2.5 — share 0.011111111111111125
+  - ETABLISSEMENTS DESCOURS ET CABAUD RHONE ALPES AUVERGNE,ETABLISSEMENTS DESCOURS ET CABAUD RHONE ALPES AUVERGNE — weight 2.0 — share 0.0088888888888889
+  - EURL KAKI — weight 2.0 — share 0.0088888888888889
+  - LEGALLAIS — weight 2.0 — share 0.0088888888888889
 
 ## WORKWEAR_PPE_SUPPLY — Germany / EUR
 - records **140** · buyers **48** · repeat **11** · median **350400.0** · bidders **2.0** · suppliers **43** · top share **0.0821917808219178**
@@ -35,11 +35,11 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Peter Schmitt GmbH — weight 6.0 — share 0.0821917808219178
   - RG ARBEITSSCHUTZ GMBH — weight 5.0 — share 0.0684931506849315
   - Büttner GmbH — weight 4.0 — share 0.0547945205479452
-  - Carl Henkel GmbH & Co. KG — weight 4.0 — share 0.0547945205479452
+  - Carl Henkel GmbH & Co KG — weight 4.0 — share 0.0547945205479452
   - Hubert Schmitz GmbH — weight 4.0 — share 0.0547945205479452
 
 ## WORKWEAR_PPE_SUPPLY — BE / UNKNOWN
-- records **94** · buyers **74** · repeat **16** · median **UNKNOWN** · bidders **UNKNOWN** · suppliers **UNKNOWN** · top share **UNKNOWN**
+- records **84** · buyers **67** · repeat **13** · median **UNKNOWN** · bidders **UNKNOWN** · suppliers **UNKNOWN** · top share **UNKNOWN**
 - representative titles:
   - Zone de secours wallonie Picarde — Fourniture d'équipements de protection individuelle pour les ambulanciers de la Zone de Secours Wallonie Picarde — value UNKNOWN
   - Lasne — Fournitures, entretien et location vêtements de travail ouvriers - Location et entretien de vêtements de travail pour le Service Technique communal et le technicien de surface - Accord-cadre 2026/2029 N°2026.011 - - 2.087.426 — value UNKNOWN
@@ -50,26 +50,8 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Centre Hospitalier Universitaire et Psychiatrique de Mons-Borinage — Accord-cadre pour la fourniture de vêtements de travail — value UNKNOWN
   - FOD FIN - Team Overheidsopdrachten — Procédure ouverte relativa à des fournitures "d'équipements de protection individuelle (EPI) de base pour l'Administration générale des Douanes et Accises". — value UNKNOWN
 
-## WORKWEAR_PPE_SUPPLY — United Kingdom / GBP
-- records **77** · buyers **59** · repeat **11** · median **425000.0** · bidders **9.0** · suppliers **65** · top share **0.10273972602739725**
-- representative titles:
-  - LEIDOS SUPPLY, LIMITED — Supply of Workwear, Shirts and Worsted Woo l- PMEN — value 22500000.0
-  - Leidos Supply Limited — The Supply of Military, Civilian and Anti-Static Safety Footwear — value 10860000.0
-  - Translink — P-3226 Managed Service for the Supply and Delivery of Corporate Clothing and Workwear — value 5690000.0
-  - Cumberland Council — Supply of Personal Protective Equipment (PPE) & Workwear — value 3000000.0
-  - NI Water and its subsidiaries — C1174 – Supply and Delivery of PPE and Workwear — value 2650000.0
-  - NHS Blood and Transplant — Framework Agreement for the Supply of Copper Sulphate Solution for Blood Donor Haemoglobin Screening — value 2135132.0
-  - Leidos Supply Limited — The Supply of PPE Foul Wet Weather Clothing — value 1600000.0
-  - Transport for Wales Rail Limited (Utility Buyer) — Supply of Workwear and PPE — value 1250000.0
-- top historical winners:
-  - PJD Safety Supplies — weight 7.5 — share 0.1027397260273972
-  - Arco Limited — weight 3.1333333333333333 — share 0.04292237442922372
-  - Arden Winch & Co.Ltd — weight 3.0 — share 0.04109589041095888
-  - Stark Building Materials UK Limited T/A Jewson Partnership Solutions — weight 3.0 — share 0.04109589041095888
-  - Contego Safety Solutions Ltd — weight 2.1333333333333333 — share 0.029223744292237425
-
 ## WORKWEAR_PPE_SUPPLY — Canada - Quebec / CAD
-- records **63** · buyers **26** · repeat **11** · median **65585.74** · bidders **1.0** · suppliers **32** · top share **0.3157894736842105**
+- records **61** · buyers **24** · repeat **11** · median **65585.74** · bidders **1.0** · suppliers **30** · top share **0.32432432432432434**
 - representative titles:
   - Ville de Québec — Fourniture et livraison d'équipements de protection individuelle et de gants de travail, incluant le prêt de machines distributrices — value 1730182.16
   - Ville de Québec — Fourniture et livraison de vêtements de travail — value 1367126.91
@@ -80,48 +62,50 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Ville de Montréal - Service de l'approvisionnement — Fourniture d'équipements de protection individuelle (EPI) pour la Ville de Montréal — value 242853.36
   - Ville de Saint-Hyacinthe . — Fourniture et livraison de vêtements de travail et de vêtements de sécurité — value 208572.7
 - top historical winners:
-  - Québec Linge — weight 36.0 — share 0.3157894736842105
-  - UNIFIRST CANADA LTEE — weight 11.0 — share 0.09649122807017543
-  - CINTAS CANADA LIMITÉE — weight 6.0 — share 0.05263157894736842
-  - LE GROUPE J.S.V. INC. — weight 6.0 — share 0.05263157894736842
-  - LE MAGASIN INDUSTRIEL INC. — weight 6.0 — share 0.05263157894736842
+  - Québec Linge — weight 36.0 — share 0.32432432432432434
+  - UNIFIRST CANADA LTEE — weight 11.0 — share 0.0990990990990991
+  - CINTAS CANADA LIMITÉE — weight 6.0 — share 0.05405405405405406
+  - LE GROUPE J.S.V. INC. — weight 6.0 — share 0.05405405405405406
+  - LE MAGASIN INDUSTRIEL INC. — weight 6.0 — share 0.05405405405405406
+
+## WORKWEAR_PPE_SUPPLY — United Kingdom / GBP
+- records **60** · buyers **48** · repeat **9** · median **600000.0** · bidders **11.5** · suppliers **55** · top share **0.1171875**
+- representative titles:
+  - LEIDOS SUPPLY, LIMITED — Supply of Workwear, Shirts and Worsted Woo l- PMEN — value 22500000.0
+  - Leidos Supply Limited — The Supply of Military, Civilian and Anti-Static Safety Footwear — value 10860000.0
+  - Translink — P-3226 Managed Service for the Supply and Delivery of Corporate Clothing and Workwear — value 5690000.0
+  - Cumberland Council — Supply of Personal Protective Equipment (PPE) & Workwear — value 3000000.0
+  - NI Water and its subsidiaries — C1174 – Supply and Delivery of PPE and Workwear — value 2650000.0
+  - Leidos Supply Limited — The Supply of PPE Foul Wet Weather Clothing — value 1600000.0
+  - Transport for Wales Rail Limited (Utility Buyer) — Supply of Workwear and PPE — value 1250000.0
+  - York College — York College - ITT for the Supply of Staff and Student Uniform and PPE — value 1200000.0
+- top historical winners:
+  - PJD Safety Supplies — weight 7.5 — share 0.1171875
+  - Arco Limited — weight 3.1333333333333333 — share 0.04895833333333333
+  - Arden Winch & Co.Ltd — weight 3.0 — share 0.046875
+  - Stark Building Materials UK Limited T/A Jewson Partnership Solutions — weight 3.0 — share 0.046875
+  - Contego Safety Solutions Ltd — weight 2.1333333333333333 — share 0.03333333333333333
 
 ## WORKWEAR_PPE_SUPPLY — Ireland / EUR
-- records **51** · buyers **26** · repeat **11** · median **216841.01** · bidders **3.0** · suppliers **70** · top share **0.051282051282051336**
+- records **17** · buyers **11** · repeat **4** · median **600000.0** · bidders **4.5** · suppliers **52** · top share **0.11111111111111102**
 - representative titles:
   - The Office of Government Procurement — FBM072F Single Supplier Framework Contract for the Supply of Personal Protective Equipment, Workwear, and First Aid Supplies — value 30000000.0
-  - South Dublin County Council — CFT 3633 -MPFA for the Supply and Installation of signage across South Dublin County Council with an initial contract for supply and installation of signage at Kiltipper Park, Dublin 24 — value 10000000.0
   - An Garda Síochána — T.022.2026 Request for Tender Supply and Delivery of Public Order PPE and Accessories to An Garda Síochána — value 5150000.0
   - Health Service Executive (HSE) — DPS Invitation for the Supply and Support of Advanced Level PPE for CBRN and HCID HSE 24919 — value 4000000.0
   - Electricity Supply Board ( ESB ) — TR2961 - SUPPLY OF PPE Safety Footwear — value 1450000.0
   - An Garda Síochána — T.011.2026 Request for Tenders for the supply of Mountain Bike PPE and Ancillary Equipment for An Garda Síochána — value 1000000.0
   - An Garda Síochána — T.050/2025 Request for Tenders for the Supply of of Motorcycle Protective Equipment (PPE) for Garda Personnel — value 1000000.0
   - Health Service Executive (HSE) — Framework Agreement for Supply of Healthcare PPE for HSE — value 800000.0
+  - Kerry Education and Training Board — Establishment of a Multi Supplier Framework Agreement for Supply of Welding Consumables, Welding PPE, and Welding Tools to Kerry Education and Training Board — value 600000.0
 - top historical winners:
-  - Ronayne Hire and Hardware — weight 1.3333333333333333 — share 0.05128205128205141
-  - Block Automotive Ltd — weight 1.0 — share 0.03846153846153856
-  - British Cables Ltd — weight 1.0 — share 0.03846153846153856
-  - Cork Truck Services Ltd — weight 1.0 — share 0.03846153846153856
-  - Daniel Technologies — weight 1.0 — share 0.03846153846153856
-
-## WORKWEAR_PPE_SUPPLY — MLT / EUR
-- records **12** · buyers **3** · repeat **3** · median **174225.0** · bidders **3.0** · suppliers **3** · top share **0.6666666666666666**
-- representative titles:
-  - Sectoral Procurement Directorate — SPD8/2026/046 - Tender For The Supply, Delivery And Commissioning Of Four (4) Brand-New Low Emission17-19 Tonne Tipper Trucks For The Transportation Of Waste For The Cleansing And Maintenance Division (Inclusive Of Maintenance Agreement). — value 548000.0
-  - Sectoral Procurement Directorate — SPD8/2023/161 - Framework Contract For The Supply And Delivery Of Various Personal Protective Equipment (PPE), For Wasteserv Malta Ltd (In 4 Lots) — value 349680.0
-  - Sectoral Procurement Directorate — SPD8/2025/028 - Supply, Delivery And Commissioning Of Two (2) Light Trucks With Tippers And Two (2) Light Trucks With Tail-Lifts Including A Three (3) Year Service Agreement For Wasteserv Malta — value 305400.0
-  - Sectoral Procurement Directorate — SPD8/2025/162 - TENDER FOR THE SUPPLY, DELIVERY AND COMMISSIONING OF FOUR NEW LOW EMISSION DOUBLE CAB LIGHT TIPPER TRUCKS WITH MAINTENANCE AGREEMENT FOR WASTE TRANSPORT – CMD — value 256400.0
-  - Sectoral Procurement Directorate — SPD8/2026/037 Tender for the Supply, Delivery and Commissioning of Three (3) Brand New Double Cab Vans equipped with Drop-Side Body and Tail Lift to Ambjent Malta — value 205000.0
-  - Sectoral Procurement Directorate — SPD8/2024/125 - Tender for the Supply, Delivery and Commissioning of 3 Brand New Double Cab Tipper Vans to Ambjent Malta — value 177300.0
-  - Department of Contracts — CT2056/2024 - Tender for the supply of Left Atrial Appendage Occlusion Devices with delivery system on PPU basis — value 171150.0
-  - Department of Contracts — CT2239/2023 - Tender for the Supply of Gripper Needles, Size 20G, Length 25mm — value 119536.0
-- top historical winners:
-  - GasanZammit Motors Ltd — weight 6.0 — share 0.6666666666666666
-  - Domeman Glove Co Ltd — weight 2.0 — share 0.2222222222222222
-  - WURTH LIMITED — weight 1.0 — share 0.1111111111111111
+  - Daniel Technologies — weight 1.0 — share 0.11111111111111095
+  - HPMP Fire c/o High Precision Motor Products — weight 1.0 — share 0.11111111111111095
+  - Reliance Equipment Ltd — weight 1.0 — share 0.11111111111111095
+  - Sioen Ireland — weight 1.0 — share 0.11111111111111095
+  - Terberg MPM Ireland Ltd — weight 1.0 — share 0.11111111111111095
 
 ## OFFICE_STATIONERY — France / EUR
-- records **550** · buyers **474** · repeat **60** · median **320000.0** · bidders **UNKNOWN** · suppliers **140** · top share **0.07487922705314011**
+- records **550** · buyers **474** · repeat **60** · median **320000.0** · bidders **UNKNOWN** · suppliers **140** · top share **0.07487922705314012**
 - representative titles:
   - Centre Hospitalier de Cayenne "Andrée ROSEMON" — FOURNITURE DE BUREAU ET PAPETERIE POUR LES BESOINS DU GHT DE GUYANE — value 51332000.0
   - Union des Caisses Nationales de Sécurité sociale (UCANSS) — Le présent accord-cadre a pour objet l'approvisionnement en fournitures de bureau des organismes de Sécurité Sociale pour la France métropolitaine dont la Corse. — value 28540954.0
@@ -152,8 +136,8 @@ Historical-only. Classification is already title-led; this packet verifies repre
 - top historical winners:
   - Lyreco Deutschland GmbH — weight 27.5 — share 0.18835616438356165
   - allpremio Handel GmbH — weight 22.5 — share 0.1541095890410959
-  - ISFORT GmbH & Co.KG — weight 15.0 — share 0.10273972602739725
-  - Streit Service & Solution GmbH & Co.KG — weight 11.0 — share 0.07534246575342465
+  - ISFORT GmbH & Co. KG — weight 15.0 — share 0.10273972602739725
+  - Streit Service & Solution GmbH & Co. KG — weight 11.0 — share 0.07534246575342465
   - Erhardt & Fischer GmbH & Co. KG — weight 8.0 — share 0.0547945205479452
 
 ## OFFICE_STATIONERY — BE / UNKNOWN
@@ -187,7 +171,7 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - NOVEXCO INC. — weight 3.0 — share 0.058823529411764705
 
 ## OFFICE_STATIONERY — United Kingdom / GBP
-- records **44** · buyers **38** · repeat **5** · median **291666.66** · bidders **1.0** · suppliers **69** · top share **0.19312996031746016**
+- records **44** · buyers **38** · repeat **5** · median **291666.66** · bidders **1.0** · suppliers **69** · top share **0.19312996031746005**
 - representative titles:
   - THE ASSOCIATION OF NORTH EAST COUNCILS LIMITED — Office Supplies — value 102000000.0
   - SUPPLY CHAIN COORDINATION LIMITED — Office Supplies 2026 — value 100000000.0
@@ -199,7 +183,7 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Yorkshire Purchasing Organisation — Electronic Office Supplies 4 — value 9600000.0
 - top historical winners:
   - Banner Group Limited — weight 9.270238095238096 — share 0.19312996031746008
-  - Lyreco UK Limited — weight 6.270238095238095 — share 0.13062996031746013
+  - LYRECO UK LIMITED — weight 6.270238095238095 — share 0.13062996031746013
   - Banner Group Ltd — weight 3.032936507936508 — share 0.06318617724867716
   - ACS Technology Group Ltd — weight 2.0702380952380954 — share 0.04312996031746026
   - Bates Office Services Ltd — weight 2.020238095238095 — share 0.04208829365079359
@@ -253,11 +237,11 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Nowy Styl Deutschland GmbH — weight 13.0 — share 0.046762589928057555
   - REISS Büromöbel GmbH — weight 11.0 — share 0.039568345323741004
   - Wipper Buero-Design GmbH — weight 10.0 — share 0.03597122302158273
-  - Assmann Büromöbel GmbH & Co.KG — weight 7.0 — share 0.025179856115107913
+  - ASSMANN Büromöbel GmbH & Co. KG — weight 7.0 — share 0.025179856115107913
   - Bürotec Thoss GmbH — weight 7.0 — share 0.025179856115107913
 
 ## OFFICE_FURNITURE — France / EUR
-- records **221** · buyers **197** · repeat **22** · median **362000.0** · bidders **UNKNOWN** · suppliers **67** · top share **0.0784313725490196**
+- records **221** · buyers **197** · repeat **22** · median **362000.0** · bidders **UNKNOWN** · suppliers **67** · top share **0.07843137254901959**
 - representative titles:
   - GIP RESAH — Mobilier de bureau, d'accueil et de salle de réunion/formation avec prestations associées — value 20000000.0
   - Université Grenoble Alpes — Fourniture, conseil et pose de mobilier de bureau, de salles de réunion, d’espaces de convivialité, de sièges de bureau, visiteurs ou d'accueil, de mobilier pédagogique et d'espaces de vie étudiante — value 8388000.0
@@ -341,7 +325,7 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - ASBL CHU HELORA — Mobilier de bureau — value UNKNOWN
 
 ## OFFICE_FURNITURE — United Kingdom / GBP
-- records **43** · buyers **38** · repeat **5** · median **610000.0** · bidders **5.5** · suppliers **63** · top share **0.04054054054054054**
+- records **43** · buyers **38** · repeat **5** · median **610000.0** · bidders **5.5** · suppliers **63** · top share **0.04054054054054052**
 - representative titles:
   - YPO — 001281 - Office furniture solutions and associated services — value 75000000.0
   - The Department of Finance — ID 3899649 - Framework for the Supply, Delivery and Installation of Office Furniture to the Northern Ireland Public Sector — value 21500000.0
@@ -359,7 +343,7 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Emergent Crown Contract Office Furnishings Limited — weight 1.1 — share 0.02972972972972971
 
 ## SCHOOL_ART_SUPPLIES — France / EUR
-- records **446** · buyers **392** · repeat **48** · median **320000.0** · bidders **UNKNOWN** · suppliers **125** · top share **0.04464285714285713**
+- records **448** · buyers **393** · repeat **49** · median **317500.0** · bidders **UNKNOWN** · suppliers **125** · top share **0.05014749262536872**
 - representative titles:
   - Commune de Nanterre — Achat de fournitures scolaires, de loisirs récréatifs, de matériels éducatifs et pédagogiques — value 2400000.0
   - Mairie de Conflans Sainte Honorine — Achat de fournitures scolaires générales et de matériel éducatif et jeux pédagogiques — value 1600000.0
@@ -370,11 +354,11 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Commune de Montesson — Fourniture et livraison de fournitures scolaires et pour activités manuelles et artistiques — value 1095000.0
   - Commune d'Issy-les-Moulineaux — Achat de fournitures scolaires pour les communes d'Issy-les-Moulineaux et Ville-d'Avray — value 1060000.0
 - top historical winners:
-  - PAPETERIES PICHON SAS — weight 5.0 — share 0.04464285714285715
-  - PAPETERIES PICHON — weight 4.666666666666666 — share 0.04166666666666667
-  - CENTRALE INTER PROFESSIONNELLE D'ACHAT — weight 2.0 — share 0.017857142857142863
-  - DEVELAY — weight 2.0 — share 0.017857142857142863
-  - LACOSTE — weight 2.0 — share 0.017857142857142863
+  - PAPETERIES PICHON — weight 5.666666666666666 — share 0.05014749262536874
+  - PAPETERIES PICHON SAS — weight 5.0 — share 0.04424778761061948
+  - CENTRALE INTER PROFESSIONNELLE D'ACHAT — weight 2.0 — share 0.01769911504424779
+  - DEVELAY — weight 2.0 — share 0.01769911504424779
+  - LACOSTE — weight 2.0 — share 0.01769911504424779
 
 ## SCHOOL_ART_SUPPLIES — BE / UNKNOWN
 - records **65** · buyers **49** · repeat **14** · median **UNKNOWN** · bidders **UNKNOWN** · suppliers **UNKNOWN** · top share **UNKNOWN**
@@ -407,7 +391,7 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - SELF SIGNAL — weight 2.0 — share 0.021978021978021983
 
 ## SIGNAGE_SUPPLY_INSTALL — United Kingdom / GBP
-- records **44** · buyers **40** · repeat **4** · median **343944.87** · bidders **7.0** · suppliers **57** · top share **0.07142857142857141**
+- records **44** · buyers **40** · repeat **4** · median **343944.87** · bidders **7.0** · suppliers **57** · top share **0.0714285714285714**
 - representative titles:
   - London Bus Services Limited — PRO1681 -Contract for the Design, Development, Supply and Installation of Passenger Stop Signs and the provision of related Services — value 8201697.0
   - London Bus Services Limited — PRO1680 -Contract for the Design, Development, Supply and Installation of Passenger Stop Signs and the provision of related Services — value 7898918.0
@@ -440,8 +424,9 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Schilderwerk Beutha GmbH — weight 1.0 — share 0.5
 
 ## SIGNAGE_SUPPLY_INSTALL — Ireland / EUR
-- records **29** · buyers **22** · repeat **5** · median **185450.53999999998** · bidders **4.0** · suppliers **15** · top share **0.14285714285714285**
+- records **30** · buyers **22** · repeat **6** · median **200000.0** · bidders **4.0** · suppliers **15** · top share **0.14285714285714285**
 - representative titles:
+  - South Dublin County Council — CFT 3633 -MPFA for the Supply and Installation of signage across South Dublin County Council with an initial contract for supply and installation of signage at Kiltipper Park, Dublin 24 — value 10000000.0
   - Electricity Supply Board ( ESB ) — A single Service Provider for the Software licencing, install, supply, maintenance and support of AV and Digital Signage Services (Software and Hardware) — value 7200000.0
   - Office of Public Works (OPW) — Tender for Provision of Design, Supply, Installation and Removal of Exhibition Display Systems, Bespoke Signage, Staging, Backdrops, and Mesh Banner Cladding Services. — value 6000000.0
   - daa plc — P19781 Supply of Airfield Illuminated Signage and Associated Equipment — value 1200000.0
@@ -449,7 +434,6 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Education Procurement Service (EPS) — BE2563F Multi Supplier Framework Agreement for the Supply of Signage for University of Limerick — value 1000000.0
   - Fáilte Ireland-National Tourism Development Authority — DB/2025/02 Dublin Coastal Trail Phase 2 Manufacture, Distribution and Design of Signage — value 800000.0
   - Office of Public Works (OPW) — The provision of Exhibition Fitout, Graphics and Signage (production and installation) for the Clonmacnoise Monastic Site Visitor Centre, County Offaly. — value 800000.0
-  - South Dublin County Council — CFT 3753 - MPFA for Signage Design, Procurement of signage manufacture and Installation, with an initial contract at Dodder Valley Park — value 550000.0
 - top historical winners:
   - Placemarque — weight 2.0 — share 0.14285714285714285
   - Hamilton Robson Audio Visual Ltd — weight 1.0 — share 0.07142857142857142
@@ -499,7 +483,7 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Pembroke Local Council — PLC_T_2025_03 - Tender for the supply and upkeep of traffic signs works — value 40000.0
   - Zebbug Local Council (Gozo) — Request for Quotations for the Supply of PVC signs for Heritage Trail — value 455.0
 - top historical winners:
-  - Charles De Giorgio Ltd. — weight 4.0 — share 1.0
+  - James Cutajar — weight 4.0 — share 1.0
 
 ## TONER_INK — Germany / EUR
 - records **285** · buyers **45** · repeat **8** · median **286150.85** · bidders **4.0** · suppliers **27** · top share **0.3484848484848485**
@@ -516,7 +500,7 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - MUP Bürohandels GmbH — weight 23.0 — share 0.3484848484848485
   - OfficeXpress GmbH — weight 8.0 — share 0.12121212121212122
   - Ribbex GmbH — weight 5.0 — share 0.07575757575757576
-  - HORN GmbH — weight 4.0 — share 0.06060606060606061
+  - Horn GmbH — weight 4.0 — share 0.06060606060606061
   - item deutschland GmbH (HS Meerbusch) — weight 3.0 — share 0.045454545454545456
 
 ## TONER_INK — POL / UNKNOWN
@@ -531,11 +515,11 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - 28 Wojskowy Oddział Gospodarczy — DOSTAWA TUSZY, TONERÓW I INNYCH MATERIAŁÓW EKSPLOATACYJNYCH DO SPRZĘTU INFORMATYCZNEGO — value 558611.25
   - 28 Wojskowy Oddział Gospodarczy — DOSTAWA TUSZY, TONERÓW I INNYCH MATERIAŁÓW EKSPLOATACYJNYCH DO SPRZĘTU INFORMATYCZNEGO — value 540650.0
 - top historical winners:
-  - Golden Line Sp. z o.o. — weight 34.0 — share 0.37362637362637363
-  - Partner Papes Sp. z o.o. — weight 18.0 — share 0.1978021978021978
+  - "KOMERS" D.K. KURPIEL SPÓŁKA JAWNA — weight 34.0 — share 0.37362637362637363
+  - Respol Polska Sp. z o.o. — weight 18.0 — share 0.1978021978021978
   - TONATUSZU.PL SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ — weight 16.0 — share 0.17582417582417584
   - Golden Line Sp. z o.o. — weight 9.0 — share 0.0989010989010989
-  - KOMAX Sp.z o.o. — weight 3.0 — share 0.03296703296703297
+  - Grafix K.Olszewska-Piotrowska M.Tyrała Sp jawna — weight 3.0 — share 0.03296703296703297
 
 ## TONER_INK — ITA / EUR
 - records **38** · buyers **24** · repeat **8** · median **686891.38** · bidders **1.0** · suppliers **4** · top share **0.6136363636363636**
@@ -549,10 +533,10 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Agenzia per i contratti pubblici – ACP - Stazione unica appaltante Servizi e forniture — AOV SUA-SF 030 2024 FORNITURA DI CARTUCCE TONER E A GETTO DI INCHIOSTRO ORIGINALI E RIGENERATE ALL'AZIENDA SANITARIA DELL'ALTO ADIGE PER UN PERIODO DI 5 ANNI — value 8990128.0
   - Agenzia per i contratti pubblici – ACP - Stazione unica appaltante Servizi e forniture — AOV SUA-SF 030 2024 FORNITURA DI CARTUCCE TONER E A GETTO DI INCHIOSTRO ORIGINALI E RIGENERATE ALL'AZIENDA SANITARIA DELL'ALTO ADIGE PER UN PERIODO DI 5 ANNI — value 8990128.0
 - top historical winners:
-  - GECAL spa — weight 13.5 — share 0.6136363636363636
-  - KIT Ufficio srl — weight 4.5 — share 0.20454545454545456
+  - SIBAS SRL — weight 13.5 — share 0.6136363636363636
+  - Nuovadata Grafix Wide srl — weight 4.5 — share 0.20454545454545456
+  - PROMO RIGENERA SRL — weight 2.0 — share 0.09090909090909091
   - PROMO ROGENERA SRL — weight 2.0 — share 0.09090909090909091
-  - TONERGROSS SOCIETA' A RESPONSABILITA' LIMITATA — weight 2.0 — share 0.09090909090909091
 
 ## TONER_INK — CZE / CZK
 - records **38** · buyers **24** · repeat **11** · median **1351823.615** · bidders **2.0** · suppliers **9** · top share **0.38293216630196936**
@@ -566,11 +550,11 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Ministerstvo obrany — Originální tonery, náplně a pásky do tiskáren a kopírovacích strojů + související části — value 11385415.0
   - Statutární město Děčín — DNS - spotřební materiál do tiskáren (tonerové kazety a inkoustové náplně) — value 10000000.0
 - top historical winners:
-  - SENTA, spol. s r.o. — weight 175.0 — share 0.38293216630196936
+  - CSF, s.r.o. — weight 175.0 — share 0.38293216630196936
   - Pody print s.r.o. — weight 94.0 — share 0.20568927789934355
   - PREMO s.r.o. — weight 67.0 — share 0.14660831509846828
-  - BossCan ComPrint spol. s r.o. — weight 58.0 — share 0.12691466083150985
-  - Af Office, s.r.o. — weight 25.0 — share 0.05470459518599562
+  - STEELMET, s.r.o. — weight 58.0 — share 0.12691466083150985
+  - PREMO s.r.o. — weight 25.0 — share 0.05470459518599562
 
 ## TONER_INK — ROU / UNKNOWN
 - records **32** · buyers **26** · repeat **5** · median **221810.88** · bidders **2.0** · suppliers **15** · top share **0.41155234657039713**
@@ -602,9 +586,9 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Banca Nationala a Romaniei — Furnizare cartușe de tonere și consumabile auxiliare — value 756915.6
   - CURTEA DE APEL BUCURESTI — Contract de furnizare tonere — value 705741.85
 - top historical winners:
-  - Mida Soft Business — weight 96.0 — share 0.4528301886792453
+  - EXPERT COPY SERVICE — weight 96.0 — share 0.4528301886792453
   - MANOPRINTING SYSTEM — weight 86.0 — share 0.4056603773584906
-  - Mida Soft Business — weight 26.0 — share 0.12264150943396226
+  - VIC INSERO — weight 26.0 — share 0.12264150943396226
   - Mida Soft Business — weight 2.0 — share 0.009433962264150943
   - Mida Soft Business — weight 2.0 — share 0.009433962264150943
 
@@ -639,7 +623,7 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - DAK-Gesundheit — Hochleistungskuvertiersystem — value 1500000.0
 - top historical winners:
   - Kern GmbH — weight 9.0 — share 0.09574468085106383
-  - AWA COUVERT GmbH — weight 8.0 — share 0.0851063829787234
+  - AWA-COUVERT GmbH — weight 8.0 — share 0.0851063829787234
   - OVOL Papier Deutschland GmbH — weight 8.0 — share 0.0851063829787234
   - IBA Hartmann GmbH & Co. KG — weight 7.0 — share 0.07446808510638298
   - Koninklijke Van der Most B.V. — weight 6.0 — share 0.06382978723404255
@@ -663,7 +647,7 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Brook Construction (2007) Inc. — weight 1.0 — share 0.05555555555555555
 
 ## PAPER_ENVELOPES — United Kingdom / GBP
-- records **35** · buyers **23** · repeat **4** · median **118829.5** · bidders **7.0** · suppliers **40** · top share **0.15185185185185182**
+- records **35** · buyers **23** · repeat **4** · median **118829.5** · bidders **7.0** · suppliers **40** · top share **0.15185185185185185**
 - representative titles:
   - East Ayrshire Council — PS-22-109 - External Envelope Enhancement Programme (PRJ0013246) — value 29638022.0
   - Hertfordshire County Council — HCC Feb 2026 - The Provision of a Framework for the Supply of Cut Paper, Card and Envelopes — value 19400000.0
@@ -710,7 +694,7 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Polismyndigheten — Kuvert till Polismyndigheten — value 7000000.0
   - Polismyndigheten — Upphandling av Kuverteringsmaskin — value 6600000.0
 - top historical winners:
-  - Böwe Systec AB — weight 5.0 — share 0.8333333333333334
+  - Lyreco Sverige AB — weight 5.0 — share 0.8333333333333334
   - MB Automation GmbH & Co. KG — weight 1.0 — share 0.16666666666666666
 
 ## PAPER_ENVELOPES — Ireland / EUR
@@ -806,7 +790,7 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Landeshauptstadt Düsseldorf, Der Oberbürgermeister, Amt für Recht, Vergabe und Versicherungen, Zentrale Vergabestelle — Rahmenvertrag Schulmöbel für die Kreisstadt Mettmann — value 921601.0
 - top historical winners:
   - VS Vereinigte Spezialmöbelfabriken GmbH & Co. KG — weight 73.0 — share 0.44242424242424244
-  - ASS-Einrichtungssysteme GmbH — weight 34.0 — share 0.20606060606060606
+  - ASS-EINRICHTUNGSSYSTEME GMBH — weight 34.0 — share 0.20606060606060606
   - project Schul- und Objekteinrichtungen GmbH — weight 8.0 — share 0.048484848484848485
   - VS Vereinigte Spezialmöbelfabriken GmbH & Co. KG - Niederlassung Süd — weight 6.0 — share 0.03636363636363636
   - Vereinigte Spezialmöbelfabriken GmbH & Co. KG — weight 4.0 — share 0.024242424242424242
@@ -889,7 +873,7 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Service immobilier et patrimoine / Dienststelle für Immobilien und Bauliches Erbe - Investissements / Investitionen — Campus du Pôle Santé - CFC 901.0 - mobilier scolaire — value UNKNOWN
   - Centrale commune d'achats — Appel d'offres public pour l'acquisition de mobilier scolaire — value UNKNOWN
 - top historical winners:
-  - FR_Chasseur Express Transports Déménagements Sàrl — weight 2.0 — share 1.0
+  - FR_mobil Werke AG — weight 2.0 — share 1.0
 
 ## MOBILE_DEVICES — MLT / EUR
 - records **127** · buyers **2** · repeat **2** · median **222587.48** · bidders **4.0** · suppliers **4** · top share **0.8620689655172413**
@@ -903,9 +887,9 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Department of Contracts — CT2125/2026 - Framework Contract for the supply of Tiopronin Tablets — value 3139290.0
   - Department of Contracts — CT2171/2024 - Tender for the supply of MEK Inhibitor Tablets/Capsules and BRAF Inhibitor Tablets/Capsules — value 2970297.0
 - top historical winners:
-  - E.J. BUSUTTIL LIMITED — weight 75.0 — share 0.8620689655172413
+  - Mint Health Limited — weight 75.0 — share 0.8620689655172413
   - Farmarosib SRL — weight 8.0 — share 0.09195402298850575
-  - Trion Pharma — weight 3.0 — share 0.034482758620689655
+  - Health House Pharma Ltd T/as P and D Pharmaceuticals — weight 3.0 — share 0.034482758620689655
   - PHARMA.MT LTD — weight 1.0 — share 0.011494252873563218
 
 ## MOBILE_DEVICES — Germany / EUR
@@ -1005,7 +989,7 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Caraglass Ltd T/A Zeeko — weight 0.375 — share 0.0625
 
 ## PROMOTIONAL_MERCH — France / EUR
-- records **108** · buyers **89** · repeat **11** · median **400000.0** · bidders **UNKNOWN** · suppliers **24** · top share **0.14285714285714285**
+- records **108** · buyers **89** · repeat **11** · median **400000.0** · bidders **UNKNOWN** · suppliers **24** · top share **0.14285714285714288**
 - representative titles:
   - Université d'Aix-Marseille — fourniture d'objets publicitaires, de goodies et de textiles avec ou sans marquages, et exécution de prestations associées - relance — value 2400000.0
   - UNIVERSITE DE LILLE — Conception et livraison de goodies via une boutique en ligne pour la communauté universitaire de l'EPE Université de Lille — value 2000000.0
@@ -1030,9 +1014,9 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - IKK - Die Innovationskasse — Rahmenvertrag Werbeartikel — value 120.05
   - KfW Bankengruppe — Werbeartikel — value 1.0
   - UNKNOWN — Herstellung und Lieferung von Werbeartikeln — value UNKNOWN
-  - UNKNOWN — Abschluss einer Rahmenvereinbarung über die Lieferung von Werbeartikeln — value UNKNOWN
   - UNKNOWN — Vergebener Auftrag: Beschaffung neuer Werbeartikel 2025 — value UNKNOWN
   - Techniker Krankenkasse — Werbeartikel der TK — value UNKNOWN
+  - UNKNOWN — Abschluss einer Rahmenvereinbarung über die Lieferung von Werbeartikeln — value UNKNOWN
 - top historical winners:
   - Kandinsky Deutschland GmbH — weight 1.0 — share 0.2
   - Kunze-Werbung — weight 1.0 — share 0.2
@@ -1223,7 +1207,7 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Department of Contracts — CT2120/2024 - TENDER FOR THE SUPPLY AND INSTALLATION OF DUAL DETECTOR DIRECT DIGITAL X-RAY MACHINE PRODUCED WITH REDUCED ENVIRONMENTAL IMPACT, INCLUDING ENERGY EFFICIENT WORKSTATION AND MONITORS — value 417420.0
   - Department of Contracts — CT2116/2025 - TENDER FOR THE SUPPLY OF DISPOSABLE BRONCHOSCOPES TO BE SUPPLIED ON A PAY PER USE BASIS WITH MONITORS TO BE SUPPLIED ON LOAN FREE OF CHARGE FOR THE WHOLE DURATION OF THE CONTRACT — value 270000.0
 - top historical winners:
-  - Pharmascint Ltd — weight 9.0 — share 1.0
+  - Cherubino Ltd. — weight 9.0 — share 1.0
 
 ## IT_PERIPHERALS — United Kingdom / GBP
 - records **11** · buyers **10** · repeat **1** · median **325000.0** · bidders **5.5** · suppliers **8** · top share **0.2**
@@ -1244,7 +1228,7 @@ Historical-only. Classification is already title-led; this packet verifies repre
   - Draeger Safety UK Ltd — weight 1.0 — share 0.1
 
 ## PACKAGING_MATERIALS — France / EUR
-- records **188** · buyers **152** · repeat **30** · median **500000.0** · bidders **UNKNOWN** · suppliers **52** · top share **0.06037735849056603**
+- records **188** · buyers **152** · repeat **30** · median **500000.0** · bidders **UNKNOWN** · suppliers **52** · top share **0.06037735849056604**
 - representative titles:
   - Communauté d'Agglomération de Grand Châtellerault (86) — Fourniture, livraison et installation des abris-bacs à ordures ménagères résiduelles et déchets d’emballages légers — value 6000000.0
   - CALITOM — FOURNITURE DE SACS POUR LA COLLECTE DES EMBALLAGES RECYCLABLES, JOURNAUX, MAGAZINES, DECHETS DE FOIRE, BIODECHETS ET ORDURES MENAGERES POUR LE TERRITOIRE DE CALITOM (CHARENTE) — value 3500000.0
