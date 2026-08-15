@@ -1,0 +1,61 @@
+name: Historical Australia Staffing v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/historical-australia-staffing-v1.yml'
+      - 'historical_lab/decompose_australia_staffing_v1.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-australia-staffing-v1
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Download canonical AusTender award-first archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          gh release download tender-normalized-austender-v1 --repo walidgdg1-ai/coldemailtool --pattern historical_tenders.csv.gz --dir source --clobber
+      - name: Decompose staffing and support markets
+        run: |
+          python historical_lab/decompose_australia_staffing_v1.py \
+            --input source/historical_tenders.csv.gz --out out
+      - name: Persist historical staffing atlas
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-australia-staffing-v1
+          if ! gh release view "$TAG" --repo walidgdg1-ai/tender-engine >/dev/null 2>&1; then
+            gh release create "$TAG" --repo walidgdg1-ai/tender-engine --target main \
+              --title 'Historical Australia Staffing v1' \
+              --notes 'Award-first AusTender decomposition of staffing, ICT talent, project/program talent, professional support and managed IT support. Historical demand/supplier evidence only.'
+          fi
+          for f in summary.json REPORT.md market_matrix.csv top_winners.csv top_buyers.csv examples.csv; do
+            gh release upload "$TAG" "out/$f" --repo walidgdg1-ai/tender-engine --clobber
+          done
+          mkdir -p control/historical_australia_staffing_v1
+          cp out/summary.json out/REPORT.md control/historical_australia_staffing_v1/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_australia_staffing_v1/
+          git commit -m 'historical: persist Australia staffing decomposition v1' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
