@@ -1,0 +1,66 @@
+name: Germany Historical Provenance Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/germany-historical-provenance-probe.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Download canonical historical tender facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source
+          gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool \
+            --pattern historical_tenders.parquet --dir source --clobber
+      - name: Inspect Germany identity and URL provenance
+        shell: bash
+        run: |
+          python - <<'PY'
+          import duckdb,json,re
+          from pathlib import Path
+          p='source/historical_tenders.parquet';con=duckdb.connect()
+          cols=[r[0] for r in con.execute('DESCRIBE SELECT * FROM read_parquet(?)',[p]).fetchall()]
+          relevant=[c for c in cols if re.search(r'(url|uri|link|source|notice|tender|id|publication|portal)',c,re.I)]
+          def q(c):return '"'+c.replace('"','""')+'"'
+          sel=['Warehouse_Source','Historical_Tender_ID','Country','Buyer_Name','Title','Primary_Source_URL','Publication_Date']
+          for c in relevant:
+            if c not in sel:sel.append(c)
+          sel=[c for c in sel if c in cols]
+          sql='SELECT '+','.join(q(c) for c in sel)+' FROM read_parquet(?) WHERE lower(cast(Warehouse_Source as varchar))=\'germany\' AND regexp_matches(lower(cast(Title as varchar)), \'(website|webseite|internetauftritt|webauftritt).*(pflege|wartung|betreuung|support|hosting|betrieb)|(pflege|wartung|betreuung|support|hosting|betrieb).*(website|webseite|internetauftritt|webauftritt)\') LIMIT 30'
+          rows=con.execute(sql,[p]).fetchall();samples=[]
+          for vals in rows:
+            d={c:v for c,v in zip(sel,vals)}
+            d={k:(v.isoformat() if hasattr(v,'isoformat') else v) for k,v in d.items() if v not in (None,'')}
+            samples.append(d)
+          nonempty={c:sum(1 for r in samples if r.get(c) not in (None,'')) for c in sel}
+          out={'contract':'GERMANY_HISTORICAL_PROVENANCE_PROBE_V1','schema_relevant_columns':relevant,'selected_columns':sel,'sample_count':len(samples),'nonempty_in_sample':nonempty,'samples':samples}
+          Path('germany_provenance_probe.json').write_text(json.dumps(out,indent=2,ensure_ascii=False,default=str)+'\n',encoding='utf-8')
+          print(json.dumps({'relevant':relevant,'sample_count':len(samples),'nonempty':nonempty,'samples':samples[:5]},indent=2,ensure_ascii=False,default=str))
+          PY
+      - name: Persist probe
+        shell: bash
+        run: |
+          mkdir -p control/germany_historical_provenance_probe_v1
+          cp germany_provenance_probe.json control/germany_historical_provenance_probe_v1/probe.json
+          git config user.name 'github-actions[bot]';git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/germany_historical_provenance_probe_v1/probe.json
+          git commit -m 'tenders: persist Germany historical provenance probe v1' || exit 0
+          for i in 1 2 3 4 5; do git pull --rebase origin main && git push origin HEAD:main && exit 0; git rebase --abort >/dev/null 2>&1 || true; sleep $((i*3)); done
+          exit 1
