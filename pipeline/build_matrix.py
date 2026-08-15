@@ -6,10 +6,10 @@ import os
 import re
 from pathlib import Path
 
-# TED is marked browser-capable because BT-15 can route to a browser-backed downstream portal.
-# National discovery sources are also browser-capable: their public notice pages may expose
-# DCE/document links server-side or only after JS rendering. The worker remains conservative
-# and never bypasses auth/CAPTCHA; it merely follows publicly exposed document routes.
+# Browser-capable portals may expose DCE/document links server-side or after JS.
+# Keep this list aligned with dce_worker_v4/v5 registrations and every LIVE source
+# emitted by SuperGreen Discovery V2. Archive-only lanes (for example IT_ANAC_DELTA)
+# are intentionally omitted because they never belong in the open-bid queue.
 BROWSER_PORTALS = {
     "TED",
     "IRELAND_ETENDERS",
@@ -22,11 +22,31 @@ BROWSER_PORTALS = {
     "FR_BOAMP",
     "NZ_GETS",
     "AU_AUSTENDER",
+    "US_SAM",
+    "US_SAM_BULK",
+    "NL_TENDERNED",
+    "NL_TENDERNED_RSS",
+    "CH_SIMAP",
+    "LV_IUB",
+    "NO_DOFFIN",
+    "PL_EZAMOWIENIA",
+    "PL_BZP",
+    "GR_KHMDHS",
+    "ES_PLACSP",
+    "FI_HILMA",
+    "PT_BASE_OPEN",
+    "DK_UDBUD_PUBLIC",
+    "CZ_ZAKAZKY_GOV",
 }
 SUPPORTED = BROWSER_PORTALS | {
     "UNGM",
     "DIRECT_HTTP",
     "UK_CONTRACTS_FINDER",
+    "CYPRUS_EPPS",
+    "LITHUANIA_EPPS",
+    "GENERIC_EPPS",
+    "GENERIC_PUBLIC_PAGE",
+    "TED_PUBLIC_PAGE_FAST",
 }
 
 
@@ -63,7 +83,7 @@ def main():
     skipped = []
     for line_no, rec in load_lines(Path(args.queue)):
         status = str(rec.get("status") or "QUEUED").upper()
-        if status not in {"QUEUED", "READY", "DCE_PENDING"}:
+        if status not in {"QUEUED", "READY", "DCE_PENDING", "AUTO_DCE_PREFETCH"}:
             skipped.append({"line": line_no, "candidate_id": rec.get("candidate_id"), "reason": f"status:{status}"})
             continue
         portal = str(rec.get("portal") or rec.get("portal_key") or rec.get("source") or "").upper()
