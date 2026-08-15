@@ -1,9 +1,9 @@
 {
   "contract": "TENDER_MARKET_BRAIN_PRIORS_V1",
   "status": "READY",
-  "generated_at": "2026-08-15T17:38:00Z",
-  "source_release": "walidgdg1-ai/tender-engine:market-intelligence-v9-final-qa + Exhaustive Every-Record v1 / Semantic Promotion v2.1",
-  "source_scope": "Global Core v4 notice-first. v9 remains authority for cleaned named lean lanes. Two additional broker lanes are admitted only after strict semantic QA plus persisted manual sample review.",
+  "generated_at": "2026-08-15T18:02:18.564650+00:00",
+  "source_release": "walidgdg1-ai/tender-engine:market-intelligence-v9-final-qa + market-intelligence-micro-niche-v2-precision",
+  "source_scope": "Global Core v4 notice-first. v9 cleaned lanes plus title-led Micro-Niche v2 Precision lanes admitted only after persisted manual QA. Direct/noncompetitive evidence remains buyer-demand intelligence only.",
   "safety": {
     "affects_final_verdict": false,
     "satisfies_dce_gates": false,
@@ -18,22 +18,61 @@
     {
       "lane": "Printing / mailing / routing",
       "country": "FRANCE",
-      "sample_size": 915,
-      "historical_score": 91.5,
+      "sample_size": 779,
+      "historical_score": 84.9,
       "priority_bonus": 6,
-      "decision": "PROMOTE_CORE",
-      "patterns": ["\\bprinting\\b", "\\bimpression\\b", "imprimerie", "routage", "mise sous pli", "mailing"],
-      "negative_patterns": ["3d print", "printer maintenance", "imprimante", "copier rental", "managed print"]
+      "decision": "PROMOTE_BROKER",
+      "match_field": "title",
+      "patterns": [
+        "travaux d['’]impression",
+        "prestations? d['’]impression",
+        "services? d['’]impression",
+        "\\bimpression (?:de|des|et)\\b",
+        "\\broutage\\b",
+        "mise sous pli",
+        "\\bmailing\\b"
+      ],
+      "negative_patterns": [
+        "3d print",
+        "printer maintenance",
+        "\\bimprimante",
+        "\\bcopieur",
+        "managed print",
+        "syst[eè]me.{0,30}impression",
+        "presse num[eé]rique",
+        "location.{0,30}(?:presse|copieur)",
+        "maintenance.{0,30}(?:presse|copieur)",
+        "transformation.{0,40}imprimerie"
+      ]
     },
     {
       "lane": "Graphic design / layout / DTP",
       "country": "FRANCE",
       "sample_size": 194,
-      "historical_score": 88.79,
+      "historical_score": 85.97,
       "priority_bonus": 6,
       "decision": "PROMOTE_CORE",
-      "patterns": ["conception graphique", "design graphique", "graphisme", "mise en page", "identit[eé] visuelle", "desktop publishing", "infograph"],
-      "negative_patterns": ["architect", "engineering", "ma[iî]trise d.oeuvre", "construction"]
+      "match_field": "title",
+      "patterns": [
+        "conception graphique",
+        "design graphique",
+        "\\bgraphisme\\b",
+        "mise en page",
+        "identit[eé] visuelle",
+        "desktop publishing",
+        "\\binfograph"
+      ],
+      "negative_patterns": [
+        "architect",
+        "engineering",
+        "ma[iî]trise d['’]oeuvre",
+        "construction",
+        "sc[eé]nograph",
+        "mus[eé]ograph",
+        "exposition",
+        "\\btravaux\\b",
+        "\\bstand\\b"
+      ]
     },
     {
       "lane": "Document digitization / OCR / scanning",
@@ -42,18 +81,45 @@
       "historical_score": 87.45,
       "priority_bonus": 6,
       "decision": "PROMOTE_CORE",
-      "patterns": ["num[eé]risation", "digitization", "digitisation", "document scanning", "\\bocr\\b", "digitalisation d.{0,20}documents"],
-      "negative_patterns": ["microscope", "medical", "scanner m[eé]dical", "laser scanning", "street", "voirie"]
+      "patterns": [
+        "num[eé]risation",
+        "digitization",
+        "digitisation",
+        "document scanning",
+        "\\bocr\\b",
+        "digitalisation d.{0,20}documents"
+      ],
+      "negative_patterns": [
+        "microscope",
+        "medical",
+        "scanner m[eé]dical",
+        "laser scanning",
+        "street",
+        "voirie"
+      ]
     },
     {
       "lane": "Translation",
       "country": "FRANCE",
-      "sample_size": 124,
-      "historical_score": 84.9,
+      "sample_size": 139,
+      "historical_score": 84.28,
       "priority_bonus": 5,
       "decision": "PROMOTE_CORE",
-      "patterns": ["traduction", "translation services?", "linguistic"],
-      "negative_patterns": ["translational", "translationnelle", "medicine", "m[eé]decine"]
+      "match_field": "title",
+      "patterns": [
+        "\\btraduction\\b",
+        "\\binterpr[eé]tariat\\b",
+        "translation services?",
+        "linguistic translation"
+      ],
+      "negative_patterns": [
+        "translational",
+        "translationnelle",
+        "m[eé]decine",
+        "mat[eé]riel.{0,40}traduction",
+        "audiovisuel.{0,50}traduction",
+        "translation.{0,40}equipment"
+      ]
     },
     {
       "lane": "Website / CMS build or redesign",
@@ -62,18 +128,39 @@
       "historical_score": 81.36,
       "priority_bonus": 5,
       "decision": "PROMOTE_CORE",
-      "patterns": ["website", "webseite", "internetauftritt", "webportal", "web portal", "\\bcms\\b", "wordpress", "drupal"],
-      "negative_patterns": ["portal crane", "security portal", "x-ray", "medical", "construction", "hardware supply"]
+      "match_field": "title",
+      "patterns": [
+        "(?:relaunch|neugestaltung|entwicklung|redesign).{0,90}(?:webseite|website|internetauftritt|webportal)",
+        "(?:webseite|website|internetauftritt|webportal).{0,90}(?:relaunch|neugestaltung|entwicklung|redesign)",
+        "(?:wordpress|drupal|joomla).{0,90}(?:webseite|website|cms|portal)"
+      ],
+      "negative_patterns": [
+        "portal crane",
+        "security portal",
+        "x-ray",
+        "medical",
+        "construction",
+        "hardware supply"
+      ]
     },
     {
       "lane": "Website support / accessibility / hosting",
       "country": "FRANCE",
-      "sample_size": 118,
-      "historical_score": 77.8,
+      "sample_size": 121,
+      "historical_score": 81.97,
       "priority_bonus": 5,
       "decision": "PROMOTE_CORE",
-      "patterns": ["site web.{0,80}(maintenance|support|h[eé]bergement|accessibil)", "website.{0,80}(maintenance|support|hosting|accessibil)", "portail web.{0,80}(maintenance|support|h[eé]bergement)"],
-      "negative_patterns": ["construction", "hardware", "security portal", "x-ray"]
+      "match_field": "title",
+      "patterns": [
+        "(?:site web|site internet|website|portail web).{0,90}(?:maintenance|support|h[eé]bergement|entretien|mise [àa] jour)",
+        "(?:maintenance|support|h[eé]bergement|entretien|mise [àa] jour).{0,90}(?:site web|site internet|website|portail web)"
+      ],
+      "negative_patterns": [
+        "construction",
+        "hardware",
+        "security portal",
+        "x-ray"
+      ]
     },
     {
       "lane": "Promotional merchandise",
@@ -82,38 +169,80 @@
       "historical_score": 76.77,
       "priority_bonus": 4,
       "decision": "PROMOTE_BROKER",
-      "patterns": ["objets publicitaires", "articles promotionnels", "goodies", "promotional merchandise", "branded merchandise"],
-      "negative_patterns": ["event management", "full service marketing"]
+      "patterns": [
+        "objets publicitaires",
+        "articles promotionnels",
+        "goodies",
+        "promotional merchandise",
+        "branded merchandise"
+      ],
+      "negative_patterns": [
+        "event management",
+        "full service marketing"
+      ]
     },
     {
       "lane": "Website / CMS build or redesign",
       "country": "FRANCE",
-      "sample_size": 100,
-      "historical_score": 74.5,
+      "sample_size": 66,
+      "historical_score": 79.14,
       "priority_bonus": 4,
       "decision": "PROMOTE_CORE",
-      "patterns": ["site web", "site internet", "website", "portail web", "\\bcms\\b", "wordpress", "drupal"],
-      "negative_patterns": ["portal crane", "security portal", "x-ray", "medical", "construction", "hardware"]
+      "match_field": "title",
+      "patterns": [
+        "(?:refonte|cr[eé]ation|conception|d[eé]veloppement|relaunch|redesign).{0,90}(?:site internet|site web|website|portail web)",
+        "(?:site internet|site web|website|portail web).{0,90}(?:refonte|cr[eé]ation|conception|d[eé]veloppement|relaunch|redesign)",
+        "(?:wordpress|drupal|joomla).{0,90}(?:site|website|cms|portail)"
+      ],
+      "negative_patterns": [
+        "portal crane",
+        "security portal",
+        "x-ray",
+        "medical",
+        "construction",
+        "hardware"
+      ]
     },
     {
       "lane": "Website support / accessibility / hosting",
       "country": "GERMANY",
-      "sample_size": 97,
-      "historical_score": 72.94,
-      "priority_bonus": 4,
+      "sample_size": 90,
+      "historical_score": 86.29,
+      "priority_bonus": 5,
       "decision": "PROMOTE_CORE",
-      "patterns": ["webseite.{0,80}(pflege|betrieb|support|hosting|barrierefrei)", "website.{0,80}(maintenance|support|hosting|accessibil)", "internetauftritt.{0,80}(pflege|betrieb)"],
-      "negative_patterns": ["construction", "hardware", "security portal"]
+      "match_field": "title",
+      "patterns": [
+        "(?:webseite|website|internetauftritt|webauftritt).{0,90}(?:pflege|wartung|betreuung|support|hosting|betrieb)",
+        "(?:pflege|wartung|betreuung|support|hosting|betrieb).{0,90}(?:webseite|website|internetauftritt|webauftritt)"
+      ],
+      "negative_patterns": [
+        "construction",
+        "hardware",
+        "security portal",
+        "portal crane"
+      ]
     },
     {
       "lane": "Website / CMS build or redesign",
       "country": "UNITED KINGDOM",
       "sample_size": 60,
       "historical_score": 70.1,
-      "priority_bonus": 4,
+      "priority_bonus": 3,
       "decision": "PROMOTE_CORE",
-      "patterns": ["website", "web site", "web redesign", "web development", "content management system", "\\bcms\\b", "wordpress", "drupal"],
-      "negative_patterns": ["portal crane", "security portal", "x-ray", "medical", "construction", "hardware"]
+      "match_field": "title",
+      "patterns": [
+        "(?:redesign|rebuild|development|develop|new website).{0,90}(?:website|web site|web portal|cms)",
+        "(?:website|web site|web portal|cms).{0,90}(?:redesign|rebuild|development|develop)",
+        "(?:wordpress|drupal|joomla).{0,90}(?:website|cms|portal)"
+      ],
+      "negative_patterns": [
+        "portal crane",
+        "security portal",
+        "x-ray",
+        "medical",
+        "construction",
+        "hardware"
+      ]
     },
     {
       "lane": "Social media / community management",
@@ -122,8 +251,16 @@
       "historical_score": 69.37,
       "priority_bonus": 3,
       "decision": "PROMOTE_CORE",
-      "patterns": ["r[eé]seaux sociaux", "social media", "community management", "gestion des m[eé]dias sociaux"],
-      "negative_patterns": ["physical event", "infrastructure"]
+      "patterns": [
+        "r[eé]seaux sociaux",
+        "social media",
+        "community management",
+        "gestion des m[eé]dias sociaux"
+      ],
+      "negative_patterns": [
+        "physical event",
+        "infrastructure"
+      ]
     },
     {
       "lane": "Website support / accessibility / hosting",
@@ -132,18 +269,42 @@
       "historical_score": 66.57,
       "priority_bonus": 3,
       "decision": "PROMOTE_CORE",
-      "patterns": ["website.{0,80}(maintenance|support|hosting|accessibil)", "web support", "web maintenance", "web hosting"],
-      "negative_patterns": ["construction", "hardware"]
+      "match_field": "title",
+      "patterns": [
+        "(?:website|web site|web portal).{0,90}(?:maintenance|support|hosting|accessibil)",
+        "(?:maintenance|support|hosting|accessibil).{0,90}(?:website|web site|web portal)"
+      ],
+      "negative_patterns": [
+        "construction",
+        "hardware"
+      ]
     },
     {
       "lane": "Survey / market research",
       "country": "IRELAND",
       "sample_size": 30,
-      "historical_score": 63.25,
-      "priority_bonus": 3,
-      "decision": "PROMOTE_CORE",
-      "patterns": ["market research", "survey services?", "opinion poll", "customer survey"],
-      "negative_patterns": ["geotechn", "soil", "drilling", "borehole"]
+      "historical_score": 86.48,
+      "priority_bonus": 0,
+      "decision": "HOLD_QA",
+      "match_field": "title",
+      "patterns": [
+        "market research",
+        "opinion poll",
+        "customer survey",
+        "satisfaction survey",
+        "research panel"
+      ],
+      "negative_patterns": [
+        "archaeolog",
+        "topograph",
+        "lidar",
+        "ornitholog",
+        "ecolog",
+        "geotechn",
+        "soil",
+        "drilling",
+        "borehole"
+      ]
     },
     {
       "lane": "Software licences / SaaS resale",
@@ -152,8 +313,22 @@
       "historical_score": null,
       "priority_bonus": 2,
       "decision": "PROMOTE_BROKER",
-      "patterns": ["software licen[cs](e|es|ing)", "software subscription", "licences? logicielles?", "software licensing", "software licencing", "saas subscription"],
-      "negative_patterns": ["custom software development", "application development", "system integration", "implementation project", "professional licence", "medical licence"]
+      "patterns": [
+        "software licen[cs](e|es|ing)",
+        "software subscription",
+        "licences? logicielles?",
+        "software licensing",
+        "software licencing",
+        "saas subscription"
+      ],
+      "negative_patterns": [
+        "custom software development",
+        "application development",
+        "system integration",
+        "implementation project",
+        "professional licence",
+        "medical licence"
+      ]
     },
     {
       "lane": "Promotional merchandise — cross-country expansion",
@@ -162,18 +337,129 @@
       "historical_score": null,
       "priority_bonus": 2,
       "decision": "PROMOTE_BROKER",
-      "patterns": ["promotional merchandise", "branded merchandise", "promotional items", "objets publicitaires", "articles promotionnels", "articles promotionnels", "corporate gifts"],
-      "negative_patterns": ["full service marketing", "event management", "campaign management"]
+      "patterns": [
+        "promotional merchandise",
+        "branded merchandise",
+        "promotional items",
+        "objets publicitaires",
+        "articles promotionnels",
+        "articles promotionnels",
+        "corporate gifts"
+      ],
+      "negative_patterns": [
+        "full service marketing",
+        "event management",
+        "campaign management"
+      ]
+    },
+    {
+      "lane": "Transcription / speech-to-text",
+      "country": "FRANCE",
+      "sample_size": 58,
+      "historical_score": 82.42,
+      "priority_bonus": 4,
+      "decision": "PROMOTE_CORE",
+      "match_field": "title",
+      "patterns": [
+        "\\btranscription\\b",
+        "\\bretranscription\\b",
+        "st[eé]notyp",
+        "speech[- ]to[- ]text"
+      ],
+      "negative_patterns": [
+        "dna transcription",
+        "gene transcription",
+        "transcription factor"
+      ]
+    },
+    {
+      "lane": "Commercial printing / print production",
+      "country": "CANADA - QUEBEC",
+      "sample_size": 68,
+      "historical_score": 90.86,
+      "priority_bonus": 5,
+      "decision": "PROMOTE_BROKER",
+      "match_field": "title",
+      "patterns": [
+        "services? d['’]impression",
+        "travaux d['’]impression",
+        "\\bimpression (?:de|des|pour)\\b",
+        "communications? imprim[eé]es?",
+        "impression grand format"
+      ],
+      "negative_patterns": [
+        "\\bimprimante",
+        "\\bcopieur",
+        "managed print",
+        "3d print",
+        "maintenance.{0,30}(?:imprimante|copieur)",
+        "location.{0,30}(?:imprimante|copieur)"
+      ]
+    },
+    {
+      "lane": "Translation",
+      "country": "CANADA",
+      "sample_size": 35,
+      "historical_score": 81.5,
+      "priority_bonus": 3,
+      "decision": "PROMOTE_CORE",
+      "match_field": "title",
+      "patterns": [
+        "translation services?",
+        "professional translation",
+        "technical translation",
+        "sign language translation",
+        "interpretation services?"
+      ],
+      "negative_patterns": [
+        "translational",
+        "translation.{0,40}equipment",
+        "simultaneous interpretation equipment"
+      ]
     }
   ],
   "manual_reviewed_expansion": {
     "authority": "control/semantic_promotion_v2/MANUAL_REVIEW_VERDICT.md",
-    "promoted": ["Software licences / SaaS resale", "Promotional merchandise"],
-    "held": ["Training / e-learning"],
+    "promoted": [
+      "Software licences / SaaS resale",
+      "Promotional merchandise"
+    ],
+    "held": [
+      "Training / e-learning"
+    ],
     "note": "Training/e-learning remains HOLD despite automatic PROMOTE_CORE because the persisted 40-row manual sample still contains semantic collisions."
   },
   "pending_expansion": {
     "authority": "control/semantic_promotion_v2/promotion_decisions.csv",
     "rule": "No further exhaustive/open-world lane is added to lane_rules until strict semantic QA and manual sample review both pass."
+  },
+  "micro_niche_precision_v2": {
+    "authority": "control/micro_niche_intelligence_v2_precision/MANUAL_PROMOTION_VERDICT.md",
+    "source_release": "market-intelligence-micro-niche-v2-precision",
+    "classified_notice_first_tenders": 7427,
+    "micro_niches": 23,
+    "promoted_or_strengthened": [
+      "Quebec commercial printing",
+      "Germany website maintenance/hosting/support",
+      "France graphic design/layout/DTP",
+      "France printing/mailing/routing",
+      "France translation",
+      "France transcription/speech-to-text",
+      "France website maintenance/hosting/support",
+      "France website build/redesign",
+      "Canada federal translation (modest)"
+    ],
+    "legacy_rules_hardened_title_led": [
+      "Germany website/CMS build",
+      "United Kingdom website/CMS build",
+      "Ireland website support/hosting"
+    ],
+    "held": [
+      "Ireland broad survey/market research (semantic QA)",
+      "Quebec market research (delivery-model QA)",
+      "Ireland media monitoring (winner concentration)"
+    ],
+    "title_led": true,
+    "note": "Only PROMOTE_CORE/PROMOTE_BROKER rules can affect live retrieval. HOLD_* rules are persisted for audit but ignored by the loader."
   }
 }
