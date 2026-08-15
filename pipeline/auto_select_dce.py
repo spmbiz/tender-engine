@@ -4,7 +4,7 @@ import argparse
 import json
 import math
 import re
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
@@ -47,6 +47,7 @@ SAM_SOFT_NON_BID_TYPES = {
     "request for information": -55,
     "rfi": -55,
 }
+SAM_PORTALS = {"US_SAM", "US_SAM_BULK"}
 
 
 def load_jsonl(path: Path) -> Iterable[dict]:
@@ -81,14 +82,9 @@ def portal_key(rec: dict) -> str:
 
 
 def sam_adjustment(rec: dict) -> tuple[int, list[str]]:
-    """Prevent US SAM discovery volume from masquerading as Belgian-bid eligibility.
-
-    The official bulk feed is useful for discovery, but many rows are US small-business
-    set-asides or non-bid notices and the SAM web UI commonly gates attachments behind
-    authentication. Penalize those before they consume expensive DCE fanout slots.
-    """
+    """Prevent US SAM discovery volume from masquerading as Belgian-bid eligibility."""
     portal = portal_key(rec)
-    if portal not in {"US_SAM", "US_SAM_BULK"}:
+    if portal not in SAM_PORTALS:
         return 0, []
 
     score = 0
@@ -203,6 +199,18 @@ def _emit(out, item, emitted_ids, emitted_tb, counts):
     return True
 
 
+def _fill_with_caps(items, out, emitted_ids, emitted_tb, counts, limit: int, default_cap: int, sam_cap: int):
+    for item in items:
+        pkey = portal_key(item[3])
+        cap = sam_cap if pkey in SAM_PORTALS else default_cap
+        if counts[pkey] >= cap:
+            continue
+        _emit(out, item, emitted_ids, emitted_tb, counts)
+        if len(out) >= limit:
+            return True
+    return len(out) >= limit
+
+
 def select(records: Iterable[dict], minimum: int = 34, limit: int = 320, blocked_ids: set[str] | None = None) -> list[dict]:
     rows = list(records)
     blocked_norm = {str(x).strip().casefold() for x in (blocked_ids or set()) if str(x).strip()}
@@ -212,58 +220,44 @@ def select(records: Iterable[dict], minimum: int = 34, limit: int = 320, blocked
         if cid_key in blocked_norm and tb_key:
             blocked_tb.add(tb_key)
 
-    scored = []
+    all_scored = []
     for rec in rows:
         cid = str(rec.get("candidate_id") or "").strip()
         cid_key, tb_key = identity(rec)
         if not cid or cid_key in blocked_norm or (tb_key and tb_key in blocked_tb):
             continue
         score, reasons = retrieval_score(rec)
-        if score < minimum:
-            continue
-        scored.append((score, cid, reasons, rec, cid_key, tb_key))
+        all_scored.append((score, cid, reasons, rec, cid_key, tb_key))
 
-    # Use exact materialization identity semantics, but do not let one giant source
-    # monopolize an expensive 320-candidate DCE wave. First pass applies a soft
-    # source cap; second pass fills remaining capacity round-robin from portal
-    # overflow. This preserves throughput while materially increasing world coverage.
-    scored.sort(key=lambda x: (-x[0], str(x[3].get("deadline") or "9999"), x[1]))
-    default_cap = max(24, math.ceil(limit * 0.25))
-    special_caps = {"US_SAM": max(24, math.ceil(limit * 0.125)), "US_SAM_BULK": max(24, math.ceil(limit * 0.125))}
+    all_scored.sort(key=lambda x: (-x[0], str(x[3].get("deadline") or "9999"), x[1]))
+    primary = [x for x in all_scored if x[0] >= minimum]
+    recall_floor = max(0, minimum - 24)
+    recall = [x for x in all_scored if recall_floor <= x[0] < minimum]
 
     out = []
     emitted_ids: set[str] = set()
     emitted_tb: set[tuple[str, str]] = set()
     counts: Counter[str] = Counter()
-    overflow: dict[str, list] = defaultdict(list)
 
-    for item in scored:
-        pkey = portal_key(item[3])
-        cap = special_caps.get(pkey, default_cap)
-        if counts[pkey] >= cap:
-            overflow[pkey].append(item)
-            continue
-        _emit(out, item, emitted_ids, emitted_tb, counts)
-        if len(out) >= limit:
-            return out
+    # Hard policy learned from the measured SAM wave: 299/320 auth-blocked and only
+    # 14/320 substantive DCE. SAM therefore never exceeds 12.5% of a 320 batch,
+    # regardless of overflow. Other portals start at 25%; if the high-score pool is
+    # exhausted, widen relevance recall before relaxing their caps.
+    sam_cap = max(16, math.ceil(limit * 0.125))
+    cap_25 = max(24, math.ceil(limit * 0.25))
+    cap_35 = max(cap_25, math.ceil(limit * 0.35))
+    cap_50 = max(cap_35, math.ceil(limit * 0.50))
 
-    # Fill any remaining capacity fairly. Highest score still matters within a
-    # portal, but each active portal gets one turn before any gets a second.
-    active = [p for p, items in overflow.items() if items]
-    active.sort(key=lambda p: (-overflow[p][0][0], p))
-    while active and len(out) < limit:
-        next_active = []
-        for pkey in active:
-            items = overflow[pkey]
-            while items:
-                item = items.pop(0)
-                if _emit(out, item, emitted_ids, emitted_tb, counts):
-                    break
-            if items:
-                next_active.append(pkey)
-            if len(out) >= limit:
-                break
-        active = next_active
+    for pool, cap in (
+        (primary, cap_25),
+        (recall, cap_25),
+        (primary, cap_35),
+        (recall, cap_35),
+        (primary, cap_50),
+        (recall, cap_50),
+    ):
+        if _fill_with_caps(pool, out, emitted_ids, emitted_tb, counts, limit, cap, sam_cap):
+            break
 
     return out
 
@@ -291,14 +285,20 @@ def main() -> None:
         for rec in selected:
             f.write(json.dumps(rec, ensure_ascii=False, separators=(",", ":")) + "\n")
     portal_counts = dict(Counter(str(x.get("selection_portal") or "UNKNOWN") for x in selected))
+    sam_count = sum(portal_counts.get(p, 0) for p in SAM_PORTALS)
+    sam_cap = max(16, math.ceil(args.limit * 0.125))
     summary = {
         "input": len(rows),
         "blocked_ids": len(blocked),
         "selected": len(selected),
         "minimum": args.minimum,
+        "recall_floor": max(0, args.minimum - 24),
         "limit": args.limit,
         "selection_portal_counts": portal_counts,
         "max_portal_share": round(max(portal_counts.values(), default=0) / max(1, len(selected)), 6),
+        "sam_count": sam_count,
+        "sam_hard_cap": sam_cap,
+        "sam_cap_respected": sam_count <= sam_cap,
     }
     out.with_suffix(out.suffix + ".summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(json.dumps(summary, indent=2))
