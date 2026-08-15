@@ -1,0 +1,232 @@
+name: SPM Exhaustive Every-Record Historical Read v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/exhaustive-every-record-v1.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: spm-exhaustive-every-record-v1
+  cancel-in-progress: false
+
+env:
+  TAG: market-intelligence-exhaustive-every-record-v1
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure canonical derived release exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view "$TAG" --repo walidgdg1-ai/tender-engine >/dev/null 2>&1; then
+            gh release create "$TAG" --repo walidgdg1-ai/tender-engine --target main \
+              --title 'SPM Exhaustive Every-Record Historical Read v1' \
+              --notes 'Exhaustive structured-data processing across canonical notice-first Global Core v4 plus USAspending and AusTender award-first warehouses. Every procurement row is scored before aggregation; every award and award-supplier link row is scanned. Historical priors only, not live/DCE verdicts.'
+          fi
+
+  global_core:
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Runtime hardening patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('pipeline/exhaustive_record_reader_v1.py')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('sample_size=-1','sample_size=200000')
+          s=s.replace("SET memory_limit='10GB'","SET memory_limit='5GB'")
+          s=s.replace("con = duckdb.connect(str(out / 'work.duckdb'))","(out/'ducktmp').mkdir(parents=True,exist_ok=True)\n    con = duckdb.connect(str(out / 'work.duckdb'))")
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Download Global Core v4 canonical facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          for a in historical_tenders.parquet awards.parquet award_suppliers.parquet data_quality.json; do
+            gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern "$a" --dir source --clobber
+          done
+      - name: Process every notice-first record
+        run: |
+          python pipeline/exhaustive_record_reader_v1.py \
+            --label GLOBAL_CORE_V4 --grain NOTICE_FIRST_TENDER \
+            --historical source/historical_tenders.parquet --awards source/awards.parquet --bridge source/award_suppliers.parquet \
+            --expected-tenders 2250547 --expected-awards 4286784 --expected-links 3937663 --out out
+      - name: Publish compact derived outputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -f out/processed_records.parquet out/award_stats.parquet out/supplier_stats.parquet out/work.duckdb out/work.duckdb.wal
+          rm -rf out/ducktmp
+          for f in summary.json REPORT.md broad_families.csv lanes_by_route.csv source_route_coverage.csv repeat_buyers.csv open_world_clusters.csv top_record_review_queue.csv; do
+            cp "out/$f" "global_core_$f"
+            gh release upload "$TAG" "global_core_$f" --repo walidgdg1-ai/tender-engine --clobber
+          done
+
+  australia:
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Runtime hardening patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('pipeline/exhaustive_record_reader_v1.py')
+          s=p.read_text(encoding='utf-8').replace('sample_size=-1','sample_size=200000').replace("SET memory_limit='10GB'","SET memory_limit='5GB'")
+          s=s.replace("con = duckdb.connect(str(out / 'work.duckdb'))","(out/'ducktmp').mkdir(parents=True,exist_ok=True)\n    con = duckdb.connect(str(out / 'work.duckdb'))")
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Download AusTender canonical award-first facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          for a in historical_tenders.csv.gz awards.csv.gz award_suppliers.csv.gz data_quality.json; do
+            gh release download tender-normalized-austender-v1 --repo walidgdg1-ai/coldemailtool --pattern "$a" --dir source --clobber
+          done
+      - name: Process every AusTender record
+        run: |
+          python pipeline/exhaustive_record_reader_v1.py \
+            --label AUSTENDER_V1 --grain AWARD_FIRST_PROCUREMENT \
+            --historical source/historical_tenders.csv.gz --awards source/awards.csv.gz --bridge source/award_suppliers.csv.gz \
+            --expected-tenders 178211 --expected-awards 178211 --expected-links 178211 --out out
+      - name: Publish compact derived outputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -f out/processed_records.parquet out/award_stats.parquet out/supplier_stats.parquet out/work.duckdb out/work.duckdb.wal
+          rm -rf out/ducktmp
+          for f in summary.json REPORT.md broad_families.csv lanes_by_route.csv source_route_coverage.csv repeat_buyers.csv open_world_clusters.csv top_record_review_queue.csv; do
+            cp "out/$f" "australia_$f"
+            gh release upload "$TAG" "australia_$f" --repo walidgdg1-ai/tender-engine --clobber
+          done
+
+  usa:
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Runtime hardening patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('pipeline/exhaustive_record_reader_v1.py')
+          s=p.read_text(encoding='utf-8').replace('sample_size=-1','sample_size=200000').replace("SET memory_limit='10GB'","SET memory_limit='5GB'")
+          s=s.replace("con = duckdb.connect(str(out / 'work.duckdb'))","(out/'ducktmp').mkdir(parents=True,exist_ok=True)\n    con = duckdb.connect(str(out / 'work.duckdb'))")
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Download USAspending canonical award-first facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          for a in historical_tenders.csv.gz awards.csv.gz award_suppliers.csv.gz data_quality.json; do
+            gh release download tender-normalized-usa-awards-v1 --repo walidgdg1-ai/coldemailtool --pattern "$a" --dir source --clobber
+          done
+          df -h .
+      - name: Process all 15.8M USA procurement records
+        run: |
+          python pipeline/exhaustive_record_reader_v1.py \
+            --label USASPENDING_V1 --grain AWARD_FIRST_PROCUREMENT \
+            --historical source/historical_tenders.csv.gz --awards source/awards.csv.gz --bridge source/award_suppliers.csv.gz \
+            --expected-tenders 15842317 --expected-awards 15842317 --expected-links 15842317 --out out
+      - name: Publish compact derived outputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -f out/processed_records.parquet out/award_stats.parquet out/supplier_stats.parquet out/work.duckdb out/work.duckdb.wal
+          rm -rf out/ducktmp
+          for f in summary.json REPORT.md broad_families.csv lanes_by_route.csv source_route_coverage.csv repeat_buyers.csv open_world_clusters.csv top_record_review_queue.csv; do
+            cp "out/$f" "usa_$f"
+            gh release upload "$TAG" "usa_$f" --repo walidgdg1-ai/tender-engine --clobber
+          done
+
+  consolidate:
+    needs: [global_core, australia, usa]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download source summaries
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p all
+          for p in global_core_summary.json australia_summary.json usa_summary.json global_core_broad_families.csv australia_broad_families.csv usa_broad_families.csv global_core_lanes_by_route.csv australia_lanes_by_route.csv usa_lanes_by_route.csv; do
+            gh release download "$TAG" --repo walidgdg1-ai/tender-engine --pattern "$p" --dir all --clobber
+          done
+      - name: Build authoritative master completion report
+        run: |
+          python - <<'PY'
+          import csv,json
+          from pathlib import Path
+          root=Path('all')
+          ss=[json.load(open(root/f'{x}_summary.json',encoding='utf-8')) for x in ['global_core','australia','usa']]
+          totals={k:sum(s['counts'][k] for s in ss) for k in ['procurement_records','award_rows','award_supplier_links']}
+          assert totals['procurement_records']==18271075,totals
+          assert totals['award_rows']==20307312,totals
+          assert totals['award_supplier_links']==19934191,totals
+          master={'version':'SPM_EXHAUSTIVE_EVERY_RECORD_MASTER_V1','status':'PASS','sources':ss,'totals':totals,
+                  'grain_note':'18,271,075 procurement records = 2,250,547 notice-first unique Global Core procurements + 15,842,317 USA award-first procurements + 178,211 AusTender award-first procurements. Do not sum this with national source releases already deduped into Global Core.',
+                  'scope_note':'Every structured procurement row was materialized/scored; every award and supplier-link row was scanned. Underlying DCE/PDF attachments were not all fetched/read; DCE is a separate live/final gate.'}
+          Path('MASTER_SUMMARY.json').write_text(json.dumps(master,ensure_ascii=False,indent=2),encoding='utf-8')
+          lines=['# SPM Exhaustive Every-Record Historical Read — MASTER','', '**STATUS: PASS**','',
+                 'This is the first pass that accounts for the entire canonical structured historical corpus instead of only known lean lanes or a sample.','',
+                 f"- Procurement records processed: **{totals['procurement_records']:,}**",
+                 f"  - Notice-first Global Core v4: **{ss[0]['counts']['procurement_records']:,}**",
+                 f"  - USAspending award-first: **{ss[2]['counts']['procurement_records']:,}**",
+                 f"  - AusTender award-first: **{ss[1]['counts']['procurement_records']:,}**",
+                 f"- Award rows scanned: **{totals['award_rows']:,}**",
+                 f"- Award↔supplier links scanned: **{totals['award_supplier_links']:,}**",'',
+                 '## Integrity','']
+          for s in ss:
+            lines.append(f"- {s['label']}: {s['integrity']['status']} — ordinal {s['integrity']['scan_ordinal_min']}..{s['integrity']['scan_ordinal_max']}; procurement fingerprint `{s['fingerprints']['procurement_hash_sum']}`")
+          lines += ['', '## Important interpretation','',
+                    '- No structured procurement row is silently discarded: known lanes, open-world candidates, and residuals are all accounted for.',
+                    '- USA and Australia are award-first evidence lanes, not reconstructed original opportunity notices.',
+                    '- Historical scoring is a market prior, not a live eligibility verdict.',
+                    '- This does **not** claim every DCE/PDF attachment was manually read. Live/final candidates still require selective DCE retrieval and mandatory-gate verification.', '']
+          Path('MASTER_REPORT.md').write_text('\n'.join(lines),encoding='utf-8')
+          PY
+      - name: Publish master completion assets and persist compact snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "$TAG" MASTER_SUMMARY.json MASTER_REPORT.md --repo walidgdg1-ai/tender-engine --clobber
+          mkdir -p control/exhaustive_every_record_v1
+          cp MASTER_SUMMARY.json control/exhaustive_every_record_v1/MASTER_SUMMARY.json
+          cp MASTER_REPORT.md control/exhaustive_every_record_v1/MASTER_REPORT.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/exhaustive_every_record_v1/
+          git commit -m 'tenders: persist exhaustive every-record master snapshot' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
