@@ -1,0 +1,79 @@
+name: Historical BOAMP DCE Route Resolver
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/resolve_historical_boamp_routes.py'
+      - '.github/workflows/historical-boamp-route-resolver.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-boamp-dce-route-resolver
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q requests
+
+      - name: Resolve BOAMP DCE routes from official open-data API
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          python pipeline/resolve_historical_boamp_routes.py \
+            --queue control/historical_subniche_dce_access_v1/resolver_candidates.jsonl \
+            --out out
+
+      - name: Validate resolver contract
+        run: |
+          python - <<'PY'
+          import json, os
+          s=json.load(open('out/summary.json',encoding='utf-8'))
+          assert s['contract']=='HISTORICAL_BOAMP_DCE_ROUTE_RESOLVER_V1',s
+          assert s['input_boamp_candidates']==36,s
+          assert s['final_verdict_allowed'] is False
+          assert os.path.isfile('out/boamp_routes.jsonl')
+          assert os.path.isfile('out/resolved_candidates.jsonl')
+          print(json.dumps(s,indent=2,ensure_ascii=False))
+          PY
+
+      - name: Persist compact route intelligence
+        run: |
+          set -euo pipefail
+          mkdir -p control/historical_boamp_dce_routes_v1
+          cp out/summary.json control/historical_boamp_dce_routes_v1/summary.json
+          cp out/boamp_routes.jsonl control/historical_boamp_dce_routes_v1/boamp_routes.jsonl
+          cp out/resolved_candidates.jsonl control/historical_boamp_dce_routes_v1/resolved_candidates.jsonl
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_boamp_dce_routes_v1/
+          git commit -m 'tenders: persist official BOAMP historical DCE routes' || exit 0
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
+
+      - name: Publish durable route bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag='historical-boamp-dce-routes-v1'
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --target main \
+            --title 'Historical BOAMP DCE Routes v1' \
+            --notes 'Official BOAMP open-data resolution of historical sub-niche notice IDs into downstream DCE/procedure routes. Research evidence only; no access controls bypassed and no final bid verdict.'
+          gh release upload "$tag" out/summary.json out/boamp_routes.jsonl out/resolved_candidates.jsonl --clobber
