@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       dce_run_id:
-        description: Completed DCE Fanout run ID whose durable handoffs should be re-aggregated
+        description: Completed DCE Fanout run ID whose durable aggregate should be measured
         required: true
   push:
     branches: [main]
@@ -41,7 +41,7 @@ jobs:
           fi
           [[ "$rid" =~ ^[0-9]+$ ]] || { echo "Invalid DCE run id: $rid" >&2; exit 1; }
           echo "id=$rid" >> "$GITHUB_OUTPUT"
-      - name: Rehydrate compact durable shard handoffs only
+      - name: Rehydrate compact durable aggregate only
         env:
           GH_TOKEN: ${{ github.token }}
           RID: ${{ steps.resolve.outputs.id }}
@@ -49,25 +49,12 @@ jobs:
         run: |
           set -euo pipefail
           tag="dce-harvest-$RID"
-          mkdir -p release-handoff dce-artifacts
-          gh release download "$tag" --pattern 'handoff-shard-*.tar.gz' --dir release-handoff
-          count=0
-          for archive in release-handoff/handoff-shard-*.tar.gz; do
-            [ -e "$archive" ] || continue
-            base="$(basename "$archive" .tar.gz)"
-            mkdir -p "dce-artifacts/$base"
-            tar -xzf "$archive" -C "dce-artifacts/$base"
-            count=$((count+1))
-          done
-          test "$count" -gt 0
-          echo "rehydrated_shards=$count"
-      - name: Recompute scheduler-grade portal yield without retrieval work
-        env:
-          RID: ${{ steps.resolve.outputs.id }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          python pipeline/aggregate_dce.py --root dce-artifacts --out backfill
+          archive="dce-deep-review-$RID.tar.gz"
+          mkdir -p release-aggregate backfill
+          gh release download "$tag" --pattern "$archive" --dir release-aggregate
+          tar -xzf "release-aggregate/$archive" -C backfill
+          test -s backfill/summary.json
+          test -s backfill/portal_yield.json
           cp backfill/portal_yield.json "portal-yield-$RID.json"
           cp backfill/summary.json "dce-yield-summary-$RID.json"
       - name: Measure exact GitHub shard runner-minutes
