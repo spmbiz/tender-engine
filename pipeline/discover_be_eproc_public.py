@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 import os
 import shutil
@@ -17,7 +18,6 @@ BE_TZ = ZoneInfo("Europe/Brussels")
 LOOKBACK_DAYS = max(1, min(365, int(os.getenv("LOOKBACK_DAYS", "14"))))
 SCAN_DAYS = max(LOOKBACK_DAYS, min(730, int(os.getenv("BE_SCAN_DAYS", "120"))))
 MAX_PAGES = max(1, min(500, int(os.getenv("BE_MAX_PAGES", "220"))))
-PAGE_SIZE = max(25, min(250, int(os.getenv("BE_PAGE_SIZE", "100"))))
 
 
 def clean(value):
@@ -41,17 +41,48 @@ def parse_dt(value):
 
 
 def pick_text(items, preferred=()):
+    if isinstance(items, str):
+        return clean(items) or None
+    if isinstance(items, dict):
+        for key in ("text", "name", "value", "label"):
+            if clean(items.get(key)):
+                return clean(items.get(key))
+        items = list(items.values())
     if not isinstance(items, list):
         return None
     rows = [x for x in items if isinstance(x, dict) and clean(x.get("text"))]
-    if not rows:
-        return None
-    wanted = [clean(x).upper() for x in preferred if clean(x)] + ["NL", "FR", "EN", "DE"]
-    for lang in wanted:
-        for row in rows:
-            if clean(row.get("language")).upper() == lang:
-                return clean(row.get("text"))
-    return clean(rows[0].get("text"))
+    if rows:
+        wanted = [clean(x).upper() for x in preferred if clean(x)] + ["NL", "FR", "EN", "DE"]
+        for lang in wanted:
+            for row in rows:
+                if clean(row.get("language")).upper() == lang:
+                    return clean(row.get("text"))
+        return clean(rows[0].get("text"))
+    for item in items:
+        if isinstance(item, str) and clean(item):
+            return clean(item)
+        if isinstance(item, dict):
+            for key in ("name", "value", "label"):
+                if clean(item.get(key)):
+                    return clean(item.get(key))
+    return None
+
+
+def buyer_from(pub, langs):
+    org = pub.get("organisation") if isinstance(pub.get("organisation"), dict) else {}
+    candidates = [
+        org.get("organisationNames"),
+        org.get("names"),
+        org.get("name"),
+        pub.get("organisationName"),
+        pub.get("buyerName"),
+        pub.get("contractingAuthorityName"),
+    ]
+    for value in candidates:
+        text = pick_text(value, langs)
+        if text:
+            return text, org
+    return None, org
 
 
 def normalize(pub):
@@ -67,8 +98,7 @@ def normalize(pub):
     langs = pub.get("publicationLanguages") or []
     title = pick_text(dossier.get("titles"), langs)
     description = pick_text(dossier.get("descriptions"), langs)
-    org = pub.get("organisation") if isinstance(pub.get("organisation"), dict) else {}
-    buyer = pick_text(org.get("organisationNames"), langs)
+    buyer, org = buyer_from(pub, langs)
     deadline = parse_dt(pub.get("vaultSubmissionDeadline"))
     published = parse_dt(pub.get("publicationDate") or ((pub.get("publishedAt") or [None])[-1] if isinstance(pub.get("publishedAt"), list) else pub.get("publishedAt")))
     cancelled = bool(pub.get("cancelledAt"))
@@ -91,7 +121,7 @@ def normalize(pub):
         "publication_reference_numbers_ted": ted_refs,
         "title": title or ref or identity,
         "buyer": buyer,
-        "buyer_organisation_id": org.get("organisationId"),
+        "buyer_organisation_id": org.get("organisationId") or pub.get("organisationId"),
         "deadline": deadline.isoformat() if deadline else None,
         "published": published.isoformat() if published else None,
         "current": current,
@@ -131,13 +161,13 @@ def main():
 
     pw = browser = context = page = None
     captured_headers = None
+    captured_payload = None
     first_data = None
     telemetry = []
     errors = []
     publications = []
     total_count = None
     pages_fetched = 0
-    effective_page_size = PAGE_SIZE
     scan_cutoff = NOW - timedelta(days=SCAN_DAYS)
     raw_cutoff = NOW - timedelta(days=LOOKBACK_DAYS)
 
@@ -148,10 +178,14 @@ def main():
         page = context.new_page()
 
         def on_request(req):
-            nonlocal captured_headers
+            nonlocal captured_headers, captured_payload
             try:
                 if req.url.startswith(SEARCH_API) and req.method == "POST" and captured_headers is None:
-                    captured_headers = req.all_headers()
+                    raw = req.post_data or ""
+                    payload = json.loads(raw) if raw else None
+                    if isinstance(payload, dict):
+                        captured_headers = req.all_headers()
+                        captured_payload = payload
             except Exception:
                 pass
 
@@ -169,58 +203,63 @@ def main():
         page.on("response", on_response)
         page.goto(BDA, wait_until="domcontentloaded", timeout=60000)
         for _ in range(50):
-            if captured_headers and first_data:
+            if captured_headers and captured_payload and first_data:
                 break
             page.wait_for_timeout(400)
-        if not captured_headers or not first_data:
-            raise RuntimeError("Belgian public BDA search bootstrap did not yield a 200 publication response")
+        if not captured_headers or not captured_payload or not first_data:
+            raise RuntimeError("Belgian public BDA search bootstrap did not yield a complete 200 publication request/response pair")
 
-        # Keep the anonymous public bearer/cookie/session only in memory. Never log or persist it.
-        allowed = {"authorization", "content-type", "accept", "accept-language", "account-type", "origin", "referer"}
+        # The endpoint validates the complete SPA request schema. Replay the exact anonymous public
+        # payload and alter only page. Keep the native pageSize rather than guessing a larger value.
+        native_page_size = int(captured_payload.get("pageSize") or 25)
+        allowed = {"authorization", "content-type", "accept", "accept-language", "account-type"}
         replay_headers = {k: v for k, v in captured_headers.items() if k.lower() in allowed and v}
         replay_headers.setdefault("content-type", "application/json")
         replay_headers.setdefault("accept", "application/json, text/plain, */*")
         replay_headers.setdefault("account-type", "public")
 
-        def fetch_page(page_no, page_size):
-            payload = {"includeOrganisationChildren": True, "page": page_no, "pageSize": page_size}
+        def make_payload(page_no):
+            payload = copy.deepcopy(captured_payload)
+            payload["page"] = page_no
+            payload["pageSize"] = native_page_size
+            return payload
+
+        def fetch_page(page_no):
+            payload = make_payload(page_no)
+            # Same-origin fetch first: it reuses the browser's exact anonymous session/cookie state.
             try:
-                rr = context.request.post(SEARCH_API, headers=replay_headers, data=payload, timeout=45000)
-                text = rr.text()
-                data = json.loads(text) if text else None
-                telemetry.append({"page": page_no, "page_size": page_size, "method": "context.request", "status": rr.status, "bytes": len(text)})
-                if rr.status == 200 and isinstance(data, dict) and isinstance(data.get("publications"), list):
-                    return data
-            except Exception as exc:
-                telemetry.append({"page": page_no, "page_size": page_size, "method": "context.request", "error": repr(exc)})
-            try:
+                js_headers = {k: v for k, v in replay_headers.items() if k.lower() not in {"origin", "referer", "cookie"}}
                 result = page.evaluate(
                     """async ({url,payload,headers}) => {
                       const r = await fetch(url,{method:'POST',headers,credentials:'include',body:JSON.stringify(payload)});
                       const text = await r.text();
                       return {status:r.status,text};
                     }""",
-                    {"url": SEARCH_API, "payload": payload, "headers": replay_headers},
+                    {"url": SEARCH_API, "payload": payload, "headers": js_headers},
                 )
                 text = result.get("text") or ""
                 data = json.loads(text) if text else None
-                telemetry.append({"page": page_no, "page_size": page_size, "method": "page.fetch", "status": result.get("status"), "bytes": len(text)})
+                telemetry.append({"page": page_no, "page_size": native_page_size, "method": "page.fetch_exact_payload", "status": result.get("status"), "bytes": len(text)})
                 if result.get("status") == 200 and isinstance(data, dict) and isinstance(data.get("publications"), list):
                     return data
             except Exception as exc:
-                telemetry.append({"page": page_no, "page_size": page_size, "method": "page.fetch", "error": repr(exc)})
+                telemetry.append({"page": page_no, "page_size": native_page_size, "method": "page.fetch_exact_payload", "error": repr(exc)})
+            # APIRequestContext fallback shares browser storage and uses the exact captured schema.
+            try:
+                rr = context.request.post(SEARCH_API, headers=replay_headers, data=payload, timeout=45000)
+                text = rr.text()
+                data = json.loads(text) if text else None
+                telemetry.append({"page": page_no, "page_size": native_page_size, "method": "context.request_exact_payload", "status": rr.status, "bytes": len(text)})
+                if rr.status == 200 and isinstance(data, dict) and isinstance(data.get("publications"), list):
+                    return data
+            except Exception as exc:
+                telemetry.append({"page": page_no, "page_size": native_page_size, "method": "context.request_exact_payload", "error": repr(exc)})
             return None
 
-        data = fetch_page(1, effective_page_size)
-        if data is None and effective_page_size != 25:
-            effective_page_size = 25
-            data = first_data
-        elif data is None:
-            data = first_data
-
+        data = first_data
         for page_no in range(1, MAX_PAGES + 1):
             if page_no > 1:
-                data = fetch_page(page_no, effective_page_size)
+                data = fetch_page(page_no)
             if not data:
                 if page_no == 1:
                     raise RuntimeError("Belgian publication API returned no usable first page")
@@ -235,11 +274,9 @@ def main():
 
             pub_dates = [parse_dt(x.get("publicationDate")) for x in rows if isinstance(x, dict)]
             pub_dates = [x for x in pub_dates if x]
-            # Public search is newest-first. Stop only when every dated row on the page is
-            # already older than the configured scan horizon; one stray old row cannot truncate recall.
             if pub_dates and max(pub_dates) < scan_cutoff:
                 break
-            if len(rows) < effective_page_size:
+            if len(rows) < native_page_size:
                 break
 
     except Exception as exc:
@@ -290,7 +327,7 @@ def main():
         "ted_published": sum(bool(x.get("ted_published")) for x in raw),
         "national_only": sum(not bool(x.get("ted_published")) for x in raw),
         "pages_fetched": pages_fetched,
-        "page_size": effective_page_size,
+        "page_size": native_page_size if captured_payload else None,
         "api_total_count": total_count,
         "lookback_days": LOOKBACK_DAYS,
         "scan_days": SCAN_DAYS,
@@ -300,6 +337,7 @@ def main():
         "public_search_api": SEARCH_API,
         "auth_mode": "ANONYMOUS_PUBLIC_SPA_SESSION",
         "credentials_persisted": False,
+        "request_schema_keys": sorted(captured_payload.keys()) if isinstance(captured_payload, dict) else [],
         "telemetry": telemetry,
     }
     (OUT / "stats.json").write_text(json.dumps(stats, indent=2, ensure_ascii=False), encoding="utf-8")
