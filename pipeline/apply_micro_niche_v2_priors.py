@@ -109,6 +109,38 @@ def main():
         [r"portal crane", r"security portal", r"x-ray", r"medical", r"construction", r"hardware"],
     ))
 
+    # Legacy v9 web-build priors remain useful, but v1 QA proved that broad scope
+    # matching could contaminate them. Preserve their old evidence/weight while
+    # forcing title-led explicit build/redesign semantics.
+    upsert(rules, rule(
+        "Website / CMS build or redesign", "GERMANY", 230, 81.36, 5, "PROMOTE_CORE",
+        [
+            r"(?:relaunch|neugestaltung|entwicklung|redesign).{0,90}(?:webseite|website|internetauftritt|webportal)",
+            r"(?:webseite|website|internetauftritt|webportal).{0,90}(?:relaunch|neugestaltung|entwicklung|redesign)",
+            r"(?:wordpress|drupal|joomla).{0,90}(?:webseite|website|cms|portal)",
+        ],
+        [r"portal crane", r"security portal", r"x-ray", r"medical", r"construction", r"hardware supply"],
+    ))
+
+    upsert(rules, rule(
+        "Website / CMS build or redesign", "UNITED KINGDOM", 60, 70.10, 3, "PROMOTE_CORE",
+        [
+            r"(?:redesign|rebuild|development|develop|new website).{0,90}(?:website|web site|web portal|cms)",
+            r"(?:website|web site|web portal|cms).{0,90}(?:redesign|rebuild|development|develop)",
+            r"(?:wordpress|drupal|joomla).{0,90}(?:website|cms|portal)",
+        ],
+        [r"portal crane", r"security portal", r"x-ray", r"medical", r"construction", r"hardware"],
+    ))
+
+    upsert(rules, rule(
+        "Website support / accessibility / hosting", "IRELAND", 53, 66.57, 3, "PROMOTE_CORE",
+        [
+            r"(?:website|web site|web portal).{0,90}(?:maintenance|support|hosting|accessibil)",
+            r"(?:maintenance|support|hosting|accessibil).{0,90}(?:website|web site|web portal)",
+        ],
+        [r"construction", r"hardware"],
+    ))
+
     upsert(rules, rule(
         "Commercial printing / print production", "CANADA - QUEBEC", 68, 90.86, 5, "PROMOTE_BROKER",
         [r"services? d['’]impression", r"travaux d['’]impression", r"\bimpression (?:de|des|pour)\b", r"communications? imprim[eé]es?", r"impression grand format"],
@@ -149,6 +181,11 @@ def main():
             "France website maintenance/hosting/support",
             "France website build/redesign",
             "Canada federal translation (modest)",
+        ],
+        "legacy_rules_hardened_title_led": [
+            "Germany website/CMS build",
+            "United Kingdom website/CMS build",
+            "Ireland website support/hosting",
         ],
         "held": [
             "Ireland broad survey/market research (semantic QA)",
