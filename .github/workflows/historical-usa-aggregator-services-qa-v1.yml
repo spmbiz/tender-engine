@@ -1,0 +1,49 @@
+name: Historical USA Aggregator Services QA v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/historical-usa-aggregator-services-qa-v1.yml
+      - historical_lab/build_decomposition_qa_packet.py
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download USA aggregator evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input
+          for f in examples.csv top_winners.csv top_buyers.csv; do gh release download historical-usa-aggregator-services-v1 --repo "$GITHUB_REPOSITORY" --pattern "$f" --dir input --clobber; done
+      - name: Build QA packet
+        run: |
+          python historical_lab/build_decomposition_qa_packet.py \
+            --examples input/examples.csv --winners input/top_winners.csv --buyers input/top_buyers.csv \
+            --group-cols economic_model,service_family --title 'USA Aggregator Services — Semantic QA v1' --out QA_PACKET.md
+      - name: Persist QA packet
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-usa-aggregator-services-qa-v1
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target main --title 'Historical USA Aggregator Services QA v1' --notes 'Representative historical titles, winners and buyers for expert/language/local-service/lodging QA.'
+          gh release upload "$TAG" QA_PACKET.md --repo "$GITHUB_REPOSITORY" --clobber
+          mkdir -p control/historical_usa_aggregator_services_qa_v1
+          cp QA_PACKET.md control/historical_usa_aggregator_services_qa_v1/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_usa_aggregator_services_qa_v1/
+          git commit -m 'historical: persist USA aggregator-services QA v1' || exit 0
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
