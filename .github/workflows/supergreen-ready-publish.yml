@@ -10,6 +10,10 @@ on:
         description: Canonical DCE run ID
         required: false
         default: ''
+  push:
+    branches: [main]
+    paths:
+      - 'control/supergreen_review_trigger.txt'
 
 permissions:
   contents: write
@@ -19,7 +23,7 @@ env:
 
 jobs:
   publish:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -30,13 +34,30 @@ jobs:
         name: Resolve canonical DCE run
         shell: bash
         env:
+          GH_TOKEN: ${{ github.token }}
           INPUT_RUN: ${{ github.event.inputs.dce_run }}
           EVENT_RUN: ${{ github.event.workflow_run.id }}
         run: |
           set -euo pipefail
-          if [[ "${INPUT_RUN:-}" =~ ^[0-9]+$ ]]; then rid="$INPUT_RUN"; else rid="$EVENT_RUN"; fi
-          [[ "$rid" =~ ^[0-9]+$ ]] || { echo "No DCE run id" >&2; exit 1; }
+          rid=''
+          if [[ "${INPUT_RUN:-}" =~ ^[0-9]+$ ]]; then
+            rid="$INPUT_RUN"
+          elif [[ "${EVENT_RUN:-}" =~ ^[0-9]+$ ]] && gh release view "dce-harvest-${EVENT_RUN}" --repo "$GH_REPO" >/dev/null 2>&1; then
+            rid="$EVENT_RUN"
+          else
+            # Recovery and parent-stale runs can finish via a durable Release even when workflow_run is not reliable.
+            # Resolve the newest DCE Release that actually contains a deep-review aggregate.
+            while IFS=$'\t' read -r tag _; do
+              [[ "$tag" =~ ^dce-harvest-([0-9]+)$ ]] || continue
+              candidate="${BASH_REMATCH[1]}"
+              if gh release view "$tag" --repo "$GH_REPO" --json assets --jq '.assets[].name' | grep -Fxq "dce-deep-review-${candidate}.tar.gz"; then
+                rid="$candidate"; break
+              fi
+            done < <(gh release list --repo "$GH_REPO" --limit 100 --json tagName,publishedAt --jq '.[] | [.tagName,.publishedAt] | @tsv')
+          fi
+          [[ "$rid" =~ ^[0-9]+$ ]] || { echo "No durable DCE deep-review Release found" >&2; exit 1; }
           echo "dce_run=$rid" >> "$GITHUB_OUTPUT"
+          echo "Resolved canonical DCE run: $rid"
       - name: Download canonical DCE review aggregate
         shell: bash
         env:
@@ -68,6 +89,7 @@ jobs:
           assert m['contract']=='GPT_SUPERGREEN_READY_PACK_V1',m
           rows=sum(1 for _ in Path('supergreen-ready/supergreen_ready.jsonl').open())
           assert rows==m['ready_rows'],(rows,m)
+          assert all(json.loads(x).get('gate_readiness') for x in Path('supergreen-ready/supergreen_ready.jsonl').read_text().splitlines() if x.strip())
           print(json.dumps(m,indent=2))
           PY
       - name: Persist on canonical DCE Release and stable latest Release
