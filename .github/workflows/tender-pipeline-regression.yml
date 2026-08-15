@@ -1,0 +1,46 @@
+name: Tender Pipeline Regression
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/**'
+      - 'tests/**'
+      - '.github/workflows/dce-fanout-v2.yml'
+      - '.github/workflows/tender-pipeline-regression.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Syntax gate
+        run: python -m py_compile pipeline/*.py
+      - name: Install test dependency
+        run: python -m pip install --disable-pip-version-check -q pytest
+      - name: Run pipeline invariants
+        run: python -m pytest -q tests
+      - name: Assert final-verdict guard rejects missing DCE evidence
+        shell: bash
+        run: |
+          cat > /tmp/bad-review.json <<'JSON'
+          {
+            "candidate_id":"REGRESSION:ACCESS-GUIDE",
+            "classification":"FINAL_SUPER_GREEN",
+            "score":95,
+            "evidence_quality":{"content_quality":"ACCESS_GUIDE_ONLY","gate_readiness":false},
+            "gates":{}
+          }
+          JSON
+          if python pipeline/final_verdict_guard.py --review /tmp/bad-review.json; then
+            echo 'Guard incorrectly accepted an unverified final supergreen' >&2
+            exit 1
+          fi
