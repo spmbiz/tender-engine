@@ -24,7 +24,7 @@ jobs:
         run: |
           set -euo pipefail
           tag="it-anac-cig-archive-${GITHUB_RUN_ID}"
-          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Italy ANAC CIG Archive ${GITHUB_RUN_ID}" --notes "Durable authoritative monthly ANAC CIG archive harvest. Raw official ZIPs are canonical Release assets; Actions artifacts are not used as storage."
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Italy ANAC CIG Archive ${GITHUB_RUN_ID}" --notes "Authoritative ANAC CIG archive attempt. A month is counted as recovered only when the official ZIP itself is present and verified. Telemetry-only assets are explicitly status evidence, never archive data."
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
   month:
@@ -50,7 +50,7 @@ jobs:
         run: |
           out="archive/it_anac_cig/${{ matrix.year }}-${{ matrix.month }}"
           python pipeline/harvest_it_anac_cig_month.py --year '${{ matrix.year }}' --month '${{ matrix.month }}' --out "$out"
-      - name: Persist month and telemetry durably
+      - name: Persist honest month status and data when present
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
@@ -59,11 +59,25 @@ jobs:
         run: |
           set -euo pipefail
           out="archive/it_anac_cig/${{ matrix.year }}-${{ matrix.month }}"
-          [ -d "$out" ] || { echo "no output"; exit 1; }
-          archive="it-anac-cig-${{ matrix.year }}-${{ matrix.month }}.tar.gz"
-          tar -C "$out" -czf "$archive" .
-          gh release upload "$RELEASE_TAG" "$archive" --clobber
-          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | grep -Fxq "$archive"
+          [ -f "$out/stats.json" ] || { echo "missing stats"; exit 1; }
+          status_archive="it-anac-cig-status-${{ matrix.year }}-${{ matrix.month }}.tar.gz"
+          tar -C "$out" -czf "$status_archive" stats.json
+          gh release upload "$RELEASE_TAG" "$status_archive" --clobber
+          data_file="$(python - "$out/stats.json" "$out" <<'PY'
+          import json, pathlib, sys
+          s=json.load(open(sys.argv[1])); saved=s.get('saved') or {}; name=saved.get('file')
+          p=pathlib.Path(sys.argv[2])/(name or '')
+          print(str(p) if name and p.is_file() and p.stat().st_size>1024 else '')
+          PY
+          )"
+          if [ -n "$data_file" ]; then
+            data_archive="it-anac-cig-data-${{ matrix.year }}-${{ matrix.month }}.tar.gz"
+            tar -C "$out" -czf "$data_archive" "$(basename "$data_file")" stats.json
+            gh release upload "$RELEASE_TAG" "$data_archive" --clobber
+            echo "DATA_RECOVERED $data_file"
+          else
+            echo "BLOCKED_OR_UNAVAILABLE: telemetry persisted, no archive-data asset"
+          fi
 
   audit:
     needs: [init, month]
@@ -72,7 +86,7 @@ jobs:
     timeout-minutes: 6
     steps:
       - uses: actions/checkout@v4
-      - name: Inventory durable archive assets
+      - name: Inventory durable archive data separately from telemetry
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.init.outputs.tag }}
@@ -82,9 +96,13 @@ jobs:
           gh release view "$RELEASE_TAG" --json assets > assets.json
           python - <<'PY'
           import json
-          x=json.load(open('assets.json')); a=x.get('assets') or []
-          names=[z.get('name') for z in a if str(z.get('name','')).startswith('it-anac-cig-')]
-          total=sum(int(z.get('size') or 0) for z in a if z.get('name') in names)
-          print(json.dumps({'durable_month_assets':len(names),'durable_bytes':total,'assets':names},indent=2))
-          assert len(names) >= 30, f'Archive coverage too low: {len(names)}/36 assets'
+          a=json.load(open('assets.json')).get('assets') or []
+          data=[z for z in a if str(z.get('name','')).startswith('it-anac-cig-data-')]
+          status=[z for z in a if str(z.get('name','')).startswith('it-anac-cig-status-')]
+          data_bytes=sum(int(z.get('size') or 0) for z in data)
+          out={'data_months':len(data),'status_months':len(status),'data_bytes':data_bytes,
+               'classification':'RECOVERED' if len(data)>=30 and data_bytes>1_000_000 else 'BLOCKED_OR_INCOMPLETE'}
+          print(json.dumps(out,indent=2))
+          assert len(status)>=30, f'telemetry incomplete: {len(status)}/36'
+          assert len(data)>=30 and data_bytes>1_000_000, f'ANAC data not recovered: {len(data)} data months, {data_bytes} bytes'
           PY
