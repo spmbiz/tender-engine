@@ -24,9 +24,9 @@ on:
         required: false
         default: '256'
       jobs_per_shard:
-        description: Target candidates per shard before the 256-shard cap
+        description: '0 = adaptive sizing from candidate count and live runner budget; positive value = manual target'
         required: false
-        default: '2'
+        default: '0'
   push:
     branches: [main]
     paths:
@@ -87,14 +87,17 @@ jobs:
           cp "$SELECTION_PATH" "dce-selection-${GITHUB_RUN_ID}.jsonl"
           echo "queue_asset=$queue_asset" >> "$GITHUB_OUTPUT"
       - id: matrix
-        name: Compile deep dynamic browser/HTTP shard queue
+        name: Compile adaptive browser/HTTP shard queue
         env:
           DCE_MAX_SHARDS: ${{ github.event.inputs.max_shards || '256' }}
           DCE_MAX_PARALLEL: ${{ github.event.inputs.max_parallel || '20' }}
-          DCE_TARGET_JOBS_PER_SHARD: ${{ github.event.inputs.jobs_per_shard || '2' }}
+          DCE_TARGET_JOBS_PER_SHARD: ${{ github.event.inputs.jobs_per_shard || '0' }}
+          DCE_TARGET_WAVES: '1'
+          DCE_BROWSER_MAX_JOBS_PER_SHARD: '12'
+          DCE_HTTP_MAX_JOBS_PER_SHARD: '32'
           MAX_DCE_JOBS: ${{ github.event.inputs.max_jobs || '320' }}
-          DCE_BROWSER_LOCAL_CONCURRENCY: '1'
-          DCE_HTTP_LOCAL_CONCURRENCY: '4'
+          DCE_BROWSER_LOCAL_CONCURRENCY: '2'
+          DCE_HTTP_LOCAL_CONCURRENCY: '8'
         run: python pipeline/build_dce_shards.py --queue generated/dce_candidates.jsonl
       - id: release
         name: Create durable canonical harvest release
@@ -139,7 +142,7 @@ jobs:
     needs: prepare
     if: needs.prepare.outputs.count != '0'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       max-parallel: ${{ fromJSON(needs.prepare.outputs.max_parallel) }}
@@ -198,11 +201,11 @@ jobs:
           --concurrency '${{ matrix.local_concurrency }}'
       - name: Extract candidate corpora in parallel
         env:
-          DCE_EXTRACT_WORKERS: '2'
+          DCE_EXTRACT_WORKERS: '4'
         run: python pipeline/extract_corpus.py --root out
       - name: Extract mandatory-gate snippets in parallel
         env:
-          DCE_GATE_WORKERS: '2'
+          DCE_GATE_WORKERS: '4'
         run: python pipeline/extract_gates.py --root out
       - name: Build canonical durable packs and compact aggregate handoff
         shell: bash
