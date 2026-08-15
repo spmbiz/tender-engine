@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 
 from final_verdict_guard import REQUIRED_GATES
@@ -73,6 +73,79 @@ def quality_key(row: dict) -> tuple:
     )
 
 
+def portal_yield_metrics(rows: list[dict], batch_results: list[dict]) -> dict[str, dict]:
+    """Compute scheduler-grade portal yield without pretending CPU time is runner wall time.
+
+    Candidate subprocess elapsed time is available for every DCE attempt and is a
+    stable source/adapter cost signal. Exact GitHub runner wall-time is instrumented
+    separately; until then this field is deliberately named candidate_processing_minutes.
+    """
+    stats: dict[str, dict] = defaultdict(lambda: {
+        "candidates": 0,
+        "gate_ready_substantive_dce": 0,
+        "raw_downloaded_public": 0,
+        "auth_required": 0,
+        "generic_or_unresolved": 0,
+        "candidate_processing_seconds": 0.0,
+        "retries": 0,
+        "rate_limit_signals": 0,
+        "worker_failures": 0,
+        "raw_status_counts": Counter(),
+        "derived_status_counts": Counter(),
+    })
+    row_portal = {}
+    for row in rows:
+        portal = str(row.get("portal") or "UNKNOWN").upper()
+        cid = str(row.get("candidate_id") or "").casefold()
+        if cid:
+            row_portal[cid] = portal
+        s = stats[portal]
+        s["candidates"] += 1
+        s["gate_ready_substantive_dce"] += int(bool(row.get("gate_readiness")))
+        s["raw_downloaded_public"] += int(str(row.get("raw_status") or "") == "DOWNLOADED_PUBLIC")
+        s["auth_required"] += int(str(row.get("raw_status") or "") in {"AUTH_REQUIRED", "INTEREST_RECORDING_REQUIRED"})
+        s["generic_or_unresolved"] += int(str(row.get("status") or "") in {
+            "GENERIC_PUBLIC_PAGE_UNRESOLVED", "PORTAL_GENERIC_ONLY", "DCE_CONTENT_UNVERIFIED",
+            "TED_DOWNSTREAM_ADAPTER_PENDING", "TED_ROUTE_UNRESOLVED", "ROUTE_INCOMPLETE",
+        })
+        s["raw_status_counts"][str(row.get("raw_status") or "UNKNOWN")] += 1
+        s["derived_status_counts"][str(row.get("status") or "UNKNOWN")] += 1
+
+    for rec in batch_results:
+        cid = str(rec.get("candidate_id") or "").casefold()
+        portal = str(rec.get("portal") or row_portal.get(cid) or "UNKNOWN").upper()
+        s = stats[portal]
+        s["candidate_processing_seconds"] += max(0.0, float(rec.get("elapsed_seconds") or 0.0))
+        s["retries"] += int(rec.get("retries") or 0)
+        s["rate_limit_signals"] += int(bool(rec.get("rate_limited")))
+        s["worker_failures"] += int(int(rec.get("returncode") or 0) != 0)
+
+    out = {}
+    for portal, s in sorted(stats.items()):
+        candidates = int(s["candidates"])
+        useful = int(s["gate_ready_substantive_dce"])
+        seconds = float(s["candidate_processing_seconds"])
+        minutes = seconds / 60.0
+        out[portal] = {
+            "candidates": candidates,
+            "gate_ready_substantive_dce": useful,
+            "useful_rate": round(useful / candidates, 6) if candidates else 0.0,
+            "raw_downloaded_public": int(s["raw_downloaded_public"]),
+            "auth_required": int(s["auth_required"]),
+            "auth_rate": round(int(s["auth_required"]) / candidates, 6) if candidates else 0.0,
+            "generic_or_unresolved": int(s["generic_or_unresolved"]),
+            "candidate_processing_seconds": round(seconds, 3),
+            "candidate_processing_minutes": round(minutes, 6),
+            "useful_per_candidate_processing_minute": round(useful / minutes, 6) if minutes > 0 else 0.0,
+            "retries": int(s["retries"]),
+            "rate_limit_signals": int(s["rate_limit_signals"]),
+            "worker_failures": int(s["worker_failures"]),
+            "raw_status_counts": dict(s["raw_status_counts"]),
+            "derived_status_counts": dict(s["derived_status_counts"]),
+        }
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default="dce-artifacts")
@@ -109,7 +182,7 @@ def main():
             "candidate_id": cid,
             "title": candidate.get("title"),
             "buyer": candidate.get("buyer"),
-            "portal": manifest.get("portal"),
+            "portal": str(manifest.get("portal") or candidate.get("portal") or candidate.get("source") or "UNKNOWN").upper(),
             "raw_status": raw_status,
             "status": status,
             "content_quality": content_quality,
@@ -175,6 +248,8 @@ def main():
     worker_failures = sum(1 for x in batch_results if int(x.get("returncode") or 0) != 0)
     gate_ready_count = sum(1 for r in rows if r.get("gate_readiness"))
     deadline_conflict_count = sum(1 for r in rows if r.get("deadline_conflict"))
+    portal_yield = portal_yield_metrics(rows, batch_results)
+    (out / "portal_yield.json").write_text(json.dumps(portal_yield, indent=2, ensure_ascii=False), encoding="utf-8")
 
     summary = {
         "candidates": len(rows),
@@ -199,6 +274,8 @@ def main():
         "raw_worker_tree_bytes": raw_bytes,
         "slim_handoff_bytes": slim_bytes,
         "handoff_storage_reduction_ratio": round((1 - slim_bytes / raw_bytes) if raw_bytes else 0, 6),
+        "portal_yield": portal_yield,
+        "portal_yield_time_basis": "candidate_processing_minutes; not yet exact GitHub runner wall-time",
         "raw_archives_in_final_artifact": False,
         "mandatory_gate_names": REQUIRED_GATES,
         "contract": "Only gate_ready_substantive_dce rows may advance to mandatory-gate adjudication; authority conflicts remain explicit; final 90+/FINAL_SUPER_GREEN requires all mandatory gate statuses resolved with evidence and validation by final_verdict_guard.py.",
