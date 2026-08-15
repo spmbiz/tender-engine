@@ -1,0 +1,38 @@
+name: Historical Private Warehouse Bridge Canary
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/historical_private_bridge_probe.txt'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe existing cross-repo token without exposing it
+        env:
+          FLEET_GITHUB_TOKEN: ${{ secrets.FLEET_GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${FLEET_GITHUB_TOKEN:-}" ]; then
+            echo 'BRIDGE_STATUS=SECRET_MISSING'
+            exit 0
+          fi
+          export GH_TOKEN="$FLEET_GITHUB_TOKEN"
+          if gh release view tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --json tagName,assets >/tmp/release.json 2>/tmp/err; then
+            count="$(jq '.assets|length' /tmp/release.json)"
+            has_hist="$(jq -r '[.assets[].name] | index("historical_tenders.parquet") != null' /tmp/release.json)"
+            echo "BRIDGE_STATUS=READY assets=$count historical_parquet=$has_hist"
+          else
+            status='TOKEN_PRESENT_BUT_PRIVATE_READ_FAILED'
+            echo "BRIDGE_STATUS=$status"
+            # Do not print API body/token-bearing diagnostics. Only bounded class.
+            exit 0
+          fi
