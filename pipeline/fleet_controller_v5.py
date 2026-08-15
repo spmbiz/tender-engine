@@ -1,12 +1,18 @@
 from __future__ import annotations
 
-"""Broker-, yield- and historical-prior-aware Tender controller wrapper.
+"""Broker-, yield-, historical-prior- and semantic-retry-aware Tender controller.
 
 Historical Market Brain priors are strictly a bounded pre-DCE retrieval signal.
 They cannot satisfy eligibility, DCE authority, or final verdict gates.
+
+Critical state rule: ATTEMPTED is not PROCESSED. A candidate becomes durably
+processed only after the aggregate proves a candidate-specific substantive DCE is
+gate-ready. Retrieval misses remain retryable behind a bounded cooldown.
 """
 
+import io
 import json
+import tarfile
 from datetime import datetime, timedelta, timezone
 
 import requests
@@ -26,6 +32,9 @@ PORTAL_PERFORMANCE_ASSET = "portal-performance.json"
 DEFAULT_MINIMUMS = {"hospitality": 6, "gws": 3}
 DISCOVERY_WORKFLOW = "supergreen-discovery-v2.yml"
 ORPHAN_RECONCILE_INTERVAL_MINUTES = 30
+RETRY_BASE_MINUTES = 5
+RETRY_MAX_MINUTES = 360
+MAX_RETRY_STATE = 100_000
 
 _HISTORICAL_PRIORS = historical_priors.load()
 _ORIGINAL_RETRIEVAL_SCORE = selector_mod.retrieval_score
@@ -47,7 +56,7 @@ def _release_asset_json(repo: str, tag: str, name: str):
     try:
         rel = requests.get(
             f"https://api.github.com/repos/{repo}/releases/tags/{tag}",
-            headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-fleet-broker/1.1"},
+            headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-fleet-broker/1.2"},
             timeout=20,
         )
         if rel.status_code != 200:
@@ -57,7 +66,7 @@ def _release_asset_json(repo: str, tag: str, name: str):
             return None
         r = requests.get(
             asset["url"],
-            headers={"Accept": "application/octet-stream", "User-Agent": "tender-fleet-broker/1.1"},
+            headers={"Accept": "application/octet-stream", "User-Agent": "tender-fleet-broker/1.2"},
             timeout=20,
         )
         if r.status_code != 200:
@@ -71,7 +80,7 @@ def _policy():
     try:
         r = requests.get(
             f"https://raw.githubusercontent.com/{EVERGREEN_REPO}/main/config/global_fleet.json",
-            headers={"User-Agent": "tender-fleet-broker/1.1"},
+            headers={"User-Agent": "tender-fleet-broker/1.2"},
             timeout=20,
         )
         if r.status_code == 200:
@@ -169,6 +178,186 @@ import fleet_controller_v3 as v3  # noqa: E402
 _original_reconcile_pending = v3._reconcile_pending
 
 
+def _semantic_resolution(dce_run_id: str, executed_ids: list[str]) -> dict | None:
+    """Read aggregate truth already persisted in the DCE Release.
+
+    The deep-review tar is produced by aggregate_dce.py after content-quality and
+    candidate-specific relevance checks. It is therefore a semantic execution
+    index: gate_readiness=true means the DCE is sufficiently resolved for review;
+    everything else is a retrieval miss to retry, not a permanently processed ID.
+    """
+    try:
+        rel, assets = v4._release_assets(dce_run_id)
+        if not rel:
+            return None
+        name = f"dce-deep-review-{dce_run_id}.tar.gz"
+        if not any(str(a.get("name") or "") == name for a in assets):
+            return None
+        blob = fc.download_asset({**rel, "assets": assets}, name)
+        if not blob:
+            return None
+        with tarfile.open(fileobj=io.BytesIO(blob), mode="r:gz") as tf:
+            member = next(
+                (m for m in tf.getmembers() if m.isfile() and m.name.rstrip("/").endswith("deep_review_queue.jsonl")),
+                None,
+            )
+            if member is None:
+                return None
+            fh = tf.extractfile(member)
+            if fh is None:
+                return None
+            rows = []
+            for raw in fh.read().decode("utf-8", errors="replace").splitlines():
+                raw = raw.strip()
+                if not raw:
+                    continue
+                try:
+                    row = json.loads(raw)
+                except Exception:
+                    continue
+                if isinstance(row, dict) and row.get("candidate_id"):
+                    rows.append(row)
+        by_id = {str(r.get("candidate_id")).casefold(): r for r in rows}
+        resolved: list[str] = []
+        retryable: list[str] = []
+        retry_reasons: dict[str, str] = {}
+        for cid in executed_ids:
+            row = by_id.get(str(cid).casefold())
+            if row and bool(row.get("gate_readiness")):
+                resolved.append(cid)
+            else:
+                retryable.append(cid)
+                retry_reasons[cid] = str((row or {}).get("status") or (row or {}).get("raw_status") or "SEMANTIC_RESULT_MISSING")
+        return {
+            "resolved_ids": resolved,
+            "retryable_ids": retryable,
+            "retry_reasons": retry_reasons,
+            "semantic_rows": len(rows),
+            "asset": name,
+        }
+    except Exception as exc:
+        print(json.dumps({"semantic_resolution_error": {"run_id": dce_run_id, "error": repr(exc)[:500]}}, separators=(",", ":")))
+        return None
+
+
+def _expire_retry_cooldowns(state: dict, actions: list[dict]) -> None:
+    retry_after = state.setdefault("dce_retry_after", {})
+    attempts = state.setdefault("dce_retry_attempts", {})
+    if not isinstance(retry_after, dict):
+        retry_after = state["dce_retry_after"] = {}
+    if not isinstance(attempts, dict):
+        attempts = state["dce_retry_attempts"] = {}
+    expired = []
+    for cid, when in list(retry_after.items()):
+        ts = fc.parse_ts(str(when or ""))
+        if ts is None or fc.NOW >= ts:
+            expired.append(str(cid))
+            retry_after.pop(cid, None)
+    if expired:
+        expired_set = set(expired)
+        state["processed_candidate_ids"] = [
+            str(cid) for cid in state.get("processed_candidate_ids", []) if str(cid) not in expired_set
+        ]
+        actions.append({
+            "type": "dce_retry_cooldown_expired",
+            "candidates_released": len(expired),
+            "sample": expired[:12],
+        })
+    # Bound retry bookkeeping independently from the permanent processed set.
+    if len(attempts) > MAX_RETRY_STATE:
+        keep = set(list(attempts)[-MAX_RETRY_STATE:])
+        state["dce_retry_attempts"] = {k: v for k, v in attempts.items() if k in keep}
+
+
+def _semantic_commit_durable_batch(
+    state: dict,
+    actions: list[dict],
+    pending: dict,
+    leased_ids: list[str],
+    run_id: str,
+    executed_ids: list[str],
+) -> bool:
+    semantic = _semantic_resolution(run_id, executed_ids)
+    if semantic is None:
+        tries = int(pending.get("semantic_resolution_attempts") or 0) + 1
+        pending["semantic_resolution_attempts"] = tries
+        if tries < 4:
+            state["pending_dce_batch"] = pending
+            actions.append({
+                "type": "dce_commit_waiting_for_semantic_resolution",
+                "workflow_run_id": run_id,
+                "executed_candidates": len(executed_ids),
+                "verification_attempt": tries,
+                "rule": "execution archive alone never makes a candidate processed",
+            })
+            return True
+        # High-recall fallback: if semantic truth never materializes, requeue rather
+        # than permanently losing every executed candidate.
+        actions.append({
+            "type": "dce_batch_semantic_resolution_missing_requeued",
+            "workflow_run_id": run_id,
+            "executed_candidates": len(executed_ids),
+        })
+        state["pending_dce_batch"] = None
+        if run_id and executed_ids:
+            v4._dispatch_postprocessing(run_id, actions, state)
+        return False
+
+    resolved_ids = list(semantic["resolved_ids"])
+    retryable_ids = list(semantic["retryable_ids"])
+    retry_after = state.setdefault("dce_retry_after", {})
+    attempts = state.setdefault("dce_retry_attempts", {})
+
+    processed = list(state.get("processed_candidate_ids", []))
+    # Resolved DCEs are permanent. Retryable misses are temporarily added to the
+    # same blocked set only until their cooldown expires, so the existing selector
+    # remains unchanged and cannot immediately thrash the same portals.
+    processed.extend(resolved_ids)
+    now = fc.NOW
+    cooldowns = []
+    for cid in retryable_ids:
+        n = int(attempts.get(cid) or 0) + 1
+        attempts[cid] = n
+        minutes = min(RETRY_MAX_MINUTES, RETRY_BASE_MINUTES * (2 ** min(6, n - 1)))
+        retry_after[cid] = (now + timedelta(minutes=minutes)).isoformat()
+        processed.append(cid)
+        cooldowns.append({"candidate_id": cid, "attempt": n, "minutes": minutes, "reason": semantic["retry_reasons"].get(cid)})
+    for cid in resolved_ids:
+        retry_after.pop(cid, None)
+        attempts.pop(cid, None)
+
+    state["processed_candidate_ids"] = v4._dedupe(processed)[-v3.MAX_REMEMBERED_CANDIDATES:]
+    state["dce_retry_after"] = retry_after
+    state["dce_retry_attempts"] = attempts
+
+    executed_set = set(executed_ids)
+    not_executed = [cid for cid in leased_ids if cid not in executed_set]
+    actions.append({
+        "type": "dce_batch_semantically_committed",
+        "workflow_run_id": run_id,
+        "source_run": pending.get("source_run"),
+        "leased_candidates": len(leased_ids),
+        "executed_candidates": len(executed_ids),
+        "resolved_gate_ready_processed": len(resolved_ids),
+        "retryable_executed_with_cooldown": len(retryable_ids),
+        "not_executed_returned_immediately": len(not_executed),
+        "execution_coverage": round(len(executed_ids) / max(1, len(leased_ids)), 6),
+        "semantic_asset": semantic.get("asset"),
+        "semantic_rows": semantic.get("semantic_rows"),
+        "retry_sample": cooldowns[:12],
+        "rule": "ATTEMPTED != PROCESSED; only candidate-specific gate-ready DCE becomes permanent",
+    })
+    state["pending_dce_batch"] = None
+    if run_id and executed_ids:
+        v4._dispatch_postprocessing(run_id, actions, state)
+    return False
+
+
+# v4._reconcile_pending resolves this global function dynamically, so replacing it
+# here upgrades old and new DCE batches without duplicating the reconciliation code.
+v4._commit_durable_batch = _semantic_commit_durable_batch
+
+
 def _release_successful_zero_dce_lease(state: dict, actions: list[dict]) -> bool:
     pending = state.get("pending_dce_batch")
     if not isinstance(pending, dict) or not pending.get("candidate_ids"):
@@ -182,10 +371,6 @@ def _release_successful_zero_dce_lease(state: dict, actions: list[dict]) -> bool
     if not run_id:
         return False
 
-    # The DCE workflow creates dce-harvest-$RUN_ID only when the sharder output
-    # count is non-zero. A successful run with no such Release therefore executed
-    # no DCE candidates (the matrix only contains GitHub's skipped placeholder).
-    # This is much more reliable than counting matrix job names.
     release, _assets = v4._release_assets(run_id)
     if release:
         return False
@@ -203,6 +388,8 @@ def _release_successful_zero_dce_lease(state: dict, actions: list[dict]) -> bool
 
 
 def _reconcile_pending_with_orphans(state: dict, actions: list[dict]) -> bool:
+    _expire_retry_cooldowns(state, actions)
+
     if _release_successful_zero_dce_lease(state, actions):
         return False
 
