@@ -1,0 +1,83 @@
+name: Historical Broker Semantic QA v2
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Historical Explicit Broker Census v2']
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/historical-broker-semantic-qa-v2.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-broker-semantic-qa-v2
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download broker census evidence tables
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source
+          TAG=historical-explicit-broker-census-v2
+          for f in examples.csv market_matrix.csv top_winners.csv top_buyers.csv; do
+            gh release download "$TAG" --repo walidgdg1-ai/tender-engine --pattern "$f" --dir source --clobber
+          done
+      - name: Build semantic QA packet
+        run: |
+          python - <<'PY'
+          import csv,json
+          from collections import defaultdict
+          from pathlib import Path
+          def rows(p):
+            with open(p,encoding='utf-8',errors='replace',newline='') as f:return list(csv.DictReader(f))
+          matrix=rows('source/market_matrix.csv'); ex=rows('source/examples.csv'); win=rows('source/top_winners.csv'); buy=rows('source/top_buyers.csv')
+          priority=['ICT_HARDWARE_VAR','PROCUREMENT_AGENT','TRAVEL_MANAGEMENT_AGENCY','MEDIA_BUYING_AGENCY','FREIGHT_FORWARDER_LOGISTICS_BROKER','INSURANCE_BROKER','REAL_ESTATE_BROKER','GENERIC_BROKER_INTERMEDIARY','SOFTWARE_RESELLER','CONSULTANT_BROKER','PRINT_MAIL_FULFILMENT','PROMOTIONAL_MERCH_RESELLER']
+          idx=defaultdict(list); widx=defaultdict(list); bidx=defaultdict(list)
+          for r in ex: idx[(r['family'],r['country'],r['currency'])].append(r)
+          for r in win: widx[(r['family'],r['country'],r['currency'])].append(r)
+          for r in buy: bidx[(r['family'],r['country'],r['currency'])].append(r)
+          chosen=[]
+          for fam in priority:
+            sub=[r for r in matrix if r['family']==fam]
+            sub.sort(key=lambda r:(-int(float(r.get('records') or 0)),-int(float(r.get('buyers') or 0))))
+            chosen.extend(sub[:8])
+          out=Path('control/historical_broker_semantic_qa_v2');out.mkdir(parents=True,exist_ok=True)
+          lines=['# Historical Broker Census v2 — Semantic QA Packet','',
+                 'Historical-only evidence packet for manual semantic adjudication. The broad regex census is not promotion authority until representative titles support the claimed business family.','']
+          packet=[]
+          for r in chosen:
+            k=(r['family'],r['country'],r['currency'])
+            lines += [f"## {r['family']} — {r['country']} / {r['currency']}",
+                      f"- records **{r['records']}** · buyers **{r['buyers']}** · repeat buyers **{r['repeat_buyers']}** · median **{r.get('median_value') or 'UNKNOWN'}** · suppliers **{r.get('suppliers') or 'UNKNOWN'}** · top supplier share **{r.get('top_supplier_share') or 'UNKNOWN'}**",'- representative titles:']
+            for e in idx.get(k,[])[:6]: lines.append(f"  - {e.get('buyer') or 'UNKNOWN'} — {e.get('title') or ''} — {e.get('reference_value') or 'UNKNOWN'}")
+            if widx.get(k):
+              lines.append('- leading historical winners:')
+              for w in widx[k][:5]: lines.append(f"  - {w.get('supplier')} — weight {w.get('weighted_awards')} — share {w.get('supplier_share')}")
+            lines.append('')
+            packet.append({'market':r,'examples':idx.get(k,[])[:6],'winners':widx.get(k,[])[:5],'buyers':bidx.get(k,[])[:5]})
+          (out/'QA_PACKET.md').write_text('\n'.join(lines),encoding='utf-8')
+          (out/'qa_packet.json').write_text(json.dumps(packet,indent=2,ensure_ascii=False),encoding='utf-8')
+          (out/'summary.json').write_text(json.dumps({'buckets_reviewed':len(packet),'families':priority,'historical_only':True,'semantic_verdicts_applied':False},indent=2),encoding='utf-8')
+          PY
+      - name: Persist QA packet
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_broker_semantic_qa_v2/
+          git commit -m 'historical: persist broker semantic QA packet v2' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
