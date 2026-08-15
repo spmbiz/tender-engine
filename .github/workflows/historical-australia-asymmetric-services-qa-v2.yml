@@ -1,0 +1,50 @@
+name: Historical Australia Asymmetric Services QA v2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/historical-australia-asymmetric-services-qa-v2.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download v2 evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input
+          gh release download historical-australia-asymmetric-services-v2 --repo "$GITHUB_REPOSITORY" --pattern examples.csv --dir input --clobber
+          gh release download historical-australia-asymmetric-services-v2 --repo "$GITHUB_REPOSITORY" --pattern top_winners_normalized.csv --dir input --clobber
+          gh release download historical-australia-asymmetric-services-v2 --repo "$GITHUB_REPOSITORY" --pattern top_buyers.csv --dir input --clobber
+      - name: Build description-backed QA packet
+        run: |
+          python historical_lab/build_decomposition_qa_packet.py \
+            --examples input/examples.csv --winners input/top_winners_normalized.csv --buyers input/top_buyers.csv \
+            --group-cols family,subfamily --title 'Australia Asymmetric Services — Description-backed QA v2' --out QA_PACKET.md
+      - name: Persist QA v2
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-australia-asymmetric-services-qa-v2
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target main --title 'Historical Australia Asymmetric Services QA v2' --notes 'Description-backed examples plus heuristic-normalized supplier winners.'
+          gh release upload "$TAG" QA_PACKET.md --repo "$GITHUB_REPOSITORY" --clobber
+          mkdir -p control/historical_australia_asymmetric_services_qa_v2
+          cp QA_PACKET.md control/historical_australia_asymmetric_services_qa_v2/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_australia_asymmetric_services_qa_v2/
+          git commit -m 'historical: persist Australia asymmetric-services QA v2' || exit 0
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
