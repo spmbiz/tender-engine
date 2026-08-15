@@ -1,0 +1,106 @@
+name: SPM Hunt Sub-Niches v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/build_spm_hunt_subniches_v1.py'
+      - '.github/workflows/spm-hunt-subniches-v1.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: spm-hunt-subniches-v1
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+
+      - name: Download canonical Global Core v4
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p source out
+          for asset in historical_tenders.parquet awards.parquet award_suppliers.parquet; do
+            gh release download tender-normalized-global-core-v4 \
+              --repo walidgdg1-ai/coldemailtool \
+              --pattern "$asset" --dir source --clobber
+            test -s "source/$asset"
+          done
+
+      - name: Build strict concrete hunt sub-niches
+        run: |
+          python pipeline/build_spm_hunt_subniches_v1.py \
+            --historical source/historical_tenders.parquet \
+            --awards source/awards.parquet \
+            --bridge source/award_suppliers.parquet \
+            --out out
+
+      - name: Validate output contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import csv,json,os
+          m=json.load(open('out/manifest.json',encoding='utf-8'))
+          assert m['version']=='SPM_HUNT_SUBNICHES_V1',m
+          assert m['counts']['classified_records']>=500,m['counts']
+          assert m['counts']['sub_niches']>=10,m['counts']
+          for f in ['REPORT.md','subniche_rank.csv','open_hunt_subniches.csv','direct_buyer_subniches.csv','repeat_buyers_subniche.csv','top_winners_subniche.csv','representative_examples_subniche.csv','hunt_playbook.csv','manifest.json']:
+            assert os.path.isfile('out/'+f) and os.path.getsize('out/'+f)>0,f
+          rows=list(csv.DictReader(open('out/open_hunt_subniches.csv',encoding='utf-8')))
+          assert rows,'no open hunt rows'
+          print(json.dumps({'counts':m['counts'],'top10':rows[:10]},indent=2,ensure_ascii=False))
+          PY
+
+      - name: Persist compact authority files to repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f out/work.duckdb out/work.duckdb.wal
+          mkdir -p control/spm_hunt_subniches_v1
+          cp out/REPORT.md control/spm_hunt_subniches_v1/REPORT.md
+          cp out/manifest.json control/spm_hunt_subniches_v1/manifest.json
+          cp out/open_hunt_subniches.csv control/spm_hunt_subniches_v1/open_hunt_subniches.csv
+          cp out/direct_buyer_subniches.csv control/spm_hunt_subniches_v1/direct_buyer_subniches.csv
+          cp out/hunt_playbook.csv control/spm_hunt_subniches_v1/hunt_playbook.csv
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/spm_hunt_subniches_v1/
+          git commit -m 'tenders: persist SPM hunt subniches v1' || true
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then break; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            if [ "$i" = 5 ]; then exit 1; fi
+            sleep $((i*3))
+          done
+
+      - name: Publish full derived bundle durably
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag='market-intelligence-hunt-subniches-v1'
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" \
+            --target main --title 'SPM Market Intelligence — Hunt Sub-Niches v1' \
+            --notes 'Strict title-led full-corpus concrete sub-niche hunting intelligence. Historical/retrieval prior only; live DCE controls eligibility and bid decisions.'
+          gh release upload "$tag" \
+            out/REPORT.md out/manifest.json out/subniche_rank.csv \
+            out/open_hunt_subniches.csv out/direct_buyer_subniches.csv \
+            out/repeat_buyers_subniche.csv out/top_winners_subniche.csv \
+            out/representative_examples_subniche.csv out/hunt_playbook.csv --clobber
