@@ -1,0 +1,76 @@
+name: Historical Gate Severity Review
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/build_historical_gate_severity.py'
+      - '.github/workflows/historical-gate-severity-review.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-gate-severity-review
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Recover preserved historical DCE worker output
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source extracted review
+          gh release download historical-subniche-dce-review-v1 \
+            --pattern 'historical-dce-worker-output.tar.gz' --dir source --clobber
+          test -s source/historical-dce-worker-output.tar.gz
+          tar -xzf source/historical-dce-worker-output.tar.gz -C extracted
+      - name: Build qualitative gate severity review
+        run: python pipeline/build_historical_gate_severity.py --root extracted --out review
+      - name: Validate output contract
+        run: |
+          python - <<'PY'
+          import json,os
+          s=json.load(open('review/summary.json',encoding='utf-8'))
+          assert s['contract']=='HISTORICAL_GATE_SEVERITY_REVIEW_V1',s
+          assert s['gate_ready_candidates']==17,s
+          assert s['final_verdict_allowed'] is False
+          assert os.path.getsize('review/gate_severity_candidates.jsonl')>0
+          print(json.dumps(s,indent=2,ensure_ascii=False))
+          PY
+      - name: Persist compact evidence-backed review
+        run: |
+          set -euo pipefail
+          mkdir -p control/historical_gate_severity_v1
+          cp review/summary.json control/historical_gate_severity_v1/summary.json
+          cp review/REPORT.md control/historical_gate_severity_v1/REPORT.md
+          cp review/gate_severity_candidates.jsonl control/historical_gate_severity_v1/gate_severity_candidates.jsonl
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_gate_severity_v1/
+          git commit -m 'tenders: persist historical gate severity review v1' || true
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then break; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            if [ "$i" = 5 ]; then exit 1; fi
+            sleep $((i*3))
+          done
+      - name: Publish durable review bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tar -C review -czf historical-gate-severity-v1.tar.gz .
+          tag='historical-gate-severity-v1'
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --target main \
+            --title 'Historical Gate Severity Review v1' \
+            --notes 'Evidence-backed qualitative review of the 17 gate-ready historical DCEs. Conservative pattern signals only; absence remains UNKNOWN and no final verdict is allowed.'
+          gh release upload "$tag" historical-gate-severity-v1.tar.gz review/summary.json review/REPORT.md --clobber
