@@ -6,19 +6,21 @@ import re
 from pathlib import Path
 
 CATS = [
+    "entity_geography",
     "turnover_financial",
     "references_experience",
-    "insurance",
-    "team_cvs",
-    "language",
-    "certifications",
-    "onsite_geography",
+    "certifications_partner",
+    "staffing_team",
+    "insurance_bonds",
     "subcontracting_consortium",
-    "hosting_security_data",
-    "award_criteria",
-    "payment",
-    "deadline_submission",
     "deliverables_scope",
+    "sla_onsite",
+    "term_value",
+    "award_criteria",
+    "forms_signatures",
+    "submission",
+    "ip_data_security",
+    "payment_tax",
 ]
 
 
@@ -56,6 +58,7 @@ def main():
             "buyer": c.get("buyer"),
             "deadline": c.get("deadline"),
             "estimated_value": c.get("estimated_value"),
+            "currency": c.get("currency"),
             "portal": c.get("portal") or c.get("portal_key") or c.get("source"),
             "source_url": c.get("source_url") or c.get("notice_url") or c.get("url"),
             "manifest_status": m.get("status"),
@@ -67,10 +70,12 @@ def main():
             "files": [{"name":x.get("name"),"size":x.get("size"),"source":x.get("source") or x.get("url") or x.get("source_url")} for x in (m.get("files") or []) if isinstance(x,dict)],
             "corpus_chars": g.get("corpus_chars"),
             "evidence_counts": g.get("evidence_counts") or {},
+            "canonical_gate_names": g.get("canonical_gate_names") or CATS[:-1],
             "gates": {},
+            "review_template": {},
             "review_contract": (
-                "Do not adjudicate mandatory gates unless gate_readiness is true. "
-                "Do not assign score >=90 or FINAL_SUPER_GREEN until all potentially disqualifying gates are resolved with authoritative evidence."
+                "Do not adjudicate mandatory gates unless gate_readiness is true. Fill each canonical gate with PASS/PASS_CONDITIONAL/FAIL_HARD/UNKNOWN/NOT_APPLICABLE and authoritative evidence. "
+                "Do not assign score >=90 or FINAL_SUPER_GREEN until all potentially disqualifying gates are resolved with evidence."
             ),
         }
         cats = g.get("categories") or {}
@@ -80,6 +85,13 @@ def main():
                 if isinstance(hit,dict):
                     snippets.append({"match":hit.get("match"),"snippet":clean(hit.get("snippet"))})
             rec["gates"][cat]=snippets
+            if cat != "payment_tax":
+                rec["review_template"][cat] = {
+                    "status": "UNKNOWN",
+                    "evidence": [],
+                    "evidence_candidates": snippets,
+                    "notes": "",
+                }
         out.append(rec)
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     Path(args.out).write_text(json.dumps({"candidate_count":len(out),"candidates":out},ensure_ascii=False,indent=2),encoding="utf-8")
