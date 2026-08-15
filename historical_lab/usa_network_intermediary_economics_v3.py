@@ -35,7 +35,6 @@ def main():
       FROM hh LEFT JOIN aa USING(tender_id)
     """)
 
-    # Strict title-led families. v2 broad counts are not reused here.
     con.execute("""
       CREATE TABLE y0 AS SELECT *,CASE
         WHEN regexp_matches(title_l,'(?i)(expert witness|expert witness services|expert services.*witness)') THEN 'EXPERT_WITNESS'
@@ -63,7 +62,7 @@ def main():
       )
       SELECT s.*,conc.top_buyer_share,
         CASE
-          WHEN family IN ('COURT_REPORTING') AND regexp_matches(upper(supplier),'(REPORT|DEPOSITION|LEGAL SUPPORT|STENOGRAPH|CAPTION|ESCRIBER)') THEN 'STRONG_NETWORK_OR_AGENCY_SIGNAL'
+          WHEN family='COURT_REPORTING' AND regexp_matches(upper(supplier),'(REPORT|DEPOSITION|LEGAL SUPPORT|STENOGRAPH|CAPTION|ESCRIBER)') THEN 'STRONG_NETWORK_OR_AGENCY_SIGNAL'
           WHEN family IN ('GENERAL_LANGUAGE_INTERPRETATION','REMOTE_LANGUAGE_INTERPRETATION','SIGN_LANGUAGE_INTERPRETATION') AND regexp_matches(upper(supplier),'(LANGUAGE|INTERPRET|TRANSLAT|LINGUIST|DEAF|HEARING|COMMUNICATION)') THEN 'STRONG_NETWORK_OR_AGENCY_SIGNAL'
           WHEN family IN ('EXPERT_WITNESS','LITIGATION_SUPPORT') AND regexp_matches(upper(supplier),'(EXPERTCONNECT|EXPERT NETWORK|LITIGATION SUPPORT|LEGAL SUPPORT|EXPERT SERVICES)') THEN 'STRONG_NETWORK_OR_AGENCY_SIGNAL'
           WHEN regexp_matches(upper(supplier),'(LLC|INC\.?|CORP|CORPORATION|COMPANY| CO\.?|GROUP|ASSOCIATES|SERVICES|SOLUTIONS|PARTNERS|CONSULTING|AGENCY|ENTERPRISES|LTD|LIMITED|PLLC)') AND s.buyers>=3 THEN 'REPEAT_ORG_AGENCY_PLAUSIBLE'
@@ -87,8 +86,11 @@ def main():
                quantile_cont(award_value,.75) FILTER(WHERE award_value>=0) p75_award
         FROM enriched GROUP BY 1
       ), sc AS (
-        SELECT family,count(*) multi_buyer_suppliers FILTER(WHERE buyers>=2),count(*) repeat_3plus_buyer_suppliers FILTER(WHERE buyers>=3),
-               median(buyers) median_buyers_per_supplier,max(awards)*1.0/sum(awards) top_supplier_share
+        SELECT family,
+               count(*) FILTER(WHERE buyers>=2) multi_buyer_suppliers,
+               count(*) FILTER(WHERE buyers>=3) repeat_3plus_buyer_suppliers,
+               median(buyers) median_buyers_per_supplier,
+               max(awards)*1.0/nullif(sum(awards),0) top_supplier_share
         FROM supplier_stats GROUP BY 1
       ), sh AS (
         SELECT family,
@@ -128,15 +130,16 @@ def main():
     write(out/'examples.csv',['family','supplier_shape','tender_id','buyer','supplier','title','award_value','native_code','native_subcategory','supplier_awards','supplier_buyers','top_buyer_share'],examples)
 
     summary={
-      'version':'HISTORICAL_US_NETWORK_INTERMEDIARY_ECONOMICS_V3',
+      'version':'HISTORICAL_US_NETWORK_INTERMEDIARY_ECONOMICS_V3_1',
       'archive_records_scanned':con.execute('select count(*) from x').fetchone()[0],
       'strict_title_rows':con.execute('select count(*) from enriched').fetchone()[0],
       'families':dict(con.execute('select family,count(*) from enriched group by 1 order by 2 desc').fetchall()),
       'grain':'AWARD_FIRST_PROCUREMENT','historical_only':True,'live_used':False,'dce_used':False,'record_deletion':False,
+      'supersession':'v3.0 compute failed only in final supplier-count aggregation syntax; no v3.0 USA output was promoted.',
       'warning':'Supplier business shape is a historical heuristic based on name and multi-buyer behavior; it does not prove subcontracting, brokerage, licensing, set-aside access or current bidability.'
     }
     (out/'summary.json').write_text(json.dumps(summary,indent=2,ensure_ascii=False),encoding='utf-8')
-    lines=['# USA Network / Intermediary Economics v3','',f"- USAspending records scanned **{summary['archive_records_scanned']:,}**",f"- strict title-led network-service award rows **{summary['strict_title_rows']:,}**",'', 'This analysis asks whether repeat multi-buyer organizations are empirically present in expert, court-reporting and interpretation markets. It does not infer current eligibility.','']
+    lines=['# USA Network / Intermediary Economics v3.1','',f"- USAspending records scanned **{summary['archive_records_scanned']:,}**",f"- strict title-led network-service award rows **{summary['strict_title_rows']:,}**",'', 'This analysis asks whether repeat multi-buyer organizations are empirically present in expert, court-reporting and interpretation markets. It does not infer current eligibility.','']
     for r in family:
         fam,n,buy,sup,med,p25,p75,multi,three,mbps,top,strong,org,ind=r
         lines += [f'## {fam}',f'- awards **{n}** · buyers **{buy}** · suppliers **{sup}** · median award **{med if med is not None else "UNKNOWN"} USD**',f'- suppliers serving ≥2 buyers **{multi}** · ≥3 buyers **{three}** · top supplier share **{round(100*top,1) if top is not None else "UNKNOWN"}%**',f'- strong network/agency-name award share **{round(100*strong,1)}%** · strong+repeat-org share **{round(100*org,1)}%** · individual/ambiguous share **{round(100*ind,1)}%**','']
