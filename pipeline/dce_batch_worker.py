@@ -43,9 +43,6 @@ def load_manifest(out: str, candidate_id: str) -> dict:
 def _fast_lane_policy(candidate: dict, requested_retries: int, requested_timeout: int) -> tuple[int, int, str]:
     portal = str(candidate.get("portal") or candidate.get("portal_key") or candidate.get("source") or "").upper()
     if portal in BROWSER_PORTALS:
-        # Browser failures are expensive and are returned to the durable queue by
-        # the fleet controller. Do not burn the same runner on repeated inline
-        # 180s retries; give the route one meaningful fast-lane attempt and move on.
         retries = min(max(0, requested_retries), max(0, int(os.getenv("DCE_BROWSER_INLINE_RETRIES", "0"))))
         timeout_seconds = min(max(30, requested_timeout), max(30, int(os.getenv("DCE_BROWSER_FAST_TIMEOUT_SECONDS", "150"))))
         return retries, timeout_seconds, "browser_fast_lane"
@@ -66,7 +63,7 @@ def run_one(queue: str, line_no: int, out: str, retries: int, timeout_seconds: i
     for attempt in range(1, effective_retries + 2):
         cmd = [
             sys.executable,
-            "pipeline/dce_worker_v7.py",
+            "pipeline/dce_worker_v8.py",
             "--queue",
             queue,
             "--line",
