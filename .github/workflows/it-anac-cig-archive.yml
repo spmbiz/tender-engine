@@ -1,0 +1,90 @@
+name: Italy ANAC CIG Archive
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'control/it_anac_archive_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+    steps:
+      - id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="it-anac-cig-archive-${GITHUB_RUN_ID}"
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Italy ANAC CIG Archive ${GITHUB_RUN_ID}" --notes "Durable authoritative monthly ANAC CIG archive harvest. Raw official ZIPs are canonical Release assets; Actions artifacts are not used as storage."
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  month:
+    needs: init
+    name: CIG-${{ matrix.year }}-${{ matrix.month }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      max-parallel: 12
+      matrix:
+        year: [2023, 2024, 2025]
+        month: [1,2,3,4,5,6,7,8,9,10,11,12]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Fetch authoritative monthly archive
+        id: harvest
+        continue-on-error: true
+        shell: bash
+        run: |
+          out="archive/it_anac_cig/${{ matrix.year }}-${{ matrix.month }}"
+          python pipeline/harvest_it_anac_cig_month.py --year '${{ matrix.year }}' --month '${{ matrix.month }}' --out "$out"
+      - name: Persist month and telemetry durably
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="archive/it_anac_cig/${{ matrix.year }}-${{ matrix.month }}"
+          [ -d "$out" ] || { echo "no output"; exit 1; }
+          archive="it-anac-cig-${{ matrix.year }}-${{ matrix.month }}.tar.gz"
+          tar -C "$out" -czf "$archive" .
+          gh release upload "$RELEASE_TAG" "$archive" --clobber
+          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | grep -Fxq "$archive"
+
+  audit:
+    needs: [init, month]
+    if: always() && needs.init.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inventory durable archive assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release view "$RELEASE_TAG" --json assets > assets.json
+          python - <<'PY'
+          import json
+          x=json.load(open('assets.json')); a=x.get('assets') or []
+          names=[z.get('name') for z in a if str(z.get('name','')).startswith('it-anac-cig-')]
+          total=sum(int(z.get('size') or 0) for z in a if z.get('name') in names)
+          print(json.dumps({'durable_month_assets':len(names),'durable_bytes':total,'assets':names},indent=2))
+          assert len(names) >= 30, f'Archive coverage too low: {len(names)}/36 assets'
+          PY
