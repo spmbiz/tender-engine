@@ -65,8 +65,13 @@ def main() -> None:
     reason = "benchmark neutral/healthy"
 
     if not healthy or ratio < MIN_KEEP_RATIO:
-        lower = [x for x in LADDER if x < current]
-        next_size = max(lower) if lower else current
+        # Return to the last accepted benchmark rung whenever it is a valid lower
+        # rung. Never promote the failed observation to the new reference.
+        if reference_size in LADDER and reference_size < current:
+            next_size = reference_size
+        else:
+            lower = [x for x in LADDER if x < current]
+            next_size = max(lower) if lower else current
         action = "ROLLBACK" if next_size < current else "KEEP"
         reason = f"unhealthy or yield ratio {ratio:.3f} below keep floor {MIN_KEEP_RATIO:.2f}"
     elif current in LADDER and ratio >= MIN_ADVANCE_RATIO:
@@ -79,7 +84,7 @@ def main() -> None:
             reason = "top tested batch-size rung reached"
 
     decision = {
-        "contract": "DCE_BATCH_AUTOTUNE_V1",
+        "contract": "DCE_BATCH_AUTOTUNE_V2",
         "at": datetime.now(timezone.utc).isoformat(),
         "action": action,
         "current_batch_size": current,
@@ -95,15 +100,22 @@ def main() -> None:
         "reason": reason,
     }
 
-    if action in {"ADVANCE", "ROLLBACK"}:
+    if action == "ADVANCE":
+        # A healthy current rung becomes the accepted baseline for testing the
+        # next rung.
         dce["max_candidates_per_cycle"] = next_size
         dce["benchmark_basis"] = {
             "previous_batch_candidates": current,
             "previous_batch_gate_ready": useful,
             "previous_runner_minutes_exact": runner_minutes,
             "previous_useful_per_runner_minute_exact": current_yield,
-            "decision": f"autotune_{action.lower()}_to_{next_size}",
+            "decision": f"autotune_advance_to_{next_size}",
         }
+    elif action == "ROLLBACK":
+        dce["max_candidates_per_cycle"] = next_size
+        # Keep the last accepted reference exactly as-is. The failed larger rung
+        # is recorded only in the immutable autotune decision, never as baseline.
+        dce["benchmark_basis"] = basis
     else:
         dce.setdefault("benchmark_basis", basis)
 
