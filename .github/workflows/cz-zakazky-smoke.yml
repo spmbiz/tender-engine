@@ -22,6 +22,23 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests
-      - run: python -m py_compile pipeline/probe_cz_zakazky_public.py
-      - env: {DISCOVERY_OUT: 'discovery/global/CZ_ZAKAZKY_GOV'}
-        run: python pipeline/probe_cz_zakazky_public.py
+      - run: python -m py_compile pipeline/discover_cz_zakazky_public.py
+      - name: Harvest official NIPEZ 24h feed
+        env: {DISCOVERY_OUT: 'discovery/global/CZ_ZAKAZKY_GOV'}
+        run: python pipeline/discover_cz_zakazky_public.py
+      - name: Verify incremental materialization
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('discovery/global/CZ_ZAKAZKY_GOV/stats.json'))
+          print(json.dumps(s,indent=2,ensure_ascii=False))
+          assert not s.get('errors'), s
+          assert s.get('lane') == 'INCREMENTAL_24H', s
+          assert s.get('raw_materialized',0) >= 25, s
+          assert s.get('current_materialized',0) > 0, s
+          assert s.get('title_parsed') == s.get('raw_materialized'), s
+          assert s.get('buyer_parsed',0) > 0, s
+          assert s.get('rate_limit_signals',0) == 0, s
+          PY
+          echo sample_current:
+          head -n 3 discovery/global/CZ_ZAKAZKY_GOV/current.jsonl
