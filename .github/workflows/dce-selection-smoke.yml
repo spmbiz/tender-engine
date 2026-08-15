@@ -36,7 +36,7 @@ jobs:
           fi
           [[ "$rid" =~ ^[0-9]+$ ]] || { echo "Invalid discovery run id: $rid" >&2; exit 1; }
           echo "id=$rid" >> "$GITHUB_OUTPUT"
-      - name: Download canonical discovery and durable controller state
+      - name: Download canonical discovery, controller state and rolling yield state
         env:
           GH_TOKEN: ${{ github.token }}
           RID: ${{ steps.resolve.outputs.id }}
@@ -44,9 +44,19 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p smoke/discovery
-          gh release download "discovery-harvest-$RID" --pattern "supergreen-wide-read-$RID.tar.gz" --dir smoke
-          tar -xzf "smoke/supergreen-wide-read-$RID.tar.gz" -C smoke/discovery
+          if gh release view "discovery-harvest-$RID" --json assets --jq '.assets[].name' | grep -Fxq "supergreen-wide-read-$RID-repaired.tar.gz"; then
+            asset="supergreen-wide-read-$RID-repaired.tar.gz"
+          else
+            asset="supergreen-wide-read-$RID.tar.gz"
+          fi
+          gh release download "discovery-harvest-$RID" --pattern "$asset" --dir smoke
+          tar -xzf "smoke/$asset" -C smoke/discovery
           gh release download fleet-state --pattern controller-state.json --dir smoke
+          if gh release view fleet-state --json assets --jq '.assets[].name' | grep -Fxq 'portal-performance.json'; then
+            gh release download fleet-state --pattern portal-performance.json --dir smoke
+          else
+            echo '{"schema_version":1,"run_ids":[],"portals":{}}' > smoke/portal-performance.json
+          fi
           candidate_file="$(find smoke/discovery -type f -name current_candidates.jsonl -printf '%s %p\n' | sort -nr | head -1 | cut -d' ' -f2-)"
           test -s "$candidate_file"
           cp "$candidate_file" smoke/current_candidates.jsonl
@@ -63,19 +73,21 @@ jobs:
                   if not cid or cid in seen: continue
                   seen.add(cid)
                   f.write(json.dumps({'candidate_id':cid},separators=(',',':'))+'\n')
-          print(json.dumps({'processed':len(state.get('processed_candidate_ids') or []),'pending':len((state.get('pending_dce_batch') or {}).get('candidate_ids') or []),'blocked_unique':len(seen)}))
+          perf=json.loads(Path('smoke/portal-performance.json').read_text())
+          print(json.dumps({'processed':len(state.get('processed_candidate_ids') or []),'pending':len((state.get('pending_dce_batch') or {}).get('candidate_ids') or []),'blocked_unique':len(seen),'history_run_ids':perf.get('run_ids') or []}))
           PY
-      - name: Run diversified selector without dispatching DCE
+      - name: Run yield-aware selector without dispatching DCE
         shell: bash
         run: |
           set -euo pipefail
           python pipeline/auto_select_dce.py \
             --input smoke/current_candidates.jsonl \
             --blocked smoke/blocked.jsonl \
+            --performance smoke/portal-performance.json \
             --out smoke/selection.jsonl \
             --minimum 34 \
             --limit 320
-          test "$(wc -l < smoke/selection.jsonl)" -gt 0
+          test "$(wc -l < smoke/selection.jsonl)" -eq 320
       - name: Assert controller-requested parallel capacity beats legacy fallback
         env:
           DCE_REQUESTED_MAX_PARALLEL: '19'
@@ -102,15 +114,12 @@ jobs:
           import json
           from pathlib import Path
           plan=json.loads(Path('dce_plan.json').read_text())
+          if plan['candidate_count'] != 320: raise SystemExit(f"Expected 320, got {plan['candidate_count']}")
+          if plan['skipped_count'] != 0: raise SystemExit(f"Expected zero skips, got {plan['skipped_count']}")
+          if plan['max_parallel'] != 19: raise SystemExit(f"Expected parallel=19, got {plan['max_parallel']}")
           print(json.dumps({'candidate_count':plan['candidate_count'],'max_parallel':plan['max_parallel'],'shard_count':plan['shard_count'],'skipped_count':plan['skipped_count']},indent=2))
-          if plan['candidate_count'] != 320:
-              raise SystemExit(f"Expected 320 materialized DCE candidates, got {plan['candidate_count']}")
-          if plan['skipped_count'] != 0:
-              raise SystemExit(f"Expected zero DCE matrix skips, got {plan['skipped_count']}")
-          if plan['max_parallel'] != 19:
-              raise SystemExit(f"Dynamic parallel budget regression: expected 19, got {plan['max_parallel']}")
           PY
-      - name: Regression assertions and report
+      - name: Regression assertions and yield comparison
         shell: bash
         run: |
           set -euo pipefail
@@ -120,27 +129,33 @@ jobs:
           from pathlib import Path
           rows=[json.loads(x) for x in Path('smoke/selection.jsonl').read_text().splitlines() if x.strip()]
           counts=Counter(str(x.get('selection_portal') or 'UNKNOWN') for x in rows)
+          buckets=Counter(str(x.get('selection_bucket') or 'UNKNOWN') for x in rows)
           total=len(rows)
-          max_portal,max_count=(counts.most_common(1)[0] if counts else ('NONE',0))
           sam=counts.get('US_SAM',0)+counts.get('US_SAM_BULK',0)
+          selector=json.loads(Path('smoke/selection.jsonl.summary.json').read_text())
           plan=json.loads(Path('dce_plan.json').read_text())
+          modeled=(selector.get('modeled_yield') or {}).get('modeled_expected_useful')
           report={
               'selected':total,
               'portal_counts':dict(counts),
+              'bucket_counts':dict(buckets),
               'unique_portals':len(counts),
-              'max_portal':max_portal,
-              'max_portal_count':max_count,
-              'max_portal_share':round(max_count/max(1,total),6),
+              'max_portal_share':round(max(counts.values(),default=0)/max(1,total),6),
               'sam_count':sam,
               'sam_share':round(sam/max(1,total),6),
+              'history_run_ids':selector.get('history_run_ids') or [],
+              'modeled_expected_useful':modeled,
+              'previous_realized_baseline_useful':64,
+              'modeled_delta_vs_64':round(float(modeled or 0)-64,3),
               'dce_materialized':plan.get('candidate_count'),
               'dce_skipped':plan.get('skipped_count'),
               'dynamic_max_parallel':plan.get('max_parallel'),
           }
           Path('smoke/regression-report.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
           print(json.dumps(report,indent=2))
-          if total >= 160 and len(counts) > 1 and max_count >= int(total*0.90):
-              raise SystemExit('Selector regression: one portal still monopolizes >=90% of a multi-portal batch')
+          if total != 320: raise SystemExit('Selector regression: not 320')
+          if sam > 40: raise SystemExit('Selector regression: SAM hard cap violated')
+          if len(selector.get('history_run_ids') or []) < 2: raise SystemExit('Canary invalid: need >=2 rolling performance runs')
           PY
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
           cat smoke/regression-report.json >> "$GITHUB_STEP_SUMMARY"
