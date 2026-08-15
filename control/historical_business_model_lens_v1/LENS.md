@@ -3,7 +3,7 @@
 Historical-only hypothesis layer. Every label below is a review aid, not an eligibility or profitability conclusion.
 
 - empirical cohorts read: **210**
-- cohorts matching at least one broad execution model: **52**
+- cohorts matching at least one broad execution model: **56**
 
 ## 1. Australia — <n> ict labour hire other
 - Hypothesis families: **DIGITAL_SOFTWARE, STAFFING_BROKER** · lens score **120.2** · specialist/heavy penalty **NO**
@@ -149,7 +149,16 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Department of Home Affairs — 0070039167 — 1365848.0
   - Australian Signals Directorate — 4501187459 — 1232160.0
 
-## 17. Australia — <n> project management other
+## 17. Canada — npp s <n> ths sa one 1 special advisor temporary help services against the supply arrangement for the national capital region ncr temporary help services requirement this requireme
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **106.8** · specialist/heavy penalty **NO**
+- records 46 · buyers 3 · repeat buyers 3 · median 267690.5 CAD · bidders UNKNOWN · top supplier share 0.18181818181818182
+- route `COMPETITIVE_OTHER` · code `NO_CODE`
+- examples:
+  - Department of National Defense — NPP – S5228810 - THS SA – One (1) Special Advisor. Temporary Help Services against the Supply Arrangement for the National Capital Region (NCR). — 360611.25
+  - Department of National Defence (DND) — NPP – S5624569 - THS SA – One (1) Special Advisor. Temporary Help Services against the Supply Arrangement for the National Capital Region (NCR) — 319677.0
+  - Department of National Defense — NPP – S5060649 - THS SA – One (1) Special Advisor. Temporary Help Services against the Supply Arrangement for the National Capital Region (NCR). — 306938.58
+
+## 18. Australia — <n> project management other
 - Hypothesis families: **STAFFING_BROKER** · lens score **106.2** · specialist/heavy penalty **NO**
 - records 10 · buyers 3 · repeat buyers 3 · median 886696.005 AUD · bidders UNKNOWN · top supplier share 0.2
 - route `AWARD_FIRST_EVIDENCE` · code `81110000`
@@ -158,7 +167,7 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Department of Foreign Affairs and Trade — 4600020274 — 4554000.0
   - Australian Signals Directorate — 4600063017 — 1485978.12
 
-## 18. Australia — <n> program management services other
+## 19. Australia — <n> program management services other
 - Hypothesis families: **STAFFING_BROKER** · lens score **106.1** · specialist/heavy penalty **NO**
 - records 13 · buyers 3 · repeat buyers 2 · median 1408829.91 AUD · bidders UNKNOWN · top supplier share 0.15384615384615385
 - route `AWARD_FIRST_EVIDENCE` · code `80161500`
@@ -167,7 +176,16 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Australian Submarine Agency — 4600074733 — 3655156.04
   - Department of Defence — 4610000520 — 2568645.6
 
-## 19. Australia — <n> software support services automation software
+## 20. Netherlands — ict hardware other
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **105.8** · specialist/heavy penalty **NO**
+- records 13 · buyers 12 · repeat buyers 1 · median 923750.0 UNKNOWN · bidders UNKNOWN · top supplier share 0.2
+- route `UNKNOWN` · code `30200000-1`
+- examples:
+  - Gemeente Alkmaar — ICT Hardware — 2400000.0
+  - Sportbedrijf Rotterdam B.V. — ICT Hardware — 1600000.0
+  - Het Baken Almere — ICT-Hardware — 1300000.0
+
+## 21. Australia — <n> software support services automation software
 - Hypothesis families: **DIGITAL_SOFTWARE, ADMIN_BPO** · lens score **105.8** · specialist/heavy penalty **NO**
 - records 19 · buyers 4 · repeat buyers 2 · median 772997.56 AUD · bidders UNKNOWN · top supplier share 0.21052631578947367
 - route `AWARD_FIRST_EVIDENCE` · code `81110000`
@@ -176,7 +194,7 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Department of Defence — 4600079326 — 3606601.24
   - Department of Defence — 4600078835 — 3138960.0
 
-## 20. USA — program management program management other
+## 22. USA — program management program management other
 - Hypothesis families: **STAFFING_BROKER** · lens score **105.5** · specialist/heavy penalty **NO**
 - records 9 · buyers 4 · repeat buyers 2 · median 5502657.57 USD · bidders 1.0 · top supplier share 0.2222222222222222
 - route `AWARD_FIRST_EVIDENCE` · code `336413`
@@ -185,7 +203,7 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - AMSAM-SPK — PROGRAM MANAGEMENT — 9853545.12
   - DCMA RADARS AND SENSORS — PROGRAM MANAGEMENT — 9635180.32
 
-## 21. Australia — <n> sustainment support services other
+## 23. Australia — <n> sustainment support services other
 - Hypothesis families: **ADMIN_BPO** · lens score **104.7** · specialist/heavy penalty **NO**
 - records 8 · buyers 2 · repeat buyers 1 · median 6135411.4 AUD · bidders UNKNOWN · top supplier share 0.25
 - route `AWARD_FIRST_EVIDENCE` · code `80161500`
@@ -194,7 +212,7 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Department of Defence — 4610000935 — 12961148.42
   - Department of Defence — 4610002975 — 9286973.3
 
-## 22. Australia — <n> software licence and maintenance automation software
+## 24. Australia — <n> software licence and maintenance automation software
 - Hypothesis families: **DIGITAL_SOFTWARE** · lens score **104.4** · specialist/heavy penalty **NO**
 - records 4 · buyers 3 · repeat buyers 1 · median 6222675.755 AUD · bidders UNKNOWN · top supplier share 0.25
 - route `AWARD_FIRST_EVIDENCE` · code `43230000`
@@ -203,7 +221,7 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Department of Defence — 4610004991 — 11909356.09
   - Department of Health, Disability and Ageing — 4500163827 — 535995.42
 
-## 23. Australia — <n> software development services automation software
+## 25. Australia — <n> software development services automation software
 - Hypothesis families: **DIGITAL_SOFTWARE** · lens score **104.4** · specialist/heavy penalty **NO**
 - records 5 · buyers 3 · repeat buyers 1 · median 2300000.0 AUD · bidders UNKNOWN · top supplier share 0.2
 - route `AWARD_FIRST_EVIDENCE` · code `43230000`
@@ -212,7 +230,7 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Australian Prudential Regulation Authority — 7913 — 2612776.1
   - Australian Prudential Regulation Authority — 7913 — 2300000.0
 
-## 24. Australia — <n> data services other
+## 26. Australia — <n> data services other
 - Hypothesis families: **DIGITAL_SOFTWARE** · lens score **104.3** · specialist/heavy penalty **NO**
 - records 11 · buyers 2 · repeat buyers 1 · median 1382257.78 AUD · bidders UNKNOWN · top supplier share 0.18181818181818182
 - route `AWARD_FIRST_EVIDENCE` · code `80161500`
@@ -221,7 +239,7 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Department of Defence — 4600064295 — 4422440.0
   - Department of Defence — 4600074348 — 2877147.8
 
-## 25. Australia — <n> labour hire other
+## 27. Australia — <n> labour hire other
 - Hypothesis families: **STAFFING_BROKER** · lens score **104.2** · specialist/heavy penalty **NO**
 - records 5 · buyers 3 · repeat buyers 1 · median 1801478.25 AUD · bidders UNKNOWN · top supplier share 0.2
 - route `AWARD_FIRST_EVIDENCE` · code `80161500`
@@ -230,7 +248,16 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Department of Foreign Affairs and Trade — 4600015386 — 2510315.07
   - Department of Defence — 3000053373 — 1801478.25
 
-## 26. Australia — <n> professional services other
+## 28. ITA — procedura aperta telematica ex art <n> d lgs n <n> <n> per l acquisizione di servizi di gestione delle infrastrutture it e sicurezza informatica della regione del veneto giunta reg
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **104.2** · specialist/heavy penalty **NO**
+- records 5 · buyers 2 · repeat buyers 1 · median 45164256.0 EUR · bidders 0.5 · top supplier share 0.16666666666666669
+- route `UNKNOWN` · code `72500000`
+- examples:
+  - AREA - AREA RISORSE FINANZIARIE, STRUMENTALI, ICT ED ENTI LOCALI - DIREZIONE - ICT, AGENDA DIGITALE E SOS AFFIDAMENTO SERVIZI E FORNITURE ICT — Procedura aperta telematica, ex art. 71 D.lgs. n. 36/2023, per l'acquisizione di servizi di gestione delle infrastrutture IT e sicurezza informatica della Regione del Veneto - Giunta regionale. — 45340583.14
+  - AREA - AREA RISORSE FINANZIARIE, STRUMENTALI, ICT ED ENTI LOCALI - DIREZIONE - ICT, AGENDA DIGITALE E SOS AFFIDAMENTO SERVIZI E FORNITURE ICT — Procedura aperta telematica, ex art. 71 D.lgs. n. 36/2023, per l'acquisizione di servizi di gestione delle infrastrutture IT e sicurezza informatica della Regione del Veneto - Giunta regionale. — 45164256.0
+  - AREA - AREA RISORSE FINANZIARIE, STRUMENTALI, ICT ED ENTI LOCALI - DIREZIONE - ICT, AGENDA DIGITALE E SOS AFFIDAMENTO SERVIZI E FORNITURE ICT — Procedura aperta telematica, ex art. 71 D.lgs. n. 36/2023, per l'acquisizione di servizi di gestione delle infrastrutture IT e sicurezza informatica della Regione del Veneto - Giunta regionale. — 45164256.0
+
+## 29. Australia — <n> professional services other
 - Hypothesis families: **STAFFING_BROKER** · lens score **104.0** · specialist/heavy penalty **NO**
 - records 5 · buyers 4 · repeat buyers 1 · median 1147300.0 AUD · bidders UNKNOWN · top supplier share 0.2
 - route `AWARD_FIRST_EVIDENCE` · code `81100000`
@@ -239,7 +266,7 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Department of Defence — 4600075163 — 1850149.81
   - Australian Submarine Agency — 4600093841 — 1147300.0
 
-## 27. Australia — <n> project management services other
+## 30. Australia — <n> project management services other
 - Hypothesis families: **STAFFING_BROKER** · lens score **104.0** · specialist/heavy penalty **NO**
 - records 4 · buyers 3 · repeat buyers 1 · median 2466731.98 AUD · bidders UNKNOWN · top supplier share 0.25
 - route `AWARD_FIRST_EVIDENCE` · code `80101604`
@@ -248,7 +275,7 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Department of Home Affairs — 0070037951 — 2743804.8
   - Australian Federal Police — 5700024157 — 2189659.16
 
-## 28. Australia — <n> business support services other
+## 31. Australia — <n> business support services other
 - Hypothesis families: **ADMIN_BPO** · lens score **103.9** · specialist/heavy penalty **NO**
 - records 4 · buyers 3 · repeat buyers 1 · median 1997755.7650000001 AUD · bidders UNKNOWN · top supplier share 0.25
 - route `AWARD_FIRST_EVIDENCE` · code `81110000`
@@ -257,70 +284,16 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Department of Education — 4400073738 — 3000000.0
   - Australian Signals Directorate — 4501195915 — 995511.53
 
-## 29. Canada - Quebec — services d entretien ménager services d entretien ménager other
-- Hypothesis families: **FACILITY_BROKER** · lens score **102.3** · specialist/heavy penalty **NO**
-- records 10 · buyers 9 · repeat buyers 1 · median 3785549.0 CAD · bidders UNKNOWN · top supplier share UNKNOWN
-- route `OPEN_PUBLIC` · code `NO_CODE`
+## 32. Netherlands — warme drankenvoorziening automation software
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **101.8** · specialist/heavy penalty **NO**
+- records 8 · buyers 6 · repeat buyers 2 · median 6000000.0 UNKNOWN · bidders UNKNOWN · top supplier share 0.5
+- route `UNKNOWN` · code `42968100-0`
 - examples:
-  - Université McGill — Services d'entretien ménager — 19999999.0
-  - Cégep Marie-Victorin — Services d'entretien ménager — 6943899.0
-  - Centre de services Scolaire des Phares. — Services d'entretien ménager — 627199.0
+  - Leids Universitair Medisch Centrum (LUMC) — Warme drankenvoorziening — 6000000.0
+  - Waterschap Vechtstromen — Warme Drankenvoorziening — UNKNOWN
+  - Waterschap Drents Overijsselse Delta — Warme drankenvoorziening — UNKNOWN
 
-## 30. Canada - Quebec — service de déneigement service de déneigement other
-- Hypothesis families: **FACILITY_BROKER** · lens score **101.8** · specialist/heavy penalty **NO**
-- records 13 · buyers 13 · repeat buyers 0 · median 334399.0 CAD · bidders UNKNOWN · top supplier share UNKNOWN
-- route `OPEN_PUBLIC` · code `NO_CODE`
-- examples:
-  - Bibliothèque et Archives nationales du Québec — SERVICE DE DÉNEIGEMENT — 334399.0
-  - Buanderie centrale de Montréal — Service de déneigement — UNKNOWN
-  - École Nationale de Police du Québec — Service de déneigement — UNKNOWN
-
-## 31. Canada - Quebec — agence de sécurité agence de sécurité other
-- Hypothesis families: **FACILITY_BROKER** · lens score **101.5** · specialist/heavy penalty **NO**
-- records 5 · buyers 4 · repeat buyers 1 · median 6943899.0 CAD · bidders UNKNOWN · top supplier share UNKNOWN
-- route `OPEN_PUBLIC` · code `NO_CODE`
-- examples:
-  - Université du Québec à Chicoutimi . — Agence de sécurité — 6943899.0
-  - SQI-Direction immobilière Sud de Montréal — Agence de sécurité — UNKNOWN
-  - SQI-Direction immobilière Sud de Montréal — Agence de sécurité — UNKNOWN
-
-## 32. PRT — fornecimento instalação e manutenção de rede de telemetria software de gestão do parque de contadores e da rede a instalar e fornecimento de contadores ultrassónicos com telemetria
-- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **100.8** · specialist/heavy penalty **NO**
-- records 4 · buyers 2 · repeat buyers 2 · median 15294098.54 EUR · bidders UNKNOWN · top supplier share UNKNOWN
-- route `UNKNOWN` · code `38421100`
-- examples:
-  - AGERE- Empresa de Águas Efluentes e Resíduos de Braga, EM — FORNECIMENTO, INSTALAÇÃO E MANUTENÇÃO DE REDE DE TELEMETRIA, SOFTWARE DE GESTÃO DO PARQUE DE CONTADORES E DA REDE A INSTALAR E FORNECIMENTO DE CONTADORES ULTRASSÓNICOS COM TELEMETRIA INCORPORADA — 15294098.54
-  - AGERE- Empresa de Águas Efluentes e Resíduos de Braga, EM — FORNECIMENTO, INSTALAÇÃO E MANUTENÇÃO DE REDE DE TELEMETRIA, SOFTWARE DE GESTÃO DO PARQUE DE CONTADORES E DA REDE A INSTALAR E FORNECIMENTO DE CONTADORES ULTRASSÓNICOS COM TELEMETRIA INCORPORADA — 15294098.54
-  - AGERE- Empresa de Águas Efluentes e Resíduos de Braga, E. M. — FORNECIMENTO, INSTALAÇÃO E MANUTENÇÃO DE REDE DE TELEMETRIA, SOFTWARE DE GESTÃO DO PARQUE DE CONTADORES E DA REDE A INSTALAR E FORNECIMENTO DE CONTADORES ULTRASSÓNICOS COM TELEMETRIA INCORPORADA — 15294098.54
-
-## 33. United Kingdom — competitive land design and build framework for nihe belfast north and south regions the project is for the delivery of social housing units in nihe belfast north and south regions
-- Hypothesis families: **CREATIVE_LANGUAGE** · lens score **100.5** · specialist/heavy penalty **NO**
-- records 3 · buyers 2 · repeat buyers 1 · median 20000000.0 GBP · bidders UNKNOWN · top supplier share UNKNOWN
-- route `OPEN_PUBLIC` · code `NO_CODE`
-- examples:
-  - Arbour Housing Ltd — Provision of Competitive Land, Design and Build Framework for NIHE Belfast, North and South Regions — 20000000.0
-  - Arbour Housing Ltd — Provision of Competitive Land, Design and Build Framework for NIHE Belfast, North and South Regions — 20000000.0
-  - Arbour Housing — Provision of Competitive Land, Design and Build Framework for NIHE Belfast, North and South Regions — UNKNOWN
-
-## 34. FIN — ohjelmisto ja pilvipalvelulisenssien jälleenmyynti automation software
-- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **100.3** · specialist/heavy penalty **NO**
-- records 4 · buyers 3 · repeat buyers 1 · median 26500000.0 EUR · bidders UNKNOWN · top supplier share UNKNOWN
-- route `UNKNOWN` · code `48000000`
-- examples:
-  - Helsingin yliopisto — Ohjelmisto- ja pilvipalvelulisenssien jälleenmyynti — 46000000.0
-  - Helsingin yliopisto — Ohjelmisto- ja pilvipalvelulisenssien jälleenmyynti — 46000000.0
-  - Oulun yliopisto — Ohjelmisto- ja pilvipalvelulisenssien jälleenmyynti — 7000000.0
-
-## 35. AUT — it dienstleistungen <n> automation software
-- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **100.2** · specialist/heavy penalty **NO**
-- records 3 · buyers 3 · repeat buyers 0 · median 235400000.0 EUR · bidders UNKNOWN · top supplier share UNKNOWN
-- route `UNKNOWN` · code `72000000`
-- examples:
-  - Auftraggeber sind die Republik Österreich (Bund), die Bundesbeschaffung GmbH sowie alle weiteren Auftraggeber gemäß der den Ausschreibungsunterlagen beiliegenden Kundenliste. — IT-Dienstleistungen 2025 — 240000000.0
-  - Auftraggeber sind die Republik Österreich (Bund), die Bundesbeschaffung GmbH sowie alle weiteren Auftraggeber gemäß der den Ausschreibungsunterlagen beiliegenden Kundenliste, im Vergabeverfahren alle vertreten durch die Bundesbeschaffung GmbH. — IT-Dienstleistungen 2026 — 235400000.0
-  - IT-Services der Sozialversicherung GmbH — IT-Dienstleistungen 2024 — 45000000.0
-
-## 36. Australia — <n> software development automation software
+## 33. Australia — <n> software development automation software
 - Hypothesis families: **DIGITAL_SOFTWARE** · lens score **100.1** · specialist/heavy penalty **NO**
 - records 6 · buyers 2 · repeat buyers 2 · median 4114206.695 AUD · bidders UNKNOWN · top supplier share 0.3333333333333333
 - route `AWARD_FIRST_EVIDENCE` · code `43230000`
@@ -329,88 +302,34 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Australian Signals Directorate — 4600054187 — 8495148.75
   - Australian Signals Directorate — 4600075909 — 5169827.52
 
-## 37. PRT — cpi <n> <n> cpi cd ecossistema de serviços digitais prr <n> <n> automation software
+## 34. Canada - Quebec — offres infonuagiques de solutions iaas paas et saas reliées offres infonuagiques de solutions iaas paas et saas reliées automation software
 - Hypothesis families: **DIGITAL_SOFTWARE** · lens score **100.1** · specialist/heavy penalty **NO**
-- records 4 · buyers 2 · repeat buyers 1 · median 31741794.4 EUR · bidders UNKNOWN · top supplier share UNKNOWN
-- route `UNKNOWN` · code `72230000`
+- records 5 · buyers 4 · repeat buyers 1 · median 1400000.0 CAD · bidders 1.0 · top supplier share 0.4
+- route `DIRECT_NONCOMPETITIVE` · code `NO_CODE`
 - examples:
-  - Agência para a Modernização Administrativa, I. P. — CPI 184/2023/CPI/CD/ECOSSISTEMA DE SERVIÇOS DIGITAIS PRR 2024-2026 — 31741794.4
-  - Agência para a Modernização Administrativa, I. P. — CPI 184/2023/CPI/CD/ECOSSISTEMA DE SERVIÇOS DIGITAIS PRR 2024-2026 — 31741794.4
-  - Agência para a Modernização Administrativa, I. P. — CPI 184/2023/CPI/CD/ECOSSISTEMA DE SERVIÇOS DIGITAIS PRR 2024-2026 — 31741794.4
+  - Ministère du Tourisme — Offres infonuagiques de solutions IAAS, PAAS et SAAS reliées — 1418279.08
+  - Société de télédiffusion du Québec. — Offres infonuagiques de solutions IAAS, PAAS ET SAAS RELIÉES — 1400000.0
+  - Société de télédiffusion du Québec. — Offres infonuagiques de solutions IAAS, PAAS ET SAAS RELIÉES — 1400000.0
 
-## 38. ESP — contrato de servicios contr <n> <n> automation software
-- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **100.0** · specialist/heavy penalty **NO**
-- records 7 · buyers 2 · repeat buyers 1 · median 12917826.72 EUR · bidders UNKNOWN · top supplier share UNKNOWN
-- route `UNKNOWN` · code `72222300`
+## 35. Netherlands — outsourcing it infrastructuur en beheerdiensten automation software
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **99.6** · specialist/heavy penalty **NO**
+- records 5 · buyers 5 · repeat buyers 0 · median 4235607.0 UNKNOWN · bidders UNKNOWN · top supplier share 0.3333333333333333
+- route `UNKNOWN` · code `72510000-3`
 - examples:
-  - SERVICIO ANDALUZ DE SALUD. SERVICIOS CENTRALES — Contrato de Servicios (CONTR 2023 0000541135) — 75049497.6
-  - Servicio Andaluz de Salud. Servicios Centrales — Contrato de Servicios (CONTR 2025 0000528153) — 29396808.0
-  - Servicio Andaluz de Salud. Servicios Centrales — Contrato de Servicios (CONTR 2025 0000541335) — 17941392.0
+  - ICT WBW — Outsourcing IT-infrastructuur- en beheerdiensten — 9175079.0
+  - gemeente Doetinchem — Outsourcing IT-infrastructuur- en beheerdiensten — 4235607.0
+  - Gemeente Houten — Outsourcing IT-infrastructuur en -beheerdiensten — 2700000.0
 
-## 39. AUT — security software <n> automation software
-- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **100.0** · specialist/heavy penalty **NO**
-- records 3 · buyers 2 · repeat buyers 1 · median 66000000.0 EUR · bidders UNKNOWN · top supplier share UNKNOWN
-- route `UNKNOWN` · code `48000000`
+## 36. NOR — interpretation and translation services language
+- Hypothesis families: **CREATIVE_LANGUAGE** · lens score **99.5** · specialist/heavy penalty **NO**
+- records 3 · buyers 2 · repeat buyers 1 · median 80000000.0 UNKNOWN · bidders 1.5 · top supplier share 0.5
+- route `UNKNOWN` · code `79540000`
 - examples:
-  - Auftraggeber sind die Republik Österreich (Bund), die Bundesbeschaffung GmbH sowie alle weiteren Auftraggeber gemäß der den Ausschreibungsunterlagen beiliegenden Kundenliste. — Security Software 2025 — 165000000.0
-  - Auftraggeber sind die Republik Österreich (Bund), die Bundesbeschaffung GmbH sowie alle weiteren Auftraggeber gemäß der den Ausschreibungsunterlagen beiliegenden Kundenliste, im Vergabeverfahren alle vertreten durch die Bundesbeschaffung GmbH. — Security Software 2026 — 66000000.0
-  - Auftraggeber sind die Republik Österreich (Bund), die Bundesbeschaffung GmbH sowie alle weiteren Auftraggeber gemäß der den Ausschreibungsunterlagen beiliegenden Kundenliste. — Security Software 2024 — 60000000.0
+  - Bærum kommune — Interpretation and translation services — 80000000.0
+  - Anskaffelser i Akershus, Buskerud og Østfold KO — Interpretation and translation services — UNKNOWN
+  - Anskaffelser i Akershus, Buskerud og Østfold KO — Interpretation and translation services — UNKNOWN
 
-## 40. PRT — concurso público com publicação de anúncio no jornal oficial da união europeia joue para aquisição de licenciamento de software microsoft e serviços conexos para as entidades do sn
-- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **99.8** · specialist/heavy penalty **NO**
-- records 4 · buyers 2 · repeat buyers 1 · median 14098295.945 EUR · bidders UNKNOWN · top supplier share UNKNOWN
-- route `UNKNOWN` · code `48200000`
-- examples:
-  - Serviços Partilhados do Ministério da Saúde, EPE — Concurso Público com publicação de anúncio no Jornal Oficial da União Europeia | JOUE para aquisição de Licenciamento de Software Microsoft e Serviços Conexos para as Entidades do SNS e Ministério da — 15929010.88
-  - SPMS - Serviços Partilhados do Ministério da Saúde, E. P. E. — Concurso Público com publicação de anúncio no Jornal Oficial da União Europeia | JOUE para aquisição de Licenciamento de Software Microsoft e Serviços Conexos para as Entidades do SNS e Ministério da Saúde. — 14324880.08
-  - SPMS - Serviços Partilhados do Ministério da Saúde, E. P. E. — Concurso Público com publicação de anúncio no Jornal Oficial da União Europeia | JOUE para aquisição de Licenciamento de Software Microsoft e Serviços Conexos para as Entidades do SNS e Ministério da Saúde. — 13871711.81
-
-## 41. FIN — puhtaanapidon tarvikkeet other
-- Hypothesis families: **STANDARD_GOODS_BROKER** · lens score **99.7** · specialist/heavy penalty **NO**
-- records 3 · buyers 2 · repeat buyers 1 · median 26199225.0 EUR · bidders UNKNOWN · top supplier share UNKNOWN
-- route `UNKNOWN` · code `39800000`
-- examples:
-  - Sarastia Oy — Puhtaanapidon tarvikkeet — 26199225.0
-  - Sarastia Oy — Puhtaanapidon tarvikkeet — 26199225.0
-  - Länsi-Uudenmaan hyvinvointialue — Puhtaanapidon tarvikkeet — 3608000.0
-
-## 42. United Kingdom — competitive land design and build framework for all nihe regions the project is for the delivery of social housing units in nihe north south and belfast regions by means of a land 
-- Hypothesis families: **CREATIVE_LANGUAGE** · lens score **99.7** · specialist/heavy penalty **NO**
-- records 3 · buyers 3 · repeat buyers 0 · median 20000000.0 GBP · bidders UNKNOWN · top supplier share UNKNOWN
-- route `OPEN_PUBLIC` · code `NO_CODE`
-- examples:
-  - ALPHA HOUSING (NORTHERN IRELAND) LIMITED — Provision of Competitive Land, Design and Build Framework for all NIHE Regions — 20000000.0
-  - Alpha Housing NI Ltd — Provision of Competitive Land, Design and Build Framework for all NIHE Regions — 20000000.0
-  - Alpha Housing (Northern Ireland) Limited — Provision of Competitive Land, Design and Build Framework for all NIHE Regions — UNKNOWN
-
-## 43. ITA — procedura aperta telematica ex art <n> d lgs n <n> <n> per l acquisizione di servizi di gestione delle infrastrutture it e sicurezza informatica della regione del veneto giunta reg
-- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **99.5** · specialist/heavy penalty **NO**
-- records 5 · buyers 2 · repeat buyers 1 · median 45164256.0 EUR · bidders UNKNOWN · top supplier share UNKNOWN
-- route `UNKNOWN` · code `72500000`
-- examples:
-  - AREA - AREA RISORSE FINANZIARIE, STRUMENTALI, ICT ED ENTI LOCALI - DIREZIONE - ICT, AGENDA DIGITALE E SOS AFFIDAMENTO SERVIZI E FORNITURE ICT — Procedura aperta telematica, ex art. 71 D.lgs. n. 36/2023, per l'acquisizione di servizi di gestione delle infrastrutture IT e sicurezza informatica della Regione del Veneto - Giunta regionale. — 45340583.14
-  - AREA - AREA RISORSE FINANZIARIE, STRUMENTALI, ICT ED ENTI LOCALI - DIREZIONE - ICT, AGENDA DIGITALE E SOS AFFIDAMENTO SERVIZI E FORNITURE ICT — Procedura aperta telematica, ex art. 71 D.lgs. n. 36/2023, per l'acquisizione di servizi di gestione delle infrastrutture IT e sicurezza informatica della Regione del Veneto - Giunta regionale. — 45340583.14
-  - AREA - AREA RISORSE FINANZIARIE, STRUMENTALI, ICT ED ENTI LOCALI - DIREZIONE - ICT, AGENDA DIGITALE E SOS AFFIDAMENTO SERVIZI E FORNITURE ICT — Procedura aperta telematica, ex art. 71 D.lgs. n. 36/2023, per l'acquisizione di servizi di gestione delle infrastrutture IT e sicurezza informatica della Regione del Veneto - Giunta regionale. — 45164256.0
-
-## 44. ITA — procedura aperta europea per l appalto del servizio di ristorazione catering completo catering veicolato presso edrc del ministero della difesa other
-- Hypothesis families: **FACILITY_BROKER** · lens score **99.5** · specialist/heavy penalty **NO**
-- records 3 · buyers 2 · repeat buyers 1 · median 724583265.75 EUR · bidders UNKNOWN · top supplier share UNKNOWN
-- route `UNKNOWN` · code `55500000`
-- examples:
-  - DIREZIONE GENERALE COMMISSARIATO E SERVIZI GENERALI — Procedura aperta europea per l’appalto del servizio di ristorazione, catering completo, catering veicolato presso EDRC del Ministero della Difesa — 724583265.75
-  - DIREZIONE GENERALE COMMISSARIATO E SERVIZI GENERALI — Procedura aperta europea per l’appalto del servizio di ristorazione, catering completo, catering veicolato presso EDRC del Ministero della Difesa — 724583265.75
-  - DIREZIONE GENERALE DEL COMMISSARIATO E DEI SERVIZI GENERALI — Procedura aperta europea per l’appalto del servizio di ristorazione, catering completo, catering veicolato presso EDRC del Ministero della Difesa — 38196070.58
-
-## 45. SWE — konsultmäklare automation software
-- Hypothesis families: **DIGITAL_SOFTWARE, STAFFING_BROKER** · lens score **99.4** · specialist/heavy penalty **NO**
-- records 3 · buyers 3 · repeat buyers 0 · median 517000000.0 SEK · bidders UNKNOWN · top supplier share UNKNOWN
-- route `UNKNOWN` · code `72000000`
-- examples:
-  - E-hälsomyndigheten — Konsultmäklare — 1150000000.0
-  - Sigtuna kommun — Konsultmäklare — 517000000.0
-  - Almi AB — Konsultmäklare — 400000000.0
-
-## 46. Australia — <n> support services other
+## 37. Australia — <n> support services other
 - Hypothesis families: **ADMIN_BPO** · lens score **99.2** · specialist/heavy penalty **NO**
 - records 13 · buyers 3 · repeat buyers 1 · median 891303.0 AUD · bidders UNKNOWN · top supplier share 0.3076923076923077
 - route `AWARD_FIRST_EVIDENCE` · code `80111600`
@@ -419,25 +338,70 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Department of Defence — 3000213284 — 1956679.19
   - Australian Criminal Intelligence Commission — 0000003871 — 1453292.0
 
-## 47. Netherlands — softwarebroker automation software
+## 38. FIN — tietoliikennepalvelut automation software
 - Hypothesis families: **DIGITAL_SOFTWARE** · lens score **99.2** · specialist/heavy penalty **NO**
-- records 3 · buyers 3 · repeat buyers 0 · median 19600000.0 EUR · bidders UNKNOWN · top supplier share UNKNOWN
+- records 4 · buyers 3 · repeat buyers 1 · median 3279752.0 UNKNOWN · bidders 1.0 · top supplier share 0.5
+- route `UNKNOWN` · code `72720000`
+- examples:
+  - HPK Palvelut Oy — Tietoliikennepalvelut — 5669085.0
+  - Tuusulan kunta — Tietoliikennepalvelut — 890419.0
+  - LapIT Oy — Tietoliikennepalvelut — UNKNOWN
+
+## 39. Netherlands — software broker automation software
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **99.2** · specialist/heavy penalty **NO**
+- records 3 · buyers 2 · repeat buyers 1 · median 4200000.0 UNKNOWN · bidders UNKNOWN · top supplier share 0.5
+- route `UNKNOWN` · code `48000000-8`
+- examples:
+  - Veiligheidsregio Drenthe — Software Broker — 4200000.0
+  - Veiligheidsregio Drenthe — Software Broker — UNKNOWN
+  - Gemeente Schiedam — Software Broker — UNKNOWN
+
+## 40. Netherlands — student informatie systeem automation software
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **98.9** · specialist/heavy penalty **NO**
+- records 3 · buyers 3 · repeat buyers 0 · median 9400000.0 UNKNOWN · bidders UNKNOWN · top supplier share 0.5
+- route `UNKNOWN` · code `48000000-8`
+- examples:
+  - Koning Willem I College — Student Informatie Systeem — 10000000.0
+  - Media College — Student Informatie Systeem — 8800000.0
+  - MBO Amersfoort — Student Informatie Systeem — UNKNOWN
+
+## 41. Netherlands — microsoft licenties automation software
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **98.8** · specialist/heavy penalty **NO**
+- records 4 · buyers 4 · repeat buyers 0 · median 1825000.0 UNKNOWN · bidders UNKNOWN · top supplier share 0.3333333333333333
+- route `UNKNOWN` · code `48000000-8`
+- examples:
+  - De Bedrijfsvoeringspartner (Barendrecht, Albrandswaard, Ridderkerk, De Bedrijfsvoeringspartner) — Microsoft licenties — 2500000.0
+  - Werkbedrijf Lucrato — Microsoft Licenties — 1150000.0
+  - Gemeente Oost Gelre — Microsoft Licenties — UNKNOWN
+
+## 42. Netherlands — warme dranken automation software
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **98.3** · specialist/heavy penalty **NO**
+- records 4 · buyers 4 · repeat buyers 0 · median 1359810.8 UNKNOWN · bidders UNKNOWN · top supplier share 0.5
+- route `UNKNOWN` · code `42968100-0`
+- examples:
+  - Veiligheidsregio Noord Holland Noord — Warme dranken — 1359810.8
+  - Stichting NHL Stenden Hogeschool — Warme dranken — UNKNOWN
+  - Gemeente Hof van Twente — Warme dranken — UNKNOWN
+
+## 43. Netherlands — burgerzaken software automation software
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **97.9** · specialist/heavy penalty **NO**
+- records 3 · buyers 3 · repeat buyers 0 · median 1552472.55 UNKNOWN · bidders UNKNOWN · top supplier share 0.5
+- route `UNKNOWN` · code `48000000-8`
+- examples:
+  - Regionale ICT-Dienst Utrecht — Burgerzaken software — 3104944.1
+  - Gemeente Waalwijk — Burgerzaken software — 1.0
+  - Gemeente Bronckhorst — Burgerzaken-software — UNKNOWN
+
+## 44. Netherlands — raadsinformatiesysteem automation software
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **97.8** · specialist/heavy penalty **NO**
+- records 4 · buyers 4 · repeat buyers 0 · median 617627.0 UNKNOWN · bidders UNKNOWN · top supplier share 0.3333333333333333
 - route `UNKNOWN` · code `72000000-5`
 - examples:
-  - Gemeente Dronten — Softwarebroker — 20000000.0
-  - Gemeente Hardenberg — Softwarebroker — 19600000.0
-  - Gemeente Halderberge — Softwarebroker — 9000000.0
+  - Gemeente Gooise Meren — Raadsinformatiesysteem — 625000.0
+  - Gemeente Lochem — Raadsinformatiesysteem — 617627.0
+  - Gemeente Dongen — Raadsinformatiesysteem — 1.0
 
-## 48. PRT — aquisição de serviços de conectividade para disponibilização aos alunos beneficiários da ação social escolar que frequentem escolas públicas e estabelecimentos de ensino particular
-- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **99.2** · specialist/heavy penalty **NO**
-- records 3 · buyers 3 · repeat buyers 0 · median 14833500.0 EUR · bidders UNKNOWN · top supplier share UNKNOWN
-- route `UNKNOWN` · code `72400000`
-- examples:
-  - Direção-Geral dos Estabelecimentos Escolares — Aquisição de serviços de conectividade para disponibilização aos alunos beneficiários da ação social escolar que frequentem escolas públicas e estabelecimentos de ensino particulares e cooperativos abrangidos por contratos de associação com o Estado — 14999960.0
-  - Secretaria-Geral da Educação e Ciência — Aquisição de serviços de conectividade para disponibilização aos alunos beneficiários da Ação Social Escolar que frequentem escolas públicas e estabelecimentos de ensino particulares e cooperativos abrangidos por contratos de associação com o Estado, bem como aos docentes dos ensinos básico e secundário dos estabelecimentos de ensino públicos, até final do ano letivo 2023/2024 — 14833500.0
-  - Agência para a Gestão do Sistema Educativo, IP — Aquisição de serviços de conectividade para disponibilização aos alunos beneficiários da Ação Social Escolar que frequentem escolas públicas e estabelecimentos de ensino particulares e cooperativos abrangidos por contratos de associação com o Estado, bem como aos alunos abrangidos pelo projeto piloto "Manuais Digitais", aos alunos que realizem provas em suporte digital e em cada sala de aula de um — 12180000.0
-
-## 49. Australia — <n> media buying services other
+## 45. Australia — <n> media buying services other
 - Hypothesis families: **CREATIVE_LANGUAGE** · lens score **93.5** · specialist/heavy penalty **NO**
 - records 11 · buyers 5 · repeat buyers 3 · median 6572237.0 AUD · bidders UNKNOWN · top supplier share 1.0
 - route `AWARD_FIRST_EVIDENCE` · code `82100000`
@@ -446,7 +410,61 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Department of Health, Disability and Ageing — 4500161688 — 12625797.8
   - Department of Health and Aged Care — 4500157941 — 12540000.0
 
-## 50. Australia — <n> construction support services other
+## 46. Netherlands — softwarebroker automation software
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **93.0** · specialist/heavy penalty **NO**
+- records 8 · buyers 6 · repeat buyers 2 · median 2950000.0 UNKNOWN · bidders UNKNOWN · top supplier share 0.6666666666666666
+- route `UNKNOWN` · code `72260000-5`
+- examples:
+  - Veiligheidsregio Hollands Midden — Softwarebroker — 3500000.0
+  - Gemeente De Fryske Marren — Softwarebroker — 2400000.0
+  - HTM Personenvervoer N.V. — Softwarebroker — UNKNOWN
+
+## 47. Germany — erweiterung sap maxattention erweiterung des bestehenden sap maxattention vertrags automation software
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **92.7** · specialist/heavy penalty **NO**
+- records 4 · buyers 3 · repeat buyers 1 · median 7665480.0 EUR · bidders 1.0 · top supplier share 1.0
+- route `DIRECT_NONCOMPETITIVE` · code `NO_CODE`
+- examples:
+  - Landeshauptstadt München, IT@M-BO4, Vergabemanagement — Erweiterung SAP-MaxAttention — 7726000.0
+  - Landeshauptstadt München, IT@M-GL4, Vergabemanagement — Erweiterung SAP-MaxAttention — 7665480.0
+  - Landeshauptstadt München, IT@M-GL4, Vergabemanagement — Erweiterung SAP-MaxAttention — 7665480.0
+
+## 48. Netherlands — service management tool automation software
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **92.6** · specialist/heavy penalty **NO**
+- records 5 · buyers 3 · repeat buyers 2 · median 5517740.0 UNKNOWN · bidders UNKNOWN · top supplier share 1.0
+- route `UNKNOWN` · code `72000000-5`
+- examples:
+  - Provincie Noord-Brabant — Service Management Tool — 5517740.0
+  - Hogeschool Leiden — Service Management Tool — UNKNOWN
+  - Hogeschool Leiden — Service Management Tool — UNKNOWN
+
+## 49. Netherlands — warme drankenautomaten automation software
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **92.2** · specialist/heavy penalty **NO**
+- records 6 · buyers 4 · repeat buyers 2 · median 1900000.0 UNKNOWN · bidders UNKNOWN · top supplier share 1.0
+- route `UNKNOWN` · code `15860000-4`
+- examples:
+  - Stichting Regionaal Opleidingencentrum van Twente — Warme Drankenautomaten — 1900000.0
+  - Veiligheidsregio Zuid-Holland Zuid — Warme drankenautomaten — UNKNOWN
+  - Laborijn — Warme Drankenautomaten — UNKNOWN
+
+## 50. Netherlands — softwarebroker automation software
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **92.1** · specialist/heavy penalty **NO**
+- records 8 · buyers 7 · repeat buyers 1 · median 3600000.0 UNKNOWN · bidders UNKNOWN · top supplier share 1.0
+- route `UNKNOWN` · code `72000000-5`
+- examples:
+  - Senzer — Softwarebroker — 3600000.0
+  - Bedrijfsvoeringseenheid Bommelerwaard — Softwarebroker — UNKNOWN
+  - Gemeente Utrecht — Softwarebroker — UNKNOWN
+
+## 51. Netherlands — software broker automation software
+- Hypothesis families: **DIGITAL_SOFTWARE** · lens score **91.9** · specialist/heavy penalty **NO**
+- records 5 · buyers 4 · repeat buyers 1 · median 6409812.62 UNKNOWN · bidders UNKNOWN · top supplier share 1.0
+- route `UNKNOWN` · code `72260000-5`
+- examples:
+  - Gemeente Den Haag — Software Broker — 6409812.62
+  - Alliander N.V. — Software Broker — UNKNOWN
+  - Gemeente Stichtse Vecht — Software Broker — UNKNOWN
+
+## 52. Australia — <n> construction support services other
 - Hypothesis families: **ADMIN_BPO** · lens score **87.6** · specialist/heavy penalty **YES**
 - records 18 · buyers 2 · repeat buyers 1 · median 1019402.8999999999 AUD · bidders UNKNOWN · top supplier share 0.1111111111111111
 - route `AWARD_FIRST_EVIDENCE` · code `72100000`
@@ -455,7 +473,7 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Department of Defence — 4600089309 — 88967384.0
   - Department of Defence — 4600088559 — 36170819.75
 
-## 51. Australia — <n> design and construction services creative communications
+## 53. Australia — <n> design and construction services creative communications
 - Hypothesis families: **CREATIVE_LANGUAGE** · lens score **84.7** · specialist/heavy penalty **YES**
 - records 11 · buyers 3 · repeat buyers 2 · median 5801285.26 AUD · bidders UNKNOWN · top supplier share 0.18181818181818182
 - route `AWARD_FIRST_EVIDENCE` · code `72100000`
@@ -464,7 +482,7 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - Department of Defence — 4600094052 — 17271740.2
   - Department of Foreign Affairs and Trade — 4600022573 — 14403051.98
 
-## 52. USA — engineering services engineering services automation software
+## 54. USA — engineering services engineering services automation software
 - Hypothesis families: **DIGITAL_SOFTWARE** · lens score **84.3** · specialist/heavy penalty **YES**
 - records 15 · buyers 5 · repeat buyers 2 · median 4900586.12 USD · bidders 1.0 · top supplier share 0.26666666666666666
 - route `AWARD_FIRST_EVIDENCE` · code `541330`
@@ -472,3 +490,21 @@ Historical-only hypothesis layer. Every label below is a review aid, not an elig
   - NASA JOHNSON SPACE CENTER — ENGINEERING SERVICES — 28297135.04
   - NAVAL AIR WARFARE CENTER — ENGINEERING SERVICES — 14723466.0
   - NIWC PACIFIC — ENGINEERING SERVICES — 11577858.12
+
+## 55. NOR — medical consumables other
+- Hypothesis families: **STANDARD_GOODS_BROKER** · lens score **67.7** · specialist/heavy penalty **YES**
+- records 3 · buyers 3 · repeat buyers 0 · median 16200000.0 UNKNOWN · bidders 2.0 · top supplier share 1.0
+- route `UNKNOWN` · code `33140000`
+- examples:
+  - Fredrikstad kommune — Medical consumables — 16200000.0
+  - GKI Grenlandskommunenes Innkjøpsenhet — Medical consumables — UNKNOWN
+  - Øvre Romerike Innkjøpssamarbeid — Medical consumables — UNKNOWN
+
+## 56. NOR — medical consumables other
+- Hypothesis families: **STANDARD_GOODS_BROKER** · lens score **66.8** · specialist/heavy penalty **YES**
+- records 3 · buyers 3 · repeat buyers 0 · median 7000000.0 UNKNOWN · bidders 2.0 · top supplier share 0.75
+- route `UNKNOWN` · code `33000000`
+- examples:
+  - OsloMet - storbyuniversitetet — Medical consumables — 7000000.0
+  - Sarpsborg kommune — Medical consumables — UNKNOWN
+  - Øvre Romerike Innkjøpssamarbeid — Medical consumables — UNKNOWN
