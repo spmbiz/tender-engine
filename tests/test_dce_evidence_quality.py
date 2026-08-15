@@ -39,6 +39,28 @@ def test_real_rft_is_gate_ready():
         td.cleanup()
 
 
+def test_french_dce_is_gate_ready():
+    corpus="Règlement de la consultation. Cahier des charges. Critères d'attribution. Date limite de remise des offres. Bordereau des prix. Mémoire technique."
+    td, root = make_root(corpus, 'DCE_RC.pdf', 'Rédaction de contenus pour le futur site internet régional')
+    try:
+        x=classify_candidate(root)
+        assert x['content_quality']=='SUBSTANTIVE_DCE_PRESENT'
+        assert x['gate_readiness'] is True
+    finally:
+        td.cleanup()
+
+
+def test_german_dce_is_gate_ready():
+    corpus='Vergabeunterlagen. Leistungsbeschreibung. Zuschlagskriterien. Eignungskriterien. Angebotsfrist. Preisblatt. Vertragsbedingungen.'
+    td, root = make_root(corpus, 'Vergabeunterlagen.pdf', 'Digitale Plattform')
+    try:
+        x=classify_candidate(root)
+        assert x['content_quality']=='SUBSTANTIVE_DCE_PRESENT'
+        assert x['gate_readiness'] is True
+    finally:
+        td.cleanup()
+
+
 def test_unknown_download_does_not_become_authoritative():
     td, root = make_root('Welcome to the portal. General information only.', 'info.pdf')
     try:
