@@ -24,6 +24,8 @@ GLOBAL_PACKS = [
     "discovery-global-lv-iub",
     "discovery-global-ch-simap",
     "discovery-global-no-doffin",
+    "discovery-global-fi-hilma",
+    "discovery-global-pt-base-open",
     "discovery-global-it-anac-delta",
 ]
 REQUIRED_SHARDED = {
@@ -59,9 +61,19 @@ def stats_health(pack_dir: Path) -> dict:
             bad.append({"path": str(path), "reason": f"STATUS_{status}"})
         if obj.get("truncated_by_page_cap"):
             bad.append({"path": str(path), "reason": "TRUNCATED_BY_PAGE_CAP"})
+    exit_files = sorted(pack_dir.rglob("adapter_exit_code.txt"))
+    for path in exit_files:
+        try:
+            rc=int(path.read_text(encoding="utf-8", errors="replace").strip())
+        except Exception:
+            bad.append({"path": str(path), "reason": "UNREADABLE_ADAPTER_EXIT_CODE"})
+            continue
+        if rc != 0:
+            bad.append({"path": str(path), "reason": "ADAPTER_EXIT_NONZERO", "value": rc})
     return {
         "status": "DEGRADED" if bad else "OK",
         "stats_files": [str(x) for x in stats_files],
+        "adapter_exit_files": [str(x) for x in exit_files],
         "problems": bad,
     }
 
