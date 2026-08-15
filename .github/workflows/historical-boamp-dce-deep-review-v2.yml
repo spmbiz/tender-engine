@@ -8,6 +8,7 @@ on:
       - '.github/workflows/historical-boamp-dce-deep-review-v2.yml'
       - 'pipeline/dce_evidence_quality.py'
       - 'control/historical_boamp_dce_routes_v1/resolved_candidates.jsonl'
+      - 'control/historical_boamp_dce_routes_v1/summary.json'
 
 permissions:
   contents: write
@@ -27,13 +28,22 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate resolved BOAMP queue
+      - name: Validate resolved BOAMP queue against resolver authority
         run: |
           set -euo pipefail
           test -s control/historical_boamp_dce_routes_v1/resolved_candidates.jsonl
-          n="$(wc -l < control/historical_boamp_dce_routes_v1/resolved_candidates.jsonl)"
-          test "$n" -eq 19
-          echo "RESOLVED_BOAMP=$n"
+          test -s control/historical_boamp_dce_routes_v1/summary.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          summary=json.load(open('control/historical_boamp_dce_routes_v1/summary.json',encoding='utf-8'))
+          n=sum(1 for x in Path('control/historical_boamp_dce_routes_v1/resolved_candidates.jsonl').read_text(encoding='utf-8').splitlines() if x.strip())
+          assert summary['contract']=='HISTORICAL_BOAMP_DCE_ROUTE_RESOLVER_V1',summary
+          assert n==int(summary['resolved_candidates']), (n,summary['resolved_candidates'])
+          assert n>0
+          Path('/tmp/expected_count').write_text(str(n),encoding='utf-8')
+          print('RESOLVED_BOAMP',n)
+          PY
       - name: Install live DCE resolver dependencies
         run: |
           python -m pip install --disable-pip-version-check -q \
@@ -49,7 +59,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p out review
-          n="$(wc -l < control/historical_boamp_dce_routes_v1/resolved_candidates.jsonl)"
+          n="$(cat /tmp/expected_count)"
           lines="$(seq -s, 1 "$n")"
           python pipeline/dce_batch_worker.py \
             --queue control/historical_boamp_dce_routes_v1/resolved_candidates.jsonl \
@@ -64,13 +74,14 @@ jobs:
           python pipeline/extract_gates.py --root out
       - name: Aggregate BOAMP route DCE reality
         run: python pipeline/summarize_historical_subniche_dce.py --root out --out review
-      - name: Validate research output
+      - name: Validate research output against strict route count
         run: |
           python - <<'PY'
           import json,os
           s=json.load(open('review/summary.json',encoding='utf-8'))
+          expected=int(open('/tmp/expected_count').read().strip())
           assert s['contract']=='HISTORICAL_SUBNICHE_DCE_GATE_RESEARCH_V1',s
-          assert s['total_candidates']==19,s
+          assert s['total_candidates']==expected,(s['total_candidates'],expected)
           assert s['final_verdict_allowed'] is False
           assert os.path.getsize('review/candidate_dce_review.jsonl')>0
           print(json.dumps({k:v for k,v in s.items() if k!='subniches'},indent=2,ensure_ascii=False))
@@ -86,7 +97,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add control/historical_boamp_dce_review_v2/
-          git commit -m 'tenders: persist downstream BOAMP historical DCE review v2' || true
+          git commit -m 'tenders: persist strict downstream BOAMP historical DCE review v2' || true
           for i in 1 2 3 4 5; do
             if git pull --rebase origin main && git push origin HEAD:main; then break; fi
             git rebase --abort >/dev/null 2>&1 || true
@@ -103,5 +114,5 @@ jobs:
           tag='historical-boamp-dce-review-v2'
           gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --target main \
             --title 'Historical BOAMP DCE Reality Check v2' \
-            --notes 'Deep public-DCE retrieval from official BOAMP-resolved downstream routes. BOAMP publication PDFs are explicitly notice-only and cannot become gate-ready DCE evidence.'
+            --notes 'Deep public-DCE retrieval from strict official BOAMP document routes. BOAMP publication PDFs are explicitly notice-only and cannot become gate-ready DCE evidence.'
           gh release upload "$tag" historical-boamp-dce-worker-v2.tar.gz historical-boamp-dce-review-v2.tar.gz review/summary.json review/REPORT.md --clobber
