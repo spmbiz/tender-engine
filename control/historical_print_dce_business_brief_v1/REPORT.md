@@ -1,6 +1,6 @@
 # Historical Print DCE Business Brief v1
 
-True gate-ready print DCEs: **3**.
+True gate-ready print DCEs: **2**.
 
 Absence of a signal remains UNKNOWN.
 
@@ -13,8 +13,4 @@ Buyer: Communauté de communes du Pays de l'Ourcq · Sub-niche: FR · Communicat
 Signals: similar_references, mandatory_insurance, mandatory_sample_or_proof, quantity_or_run, delivery_logistics
 Price-weight candidates: 0
 Quality/technical-weight candidates: 0, 0
-
-## Location de tentes de réception, aménagement, conception de supports de communication, impression des support de communication et animation de l'espace Chambre d'agriculture de la
-Buyer: Chambre d'agriculture de la Marne · Sub-niche: FR · Communication collateral printing
-Signals: none detected by strict patterns
 
