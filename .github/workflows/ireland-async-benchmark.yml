@@ -1,0 +1,58 @@
+name: Ireland async concurrency benchmark
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/ireland-async-benchmark.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        concurrency: [1, 2, 3]
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q 'playwright>=1.46,<2' beautifulsoup4
+      - name: Reuse runner Chrome
+        shell: bash
+        run: |
+          set -euo pipefail
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          [ -n "$chrome" ] || exit 1
+          echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+      - name: Benchmark identical five-page window
+        env:
+          DISCOVERY_OUT: bench/ie-c${{ matrix.concurrency }}
+          PAGE_START: '6'
+          PAGE_END: '10'
+          IE_PAGE_CONCURRENCY: ${{ matrix.concurrency }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          START=$(date +%s%3N)
+          python pipeline/discover_etenders_ie_async.py | tee /tmp/ie.log
+          END=$(date +%s%3N)
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          c=os.environ['IE_PAGE_CONCURRENCY']
+          s=json.loads(Path(f'bench/ie-c{c}/stats.json').read_text())
+          assert s['page_errors']==0,s
+          assert s['raw_materialized']==500,s
+          assert s['deadline_parsed']==500,s
+          assert s['buyer_parsed']==500,s
+          print('IRELAND_ASYNC_INTEGRITY_PASS',json.dumps(s,sort_keys=True))
+          PY
+          echo "IRELAND_ASYNC_BENCH concurrency=${IE_PAGE_CONCURRENCY} elapsed_ms=$((END-START))"
