@@ -23,7 +23,7 @@ def main():
       WITH hh AS (
         SELECT Historical_Tender_ID tender_id,Buyer_Name buyer,Title title,coalesce(Description,'') description,
                coalesce(Subcategory,'') subcategory,coalesce(Category,'') category,
-               lower(coalesce(Title,'')) title_l,
+               lower(coalesce(Title,'')) title_l,lower(coalesce(Description,'')) description_l,
                lower(concat_ws(' ',coalesce(Title,''),coalesce(Description,''),coalesce(Subcategory,''),coalesce(Category,''))) txt
         FROM {h}
       ), aa AS (
@@ -35,13 +35,19 @@ def main():
       FROM hh LEFT JOIN aa USING(tender_id)
     """)
 
+    # AusTender titles are frequently opaque IDs. Use strict phrases across title+description,
+    # while retaining which field actually carried the semantic evidence.
     con.execute("""
       CREATE TABLE c0 AS SELECT *,CASE
-        WHEN regexp_matches(title_l,'(?i)(gateway review|assurance review|project assurance|program assurance|programme assurance|project health check|program health check)') THEN 'PROJECT_PROGRAM_ASSURANCE'
-        WHEN regexp_matches(title_l,'(?i)(program evaluation|programme evaluation|evaluation of .*program|evaluation of .*programme|impact evaluation|outcome evaluation|process evaluation|evaluation services?)') THEN 'PROGRAM_EVALUATION'
-        WHEN regexp_matches(title_l,'(?i)(independent review|independent assessment|specialist review|external review|peer review)') THEN 'INDEPENDENT_REVIEW'
-        WHEN regexp_matches(title_l,'(?i)(research evaluation|evaluation research|monitoring and evaluation|m&e services|evaluation framework)') THEN 'RESEARCH_MONITORING_EVALUATION'
-        ELSE NULL END review_family
+        WHEN regexp_matches(txt,'(?i)(gateway review|assurance review|project assurance review|program assurance review|programme assurance review|project health check review|program health check review)') THEN 'PROJECT_PROGRAM_ASSURANCE'
+        WHEN regexp_matches(txt,'(?i)(program evaluation|programme evaluation|evaluation of (the )?.{0,80}(program|programme)|impact evaluation|outcome evaluation|process evaluation|evaluation services?)') THEN 'PROGRAM_EVALUATION'
+        WHEN regexp_matches(txt,'(?i)(independent review|independent assessment|specialist review|external review|peer review)') THEN 'INDEPENDENT_REVIEW'
+        WHEN regexp_matches(txt,'(?i)(research evaluation|evaluation research|monitoring and evaluation|monitoring & evaluation|evaluation framework)') THEN 'RESEARCH_MONITORING_EVALUATION'
+        ELSE NULL END review_family,
+        CASE
+          WHEN regexp_matches(title_l,'(?i)(gateway review|assurance review|project assurance|program assurance|programme assurance|health check review|program evaluation|programme evaluation|impact evaluation|outcome evaluation|process evaluation|independent review|independent assessment|specialist review|external review|peer review|monitoring and evaluation|evaluation framework)') THEN 'TITLE_SIGNAL'
+          WHEN regexp_matches(description_l,'(?i)(gateway review|assurance review|project assurance review|program assurance review|programme assurance review|health check review|program evaluation|programme evaluation|impact evaluation|outcome evaluation|process evaluation|independent review|independent assessment|specialist review|external review|peer review|monitoring and evaluation|monitoring & evaluation|evaluation framework)') THEN 'DESCRIPTION_SIGNAL'
+          ELSE 'CATEGORY_OR_COMBINED_SIGNAL' END signal_source
       FROM x
     """)
 
@@ -61,22 +67,22 @@ def main():
 
     matrix=con.execute("""
       WITH b AS (
-        SELECT review_family,delivery_risk,deliverable_type,currency,count(*) records,count(distinct nullif(buyer,'')) buyers,
+        SELECT review_family,signal_source,delivery_risk,deliverable_type,currency,count(*) records,count(distinct nullif(buyer,'')) buyers,
                count(distinct nullif(supplier_key,'')) supplier_keys,
                quantile_cont(award_value,.25) FILTER(WHERE award_value>=0) p25_value,
                median(award_value) FILTER(WHERE award_value>=0) median_value,
                quantile_cont(award_value,.75) FILTER(WHERE award_value>=0) p75_value
-        FROM y GROUP BY 1,2,3,4
-      ), rb0 AS (SELECT review_family,delivery_risk,deliverable_type,currency,buyer,count(*) n FROM y WHERE buyer<>'' GROUP BY 1,2,3,4,5),
-      rb AS (SELECT review_family,delivery_risk,deliverable_type,currency,count(*) FILTER(WHERE n>=2) repeat_buyers FROM rb0 GROUP BY 1,2,3,4),
-      ss0 AS (SELECT review_family,delivery_risk,deliverable_type,currency,supplier_key,count(*) n FROM y WHERE supplier_key<>'' GROUP BY 1,2,3,4,5),
-      ss AS (SELECT review_family,delivery_risk,deliverable_type,currency,max(n)*1.0/sum(n) top_supplier_share FROM ss0 GROUP BY 1,2,3,4)
+        FROM y GROUP BY 1,2,3,4,5
+      ), rb0 AS (SELECT review_family,signal_source,delivery_risk,deliverable_type,currency,buyer,count(*) n FROM y WHERE buyer<>'' GROUP BY 1,2,3,4,5,6),
+      rb AS (SELECT review_family,signal_source,delivery_risk,deliverable_type,currency,count(*) FILTER(WHERE n>=2) repeat_buyers FROM rb0 GROUP BY 1,2,3,4,5),
+      ss0 AS (SELECT review_family,signal_source,delivery_risk,deliverable_type,currency,supplier_key,count(*) n FROM y WHERE supplier_key<>'' GROUP BY 1,2,3,4,5,6),
+      ss AS (SELECT review_family,signal_source,delivery_risk,deliverable_type,currency,max(n)*1.0/sum(n) top_supplier_share FROM ss0 GROUP BY 1,2,3,4,5)
       SELECT b.*,coalesce(rb.repeat_buyers,0),ss.top_supplier_share FROM b
-      LEFT JOIN rb USING(review_family,delivery_risk,deliverable_type,currency)
-      LEFT JOIN ss USING(review_family,delivery_risk,deliverable_type,currency)
+      LEFT JOIN rb USING(review_family,signal_source,delivery_risk,deliverable_type,currency)
+      LEFT JOIN ss USING(review_family,signal_source,delivery_risk,deliverable_type,currency)
       ORDER BY delivery_risk,records DESC
     """).fetchall()
-    write(out/'market_matrix.csv',['review_family','delivery_risk','deliverable_type','currency','records','buyers','supplier_keys','p25_value','median_value','p75_value','repeat_buyers','top_supplier_share'],matrix)
+    write(out/'market_matrix.csv',['review_family','signal_source','delivery_risk','deliverable_type','currency','records','buyers','supplier_keys','p25_value','median_value','p75_value','repeat_buyers','top_supplier_share'],matrix)
 
     family=con.execute("""
       WITH b AS (SELECT review_family,delivery_risk,count(*) records,count(distinct nullif(buyer,'')) buyers,count(distinct nullif(supplier_key,'')) suppliers,median(award_value) FILTER(WHERE award_value>=0) median_value FROM y GROUP BY 1,2),
@@ -97,24 +103,26 @@ def main():
     write(out/'top_winners.csv',['review_family','delivery_risk','supplier_key','supplier','awards','buyers','supplier_share'],winners)
 
     examples=con.execute("""
-      SELECT review_family,delivery_risk,deliverable_type,currency,tender_id,buyer,supplier,title,substr(description,1,1800) description_excerpt,award_value,subcategory,category
-      FROM y QUALIFY row_number() over(partition by review_family,delivery_risk order by award_value desc nulls last,tender_id)<=20
-      ORDER BY review_family,delivery_risk,award_value DESC NULLS LAST
+      SELECT review_family,signal_source,delivery_risk,deliverable_type,currency,tender_id,buyer,supplier,title,substr(description,1,1800) description_excerpt,award_value,subcategory,category
+      FROM y QUALIFY row_number() over(partition by review_family,signal_source,delivery_risk order by award_value desc nulls last,tender_id)<=20
+      ORDER BY review_family,signal_source,delivery_risk,award_value DESC NULLS LAST
     """).fetchall()
-    write(out/'examples.csv',['review_family','delivery_risk','deliverable_type','currency','tender_id','buyer','supplier','title','description_excerpt','award_value','subcategory','category'],examples)
+    write(out/'examples.csv',['review_family','signal_source','delivery_risk','deliverable_type','currency','tender_id','buyer','supplier','title','description_excerpt','award_value','subcategory','category'],examples)
 
     summary={
-      'version':'HISTORICAL_AU_REVIEW_EVALUATION_PRECISION_V3',
+      'version':'HISTORICAL_AU_REVIEW_EVALUATION_PRECISION_V3_1',
       'archive_records_scanned':con.execute('select count(*) from x').fetchone()[0],
-      'strict_title_review_rows':con.execute('select count(*) from y').fetchone()[0],
+      'strict_semantic_review_rows':con.execute('select count(*) from y').fetchone()[0],
       'remote_analytical_rows':con.execute("select count(*) from y where delivery_risk='REMOTE_ANALYTICAL_PLAUSIBLE'").fetchone()[0],
+      'signal_sources':dict(con.execute('select signal_source,count(*) from y group by 1 order by 2 desc').fetchall()),
       'risk_classes':dict(con.execute('select delivery_risk,count(*) from y group by 1 order by 2 desc').fetchall()),
       'families':dict(con.execute('select review_family,count(*) from y group by 1 order by 2 desc').fetchall()),
       'grain':'AWARD_FIRST_PROCUREMENT','historical_only':True,'record_deletion':False,'live_used':False,'dce_used':False,
+      'supersession':'v3.0 title-only Australia output is superseded because AusTender frequently stores opaque reference IDs in Title. v3.1 uses strict title+Description semantic evidence and records the signal source.',
       'warning':'Delivery risk is semantic triage only. Credentials, panels, insurance, clearances and current access remain unknown.'
     }
     (out/'summary.json').write_text(json.dumps(summary,indent=2,ensure_ascii=False),encoding='utf-8')
-    lines=['# Australia Review / Evaluation Precision v3','',f"- AusTender records scanned **{summary['archive_records_scanned']:,}**",f"- strict title-led review/evaluation rows **{summary['strict_title_review_rows']:,}**",f"- remote-analytical-plausible rows **{summary['remote_analytical_rows']:,}**",'', 'This pass separates remotely analyzable review/evaluation work from specialist, physical and human-research-heavy work.','']
+    lines=['# Australia Review / Evaluation Precision v3.1','',f"- AusTender records scanned **{summary['archive_records_scanned']:,}**",f"- strict semantic review/evaluation rows **{summary['strict_semantic_review_rows']:,}**",f"- remote-analytical-plausible rows **{summary['remote_analytical_rows']:,}**",'', 'v3.0 title-only output is superseded. AusTender often uses opaque reference IDs as titles; v3.1 preserves whether semantic evidence came from Title or Description.','']
     for fam,risk,n,buy,sup,med,share in family:
         lines += [f'## {fam} → {risk}',f'- awards **{n}** · buyers **{buy}** · suppliers **{sup}** · median **{med if med is not None else "UNKNOWN"} AUD** · top supplier **{round(100*share,1) if share is not None else "UNKNOWN"}%**','']
     (out/'REPORT.md').write_text('\n'.join(lines),encoding='utf-8')
