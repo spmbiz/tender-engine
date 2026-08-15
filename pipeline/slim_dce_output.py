@@ -12,6 +12,7 @@ KEEP_FILES = {
     "ted_resolution.json",
     "document_index.json",
     "corpus.txt",
+    "evidence_quality.json",
     "gate_snippets.json",
 }
 ROOT_KEEP = {"batch_results.json", "batch_summary.json"}
@@ -42,6 +43,8 @@ def main():
 
     raw_bytes = tree_bytes(root)
     statuses = Counter()
+    evidence_qualities = Counter()
+    gate_ready = 0
     candidates = 0
     copied_files = 0
 
@@ -55,6 +58,10 @@ def main():
         target_root.mkdir(parents=True, exist_ok=True)
         manifest = load_json(manifest_path) or {}
         statuses[str(manifest.get("status") or "UNKNOWN")] += 1
+        evidence = load_json(candidate_root / "evidence_quality.json") or {}
+        if evidence:
+            evidence_qualities[str(evidence.get("content_quality") or "UNKNOWN")] += 1
+            gate_ready += int(bool(evidence.get("gate_readiness")))
         candidates += 1
 
         for name in KEEP_FILES:
@@ -63,8 +70,6 @@ def main():
                 shutil.copy2(src, target_root / name)
                 copied_files += 1
 
-        # Portal page text is only useful when no DCE corpus was obtained. Cap it so
-        # an unexpected HTML/text dump cannot become another artifact-storage problem.
         corpus = candidate_root / "corpus.txt"
         portal_page = candidate_root / "portal_page.txt"
         if (not corpus.exists() or corpus.stat().st_size == 0) and portal_page.is_file():
@@ -82,13 +87,16 @@ def main():
     metrics = {
         "candidates": candidates,
         "status_counts": dict(statuses),
+        "evidence_quality_counts": dict(evidence_qualities),
+        "gate_ready": gate_ready,
+        "gate_blocked": max(0, candidates - gate_ready),
         "raw_worker_tree_bytes": raw_bytes,
         "slim_handoff_bytes_before_metrics": slim_bytes_before_metrics,
         "bytes_removed": max(0, raw_bytes - slim_bytes_before_metrics),
         "reduction_ratio": round((1 - slim_bytes_before_metrics / raw_bytes) if raw_bytes else 0, 6),
         "copied_files": copied_files,
         "raw_archives_retained_in_artifact": False,
-        "contract": "handoff keeps manifests, extracted corpus, document index, gate snippets and batch metrics; raw DCE files stay runner-local",
+        "contract": "handoff keeps manifests, evidence quality, extracted corpus, document index, gate snippets and batch metrics; raw DCE files stay runner-local",
     }
     (out / "_shard_metrics.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")
     metrics["slim_handoff_bytes"] = tree_bytes(out)
