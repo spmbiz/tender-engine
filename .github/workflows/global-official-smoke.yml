@@ -14,23 +14,19 @@ jobs:
   source:
     name: ${{ matrix.source }}
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 20
     strategy:
       fail-fast: false
-      max-parallel: 13
+      max-parallel: 15
       matrix:
-        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP]
+        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP, NO_DOFFIN, IT_ANAC_DELTA]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4 playwright
-      - name: Reuse runner Chrome for browser fallbacks
-        if: matrix.source == 'AU_AUSTENDER'
-        shell: bash
-        run: |
-          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
+      - name: Syntax gate
+        run: python -m py_compile pipeline/discover_*.py pipeline/dce_worker_v4.py
       - name: Run source probe
         env: {GLOBAL_SOURCE: '${{ matrix.source }}', DISCOVERY_OUT: 'discovery/global/${{ matrix.source }}', LOOKBACK_DAYS: '14'}
         shell: bash
@@ -47,6 +43,8 @@ jobs:
             PL_BZP) python pipeline/discover_pl_bzp.py ;;
             LV_IUB) python pipeline/discover_lv_iub.py ;;
             CH_SIMAP) python pipeline/discover_ch_simap.py ;;
+            NO_DOFFIN) python pipeline/discover_no_doffin.py ;;
+            IT_ANAC_DELTA) python pipeline/discover_it_anac_delta.py ;;
             *) python pipeline/discover_global_official.py ;;
           esac
           rc=$?
