@@ -12,6 +12,7 @@ on:
       - 'control/portal_yield_backfill.txt'
 
 permissions:
+  actions: read
   contents: write
 
 jobs:
@@ -66,6 +67,20 @@ jobs:
           cp backfill/portal_yield.json "portal-yield-$RID.json"
           cp backfill/summary.json "dce-yield-summary-$RID.json"
           cat "portal-yield-$RID.json"
+      - name: Measure exact GitHub shard runner-minutes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RID: ${{ steps.resolve.outputs.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check -q requests
+          python pipeline/dce_runner_metrics.py \
+            --repo "$GITHUB_REPOSITORY" \
+            --run-id "$RID" \
+            --summary "dce-yield-summary-$RID.json" \
+            --portal-yield "portal-yield-$RID.json" \
+            --out "runner-yield-$RID.json"
       - name: Persist measured portal yield beside immutable DCE harvest
         env:
           GH_TOKEN: ${{ github.token }}
@@ -74,7 +89,11 @@ jobs:
         run: |
           set -euo pipefail
           tag="dce-harvest-$RID"
-          gh release upload "$tag" "portal-yield-$RID.json" "dce-yield-summary-$RID.json" --clobber
+          gh release upload "$tag" \
+            "portal-yield-$RID.json" \
+            "dce-yield-summary-$RID.json" \
+            "runner-yield-$RID.json" --clobber
+          echo '### Exact runner yield' >> "$GITHUB_STEP_SUMMARY"
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
-          cat "dce-yield-summary-$RID.json" >> "$GITHUB_STEP_SUMMARY"
+          cat "runner-yield-$RID.json" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
