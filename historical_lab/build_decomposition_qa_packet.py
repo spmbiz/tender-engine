@@ -25,14 +25,14 @@ def main():
             lines.append('### Representative examples')
             for r in E[k][:12]:
                 bits=[]
-                for c in ('buyer','supplier','title','award_value','reference_value','native_code','native_subcategory','subcategory','category'):
+                for c in ('buyer','supplier','title','description_excerpt','award_value','reference_value','native_code','native_subcategory','subcategory','category'):
                     if r.get(c):bits.append(f'{c}: {r[c]}')
                 lines.append('- '+' | '.join(bits))
             lines.append('')
         if W[k]:
             lines.append('### Top historical winners')
             for r in W[k][:15]:
-                s=r.get('supplier','UNKNOWN'); awards=r.get('awards') or r.get('weighted_awards') or ''; share=r.get('supplier_share') or ''; shape=r.get('supplier_name_shape') or ''
+                s=r.get('supplier') or r.get('representative_supplier') or 'UNKNOWN'; awards=r.get('awards') or r.get('weighted_awards') or ''; share=r.get('supplier_share') or r.get('normalized_supplier_share') or ''; shape=r.get('supplier_name_shape') or r.get('supplier_shape') or ''
                 lines.append(f'- {s} — awards={awards} share={share} {shape}'.rstrip())
             lines.append('')
         if B[k]:
