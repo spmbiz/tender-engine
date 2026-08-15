@@ -1,6 +1,6 @@
 # Exhaustive historical cross-source review
 
-**Status: PARTIAL_SOURCE_PROMOTION** — available: global_core, australia
+**Status: PASS** — available: global_core, australia, usa
 
 This review is downstream of the every-record scan. It surfaces named lanes, residual/open-world clusters, and a diversity-preserving individual-record queue for semantic QA.
 
@@ -17,6 +17,12 @@ This review is downstream of the every-record scan. It surfaces named lanes, res
 - Awards: 178,211
 - Supplier links: 178,211
 - Known lane: 9,981; open-world candidate: 43,194; residual: 125,036
+
+### USASPENDING_V1
+- Procurement records: 15,842,317
+- Awards: 15,842,317
+- Supplier links: 15,842,312
+- Known lane: 1,169,274; open-world candidate: 1,430,750; residual: 13,242,293
 
 ## Highest-priority named lane cohorts
 
@@ -55,8 +61,10 @@ This review is downstream of the every-record scan. It surfaces named lanes, res
 |global_core|Website / CMS build or redesign|OPEN_PUBLIC|GBP|336|282103.03500000003|6.5|80.77011904761905|
 |global_core|Document digitization / OCR / scanning|UNKNOWN|USD|1|1030000.0||80.76|
 |global_core|Transcription / captioning|LIMITED_INVITATION|CAD|4|60594.0|1.5|80.575|
+|usa|Website support / accessibility / hosting|AWARD_FIRST_EVIDENCE|USD|828|356673.65|1.0|80.55130434782609|
 |global_core|Media / press monitoring|UNKNOWN|NOK|9|4800000.0|2.0|80.44444444444444|
 |global_core|Transcription / captioning|FRAMEWORK_DPS_CALLOFF|EUR|5|150000.0||80.36|
+|usa|Website / CMS build or redesign|AWARD_FIRST_EVIDENCE|USD|293|91635.0|1.0|80.32546075085324|
 |global_core|Website support / accessibility / hosting|OPEN_PUBLIC|GBP|468|450000.0|7.0|80.31337606837607|
 |global_core|SEO / digital marketing|LIMITED_INVITATION|CAD|2|63745.0|1.5|80.22|
 |global_core|Document digitization / OCR / scanning|OPEN_PUBLIC|GBP|40|1000000.0|4.0|80.2065|
@@ -74,14 +82,12 @@ This review is downstream of the every-record scan. It surfaces named lanes, res
 |global_core|Website / CMS build or redesign|DIRECT_NONCOMPETITIVE|GBP|91|73333.33|1.0|79.20791208791209|
 |global_core|Translation|DIRECT_NONCOMPETITIVE|GBP|62|120000.0|2.0|79.18354838709678|
 |global_core|Graphic design / layout / DTP|UNKNOWN|NOK|9|4800000.0|8.0|79.15555555555555|
+|usa|Social media / community management|AWARD_FIRST_EVIDENCE|USD|296|138321.375|1.5|79.13391891891892|
 |global_core|Translation|OPEN_PUBLIC|GBP|99|432000.0|12.0|79.12161616161616|
 |global_core|Software licences / SaaS resale|UNKNOWN|USD|1|3400000.0||79.08|
 |global_core|Software licences / SaaS resale|UNKNOWN|CHF|1|5000000.0||79.08|
 |australia|Website / CMS build or redesign|AWARD_FIRST_EVIDENCE|AUD|195|92928.0||79.04123076923076|
 |global_core|Data entry / clerical processing|DIRECT_NONCOMPETITIVE|GBP|4|102504.065|1.0|79.015|
-|global_core|SEO / digital marketing|UNKNOWN|SEK|1|20000000.0|16.0|79.0|
-|global_core|Training / e-learning|UNKNOWN|PLN|11|768292.68|2.0|78.94363636363636|
-|global_core|Translation|FRAMEWORK_DPS_CALLOFF|EUR|20|145000.0|5.0|78.915|
 
 ## Open-world clusters requiring semantic QA
 
