@@ -87,16 +87,7 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - SQI-Direction immobilière Sud de Montréal — Agence de sécurité — value UNKNOWN
   - SQI-Direction immobilière Sud de Montréal — Agence de sécurité — value UNKNOWN
 
-### 10. United Kingdom · `NO_CODE` · extension of existing dynamic purchasing system dps for the temporary accommodation this is a further extension to the council s dynamic purchasing system dps for temporary accommo
-- Structure: **99.81** · records **4** · buyers **4** · repeat buyers **0**
-- Route `COMPETITIVE_OTHER` · currency `GBP` · p25 **284768750.0** · median **331012494.5** · p75 **445087491.75**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - London Borough of Newham — Extension of existing Dynamic Purchasing System (DPS) for the Supply of Temporary Accommodation — value 714600000.0
-  - London Borough of Enfield — Extension of existing Dynamic Purchasing System (DPS) for the Supply of Temporary Accommodation — value 355249989.0
-  - London Borough of Redbridge — Extension of existing Dynamic Purchasing System (DPS) for the Supply of Temporary Accommodation — value 306775000.0
-
-### 11. Germany · `NO_CODE` · herstellung lieferung und ausgabe von schulmittagessen cpv code <n> 9 herstellung lieferung und ausgabe von schulmittagessen einschlie lich eines täglichen rohkostanteils und eines
+### 10. Germany · `NO_CODE` · herstellung lieferung und ausgabe von schulmittagessen cpv code <n> 9 herstellung lieferung und ausgabe von schulmittagessen einschlie lich eines täglichen rohkostanteils und eines
 - Structure: **99.81** · records **4** · buyers **2** · repeat buyers **1**
 - Route `OPEN_PUBLIC` · currency `EUR` · p25 **16294540.8875** · median **17598676.13** · p75 **24538773.005000003**
 - Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
@@ -104,6 +95,15 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - Bezirksamt Tempelhof-Schöneberg von Berlin — Herstellung, Lieferung und Ausgabe von Schulmittagessen- CPV-Code 55524000-9 — value 41458759.88
   - Land Berlin vertr. durch BA Mitte v. Berlin — Herstellung, Lieferung und Ausgabe von Schulmittagessen - CPV-Code 55524000-9 — value 18898777.38
   - Land Berlin vertr. durch BA Mitte v. Berlin — Herstellung, Lieferung und Ausgabe von Schulmittagessen - CPV-Code 55524000-9 — value 16298574.88
+
+### 11. United Kingdom · `NO_CODE` · extension of existing dynamic purchasing system dps for the temporary accommodation this is a further extension to the council s dynamic purchasing system dps for temporary accommo
+- Structure: **99.81** · records **4** · buyers **4** · repeat buyers **0**
+- Route `COMPETITIVE_OTHER` · currency `GBP` · p25 **284768750.0** · median **331012494.5** · p75 **445087491.75**
+- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+- Historical examples:
+  - London Borough of Newham — Extension of existing Dynamic Purchasing System (DPS) for the Supply of Temporary Accommodation — value 714600000.0
+  - London Borough of Enfield — Extension of existing Dynamic Purchasing System (DPS) for the Supply of Temporary Accommodation — value 355249989.0
+  - London Borough of Redbridge — Extension of existing Dynamic Purchasing System (DPS) for the Supply of Temporary Accommodation — value 306775000.0
 
 ### 12. France · `NO_CODE` · concours restreint de maîtrise d oeuvre sur esquisse pour l extension et la réhabilitation du complexe piscine patinoire de mercières à compiègne concours restreint de maîtrise d o
 - Structure: **99.8** · records **3** · buyers **3** · repeat buyers **0**
@@ -254,8 +254,8 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
 - Route `OPEN_PUBLIC` · currency `EUR` · p25 **922463.75** · median **1214285.0** · p75 **1214285.0**
 - Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `MULTI_BUYER_MARKET`
 - Historical examples:
-  - Stadt Waiblingen -FB Hochbau und Gebäudemanagement- — Kita Ringstraße — value 1214285.0
   - Stadt Waiblingen -GB Hochbau und Gebäudemanagement- — Kita Ringstraße — value 1214285.0
+  - Stadt Waiblingen -FB Hochbau und Gebäudemanagement- — Kita Ringstraße — value 1214285.0
   - Stadt Waiblingen -FB Hochbau und Gebäudemanagement- — Kita Ringstraße — value 1214285.0
 
 ### 29. ESP · `33652100` · suministro sucesivo del medicamento axicabtagen ciloleucel other
@@ -456,7 +456,16 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - PREFETTURA DI BRESCIA — Gara europea a procedura aperta per la conclusione di un accordo quadro per l’affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità recettiva massima di 50 posti — value 73381425.0
   - PREFETTURA DI BRESCIA — Gara europea a procedura aperta per la conclusione di un accordo quadro per l’affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità recettiva massima di 50 posti — value 51393825.0
 
-### 51. ROU · `33652000` · acord cadru furnizare medicamente oncologice other
+### 51. ESP · `85300000` · licitación servicio teleasistencia domiciliaria other
+- Structure: **99.06** · records **4** · buyers **2** · repeat buyers **2**
+- Route `UNKNOWN` · currency `EUR` · p25 **25758000.0** · median **25758000.0** · p75 **25758000.0**
+- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Pleno de la Diputación Provincial de Valencia — Licitación servicio Teleasistencia domiciliaria. — value 25758000.0
+  - Pleno de la Diputación Provincial de Valencia — Licitación servicio Teleasistencia domiciliaria. — value 25758000.0
+  - Presidencia de la Diputación Provincial de Valencia — Licitación servicio Teleasistencia domiciliaria. — value 25758000.0
+
+### 52. ROU · `33652000` · acord cadru furnizare medicamente oncologice other
 - Structure: **99.06** · records **4** · buyers **4** · repeat buyers **0**
 - Route `UNKNOWN` · currency `RON` · p25 **31991270.78** · median **151201411.925** · p75 **400623363.6**
 - Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
@@ -464,15 +473,6 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - RTC Radiology Therapeutic Center — Acord cadru furnizare medicamente oncologice — value 794727284.4
   - Institutul de Fonoaudiologie si Chirurgie Functionala - O.R.L. Prof. Dr. D. Hociota — Acord cadru furnizare „Medicamente oncologice „ — value 269255390.0
   - RTC RADIOLOGY THERAPEUTIC CENTER — Acord cadru furnizare medicamente oncologice — value 33147433.85
-
-### 52. ESP · `85300000` · licitación servicio teleasistencia domiciliaria other
-- Structure: **99.06** · records **4** · buyers **2** · repeat buyers **2**
-- Route `UNKNOWN` · currency `EUR` · p25 **25758000.0** · median **25758000.0** · p75 **25758000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Pleno de la Diputación Provincial de Valencia — Licitación servicio Teleasistencia domiciliaria. — value 25758000.0
-  - Presidencia de la Diputación Provincial de Valencia — Licitación servicio Teleasistencia domiciliaria. — value 25758000.0
-  - Pleno de la Diputación Provincial de Valencia — Licitación servicio Teleasistencia domiciliaria. — value 25758000.0
 
 ### 53. HRV · `90910000` · usluge i enja prostorija other
 - Structure: **99.04** · records **13** · buyers **2** · repeat buyers **2**
@@ -897,16 +897,7 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - Consip S.p.A. — Fornitura di carte nazionali dei servizi con funzione di tessera sanitaria di tipo TS e di tipo TS CNS ID 2713 — value 69966000.0
   - CONSIP S.p.A. — Fornitura di carte nazionali dei servizi con funzione di tessera sanitaria di tipo TS e di tipo TS CNS ID 2713 — value 69966000.0
 
-### 100. SE · `45000000` · ramavtal mark och anläggningsarbeten other
-- Structure: **98.46** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `SEK` · p25 **140000000.0** · median **160000000.0** · p75 **380000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Upplands-Bro kommun — Ramavtal Mark- och Anläggningsarbeten — value 600000000.0
-  - Täby kommun — Ramavtal Mark och anläggningsarbeten — value 160000000.0
-  - Ekerö kommun — Ramavtal Mark- och anläggningsarbeten — value 120000000.0
-
-### 101. ESP · `33140000` · contrato de suministro contr <n> <n> other
+### 100. ESP · `33140000` · contrato de suministro contr <n> <n> other
 - Structure: **98.46** · records **3** · buyers **2** · repeat buyers **1**
 - Route `UNKNOWN` · currency `EUR` · p25 **11141959.985** · median **15702458.27** · p75 **16110589.135**
 - Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
@@ -914,6 +905,15 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - Servicio Andaluz de Salud. Hospital Universitario de Jaén. — Contrato de Suministro (CONTR 2025 0000696845) — value 16518720.0
   - Servicio Andaluz de Salud. Hospital Universitario de Jaén — Contrato de Suministro (CONTR 2025 0000496854) — value 15702458.27
   - Servicio Andaluz de Salud. Hospital Universitario de Jaén. — Contrato de Suministro (CONTR 2026 0000097748) — value 6581461.7
+
+### 101. SE · `45000000` · ramavtal mark och anläggningsarbeten other
+- Structure: **98.46** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `SEK` · p25 **140000000.0** · median **160000000.0** · p75 **380000000.0**
+- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Upplands-Bro kommun — Ramavtal Mark- och Anläggningsarbeten — value 600000000.0
+  - Täby kommun — Ramavtal Mark och anläggningsarbeten — value 160000000.0
+  - Ekerö kommun — Ramavtal Mark- och anläggningsarbeten — value 120000000.0
 
 ### 102. SWE · `45000000` · ramavtal byggtjänster other
 - Structure: **98.44** · records **3** · buyers **3** · repeat buyers **0**
@@ -1131,16 +1131,7 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - SERVICIO ANDALUZ DE SALUD. SERVICIOS CENTRALES — Obras (CONTR 2022 0001173379) — value 7414973.0
   - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO PUERTA DEL MAR — Obras CONTR 2023 0000764644 — value 6034745.64
 
-### 126. CZE · `09310000` · nákup sdru ených slu eb dodávek elektrické energie v hladin nízkého nap tí a vysokého nap tí resortu na rok <n> other
-- Structure: **98.16** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `CZK` · p25 **155500000.0** · median **155500000.0** · p75 **159500000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Moravská galerie v Brně — Nákup sdružených služeb dodávek elektrické energie v hladině nízkého napětí a vysokého napětí resortu na rok 2025 — value 163500000.0
-  - Uměleckoprůmyslové museum v Praze — Nákup sdružených služeb dodávek elektrické energie v hladině nízkého napětí a vysokého napětí resortu na rok 2027 — value 155500000.0
-  - Uměleckoprůmyslové museum v Praze — Nákup sdružených služeb dodávek elektrické energie v hladině nízkého napětí a vysokého napětí resortu na rok 2026 — value 155500000.0
-
-### 127. PRT · `90513800` · aquisição de serviços para valorização de lamas das fábricas de água da tejo atlântico por lotes other
+### 126. PRT · `90513800` · aquisição de serviços para valorização de lamas das fábricas de água da tejo atlântico por lotes other
 - Structure: **98.16** · records **3** · buyers **2** · repeat buyers **1**
 - Route `UNKNOWN` · currency `EUR` · p25 **13867500.0** · median **19965000.0** · p75 **31282500.0**
 - Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
@@ -1148,6 +1139,15 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - Águas do Tejo Atlântico, S. A. — Aquisição de Serviços para Valorização de Lamas das Fábricas de Água da Tejo Atlântico, por Lotes — value 42600000.0
   - Águas do Tejo Atlântico, S. A. — Aquisição de Serviços para Valorização de Lamas das Fábricas de Água da Tejo Atlântico, por Lotes — value 19965000.0
   - Águas do Tejo Atlântico, SA — Aquisição de Serviços para Valorização de Lamas das Fábricas de Água da Tejo Atlântico, por Lotes — value 7770000.0
+
+### 127. CZE · `09310000` · nákup sdru ených slu eb dodávek elektrické energie v hladin nízkého nap tí a vysokého nap tí resortu na rok <n> other
+- Structure: **98.16** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `CZK` · p25 **155500000.0** · median **155500000.0** · p75 **159500000.0**
+- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Moravská galerie v Brně — Nákup sdružených služeb dodávek elektrické energie v hladině nízkého napětí a vysokého napětí resortu na rok 2025 — value 163500000.0
+  - Uměleckoprůmyslové museum v Praze — Nákup sdružených služeb dodávek elektrické energie v hladině nízkého napětí a vysokého napětí resortu na rok 2027 — value 155500000.0
+  - Uměleckoprůmyslové museum v Praze — Nákup sdružených služeb dodávek elektrické energie v hladině nízkého napětí a vysokého napětí resortu na rok 2026 — value 155500000.0
 
 ### 128. ITA · `34110000` · accordo quadro veicoli in noleggio id <n> other
 - Structure: **98.12** · records **3** · buyers **2** · repeat buyers **1**
@@ -1176,16 +1176,7 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - DIREZIONE GENERALE COMMISSARIATO E SERVIZI GENERALI — Procedura aperta europea per l’appalto del servizio di ristorazione, catering completo, catering veicolato presso EDRC del Ministero della Difesa — value 724583265.75
   - DIREZIONE GENERALE DEL COMMISSARIATO E DEI SERVIZI GENERALI — Procedura aperta europea per l’appalto del servizio di ristorazione, catering completo, catering veicolato presso EDRC del Ministero della Difesa — value 38196070.58
 
-### 131. SVK · `09123000` · zemný plyn other
-- Structure: **98.09** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **8166653.215** · median **15649706.43** · p75 **775774853.215**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Žilinský samosprávny kraj — ZEMNÝ PLYN — value 1535900000.0
-  - Žilinský samosprávny kraj — ZEMNÝ PLYN — value 15649706.43
-  - Národný ústav tuberkulózy, pľúcnych chorôb a hrudníkovej chirurgie Vyšné Hágy — Zemný plyn — value 683600.0
-
-### 132. HRV · `33140000` · testovi i potro ni materijal za patologiju i citologiju za zdravstvene ustanove u republici hrvatskoj other
+### 131. HRV · `33140000` · testovi i potro ni materijal za patologiju i citologiju za zdravstvene ustanove u republici hrvatskoj other
 - Structure: **98.09** · records **3** · buyers **2** · repeat buyers **1**
 - Route `UNKNOWN` · currency `EUR` · p25 **15395990.31** · median **28880559.1** · p75 **28880559.1**
 - Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
@@ -1193,6 +1184,15 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - Klinički bolnički centar Rijeka — Testovi i potrošni materijal za patologiju i citologiju za zdravstvene ustanove u Republici Hrvatskoj — value 28880559.1
   - Klinički bolnički centar Rijeka — Testovi i potrošni materijal za patologiju i citologiju za zdravstvene ustanove u Republici Hrvatskoj — value 28880559.1
   - KLINIČKI BOLNIČKI CENTAR RIJEKA — Testovi i potrošni materijal za patologiju i citologiju za zdravstvene ustanove u Republici Hrvatskoj — value 1911421.52
+
+### 132. SVK · `09123000` · zemný plyn other
+- Structure: **98.09** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **8166653.215** · median **15649706.43** · p75 **775774853.215**
+- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+- Historical examples:
+  - Žilinský samosprávny kraj — ZEMNÝ PLYN — value 1535900000.0
+  - Žilinský samosprávny kraj — ZEMNÝ PLYN — value 15649706.43
+  - Národný ústav tuberkulózy, pľúcnych chorôb a hrudníkovej chirurgie Vyšné Hágy — Zemný plyn — value 683600.0
 
 ### 133. ITA · `66512000` · procedura aperta ai sensi dell art <n> del d lgs <n> <n> per l affidamento di una copertura assicurativa finalizzata alla pre stazione del servizio di assistenza sanitaria integrat
 - Structure: **98.09** · records **3** · buyers **2** · repeat buyers **1**
