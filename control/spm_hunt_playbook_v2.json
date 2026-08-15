@@ -1,0 +1,127 @@
+{
+  "contract": "SPM_HUNT_PLAYBOOK_V2",
+  "status": "READY_PRE_DCE",
+  "authority_stack": [
+    "control/spm_hunt_subniches_v2_precision/REPORT.md",
+    "control/historical_boamp_dce_routes_v1/summary.json",
+    "control/historical_boamp_dce_review_v2/summary.json",
+    "control/historical_print_dce_business_brief_v1/MANUAL_QA.md",
+    "control/historical_seao_dce_probe_v1/summary.json"
+  ],
+  "truth_rules": {
+    "historical_market_facts_are_priors": true,
+    "historical_dce_examples_are_not_prevalence_estimates": true,
+    "live_dce_required_for_eligibility": true,
+    "missing_gate_evidence": "UNKNOWN",
+    "final_super_green_from_this_playbook": false
+  },
+  "lanes": [
+    {
+      "priority": 1,
+      "lane": "DE website maintenance / support",
+      "model": "CORE_DIGITAL",
+      "historical": {"records": 123, "buyers": 42, "repeat_buyers": 7, "median_award": 393000, "currency": "EUR", "median_bidders": 3.5, "top_supplier_share_pct": 4.76},
+      "why_hunt": "Clean title-led lane with observed bidder evidence and fragmented winners. Recurring maintenance/support can be fulfilled leanly if stack and SLA fit.",
+      "historical_dce_evidence": "NOT_SAMPLED_IN_BOAMP_FRENCH_DCE_STUDY",
+      "live_dce_kill_questions": ["minimum comparable references", "named technical team/CVs", "mandatory onsite meetings", "CMS/framework-specific experience", "hosting/security/data residency", "German-language support SLA", "turnover/insurance"]
+    },
+    {
+      "priority": 2,
+      "lane": "QC general commercial print production",
+      "model": "BROKER_PRINT",
+      "historical": {"records": 43, "buyers": 26, "repeat_buyers": 9, "median_award": 129800, "currency": "CAD", "median_bidders": 2.0, "top_supplier_share_pct": 13.85},
+      "why_hunt": "Low observed bidder median and recurring public buyers make this one of the strongest broker signals.",
+      "historical_dce_evidence": "PUBLIC_HISTORICAL_SAMPLE_BLOCKED_BY_AUTH",
+      "historical_access_fact": "Six audited SEAO historical print/form samples returned AUTH_REQUIRED; no access controls were bypassed.",
+      "live_dce_kill_questions": ["Belgian/EU supplier eligibility for this exact procurement", "Quebec/local preference or establishment requirement", "samples/proofs", "FSC/PEFC or environmental printing requirements", "delivery geography and deadlines", "insurance", "references", "subcontracting", "tax/registration"]
+    },
+    {
+      "priority": 3,
+      "lane": "FR general graphic design",
+      "model": "CORE_CREATIVE_AI_ASSISTED",
+      "historical": {"records": 104, "buyers": 87, "repeat_buyers": 12, "median_award": 200000, "currency": "EUR", "median_bidders": null, "top_supplier_share_pct": 5.26},
+      "why_hunt": "Broad buyer base, low observed winner concentration and high AI leverage for production/layout variants.",
+      "historical_dce_evidence": "SAMPLED_DOWNLOAD_WAS_NOTICE_ONLY_NOT_DCE",
+      "live_dce_kill_questions": ["portfolio/comparable references", "named art director/team", "source-file requirements", "Adobe/native deliverables", "IP assignment", "number of revisions", "onsite workshops", "print-production bundle", "turnover/insurance"]
+    },
+    {
+      "priority": 4,
+      "lane": "FR written translation",
+      "model": "AI_HUMAN_LANGUAGE",
+      "historical": {"records": 63, "buyers": 59, "repeat_buyers": 4, "median_award": 190000, "currency": "EUR", "median_bidders": null, "top_supplier_share_pct": 6.67},
+      "why_hunt": "Semantically clean written-translation demand with many buyers and modest winner concentration; AI can reduce unit cost if human QA is allowed.",
+      "historical_dce_evidence": "TWO_STRICT_BOAMP_SAMPLE_ROUTES_AUTH_REQUIRED",
+      "live_dce_kill_questions": ["sworn/certified translator requirement", "native-speaker or diploma requirements", "named linguist CVs", "minimum references", "security/confidentiality", "machine-translation prohibition", "CAT/TM ownership", "turnaround SLA", "languages and volumes"]
+    },
+    {
+      "priority": 5,
+      "lane": "FR publication layout / DTP",
+      "model": "CORE_CREATIVE_AI_ASSISTED",
+      "historical": {"records": 45, "buyers": 41, "repeat_buyers": 4, "median_award": 98267, "currency": "EUR", "median_bidders": null, "top_supplier_share_pct": 10.0},
+      "why_hunt": "Smaller ticket than broad design but highly compatible with lean layout automation and templated production.",
+      "historical_dce_evidence": "THREE_AUDITED_BOAMP_SAMPLES_EXPOSED_NO_STRICT_DOCUMENT_ROUTE",
+      "live_dce_kill_questions": ["InDesign/native source delivery", "accessibility/PDF-UA requirements", "page-volume and turnaround", "template complexity", "proofing/revision rounds", "print bundle", "references", "named team"]
+    },
+    {
+      "priority": 6,
+      "lane": "FR brochure/publication/book printing",
+      "model": "BROKER_PRINT",
+      "historical": {"records": 123, "buyers": 107, "repeat_buyers": 8, "median_award": 341666.67, "currency": "EUR", "median_bidders": null, "top_supplier_share_pct": 7.14},
+      "why_hunt": "Large ticket and buyer breadth; true historical BPU proves quantity-band and delivery-matrix work can be quoted by external printers.",
+      "historical_dce_evidence": "ONE_TRUE_GATE_READY_DCE_IN_STRICT_SAMPLE",
+      "true_dce_observation": "CNAV BPU: impression + finishing + delivery; visible quantity bands include 5k, 10k, 20k, 80k, 120k, 160k and 180k copies; one vs two metropolitan-France delivery points; four-year quantity horizon.",
+      "live_dce_kill_questions": ["full candidature references/turnover not visible in BPU-only sample", "paper/format/grammage", "proof/BAT", "eco certifications", "delivery SLA", "storage", "working capital/payment timing", "subcontract disclosure"]
+    },
+    {
+      "priority": 7,
+      "lane": "FR communication collateral printing",
+      "model": "BROKER_PRINT",
+      "historical": {"records": 408, "buyers": 343, "repeat_buyers": 54, "median_award": 240000, "currency": "EUR", "median_bidders": null, "top_supplier_share_pct": 1.09},
+      "why_hunt": "Very broad fragmented supplier/buyer market; natural tender-arbitrage lane for a European printer network.",
+      "historical_dce_evidence": "ONE_TRUE_GATE_READY_DCE_IN_STRICT_SAMPLE",
+      "true_dce_observation": "Pays de l'Ourcq RC requires principal services from the prior three years, insurance attestations and mandatory free samples delivered before deadline; main Price criterion 60%, main Quality criterion 15%, with sample quality and proposed means each 50% inside that 15%; execution deadlines main criterion 5%.",
+      "live_dce_kill_questions": ["sample lead time", "reference evidence", "insurance", "paper/print specifications", "lot structure", "eco requirements", "delivery", "price-vs-quality weighting", "working capital"]
+    },
+    {
+      "priority": 8,
+      "lane": "DE website relaunch / development",
+      "model": "CORE_DIGITAL",
+      "historical": {"records": 37, "buyers": 20, "repeat_buyers": 2, "median_award": 152464, "currency": "EUR", "median_bidders": 3.0, "top_supplier_share_pct": 9.09},
+      "why_hunt": "Observed competition is moderate and titles are clean website-relaunch work; smaller than German maintenance but directly fulfillable if stack and reference gates fit.",
+      "historical_dce_evidence": "NOT_SAMPLED_IN_FRENCH_BOAMP_DCE_STUDY",
+      "live_dce_kill_questions": ["CMS-specific references", "German public-sector accessibility", "hosting/security", "migration/content volume", "named team", "support term", "onsite workshops", "turnover"]
+    },
+    {
+      "priority": 9,
+      "lane": "FR promotional objects / branded goods",
+      "model": "BROKER_RESELL",
+      "historical": {"records": 230, "buyers": 196, "repeat_buyers": 25, "median_award": 320000, "currency": "EUR", "median_bidders": null, "top_supplier_share_pct": 5.36},
+      "why_hunt": "Large fragmented branded-goods market with straightforward supplier-arbitrage potential.",
+      "historical_dce_evidence": "ONE_STRICT_BOAMP_SAMPLE_ROUTE_AUTH_REQUIRED",
+      "live_dce_kill_questions": ["physical samples", "eco/textile certifications", "product traceability", "personalisation methods", "stock/storage", "delivery schedule", "working capital", "framework maximums", "references"]
+    },
+    {
+      "priority": 10,
+      "lane": "FR mailing / routing / fulfilment",
+      "model": "BROKER_LOGISTICS",
+      "historical": {"records": 219, "buyers": 185, "repeat_buyers": 27, "median_award": 500000, "currency": "EUR", "median_bidders": null, "top_supplier_share_pct": 3.85},
+      "why_hunt": "High historical ticket and repeat purchasing; pairs naturally with print brokerage.",
+      "historical_dce_evidence": "ONE_STRICT_BOAMP_SAMPLE_ROUTE_AUTH_REQUIRED",
+      "live_dce_kill_questions": ["postal tariff treatment", "address-data/GDPR", "secure data transfer", "storage", "daily/weekly SLA", "mailing volumes", "France-local logistics", "working capital", "subcontracting"]
+    },
+    {
+      "priority": 11,
+      "lane": "FR meeting/debate transcription",
+      "model": "AI_HUMAN_LANGUAGE",
+      "historical": {"records": 50, "buyers": 47, "repeat_buyers": 3, "median_award": 364000, "currency": "EUR", "median_bidders": null, "top_supplier_share_pct": 11.11},
+      "why_hunt": "Attractive ticket and AI leverage where the requirement is audio-to-text/minutes rather than live stenotypy.",
+      "historical_dce_evidence": "ONE_STRICT_BOAMP_SAMPLE_ROUTE_AUTH_REQUIRED",
+      "live_dce_kill_questions": ["live stenotypist requirement", "onsite presence", "named qualified staff", "verbatim accuracy", "turnaround", "confidentiality/security", "human-only requirement", "references"]
+    }
+  ],
+  "routing_observations": {
+    "historical_boamp_sample": {"input_notices": 36, "strict_document_routes": 15, "downloaded_from_strict_routes": 6, "true_gate_ready_dces": 2},
+    "historical_seao_sample": {"sample": 6, "auth_required": 6, "public_dce_downloads": 0},
+    "interpretation": "Historical DCE acquisition is itself a source-specific evidence-coverage problem. Absence of a retrieved historical DCE must not be interpreted as a hard gate or an easy gate."
+  }
+}
