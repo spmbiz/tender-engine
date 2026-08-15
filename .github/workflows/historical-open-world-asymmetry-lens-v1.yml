@@ -1,0 +1,55 @@
+name: Historical Open World Asymmetry Lens v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - historical_lab/open_world_asymmetry_lens_v1.py
+      - .github/workflows/historical-open-world-asymmetry-lens-v1.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-open-world-asymmetry-lens-v1
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download unknown-domain review queue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input
+          gh release download historical-open-world-unknowns-v1 --repo "$GITHUB_REPOSITORY" --pattern review_queue.jsonl --dir input --clobber
+      - name: Apply economic-mechanism lens
+        run: python historical_lab/open_world_asymmetry_lens_v1.py --input input/review_queue.jsonl --out out
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-open-world-asymmetry-lens-v1
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "Historical Open World Asymmetry Lens v1" --notes "Economic-mechanism tagging of the historical unknown-domain review queue. Discovery hypotheses only."
+          gh release upload "$TAG" out/summary.json out/REPORT.md out/tagged_clusters.csv --repo "$GITHUB_REPOSITORY" --clobber
+      - name: Persist compact report
+        run: |
+          mkdir -p control/historical_open_world_asymmetry_lens_v1
+          cp out/summary.json out/REPORT.md control/historical_open_world_asymmetry_lens_v1/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_open_world_asymmetry_lens_v1/
+          git commit -m 'historical: persist open-world asymmetry lens v1' || exit 0
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
