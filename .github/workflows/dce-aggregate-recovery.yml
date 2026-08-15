@@ -1,0 +1,116 @@
+name: DCE Aggregate Recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      dce_run_id:
+        description: DCE Fanout V2 run whose completed shard artifacts should be aggregated
+        required: true
+  push:
+    branches: [main]
+    paths:
+      - 'control/dce_aggregate_recovery.txt'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: dce-aggregate-recovery-${{ github.event.inputs.dce_run_id || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - id: resolve
+        shell: bash
+        env:
+          INPUT_RUN: ${{ github.event.inputs.dce_run_id }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = 'workflow_dispatch' ]; then
+            rid="$INPUT_RUN"
+          else
+            rid="$(sed -nE 's/^dce_run_id=([0-9]+).*$/\1/p' control/dce_aggregate_recovery.txt | tail -1)"
+          fi
+          [[ "$rid" =~ ^[0-9]+$ ]] || { echo "Invalid DCE run id: $rid" >&2; exit 1; }
+          jobs="$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$rid/jobs?per_page=100")"
+          expected="$(jq '[.jobs[] | select(.name|startswith("shard-"))] | length' <<< "$jobs")"
+          success="$(jq '[.jobs[] | select((.name|startswith("shard-")) and .status=="completed" and .conclusion=="success")] | length' <<< "$jobs")"
+          echo "source_run=$rid expected_shards=$expected successful_shards=$success"
+          [ "$expected" -gt 0 ]
+          [ "$success" -eq "$expected" ] || { echo 'Source shard set is not fully successful'; exit 1; }
+          echo "id=$rid" >> "$GITHUB_OUTPUT"
+          echo "expected=$expected" >> "$GITHUB_OUTPUT"
+      - name: Recover all completed shard artifacts from source run
+        uses: actions/download-artifact@v4
+        with:
+          repository: ${{ github.repository }}
+          run-id: ${{ steps.resolve.outputs.id }}
+          github-token: ${{ github.token }}
+          pattern: dce-shard-*
+          path: shard-transport
+          merge-multiple: true
+      - name: Verify exact shard completeness and unpack compact handoffs
+        shell: bash
+        env:
+          EXPECTED: ${{ steps.resolve.outputs.expected }}
+        run: |
+          set -euo pipefail
+          mkdir -p dce-artifacts
+          count=0
+          for archive in shard-transport/handoff-shard-*.tar.gz; do
+            [ -e "$archive" ] || continue
+            base="$(basename "$archive" .tar.gz)"
+            mkdir -p "dce-artifacts/$base"
+            tar -xzf "$archive" -C "dce-artifacts/$base"
+            count=$((count + 1))
+          done
+          echo "expected_shards=$EXPECTED recovered_shards=$count"
+          [ "$count" -eq "$EXPECTED" ] || { echo 'Artifact completeness failure'; exit 1; }
+      - name: Canonical aggregate and benchmark metrics
+        run: python pipeline/aggregate_dce.py --root dce-artifacts --out dce-aggregate
+      - name: Build bounded deterministic durable bundles
+        shell: bash
+        env:
+          RID: ${{ steps.resolve.outputs.id }}
+        run: |
+          set -euo pipefail
+          mkdir -p release-bundles
+          python pipeline/bundle_dce_release.py --root shard-transport --out release-bundles --max-bytes 1200000000
+          cp dce-aggregate/summary.json "dce-summary-$RID.json"
+          tar -C dce-aggregate -czf "dce-deep-review-$RID.tar.gz" .
+          indexes=(shard-transport/canonical-index-shard-*.json)
+          if [ -e "${indexes[0]}" ]; then
+            tar -cf "release-bundles/dce-shard-indexes-$RID.tar" "${indexes[@]}"
+          fi
+      - name: Persist recovered aggregate through one Release writer
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RID: ${{ steps.resolve.outputs.id }}
+        run: |
+          set -euo pipefail
+          tag="dce-harvest-$RID"
+          gh release view "$tag" >/dev/null
+          assets=(release-bundles/* "dce-summary-$RID.json" "dce-deep-review-$RID.tar.gz")
+          for attempt in 1 2 3 4 5; do
+            if gh release upload "$tag" "${assets[@]}" --clobber; then break; fi
+            [ "$attempt" -lt 5 ] || exit 1
+            sleep "$((attempt * attempt * 15))"
+          done
+          gh release view "$tag" --json assets --jq '.assets[].name' > /tmp/release-assets.txt
+          for asset in "${assets[@]}"; do
+            name="$(basename "$asset")"
+            grep -Fxq "$name" /tmp/release-assets.txt || { echo "Missing durable asset $name"; exit 1; }
+          done
+          echo '### Recovered DCE aggregate' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat "dce-summary-$RID.json" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
