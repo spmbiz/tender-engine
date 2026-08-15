@@ -14,7 +14,7 @@ permissions:
 jobs:
   live-canary:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 14
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,24 +29,26 @@ jobs:
           if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
       - name: Ensure archive extractor
         run: command -v 7z >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq p7zip-full)
-      - name: Build two real canary candidates
+      - name: Build real cross-portal canary candidates
         shell: bash
         run: |
           mkdir -p canary
           cat > canary/queue.jsonl <<'JSONL'
           {"candidate_id":"CANARY:WMO:308742","portal":"UNGM","notice_id":"308742","notice_url":"https://www.ungm.org/Public/Notice/308742","title":"Provision of Website Hosting, Maintenance, Security and Development Services for wmo.int"}
           {"candidate_id":"CANARY:COGG:8763200","portal":"IRELAND_ETENDERS","resource_id":"8763200","notice_url":"https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8763200","deadline":"2026-08-24T17:30:00+01:00","title":"AN TOBAR – Invitation to Tender for Creation of an Educational Website"}
+          {"candidate_id":"CANARY:PL:08deefac-2dd7-0204-962b-120001957662","portal":"PL_EZAMOWIENIA","notice_id":"2026/BZP 00373625/01","tender_id":"ocds-148610-c2e1bb6f-a66b-4a71-b975-7a6448db608f","notice_url":"https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08deefac-2dd7-0204-962b-120001957662","title":"Remont pomieszczeń w Szkole Podstawowej nr 64","route":{"proceeding_url":"https://ezamowienia.gov.pl/mp-client/search/list/ocds-148610-c2e1bb6f-a66b-4a71-b975-7a6448db608f","detail_url":"https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08deefac-2dd7-0204-962b-120001957662","tender_api_url":"https://ezamowienia.gov.pl/mp-readmodels/api/Search/GetTender?id=ocds-148610-c2e1bb6f-a66b-4a71-b975-7a6448db608f","tender_id":"ocds-148610-c2e1bb6f-a66b-4a71-b975-7a6448db608f","document_download_template":"https://ezamowienia.gov.pl/mp-readmodels/api/Tender/DownloadDocument/ocds-148610-c2e1bb6f-a66b-4a71-b975-7a6448db608f/{document_id}"}}
+          {"candidate_id":"CANARY:GR:26PROC019633833","portal":"GR_KHMDHS","notice_id":"26PROC019633833","notice_url":"https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019633833","title":"Greek KHMDHS public attachment route","route":{"document_urls":["https://cerpp.eprocurement.gov.gr/khmdhs-opendata/notice/attachment/26PROC019633833"],"direct_public_dce":true,"detail_url":"https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019633833"}}
           JSONL
       - name: Resolve real portal documents
         env:
           DCE_ITEM_RETRIES: '1'
           DCE_ITEM_TIMEOUT_SECONDS: '150'
-        run: python pipeline/dce_batch_worker.py --queue canary/queue.jsonl --lines 1,2 --out canary/out --concurrency 2
+        run: python pipeline/dce_batch_worker.py --queue canary/queue.jsonl --lines 1,2,3,4 --out canary/out --concurrency 4
       - name: Extract and classify real retrieved material
         run: |
           python pipeline/extract_corpus.py --root canary/out
           python pipeline/dce_evidence_quality.py --root canary/out
-          python pipeline/extract_gates.py --root canary/out --workers 2
+          python pipeline/extract_gates.py --root canary/out --workers 4
           python pipeline/authority_conflicts.py --root canary/out
       - name: Assert WMO access guide can never become gate-ready
         shell: bash
@@ -54,10 +56,8 @@ jobs:
           python - <<'PY'
           import json, pathlib
           p=pathlib.Path('canary/out/CANARY-WMO-308742/evidence_quality.json')
-          if not p.exists():
-              raise SystemExit('WMO evidence_quality.json missing')
-          x=json.loads(p.read_text())
-          print('WMO',json.dumps(x,indent=2,ensure_ascii=False))
+          if not p.exists(): raise SystemExit('WMO evidence_quality.json missing')
+          x=json.loads(p.read_text()); print('WMO',json.dumps(x,indent=2,ensure_ascii=False))
           assert x.get('gate_readiness') is False, x
           assert x.get('content_quality') in {'ACCESS_GUIDE_ONLY','PORTAL_GENERIC_ONLY','UNKNOWN_RETRIEVED_DOCUMENT','NOT_APPLICABLE'}, x
           PY
@@ -70,8 +70,21 @@ jobs:
           m=json.loads((root/'manifest.json').read_text()) if (root/'manifest.json').exists() else {}
           q=json.loads((root/'evidence_quality.json').read_text()) if (root/'evidence_quality.json').exists() else {}
           print(json.dumps({'COGG_manifest_status':m.get('status'),'COGG_evidence_quality':q.get('content_quality'),'COGG_gate_readiness':q.get('gate_readiness')},indent=2))
-          if m.get('status')=='DOWNLOADED_PUBLIC':
-              assert q.get('gate_readiness') is True, q
+          if m.get('status')=='DOWNLOADED_PUBLIC': assert q.get('gate_readiness') is True, q
+          PY
+      - name: Assert Poland and Greece public DCE transport
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          checks=['CANARY-PL-08deefac-2dd7-0204-962b-120001957662','CANARY-GR-26PROC019633833']
+          for slug in checks:
+              root=pathlib.Path('canary/out')/slug
+              m=json.loads((root/'manifest.json').read_text()) if (root/'manifest.json').exists() else {}
+              q=json.loads((root/'evidence_quality.json').read_text()) if (root/'evidence_quality.json').exists() else {}
+              print(slug,json.dumps({'status':m.get('status'),'files':len(m.get('files') or []),'quality':q.get('content_quality'),'gate_readiness':q.get('gate_readiness'),'attempts':m.get('dce_method_attempts',[])},indent=2,ensure_ascii=False))
+              assert m.get('status')=='DOWNLOADED_PUBLIC', (slug,m)
+              assert len(m.get('files') or []) > 0, (slug,m)
           PY
       - name: Upload canary evidence
         uses: actions/upload-artifact@v4
