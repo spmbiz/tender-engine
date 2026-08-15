@@ -1,0 +1,107 @@
+{
+  "version": "SPM_EXHAUSTIVE_RECORD_READER_V1",
+  "generated_at": "2026-08-15T16:38:12.684379+00:00",
+  "label": "AUSTENDER_V1",
+  "grain": "AWARD_FIRST_PROCUREMENT",
+  "inputs": {
+    "historical": "source/historical_tenders.csv.gz",
+    "awards": "source/awards.csv.gz",
+    "bridge": "source/award_suppliers.csv.gz"
+  },
+  "columns": {
+    "historical": [
+      "Award_Link_Status",
+      "Buyer_ID",
+      "Buyer_Name",
+      "Category",
+      "Contract_Type",
+      "Country",
+      "Currency",
+      "Deadline",
+      "Description",
+      "Evidence_Type",
+      "Historical_Tender_ID",
+      "Lean_Fit",
+      "Main_CPV",
+      "OCID",
+      "Official_Estimated_Value",
+      "Procedure_Type",
+      "Publication_Date",
+      "Source_Contract_ID",
+      "Source_System",
+      "Source_URL",
+      "Subcategory",
+      "Title"
+    ],
+    "awards": [
+      "Award_Date",
+      "Award_ID",
+      "Award_Value",
+      "Bidder_Count",
+      "Buyer_ID",
+      "Buyer_Name",
+      "Contract_End",
+      "Contract_Start",
+      "Currency",
+      "Evidence_Type",
+      "Historical_Tender_ID",
+      "OCID",
+      "Procedure_Type",
+      "Source_Contract_ID",
+      "Supplier_Count",
+      "Supplier_Country",
+      "Supplier_ID",
+      "Supplier_Name",
+      "Value_Field"
+    ],
+    "bridge": [
+      "Award_ID",
+      "Award_Value_Allocated",
+      "Relationship",
+      "SME_Status",
+      "Supplier_Country",
+      "Supplier_ID",
+      "Supplier_Name"
+    ]
+  },
+  "counts": {
+    "procurement_records": 178211,
+    "distinct_procurement_ids": 178211,
+    "award_rows": 178211,
+    "award_supplier_links": 178211
+  },
+  "fingerprints": {
+    "procurement_hash_sum": "1643141408666096695364443",
+    "award_hash_sum": "1643177514392199251212284",
+    "link_hash_sum": "1647010693869348648443150"
+  },
+  "integrity": {
+    "scan_ordinal_min": 1,
+    "scan_ordinal_max": 178211,
+    "no_row_filter_before_scoring": true,
+    "all_rows_materialized": true,
+    "expected_counts_checked": true,
+    "status": "PASS"
+  },
+  "discovery_bucket_counts": {
+    "RESIDUAL": 125036,
+    "OPEN_WORLD_CANDIDATE": 43194,
+    "KNOWN_LANE": 9981
+  },
+  "route_counts": {
+    "AWARD_FIRST_EVIDENCE": 178211
+  },
+  "priority_bands": {
+    "50-59.99": 50452,
+    "60-69.99": 5671,
+    "70-79.99": 4965,
+    "80+": 213,
+    "<50": 116910
+  },
+  "notes": [
+    "Historical priority is a prior, not a live bid verdict.",
+    "AWARD_FIRST_PROCUREMENT records are not reconstructed original tender notices.",
+    "OTHER / OPEN WORLD is intentionally retained and clustered rather than discarded.",
+    "No currency mixing is performed in value tables."
+  ]
+}
