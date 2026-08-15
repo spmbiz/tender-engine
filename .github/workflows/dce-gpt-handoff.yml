@@ -26,7 +26,7 @@ jobs:
   publish:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -63,15 +63,44 @@ jobs:
           tar -xzf "dce-deep-review-$RID.tar.gz" -C dce-aggregate
           test -s dce-aggregate/deep_review_queue.jsonl
           test -s dce-aggregate/summary.json
+      - name: Sample small candidate packs for TED unresolved-route telemetry
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.run.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p route-packs route-sample
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" \
+            --jq '.assets[] | select((.name | startswith("candidate-")) and (.size <= 250000)) | .name' \
+            | head -250 > /tmp/small-candidate-assets.txt
+          if [ -s /tmp/small-candidate-assets.txt ]; then
+            export TAG GH_TOKEN
+            cat /tmp/small-candidate-assets.txt | xargs -r -P 12 -I{} bash -c 'gh release download "$TAG" --pattern "$1" --dir route-packs' _ '{}'
+            for archive in route-packs/candidate-*.tar.gz; do
+              [ -e "$archive" ] || continue
+              d="route-sample/$(basename "$archive" .tar.gz)"
+              mkdir -p "$d"
+              tar -xzf "$archive" -C "$d" || true
+            done
+          fi
+          python pipeline/summarize_ted_pending_routes.py \
+            --root route-sample \
+            --json-out dce-aggregate/pending-route-summary.json \
+            --md-out dce-aggregate/pending-route-summary.md
       - name: Build GPT-readable release body
-        run: >-
-          python pipeline/build_gpt_release_notes.py
-          --queue dce-aggregate/deep_review_queue.jsonl
-          --summary dce-aggregate/summary.json
-          --out dce-aggregate/gpt_release_notes.md
-          --top 120
-          --evidence-top 20
-          --max-chars 120000
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/build_gpt_release_notes.py \
+            --queue dce-aggregate/deep_review_queue.jsonl \
+            --summary dce-aggregate/summary.json \
+            --out dce-aggregate/gpt_release_notes.md \
+            --top 120 \
+            --evidence-top 20 \
+            --max-chars 105000
+          printf '\n\n' >> dce-aggregate/gpt_release_notes.md
+          cat dce-aggregate/pending-route-summary.md >> dce-aggregate/gpt_release_notes.md
       - name: Publish handoff into canonical DCE Release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -80,7 +109,10 @@ jobs:
         run: |
           set -euo pipefail
           gh release edit "$TAG" --notes-file dce-aggregate/gpt_release_notes.md
-          gh release upload "$TAG" dce-aggregate/gpt_release_notes.md --clobber
+          gh release upload "$TAG" \
+            dce-aggregate/gpt_release_notes.md \
+            dce-aggregate/pending-route-summary.json \
+            dce-aggregate/pending-route-summary.md --clobber
           body="$(gh release view "$TAG" --json body --jq '.body')"
           test ${#body} -gt 100
-          echo "GPT-readable DCE handoff published to $TAG" >> "$GITHUB_STEP_SUMMARY"
+          echo "GPT-readable DCE handoff + TED route telemetry published to $TAG" >> "$GITHUB_STEP_SUMMARY"
