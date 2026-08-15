@@ -12,6 +12,7 @@ from pathlib import Path
 
 import requests
 
+from authority_conflicts import process as reconcile_authority
 from final_verdict_guard import REQUIRED_GATES, validate_record
 
 ALLOWED_GATE_STATUSES = {"PASS", "PASS_CONDITIONAL", "FAIL_HARD", "UNKNOWN", "NOT_APPLICABLE"}
@@ -65,6 +66,53 @@ def number_evidence(row: dict):
             numbered.append({"ref": ref, "text": text[:2400], "source": source})
         gates[gate] = numbered
     return refs, gates
+
+
+def compact_review_evidence(row: dict, per_gate: int = 3, chars: int = 1400) -> dict:
+    snippets = row.get("gate_snippets") or {}
+    packed: dict[str, list[dict]] = {}
+    for gate in REQUIRED_GATES:
+        out = []
+        for item in list(snippets.get(gate) or [])[:per_gate]:
+            if isinstance(item, dict):
+                text = str(item.get("text") or item.get("snippet") or item.get("evidence") or "")
+                source = item.get("source") or item.get("file") or item.get("path")
+            else:
+                text = str(item or "")
+                source = None
+            text = " ".join(text.split())[:chars]
+            if text:
+                out.append({"text": text, "source": source})
+        packed[gate] = out
+    return packed
+
+
+def refresh_authority(row: dict) -> dict:
+    """Reconcile DCE deadline from the live extracted shard before any verdict.
+
+    The heavy durable pack historically created authority_conflicts.json later in
+    the shard. Hot adjudication must not run earlier than deadline authority, so we
+    compute it directly from the same authoritative extracted DCE tree here.
+    """
+    if not row.get("gate_readiness"):
+        return row
+    rel = str(row.get("artifact_relative_root") or "").strip()
+    if not rel:
+        return row
+    base = Path(os.getenv("DCE_FAST_ROOT", "out")) / rel
+    if not (base / "manifest.json").exists():
+        return row
+    try:
+        authority = reconcile_authority(base)
+    except Exception as exc:
+        row["authority_refresh_error"] = str(exc)[:500]
+        return row
+    row["authority_conflicts"] = authority
+    deadline = authority.get("deadline") if isinstance(authority, dict) else None
+    if isinstance(deadline, dict):
+        row["deadline_authority_status"] = deadline.get("status")
+        row["deadline_conflict"] = bool(deadline.get("conflict"))
+    return row
 
 
 def output_text(response: dict) -> str:
@@ -148,16 +196,22 @@ def call_model(row: dict, model: str, api_key: str, retries: int = 2):
 
 
 def fallback_record(row: dict, reason: str, model: str | None = None):
+    try:
+        prelim = min(89, int(float(row.get("preliminary_score") or 0)))
+    except Exception:
+        prelim = 0
     return {
         "candidate_id": row.get("candidate_id"),
         "title": row.get("title"),
         "buyer": row.get("buyer"),
+        "portal": row.get("portal"),
         "notice_url": row.get("notice_url"),
         "deadline": row.get("deadline"),
         "estimated_value": row.get("estimated_value"),
         "currency": row.get("currency"),
+        "preliminary_score": row.get("preliminary_score"),
         "classification": "MODEL_REVIEW_REQUIRED",
-        "final_score": min(89, int(float(row.get("preliminary_score") or 0))),
+        "final_score": prelim,
         "summary": reason,
         "model": model,
         "model_review_completed": False,
@@ -165,6 +219,7 @@ def fallback_record(row: dict, reason: str, model: str | None = None):
         "gate_readiness": bool(row.get("gate_readiness")),
         "evidence_quality": row.get("evidence_quality") or {},
         "authority_conflicts": row.get("authority_conflicts") or {},
+        "gate_evidence_candidates": compact_review_evidence(row),
         "gates": {
             gate: {
                 "status": "UNKNOWN",
@@ -210,10 +265,12 @@ def normalize_model_record(row: dict, obj: dict, refs: dict, model: str):
         "candidate_id": row.get("candidate_id"),
         "title": row.get("title"),
         "buyer": row.get("buyer"),
+        "portal": row.get("portal"),
         "notice_url": row.get("notice_url"),
         "deadline": row.get("deadline"),
         "estimated_value": row.get("estimated_value"),
         "currency": row.get("currency"),
+        "preliminary_score": row.get("preliminary_score"),
         "classification": classification,
         "final_score": score,
         "summary": str(obj.get("summary") or "")[:5000],
@@ -232,6 +289,7 @@ def normalize_model_record(row: dict, obj: dict, refs: dict, model: str):
         if rec["classification"] in FINAL_CLASSIFICATIONS or rec["final_score"] >= 90:
             rec["classification"] = "MODEL_REVIEW_REQUIRED"
             rec["final_score"] = min(89, rec["final_score"])
+            rec["gate_evidence_candidates"] = compact_review_evidence(row)
             rec["summary"] = (rec["summary"] + " | Finalization blocked by deterministic guard.").strip()
     return rec
 
@@ -253,7 +311,7 @@ def main():
     ap.add_argument("--model-retries", type=int, default=int(os.getenv("OPENAI_ADJUDICATION_RETRIES", "2")))
     args = ap.parse_args()
 
-    rows = list(load_jsonl(Path(args.queue)))
+    rows = [refresh_authority(r) for r in load_jsonl(Path(args.queue))]
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
@@ -271,10 +329,10 @@ def main():
             records[idx] = rec
             continue
         if not api_key:
-            records[idx] = fallback_record(row, "OPENAI_API_KEY unavailable: queued for model/manual gate adjudication.", model)
+            records[idx] = fallback_record(row, "OPENAI_API_KEY unavailable: published to ChatGPT-ready hot review bank.", model)
             continue
         if len(review_jobs) >= review_budget:
-            records[idx] = fallback_record(row, "Per-run model review cap reached; queued for next/manual adjudication.", model)
+            records[idx] = fallback_record(row, "Per-run model review cap reached; published to ChatGPT-ready hot review bank.", model)
             continue
         review_jobs.append((idx, row))
 
@@ -325,6 +383,7 @@ def main():
         "final_supergreen": len(finals),
         "green_or_partnerable": len(greens),
         "review_required": len(review_required),
+        "chatgpt_hot_review_ready": sum(1 for r in review_required if r.get("gate_readiness") and r.get("gate_evidence_candidates")),
         "guard_contract": "FINAL_SUPER_GREEN/90+ is accepted only after final_verdict_guard.py returns no violations.",
     }
     (out / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
