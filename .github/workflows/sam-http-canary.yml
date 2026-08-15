@@ -1,0 +1,77 @@
+name: SAM HTTP Fast-Lane Canary
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/sam-http-canary.yml'
+      - 'control/sam_http_canary_trigger.txt'
+      - 'pipeline/dce_worker_v9.py'
+
+permissions:
+  contents: read
+
+jobs:
+  sam-http-canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install HTTP/extraction dependencies only
+        run: python -m pip install --disable-pip-version-check -q requests pypdf python-docx openpyxl python-pptx
+      - name: Build real SAM digital canary queue
+        shell: bash
+        run: |
+          mkdir -p canary
+          cat > canary/queue.jsonl <<'JSONL'
+          {"candidate_id":"US-SAM:7686bd844b36486a882c70d5a5436545","portal":"US_SAM","notice_id":"7686bd844b36486a882c70d5a5436545","opportunity_id":"7686bd844b36486a882c70d5a5436545","notice_url":"https://sam.gov/opp/7686bd844b36486a882c70d5a5436545/view","title":"Social Media Management"}
+          {"candidate_id":"US-SAM:2b927753a4d2479a8dc6e209a20d577b","portal":"US_SAM","notice_id":"2b927753a4d2479a8dc6e209a20d577b","opportunity_id":"2b927753a4d2479a8dc6e209a20d577b","solicitation_number":"36C25626Q1008","notice_url":"https://sam.gov/opp/2b927753a4d2479a8dc6e209a20d577b/view","title":"VR Application Development"}
+          {"candidate_id":"US-SAM:f85cdbffe2df41bcacfa2970787bcc79","portal":"US_SAM","notice_id":"f85cdbffe2df41bcacfa2970787bcc79","opportunity_id":"f85cdbffe2df41bcacfa2970787bcc79","notice_url":"https://sam.gov/opp/f85cdbffe2df41bcacfa2970787bcc79/view","title":"Instructional Video Series for Advanced Vascular Repair Techniques"}
+          JSONL
+      - name: Resolve with pure HTTP v9 only
+        env:
+          SAM_HTTP_ONLY: '1'
+        shell: bash
+        run: |
+          mkdir -p canary/out
+          for line in 1 2 3; do
+            python pipeline/dce_worker_v9.py --queue canary/queue.jsonl --line "$line" --out canary/out &
+          done
+          wait
+      - name: Extract and classify
+        run: |
+          python pipeline/extract_corpus.py --root canary/out
+          python pipeline/dce_evidence_quality.py --root canary/out
+      - name: Assert all three public-resource routes work without Playwright
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          roots=[p for p in pathlib.Path('canary/out').glob('*') if p.is_dir()]
+          assert len(roots)==3, roots
+          statuses=[]
+          for root in roots:
+              m=json.loads((root/'manifest.json').read_text())
+              q=json.loads((root/'evidence_quality.json').read_text())
+              status=str(m.get('status') or '')
+              files=m.get('files') or []
+              statuses.append((root.name,status,len(files),q.get('gate_readiness')))
+              assert status=='DOWNLOADED_PUBLIC', (root.name,m)
+              assert files, (root.name,m)
+              assert any(a.get('method')=='SAM_PUBLIC_RESOURCES_HTTP_V9' and a.get('outcome')=='RESOURCES_FOUND' for a in m.get('dce_method_attempts') or []), m
+              assert any(a.get('method')=='SAM_PUBLIC_RESOURCE_DOWNLOAD_V9' and a.get('outcome')=='DOWNLOADED' for a in m.get('dce_method_attempts') or []), m
+          print('SAM_HTTP_FASTLANE_CANARY_OK',statuses)
+          PY
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sam-http-canary-${{ github.run_id }}
+          path: canary/out/
+          retention-days: 2
+          compression-level: 9
+          if-no-files-found: warn
