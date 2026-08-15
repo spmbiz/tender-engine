@@ -16,9 +16,9 @@ on:
         required: false
         default: '320'
       max_parallel:
-        description: Maximum GitHub shard runners in parallel (1-20)
+        description: Maximum GitHub shard runners in parallel; globally clamped to 10 so sibling fleets retain headroom
         required: false
-        default: '20'
+        default: '10'
       max_shards:
         description: Maximum queued matrix shards (1-256)
         required: false
@@ -89,8 +89,8 @@ jobs:
       - id: matrix
         name: Compile adaptive browser/HTTP shard queue
         env:
+          DCE_REQUESTED_MAX_PARALLEL: ${{ github.event.inputs.max_parallel || '10' }}
           DCE_MAX_SHARDS: ${{ github.event.inputs.max_shards || '256' }}
-          DCE_MAX_PARALLEL: ${{ github.event.inputs.max_parallel || '20' }}
           DCE_TARGET_JOBS_PER_SHARD: ${{ github.event.inputs.jobs_per_shard || '0' }}
           DCE_TARGET_WAVES: '1'
           DCE_BROWSER_MAX_JOBS_PER_SHARD: '12'
@@ -98,7 +98,21 @@ jobs:
           MAX_DCE_JOBS: ${{ github.event.inputs.max_jobs || '320' }}
           DCE_BROWSER_LOCAL_CONCURRENCY: '2'
           DCE_HTTP_LOCAL_CONCURRENCY: '8'
-        run: python pipeline/build_dce_shards.py --queue generated/dce_candidates.jsonl
+        shell: bash
+        run: |
+          set -euo pipefail
+          DCE_MAX_PARALLEL="$(python - <<'PY'
+          import os
+          try:
+              requested=int(os.environ.get('DCE_REQUESTED_MAX_PARALLEL') or 10)
+          except Exception:
+              requested=10
+          print(max(1,min(10,requested)))
+          PY
+          )"
+          export DCE_MAX_PARALLEL
+          echo "Global runner safety clamp: DCE max_parallel=$DCE_MAX_PARALLEL"
+          python pipeline/build_dce_shards.py --queue generated/dce_candidates.jsonl
       - id: release
         name: Create durable canonical harvest release
         if: steps.matrix.outputs.count != '0'
