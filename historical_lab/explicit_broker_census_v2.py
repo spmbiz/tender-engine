@@ -77,10 +77,10 @@ def main():
     """).fetchall()
     write(out/'market_matrix.csv',['family','country','currency','records','buyers','p25_value','median_value','p75_value','repeat_buyers','suppliers','linked_weight','top_supplier_share'],matrix)
     winners=con.execute("""
-      SELECT market_family,country,currency,sname,n,n/nullif(sum(n) over(partition by market_family,country,currency),0) share
+      SELECT market_family,country,currency,sname,n,n/nullif(sum(n) over(partition by market_family,country,currency),0) supplier_share
       FROM ss0 QUALIFY row_number() over(partition by market_family,country,currency order by n desc,sname)<=10
       ORDER BY market_family,country,currency,n DESC
-    """).fetchall(); write(out/'top_winners.csv',['family','country','currency','supplier','weighted_awards','share'],winners)
+    """).fetchall(); write(out/'top_winners.csv',['family','country','currency','supplier','weighted_awards','supplier_share'],winners)
     buyers=con.execute("""
       SELECT market_family,country,currency,buyer,n FROM bs0
       QUALIFY row_number() over(partition by market_family,country,currency order by n desc,buyer)<=10
@@ -95,8 +95,8 @@ def main():
     (out/'summary.json').write_text(json.dumps(summary,indent=2,ensure_ascii=False),encoding='utf-8')
     lines=['# Explicit Broker / Intermediary Census v2','',f"- Global Core records scanned: **{summary['archive_records_scanned']:,}**",f"- Explicit/intermediary matches: **{summary['matched_records']:,}**",f"- family-country-currency buckets: **{summary['market_buckets']:,}**",'', 'Historical notice-first evidence only. Regex family assignment is a discovery aid; representative examples and market structure must be semantically QA’d before promotion.','']
     for r in matrix[:180]:
-        fam,country,currency,n,buy,p25,med,p75,rb,sup,lw,share=r
-        lines += [f'## {fam} — {country} / {currency}',f'- records **{n}** · buyers **{buy}** · repeat buyers **{rb}** · median **{med if med is not None else "UNKNOWN"}** · p25/p75 **{p25 if p25 is not None else "UNKNOWN"} / {p75 if p75 is not None else "UNKNOWN"}**',f'- linked suppliers **{sup if sup is not None else "UNKNOWN"}** · top supplier share **{round(100*share,1) if share is not None else "UNKNOWN"}%**','']
+        fam,country,currency,n,buy,p25,med,p75,rb,sup,lw,supplier_share=r
+        lines += [f'## {fam} — {country} / {currency}',f'- records **{n}** · buyers **{buy}** · repeat buyers **{rb}** · median **{med if med is not None else "UNKNOWN"}** · p25/p75 **{p25 if p25 is not None else "UNKNOWN"} / {p75 if p75 is not None else "UNKNOWN"}**',f'- linked suppliers **{sup if sup is not None else "UNKNOWN"}** · top supplier share **{round(100*supplier_share,1) if supplier_share is not None else "UNKNOWN"}%**','']
     (out/'REPORT.md').write_text('\n'.join(lines),encoding='utf-8')
 
 if __name__=='__main__': main()
