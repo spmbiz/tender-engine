@@ -1,0 +1,65 @@
+name: Historical Explicit Broker Census v2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/historical-explicit-broker-census-v2.yml'
+      - 'historical_lab/explicit_broker_census_v2.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-explicit-broker-census-v2
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Download canonical Global Core historical facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          for f in historical_tenders.parquet awards.parquet award_suppliers.parquet; do
+            gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern "$f" --dir source --clobber
+          done
+      - name: Scan explicit brokerage/intermediation families
+        run: |
+          python historical_lab/explicit_broker_census_v2.py \
+            --historical source/historical_tenders.parquet \
+            --awards source/awards.parquet \
+            --bridge source/award_suppliers.parquet --out out
+      - name: Persist broker census
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-explicit-broker-census-v2
+          if ! gh release view "$TAG" --repo walidgdg1-ai/tender-engine >/dev/null 2>&1; then
+            gh release create "$TAG" --repo walidgdg1-ai/tender-engine --target main \
+              --title 'Historical Explicit Broker Census v2' \
+              --notes 'Historical notice-first census of explicitly brokered/intermediated public procurement categories across Global Core. No live or DCE evidence.'
+          fi
+          for f in summary.json REPORT.md market_matrix.csv top_winners.csv top_buyers.csv examples.csv; do
+            gh release upload "$TAG" "out/$f" --repo walidgdg1-ai/tender-engine --clobber
+          done
+          mkdir -p control/historical_explicit_broker_census_v2
+          cp out/summary.json out/REPORT.md control/historical_explicit_broker_census_v2/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_explicit_broker_census_v2/
+          git commit -m 'historical: persist explicit broker census v2' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
