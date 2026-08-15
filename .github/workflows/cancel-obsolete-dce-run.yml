@@ -1,0 +1,37 @@
+name: Cancel Obsolete Queued DCE Run
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/cancel_obsolete_dce_run.txt'
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cancel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cancel only if target DCE run is still queued
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rid="$(sed -nE 's/^run_id=([0-9]+).*$/\1/p' control/cancel_obsolete_dce_run.txt | tail -1)"
+          expected_reason="$(sed -nE 's/^reason=(.*)$/\1/p' control/cancel_obsolete_dce_run.txt | tail -1)"
+          [[ "$rid" =~ ^[0-9]+$ ]] || { echo 'Invalid run ID'; exit 1; }
+          workflow="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$rid" --jq '.name')"
+          status="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$rid" --jq '.status')"
+          echo "run=$rid workflow=$workflow status=$status reason=$expected_reason"
+          [ "$workflow" = 'DCE Fanout V2' ] || { echo 'Refusing to cancel non-DCE workflow'; exit 1; }
+          if [ "$status" = 'queued' ] || [ "$status" = 'waiting' ] || [ "$status" = 'requested' ]; then
+            gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/$rid/cancel"
+            echo "Cancelled obsolete queued DCE run $rid"
+          else
+            echo "Run is no longer queued; refusing to kill productive/finished work"
+          fi
