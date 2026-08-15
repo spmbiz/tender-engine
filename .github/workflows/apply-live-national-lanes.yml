@@ -1,0 +1,55 @@
+name: Apply Live National Lanes
+
+on:
+  push:
+    branches: [main]
+    paths: ['control/national_expansion_patch_trigger.txt']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Apply idempotent patch
+        run: python pipeline/patch_live_national_lanes.py
+      - name: Validate Python and workflow YAML
+        run: |
+          python -m py_compile pipeline/discover_si_ejn_browser.py pipeline/discover_sk_uvo.py pipeline/dce_worker_v6.py pipeline/source_coverage_guard.py
+          python -m pip install --disable-pip-version-check -q pyyaml
+          python - <<'PY'
+          import yaml
+          from pathlib import Path
+          p=Path('.github/workflows/supergreen-discovery-v2.yml')
+          x=yaml.safe_load(p.read_text())
+          assert isinstance(x,dict) and 'jobs' in x
+          body=p.read_text()
+          for token in ('SI_EJN','SK_UVO','discover_si_ejn_browser.py','discover_sk_uvo.py'):
+              assert token in body, token
+          print('workflow patch validation OK')
+          PY
+      - name: Commit only if changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- .github/workflows/supergreen-discovery-v2.yml; then
+            echo 'Already patched'; exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .github/workflows/supergreen-discovery-v2.yml
+          git commit -m 'discovery: activate Slovenia and Slovakia national live lanes'
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep $((i*2))
+          done
+          exit 1
