@@ -1,0 +1,83 @@
+name: Historical Standard Goods Semantic QA v1
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Historical Standard Goods v1']
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/historical-standard-goods-semantic-qa-v1.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-standard-goods-semantic-qa-v1
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download standardized-goods evidence tables
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source
+          TAG=historical-standard-goods-v1
+          for f in examples.csv market_matrix.csv top_winners.csv top_buyers.csv; do
+            gh release download "$TAG" --repo walidgdg1-ai/tender-engine --pattern "$f" --dir source --clobber
+          done
+      - name: Build semantic QA packet
+        run: |
+          python - <<'PY'
+          import csv,json
+          from collections import defaultdict
+          from pathlib import Path
+          def rd(p):
+            with open(p,encoding='utf-8',errors='replace',newline='') as f:return list(csv.DictReader(f))
+          m=rd('source/market_matrix.csv');e=rd('source/examples.csv');w=rd('source/top_winners.csv');b=rd('source/top_buyers.csv')
+          priority=['OFFICE_STATIONERY','PPE_WORKWEAR','PACKAGING','FURNITURE_STANDARD','IT_PERIPHERALS','SIGNAGE_STANDARD','PAPER_ENVELOPES','MOBILE_DEVICES','UNIFORMS','PROMOTIONAL_MERCH','SCHOOL_ART_SUPPLIES','BAGS_WASTE_SACKS','TONER_INK_PRINT_CONSUMABLES','AUDIOVISUAL_STANDARD','FLAGS_BANNERS']
+          ei=defaultdict(list);wi=defaultdict(list);bi=defaultdict(list)
+          for r in e:ei[(r['goods_family'],r['country'],r['currency'])].append(r)
+          for r in w:wi[(r['goods_family'],r['country'],r['currency'])].append(r)
+          for r in b:bi[(r['goods_family'],r['country'],r['currency'])].append(r)
+          chosen=[]
+          for fam in priority:
+            ss=[r for r in m if r['goods_family']==fam]
+            ss.sort(key=lambda r:(-int(float(r['records'])),-int(float(r['buyers']))))
+            chosen.extend(ss[:6])
+          out=Path('control/historical_standard_goods_semantic_qa_v1');out.mkdir(parents=True,exist_ok=True)
+          lines=['# Historical Standard Goods — Semantic QA Packet v1','',
+                 'Historical-only representative-title review. Family regex matches are discovery evidence, not promotion authority until examples support the product interpretation.','']
+          pack=[]
+          for r in chosen:
+            k=(r['goods_family'],r['country'],r['currency'])
+            lines += [f"## {r['goods_family']} — {r['country']} / {r['currency']}",
+                      f"- records **{r['records']}** · heavy/install flagged **{r['heavy_flagged']}** · buyers **{r['buyers']}** · repeat buyers **{r['repeat_buyers']}** · median **{r.get('median_value') or 'UNKNOWN'}** · suppliers **{r.get('suppliers') or 'UNKNOWN'}** · top supplier share **{r.get('top_supplier_share') or 'UNKNOWN'}**",'- representative titles:']
+            for x in ei.get(k,[])[:8]:lines.append(f"  - {x.get('buyer') or 'UNKNOWN'} — {x.get('title') or ''} — {x.get('reference_value') or 'UNKNOWN'} — heavy={x.get('heavy_install_flag')}")
+            if wi.get(k):
+              lines.append('- leading historical winners:')
+              for x in wi[k][:5]:lines.append(f"  - {x.get('supplier')} — weight {x.get('weighted_awards')} — share {x.get('supplier_share')}")
+            lines.append('')
+            pack.append({'market':r,'examples':ei.get(k,[])[:8],'winners':wi.get(k,[])[:5],'buyers':bi.get(k,[])[:5]})
+          (out/'QA_PACKET.md').write_text('\n'.join(lines),encoding='utf-8')
+          (out/'qa_packet.json').write_text(json.dumps(pack,indent=2,ensure_ascii=False),encoding='utf-8')
+          (out/'summary.json').write_text(json.dumps({'buckets_reviewed':len(pack),'historical_only':True,'semantic_verdicts_applied':False},indent=2),encoding='utf-8')
+          PY
+      - name: Persist QA packet
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_standard_goods_semantic_qa_v1/
+          git commit -m 'historical: persist standard goods semantic QA v1' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
