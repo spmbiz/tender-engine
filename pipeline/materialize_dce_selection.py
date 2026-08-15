@@ -122,10 +122,17 @@ def main() -> None:
 
     if missing:
         raise SystemExit('Selection candidates missing from canonical discovery pool: ' + ', '.join(missing))
-    if duplicate_selection:
-        raise SystemExit('Duplicate exact identities in selection manifest: ' + ', '.join(duplicate_selection))
-    if len(selected) + len(excluded_existing) != len(selection):
-        raise SystemExit(f'Coverage mismatch: selected={len(selected)} existing={len(excluded_existing)} selection={len(selection)}')
+
+    # Exact duplicates are expected when the same procurement appears under aliases
+    # (for example TED + national portal, or duplicated canonical rows). Keep the
+    # first exact title+buyer identity and record the skipped aliases as provenance;
+    # they must never abort a high-volume DCE wave.
+    accounted = len(selected) + len(excluded_existing) + len(duplicate_selection)
+    if accounted != len(selection):
+        raise SystemExit(
+            f'Coverage mismatch: selected={len(selected)} existing={len(excluded_existing)} '
+            f'duplicates={len(duplicate_selection)} selection={len(selection)}'
+        )
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -138,8 +145,10 @@ def main() -> None:
         'selection_manifest_records': len(selection),
         'excluded_as_existing_exact_identity': len(excluded_existing),
         'excluded_existing_candidate_ids': excluded_existing,
+        'deduplicated_exact_identity_count': len(duplicate_selection),
+        'deduplicated_candidate_ids': duplicate_selection,
         'materialized_queue_records': len(selected),
-        'coverage_ok': True,
+        'coverage_ok': accounted == len(selection),
         'max_preliminary_score': max((int(r.get('preliminary_score') or 0) for r in selected), default=0),
         'source_run_ids': sorted({str(r.get('wide_read_run_id')) for r in selected if r.get('wide_read_run_id') is not None}),
     }
