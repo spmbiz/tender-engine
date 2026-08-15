@@ -1,0 +1,49 @@
+name: QA Micro-Niche Intelligence v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/qa_micro_niche_intelligence_v1.py'
+      - '.github/workflows/qa-micro-niche-intelligence-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download complete micro-niche derived bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p source qa
+          gh release download market-intelligence-micro-niche-v1 --repo "$GITHUB_REPOSITORY" --dir source --clobber
+      - name: Build semantic/evidence QA pack
+        run: python pipeline/qa_micro_niche_intelligence_v1.py --dir source --out qa
+      - name: Persist QA pack
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p control/micro_niche_intelligence_v1
+          cp qa/QA_REVIEW.md control/micro_niche_intelligence_v1/QA_REVIEW.md
+          cp qa/qa_summary.json control/micro_niche_intelligence_v1/qa_summary.json
+          cp qa/qa_review.json control/micro_niche_intelligence_v1/qa_review.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/micro_niche_intelligence_v1/
+          git commit -m 'tenders: persist micro-niche semantic QA' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
