@@ -1,0 +1,52 @@
+name: Test Historical DCE Selector v2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/historical_dce_sample_selector_v2.py'
+      - '.github/workflows/test-historical-dce-selector-v2.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build synthetic Global Core v4 fixture
+        shell: bash
+        run: |
+          python - <<'PY'
+          import csv
+          rows=[
+            {'Warehouse_Source':'France','Historical_Tender_ID':'FR:H1','Country':'FRANCE','Buyer_Name':'Ville Test','Title':'Refonte du site internet et maintenance','Publication_Date':'2025-01-01','Primary_Source_URL':'https://www.boamp.fr/avis/detail/test','CPV_NAICS_or_Local_Code':'72413000','Evidence_Grain':'NOTICE_FIRST'},
+            {'Warehouse_Source':'Germany','Historical_Tender_ID':'DE:H2','Country':'GERMANY','Buyer_Name':'Amt Test','Title':'Website Hosting und Wartung','Publication_Date':'2025-02-01','Primary_Source_URL':'https://oeffentlichevergabe.de/test','CPV_NAICS_or_Local_Code':'72415000','Evidence_Grain':'NOTICE_FIRST'},
+            {'Warehouse_Source':'Quebec','Historical_Tender_ID':'QC:H3','Country':'CANADA - QUEBEC','Buyer_Name':'Ville QC','Title':'Services impression brochure','Publication_Date':'2025-03-01','Primary_Source_URL':'https://seao.ca/test','CPV_NAICS_or_Local_Code':'79810000','Evidence_Grain':'NOTICE_FIRST'},
+            {'Warehouse_Source':'Canada federal','Historical_Tender_ID':'CA:H4','Country':'CANADA','Buyer_Name':'Dept Test','Title':'Professional Translation Services','Publication_Date':'2025-04-01','Primary_Source_URL':'https://canadabuys.canada.ca/test','CPV_NAICS_or_Local_Code':'79530000','Evidence_Grain':'NOTICE_FIRST'},
+          ]
+          with open('/tmp/core.csv','w',newline='',encoding='utf-8') as f:
+            w=csv.DictWriter(f,fieldnames=rows[0]);w.writeheader();w.writerows(rows)
+          PY
+      - name: Run selector and validate resolver-ready candidates
+        run: |
+          python pipeline/historical_dce_sample_selector_v2.py --input /tmp/core.csv --out /tmp/q.jsonl --limit 20 --min-score 1
+          python - <<'PY'
+          import json
+          rows=[json.loads(x) for x in open('/tmp/q.jsonl',encoding='utf-8') if x.strip()]
+          assert len(rows)==4,rows
+          by={r['candidate_id']:r for r in rows}
+          assert by['FR:H1']['portal']=='FR_BOAMP'
+          assert by['DE:H2']['portal']=='DE_DOE'
+          assert by['QC:H3']['portal']=='QC_SEAO'
+          assert by['CA:H4']['portal']=='CA_CANADABUYS'
+          for r in rows:
+            assert r['notice_url']==r['primary_source_url']
+            assert r['route']['detail_url']==r['notice_url']
+            assert r['final_verdict_allowed'] is False
+            assert r['cpv_division'] in {'72','79'}
+          print(json.dumps(rows,indent=2,ensure_ascii=False))
+          PY
