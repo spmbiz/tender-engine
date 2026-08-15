@@ -6,7 +6,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline"))
 from auto_select_dce import business_fit, retrieval_score, select
 
 
-def rec(cid, title, description="", portal="TEST", cpv=None):
+def rec(cid, title, description="", portal="TEST", cpv=None, naics=None):
     row = {
         "candidate_id": cid,
         "title": title,
@@ -18,6 +18,8 @@ def rec(cid, title, description="", portal="TEST", cpv=None):
     }
     if cpv:
         row["cpv"] = cpv
+    if naics:
+        row["naics"] = naics
     return row
 
 
@@ -91,3 +93,36 @@ def test_output_persists_fit_class_and_score():
     assert selected[0]["selection_fit_class"] == "SPM_WEB"
     assert selected[0]["business_fit_score"] >= 80
     assert selected[0]["preliminary_score"] <= 89
+
+
+def test_sam_hardware_boilerplate_cannot_fake_web_or_print_fit():
+    boilerplate = (
+        "Contractors may view orders in the PIEE website. Department of Defense specifications "
+        "are available from Navy Publishing and Printing Service."
+    )
+    row = rec(
+        "SAM:JUNK",
+        "TRANSMITTER,PRESSUR",
+        description=boilerplate,
+        portal="US_SAM",
+        naics="334513",
+    )
+    ok, fit_class, score, reasons = business_fit(row)
+    assert not ok
+    assert fit_class == "REJECT_SAM_NAICS_NONCORE"
+    assert score == -100
+    assert any("sam-naics" in r for r in reasons)
+
+
+def test_sam_real_software_scope_with_service_naics_can_pass():
+    row = rec(
+        "SAM:SOFT",
+        "Water Management Programming",
+        description="Software analysis, database development, web development and systems integration.",
+        portal="US_SAM",
+        naics="541511",
+    )
+    ok, fit_class, fit_score, _ = business_fit(row)
+    assert ok
+    assert fit_class in {"SPM_WEB", "SPM_SOFTWARE_AUTOMATION"}
+    assert fit_score >= 70
