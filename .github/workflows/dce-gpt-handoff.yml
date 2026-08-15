@@ -72,8 +72,8 @@ jobs:
           set -euo pipefail
           mkdir -p route-packs route-sample
           gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" \
-            --jq '.assets[] | select((.name | startswith("candidate-")) and (.size <= 250000)) | .name' \
-            | head -250 > /tmp/small-candidate-assets.txt
+            --jq '[.assets[] | select((.name | startswith("candidate-")) and (.size <= 250000))][0:250][].name' \
+            > /tmp/small-candidate-assets.txt
           if [ -s /tmp/small-candidate-assets.txt ]; then
             export TAG GH_TOKEN
             cat /tmp/small-candidate-assets.txt | xargs -r -P 12 -I{} bash -c 'gh release download "$TAG" --pattern "$1" --dir route-packs' _ '{}'
