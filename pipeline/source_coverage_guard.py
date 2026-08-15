@@ -6,8 +6,8 @@ from pathlib import Path
 
 # These are coverage lanes, not a claim that every procurement authority in a country is exhausted.
 # A run may still be useful when partial, but it must not call itself WORLD_COMPLETE unless all
-# required lanes materialized cleanly. UNGM is intentionally listed as a required global lane even
-# before its public discovery adapter is installed, so the engine cannot overclaim worldwide coverage.
+# configured required lanes materialized cleanly. UNGM is intentionally listed as a required global
+# lane until its discovery adapter is installed, so the engine cannot overclaim worldwide coverage.
 GLOBAL_PACKS = [
     "discovery-ted",
     "discovery-global-ca-canadabuys",
@@ -29,12 +29,19 @@ GLOBAL_PACKS = [
     "discovery-global-dk-udbud-public",
     "discovery-global-cz-zakazky-gov",
     "discovery-global-it-anac-delta",
+    "discovery-global-cyprus-epps",
+    "discovery-global-malta-epps",
+    "discovery-global-lux-pmp",
 ]
-REQUIRED_SHARDED = {
-    "contracts_finder": [f"discovery-contracts-finder-{i}" for i in range(8)],
-    "ireland_etenders": [f"discovery-ie-{i}" for i in range(10)],
-}
 EXTERNAL_REQUIRED_LANES = ["UNGM_PUBLIC"]
+
+
+def required_sharded(mode: str) -> dict[str, list[str]]:
+    mode = (mode or "delta").lower()
+    return {
+        "contracts_finder": [f"discovery-contracts-finder-{i}" for i in range(8)],
+        "ireland_etenders": [f"discovery-ie-{i}" for i in range(10 if mode == "reconcile" else 4)],
+    }
 
 
 def load(path: Path):
@@ -66,7 +73,7 @@ def stats_health(pack_dir: Path) -> dict:
     exit_files = sorted(pack_dir.rglob("adapter_exit_code.txt"))
     for path in exit_files:
         try:
-            rc=int(path.read_text(encoding="utf-8", errors="replace").strip())
+            rc = int(path.read_text(encoding="utf-8", errors="replace").strip())
         except Exception:
             bad.append({"path": str(path), "reason": "UNREADABLE_ADAPTER_EXIT_CODE"})
             continue
@@ -84,6 +91,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default="discovery-download")
     ap.add_argument("--out", default="merged/source_coverage.json")
+    ap.add_argument("--mode", default="delta", choices=["delta", "reconcile"])
     ap.add_argument("--external-present", default="", help="comma-separated externally implemented coverage lanes")
     ap.add_argument("--strict", action="store_true", help="exit nonzero unless all required lanes are clean")
     args = ap.parse_args()
@@ -91,7 +99,8 @@ def main():
     root = Path(args.root)
     existing_dirs = {p.name: p for p in root.iterdir() if p.is_dir()} if root.exists() else {}
     expected_packs = list(GLOBAL_PACKS)
-    for packs in REQUIRED_SHARDED.values():
+    sharded = required_sharded(args.mode)
+    for packs in sharded.values():
         expected_packs.extend(packs)
 
     missing = [name for name in expected_packs if name not in existing_dirs]
@@ -111,7 +120,8 @@ def main():
     clean = not missing and not degraded and not external_missing
     status = "WORLD_COMPLETE" if clean else "PARTIAL_WORLD_COVERAGE"
     payload = {
-        "contract": "SOURCE_COVERAGE_GUARD_V1",
+        "contract": "SOURCE_COVERAGE_GUARD_V2",
+        "discovery_mode": args.mode,
         "coverage_status": status,
         "worldwide_claim_allowed": clean,
         "expected_materialized_packs": len(expected_packs),
