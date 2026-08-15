@@ -12,10 +12,67 @@ def lit(x: str) -> str:
 
 
 def choose(cols: set[str], *names: str) -> str | None:
+    """Case-insensitive schema resolver with context-safe canonical aliases.
+
+    The three canonical warehouses intentionally retain native-ish field names.
+    Add aliases only for the semantic family requested by the caller so, for
+    example, a missing Buyer_ID can never silently fall back to a tender ID.
+    """
     m = {c.casefold(): c for c in cols}
-    for n in names:
-        if n.casefold() in m:
-            return m[n.casefold()]
+    candidates = list(names)
+    folded = {n.casefold() for n in names}
+
+    # Procurement/tender identity. This branch intentionally keys off Tender_ID
+    # rather than generic Contract_ID because award IDs use a different family.
+    if 'tender_id' in folded or 'procurement_id' in folded:
+        candidates += [
+            'Historical_Tender_ID', 'Procurement_Key', 'Source_Contract_ID',
+            'Official_Notice_ID', 'Procurement_Reference', 'US_Contract_Award_Unique_Key',
+        ]
+    # Award identity.
+    if 'award_id' in folded:
+        candidates += ['Linked_Award_ID', 'US_Contract_Award_Unique_Key', 'Source_Contract_ID']
+    # Buyer identity/name.
+    if 'buyer_id' in folded or 'agency_id' in folded:
+        candidates += ['Source_Buyer_ID']
+    if 'buyer_name' in folded or 'contracting_authority' in folded or 'awarding_agency' in folded:
+        candidates += ['Agency_Name']
+    # Warehouse/source provenance.
+    if 'source' in folded or 'warehouse_source' in folded:
+        candidates += ['Source_System', 'Source_Platform']
+    # Value/date/code/procedure aliases used by canonical normalized releases.
+    if 'estimated_value' in folded or 'contract_value' in folded or 'award_value' in folded or 'total_obligation' in folded:
+        candidates += ['Official_Estimated_Value', 'Estimated_Value_Field', 'Estimate_Field']
+    if 'publication_date' in folded:
+        candidates += ['Latest_Publication_Date']
+    if 'cpv' in folded or 'cpv_code' in folded or 'naics' in folded or 'naics_code' in folded or 'psc' in folded or 'psc_code' in folded or 'category_code' in folded:
+        candidates += ['Main_CPV', 'CPV_NAICS_or_Local_Code', 'NAICS_Code', 'PSC_Code']
+    if 'cpv_description' in folded or 'naics_description' in folded or 'psc_description' in folded or 'code_description' in folded:
+        candidates += ['Raw_CPV_Description', 'Raw_Spend_Category', 'Subcategory', 'Category']
+    if 'procurement_procedure' in folded or 'procedure' in folded or 'procedure_type' in folded:
+        candidates += ['Competition_Type', 'Extent_Competed']
+    if 'scope_summary' in folded or 'scope' in folded or 'description' in folded:
+        candidates += ['Description']
+    if 'url' in folded:
+        candidates += ['Primary_Source_URL', 'Source_URL']
+    # Award evidence aliases.
+    if 'bidder_count' in folded or 'tenderer_count' in folded or 'number_of_bids' in folded:
+        candidates += ['Official_Bidder_Count']
+    if 'award_date' in folded or 'action_date' in folded or 'contract_start_date' in folded:
+        candidates += ['Publication_Date']
+    if 'supplier_id' in folded or 'recipient_id' in folded:
+        candidates += ['Winner_ID', 'Recipient_UEI', 'Recipient_DUNS']
+    if 'supplier_name' in folded or 'recipient_name' in folded:
+        candidates += ['Winner_Name', 'Recipient_Name']
+
+    seen = set()
+    for n in candidates:
+        k = n.casefold()
+        if k in seen:
+            continue
+        seen.add(k)
+        if k in m:
+            return m[k]
     return None
 
 
