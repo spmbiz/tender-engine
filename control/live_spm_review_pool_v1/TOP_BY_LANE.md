@@ -1,0 +1,168 @@
+# Live SPM review — compact lane view
+
+Review-order evidence only. No candidate is GREEN before DCE.
+
+## NO_ONTOLOGY
+- **FR-BOAMP:26-80760** · FRANCE · p=56.0 · deadline=2026-09-15T12:00:00+00:00 · blockers=none · Conception, réalisation, impression de supports de communication au profit de la Communauté de Communes des Portes de Meuse
+
+## accessibility
+- **TED:558732-2026** · UNKNOWN · p=38.0 · deadline=2026-08-17T09:00:00+00:00 · blockers=none · Poland – Software implementation services – Rozwój e-usług, e-zasobów publicznych i cyberbezpieczeństwa w Mieście Konin
+
+## automation_data
+- **US-SAM:c4eb70101d2b46678c179dbf57070642** · USA · p=64.0 · deadline=2026-08-18T09:00:00+00:00 · blockers=none · Expeditionary Very Low Frequency (ExVLF) Transmitter System
+- **US-SAM:899c87277bfd4d539b21bf3bf5d8e122** · USA · p=64.0 · deadline=2026-08-18T21:00:00+00:00 · blockers=none · Expeditionary Very Low Frequency (ExVLF) Transmitter System
+- **US-SAM:1739402e244d46cbb7458fed7566c269** · USA · p=56.0 · deadline=2026-08-19T07:30:00+00:00 · blockers=none · Scanning Total Station with Extended-Range Wireless
+- **FI-HILMA:40025** · FINLAND · p=46.0 · deadline=2026-08-17T12:00:00+00:00 · blockers=none · Metsänhoidon suositusten digitaalisen järjestelmän ylläpito ja jatkokehitys
+- **US-SAM:665b0e5ea7794aa78e2bc60b45d19d0b** · USA · p=46.0 · deadline=2026-08-18T15:00:00+00:00 · blockers=none · Syndicated POINT OF SALE (POS) DATA PLATFORM (COS)
+- **US-SAM:bbe836c5d7ba4e2eb2fa5dca3296f742** · USA · p=46.0 · deadline=2026-08-20T17:00:00+00:00 · blockers=none · Iron Stable Isotope Analysis
+- **US-SAM:24ee7893fe1b42f28db33ce8f65e269c** · USA · p=46.0 · deadline=2026-08-20T19:00:00+00:00 · blockers=none · ACB Inmate Call Monitoring Software W91QF4-26-Q-A021
+- **US-SAM:6c0755d09df44d2c9bebc8c2537abf74** · USA · p=46.0 · deadline=2026-08-20T19:00:00+00:00 · blockers=none · ACB Inmate Call Monitoring Software W91QF4-26-Q-A021
+- **US-SAM:87741a447d254f82ad888d4ea141e067** · USA · p=46.0 · deadline=2026-08-22T21:00:00+00:00 · blockers=SOLE_SOURCE_OR_OEM,SOURCES_SOUGHT_OR_RFI · Mouse Digital Ventilated Cage (DVC) Individually Ventilated Rack System � Pilot Expansion and Software License
+- **US-SAM:0ecc5ec9a4724a338802fc244a6c8d8a** · USA · p=46.0 · deadline=2026-08-31T13:00:00+00:00 · blockers=none · FPC Yankton - Above Ground Storage Tanks Project 26Z4AH3
+- **US-SAM:6767ca3244cc4caaa5f4b8dd5c9b5a98** · USA · p=46.0 · deadline=2026-08-31T13:00:00+00:00 · blockers=none · FPC Yankton - Above Ground Storage Tanks Project 26Z4AH3
+- **US-SAM:1b353b61685649a1825ce247c5d507a9** · USA · p=46.0 · deadline=2026-11-30T00:00:00+00:00 · blockers=none · FIGHT TONIGHT
+- **US-SAM:3c3b6cb5bd4649aa8537534d78b8c594** · USA · p=46.0 · deadline=2026-11-30T00:00:00+00:00 · blockers=none · FIGHT TONIGHT
+- **US-SAM:4c2c1f677162417baa1e9a12a18694fa** · USA · p=46.0 · deadline=2026-11-30T00:00:00+00:00 · blockers=none · FIGHT TONIGHT
+- **US-SAM:5e06259cb8e7409fb6a2cee975f562ee** · USA · p=46.0 · deadline=2026-11-30T00:00:00+00:00 · blockers=none · FIGHT TONIGHT
+- **US-SAM:7382b0fdb6ad4c68831a9d1a710955bc** · USA · p=46.0 · deadline=2026-11-30T00:00:00+00:00 · blockers=none · FIGHT TONIGHT
+- **US-SAM:7e79688ad0714edab51f0cfc99dbe183** · USA · p=46.0 · deadline=2026-11-30T00:00:00+00:00 · blockers=none · FIGHT TONIGHT
+- **US-SAM:81da075a26ef4e9fa5568576fc5cacbc** · USA · p=46.0 · deadline=2026-11-30T00:00:00+00:00 · blockers=none · FIGHT TONIGHT
+- **US-SAM:89553cca5b4c4bf485408853f4b75fcb** · USA · p=46.0 · deadline=2026-11-30T00:00:00+00:00 · blockers=none · FIGHT TONIGHT
+- **US-SAM:9a852ee40820424eb721e1fb7163d8bf** · USA · p=46.0 · deadline=2026-11-30T00:00:00+00:00 · blockers=none · FIGHT TONIGHT
+
+## design_dtp
+- **FR-BOAMP:26-80272** · FRANCE · p=64.0 · deadline=2026-09-18T10:00:00+00:00 · blockers=none · CENTRALE D'ACHAT - Stratégie de communication et conception graphique
+- **TED:563974-2026** · UNKNOWN · p=40.0 · deadline=2026-09-08T22:00:00+00:00 · blockers=none · Norway – Graphic design services – Joint Agreement Visual Communication Major Concepts
+- **TED:561068-2026** · UNKNOWN · p=40.0 · deadline=2026-09-11T21:59:59+00:00 · blockers=none · Italy – Graphic design services – Provision of layout services
+- **US-SAM:0113aa78fbef4626866bae2e69416237** · USA · p=38.0 · deadline=2026-08-21T18:00:00+00:00 · blockers=none · SV0222-26 DLP Printer
+- **US-SAM:3ba8d07d21a4440fb690ffb9217ef1b6** · USA · p=38.0 · deadline=2026-08-21T18:00:00+00:00 · blockers=none · SV0222-26 DLP Printer
+- **US-SAM:4d35ba269764485c9b508172b51be504** · USA · p=38.0 · deadline=2026-08-21T18:00:00+00:00 · blockers=none · SV0222-26 DLP Printer
+- **US-SAM:7eb5aea29d374331ae1863d9858c1012** · USA · p=38.0 · deadline=2026-09-01T13:00:00+00:00 · blockers=none · Army Transportation Command Domestic Tender Program
+
+## digitization
+- **CA:CNTR0026247** · CANADA · p=38.0 · deadline=2026-08-31T16:00:00+00:00 · blockers=none · CNTR0026247 – Secure Shredding and Records Management Services
+
+## hosting_support
+- **CA:305-359-025** · CANADA · p=46.0 · deadline=2026-08-21T13:00:00+00:00 · blockers=none · Marine Mechanical Services
+- **CA:305-379-026** · CANADA · p=46.0 · deadline=2026-09-14T13:00:00+00:00 · blockers=none · Drydocking & Refit Services for the M.V. Highlanders
+- **US-SAM:08fd9bd20bcc49069edcf06fa126c2af** · USA · p=38.0 · deadline=2026-08-27T18:00:00+00:00 · blockers=none · JOURNAL SUBMISSION AND WEB HOSTING � JOURNAL OF REPLICATION AND REPRODUCIBILITY
+- **US-SAM:57a826bdee1143a7903cfa82e3adcbd1** · USA · p=38.0 · deadline=2026-08-27T18:00:00+00:00 · blockers=none · JOURNAL SUBMISSION AND WEB HOSTING � JOURNAL OF REPLICATION AND REPRODUCIBILITY
+
+## media_monitoring
+- **US-SAM:46d3624427c64e4ea996ffbc264bba53** · USA · p=46.0 · deadline=2026-08-25T23:00:00+00:00 · blockers=none · GUATEMALA Social Listening and Digital Monitoring Services
+- **US-SAM:e49eab4f43984750ae63f336578bbee7** · USA · p=46.0 · deadline=2026-08-25T23:00:00+00:00 · blockers=none · GUATEMALA Social Listening and Digital Monitoring Services
+- **DK-UDBUD:9f77d7a2-ded8-4142-8a3f-b6cfff72ab6d:01** · DENMARK · p=46.0 · deadline=2026-08-30T21:59:59+00:00 · blockers=none · Media Monitoring System
+- **US-SAM:b20f3cc1d26448b1b41fa24e6218690c** · USA · p=38.0 · deadline=2026-08-25T08:30:00+00:00 · blockers=none · Providing Televised Media Monitoring Services
+
+## print_broker
+- **QC-SEAO:ocds-ec9k95-20158859** · CANADA - QUEBEC · p=59.0 · deadline=2026-08-17T18:00:00+00:00 · blockers=none · Services d’impression de panneaux pour des campagnes d’information gouvernementale pour les clients de Revenu Québec
+- **US-SAM:d8eff781622b4b378b2e5b73f775f3ee** · USA · p=46.0 · deadline=2026-08-17T22:00:00+00:00 · blockers=none · Northwest District Carpet Replacement
+- **US-SAM:6ddcb39786844495b832a3f3c1b7713a** · USA · p=46.0 · deadline=2026-08-18T15:00:00+00:00 · blockers=none · USCG Charleston Front Gate Repair
+- **US-SAM:01315971b7f34af5a7d8be71a04cc330** · USA · p=46.0 · deadline=2026-08-18T16:00:00+00:00 · blockers=SOLE_SOURCE_OR_OEM,SET_ASIDE_OR_LOCAL_RESTRICTION · 6515--Steris Innowave Ultra Sonic Irrigator
+- **US-SAM:2d26211ce711455992c7ddad3b43d39f** · USA · p=46.0 · deadline=2026-08-19T15:00:00+00:00 · blockers=none · US Coast Guard Air Station Savannah Generator
+- **US-SAM:97d36cf52c0142ffb8c76860c3455515** · USA · p=46.0 · deadline=2026-08-19T15:00:00+00:00 · blockers=none · US Coast Guard Air Station Savannah Generator
+- **US-SAM:59726eb856cc4e89aec2a2493c76d546** · USA · p=46.0 · deadline=2026-08-19T22:00:00+00:00 · blockers=none · Northwest District Carpet Replacement
+- **US-SAM:c22440b8cccf4172b9b51d603c1abd12** · USA · p=46.0 · deadline=2026-08-21T15:00:00+00:00 · blockers=none · US Coast Guard Air Station Savannah Generator
+- **US-SAM:c59c7f62dac44353970c12afa9ce55e0** · USA · p=46.0 · deadline=2026-08-21T15:00:00+00:00 · blockers=none · US Coast Guard Air Station Savannah Generator
+- **US-SAM:db2e0f4aea3c4978910789afc7965cf9** · USA · p=46.0 · deadline=2026-08-21T15:00:00+00:00 · blockers=none · US Coast Guard Air Station Savannah Generator
+- **US-SAM:7d0eabb8413f4024a3f1652737fdeddc** · USA · p=46.0 · deadline=2026-08-22T18:00:00+00:00 · blockers=none · (2) Surgery Registered Nurse service provided to the Pine Ridge Indian Health Service Hospital
+- **US-SAM:daa3bfeb61134e5fa42fa861c5114c50** · USA · p=46.0 · deadline=2026-08-25T20:00:00+00:00 · blockers=none · Z1DA--FY26 NRM OS| SOL| NRM| 646-21-101 UD SPS AHU & RO Upgrade Construction (VA-26-00036217)
+- **US-SAM:a901e8a7202749ef8a4f7e9f0b372669** · USA · p=46.0 · deadline=2026-08-26T15:00:00+00:00 · blockers=none · SERVER ROOM MINI SPLIT REPLACEMENT FOR USCG BASE CHARLESTON
+- **US-SAM:7297117e2b4340c8981376bc5fe086e8** · USA · p=46.0 · deadline=2026-08-28T22:00:00+00:00 · blockers=none · STATION NEAH BAY INSTALL COMPLETE HVAC SYSTEM FOR GYM
+- **US-SAM:8a7b4cf726e54ffd96102e260827569c** · USA · p=46.0 · deadline=2026-08-28T22:00:00+00:00 · blockers=none · Air Station Port Angeles Aboveground Fuel Storage Tank Cleaning and Inspection
+- **US-SAM:e13aa074d87646259699b35715e08fa3** · USA · p=46.0 · deadline=2026-08-31T17:00:00+00:00 · blockers=none · FY 26 Inland Waterway CD Maintenance Dredging
+- **US-SAM:03be296958cb4f66bf5b8aa4ce832c0f** · USA · p=46.0 · deadline=2026-08-31T21:00:00+00:00 · blockers=none · M82 and M82A1 Percussion Primers
+- **US-SAM:29b08f24ff9a450994721be7d4359e52** · USA · p=46.0 · deadline=2026-08-31T21:00:00+00:00 · blockers=none · M82 and M82A1 Percussion Primers
+- **US-SAM:6d3b4ed9e062475abb37a4bbd889a931** · USA · p=46.0 · deadline=2026-08-31T21:00:00+00:00 · blockers=none · M82 and M82A1 Percussion Primers
+- **US-SAM:a2b23f23ef574e1586f522649755f5f7** · USA · p=46.0 · deadline=2026-08-31T21:00:00+00:00 · blockers=none · M82 and M82A1 Percussion Primers
+
+## promo_goods
+- **US-SAM:e497672a9dba403392c8e799921bb095** · USA · p=48.0 · deadline=2026-08-19T16:00:00+00:00 · blockers=none · 189AW Promotional Items
+- **US-SAM:f7b2e6266fd04bb297dccd8c26367f41** · USA · p=48.0 · deadline=2026-08-19T16:00:00+00:00 · blockers=none · 189AW Promotional Items
+- **CA:WS4246767482** · CANADA · p=48.0 · deadline=2026-10-31T18:00:00+00:00 · blockers=none · EN578-191297 Request for Supply Arrangement
+- **TED:564438-2026** · UNKNOWN · p=46.0 · deadline=2026-09-14T10:00:00+00:00 · blockers=none · France – Information and promotion products – PROCUREMENT OF PROMOTIONAL ITEMS AND ELECTRONIC ACCESSORIES AND RELATED ITEMS
+
+## research_surveys
+- **US-SAM:b0006a53c0d54778a4d6841f7cf5eee2** · USA · p=56.0 · deadline=2026-08-28T17:00:00+00:00 · blockers=none · TCG BOSS Equipment and Link-16 Related Products
+- **US-SAM:4a967edf6f0c41679e2a2a6d20410a4e** · USA · p=47.0 · deadline=2026-08-17T03:59:00+00:00 · blockers=SOLE_SOURCE_OR_OEM · Notice of Intent to Sole Source: Federal Mastercam Software License
+- **US-SAM:880c3a9db9434d5988178a4b9b797e24** · USA · p=47.0 · deadline=2026-08-18T18:00:00+00:00 · blockers=SOURCES_SOUGHT_OR_RFI · De-Icing Simulator
+- **US-SAM:dc270dd3a02c43149e4bb39994a9d8b9** · USA · p=47.0 · deadline=2026-08-28T17:00:00+00:00 · blockers=SET_ASIDE_OR_LOCAL_RESTRICTION · Fuel Management Cloud Software & Integration (SaaS) at North Dakota National Guard
+- **US-SAM:991d1eb9836945da9aca9d00105e8293** · USA · p=47.0 · deadline=2026-09-01T14:00:00+00:00 · blockers=SOURCES_SOUGHT_OR_RFI · Sources Sought � Motorola GTR 8000 Land Mobile Radio (LMR) System with OCONUS Installation in Japan
+- **US-SAM:29daee56de8744ffa8bd226a9ad8211b** · USA · p=47.0 · deadline=2026-09-10T00:00:00+00:00 · blockers=SOLE_SOURCE_OR_OEM · eQUIP Software Licenses
+- **US-SAM:f568b8a1118a4e0b80fbf2481e8129d5** · USA · p=47.0 · deadline=2026-09-12T00:00:00+00:00 · blockers=SOLE_SOURCE_OR_OEM · Rail Traffic Controller (RTC) License and Maintenance Plan
+- **US-SAM:34c07dcb9c7641f38bc3a56bf2f92013** · USA · p=46.0 · deadline=2026-08-17T04:00:00+00:00 · blockers=none · 66--HOUSING,INDICATOR
+- **US-SAM:45842a2265f4492b9fdfe2500f04f453** · USA · p=46.0 · deadline=2026-08-17T04:00:00+00:00 · blockers=none · 58--DISPLAY BOARD,RADAR, IN REPAIR/MODIFICATION OF
+- **US-SAM:525a69f38bcf473b8c2ccce322137387** · USA · p=46.0 · deadline=2026-08-17T04:00:00+00:00 · blockers=none · 61--PRIM INPUT CONN BUS
+- **US-SAM:532502d375674754b80444ba4b29780f** · USA · p=46.0 · deadline=2026-08-17T04:00:00+00:00 · blockers=none · 15--AILERON
+- **US-SAM:ea46fa5b16ae4b9698c38747a888612c** · USA · p=46.0 · deadline=2026-08-17T04:00:00+00:00 · blockers=none · 66--GAGE,PRESSURE,DIAL
+- **US-SAM:fee0e81118ff4945a653418b036b187e** · USA · p=46.0 · deadline=2026-08-17T04:00:00+00:00 · blockers=none · 59--HEAT SINK,ELECTRICA
+- **US-SAM:665b0e5ea7794aa78e2bc60b45d19d0b** · USA · p=46.0 · deadline=2026-08-18T15:00:00+00:00 · blockers=none · Syndicated POINT OF SALE (POS) DATA PLATFORM (COS)
+- **US-SAM:46a956af3b2e4fd2ab6e4403e7a230ef** · USA · p=46.0 · deadline=2026-08-18T20:30:00+00:00 · blockers=none · 59--GPS VME (GVRC), IN REPAIR/MODIFICATION OF
+- **US-SAM:6d1893a169e342b984bf42c78c3db008** · USA · p=46.0 · deadline=2026-08-18T20:30:00+00:00 · blockers=none · 66--VENTURI METER, IN REPAIR/MODIFICATION OF
+- **US-SAM:98cb160fcfd7415ab5c4d84350fbe94c** · USA · p=46.0 · deadline=2026-08-18T20:30:00+00:00 · blockers=none · 61--FUSE BLK/EMI A11, IN REPAIR/MODIFICATION OF
+- **US-SAM:bdda7dfff2f34fb7b2531cfc00880d70** · USA · p=46.0 · deadline=2026-08-20T15:00:00+00:00 · blockers=none · Laundry & Linen Service for Los Angeles AFB
+- **US-SAM:7d0eabb8413f4024a3f1652737fdeddc** · USA · p=46.0 · deadline=2026-08-22T18:00:00+00:00 · blockers=none · (2) Surgery Registered Nurse service provided to the Pine Ridge Indian Health Service Hospital
+- **US-SAM:87741a447d254f82ad888d4ea141e067** · USA · p=46.0 · deadline=2026-08-22T21:00:00+00:00 · blockers=SOLE_SOURCE_OR_OEM,SOURCES_SOUGHT_OR_RFI · Mouse Digital Ventilated Cage (DVC) Individually Ventilated Rack System � Pilot Expansion and Software License
+
+## social_marketing
+- **CA:WS5612173135** · CANADA · p=38.0 · deadline=2026-08-24T14:00:00+00:00 · blockers=none · Request for Proposal - Government of Canada Social Media Management Service (SMMS) -
+
+## software_resale
+- **US-SAM:c4eb70101d2b46678c179dbf57070642** · USA · p=64.0 · deadline=2026-08-18T09:00:00+00:00 · blockers=none · Expeditionary Very Low Frequency (ExVLF) Transmitter System
+- **US-SAM:899c87277bfd4d539b21bf3bf5d8e122** · USA · p=64.0 · deadline=2026-08-18T21:00:00+00:00 · blockers=none · Expeditionary Very Low Frequency (ExVLF) Transmitter System
+- **US-SAM:1739402e244d46cbb7458fed7566c269** · USA · p=56.0 · deadline=2026-08-19T07:30:00+00:00 · blockers=none · Scanning Total Station with Extended-Range Wireless
+- **US-SAM:b0006a53c0d54778a4d6841f7cf5eee2** · USA · p=56.0 · deadline=2026-08-28T17:00:00+00:00 · blockers=none · TCG BOSS Equipment and Link-16 Related Products
+- **US-SAM:2e1bfb153fbf3e898a9cbd1b0e255ae2** · USA · p=50.0 · deadline=UNKNOWN · blockers=none · 70--Endgame software subscription renewals
+- **CA:BPM026308/34425** · CANADA · p=48.0 · deadline=2026-08-17T14:00:00+00:00 · blockers=none · Alteryx Designer for Department of National Defence
+- **US-SAM:d45e2a3ef846490a8884880da208860e** · USA · p=48.0 · deadline=2026-08-17T19:00:00+00:00 · blockers=none · PowerScribe Maintenance
+- **US-SAM:40da871d02ca4eda99eb31b8c023e062** · USA · p=48.0 · deadline=2026-08-18T18:00:00+00:00 · blockers=none · Indian Health Service - Cisco Network Equipment and Software Maintenance
+- **US-SAM:74dbef20052548a2a15aa730d8531f0d** · USA · p=48.0 · deadline=2026-08-18T18:00:00+00:00 · blockers=none · Indian Health Service - Cisco Network Equipment and Software Maintenance
+- **US-SAM:8a3cc89ba7fb4ae6bc9fe27404bfe62d** · USA · p=48.0 · deadline=2026-08-18T18:00:00+00:00 · blockers=none · Indian Health Service - Cisco Network Equipment and Software Maintenance
+- **US-SAM:945b07edf5ab4da4a902523aee121e84** · USA · p=48.0 · deadline=2026-08-18T18:00:00+00:00 · blockers=none · Indian Health Service - Cisco Network Equipment and Software Maintenance
+- **US-SAM:e8fb30b0971743949b7616e74b219255** · USA · p=48.0 · deadline=2026-08-18T18:00:00+00:00 · blockers=none · Indian Health Service - Cisco Network Equipment and Software Maintenance
+- **US-SAM:b11ff0bde8974de18f643227fa3b73c5** · USA · p=48.0 · deadline=2026-08-18T23:00:00+00:00 · blockers=none · 5G Cellular Base Station (BRAND NAME Ericsson)
+- **US-SAM:192d177cce134254af5a5055dbfc8424** · USA · p=48.0 · deadline=2026-08-20T00:00:00+00:00 · blockers=none · Oracle Enterprise Software License Maintenance Support - Brand Name Justification
+- **US-SAM:0377f6cba8b74cb78a9b515c8d31e9d4** · USA · p=48.0 · deadline=2026-08-20T16:00:00+00:00 · blockers=none · MATLAB LICENSES/TOOLBOXES
+- **CA:BPM026312/34429** · CANADA · p=48.0 · deadline=2026-08-21T14:00:00+00:00 · blockers=none · R212392 Adobe License Renewal for RCMP
+- **CA:BPM026338/34461** · CANADA · p=48.0 · deadline=2026-08-22T14:00:00+00:00 · blockers=none · Dynatrace – Department of Employment and Social Development
+- **US-SAM:461881533a864d538a707fcf6aa0fbc0** · USA · p=48.0 · deadline=2026-08-27T16:00:00+00:00 · blockers=none · Monarch Software Licenses Renewal
+- **US-SAM:1dd228678c8e4520881937e1a251887a** · USA · p=48.0 · deadline=2026-08-28T22:00:00+00:00 · blockers=none · Battalion Reconnaissance UAS
+- **US-SAM:3f814d8a4b2e487c9e6d01ea0e80ffcf** · USA · p=48.0 · deadline=2026-09-03T00:00:00+00:00 · blockers=none · Navisworks Manage Government Annual Subscription Renewal
+
+## transcription
+- **US-SAM:436724e4b17944fca7f3780b2343e525** · USA · p=38.0 · deadline=2026-08-17T18:00:00+00:00 · blockers=none · R606--RFQ: VISN16-Wide Court Reporting and Transcription - SDVOSB Set-Aside - IDC
+- **US-SAM:b440523eeea948f9977b78e73d6732d6** · USA · p=38.0 · deadline=2026-08-20T18:00:00+00:00 · blockers=none · A1: R606--RFQ: VISN16-Wide Court Reporting and Transcription - SDVOSB Set-Aside - IDC
+- **US-SAM:efb6426f17fa406daab9160c2f8c7ba1** · USA · p=38.0 · deadline=2026-08-20T18:00:00+00:00 · blockers=none · A2: R606--RFQ: VISN16-Wide Court Reporting and Transcription - SDVOSB Set-Aside - IDC
+
+## translation
+- **FR-BOAMP:26-79795** · FRANCE · p=59.0 · deadline=2026-09-25T10:00:00+00:00 · blockers=none · Accord cadre de prestations de traduction et contrôle (relecture et corrections) en différentes langues pour le compte de l'EPMO-VGE
+- **CA:26-106** · CANADA · p=53.0 · deadline=2026-10-02T13:00:00+00:00 · blockers=none · EDC Translation Services
+- **CA:WS5665734815** · CANADA · p=53.0 · deadline=2031-04-29T14:00:00+00:00 · blockers=none · RFSA - Translation Services
+- **TED:561889-2026** · UNKNOWN · p=40.0 · deadline=2026-09-21T22:00:00+00:00 · blockers=none · Sweden – Translation services – Översättnings- och språkgranskningstjänster
+- **US-SAM:dfe85182f54e4ce9a0a05eb49e1eb847** · USA · p=38.0 · deadline=2026-08-20T00:00:00+00:00 · blockers=none · Human Translation Services
+
+## video_media
+- **DK-UDBUD:9f77d7a2-ded8-4142-8a3f-b6cfff72ab6d:01** · DENMARK · p=46.0 · deadline=2026-08-30T21:59:59+00:00 · blockers=none · Media Monitoring System
+
+## web_cms
+- **US-SAM:c4eb70101d2b46678c179dbf57070642** · USA · p=64.0 · deadline=2026-08-18T09:00:00+00:00 · blockers=none · Expeditionary Very Low Frequency (ExVLF) Transmitter System
+- **US-SAM:899c87277bfd4d539b21bf3bf5d8e122** · USA · p=64.0 · deadline=2026-08-18T21:00:00+00:00 · blockers=none · Expeditionary Very Low Frequency (ExVLF) Transmitter System
+- **DE-DOE:4adfbe6f-ebf9-403e-953b-bb7b90ed901f:01** · GERMANY · p=62.0 · deadline=UNKNOWN · blockers=none · Betreuung und Weiterentwicklung Websites
+- **IE:8763289** · IRELAND · p=55.0 · deadline=2026-08-24T16:30:00+00:00 · blockers=none · Provision of Website Design, Development, Hosting, Maintenance and Digital Resource Portal Services – Primary Mathematics Hub
+- **FR-BOAMP:26-80319** · FRANCE · p=54.0 · deadline=2026-09-04T11:00:00+00:00 · blockers=none · Création du nouveau site web de NEOMA BUSINESS SCHOOL avec accompagnement technique
+- **FR-BOAMP:26-80308** · FRANCE · p=54.0 · deadline=2026-10-12T12:00:00+00:00 · blockers=none · Refonte complète du site internet et intranet du Centre Hospitalier d'Erstein
+- **IE:8829345** · IRELAND · p=53.0 · deadline=2026-09-14T11:00:00+00:00 · blockers=none · Provision of a Single Party Framework for the ongoing support, maintenance, and development of YourSpace Portals, associated websites, associated systems and associated services.
+- **IE:8855660** · IRELAND · p=51.0 · deadline=2026-09-18T16:00:00+00:00 · blockers=none · ICT services for the Operation and Maintenance of the Waters of LIFE Web Portal and Smart Phone Application
+- **US-SAM:2e1bfb153fbf3e898a9cbd1b0e255ae2** · USA · p=50.0 · deadline=UNKNOWN · blockers=none · 70--Endgame software subscription renewals
+- **US-SAM:34c07dcb9c7641f38bc3a56bf2f92013** · USA · p=46.0 · deadline=2026-08-17T04:00:00+00:00 · blockers=none · 66--HOUSING,INDICATOR
+- **US-SAM:45842a2265f4492b9fdfe2500f04f453** · USA · p=46.0 · deadline=2026-08-17T04:00:00+00:00 · blockers=none · 58--DISPLAY BOARD,RADAR, IN REPAIR/MODIFICATION OF
+- **US-SAM:525a69f38bcf473b8c2ccce322137387** · USA · p=46.0 · deadline=2026-08-17T04:00:00+00:00 · blockers=none · 61--PRIM INPUT CONN BUS
+- **US-SAM:532502d375674754b80444ba4b29780f** · USA · p=46.0 · deadline=2026-08-17T04:00:00+00:00 · blockers=none · 15--AILERON
+- **US-SAM:ea46fa5b16ae4b9698c38747a888612c** · USA · p=46.0 · deadline=2026-08-17T04:00:00+00:00 · blockers=none · 66--GAGE,PRESSURE,DIAL
+- **US-SAM:fee0e81118ff4945a653418b036b187e** · USA · p=46.0 · deadline=2026-08-17T04:00:00+00:00 · blockers=none · 59--HEAT SINK,ELECTRICA
+- **FI-HILMA:40025** · FINLAND · p=46.0 · deadline=2026-08-17T12:00:00+00:00 · blockers=none · Metsänhoidon suositusten digitaalisen järjestelmän ylläpito ja jatkokehitys
+- **US-SAM:d8eff781622b4b378b2e5b73f775f3ee** · USA · p=46.0 · deadline=2026-08-17T22:00:00+00:00 · blockers=none · Northwest District Carpet Replacement
+- **US-SAM:6ddcb39786844495b832a3f3c1b7713a** · USA · p=46.0 · deadline=2026-08-18T15:00:00+00:00 · blockers=none · USCG Charleston Front Gate Repair
+- **US-SAM:01315971b7f34af5a7d8be71a04cc330** · USA · p=46.0 · deadline=2026-08-18T16:00:00+00:00 · blockers=SOLE_SOURCE_OR_OEM,SET_ASIDE_OR_LOCAL_RESTRICTION · 6515--Steris Innowave Ultra Sonic Irrigator
+- **US-SAM:46a956af3b2e4fd2ab6e4403e7a230ef** · USA · p=46.0 · deadline=2026-08-18T20:30:00+00:00 · blockers=none · 59--GPS VME (GVRC), IN REPAIR/MODIFICATION OF
+
