@@ -1,0 +1,48 @@
+name: Historical Open World Economic Archetypes v4
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - historical_lab/open_world_economic_archetypes_v4.py
+      - .github/workflows/historical-open-world-economic-archetypes-v4.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Download untagged next-wave clusters
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input out
+          gh release download historical-open-world-next-wave-v3 --repo "$GITHUB_REPOSITORY" --pattern untagged_top.jsonl --dir input --clobber
+      - name: Build economic archetype map
+        run: python historical_lab/open_world_economic_archetypes_v4.py --input input/untagged_top.jsonl --out out
+      - name: Persist economic archetypes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-open-world-economic-archetypes-v4
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target main --title 'Historical Open World Economic Archetypes v4' --notes 'Native-code economic routing of previously untagged historical clusters, focused on exposing broker/reseller/local-network candidates. Discovery only.'
+          gh release upload "$TAG" out/summary.json out/REPORT.md out/classified_clusters.csv --repo "$GITHUB_REPOSITORY" --clobber
+          mkdir -p control/historical_open_world_economic_archetypes_v4
+          cp out/summary.json out/REPORT.md control/historical_open_world_economic_archetypes_v4/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_open_world_economic_archetypes_v4/
+          git commit -m 'historical: persist open-world economic archetypes v4' || exit 0
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
