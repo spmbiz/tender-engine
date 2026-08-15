@@ -119,7 +119,7 @@ jobs:
       fail-fast: false
       max-parallel: 15
       matrix:
-        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP, NO_DOFFIN, FI_HILMA, PT_BASE_OPEN, IT_ANAC_DELTA]
+        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP, NO_DOFFIN, FI_HILMA, PT_BASE_OPEN, DK_UDBUD_PUBLIC, IT_ANAC_DELTA]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -146,6 +146,7 @@ jobs:
             NO_DOFFIN) python pipeline/discover_no_doffin.py ;;
             FI_HILMA) python pipeline/discover_fi_hilma_public.py ;;
             PT_BASE_OPEN) python pipeline/discover_pt_base_open.py ;;
+            DK_UDBUD_PUBLIC) python pipeline/discover_dk_udbud_public.py ;;
             IT_ANAC_DELTA) python pipeline/discover_it_anac_delta.py ;;
             *) python pipeline/discover_global_official.py ;;
           esac
