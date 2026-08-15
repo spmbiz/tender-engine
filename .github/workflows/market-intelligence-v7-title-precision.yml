@@ -1,0 +1,128 @@
+name: SPM Market Intelligence v7 Title Precision
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/market-intelligence-v7-title-precision.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: spm-market-intelligence-v7-title-precision
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install DuckDB
+        run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Build high-precision title classifier from v6 engine
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('pipeline/build_market_intelligence_v6_clean.py')
+          s=p.read_text(encoding='utf-8')
+          # Version/report lineage.
+          s=s.replace("VERSION='SPM_MARKET_INTELLIGENCE_V6_CLEAN'", "VERSION='SPM_MARKET_INTELLIGENCE_V7_TITLE_PRECISION'")
+          s=s.replace('# SPM Market Intelligence v6 — Clean lanes', '# SPM Market Intelligence v7 — Title-precision lanes')
+          s=s.replace('Strict semantic reclassification on Global Core v4; frameworks/DPS separated from direct-like metrics.', 'High-precision title-led semantic reclassification on Global Core v4; frameworks/DPS separated from direct-like metrics.')
+          # DuckDB reserved aliases already found during v6 hardening.
+          s=s.replace('{proc} procedure,','{proc} procurement_procedure,')
+          s=s.replace('t.procedure,t.official_url','t.procurement_procedure,t.official_url')
+          s=s.replace('),0) share FROM sx', '),0) supplier_share FROM sx')
+          s=s.replace('max(share)*100', 'max(supplier_share)*100')
+          s=s.replace('sum(share*share)*10000', 'sum(supplier_share*supplier_share)*10000')
+          s=s.replace('share*100 supplier_share_pct', 'supplier_share*100 supplier_share_pct')
+          s=s.replace('EXCLUDE(rn,share)', 'EXCLUDE(rn,supplier_share)')
+          s=s.replace('month(publication_date) month,', 'month(publication_date) publication_month,')
+          s=s.replace("get('month')", "get('publication_month')")
+          # Precision > recall: classify from the procurement title only. Scope text often contains
+          # boilerplate (especially federal Canada), and generic spend/CPV descriptions can leak unrelated concepts.
+          s=s.replace("txt=f\"lower(concat_ws(' ',{title},{scope},{cpvd},{spend}))\"", "txt=f\"lower(coalesce({title},''))\"")
+          # CMS is too ambiguous as a standalone acronym (e.g. physical facilities named CMS).
+          s=s.replace('|\\\\bcms\\\\b','')
+          # German Datenerfassung is often field/scientific data capture, not clerical data entry.
+          s=s.replace('|datenerfassung','')
+          # Translation must not absorb translational medicine / Translationale Onkologie.
+          old="WHEN regexp_matches({txt}, '(traduction|translation|translations|übersetz|uebersetz|traducción|traduccion|traduzione|tłumacz|tlumacz|linguistic translation)')\n          THEN 'Translation'"
+          new="WHEN regexp_matches({txt}, '(traduction|\\\\btranslations?\\\\b|translation services?|übersetz|uebersetz|traducción|traduccion|traduzione|tłumacz|tlumacz|linguistic translation)')\n             AND NOT regexp_matches({txt}, '(translational|translationale|translationell)')\n          THEN 'Translation'"
+          if old not in s:
+              raise SystemExit('translation classifier block not found')
+          s=s.replace(old,new)
+          p.write_text(s,encoding='utf-8')
+          assert "concat_ws(' ',{title},{scope}" not in s
+          assert 'datenerfassung' not in s
+          assert 'translationale' in s
+          PY
+      - name: Download canonical Global Core v4
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p core precision-v7
+          for asset in historical_tenders.parquet awards.parquet award_suppliers.parquet data_quality.json; do
+            gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern "$asset" --dir core --clobber
+          done
+          python - <<'PY'
+          import json
+          q=json.load(open('core/data_quality.json',encoding='utf-8'))
+          assert q.get('status')=='PASS' and q['counts_notice_first']['historical_tenders']==2250547,q
+          PY
+      - name: Run title-precision intelligence over full corpus
+        run: |
+          python pipeline/build_market_intelligence_v6_clean.py \
+            --historical core/historical_tenders.parquet \
+            --awards core/awards.parquet \
+            --award-suppliers core/award_suppliers.parquet \
+            --out precision-v7
+      - name: QA title precision outputs
+        run: |
+          python - <<'PY'
+          import json,csv,re
+          s=json.load(open('precision-v7/clean_summary.json',encoding='utf-8'))
+          assert s['version']=='SPM_MARKET_INTELLIGENCE_V7_TITLE_PRECISION',s['version']
+          assert len(s['top_50'])>=15,len(s['top_50'])
+          # Reject the exact known false-positive archetypes from v5/v6 deep examples.
+          blob=open('precision-v7/REPORT.md',encoding='utf-8').read().casefold()
+          for bad in ['balayage de rues','translationale onkologie','physiotherapy services – collins bay institution','aménagement des sti au sous-sol du cms']:
+              assert bad.casefold() not in blob,bad
+          print(json.dumps({'top10':[x['cohort'] for x in s['top_50'][:10]]},ensure_ascii=False,indent=2,default=str))
+          PY
+      - name: Publish v7 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG='market-intelligence-v7-title-precision'
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title 'SPM Market Intelligence v7 — Title Precision' --notes 'High-precision title-led lean-service reclassification of canonical Global Core v4. Known v5/v6 semantic false positives and federal boilerplate removed; framework/DPS-like opportunities separated from direct-like metrics. Historical derived evidence only.'
+          fi
+          find precision-v7 -maxdepth 1 -type f -print0 | while IFS= read -r -d '' f; do gh release upload "$TAG" "$f" --clobber; done
+      - name: Persist GPT-readable v7 snapshot
+        run: |
+          set -euo pipefail
+          mkdir -p control/market_intelligence_v7
+          cp precision-v7/REPORT.md control/market_intelligence_v7/REPORT.md
+          cp precision-v7/clean_summary.json control/market_intelligence_v7/snapshot.json
+          git checkout -- pipeline/build_market_intelligence_v6_clean.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/market_intelligence_v7/REPORT.md control/market_intelligence_v7/snapshot.json
+          git commit -m 'tenders: persist Market Intelligence v7 title-precision snapshot' || exit 0
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((attempt*3))"
+          done
+          exit 1
