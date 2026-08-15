@@ -1,6 +1,28 @@
 version: 2.1
 
 jobs:
+  connectivity-smoke:
+    docker:
+      - image: cimg/base:stable
+    resource_class: small
+    steps:
+      - checkout
+      - run:
+          name: Verify CircleCI executor and source connectivity
+          command: |
+            set -euo pipefail
+            echo "circle_node=${CIRCLE_NODE_INDEX:-0}/${CIRCLE_NODE_TOTAL:-1}"
+            echo "cpu=$(getconf _NPROCESSORS_ONLN || true)"
+            echo "memory_bytes=$(awk '/MemTotal/{print $2*1024}' /proc/meminfo || true)"
+            curl -fsS --retry 3 --retry-all-errors --connect-timeout 10 https://api.github.com/rate_limit >/tmp/github-rate.json
+            FROM="$(date -u -d '2 days ago' +%Y-%m-%dT%H:%M:%SZ)"
+            TO="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            curl -fsS --retry 4 --retry-all-errors --connect-timeout 10 \
+              "https://www.contractsfinder.service.gov.uk/Published/Notices/OCDS/Search?publishedFrom=${FROM}&publishedTo=${TO}&stages=tender&limit=1" \
+              >/tmp/cf-smoke.json
+            grep -q 'releases' /tmp/cf-smoke.json
+            echo 'CIRCLE_CONNECTIVITY_SMOKE_PASS'
+
   durable-bridge:
     docker:
       - image: cimg/base:stable
@@ -8,22 +30,65 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Verify durable GitHub persistence bridge
+          name: Verify durable GitHub persistence bridge and write permission
           command: |
             set -euo pipefail
             if [ -z "${FLEET_GITHUB_TOKEN:-}" ]; then
               echo 'FLEET_GITHUB_TOKEN is not configured in CircleCI.' >&2
-              echo 'Refusing to fan out 30 harvest workers because CircleCI artifacts are not canonical storage.' >&2
-              echo 'Add a GitHub token with Contents write access to this public repository as FLEET_GITHUB_TOKEN in the CircleCI project environment.' >&2
-              exit 1
+              echo 'Project Settings -> Environment Variables -> Add Variable.' >&2
+              exit 20
             fi
-            echo 'Durable GitHub persistence bridge present.'
+            REPO="${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
+            AUTH="Authorization: Bearer ${FLEET_GITHUB_TOKEN}"
+            CODE="$(curl -sS -o /tmp/repo.json -w '%{http_code}' \
+              -H "$AUTH" -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2022-11-28' \
+              "https://api.github.com/repos/${REPO}")"
+            if [ "$CODE" != '200' ]; then
+              echo "GitHub token cannot read ${REPO}; HTTP ${CODE}" >&2
+              exit 21
+            fi
+            CODE="$(curl -sS -o /tmp/release-probe.json -w '%{http_code}' -X POST \
+              -H "$AUTH" -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2022-11-28' -H 'Content-Type: application/json' \
+              "https://api.github.com/repos/${REPO}/releases" \
+              -d '{"tag_name":"fleet-state","target_commitish":"main","name":"permission-probe"}')"
+            if [ "$CODE" = '422' ] && grep -q 'already_exists' /tmp/release-probe.json; then
+              echo 'FLEET_GITHUB_TOKEN_CONTENTS_WRITE_PASS'
+            else
+              echo "GitHub durable-write permission probe failed; HTTP ${CODE}" >&2
+              cat /tmp/release-probe.json >&2
+              exit 22
+            fi
+
+  worker-smoke:
+    docker:
+      - image: cimg/python:3.12
+    resource_class: medium
+    environment:
+      CIRCLE_IO_WORKERS: "2"
+    steps:
+      - checkout
+      - run:
+          name: Install worker dependency
+          command: python -m pip install --disable-pip-version-check -q requests
+      - run:
+          name: Run two-day durable worker smoke with internal I/O fanout
+          command: >-
+            python pipeline/circleci_contracts_worker.py
+            --index 0
+            --total 1
+            --history-days 2
+            --io-workers "$CIRCLE_IO_WORKERS"
+            --out circle-out/smoke
 
   contracts-finder-shards:
     parallelism: 30
     docker:
       - image: cimg/python:3.12
-    resource_class: small
+    resource_class: medium
+    environment:
+      CIRCLE_IO_WORKERS: "2"
     steps:
       - checkout
       - run:
@@ -36,12 +101,15 @@ jobs:
             --index "$CIRCLE_NODE_INDEX"
             --total "$CIRCLE_NODE_TOTAL"
             --history-days 360
+            --io-workers "$CIRCLE_IO_WORKERS"
             --out "circle-out/shard-$CIRCLE_NODE_INDEX"
 
   aggregate-circle-harvest:
     docker:
       - image: cimg/python:3.12
-    resource_class: small
+    resource_class: medium
+    environment:
+      CIRCLE_AGG_DOWNLOAD_WORKERS: "8"
     steps:
       - checkout
       - run:
@@ -54,13 +122,25 @@ jobs:
 workflows:
   circleci-harvest:
     jobs:
+      - connectivity-smoke:
+          filters:
+            branches:
+              only: circleci-fleet
       - durable-bridge:
+          requires:
+            - connectivity-smoke
+          filters:
+            branches:
+              only: circleci-fleet
+      - worker-smoke:
+          requires:
+            - durable-bridge
           filters:
             branches:
               only: circleci-fleet
       - contracts-finder-shards:
           requires:
-            - durable-bridge
+            - worker-smoke
           filters:
             branches:
               only: circleci-fleet
