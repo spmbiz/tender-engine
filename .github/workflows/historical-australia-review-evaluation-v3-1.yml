@@ -1,0 +1,52 @@
+name: Historical Australia Review Evaluation v3.1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - historical_lab/australia_review_evaluation_precision_v3.py
+      - .github/workflows/historical-australia-review-evaluation-v3-1.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Download canonical AusTender facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          for a in historical_tenders.csv.gz awards.csv.gz; do
+            gh release download tender-normalized-austender-v1 --repo walidgdg1-ai/coldemailtool --pattern "$a" --dir source --clobber
+          done
+      - name: Run corrected review/evaluation v3.1
+        run: python historical_lab/australia_review_evaluation_precision_v3.py --historical source/historical_tenders.csv.gz --awards source/awards.csv.gz --out out
+      - name: Persist isolated branch authority
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-australia-review-evaluation-v3-1
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target main --title 'Historical Australia Review Evaluation v3.1' --notes 'Corrected AusTender semantic review/evaluation decomposition using strict Title + Description evidence. Historical only.'
+          gh release upload "$TAG" out/summary.json out/REPORT.md out/family_risk_summary.csv out/market_matrix.csv out/top_winners.csv out/examples.csv --repo "$GITHUB_REPOSITORY" --clobber
+          mkdir -p control/historical_australia_review_evaluation_v3_1
+          cp out/summary.json out/REPORT.md control/historical_australia_review_evaluation_v3_1/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_australia_review_evaluation_v3_1/
+          git commit -m 'historical: persist Australia review evaluation v3.1' || exit 0
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
