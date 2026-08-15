@@ -25,7 +25,7 @@ def main():
             lines.append('### Representative examples')
             for r in E[k][:12]:
                 bits=[]
-                for c in ('buyer','supplier','title','description_excerpt','award_value','reference_value','native_code','native_subcategory','subcategory','category'):
+                for c in ('buyer','supplier','title','description_excerpt','scope_excerpt','award_value','reference_value','native_code','native_subcategory','main_cpv','cpv_description','subcategory','category','delivery_flag','signal_source','bidder_count','procedure'):
                     if r.get(c):bits.append(f'{c}: {r[c]}')
                 lines.append('- '+' | '.join(bits))
             lines.append('')
@@ -38,7 +38,7 @@ def main():
         if B[k]:
             lines.append('### Top historical buyers')
             for r in B[k][:15]:
-                lines.append(f"- {r.get('buyer','UNKNOWN')} — awards={r.get('awards','')}")
+                lines.append(f"- {r.get('buyer','UNKNOWN')} — awards={r.get('awards') or r.get('records') or ''}")
             lines.append('')
     Path(a.out).write_text('\n'.join(lines),encoding='utf-8')
 if __name__=='__main__':main()
