@@ -1,0 +1,29 @@
+{
+  "version": "SPM_HUNT_SUBNICHES_V1",
+  "generated_at": "2026-08-15T18:45:36.858147+00:00",
+  "source_grain": "GLOBAL_CORE_V4_NOTICE_FIRST",
+  "counts": {
+    "classified_records": 4166,
+    "distinct_tenders": 4166,
+    "sub_niches": 31,
+    "buyers": 2250,
+    "open_or_competitive_rows": 3658,
+    "direct_noncompetitive_rows": 137
+  },
+  "safety": {
+    "historical_only": true,
+    "satisfies_dce_gates": false,
+    "affects_final_verdict": false,
+    "no_fx_mixing": true,
+    "consortium_award_fractionalized": true,
+    "unknown_is_not_zero": true,
+    "title_led_classifier": true
+  },
+  "business_heuristics": {
+    "ai_leverage": "1-5 SPM prior, not observed fact",
+    "subcontractability": "1-5 SPM prior, not observed fact",
+    "delivery_gate_risk": "1-5 SPM prior, higher is harder",
+    "working_capital_risk": "1-5 SPM prior, higher is harder",
+    "spm_hunt_score": "retrieval/business-priority heuristic only"
+  }
+}
