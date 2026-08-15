@@ -8,7 +8,7 @@ import requests
 OUT=Path(os.getenv('DISCOVERY_OUT','discovery/global/PL_BZP'));OUT.mkdir(parents=True,exist_ok=True)
 NOW=datetime.now(timezone.utc);DAYS=max(1,min(30,int(os.getenv('LOOKBACK_DAYS','14'))));MAX_PAGES=max(1,min(100,int(os.getenv('PL_MAX_PAGES','40'))))
 BASE='https://ezamowienia.gov.pl/mo-board/api/v1/notice';READMODEL='https://ezamowienia.gov.pl/mp-readmodels/api'
-S=requests.Session();S.headers.update({'User-Agent':'Tender-Engine/4.9 (+public procurement research)','Accept':'application/json,*/*'})
+S=requests.Session();S.headers.update({'User-Agent':'Tender-Engine/5.0 (+public procurement research)','Accept':'application/json,*/*'})
 def clean(v):return ' '.join(str(v or '').split())
 def pdt(v):
     s=clean(v)
@@ -72,7 +72,7 @@ def main():
             title=clean(val(o,'title','orderName','name','subject')) or (clean(order_obj) if isinstance(order_obj,str) and len(clean(order_obj))>8 else None) or html_text_title(val(o,'htmlBody'))
             if not (object_id or num or title):continue
             pub=pdt(val(o,'publicationDate','publishedDate','publicationDateTime'));deadline=pdt(val(o,'submittingOffersDate','submissionDeadline','offerDeadline','deadline','tenderDeadline'))
-            oid=object_id or num or str(abs(hash((title,str(pub))))
+            oid=object_id or num or str(abs(hash((title,str(pub)))))
             detail=f'https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/{object_id}' if object_id else None;proceeding=extract_proceeding_url(o)
             if not proceeding and desc:
                 m=re.search(r'https?://ezamowienia\.gov\.pl/mp-client/search/list/ocds-[A-Za-z0-9-]+',desc)
