@@ -231,7 +231,7 @@ for portal in (
     'GENERIC_PUBLIC_PAGE','CA_CANADABUYS','QC_SEAO','DE_DOE','FR_BOAMP',
     'NZ_GETS','AU_AUSTENDER','US_SAM','US_SAM_BULK','NL_TENDERNED',
     'NL_TENDERNED_RSS','CH_SIMAP','LV_IUB','NO_DOFFIN','FI_HILMA',
-    'PT_BASE_OPEN','DK_UDBUD_PUBLIC','CZ_ZAKAZKY_GOV'
+    'PT_BASE_OPEN','DK_UDBUD','DK_UDBUD_PUBLIC','CZ_ZAKAZKY_GOV'
 ):
     base.ADAPTERS[portal]=cascade_public_adapter
 for portal in ('PL_EZAMOWIENIA','PL_BZP'):base.ADAPTERS[portal]=adapter_poland
