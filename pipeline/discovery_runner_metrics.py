@@ -10,6 +10,28 @@ from pathlib import Path
 
 import requests
 
+SOURCE_ALIASES = {
+    "DK_UDBUD_PUBLIC": "DK_UDBUD",
+    "NL_TENDERNED_RSS": "NL_TENDERNED",
+    "US_SAM_BULK": "US_SAM",
+    "PL_BZP": "PL_EZAMOWIENIA",
+    "PT_BASE_OPEN": "PT_BASE",
+    "CZ_ZAKAZKY_GOV": "CZ_NIPEZ",
+    "FI_HILMA": "FI_HILMA",
+    "GR_KHMDHS": "GR_KHMDHS",
+    "NO_DOFFIN": "NO_DOFFIN",
+    "CH_SIMAP": "CH_SIMAP",
+    "LV_IUB": "LV_IUB",
+    "FR_BOAMP": "FR_BOAMP",
+    "QC_SEAO": "QC_SEAO",
+    "CA_CANADABUYS": "CA_CANADABUYS",
+    "AU_AUSTENDER": "AU_AUSTENDER",
+    "NZ_GETS": "NZ_GETS",
+    "DE_DOE": "DE_DOE",
+    "ES_PLACSP": "ES_PLACSP",
+    "IT_ANAC_DELTA": "IT_ANAC_DELTA",
+}
+
 
 def parse_ts(value: str | None):
     if not value:
@@ -24,12 +46,13 @@ def family(name: str) -> str:
     n = name.casefold()
     if n == "init-release" or "wide-read" in n:
         return "orchestration"
-    if n.startswith("cf-window"):
+    if n.startswith("cf-window") or n.startswith("cf-delta") or n.startswith("cf-reconcile"):
         return "UK_CONTRACTS_FINDER"
-    if n.startswith("ie-pages"):
+    if n.startswith("ie-pages") or n.startswith("ie-delta-pages") or n.startswith("ie-reconcile-pages"):
         return "IRELAND_ETENDERS"
     if n.startswith("official-"):
-        return name[len("official-"):].upper()
+        raw = name[len("official-"):].upper()
+        return SOURCE_ALIASES.get(raw, raw)
     if "ted-discovery" in n:
         return "TED"
     return name
@@ -47,7 +70,7 @@ def main() -> None:
     headers = {
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "tender-discovery-runner-metrics/1.0",
+        "User-Agent": "tender-discovery-runner-metrics/1.1",
     }
     if token:
         headers["Authorization"] = f"Bearer {token}"
@@ -75,8 +98,6 @@ def main() -> None:
         start = parse_ts(job.get("started_at"))
         end = parse_ts(job.get("completed_at"))
         seconds = max(0.0, (end - start).total_seconds()) if start and end else 0.0
-        # GitHub matrix/orchestration jobs all consume hosted runners, so include
-        # every timed job in the discovery cost denominator.
         runner_seconds += seconds
         conclusion = str(job.get("conclusion") or "")
         if conclusion not in {"success", "skipped", "neutral"}:
@@ -86,7 +107,7 @@ def main() -> None:
         by_family[fam]["runner_seconds"] += seconds
         if conclusion not in {"success", "skipped", "neutral"}:
             by_family[fam]["failures"] += 1
-        timed.append({"name": job.get("name"), "conclusion": conclusion, "runner_seconds": round(seconds, 3)})
+        timed.append({"name": job.get("name"), "family": fam, "conclusion": conclusion, "runner_seconds": round(seconds, 3)})
 
     novelty = json.loads(Path(args.novelty).read_text(encoding="utf-8"))
     new_unique = int(novelty.get("new_vs_previous") or 0)
@@ -103,10 +124,11 @@ def main() -> None:
             "failures": rec["failures"],
             "new_vs_previous": new,
             "new_unique_per_runner_minute": round(new / (sec / 60.0), 6) if sec > 0 else 0.0,
+            "canonical_alias_matched": fam in portal_novelty,
         }
 
     payload = {
-        "contract": "DISCOVERY_RUNNER_EFFICIENCY_V1",
+        "contract": "DISCOVERY_RUNNER_EFFICIENCY_V2",
         "run_id": str(args.run_id),
         "jobs": len(jobs),
         "job_failures": failures,
