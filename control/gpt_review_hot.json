@@ -1,10 +1,10 @@
 {
   "schema": "GPT_REVIEW_HOT_V2",
-  "updated_at": "2026-08-15T23:43:20.720159+00:00",
+  "updated_at": "2026-08-15T23:43:23.176657+00:00",
   "latest_dce_run_id": 31915420132,
-  "latest_shard": 1,
+  "latest_shard": 5,
   "generation_reset": false,
-  "count": 5,
+  "count": 7,
   "items": [
     {
       "candidate_id": "US-SAM:dd7a2050c40345d58e2f604afd4057db",
@@ -435,6 +435,123 @@
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation."
     },
     {
+      "candidate_id": "US-SAM:6b3a049f3e244287829845606afb4e59",
+      "title": "Household Consumer Food Purchase Panel",
+      "buyer": "AGRICULTURE, DEPARTMENT OF",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/workspace/contract/opp/6b3a049f3e244287829845606afb4e59/view",
+      "deadline": "2026-08-18T16:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 50,
+      "priority_score": 50,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-18T16:00:00+00:00",
+        "notice_deadline_date": "2026-08-18",
+        "dce_deadline_candidates": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Never silently overwrite deadline metadata. Deadline candidates come only from authoritative gate-ready DCE text near deadline language; unresolved/multiple/conflicting dates require review before final 90+/FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 6,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "A64\"/><w:rsid w:val=\"00255CDF\"/><w:rsid w:val=\"00256D00\"/><w:rsid w:val=\"00257112\"/><w:rsid w:val=\"0025743F\"/><w:rsid w:val=\"002579C7\"/><w:rsid w:val=\"002608D6\"/><w:rsid w:val=\"00260D31\"/><w:rsid w:val=\"00261EB0\"/><w:rsid w:val=\"0026445D\"/><w:rsid w:val=\"002675DE\"/><w:rsid w:val=\"00267F22\"/><w:rsid w:val=\"00270A82\"/><w:rsid w:val=\"00272764\"/><w:rsid w:val=\"00273969\"/><w:rsid w:val=\"00273E23\"/><w:rsid w:val=\"0027449D\"/><w:rsid w:val=\"00277A3D\"/><w:rsid w:val=\"00281456\"/><w:rsid w:val=\"00282191\"/><w:rsid w:val=\"00283630\"/><w:rsid w:val=\"0028427E\"/><w:rsid w:val=\"00284575\"/><w:rsid w:val=\"0028565B\"/><w:rsid w:val=\"002926DF\"/><w:rsid w:val=\"00295EEA\"/><w:rsid w:val=\"00296B91\"/><w:rsid w:val=\"00297F15\"/><w:rsid w:val=\"002A0B75\"/><w:rsid w:val=\"002A18AA\"/><w:rsid w:val=\"002A4C41\"/><w:rsid w:val=\"002A6628\"/><w:rsid w:val=\"002A6A6F\"/><w:rsid w:val=\"002A7F4E\"/><w:rsid w:val=\"002B249E\"/><w:rsid w:val=\"002B2BD3\"/><w:rsid w:val=\"002B3DF0\"/><w:rsid w:val=\"002B4178\"/><w:rsid w:val=\"002B6BC1\"/><w:rsid w:val=\"002C17E4\"/><w:rsid w:val=\"002C26D7\"/><w:rsid w:val=\"002C3268\"/><w:rsid w:val=\"002C3EB6\"/><w:rsid w:val=\"002C64BD\"/><w:rsid w:val=\"002C6713\"/><w:rsid w:val=\"002C7524\"/><w:rsid w:val=\"002D0979\"/><w:rsid w:val=\"002D2609\"/><w:rsid w:val=\"002D35FC\"/><w:rsid w:val=\"002D4D18\"/><w:rsid w:val=\"002D6263",
+            "source": null
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "/xs:attribute> <xs:attribute ref=\"pc:EntityName\"></xs:attribute> <xs:attribute ref=\"pc:SystemInstanceName\"></xs:attribute> <xs:attribute ref=\"pc:AssociationName\"></xs:attribute> </xs:complexType> </xs:element> <xs:attribute name=\"EntityNamespace\" type=\"xs:string\"></xs:attribute> <xs:attribute name=\"EntityName\" type=\"xs:string\"></xs:attribute> <xs:attribute name=\"SystemInstanceName\" type=\"xs:string\"></xs:attribute> <xs:attribute name=\"AssociationName\" type=\"xs:string\"></xs:attribute> <xs:element name=\"BDCEntity\"> <xs:complexType> <xs:sequence> <xs:element ref=\"pc:EntityDisplayName\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityInstanceReference\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId1\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId2\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId3\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId4\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId5\" minOccurs=\"0\"></xs:element> </xs:sequence> </xs:complexType> </xs:element> <xs:element name=\"EntityDisplayName\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityInstanceReference\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId1\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId2\" type=\"xs:string\"></xs:element> <xs:element name",
+            "source": null
+          },
+          {
+            "text": "ibute> <xs:element name=\"BDCEntity\"> <xs:complexType> <xs:sequence> <xs:element ref=\"pc:EntityDisplayName\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityInstanceReference\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId1\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId2\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId3\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId4\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId5\" minOccurs=\"0\"></xs:element> </xs:sequence> </xs:complexType> </xs:element> <xs:element name=\"EntityDisplayName\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityInstanceReference\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId1\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId2\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId3\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId4\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId5\" type=\"xs:string\"></xs:element> <xs:element name=\"Terms\"> <xs:complexType> <xs:sequence> <xs:element ref=\"pc:TermInfo\" minOccurs=\"0\" maxOccurs=\"unbounded\"></xs:element> </xs:sequence> </xs:complexType> </xs:element> <xs:element name=\"TermInfo\"> <xs:complexType> <xs:sequence> <xs:element ref=\"pc:TermName\" minOccurs=\"0\"></xs:element> <xs:element ref",
+            "source": null
+          },
+          {
+            "text": ":rPr><w:bCs/></w:rPr><w:t>As needed</w:t></w:r></w:p></w:tc></w:tr></w:tbl><w:p w14:paraId=\"65D8D230\" w14:textId=\"77777777\" w:rsidR=\"00A97F6B\" w:rsidRPr=\"00FB50BB\" w:rsidRDefault=\"00A97F6B\" w:rsidP=\"00506CF0\"><w:pPr><w:pStyle w:val=\"BodyText\"/><w:ind w:right=\"40\"/><w:rPr><w:bCs/><w:szCs w:val=\"44\"/></w:rPr></w:pPr></w:p><w:p w14:paraId=\"1F123546\" w14:textId=\"77777777\" w:rsidR=\"00A97F6B\" w:rsidRPr=\"00FB50BB\" w:rsidRDefault=\"00A97F6B\" w:rsidP=\"00506CF0\"><w:pPr><w:pStyle w:val=\"BodyText\"/><w:ind w:right=\"40\"/><w:rPr><w:bCs/><w:szCs w:val=\"44\"/></w:rPr></w:pPr></w:p><w:sectPr w:rsidR=\"00A97F6B\" w:rsidRPr=\"00FB50BB\" w:rsidSect=\"00A61AE1\"><w:headerReference w:type=\"default\" r:id=\"rId11\"/><w:footerReference w:type=\"default\" r:id=\"rId12\"/><w:pgSz w:w=\"12240\" w:h=\"15840\"/><w:pgMar w:top=\"1440\" w:right=\"1440\" w:bottom=\"1440\" w:left=\"1440\" w:header=\"725\" w:footer=\"706\" w:gutter=\"0\"/><w:cols w:space=\"720\"/><w:docGrid w:linePitch=\"299\"/></w:sectPr></w:body></w:document> ===== FILE: files/Attachment_2-_Statement_of_Work_unpacked/word/endnotes.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <w:endnotes xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:cx=\"http://schemas.microsoft.com/office/drawing/2014/chartex\" xmlns:cx1=\"http://schemas.microsoft.co",
+            "source": null
+          }
+        ],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [
+          {
+            "text": "===== FILE: files/Attachment_2-_Statement_of_Work.docx ===== Statement of Work Household Consumer Food Purchase Panel OBJECTIVE: The USDA requires high-quality household consumer food purchase panel data to support current, ongoing, and planned research and data analytics activities. USDA will use the data for projects that support economic and policy research within the realm of USDA’s mission. Use purposes include (but are not limited to): Describing the types and amounts of foods SNAP (Supplemental Nutrition Assistance Program) participants purchase using SNAP benefits and other methods of payment and comparing these households’ purchases against those of other households not participating in SNAP. Estimating the ef",
+            "source": null
+          },
+          {
+            "text": "economists, policy researchers, and survey and data methodologists. Research using the data may be conducted by teams consisting of only USDA staff or a combination of USDA staff and external researchers at academic or non-profit institutions. The resulting aggregated findings (not the raw data) will be disseminated through multiple media, including but not limited to professional academic journals, USDA publications, the USDA website, internal briefings, and presentations at meetings of professional economics or other research associations. Before public release, all publications and reports will be reviewed by USDA to meet data disclosure requirements and to strictly maintain privacy and confidentiality requirements of data purveyors. USDA will also provide a two-week window (ten business days) for data purveyor review of outputs and projects to assess compliance with the data agreement and confidentiality requirements, after which USDA assumes the approval for outputs and projects has been granted and will proceed with the projects and outputs. The USDA will retain the right to use the data and information indefinitely to undertake its projects as specified above. APPROACH: USDA intends to award a contract to an organization (hereafter the “contractor”) to collect household food purchas",
+            "source": null
+          },
+          {
+            "text": "s. Research using the data may be conducted by teams consisting of only USDA staff or a combination of USDA staff and external researchers at academic or non-profit institutions. The resulting aggregated findings (not the raw data) will be disseminated through multiple media, including but not limited to professional academic journals, USDA publications, the USDA website, internal briefings, and presentations at meetings of professional economics or other research associations. Before public release, all publications and reports will be reviewed by USDA to meet data disclosure requirements and to strictly maintain privacy and confidentiality requirements of data purveyors. USDA will also provide a two-week window (ten business days) for data purveyor review of outputs and projects to assess compliance with the data agreement and confidentiality requirements, after which USDA assumes the approval for outputs and projects has been granted and will proceed with the projects and outputs. The USDA will retain the right to use the data and information indefinitely to undertake its projects as specified above. APPROACH: USDA intends to award a contract to an organization (hereafter the “contractor”) to collect household food purchase panel data, deliver it to USDA, and provide adequate documentati",
+            "source": null
+          }
+        ],
+        "sla_onsite": [],
+        "term_value": [
+          {
+            "text": "outlined in Task 1 is included in Task 2, Tasks 1 and 2 can be met by providing the “full” data outlined in Task 2 with sufficient information to recreate the panel outlined in Task 1. Optional Task 3. The contractor will provide data for the nationally representative consumer panel outlined in Task 1 (and for the full set of respondents outlined in Task 2) on purchases made in other sectors, including: Baby sector. Limited service restaurant sector. The contractor will also provide accompanying documentation and technical assistance for this purchase data. PERIOD OF PERFORMANCE: Estimated 9/15/2026 to 9/14/2031 One Base Year period and four Option Years. DELIVERABLES: Initial data spanning 2019 through September 30, 2026, and initial documentation Data will be delivered no later than November 1, 2026. Data will be delivered in an acceptable format to USDA Technical POC (TPOC) (e.g., parquet files). Documentation will include necessary information to clean and use the data for research purposes (e.g., on data sources, collection procedures, estimation/imputation methods, data dictionary, variable dictionary, data quality, and limitations) and will be delivered in an acceptable format to both the contractor and USDA TPOC (e.g., .docx, .pdf, .xlsx, .json). Periodic data updates and document",
+            "source": null
+          },
+          {
+            "text": "2030 and necessary documentation updates | August 1, 2030 Deliverable 2b: Biannual data spanning July-December 2030 and necessary documentation updates | February 1, 2031 Deliverable 2b: Biannual data spanning January-June 2031 and necessary documentation updates | August 1, 2031 Deliverable 3: Technical assistance | As needed Deliverable 4: Output approval | As needed Deliverable 5: New project approval | As needed ===== FILE: files/Attachment_2-_Statement_of_Work_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/><Override PartName=\"/customXml/itemProps1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXmlProperties+xml\"/><Override PartName=\"/customXml/itemProps2.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXmlProperties+xml\"/><Override PartName=\"/customXml/itemProps3.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXm",
+            "source": null
+          },
+          {
+            "text": "July-December 2030 and necessary documentation updates | February 1, 2031 Deliverable 2b: Biannual data spanning January-June 2031 and necessary documentation updates | August 1, 2031 Deliverable 3: Technical assistance | As needed Deliverable 4: Output approval | As needed Deliverable 5: New project approval | As needed ===== FILE: files/Attachment_2-_Statement_of_Work_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/><Override PartName=\"/customXml/itemProps1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXmlProperties+xml\"/><Override PartName=\"/customXml/itemProps2.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXmlProperties+xml\"/><Override PartName=\"/customXml/itemProps3.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXmlProperties+xml\"/><Override PartName=\"/customXml/itemProps4.xml\" ContentType=\"application/vnd.open",
+            "source": null
+          }
+        ],
+        "award_criteria": [
+          {
+            "text": "===== FILE: files/Attachment_2-_Statement_of_Work.docx ===== Statement of Work Household Consumer Food Purchase Panel OBJECTIVE: The USDA requires high-quality household consumer food purchase panel data to support current, ongoing, and planned research and data analytics activities. USDA will use the data for projects that support economic and policy research within the realm of USDA’s mission. Use purposes include (but are not limited to): Describing the types and amounts of foods SNAP (Supplemental Nutrition Assistance Program) participants purchase using SNAP benefits and other methods of payment and comparing these households’ purchases against those of other households not participating in SNAP. Estimating the effects of various SNAP food restrictions introduced via food restriction waivers (FRWs) on households’ food purchases, food purchase healthfulness, shopping behaviors, and other outcomes. Using machine learning prediction methods to impute SNAP benefit distribution days. Examining item substitutions over the SNAP distribution cycle. Estimating food demand systems to obtain income and price elasticities across different household types (e.g., by SNAP participation status and by income quartile). The data will support research projects on a variety of topics of interest to USDA agencies. The data may be used in combination (or linked to) other data to conduct this re",
+            "source": null
+          },
+          {
+            "text": "ace=\"preserve\">updated </w:t></w:r><w:r w:rsidR=\"00730752\" w:rsidRPr=\"00630689\"><w:t xml:space=\"preserve\">documentation </w:t></w:r><w:r w:rsidR=\"001F7E65\" w:rsidRPr=\"00630689\"><w:t>with subsequent deliveries</w:t></w:r><w:r w:rsidR=\"00730752\" w:rsidRPr=\"00630689\"><w:t>.</w:t></w:r></w:p><w:p w14:paraId=\"5ED32944\" w14:textId=\"09C1CA56\" w:rsidR=\"0024438E\" w:rsidRPr=\"00630689\" w:rsidRDefault=\"005A26C9\" w:rsidP=\"00506CF0\"><w:pPr><w:pStyle w:val=\"BodyText\"/><w:numPr><w:ilvl w:val=\"0\"/><w:numId w:val=\"19\"/></w:numPr><w:ind w:left=\"1080\" w:right=\"40\"/></w:pPr><w:r w:rsidRPr=\"00630689\"><w:t>Documentation will include information on sampling design, weighting methodology, and known sources of measurement error.</w:t></w:r></w:p><w:p w14:paraId=\"317D16F5\" w14:textId=\"12A7CB4C\" w:rsidR=\"005A26C9\" w:rsidRPr=\"00630689\" w:rsidRDefault=\"005A26C9\" w:rsidP=\"00506CF0\"><w:pPr><w:pStyle w:val=\"BodyText\"/><w:numPr><w:ilvl w:val=\"0\"/><w:numId w:val=\"19\"/></w:numPr><w:ind w:left=\"1080\" w:right=\"40\"/></w:pPr><w:r w:rsidRPr=\"00630689\"><w:t>Documentation will include data dictionaries to describe all data and variables received with each delivery.</w:t></w:r></w:p><w:p w14:paraId=\"0AA3868A\" w14:textId=\"77777777\" w:rsidR=\"00204521\" w:rsidRPr=\"00630689\" w:rsidRDefault=\"00204521\" w:rsidP=\"00506CF0\"><w:pPr><w:pStyle",
+            "source": null
+          },
+          {
+            "text": "=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 5\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 6\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 7\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 8\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 9\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Normal Indent\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footnote text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"annotation text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"header\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footer\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"index heading\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"caption\" w:semiHidden=\"1\" w:uiPriority=\"35\" w:unhideWhenUsed=\"1\" w:qFormat=\"1\"/><w:lsdException w:name=\"table of figures\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope address\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope return\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footnote refer",
+            "source": null
+          }
+        ],
+        "forms_signatures": [
+          {
+            "text": "w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Bullet 4\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Bullet 5\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 2\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 3\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 4\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 5\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Title\" w:uiPriority=\"10\" w:qFormat=\"1\"/><w:lsdException w:name=\"Closing\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Signature\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Default Paragraph Font\" w:semiHidden=\"1\" w:uiPriority=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Body Text\" w:semiHidden=\"1\" w:uiPriority=\"1\" w:unhideWhenUsed=\"1\" w:qFormat=\"1\"/><w:lsdException w:name=\"Body Text Indent\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue 2\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue 3\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue 4\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><",
+            "source": null
+          },
+          {
+            "text": ":unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Body Text Indent 3\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Block Text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Hyperlink\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"FollowedHyperlink\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Strong\" w:uiPriority=\"22\" w:qFormat=\"1\"/><w:lsdException w:name=\"Emphasis\" w:uiPriority=\"20\" w:qFormat=\"1\"/><w:lsdException w:name=\"Document Map\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Plain Text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"E-mail Signature\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Top of Form\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Bottom of Form\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Normal (Web)\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Acronym\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Address\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Cite\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Code\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Definition\" w:semiHidden=\"1\" w:unhid",
+            "source": null
+          }
+        ],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 31915420132,
+      "source_shard": 5,
+      "hot_ready_at": "2026-08-15T23:43:21.388746+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation."
+    },
+    {
       "candidate_id": "US-SAM:1d102dc5bd4f4f0ca9da2177083f7152",
       "title": "DFAC Food Service Support - Salina Kansas",
       "buyer": "DEPT OF DEFENSE",
@@ -636,6 +753,62 @@
       "source_dce_run_id": 31915420132,
       "source_shard": 1,
       "hot_ready_at": "2026-08-15T23:43:18.982388+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation."
+    },
+    {
+      "candidate_id": "US-SAM:22bf038429044bf49f6764296dc3f1ce",
+      "title": "Bureau of Engraving and Printing (BEP) Request for Information (RFI) - R&D Hidden Machine-Readable Security Features - FY26",
+      "buyer": "TREASURY, DEPARTMENT OF THE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/workspace/contract/opp/22bf038429044bf49f6764296dc3f1ce/view",
+      "deadline": "2026-11-15T19:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 46,
+      "priority_score": 46,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-11-15T19:00:00+00:00",
+        "notice_deadline_date": "2026-11-15",
+        "dce_deadline_candidates": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Never silently overwrite deadline metadata. Deadline candidates come only from authoritative gate-ready DCE text near deadline language; unresolved/multiple/conflicting dates require review before final 90+/FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 1,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [
+          {
+            "text": "idden machine-readable feature should be: 1. difficult to discover on a banknote even by subject matter experts 2. difficult to elucidate the functionality or detection mechanism of the feature 3. readable by a highly discriminating standalone detection system 4. resistant to simulation or duplication, both in terms of material and response 2 Technologies and/or materials submitted for consideration will be reviewed for inherent and relative effectiveness as a security feature and may be further assessed for compatibility with design and production factors, durability, environmental acceptability, and other processing requirements. For initial screening purposes, interested parties are requested to submit the following items to the BEP R&D technical lead, Chris Dollberg: 1. preliminary samples and 2. a brief technical description to: Bureau of Engraving & Printing Office of the Technology & Development Attn: Chris Dollberg 301 14th Street, SW Washington, D.C. 20228-0001 The Bureau may submit offered technologies to outside technical experts under government contracts for their evaluation subject to the approval of the submitting party. Previously submitted materials or technologies need not be resubmitted. Email responses to this Notice shall b",
+            "source": null
+          }
+        ],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 31915420132,
+      "source_shard": 5,
+      "hot_ready_at": "2026-08-15T23:43:21.388746+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation."
     },
     {
