@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-15T03:04:00+02:00",
+  "updated_at": "2026-08-15T03:17:00+02:00",
   "principles": {
     "official_first": true,
     "no_auth_bypass": true,
@@ -9,23 +9,22 @@
     "status_must_reflect_observed_runtime_not_intent": true
   },
   "sources": [
-    {"id":"EU_TED","jurisdiction":"EU/EEA","status":"LIVE","transport":"API","auth":"none","cadence":"2h controller","notes":"EU-wide backbone; not a substitute for all national below-threshold notices."},
-    {"id":"UK_CONTRACTS_FINDER","jurisdiction":"United Kingdom - England and wider CF coverage","status":"LIVE","transport":"OCDS API","auth":"none","cadence":"2h controller","notes":"30-day incremental live window."},
-    {"id":"IE_ETENDERS","jurisdiction":"Ireland","status":"LIVE","transport":"public web","auth":"none","cadence":"2h controller","notes":"50 current-result pages sharded."},
-
-    {"id":"CA_CANADABUYS","jurisdiction":"Canada federal","status":"TESTING","transport":"official open CSV","auth":"none","cadence":"planned 2h","official":"https://open.canada.ca/data/en/dataset/6abd20d4-7a1c-4b38-baa2-9525d0bb2fd2"},
-    {"id":"QC_SEAO","jurisdiction":"Quebec","status":"TESTING","transport":"official JSON/OCDS open data","auth":"none","cadence":"planned 2h","official":"https://www.donneesquebec.ca/recherche/dataset/systeme-electronique-dappel-doffres-seao"},
-    {"id":"FR_BOAMP","jurisdiction":"France","status":"TESTING","transport":"official Explore API 2.1","auth":"none","cadence":"planned 2h","official":"https://www.boamp.fr/explore/dataset/boamp/api/"},
-    {"id":"DE_DOE","jurisdiction":"Germany","status":"TESTING","transport":"official OpenData API","auth":"none","cadence":"planned 2h","official":"https://oeffentlichevergabe.de/documentation/swagger-ui/opendata/index.html","notes":"National and EU notices; open-data formats include eForms-DE, CSV and OCDS."},
-    {"id":"AU_AUSTENDER","jurisdiction":"Australia federal","status":"TESTING","transport":"official current ATM RSS","auth":"none","cadence":"planned 2h","official":"https://www.tenders.gov.au/public_data/rss/rss.xml"},
-    {"id":"NZ_GETS","jurisdiction":"New Zealand","status":"TESTING","transport":"public current tender pages","auth":"none for listing","cadence":"planned 2h","official":"https://www.gets.govt.nz/ExternalIndex.htm"},
+    {"id":"EU_TED","jurisdiction":"EU/EEA","status":"LIVE","transport":"API","auth":"none","cadence":"controller","notes":"EU-wide backbone; not a substitute for all national below-threshold notices."},
+    {"id":"UK_CONTRACTS_FINDER","jurisdiction":"United Kingdom - England and wider CF coverage","status":"LIVE","transport":"OCDS API","auth":"none","cadence":"controller","notes":"30-day incremental live window."},
+    {"id":"IE_ETENDERS","jurisdiction":"Ireland","status":"LIVE","transport":"public web","auth":"none","cadence":"controller","notes":"50 current-result pages sharded."},
+    {"id":"CA_CANADABUYS","jurisdiction":"Canada federal","status":"LIVE_VALIDATED_2026-08-15","transport":"official open CSV","auth":"none","cadence":"controller","last_smoke_current":846,"official":"https://open.canada.ca/data/en/dataset/6abd20d4-7a1c-4b38-baa2-9525d0bb2fd2"},
+    {"id":"QC_SEAO","jurisdiction":"Quebec","status":"LIVE_VALIDATED_2026-08-15","transport":"official weekly JSON/OCDS open data","auth":"none","cadence":"controller","last_smoke_current":742,"official":"https://www.donneesquebec.ca/recherche/dataset/systeme-electronique-dappel-doffres-seao","notes":"Latest weekly resources selected from filename date because CKAN resource sorting is unreliable."},
+    {"id":"FR_BOAMP","jurisdiction":"France","status":"LIVE_VALIDATED_2026-08-15","transport":"official Explore API 2.1","auth":"none","cadence":"controller","last_smoke_current":1875,"official":"https://www.boamp.fr/explore/dataset/boamp/api/"},
+    {"id":"DE_DOE","jurisdiction":"Germany","status":"LIVE_VALIDATED_2026-08-15","transport":"official daily CSV ZIP OpenData API","auth":"none","cadence":"controller","last_smoke_current":6423,"last_smoke_raw":6503,"official":"https://oeffentlichevergabe.de/documentation/swagger-ui/opendata/index.html","notes":"National daily competition notices parsed from notice/purpose/organisation/submissionTerms/procedure/classification CSV tables."},
+    {"id":"NZ_GETS","jurisdiction":"New Zealand","status":"LIVE_VALIDATED_2026-08-15","transport":"public current tender pages","auth":"none for listing","cadence":"controller","last_smoke_current":281,"official":"https://www.gets.govt.nz/ExternalIndex.htm"},
+    {"id":"AU_AUSTENDER","jurisdiction":"Australia federal","status":"BLOCKED_PUBLIC_403_ON_GITHUB_CLOUD_2026-08-15","transport":"official RSS/public listing","auth":"none","cadence":"disabled until alternate route","official":"https://www.tenders.gov.au/public_data/rss/rss.xml","notes":"Both direct RSS and public listing via system Chrome returned HTTP 403 from GitHub-hosted runner; no bypass attempted."},
 
     {"id":"US_SAM_OPPORTUNITIES","jurisdiction":"United States federal","status":"CREDENTIAL_REQUIRED","transport":"official Opportunities API v2","auth":"SAM_API_KEY","official":"https://open.gsa.gov/api/get-opportunities-public-api/","next_action":"add repository secret SAM_API_KEY then enable matrix source"},
-    {"id":"NL_TENDERNED","jurisdiction":"Netherlands","status":"CREDENTIAL_REQUIRED","transport":"official XML API","auth":"basic username/password issued by TenderNed","official":"https://www.tenderned.nl/info/swagger/","next_action":"request credentials from TenderNed; national RSS/TNS fallback should also be investigated"},
+    {"id":"NL_TENDERNED","jurisdiction":"Netherlands","status":"CREDENTIAL_REQUIRED","transport":"official XML API","auth":"basic username/password issued by TenderNed","official":"https://www.tenderned.nl/info/swagger/","next_action":"request credentials from TenderNed; investigate public national fallback"},
     {"id":"PT_BASE","jurisdiction":"Portugal","status":"CREDENTIAL_REQUIRED","transport":"official Portal BASE REST API","auth":"IMPIC token","official":"https://www.base.gov.pt/APIBase2","next_action":"request Portal BASE API authorization/token; announcements may lag DRE"},
 
     {"id":"ES_PLACSP","jurisdiction":"Spain","status":"NEXT_WAVE","transport":"official machine-readable open datasets","auth":"none","official":"https://contrataciondelestado.es/wps/portal/DatosAbiertos","next_action":"resolve current incremental resource URLs and parser"},
-    {"id":"IT_ANAC_BDNCP","jurisdiction":"Italy","status":"NEXT_WAVE","transport":"official CSV/JSON open data","auth":"none for open datasets","official":"https://www.anticorruzione.it/en/-/portale-dei-dati-aperti-dell-autorita-nazionale-anticorruzione","next_action":"add recent monthly dataset harvester; investigate legal-publicity current feed separately"},
+    {"id":"IT_ANAC_BDNCP","jurisdiction":"Italy","status":"NEXT_WAVE","transport":"official CSV/JSON open data","auth":"none for open datasets","official":"https://www.anticorruzione.it/en/-/portale-dei-dati-aperti-dell-autorita-nazionale-anticorruzione","next_action":"add recent dataset harvester; investigate current legal-publicity feed separately"},
     {"id":"BE_EPROC","jurisdiction":"Belgium","status":"NEXT_WAVE","transport":"national portal","auth":"to verify for machine-readable live feed","next_action":"map public search/export endpoints; retain TED as interim above-threshold coverage"},
     {"id":"CH_SIMAP","jurisdiction":"Switzerland","status":"NEXT_WAVE","transport":"national portal","auth":"to verify","next_action":"map current public feed/API"},
     {"id":"NO_DOFFIN","jurisdiction":"Norway","status":"NEXT_WAVE","transport":"national portal","auth":"to verify","next_action":"map current public feed/API"},
