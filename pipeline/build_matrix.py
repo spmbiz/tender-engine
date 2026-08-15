@@ -7,12 +7,21 @@ import re
 from pathlib import Path
 
 # TED is marked browser-capable because BT-15 can route to a browser-backed downstream portal.
+# National discovery sources are also browser-capable: their public notice pages may expose
+# DCE/document links server-side or only after JS rendering. The worker remains conservative
+# and never bypasses auth/CAPTCHA; it merely follows publicly exposed document routes.
 BROWSER_PORTALS = {
     "TED",
     "IRELAND_ETENDERS",
     "FR_PLACE",
     "LUX_PMP",
     "SCOTLAND_PCS",
+    "CA_CANADABUYS",
+    "QC_SEAO",
+    "DE_DOE",
+    "FR_BOAMP",
+    "NZ_GETS",
+    "AU_AUSTENDER",
 }
 SUPPORTED = BROWSER_PORTALS | {
     "UNGM",
