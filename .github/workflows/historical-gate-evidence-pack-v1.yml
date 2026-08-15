@@ -1,0 +1,61 @@
+name: Historical Gate Evidence Pack v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/extract_historical_gate_evidence_pack.py'
+      - '.github/workflows/historical-gate-evidence-pack-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download deep-review worker output
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          mkdir -p source out
+          gh release download historical-subniche-dce-review-v1 \
+            --pattern 'historical-dce-worker-output.tar.gz' --dir source --clobber
+          tar -xzf source/historical-dce-worker-output.tar.gz -C source
+      - name: Build bounded evidence pack
+        run: python pipeline/extract_historical_gate_evidence_pack.py --root source --out out --per-category 3
+      - name: Validate evidence pack
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,glob,os
+          x=json.load(open('out/index.json',encoding='utf-8'))
+          assert x['contract']=='HISTORICAL_GATE_EVIDENCE_PACK_V1',x
+          assert x['gate_ready_candidates']==17,x
+          assert len(x['subniches'])>=7,x
+          for r in x['subniches']:
+            assert os.path.getsize('out/'+r['file'])>0,r
+          print(json.dumps(x,indent=2,ensure_ascii=False))
+          PY
+      - name: Persist readable evidence pack
+        shell: bash
+        run: |
+          rm -rf control/historical_gate_evidence_pack_v1
+          mkdir -p control/historical_gate_evidence_pack_v1
+          cp out/* control/historical_gate_evidence_pack_v1/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_gate_evidence_pack_v1/
+          git commit -m 'tenders: persist historical DCE gate evidence pack v1' || exit 0
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
