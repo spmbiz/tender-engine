@@ -27,7 +27,7 @@ jobs:
       - name: Python syntax gate
         run: python -m py_compile pipeline/*.py
       - name: Install test dependencies
-        run: python -m pip install --disable-pip-version-check -q pytest pyyaml
+        run: python -m pip install --disable-pip-version-check -q pytest pyyaml requests
       - name: Workflow YAML syntax gate
         shell: bash
         run: |
