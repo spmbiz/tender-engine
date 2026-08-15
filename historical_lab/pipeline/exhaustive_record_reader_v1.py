@@ -15,20 +15,26 @@ def choose(cols: set[str], *names: str) -> str | None:
     """Case-insensitive schema resolver with context-safe canonical aliases.
 
     The three canonical warehouses intentionally retain native-ish field names.
-    Add aliases only for the semantic family requested by the caller so, for
-    example, a missing Buyer_ID can never silently fall back to a tender ID.
+    For procurement identity we prefer `Historical_Tender_ID` whenever present,
+    because that is the cross-grain key shared by canonical historical, award,
+    and supplier-link facts. Native `Tender_ID` remains a fallback/source field.
     """
     m = {c.casefold(): c for c in cols}
-    candidates = list(names)
     folded = {n.casefold() for n in names}
+    candidates: list[str] = []
 
-    # Procurement/tender identity. This branch intentionally keys off Tender_ID
-    # rather than generic Contract_ID because award IDs use a different family.
+    # Canonical procurement/tender identity MUST precede native Tender_ID when
+    # joining normalized historical facts to awards.
     if 'tender_id' in folded or 'procurement_id' in folded:
         candidates += [
-            'Historical_Tender_ID', 'Procurement_Key', 'Source_Contract_ID',
-            'Official_Notice_ID', 'Procurement_Reference', 'US_Contract_Award_Unique_Key',
+            'Historical_Tender_ID', 'Tender_ID', 'Procurement_ID',
+            'Procurement_Key', 'Source_Contract_ID', 'Official_Notice_ID',
+            'Procurement_Reference', 'US_Contract_Award_Unique_Key',
         ]
+        candidates += list(names)
+    else:
+        candidates += list(names)
+
     # Award identity.
     if 'award_id' in folded:
         candidates += ['Linked_Award_ID', 'US_Contract_Award_Unique_Key', 'Source_Contract_ID']
