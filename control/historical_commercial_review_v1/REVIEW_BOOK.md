@@ -1582,3 +1582,320 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - NDIS Quality and Safeguards Commission — 91001605 — value 4871084.23
   - Australian Signals Directorate — 3000121852 — value 2087829.44
   - Australian Signals Directorate — 3000095989 — value 2002468.0
+
+## USASPENDING AWARD-FIRST — 35 reviewable cohorts
+
+### 1. USA · `541512` · igf ot igf igf ot igf other
+- Structure: **98.95** · records **28** · buyers **21** · repeat buyers **4**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **2714571.1475** · median **12382443.295** · p75 **27574110.9725**
+- Median bidders **1.0** · suppliers **26** · top supplier share **7.1%** · shape `MULTI_BUYER_REPEAT_MARKET`
+- Historical examples:
+  - OFC OF ACQUISITION AND GRANTS MGMT — IGF::OT::IGF — value 542812601.7
+  - GSA FAS AAS FEDSIM — IGF::OT::IGF — value 523270857.0
+  - OFC OF ACQUISITION AND GRANTS MGMT — IGF::OT::IGF — value 347850955.0
+
+### 2. USA · `541711` · igf ot igf igf ot igf other
+- Structure: **98.91** · records **23** · buyers **5** · repeat buyers **1**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **3657491.63** · median **18084020.62** · p75 **85834710.50999999**
+- Median bidders **1.0** · suppliers **20** · top supplier share **8.7%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - BARDA - ASPR / DAAPPO / BARDA DCMA — IGF::OT::IGF — value 1385742139.1
+  - BARDA - ASPR / DAAPPO / BARDA DCMA — IGF::OT::IGF — value 695741475.58
+  - BARDA - ASPR / DAAPPO / BARDA DCMA — IGF::OT::IGF — value 236307634.0
+
+### 3. USA · `541330` · igf ot igf igf ot igf other
+- Structure: **98.84** · records **203** · buyers **55** · repeat buyers **22**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **666538.36** · median **3351024.0** · p75 **14496406.5**
+- Median bidders **1.0** · suppliers **100** · top supplier share **9.4%** · shape `MULTI_BUYER_REPEAT_MARKET`
+- Historical examples:
+  - W6QK ACC- DTA — IGF::OT::IGF — value 503438549.81
+  - GSA FAS AAS FEDSIM — IGF::OT::IGF — value 122406035.0
+  - AMSAM-SPK — IGF::OT::IGF — value 119536746.77
+
+### 4. USA · `336413` · big safari big safari other
+- Structure: **98.8** · records **331** · buyers **6** · repeat buyers **4**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **7139849.5649999995** · median **21369369.0** · p75 **38918828.5**
+- Median bidders **1.0** · suppliers **14** · top supplier share **68.9%** · shape `MULTI_BUYER_REPEAT_MARKET`
+- Historical examples:
+  - DCMA AIMO NORTH TX — BIG SAFARI — value 660102935.0
+  - DCMA AIMO NORTH TX — BIG SAFARI — value 310314973.0
+  - FA8620  AFLCMC WIJK    BIG SAFARI — BIG SAFARI — value 285322011.0
+
+### 5. USA · `541715` · sbir phase iii r d sbir phase iii r d other
+- Structure: **98.49** · records **34** · buyers **6** · repeat buyers **3**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **1239092.805** · median **4051469.9450000003** · p75 **13073285.607499998**
+- Median bidders **1.0** · suppliers **19** · top supplier share **14.7%** · shape `MULTI_BUYER_REPEAT_MARKET`
+- Historical examples:
+  - NAVAIR WARFARE CTR AIRCRAFT DIV — SBIR PHASE III R&D — value 23956873.0
+  - NAVAIR WARFARE CTR AIRCRAFT DIV — SBIR PHASE III R&D — value 22461510.0
+  - NAVAL AIR SYSTEMS COMMAND — SBIR PHASE III R&D — value 16260480.0
+
+### 6. USA · `493190` · <n> oconus coco storage services <n> oconus coco storage services other
+- Structure: **98.34** · records **21** · buyers **2** · repeat buyers **1**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **23697761.66** · median **35271585.78** · p75 **66149460.0**
+- Median bidders **1.0** · suppliers **16** · top supplier share **14.3%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - DLA ENERGY — 8509452729!OCONUS COCO STORAGE SERVICES — value 172206114.24
+  - DLA  ENERGY — 8501089683!OCONUS COCO STORAGE SERVICES — value 120611522.62
+  - DLA ENERGY — 8510193948!OCONUS COCO STORAGE SERVICES — value 97591894.16
+
+### 7. USA · `541611` · program management support services program management support services other
+- Structure: **98.31** · records **31** · buyers **14** · repeat buyers **8**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **850889.075** · median **3276980.84** · p75 **20496829.38**
+- Median bidders **1.0** · suppliers **21** · top supplier share **19.4%** · shape `MULTI_BUYER_REPEAT_MARKET`
+- Historical examples:
+  - ACQUISITIONS - AQM MOMENTUM — PROGRAM MANAGEMENT SUPPORT SERVICES — value 226456335.75
+  - DEFENSE HEALTH AGENCY — PROGRAM MANAGEMENT SUPPORT SERVICES — value 50730314.71
+  - SAC FREDERICK (36C10X) — PROGRAM MANAGEMENT SUPPORT SERVICES — value 37282949.68
+
+### 8. USA · `541512` · it support services it support services other
+- Structure: **98.24** · records **18** · buyers **13** · repeat buyers **3**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **3412783.4825** · median **4705483.73** · p75 **10791360.325**
+- Median bidders **1.0** · suppliers **16** · top supplier share **16.7%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - USCIS CONTRACTING OFFICE(ERBUR) — IT SUPPORT SERVICES — value 170769375.3
+  - ACQUISITIONS - AQM MOMENTUM — IT SUPPORT SERVICES — value 92023067.6
+  - USCIS CONTRACTING OFFICE(ERBUR) — IT SUPPORT SERVICES — value 21799528.1
+
+### 9. USA · `541712` · igf ot igf igf ot igf other
+- Structure: **98.15** · records **79** · buyers **38** · repeat buyers **23**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **267008.0** · median **1631123.49** · p75 **7566939.965**
+- Median bidders **1.0** · suppliers **63** · top supplier share **5.1%** · shape `MULTI_BUYER_REPEAT_MARKET`
+- Historical examples:
+  - DCMA MID-ATLANTIC — IGF::OT::IGF — value 79240597.03
+  - NAVAL AIR WARFARE CENTER AIR DIV — IGF::OT::IGF — value 56434144.18
+  - NAVAIR WARFARE CTR AIRCRAFT DIV — "IGF::OT::IGF" — value 46104600.0
+
+### 10. USA · `541330` · engineering services engineering services automation software
+- Structure: **98.03** · records **15** · buyers **5** · repeat buyers **2**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **1811196.095** · median **4900586.12** · p75 **9982703.065000001**
+- Median bidders **1.0** · suppliers **8** · top supplier share **26.7%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - NASA JOHNSON SPACE CENTER — ENGINEERING SERVICES — value 28297135.04
+  - NAVAL AIR WARFARE CENTER — ENGINEERING SERVICES — value 14723466.0
+  - NIWC PACIFIC — ENGINEERING SERVICES — value 11577858.12
+
+### 11. USA · `541330` · big safari big safari other
+- Structure: **98.01** · records **78** · buyers **2** · repeat buyers **1**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **1847667.75** · median **4997110.41** · p75 **12896244.215**
+- Median bidders **1.0** · suppliers **18** · top supplier share **43.6%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - FA8620  AFLCMC WIJK    BIG SAFARI — BIG SAFARI — value 582787192.05
+  - FA8620  AFLCMC WIJK    BIG SAFARI — BIG SAFARI — value 238367409.0
+  - FA8620  AFLCMC WIJK    BIG SAFARI — BIG SAFARI — value 106549656.0
+
+### 12. USA · `541330` · base year labor base year labor other
+- Structure: **98.01** · records **10** · buyers **6** · repeat buyers **2**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **3511376.5075000003** · median **8322957.09** · p75 **14849524.2275**
+- Median bidders **1.0** · suppliers **10** · top supplier share **10.0%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - NAVAL INFORMATION WARFARE SYSTEMS — BASE YEAR LABOR — value 49477626.76
+  - NAVAL SURFACE WARFARE CENTER — BASE YEAR LABOR — value 44173075.62
+  - NAVAL AIR WARFARE CENTER AIR DIV — BASE YEAR-LABOR — value 15514429.43
+
+### 13. USA · `541715` · sbir sttr phase ii r d sbir sttr phase ii r d other
+- Structure: **97.91** · records **45** · buyers **3** · repeat buyers **2**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **1494380.0** · median **1761967.0** · p75 **2228582.0**
+- Median bidders **1.0** · suppliers **41** · top supplier share **6.7%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - MISSILE DEFENSE AGENCY (MDA) — SBIR/STTR PHASE II R&D — value 10024111.0
+  - MISSILE DEFENSE AGENCY (MDA) — SBIR/STTR PHASE II R&D — value 5403042.0
+  - DCMA MID-ATLANTIC (BALTIMORE) — SBIR/STTR PHASE II R&D — value 3999526.0
+
+### 14. USA · `722310` · full food services full food services other
+- Structure: **97.89** · records **13** · buyers **7** · repeat buyers **4**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **355590.0** · median **5708136.7** · p75 **20882765.38**
+- Median bidders **1.0** · suppliers **6** · top supplier share **38.5%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - W6QM MICC-FT JACKSON — FULL FOOD SERVICES — value 66693435.79
+  - FA3010  81 CONS CC — FULL FOOD SERVICES — value 60351476.16
+  - W6QM MICC-FT JACKSON — FULL FOOD SERVICES — value 29068135.85
+
+### 15. USA · `561720` · base custodial services base custodial services other
+- Structure: **97.84** · records **13** · buyers **10** · repeat buyers **3**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **143152.38** · median **3916853.1** · p75 **7452529.75**
+- Median bidders **1.0** · suppliers **9** · top supplier share **23.1%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - FA2860  316 CONS PK — BASE CUSTODIAL SERVICES — value 23990935.56
+  - FA2823  AFTC PZIO — BASE CUSTODIAL SERVICES — value 23708501.39
+  - FA5004  354 CONS PK — BASE CUSTODIAL SERVICES — value 11971862.26
+
+### 16. USA · `541611` · program management support program management support other
+- Structure: **97.78** · records **16** · buyers **13** · repeat buyers **3**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **844428.9575** · median **2515297.29** · p75 **7716262.5375**
+- Median bidders **1.0** · suppliers **16** · top supplier share **6.2%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - DEFENSE HEALTH AGENCY — PROGRAM MANAGEMENT SUPPORT — value 12929051.64
+  - ACQUISITIONS - AQM MOMENTUM — PROGRAM MANAGEMENT SUPPORT — value 12444732.7
+  - DEFENSE HEALTH AGENCY — PROGRAM MANAGEMENT SUPPORT — value 12194429.97
+
+### 17. USA · `541611` · overseas contract overseas contract other
+- Structure: **97.74** · records **8** · buyers **3** · repeat buyers **2**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **285374.955** · median **14312164.14** · p75 **40171066.2875**
+- Median bidders **1.0** · suppliers **5** · top supplier share **25.0%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - USAID M/OAA — OVERSEAS CONTRACT — value 180209994.0
+  - USAID M/OAA — OVERSEAS CONTRACT — value 84517071.98
+  - ACQUISITIONS - AQM MOMENTUM — OVERSEAS CONTRACT — value 25389064.39
+
+### 18. USA · `621910` · ambulance service ambulance service other
+- Structure: **97.72** · records **33** · buyers **9** · repeat buyers **6**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **14035.0** · median **1462606.89** · p75 **2250000.0**
+- Median bidders **1.0** · suppliers **13** · top supplier share **15.2%** · shape `MULTI_BUYER_REPEAT_MARKET`
+- Historical examples:
+  - 241-NETWORK CONTRACT OFFICE 01 (36C241) — AMBULANCE SERVICE — value 10841000.0
+  - 241-NETWORK CONTRACT OFFICE 01 (36C241) — AMBULANCE SERVICE — value 10791000.0
+  - 241-NETWORK CONTRACT OFFICE 01 (36C241) — AMBULANCE SERVICE — value 6267000.0
+
+### 19. USA · `541715` · sbir phase iii research development sbir phase iii research development other
+- Structure: **97.7** · records **38** · buyers **3** · repeat buyers **2**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **818541.04** · median **1497377.0** · p75 **4845911.2675**
+- Median bidders **1.0** · suppliers **31** · top supplier share **7.9%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - NAVAIR WARFARE CTR AIRCRAFT DIV — SBIR PHASE III RESEARCH & DEVELOPMENT — value 45677834.3
+  - NAVAIR WARFARE CTR AIRCRAFT DIV — SBIR PHASE III RESEARCH&DEVELOPMENT — value 23038604.04
+  - NAVAIR WARFARE CTR AIRCRAFT DIV — SBIR PHASE III RESEARCH & DEVELOPMENT — value 20243697.03
+
+### 20. USA · `541715` · sbir phase iii research and development sbir phase iii research and development other
+- Structure: **97.67** · records **16** · buyers **4** · repeat buyers **1**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **1288020.5075** · median **2749475.79** · p75 **8564002.52**
+- Median bidders **1.0** · suppliers **11** · top supplier share **31.2%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - NAVAIR WARFARE CTR AIRCRAFT DIV — SBIR PHASE III RESEARCH AND DEVELOPMENT — value 96308885.2
+  - NAVAIR WARFARE CTR AIRCRAFT DIV — SBIR PHASE III RESEARCH AND DEVELOPMENT — value 23147993.19
+  - NAVAIR WARFARE CTR AIRCRAFT DIV — SBIR PHASE III RESEARCH AND DEVELOPMENT — value 12857665.39
+
+### 21. USA · `334511` · engineering services engineering services other
+- Structure: **97.66** · records **22** · buyers **10** · repeat buyers **4**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **799322.8300000001** · median **1762572.2650000001** · p75 **6785333.2575**
+- Median bidders **1.0** · suppliers **17** · top supplier share **18.2%** · shape `MULTI_BUYER_REPEAT_MARKET`
+- Historical examples:
+  - NAVSEA HQ — ENGINEERING SERVICES — value 51291723.01
+  - NAVSEA HQ — ENGINEERING SERVICES — value 36505843.75
+  - NSWC CRANE — ENGINEERING SERVICES — value 32124556.47
+
+### 22. USA · `623110` · express report nursing home express report nursing home other
+- Structure: **97.64** · records **33** · buyers **3** · repeat buyers **2**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **549932.94** · median **1485465.94** · p75 **2282469.0**
+- Median bidders **1.0** · suppliers **30** · top supplier share **6.1%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - 250-NETWORK CONTRACT OFFICE 10 (36C250) — EXPRESS REPORT: NURSING HOME — value 6534282.13
+  - 250-NETWORK CONTRACT OFFICE 10 (36C250) — EXPRESS REPORT: NURSING HOME — value 4333020.03
+  - 250-NETWORK CONTRACT OFFICE 10 (36C250) — EXPRESS REPORT: NURSING HOME — value 3512236.77
+
+### 23. USA · `334511` · igf ot igf igf ot igf other
+- Structure: **97.64** · records **9** · buyers **6** · repeat buyers **1**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **2248718.13** · median **8457670.28** · p75 **12268995.17**
+- Median bidders **1.0** · suppliers **6** · top supplier share **44.4%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - DCMA GREAT PLAINS — IGF::OT::IGF — value 64625546.05
+  - NAVSEA HQ — IGF:OT::IGF — value 54240498.0
+  - NAVAL AIR WARFARE CENTER AIR DIV — IGF::OT::IGF — value 12268995.17
+
+### 24. USA · `541512` · igf ct igf igf ct igf other
+- Structure: **97.64** · records **7** · buyers **7** · repeat buyers **0**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **5015396.465** · median **14477751.79** · p75 **45930226.755**
+- Median bidders **1.0** · suppliers **6** · top supplier share **28.6%** · shape `RECURRING_NICHE`
+- Historical examples:
+  - IBC ACQ SVCS DIRECTORATE (00004) — IGF::CT::IGF — value 255387273.11
+  - PROGRAM SUPPORT CENTER ACQ MGMT SVC — IGF::CT::IGF — value 65671071.02
+  - IT CONTRACTING DIVISION - PL84 — IGF::CT::IGF — value 26189382.49
+
+### 25. USA · `541990` · support services support services other
+- Structure: **97.63** · records **34** · buyers **8** · repeat buyers **6**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **416998.17999999993** · median **1441965.05** · p75 **2565334.8499999996**
+- Median bidders **1.0** · suppliers **16** · top supplier share **26.5%** · shape `MULTI_BUYER_REPEAT_MARKET`
+- Historical examples:
+  - ARMY MED RES ACQ ACTIVITY — SUPPORT SERVICES — value 18542014.43
+  - CDC OFFICE OF ACQUISITION SERVICES — SUPPORT SERVICES — value 15862069.87
+  - CDC OFFICE OF ACQUISITION SERVICES — SUPPORT SERVICES — value 11942400.7
+
+### 26. USA · `336413` · program management program management other
+- Structure: **97.61** · records **9** · buyers **4** · repeat buyers **2**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **522140.0** · median **5502657.57** · p75 **9635180.32**
+- Median bidders **1.0** · suppliers **6** · top supplier share **22.2%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - NAVAL AIR SYSTEMS COMMAND — PROGRAM MANAGEMENT — value 24448358.25
+  - AMSAM-SPK — PROGRAM MANAGEMENT — value 9853545.12
+  - DCMA RADARS AND SENSORS — PROGRAM MANAGEMENT — value 9635180.32
+
+### 27. USA · `541715` · sbir phase ii r d sbir phase ii r d other
+- Structure: **97.6** · records **17** · buyers **3** · repeat buyers **2**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **1654764.63** · median **2254299.0** · p75 **2529890.26**
+- Median bidders **1.0** · suppliers **16** · top supplier share **11.8%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - NAVAIR WARFARE CTR AIRCRAFT DIV — SBIR PHASE II R&D — value 5771574.7
+  - MISSILE DEFENSE AGENCY (MDA) — SBIR PHASE II R&D — value 3372286.0
+  - NAVAIR WARFARE CTR AIRCRAFT DIV — SBIR PHASE II R&D — value 3218042.98
+
+### 28. USA · `541715` · sbir phase iii sbir phase iii other
+- Structure: **97.6** · records **10** · buyers **7** · repeat buyers **2**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **314920.49** · median **3741458.135** · p75 **9024119.66**
+- Median bidders **1.0** · suppliers **10** · top supplier share **10.0%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - MISSILE DEFENSE AGENCY (MDA) — SBIR PHASE III — value 17307609.0
+  - W6QK ACC-RSA — SBIR PHASE III — value 9711967.0
+  - NAVAIR WARFARE CTR AIRCRAFT DIV — SBIR PHASE III — value 9465492.88
+
+### 29. USA · `541715` · research development research development other
+- Structure: **97.53** · records **12** · buyers **5** · repeat buyers **2**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **783540.0** · median **2572609.0** · p75 **4189693.1325000003**
+- Median bidders **1.0** · suppliers **12** · top supplier share **8.3%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - NAVAIR WARFARE CTR AIRCRAFT DIV — RESEARCH & DEVELOPMENT — value 8051591.0
+  - NAVAIR WARFARE CTR AIRCRAFT DIV — RESEARCH&DEVELOPMENT — value 6341087.52
+  - NAVAIR WARFARE CTR AIRCRAFT DIV — RESEARCH&DEVELOPMENT — value 4683778.53
+
+### 30. USA · `334511` · spares spares other
+- Structure: **97.5** · records **25** · buyers **4** · repeat buyers **1**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **200703.0** · median **1854000.0** · p75 **8091062.53**
+- Median bidders **1.0** · suppliers **12** · top supplier share **48.0%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - DLA AVIATION AT HUNTSVILLE, AL — SPARES — value 60681288.0
+  - DLA AVIATION AT HUNTSVILLE, AL — SPARES — value 57566357.53
+  - DLA AVIATION AT HUNTSVILLE, AL — SPARES — value 52254265.6
+
+### 31. USA · `541611` · acquisition support services acquisition support services other
+- Structure: **97.49** · records **78** · buyers **49** · repeat buyers **16**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **209207.47000000003** · median **906228.6599999999** · p75 **2320141.8825**
+- Median bidders **1.0** · suppliers **47** · top supplier share **23.1%** · shape `MULTI_BUYER_REPEAT_MARKET`
+- Historical examples:
+  - OPERATION SERVICES — ACQUISITION SUPPORT SERVICES — value 73852116.44
+  - DEPT OF COMMERCE NOAA — ACQUISITION SUPPORT SERVICES — value 33069185.22
+  - DEPT OF COMMERCE SSPO — ACQUISITION SUPPORT SERVICES — value 15121002.62
+
+### 32. USA · `541611` · professional support services professional support services other
+- Structure: **97.49** · records **42** · buyers **12** · repeat buyers **8**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **252300.7875** · median **1082059.255** · p75 **2129473.9875000003**
+- Median bidders **1.0** · suppliers **21** · top supplier share **21.4%** · shape `MULTI_BUYER_REPEAT_MARKET`
+- Historical examples:
+  - WASHINGTON HEADQUARTERS SERVICES — PROFESSIONAL SUPPORT SERVICES — value 40819948.0
+  - ACQUISITIONS - AQM MOMENTUM — PROFESSIONAL SUPPORT SERVICES — value 13618155.49
+  - NATIONAL INSTITUTES OF HEALTH NLM — PROFESSIONAL SUPPORT SERVICES — value 10633095.1
+
+### 33. USA · `541511` · labor labor other
+- Structure: **97.48** · records **9** · buyers **8** · repeat buyers **1**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **3481230.42** · median **4055481.24** · p75 **10227467.04**
+- Median bidders **1.0** · suppliers **8** · top supplier share **22.2%** · shape `REPEAT_BUYER_NICHE`
+- Historical examples:
+  - NAVAL INFORMATION WARFARE SYSTEMS — LABOR — value 75635651.38
+  - WASHINGTON HEADQUARTERS SERVICES — LABOR — value 12164892.11
+  - W6QK ACC-APG CONT CT SW SECTOR — LABOR — value 10227467.04
+
+### 34. USA · `611310` · neurosurgery physician services neurosurgery physician services other
+- Structure: **97.47** · records **10** · buyers **7** · repeat buyers **3**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **973016.9324999999** · median **3262140.205** · p75 **6729729.1525**
+- Median bidders **1.0** · suppliers **8** · top supplier share **20.0%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - 248-NETWORK CONTRACT OFFICE 8 (36C248) — NEUROSURGERY PHYSICIAN SERVICES — value 8737900.8
+  - 246-NETWORK CONTRACTING OFFICE 6 (36C246) — NEUROSURGERY PHYSICIAN SERVICES — value 7045367.91
+  - 242-NETWORK CONTRACT OFFICE 02 (36C242) — NEUROSURGERY PHYSICIAN SERVICES — value 6967895.5
+
+### 35. USA · `334511` · engineering and technical services engineering and technical services other
+- Structure: **97.45** · records **18** · buyers **7** · repeat buyers **4**
+- Route `AWARD_FIRST_EVIDENCE` · currency `USD` · p25 **761602.5** · median **1743648.0** · p75 **17046720.23**
+- Median bidders **1.0** · suppliers **7** · top supplier share **27.8%** · shape `MULTI_BUYER_MARKET`
+- Historical examples:
+  - DCMA MID-ATLANTIC — ENGINEERING AND TECHNICAL SERVICES — value 115337642.0
+  - DCMA MID-ATLANTIC — ENGINEERING AND TECHNICAL SERVICES — value 84039505.0
+  - NAVSEA HQ — ENGINEERING AND TECHNICAL SERVICES — value 40776564.0
