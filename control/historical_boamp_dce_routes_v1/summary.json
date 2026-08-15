@@ -1,51 +1,74 @@
 {
   "contract": "HISTORICAL_BOAMP_DCE_ROUTE_RESOLVER_V1",
   "input_boamp_candidates": 36,
-  "resolved_candidates": 0,
+  "resolved_candidates": 19,
   "states": {
-    "API_RECORD_NOT_FOUND": 36
+    "DCE_ROUTE_FOUND": 19,
+    "API_NOTICE_FOUND_NO_DCE_ROUTE": 17
   },
-  "route_domains": {},
-  "probe_states": {},
+  "route_domains": {
+    "www.marches-publics.gouv.fr": 8,
+    "www.marches-publics.info": 7,
+    "www.achatpublic.com": 3,
+    "cnav.achatpublic.com": 2,
+    "nr.aws-achat.info": 2,
+    "marne-chambagri.e-marchespublics.com": 1,
+    "marchespublics-maineetloire.safetender.com": 1,
+    "marchespublics596280.fr": 1,
+    "plateforme.alsacemarchespublics.eu": 1
+  },
+  "probe_states": {
+    "AUTH_REQUIRED": 18,
+    "PUBLIC_PAGE": 7,
+    "TIMEOUT": 1
+  },
   "by_subniche": {
     "FR · Brochure / publication / book printing": {
-      "API_RECORD_NOT_FOUND": 3
+      "DCE_ROUTE_FOUND": 3
     },
     "FR · Communication collateral printing": {
-      "API_RECORD_NOT_FOUND": 3
+      "DCE_ROUTE_FOUND": 2,
+      "API_NOTICE_FOUND_NO_DCE_ROUTE": 1
     },
     "FR · General commercial print production": {
-      "API_RECORD_NOT_FOUND": 3
+      "API_NOTICE_FOUND_NO_DCE_ROUTE": 1,
+      "DCE_ROUTE_FOUND": 2
     },
     "FR · General graphic design": {
-      "API_RECORD_NOT_FOUND": 3
+      "DCE_ROUTE_FOUND": 2,
+      "API_NOTICE_FOUND_NO_DCE_ROUTE": 1
     },
     "FR · Mailing / routing / fulfilment": {
-      "API_RECORD_NOT_FOUND": 3
+      "DCE_ROUTE_FOUND": 1,
+      "API_NOTICE_FOUND_NO_DCE_ROUTE": 2
     },
     "FR · Meeting / debate transcription": {
-      "API_RECORD_NOT_FOUND": 3
+      "API_NOTICE_FOUND_NO_DCE_ROUTE": 2,
+      "DCE_ROUTE_FOUND": 1
     },
     "FR · Municipal/public magazine printing": {
-      "API_RECORD_NOT_FOUND": 3
+      "API_NOTICE_FOUND_NO_DCE_ROUTE": 3
     },
     "FR · Promotional objects / branded goods": {
-      "API_RECORD_NOT_FOUND": 3
+      "DCE_ROUTE_FOUND": 1,
+      "API_NOTICE_FOUND_NO_DCE_ROUTE": 2
     },
     "FR · Publication layout / DTP": {
-      "API_RECORD_NOT_FOUND": 3
+      "API_NOTICE_FOUND_NO_DCE_ROUTE": 3
     },
     "FR · Website maintenance / hosting / support": {
-      "API_RECORD_NOT_FOUND": 3
+      "DCE_ROUTE_FOUND": 3
     },
     "FR · Website redesign / development": {
-      "API_RECORD_NOT_FOUND": 3
+      "API_NOTICE_FOUND_NO_DCE_ROUTE": 1,
+      "DCE_ROUTE_FOUND": 2
     },
     "FR · Written translation": {
-      "API_RECORD_NOT_FOUND": 3
+      "DCE_ROUTE_FOUND": 2,
+      "API_NOTICE_FOUND_NO_DCE_ROUTE": 1
     }
   },
-  "official_api": "https://www.boamp.fr/api/explore/v2.1/catalog/datasets/piamp_qualification_mp/records",
+  "official_api": "https://boamp-datadila.opendatasoft.com/api/explore/v2.1/catalog/datasets/boamp/records",
   "final_verdict_allowed": false,
   "note": "Official BOAMP open-data route resolution only. Downstream access gates are surfaced and never bypassed."
 }
