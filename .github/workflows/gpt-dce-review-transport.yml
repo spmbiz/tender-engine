@@ -6,7 +6,7 @@ on:
       dce_run:
         description: Canonical DCE run ID to transport for GPT review
         required: false
-        default: '31849320928'
+        default: '31855311075'
   push:
     branches: [main]
     paths:
@@ -19,43 +19,67 @@ jobs:
   transport:
     runs-on: ubuntu-latest
     timeout-minutes: 12
-    env:
-      DCE_RUN: ${{ github.event.inputs.dce_run || '31849320928' }}
     steps:
-      - name: Download canonical compact handoffs from durable Release
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - id: resolve
+        name: Resolve canonical DCE run dynamically
+        shell: bash
+        env:
+          INPUT_RUN: ${{ github.event.inputs.dce_run }}
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = 'workflow_dispatch' ] && [[ "${INPUT_RUN:-}" =~ ^[0-9]+$ ]]; then
+            rid="$INPUT_RUN"
+          else
+            rid="$(python - <<'PY'
+          import json,re
+          p='benchmarks/gpt-dce-review-transport-trigger.json'
+          d=json.load(open(p,encoding='utf-8'))
+          s=str(d.get('dce_run') or d.get('source_release') or '')
+          m=re.search(r'(\d{8,})',s)
+          if not m: raise SystemExit('No DCE run id in trigger file')
+          print(m.group(1))
+          PY
+            )"
+          fi
+          echo "dce_run=$rid" >> "$GITHUB_OUTPUT"
+          echo "Resolved DCE run $rid"
+      - name: Download canonical compact aggregate from durable Release
         env:
           GH_TOKEN: ${{ github.token }}
+          DCE_RUN: ${{ steps.resolve.outputs.dce_run }}
         shell: bash
         run: |
           set -euo pipefail
           tag="dce-harvest-${DCE_RUN}"
-          mkdir -p payload/handoffs
-          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern 'handoff-shard-*.tar.gz' --dir payload/handoffs
-          count=$(find payload/handoffs -name 'handoff-shard-*.tar.gz' | wc -l | tr -d ' ')
-          echo "TRANSPORT_SOURCE release=$tag handoffs=$count"
-          test "$count" -gt 0
-      - name: Expand handoffs for direct GPT file review
+          mkdir -p payload/aggregate
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern "dce-deep-review-${DCE_RUN}.tar.gz" --dir payload
+          tar -xzf "payload/dce-deep-review-${DCE_RUN}.tar.gz" -C payload/aggregate
+          rm "payload/dce-deep-review-${DCE_RUN}.tar.gz"
+          test -s payload/aggregate/deep_review_queue.jsonl
+          test -s payload/aggregate/summary.json
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern 'gpt_release_notes.md' --dir payload/aggregate || true
+          echo "TRANSPORT_SOURCE release=$tag rows=$(wc -l < payload/aggregate/deep_review_queue.jsonl)"
+      - name: Validate compact review payload
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p payload/extracted
-          for a in payload/handoffs/handoff-shard-*.tar.gz; do
-            b="$(basename "$a" .tar.gz)"
-            mkdir -p "payload/extracted/$b"
-            tar -xzf "$a" -C "payload/extracted/$b"
-          done
-          manifests=$(find payload/extracted -name manifest.json | wc -l | tr -d ' ')
-          downloaded=$(grep -R '"status": "DOWNLOADED_PUBLIC"' payload/extracted --include=manifest.json | wc -l | tr -d ' ')
-          echo "TRANSPORT_EXPANDED manifests=$manifests downloaded_public=$downloaded"
-          test "$manifests" -eq 128
-      - name: Remove nested transport archives after verified expansion
-        shell: bash
-        run: rm -rf payload/handoffs
-      - name: Upload temporary GPT transport only
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('payload/aggregate')
+          summary=json.loads((root/'summary.json').read_text())
+          rows=sum(1 for _ in (root/'deep_review_queue.jsonl').open())
+          assert rows == int(summary['candidates']), (rows, summary)
+          print(json.dumps(summary, indent=2))
+          PY
+      - name: Upload temporary GPT triage transport
         uses: actions/upload-artifact@v4
         with:
-          name: gpt-dce-review-${{ github.run_id }}
-          path: payload/extracted/
+          name: gpt-dce-review-${{ steps.resolve.outputs.dce_run }}-${{ github.run_id }}
+          path: payload/aggregate/
           retention-days: 1
           compression-level: 9
           if-no-files-found: error
