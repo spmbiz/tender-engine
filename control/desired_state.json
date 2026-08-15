@@ -22,9 +22,10 @@
     "minimum_free_github_slots": 3
   },
   "circleci": {
-    "desired_enabled": true,
-    "max_parallel": 30,
-    "history_days": 360,
+    "desired_enabled": false,
+    "disabled_reason": "account_banned_2026-08-15",
+    "max_parallel": 0,
+    "history_days": 0,
     "refresh_interval_minutes": 1440,
     "trigger_file": "control/circleci_tick.txt",
     "write_bridge_secret": "FLEET_GITHUB_TOKEN"
