@@ -185,6 +185,64 @@ jobs:
         run: |
           archive="discovery-ie-${{ matrix.shard }}.tar.gz";tar -C "discovery/ireland/shard-${{ matrix.shard }}" -czf "$archive" .;gh release upload "$RELEASE_TAG" "$archive" --clobber
 
+  epps-national-discovery:
+    needs: init-release
+    name: official-${{ matrix.source }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - {source: CYPRUS_EPPS, base: 'https://www.eprocurement.gov.cy', prefix: 'CY-EPPS', tz: 'Asia/Nicosia'}
+          - {source: MALTA_EPPS, base: 'https://www.etenders.gov.mt', prefix: 'MT-EPPS', tz: 'Europe/Malta'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4
+      - name: Enumerate public ePPS live registry
+        env:
+          EPPS_SOURCE: ${{ matrix.source }}
+          EPPS_BASE_URL: ${{ matrix.base }}
+          EPPS_ID_PREFIX: ${{ matrix.prefix }}
+          EPPS_TIMEZONE: ${{ matrix.tz }}
+          DISCOVERY_OUT: discovery/global/${{ matrix.source }}
+          DISCOVERY_MODE: ${{ needs.init-release.outputs.mode }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$DISCOVERY_MODE" = reconcile ]; then export PAGE_END=20; else export PAGE_END=5; fi
+          python pipeline/discover_epps_public.py
+      - name: Persist ePPS source durably
+        env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
+        run: |
+          slug="$(echo '${{ matrix.source }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')"
+          archive="discovery-global-${slug}.tar.gz"
+          tar -C "discovery/global/${{ matrix.source }}" -czf "$archive" .
+          gh release upload "$RELEASE_TAG" "$archive" --clobber
+
+  lux-pmp-discovery:
+    needs: init-release
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4
+      - name: Enumerate Luxembourg current opportunities
+        env:
+          DISCOVERY_OUT: discovery/global/LUX_PMP
+          DISCOVERY_MODE: ${{ needs.init-release.outputs.mode }}
+        run: python pipeline/discover_lux_pmp.py
+      - name: Persist Luxembourg source durably
+        env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
+        run: |
+          tar -C discovery/global/LUX_PMP -czf discovery-global-lux-pmp.tar.gz .
+          gh release upload "$RELEASE_TAG" discovery-global-lux-pmp.tar.gz --clobber
+
   global-official-discovery:
     needs: init-release
     name: official-${{ matrix.source }}
@@ -201,7 +259,7 @@ jobs:
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4 playwright
       - name: Syntax gate
-        run: python -m py_compile pipeline/discover_*.py pipeline/dce_worker_v5.py
+        run: python -m py_compile pipeline/discover_*.py pipeline/dce_worker_v6.py
       - name: Harvest official national source with delta/reconcile window
         env:
           DISCOVERY_MODE: ${{ needs.init-release.outputs.mode }}
@@ -242,7 +300,7 @@ jobs:
           slug="$(echo '${{ matrix.source }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')";archive="discovery-global-${slug}.tar.gz";tar -C "discovery/global/${{ matrix.source }}" -czf "$archive" .;gh release upload "$RELEASE_TAG" "$archive" --clobber
 
   wide-read-pack:
-    needs: [init-release, ted-discovery, contracts-finder-discovery, etenders-ireland-delta, etenders-ireland-reconcile, global-official-discovery]
+    needs: [init-release, ted-discovery, contracts-finder-discovery, etenders-ireland-delta, etenders-ireland-reconcile, epps-national-discovery, lux-pmp-discovery, global-official-discovery]
     if: always() && needs.init-release.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -256,7 +314,8 @@ jobs:
           count=0;for archive in release-download/discovery-*.tar.gz; do [ -e "$archive" ] || continue;base="$(basename "$archive" .tar.gz)";mkdir -p "discovery-download/$base";tar -xzf "$archive" -C "discovery-download/$base";count=$((count + 1));done
           echo "source_packs=$count";[ "$count" -ge 2 ]
       - name: Measure configured world-source coverage before claiming worldwide scope
-        run: python pipeline/source_coverage_guard.py --root discovery-download --out merged/source_coverage.json
+        env: {DISCOVERY_MODE: '${{ needs.init-release.outputs.mode }}'}
+        run: python pipeline/source_coverage_guard.py --root discovery-download --out merged/source_coverage.json --mode "$DISCOVERY_MODE"
       - name: Canonical merge and dedupe
         run: python pipeline/merge_discovery.py --root discovery-download --out merged
       - name: Build mandatory GPT wide-read packets
