@@ -7,7 +7,7 @@ They cannot satisfy eligibility, DCE authority, or final verdict gates.
 """
 
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import requests
 
@@ -17,7 +17,6 @@ import fleet_controller as fc
 import historical_market_priors as historical_priors
 from github_api_resilience import install as install_github_resilience
 
-# Install low-call retrying GitHub transport before v4/v3 import and execution.
 install_github_resilience(fc)
 
 EVERGREEN_REPO = "walidgdg1-ai/evergreenleadminer"
@@ -26,10 +25,8 @@ BROKER_ASSET = "global-capacity.json"
 PORTAL_PERFORMANCE_ASSET = "portal-performance.json"
 DEFAULT_MINIMUMS = {"hospitality": 6, "gws": 3}
 DISCOVERY_WORKFLOW = "supergreen-discovery-v2.yml"
+ORPHAN_RECONCILE_INTERVAL_MINUTES = 30
 
-# Historical priors are loaded only from a versioned READY contract. The current
-# file intentionally remains BLOCKED_SOURCE_ACCESS until canonical v3/v4 analytics
-# can be regenerated from the private historical warehouse.
 _HISTORICAL_PRIORS = historical_priors.load()
 _ORIGINAL_RETRIEVAL_SCORE = selector_mod.retrieval_score
 
@@ -89,10 +86,8 @@ def _sibling_missing_headroom(fleet_detail: list[dict]) -> tuple[int, dict]:
     workloads = policy.get("workloads") or {}
     state = _release_asset_json(EVERGREEN_REPO, BROKER_TAG, BROKER_ASSET) or {}
     demand = ((state.get("last_decision") or {}).get("demand") or {})
-
     if not demand:
         demand = {"hospitality": 1, "gws": 0}
-
     active_evergreen = sum(
         int(x.get("active_jobs") or 0)
         for x in fleet_detail
@@ -108,7 +103,6 @@ def _sibling_missing_headroom(fleet_detail: list[dict]) -> tuple[int, dict]:
         need = min(backlog, floor) if enabled and backlog > 0 else 0
         components[name] = {"demand": backlog, "minimum": floor, "target": need}
         target += need
-
     missing = max(0, target - active_evergreen)
     return missing, {
         "at": datetime.now(timezone.utc).isoformat(),
@@ -151,18 +145,12 @@ def _yield_aware_select(records, minimum=34, limit=320, blocked_ids=None, **kwar
         }
     }, separators=(",", ":")))
     return _original_select(
-        records,
-        minimum=minimum,
-        limit=limit,
-        blocked_ids=blocked_ids,
+        records, minimum=minimum, limit=limit, blocked_ids=blocked_ids,
         portal_performance=performance,
     )
 
 
 def _delta_aware_dispatch(workflow: str, inputs: dict | None = None):
-    # Autonomous hourly refreshes are explicitly DELTA. The discovery workflow's
-    # independent daily schedule is the deep RECONCILE safety net, so late/index-
-    # shifted publications remain covered without paying the deep-window cost hourly.
     if workflow == DISCOVERY_WORKFLOW:
         merged = dict(inputs or {})
         merged.setdefault("mode", "delta")
@@ -175,20 +163,24 @@ fc.public_fleet_jobs = _broker_aware_public_fleet_jobs
 fc.select = _yield_aware_select
 fc.dispatch = _delta_aware_dispatch
 
-# Import only after monkey-patching the shared fleet_controller module. v4 delegates
-# execution to v3.main(), which reads fc.public_fleet_jobs / fc.select / fc.dispatch
-# at runtime.
 import fleet_controller_v4 as v4  # noqa: E402,F401
 import fleet_controller_v3 as v3  # noqa: E402
 
-# A durable DCE Release is stronger than mutable controller state. Recover recent
-# single-writer bundles that are no longer the current pending lease before normal
-# reconciliation/selection so they can never be paid for twice.
 _original_reconcile_pending = v3._reconcile_pending
 
 
 def _reconcile_pending_with_orphans(state: dict, actions: list[dict]) -> bool:
-    dce_orphan_reconcile.reconcile(fc, state, actions, recent_limit=20)
+    last = fc.parse_ts(state.get("last_orphan_reconcile_at"))
+    due = last is None or fc.NOW - last >= timedelta(minutes=ORPHAN_RECONCILE_INTERVAL_MINUTES)
+    if due:
+        dce_orphan_reconcile.reconcile(fc, state, actions, recent_limit=20)
+        state["last_orphan_reconcile_at"] = fc.NOW.isoformat()
+    else:
+        actions.append({
+            "type": "dce_orphan_reconcile_skipped_not_due",
+            "last_at": state.get("last_orphan_reconcile_at"),
+            "interval_minutes": ORPHAN_RECONCILE_INTERVAL_MINUTES,
+        })
     return _original_reconcile_pending(state, actions)
 
 
