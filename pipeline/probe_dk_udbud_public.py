@@ -7,14 +7,21 @@ from pathlib import Path
 OUT=Path(os.getenv('DISCOVERY_OUT','discovery/global/DK_UDBUD_PUBLIC'));OUT.mkdir(parents=True,exist_ok=True)
 BASE='https://udbud.dk/'
 SEARCH='https://udbud.dk/soeg?aktuelSide=1&maksElementer=25&sorteringFelt=PUBLIKATION_DATO&sorteringRetning=Desc&formularType=NATIONALE_UDBUD&formularType=EU_UDBUD'
+SEARCH_API='https://udbud.dk/soegning/public/soegeresultat'
 NOW=datetime.now(timezone.utc)
+
+def shape(data):
+    if isinstance(data,dict):
+        return {'type':'dict','keys':list(data.keys())[:100],**{k:len(v) for k,v in data.items() if isinstance(v,list)}}
+    if isinstance(data,list):return {'type':'list','length':len(data)}
+    return {'type':type(data).__name__}
 
 def main():
     chrome=os.getenv('CHROME_BIN') or shutil.which('google-chrome') or shutil.which('google-chrome-stable') or shutil.which('chromium')
     if not chrome:
         s={'source':'DK_UDBUD_PUBLIC','raw_materialized':0,'current_materialized':0,'errors':[{'type':'NO_SYSTEM_CHROME'}]};(OUT/'stats.json').write_text(json.dumps(s,indent=2));raise SystemExit(2)
     from playwright.sync_api import sync_playwright
-    pw=browser=context=page=None;net=[];reqs=[];body='';anchors=[];buttons=[]
+    pw=browser=context=page=None;net=[];reqs=[];samples=[];body='';anchors=[];buttons=[]
     try:
         pw=sync_playwright().start();browser=pw.chromium.launch(headless=True,executable_path=chrome,args=['--no-sandbox']);context=browser.new_context(locale='da-DK');page=context.new_page()
         def req(r):
@@ -31,7 +38,11 @@ def main():
                 ct=(r.headers.get('content-type') or '').lower();u=r.url.lower()
                 if 'json' in ct or any(k in u for k in ('soeg','search','notice','procure','annon','opslag','bekendt')):
                     net.append({'url':r.url,'status':r.status,'method':r.request.method,'content_type':ct})
-            except Exception:pass
+                if r.url.startswith(SEARCH_API) and r.status==200:
+                    data=r.json();raw=json.dumps(data,ensure_ascii=False)
+                    samples.append({'url':r.url,'status':r.status,'shape':shape(data),'data':data if len(raw)<=500000 else None,'data_preview':None if len(raw)<=500000 else raw[:500000]})
+            except Exception as exc:
+                if getattr(r,'url','').startswith(SEARCH_API):samples.append({'url':getattr(r,'url',''),'capture_error':repr(exc)})
         page.on('request',req);page.on('response',resp)
         page.goto(SEARCH,wait_until='domcontentloaded',timeout=60000)
         try:page.wait_for_load_state('networkidle',timeout=18000)
@@ -53,9 +64,10 @@ def main():
     for x in net:
         k=(x['method'],x['url'],x['status'])
         if k not in seen:seen.add(k);network.append(x)
-    tender_links=[a for a in anchors if any(k in str(a.get('href','')).lower() for k in ('udbud/','bekendt','notice','annon','opslag')) and '/soeg' not in str(a.get('href','')).lower()]
-    probe={'source':'DK_UDBUD_PUBLIC','generated_at':NOW.isoformat(),'search_url':SEARCH,'body_preview':body[:30000],'anchors':anchors[:500],'buttons':buttons[:150],'requests':reqs[:500],'network':network[:700],'candidate_link_count':len(tender_links),'candidate_links':tender_links[:250]}
+    tender_links=[a for a in anchors if any(k in str(a.get('href','')).lower() for k in ('detaljevisning','notice','annon','opslag')) and '/soeg' not in str(a.get('href','')).lower()]
+    probe={'source':'DK_UDBUD_PUBLIC','generated_at':NOW.isoformat(),'search_url':SEARCH,'search_api':SEARCH_API,'body_preview':body[:30000],'anchors':anchors[:500],'buttons':buttons[:150],'requests':reqs[:500],'network':network[:700],'public_json_samples':samples[:10],'candidate_link_count':len(tender_links),'candidate_links':tender_links[:250]}
     (OUT/'probe.json').write_text(json.dumps(probe,ensure_ascii=False,indent=2),encoding='utf-8')
-    stats={'source':'DK_UDBUD_PUBLIC','raw_materialized':0,'current_materialized':0,'probe_only':True,'anchor_count':len(anchors),'candidate_link_count':len(tender_links),'network_count':len(network),'api_like_count':sum('/api/' in x['url'].lower() for x in network),'generated_at':NOW.isoformat(),'errors':[],'official_url':BASE,'search_url':SEARCH}
-    (OUT/'stats.json').write_text(json.dumps(stats,indent=2));print(json.dumps(stats,indent=2));print('BODY',body[:18000]);print('REQUESTS',json.dumps(reqs[:200],ensure_ascii=False,indent=2)[:100000]);print('NETWORK',json.dumps(network[:200],ensure_ascii=False,indent=2));print('CANDIDATE_LINKS',json.dumps(tender_links[:120],ensure_ascii=False,indent=2))
+    stats={'source':'DK_UDBUD_PUBLIC','raw_materialized':0,'current_materialized':0,'probe_only':True,'anchor_count':len(anchors),'candidate_link_count':len(tender_links),'network_count':len(network),'api_like_count':sum('/api/' in x['url'].lower() for x in network),'public_json_samples':sum(1 for x in samples if x.get('status')==200),'generated_at':NOW.isoformat(),'errors':[] if any(x.get('status')==200 for x in samples) else [{'type':'NO_PUBLIC_SEARCH_JSON_CAPTURED'}],'official_url':BASE,'search_url':SEARCH,'search_api':SEARCH_API}
+    (OUT/'stats.json').write_text(json.dumps(stats,indent=2));print(json.dumps(stats,indent=2));print('PUBLIC_JSON',json.dumps(samples[:4],ensure_ascii=False,indent=2)[:500000]);print('BODY',body[:8000]);print('REQUESTS',json.dumps(reqs[:80],ensure_ascii=False,indent=2)[:80000])
+    if stats['errors']:raise SystemExit(2)
 if __name__=='__main__':main()
