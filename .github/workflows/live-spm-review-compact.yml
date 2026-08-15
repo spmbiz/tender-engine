@@ -1,0 +1,78 @@
+name: Live SPM Review Compact
+
+on:
+  workflow_run:
+    workflows: ["Live SPM Review Pool v1"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: live-spm-review-compact
+  cancel-in-progress: true
+
+jobs:
+  compact:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Build compact semantic-read pack
+        run: |
+          set -euo pipefail
+          test -s control/live_spm_review_pool_v1/top_review_1000.jsonl
+          python - <<'PY'
+          import json
+          from collections import defaultdict
+          from pathlib import Path
+          src=Path('control/live_spm_review_pool_v1/top_review_1000.jsonl')
+          rows=[]
+          for line in src.read_text(encoding='utf-8').splitlines():
+              if not line.strip(): continue
+              r=json.loads(line)
+              rows.append({
+                'candidate_id':r.get('candidate_id'),'country':r.get('resolved_country') or r.get('country'),
+                'source_family':r.get('source_family'),'buyer':r.get('buyer'),'title':r.get('title'),
+                'deadline_utc':r.get('deadline_utc'),'open_state':r.get('open_state'),
+                'estimated_value':r.get('estimated_value'),'currency':r.get('currency'),
+                'review_priority':r.get('review_priority'),
+                'historical_prior_reasons':r.get('historical_prior_reasons') or [],
+                'lean_ontology_hits':r.get('lean_ontology_hits') or [],
+                'pre_dce_blocker_flags':r.get('pre_dce_blocker_flags') or [],
+                'description_excerpt':str(r.get('description') or '')[:1400],
+                'urls':(r.get('urls') or [])[:3],
+              })
+          top=rows[:300]
+          Path('control/live_spm_review_pool_v1/top_review_compact_300.jsonl').write_text(''.join(json.dumps(r,ensure_ascii=False,separators=(',',':'))+'\n' for r in top),encoding='utf-8')
+          by=defaultdict(list)
+          for r in rows:
+              for lane in r['lean_ontology_hits'] or ['NO_ONTOLOGY']:
+                  if len(by[lane])<20: by[lane].append(r)
+          md=['# Live SPM review — compact lane view','', 'Review-order evidence only. No candidate is GREEN before DCE.','']
+          for lane in sorted(by):
+              md += [f'## {lane}']
+              for r in by[lane]:
+                  flags=','.join(r['pre_dce_blocker_flags']) or 'none'
+                  md.append(f"- **{r['candidate_id']}** · {r['country'] or 'UNKNOWN'} · p={r['review_priority']} · deadline={r['deadline_utc'] or 'UNKNOWN'} · blockers={flags} · {r['title']}")
+              md.append('')
+          Path('control/live_spm_review_pool_v1/TOP_BY_LANE.md').write_text('\n'.join(md)+'\n',encoding='utf-8')
+          print('COMPACT_ROWS',len(top),'LANES',len(by))
+          PY
+      - name: Persist compact pack
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/live_spm_review_pool_v1/top_review_compact_300.jsonl control/live_spm_review_pool_v1/TOP_BY_LANE.md
+          git commit -m 'tenders: persist compact live SPM semantic review pack' || exit 0
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
