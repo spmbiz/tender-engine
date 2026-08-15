@@ -1,0 +1,77 @@
+name: Summarize Exhaustive Native Fields v1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/summarize-native-fields-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Build compact evidence summary
+        run: |
+          python - <<'PY'
+          import csv,json
+          from collections import defaultdict
+          from pathlib import Path
+          root=Path('control/exhaustive_every_record_v1/native_fields')
+          prof=json.load(open(root/'native_field_profiles.json',encoding='utf-8'))
+          comp=list(csv.DictReader(open(root/'native_field_completeness.csv',encoding='utf-8')))
+          cells=list(csv.DictReader(open(root/'native_business_cells.csv',encoding='utf-8')))
+          census=list(csv.DictReader(open(root/'category_subcategory_census.csv',encoding='utf-8')))
+          keys=['Lean_Fit','Automation_Potential','Onsite_Requirement','Minimum_Turnover','References_Required','Required_Certifications','Subcontracting_Status','Award_Criteria','Competition_Type','Procedure_Type','Evidence_Confidence','Source_Grain_Status']
+          lines=['# Exhaustive native-field evidence summary','',f"Rows profiled: **{prof['rows']:,}**",'', '## Field completeness','', '|Field|Coverage|Nonempty|Empty/null|','|---|---:|---:|---:|']
+          for r in comp: lines.append(f"|{r['field']}|{r['coverage_pct']}%|{int(r['nonempty']):,}|{int(r['empty_or_null']):,}|")
+          lines += ['','## Key field value distributions','']
+          for k in keys:
+            vals=prof['profiles'].get(k,[])
+            lines += [f'### {k}']
+            for v in vals[:20]: lines.append(f"- `{v['value']}`: {v['n']:,} ({v['pct']}%)")
+            lines.append('')
+          # Native categories/subcategories with at least 50 rows and strongest one-bid share; preserve source/country.
+          strategic=[]
+          for r in census:
+            try:n=int(r['records']);one=int(r['one_bidder_rows'])
+            except:continue
+            if n<50:continue
+            share=one/n if n else 0
+            r['_n']=n;r['_one']=one;r['_share']=share
+            strategic.append(r)
+          strategic.sort(key=lambda r:(r['_share'],min(r['_n'],1000),r['_n']),reverse=True)
+          lines += ['## Native category/subcategory cells with high observed one-bid share','',
+                    'Historical evidence only; one-bid is meaningful only where the source actually carries official bidder counts.','',
+                    '|Source|Country|Category|Subcategory|N|Buyers|One-bid|Share|Median bidders|Median estimated value|','|---|---|---|---|---:|---:|---:|---:|---:|---:|']
+          for r in strategic[:150]:
+            lines.append(f"|{r['warehouse_source']}|{r['country']}|{r['category']}|{r['subcategory']}|{r['_n']}|{r['buyers']}|{r['_one']}|{100*r['_share']:.1f}%|{r['median_bidders']}|{r['median_estimated_value']}|")
+          # High native lean/automation cells with real volume.
+          high=[]
+          for r in cells:
+            try:n=int(r['records']);lf=float(r['lean_fit']) if r['lean_fit'] not in ('','UNKNOWN') else -1; ap=float(r['automation_potential']) if r['automation_potential'] not in ('','UNKNOWN') else -1
+            except:continue
+            if n>=20 and max(lf,ap)>=70:
+              r['_n']=n;r['_lf']=lf;r['_ap']=ap;high.append(r)
+          high.sort(key=lambda r:(max(r['_lf'],r['_ap']),min(r['_n'],5000),r['_n']),reverse=True)
+          lines += ['','## Highest native lean/automation cells (volume >=20)','',
+                    'These fields are archive-derived priors, not DCE-verified eligibility.','',
+                    '|Source|Country|Category|Subcategory|Lean|Automation|Onsite|N|Buyers|Median bidders|Median estimated value|','|---|---|---|---|---:|---:|---|---:|---:|---:|---:|']
+          for r in high[:200]:
+            lines.append(f"|{r['warehouse_source']}|{r['country']}|{r['category']}|{r['subcategory']}|{r['lean_fit']}|{r['automation_potential']}|{r['onsite_requirement']}|{r['_n']}|{r['buyers']}|{r['median_bidders']}|{r['median_estimated_value']}|")
+          (root/'INSIGHTS.md').write_text('\n'.join(lines),encoding='utf-8')
+          PY
+      - name: Persist summary
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/exhaustive_every_record_v1/native_fields/INSIGHTS.md
+          git commit -m 'tenders: persist native field evidence summary' || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
