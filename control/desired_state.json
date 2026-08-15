@@ -17,24 +17,23 @@
   },
   "dce": {
     "enabled": true,
-    "max_candidates_per_cycle": 320,
+    "max_candidates_per_cycle": 640,
     "minimum_retrieval_priority": 0,
     "minimum_free_github_slots": 3,
     "latency_policy": {
       "goal": "maximize guarded or ChatGPT-ready supergreen candidates per runner-minute: keep a deep ranked DCE reservoir queued, use short route-aware shards, fail fast on blocking routes, and publish each shard before the canonical batch aggregate completes",
-      "target_candidates_per_batch": 320,
+      "target_candidates_per_batch": 640,
       "expected_github_parallel_slots": 20,
       "target_browser_candidates_per_shard": 2,
       "target_http_candidates_per_shard": 8,
       "mode": "deep_queue_streaming_hotpath"
     },
     "benchmark_basis": {
-      "previous_batch_candidates": 313,
-      "previous_batch_gate_ready": 133,
-      "previous_runner_minutes_exact": 76.166667,
-      "previous_useful_per_runner_minute_exact": 1.746171,
-      "baseline_useful_per_runner_minute_exact": 1.084,
-      "decision": "streaming removes the batch-level first-result barrier, so keep a 1000-candidate reservoir to avoid runner starvation; autotune down to 640 only on real useful-yield, shard-health, or rate-limit degradation"
+      "previous_batch_candidates": 320,
+      "previous_batch_gate_ready": 42,
+      "previous_runner_minutes_exact": 22.3,
+      "previous_useful_per_runner_minute_exact": 1.883408,
+      "decision": "autotune_advance_to_640"
     }
   },
   "circleci": {
