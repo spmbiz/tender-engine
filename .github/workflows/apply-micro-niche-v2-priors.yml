@@ -1,0 +1,80 @@
+name: Apply Micro-Niche v2 Historical Priors
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/apply_micro_niche_v2_priors.py'
+      - 'pipeline/historical_market_priors.py'
+      - '.github/workflows/apply-micro-niche-v2-priors.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-micro-niche-v2-priors
+  cancel-in-progress: false
+
+jobs:
+  apply-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply audited v2 prior decisions
+        run: python pipeline/apply_micro_niche_v2_priors.py
+      - name: Validate JSON and loader contract
+        shell: bash
+        run: |
+          python -m json.tool control/historical_market_priors.json >/dev/null
+          python - <<'PY'
+          from pipeline import historical_market_priors as h
+          p=h.load('control/historical_market_priors.json')
+          assert p and p['status']=='READY'
+          assert p.get('micro_niche_precision_v2',{}).get('title_led') is True
+          print('PRIORS_LOAD_PASS', len(p.get('lane_rules') or []))
+          PY
+      - name: Smoke test exact positive and negative priors
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pipeline import historical_market_priors as h
+          p=h.load('control/historical_market_priors.json')
+          cases=[
+            ({'country':'GERMANY','title':'IT-Betreuung - Pflege und Wartung bestehender Webseite'},5,'Germany web support'),
+            ({'country':'FRANCE','title':'Prestations de retranscription des débats et réunions'},4,'France transcription'),
+            ({'country':'CANADA - QUEBEC','title':"Services d'impression de brochures et publications"},5,'Quebec print broker'),
+            ({'country':'CANADA','title':'Professional Translation Services'},3,'Canada translation'),
+            ({'country':'FRANCE','title':'Refonte du site internet de la ville'},4,'France web redesign'),
+            ({'country':'IRELAND','title':'Provision of Archaeological Survey Services'},0,'Ireland survey HOLD'),
+            ({'country':'GERMANY','title':'Primary care physician services','description':'website hosting and maintenance'},0,'scope contamination blocked'),
+            ({'country':'UNITED KINGDOM','title':'Supply of Military Dog Food','scope_summary':'website redesign and development'},0,'UK scope contamination blocked'),
+            ({'country':'FRANCE','title':"Location et maintenance d'un copieur pour le service impression"},0,'print equipment blocked'),
+            ({'country':'FRANCE','title':'Location de matériels audiovisuels de traduction simultanée'},0,'translation equipment blocked'),
+          ]
+          for rec,expected,label in cases:
+            got,reasons=h.adjustment(rec,p)
+            print(label,got,reasons)
+            assert got==expected,(label,got,expected,reasons)
+          print('MICRO_NICHE_V2_PRIOR_SMOKE_PASS')
+          PY
+      - name: Persist verified prior contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_market_priors.json
+          git commit -m 'tenders: activate audited micro-niche v2 historical priors' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
