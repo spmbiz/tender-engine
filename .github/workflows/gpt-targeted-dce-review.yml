@@ -1,0 +1,105 @@
+name: GPT Targeted DCE Review
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'benchmarks/gpt-targeted-dce-review-trigger.json'
+
+permissions:
+  contents: read
+
+jobs:
+  transport:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Resolve requested candidate packs
+        id: resolve
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('benchmarks/gpt-targeted-dce-review-trigger.json')
+          d=json.loads(p.read_text(encoding='utf-8'))
+          run=str(d.get('dce_run') or '').strip()
+          ids=d.get('candidate_ids') or []
+          if not run.isdigit(): raise SystemExit('Invalid dce_run')
+          if not ids: raise SystemExit('No candidate_ids')
+          Path('/tmp/dce_run').write_text(run)
+          Path('/tmp/candidate_ids').write_text('\n'.join(map(str,ids))+'\n')
+          print(f'dce_run={run} candidates={len(ids)}')
+          PY
+          echo "dce_run=$(cat /tmp/dce_run)" >> "$GITHUB_OUTPUT"
+      - name: Download exact durable candidate packs in parallel
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DCE_RUN: ${{ steps.resolve.outputs.dce_run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="dce-harvest-${DCE_RUN}"
+          mkdir -p payload/packs payload/extracted
+          export tag GH_TOKEN
+          cat /tmp/candidate_ids | xargs -r -P 10 -I{} bash -c '
+            cid="$1"
+            safe="${cid//:/-}"
+            name="candidate-${safe}.tar.gz"
+            gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern "$name" --dir payload/packs
+          ' _ '{}'
+          expected=$(wc -l < /tmp/candidate_ids | tr -d ' ')
+          got=$(find payload/packs -maxdepth 1 -name 'candidate-*.tar.gz' | wc -l | tr -d ' ')
+          echo "TARGET_PACKS expected=$expected got=$got"
+          test "$got" -eq "$expected"
+      - name: Expand packs and build review index
+        shell: bash
+        run: |
+          set -euo pipefail
+          for a in payload/packs/candidate-*.tar.gz; do
+            b="$(basename "$a" .tar.gz)"
+            mkdir -p "payload/extracted/$b"
+            tar -xzf "$a" -C "payload/extracted/$b"
+          done
+          rm -rf payload/packs
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('payload/extracted')
+          rows=[]
+          for m in root.rglob('manifest.json'):
+              try: manifest=json.loads(m.read_text(encoding='utf-8',errors='replace'))
+              except Exception: continue
+              d=m.parent
+              cand={}
+              cp=d/'candidate.json'
+              if cp.exists():
+                  try: cand=json.loads(cp.read_text(encoding='utf-8',errors='replace'))
+                  except Exception: pass
+              rows.append({
+                  'candidate_id': manifest.get('candidate_id'),
+                  'status': manifest.get('status'),
+                  'title': cand.get('title'),
+                  'buyer': cand.get('buyer'),
+                  'deadline': cand.get('deadline'),
+                  'estimated_value': cand.get('estimated_value'),
+                  'currency': cand.get('currency'),
+                  'root': str(d.relative_to(root)),
+                  'corpus_bytes': (d/'corpus.txt').stat().st_size if (d/'corpus.txt').exists() else 0,
+              })
+          (root/'TARGET_INDEX.json').write_text(json.dumps(rows,indent=2,ensure_ascii=False),encoding='utf-8')
+          print(json.dumps(rows,indent=2,ensure_ascii=False))
+          PY
+      - name: Upload temporary targeted GPT review payload
+        uses: actions/upload-artifact@v4
+        with:
+          name: gpt-targeted-dce-${{ steps.resolve.outputs.dce_run }}-${{ github.run_id }}
+          path: payload/extracted/
+          retention-days: 1
+          compression-level: 9
+          if-no-files-found: error
