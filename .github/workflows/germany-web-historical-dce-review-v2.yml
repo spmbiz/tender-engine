@@ -1,0 +1,111 @@
+name: Germany Web Historical DCE Review v2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/dce_worker_v7.py'
+      - '.github/workflows/germany-web-historical-dce-review-v2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --disable-pip-version-check -q duckdb requests pypdf python-docx openpyxl python-pptx 'playwright>=1.46,<2'
+          command -v 7z >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq p7zip-full)
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
+      - name: Download canonical Germany facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out review
+          gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern historical_tenders.parquet --dir source --clobber
+      - name: Build reconstructed official notice queue
+        shell: bash
+        run: |
+          python - <<'PY'
+          import duckdb,json,hashlib,re
+          from pathlib import Path
+          p='source/historical_tenders.parquet'; con=duckdb.connect()
+          rows=con.execute(r'''SELECT Historical_Tender_ID,Buyer_Name,Title,Publication_Date,Official_Notice_ID
+            FROM read_parquet(?)
+            WHERE lower(cast(Warehouse_Source as varchar))='germany'
+              AND Official_Notice_ID IS NOT NULL AND trim(cast(Official_Notice_ID as varchar))<>''
+              AND (
+                regexp_matches(lower(cast(Title as varchar)), '(website|webseite|internetauftritt|webauftritt).{0,90}(pflege|wartung|betreuung|support|hosting|betrieb)')
+                OR regexp_matches(lower(cast(Title as varchar)), '(pflege|wartung|betreuung|support|hosting|betrieb).{0,90}(website|webseite|internetauftritt|webauftritt)')
+                OR regexp_matches(lower(cast(Title as varchar)), '(relaunch|neugestaltung|entwicklung|redesign).{0,90}(website|webseite|internetauftritt|webportal)')
+                OR regexp_matches(lower(cast(Title as varchar)), '(website|webseite|internetauftritt|webportal).{0,90}(relaunch|neugestaltung|entwicklung|redesign)')
+                OR (regexp_matches(lower(cast(Title as varchar)), '(typo3|typo 3|drupal|wordpress)') AND regexp_matches(lower(cast(Title as varchar)), '(website|webseite|support|cms)'))
+              )
+            ORDER BY Publication_Date DESC, Historical_Tender_ID''',[p]).fetchall()
+          chosen=[]; seen=set()
+          for tid,buyer,title,pub,nid in rows:
+            b=(buyer or '').strip().casefold()
+            if b and b in seen: continue
+            if b: seen.add(b)
+            tl=(title or '').lower()
+            if re.search(r'(typo3|typo 3|drupal|wordpress)',tl): niche='DE · TYPO3 / Drupal / WordPress CMS'
+            elif re.search(r'(relaunch|neugestaltung|entwicklung|redesign)',tl): niche='DE · Website relaunch / development'
+            else: niche='DE · Website maintenance / support'
+            url='https://oeffentlichevergabe.de/ui/de/search/details?noticeId='+str(nid).strip()
+            chosen.append({'candidate_id':'de-hist:'+hashlib.sha256(str(tid).encode()).hexdigest()[:18],'historical':True,'historical_sub_niche':niche,'source':'Germany','portal':'DE_DOE','country':'GERMANY','buyer':buyer or '','title':title or '','publication_date':str(pub or ''),'official_notice_id':str(nid),'primary_source_url':url,'notice_url':url,'route':{'detail_url':url},'final_verdict_allowed':False})
+            if len(chosen)>=9: break
+          assert len(chosen)==9,len(chosen)
+          with open('source/germany_queue.jsonl','w',encoding='utf-8') as f:
+            for x in chosen:f.write(json.dumps(x,ensure_ascii=False,separators=(',',':'))+'\n')
+          Path('source/queue_summary.json').write_text(json.dumps({'selected':len(chosen),'candidates':chosen},indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print(json.dumps({'selected':len(chosen),'titles':[x['title'] for x in chosen]},indent=2,ensure_ascii=False))
+          PY
+      - name: Resolve with Germany-aware worker v7
+        shell: bash
+        run: |
+          set -euo pipefail
+          n="$(wc -l < source/germany_queue.jsonl)"
+          seq 1 "$n" | xargs -P 3 -I{} sh -c 'python pipeline/dce_worker_v7.py --queue source/germany_queue.jsonl --line "$1" --out out' _ {}
+      - name: Extract evidence and summarize
+        run: |
+          python pipeline/extract_corpus.py --root out
+          python pipeline/dce_evidence_quality.py --root out
+          python pipeline/extract_gates.py --root out
+          python pipeline/summarize_historical_subniche_dce.py --root out --out review
+          python pipeline/extract_historical_gate_evidence_pack.py --root out --out review/evidence --per-category 3
+      - name: Assert v7 materially improves Germany resolution
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('review/summary.json',encoding='utf-8'))
+          assert s['total_candidates']==9,s
+          assert s['downloaded_candidates']>=1,s
+          print(json.dumps({k:v for k,v in s.items() if k!='subniches'},indent=2,ensure_ascii=False))
+          PY
+      - name: Persist Germany v7 review
+        shell: bash
+        run: |
+          rm -rf control/germany_web_historical_dce_review_v2
+          mkdir -p control/germany_web_historical_dce_review_v2
+          cp source/queue_summary.json control/germany_web_historical_dce_review_v2/queue_summary.json
+          cp review/summary.json control/germany_web_historical_dce_review_v2/summary.json
+          cp review/REPORT.md control/germany_web_historical_dce_review_v2/REPORT.md
+          cp review/candidate_dce_review.jsonl control/germany_web_historical_dce_review_v2/candidate_dce_review.jsonl
+          cp -r review/evidence control/germany_web_historical_dce_review_v2/evidence
+          git config user.name 'github-actions[bot]'; git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/germany_web_historical_dce_review_v2/
+          git commit -m 'tenders: persist Germany web DCE review v2' || exit 0
+          for i in 1 2 3 4 5; do git pull --rebase origin main && git push origin HEAD:main && exit 0; git rebase --abort >/dev/null 2>&1 || true; sleep $((i*3)); done
+          exit 1
