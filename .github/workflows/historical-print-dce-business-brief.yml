@@ -1,0 +1,76 @@
+name: Historical Print DCE Business Brief
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/build_historical_print_dce_brief.py'
+      - '.github/workflows/historical-print-dce-business-brief.yml'
+      - 'control/historical_boamp_dce_review_v2/summary.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-print-dce-business-brief
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Recover latest fail-closed BOAMP DCE worker bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source extracted brief
+          gh release download historical-boamp-dce-review-v2 \
+            --pattern 'historical-boamp-dce-worker-v2.tar.gz' --dir source --clobber
+          test -s source/historical-boamp-dce-worker-v2.tar.gz
+          tar -xzf source/historical-boamp-dce-worker-v2.tar.gz -C extracted
+      - name: Build strict evidence-backed print brief
+        run: python pipeline/build_historical_print_dce_brief.py --root extracted --out brief
+      - name: Validate research contract
+        run: |
+          python - <<'PY'
+          import json,os
+          s=json.load(open('brief/summary.json',encoding='utf-8'))
+          assert s['contract']=='HISTORICAL_PRINT_DCE_BUSINESS_BRIEF_V1',s
+          assert s['final_verdict_allowed'] is False
+          assert os.path.isfile('brief/print_dce_briefs.jsonl')
+          print(json.dumps(s,indent=2,ensure_ascii=False))
+          PY
+      - name: Persist compact print brief
+        run: |
+          set -euo pipefail
+          mkdir -p control/historical_print_dce_business_brief_v1
+          cp brief/summary.json control/historical_print_dce_business_brief_v1/summary.json
+          cp brief/REPORT.md control/historical_print_dce_business_brief_v1/REPORT.md
+          cp brief/print_dce_briefs.jsonl control/historical_print_dce_business_brief_v1/print_dce_briefs.jsonl
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_print_dce_business_brief_v1/
+          git commit -m 'tenders: persist historical print DCE business brief v1' || true
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then break; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            if [ "$i" = 5 ]; then exit 1; fi
+            sleep $((i*3))
+          done
+      - name: Publish durable print brief
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tar -C brief -czf historical-print-dce-business-brief-v1.tar.gz .
+          tag='historical-print-dce-business-brief-v1'
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --target main \
+            --title 'Historical Print DCE Business Brief v1' \
+            --notes 'Strict evidence-backed costing/gate signals from true gate-ready historical print DCEs only. Empty signals remain UNKNOWN.'
+          gh release upload "$tag" historical-print-dce-business-brief-v1.tar.gz brief/summary.json brief/REPORT.md --clobber
