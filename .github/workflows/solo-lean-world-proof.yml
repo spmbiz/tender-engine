@@ -1,0 +1,93 @@
+name: Worldwide SOLO Lean Proof
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_discovery_run:
+        description: Canonical discovery harvest run
+        required: false
+        default: '31893737133'
+      select:
+        description: Candidate count for DCE proof
+        required: false
+        default: '80'
+  push:
+    branches: [main]
+    paths: ['control/solo_lean_world_trigger.json']
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  select-and-dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - id: cfg
+        shell: bash
+        run: |
+          if [ '${{ github.event_name }}' = 'workflow_dispatch' ]; then
+            echo "run=${{ github.event.inputs.source_discovery_run }}" >> "$GITHUB_OUTPUT"
+            echo "select=${{ github.event.inputs.select }}" >> "$GITHUB_OUTPUT"
+          else
+            python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          x=json.load(open('control/solo_lean_world_trigger.json'))
+          print('run='+str(x.get('source_discovery_run',31893737133)))
+          print('select='+str(x.get('select',80)))
+          PY
+          fi
+      - name: Download latest canonical worldwide corpus
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RID: ${{ steps.cfg.outputs.run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release download "discovery-harvest-$RID" --pattern "supergreen-wide-read-$RID.tar.gz" --dir .
+          mkdir corpus
+          tar -xzf "supergreen-wide-read-$RID.tar.gz" -C corpus
+          find corpus -name current_candidates.jsonl -print -quit | grep . > /tmp/candidates
+      - name: Select low-barrier SOLO-lean candidates
+        env:
+          RID: ${{ steps.cfg.outputs.run }}
+          N: ${{ steps.cfg.outputs.select }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p generated queues benchmarks
+          python pipeline/solo_lean_prefilter.py \
+            --input "$(cat /tmp/candidates)" \
+            --out generated/solo_lean_world_top.jsonl \
+            --selection "queues/solo_lean_selection_${RID}.jsonl" \
+            --run-id "$RID" --top 500 --select "$N" --max-per-source 12
+          cp generated/solo_lean_world_top.jsonl benchmarks/solo-lean-world-top-latest.jsonl
+          cp generated/solo_lean_world_top.jsonl.summary.json benchmarks/solo-lean-world-top-latest.summary.json
+      - name: Persist exact proof selection
+        env:
+          RID: ${{ steps.cfg.outputs.run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add benchmarks/solo-lean-world-top-latest.jsonl benchmarks/solo-lean-world-top-latest.summary.json "queues/solo_lean_selection_${RID}.jsonl"
+          git commit -m "Persist SOLO-lean worldwide proof selection $RID" || true
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Dispatch substantive DCE proof
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RID: ${{ steps.cfg.outputs.run }}
+          N: ${{ steps.cfg.outputs.select }}
+        shell: bash
+        run: |
+          gh workflow run dce-fanout-v2.yml --ref main \
+            -f source_discovery_run="$RID" \
+            -f selection_path="queues/solo_lean_selection_${RID}.jsonl" \
+            -f max_jobs="$N" -f max_parallel=20 -f max_shards=256 -f jobs_per_shard=0
