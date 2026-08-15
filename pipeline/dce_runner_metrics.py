@@ -39,7 +39,7 @@ def main():
     headers = {
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "tender-dce-runner-metrics/1.0",
+        "User-Agent": "tender-dce-runner-metrics/1.1",
     }
     if token:
         headers["Authorization"] = f"Bearer {token}"
@@ -50,8 +50,7 @@ def main():
         r = requests.get(
             f"https://api.github.com/repos/{args.repo}/actions/runs/{args.run_id}/jobs",
             headers=headers,
-            params={"per_page": 100, "page": page},
-            timeout=30,
+            params={"per_page": 100, "page": page}, timeout=30,
         )
         r.raise_for_status()
         batch = r.json().get("jobs") or []
@@ -63,15 +62,19 @@ def main():
     shard_jobs = [j for j in jobs if str(j.get("name") or "").startswith("shard-")]
     runner_seconds = 0.0
     timed = []
+    shard_job_failures = 0
     for job in shard_jobs:
         start = parse_ts(job.get("started_at"))
         end = parse_ts(job.get("completed_at"))
         seconds = max(0.0, (end - start).total_seconds()) if start and end else 0.0
         runner_seconds += seconds
+        conclusion = str(job.get("conclusion") or "")
+        if conclusion not in {"success", "skipped", "neutral"}:
+            shard_job_failures += 1
         timed.append({
             "job_id": job.get("id"),
             "name": job.get("name"),
-            "conclusion": job.get("conclusion"),
+            "conclusion": conclusion,
             "started_at": job.get("started_at"),
             "completed_at": job.get("completed_at"),
             "runner_seconds": round(seconds, 3),
@@ -80,6 +83,8 @@ def main():
     summary = json.loads(Path(args.summary).read_text(encoding="utf-8"))
     portal = json.loads(Path(args.portal_yield).read_text(encoding="utf-8"))
     useful = int(summary.get("gate_ready_substantive_dce") or 0)
+    candidates = int(summary.get("candidates") or 0)
+    candidate_failures = int(summary.get("worker_failures") or 0)
     runner_minutes = runner_seconds / 60.0
 
     total_processing = sum(max(0.0, float((v or {}).get("candidate_processing_seconds") or 0.0)) for v in portal.values())
@@ -98,13 +103,18 @@ def main():
 
     payload = {
         "run_id": str(args.run_id),
+        "candidates": candidates,
         "shard_jobs": len(shard_jobs),
         "shard_jobs_with_timing": sum(1 for x in timed if x["runner_seconds"] > 0),
+        "shard_job_failures": shard_job_failures,
+        "shard_job_failure_rate": round(shard_job_failures / max(1, len(shard_jobs)), 6),
         "runner_seconds_exact": round(runner_seconds, 3),
         "runner_minutes_exact": round(runner_minutes, 6),
         "gate_ready_substantive_dce": useful,
         "useful_per_runner_minute_exact": round(useful / runner_minutes, 6) if runner_minutes > 0 else 0.0,
-        "worker_failures": int(summary.get("worker_failures") or 0),
+        "candidate_retryable_failures": candidate_failures,
+        "candidate_retryable_failure_rate": round(candidate_failures / max(1, candidates), 6),
+        "worker_failures": candidate_failures,
         "rate_limit_signals": int(summary.get("rate_limit_signals") or 0),
         "per_portal": per_portal,
         "jobs": timed,
