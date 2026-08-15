@@ -1,0 +1,29 @@
+{
+  "version": "HISTORICAL_AU_REVIEW_EVALUATION_PRECISION_V3_1",
+  "archive_records_scanned": 178211,
+  "strict_semantic_review_rows": 1085,
+  "remote_analytical_rows": 1077,
+  "signal_sources": {
+    "DESCRIPTION_SIGNAL": 789,
+    "CATEGORY_OR_COMBINED_SIGNAL": 296
+  },
+  "risk_classes": {
+    "REMOTE_ANALYTICAL_PLAUSIBLE": 1077,
+    "SPECIALIST_CREDENTIAL_HEAVY": 6,
+    "HUMAN_RESEARCH_HEAVY": 1,
+    "LOCATION_OR_PHYSICAL_HEAVY": 1
+  },
+  "families": {
+    "PROJECT_PROGRAM_ASSURANCE": 607,
+    "PROGRAM_EVALUATION": 326,
+    "INDEPENDENT_REVIEW": 89,
+    "RESEARCH_MONITORING_EVALUATION": 63
+  },
+  "grain": "AWARD_FIRST_PROCUREMENT",
+  "historical_only": true,
+  "record_deletion": false,
+  "live_used": false,
+  "dce_used": false,
+  "supersession": "v3.0 title-only Australia output is superseded because AusTender frequently stores opaque reference IDs in Title. v3.1 uses strict title+Description semantic evidence and records the signal source.",
+  "warning": "Delivery risk is semantic triage only. Credentials, panels, insurance, clearances and current access remain unknown."
+}
