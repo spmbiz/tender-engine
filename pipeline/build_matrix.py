@@ -40,13 +40,15 @@ BROWSER_PORTALS = {
     "DK_UDBUD_PUBLIC",
     "CZ_ZAKAZKY_GOV",
     "CZ_NIPEZ",
+    # European Dynamics ePPS installs use browser-backed anonymous ZIP flows.
+    "CYPRUS_EPPS",
+    "LITHUANIA_EPPS",
+    "MALTA_EPPS",
 }
 SUPPORTED = BROWSER_PORTALS | {
     "UNGM",
     "DIRECT_HTTP",
     "UK_CONTRACTS_FINDER",
-    "CYPRUS_EPPS",
-    "LITHUANIA_EPPS",
     "GENERIC_EPPS",
     "GENERIC_PUBLIC_PAGE",
     "TED_PUBLIC_PAGE_FAST",
