@@ -1,0 +1,88 @@
+name: Live SPM Review Pool v1
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Live World Snapshot for GPT"]
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/build_live_spm_review_pool.py'
+      - '.github/workflows/live-spm-review-pool-v1.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: live-spm-review-pool-v1
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Download latest asset-verified live snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p snapshot review
+          tag='live-world-snapshot-latest'
+          for asset in live-open-tenders-latest.jsonl.gz snapshot-manifest-latest.json discovery-coverage-latest.json; do
+            gh release download "$tag" --pattern "$asset" --dir snapshot --clobber
+            test -s "snapshot/$asset"
+          done
+      - name: Build exhaustive SPM review pool
+        run: |
+          set -euo pipefail
+          python pipeline/build_live_spm_review_pool.py \
+            --snapshot snapshot/live-open-tenders-latest.jsonl.gz \
+            --manifest snapshot/snapshot-manifest-latest.json \
+            --coverage snapshot/discovery-coverage-latest.json \
+            --priors control/historical_market_priors.json \
+            --out review --packet-size 400
+      - name: Validate preservation contract
+        run: |
+          python - <<'PY'
+          import json,os
+          s=json.load(open('review/summary.json',encoding='utf-8'))
+          assert s['contract']=='LIVE_SPM_REVIEW_POOL_V1',s
+          assert s['snapshot_rows']==s['playbook_or_lean_hits']+s['residual_open_world'],s
+          assert s['final_verdict_allowed'] is False
+          assert os.path.getsize('review/playbook_lean_hits.jsonl')>0
+          print(json.dumps(s,indent=2,ensure_ascii=False))
+          PY
+      - name: Persist compact review authority
+        run: |
+          set -euo pipefail
+          mkdir -p control/live_spm_review_pool_v1
+          cp review/summary.json control/live_spm_review_pool_v1/summary.json
+          cp review/top_review_1000.jsonl control/live_spm_review_pool_v1/top_review_1000.jsonl
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/live_spm_review_pool_v1/
+          git commit -m 'tenders: persist exhaustive live SPM review pool v1' || true
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then break; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            if [ "$i" = 5 ]; then exit 1; fi
+            sleep $((i*3))
+          done
+      - name: Publish full non-destructive review bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          run="$(python -c "import json;print(json.load(open('review/summary.json'))['source_discovery_run'])")"
+          tar -C review -czf "live-spm-review-pool-${run}.tar.gz" .
+          tag="live-spm-review-pool-${run}"
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --target main \
+            --title "Live SPM Review Pool ${run}" \
+            --notes 'Exhaustive non-destructive review routing: every live snapshot row is preserved as a playbook/lean hit or residual open-world row. Ranking is review order only; DCE remains authoritative.'
+          gh release upload "$tag" "live-spm-review-pool-${run}.tar.gz" review/summary.json review/top_review_1000.jsonl --clobber
