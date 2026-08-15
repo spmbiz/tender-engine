@@ -4,7 +4,7 @@ Updated: 2026-08-16 (Europe/Brussels project session)
 
 ## Scope firewall
 
-**Historical archive analysis only.** Live tenders and DCE evidence are not inputs to the findings summarized here.
+**Historical archive analysis only.** Live tenders, DCE retrieval and final bid/no-bid are explicitly outside this state.
 
 ## Canonical corpus authority
 
@@ -13,170 +13,187 @@ Updated: 2026-08-16 (Europe/Brussels project session)
 - procurement records scanned: **18,271,075**
 - award rows scanned: **20,307,312**
 - award↔supplier links scanned: **19,958,186**
-- Global Core v4: **2,250,547 notice-first** records
-- USAspending: **15,842,317 award-first** records
-- AusTender: **178,211 award-first** records
+- Global Core v4: **2,250,547 notice-first**
+- USAspending: **15,842,317 award-first**
+- AusTender: **178,211 award-first**
 
-## Persistence / no-loss system
-
-Authoritative policy: `README.md` + `ANALYSIS_PROTOCOL.md` in this directory.
+## No-loss / provenance rules
 
 Hard rule: **REJECTED_CLASSIFICATION ≠ REJECTED_RECORD.**
 
-- No historical record is deleted because a classifier, regex, ontology or GPT hypothesis was wrong.
-- Misclassified records remain available for open-world reclassification.
-- Facts, classifications, model hypotheses and verdicts are separate layers.
-- Corrections are superseded/versioned, never silently overwritten.
+- Source records are never deleted because a regex, ontology or GPT hypothesis was wrong.
+- Wrong mappings return to reclassification/open-world queues.
+- FACTS, semantic classifications, model hypotheses and strategic verdicts are separate layers.
+- Superseded interpretations remain in Git history / versioned ledgers and are named explicitly.
+- Parallel derived workers now publish to isolated releases before any master consolidation; concurrent writers no longer share a clobbering release.
 
-Decision ledgers now include:
-- `CLASSIFICATION_DECISIONS.jsonl`
+Current strategic ledgers:
 - `OPEN_WORLD_DECISIONS_2026-08-16.jsonl`
-- `DEEP_DIVE_DECISIONS_2026-08-16.jsonl`
-- `INFORMATION_WORK_DECISIONS_2026-08-16.jsonl`
+- `ASYMMETRY_DECISIONS_V3_2026-08-16.jsonl`
+- `ASYMMETRIC_PRIORITY_V3.md`
 
-Strategic hypotheses:
-- `MODEL_HYPOTHESES.md`
-- `ASYMMETRY_SCORECARD_V1.md`
+## Global information-work — current authority v3.1
 
-## Known-opportunity map
+Authority: `control/historical_information_work_pure_core_v3_1/`
 
-`control/spm_historical_opportunity_atlas_v4/ATLAS_V4.md` contains the pre-current-expansion **90-lane** map. New adjudicated lanes below should be folded into the next Atlas version only after dedupe against v4.
+Global Core records scanned: **2,250,547**.
+Strict title-led information-work matches: **253**.
+After semantic hardening, **110** are routed as pure digital/remote service rather than platform, physical-input, specialist or collision classes.
 
-## Open-world discovery — current authority v2
+Pure core:
+- **Evidence/literature synthesis: 29** · 22 buyers · 7 countries · observed median bidders 1
+- **Data entry/keying: 18** · 17 buyers · 6 countries · bidders 2
+- **Data collection/research: 17** · 16 buyers · 8 countries · bidders 2
+- **Content/data migration: 11** · 8 buyers · 5 countries · bidders 1
+- **Data validation/coding: 11** · 7 buyers · 4 countries · bidders 3.5
+- **Data cleaning/enrichment/MDM: 7** · 6 buyers · 6 countries · bidders 1
+- **Database/registry operations: 7** · 2 buyers · 2 countries
+- OCR/text extraction: 3
+- Desk research/benchmarking: 2
+- metadata, annotation, redaction, knowledge-content and document conversion: small precision signals
 
-`control/historical_open_world_unknowns_v2/summary.json`
+v3.1 explicitly removes from the pure core:
+- physical document digitization/intake;
+- inspection/inventory plus data entry;
+- OCR software/license procurement;
+- MDM/platform implementations;
+- large embedded IT migrations;
+- domain-specialist evidence reviews;
+- semantic substring collisions such as `registre` inside French `enregistrement`.
 
-After excluding obvious already-known lane text from high-signal clusters while preserving all underlying records:
-- semantic candidates: **24,657**
-- code-only / weak-signature candidates: **1,842**
-- semantic review queue: **3,000**
-- code-only review queue: **1,500**
+**Strategic verdict:** Data entry and evidence synthesis are Tier A asymmetric theses; data collection and validation are A- conditional; pure migration is B+; tiny n=1–3 families are signals, not market-size claims.
 
-v2 fixes the v1 example-attribution bug by joining examples on the full commercial-cluster key rather than phrase signature alone.
+## USA network / agency economics — current authority v3.2
 
-## Australia — recruitment, digital learning and review/evaluation
+Authority: `control/historical_usa_network_intermediary_v3_2/`
+QA: `control/historical_usa_network_qa_v3_2/`
 
-Current structural authority: `control/historical_australia_asymmetric_services_v2/`
-Semantic authority: `control/historical_australia_asymmetric_services_qa_v2/QA_PACKET.md`
+USAspending records scanned: **15,842,317**.
+Strict title-led network-service awards: **12,267**.
 
-Strongest adjudicated expansions:
+- **Expert witness:** 7,674 awards · 182 buyers · 2,088 suppliers · median USD26.4k · 138 suppliers serve ≥3 buyers · repeat-org/network award share 40.4% → **NETWORK PLAUSIBLE / HOLD ECONOMICS**.
+- **Court reporting:** 3,003 · 191 buyers · 219 suppliers · median USD2.4k · 47 suppliers serve ≥3 buyers · repeat-org/network share **78.5%** → **PROMOTE NETWORK MODEL**.
+- **General language interpretation:** 928 · 268 buyers · 216 suppliers · median USD12.9k · repeat-org/network share **61.9%** → **PROMOTE CONDITIONALLY NETWORK**.
+- **Sign-language interpretation:** 330 · 126 buyers · 82 suppliers · repeat-org/network share **79.4%** → **PROMOTE NETWORK MODEL**.
+- Litigation support: 298 · 63 buyers · 89 suppliers; high median but concentration/complexity → hold economics.
+- Remote-language interpretation explicit-title subset: 34; too small for independent market-size conclusion.
 
-- **General recruitment/search**: 2,130 awards · 94 buyers · 359 normalized supplier keys · top normalized supplier **6.6%** · median ~AUD23.5k — **PROMOTED / VERY HIGH**.
-- **Executive search**: 118 · 40 buyers · 46 normalized keys · top **14.4%** · median ~AUD36k — **PROMOTED / HIGH**.
-- **Digital/e-learning/platform/content**: 92 · 51 buyers · 56 normalized keys · top **19.6%** · median ~AUD61.1k — **PROMOTED / HIGH**, but more concentrated than v1 suggested.
-- **Training design/content**: 162 awards — **HOLD** as a broad lean lane because Defence/specialist/instructor-heavy work is mixed with real content-design work.
-- **Project/program assurance review**: 606 awards · 18 buyers · 115 normalized keys · top ~5.9% — structurally real; credential burden still under analysis.
-- **Program evaluation**: 258 · 40 buyers · 166 normalized keys · top ~3.9% — structurally real; delivery model needs further segmentation.
+QA confirms multi-buyer agency-like court-reporting suppliers (e.g. VET Reporting, Gradillas, Capital Reporting, Anderson Court Reporting) and a real organizational interpretation market. Historical evidence does **not** prove current certification, set-aside or contract-vehicle access.
 
-Description-backed QA explicitly confirms wording such as Personnel Recruitment, Recruitment Services, Bulk Recruitment and Executive Search Services.
+## Australia review/evaluation — current authority v3.2
 
-## USA — expert networks, court reporting and interpretation
+Authority: `control/historical_australia_review_evaluation_v3_2/`
+QA: `control/historical_australia_review_qa_v3_2/`
 
-Current precision authority: `control/historical_usa_knowledge_local_services_v2/`
-Semantic authority: `control/historical_usa_knowledge_local_services_qa_v2/QA_PACKET.md`
+AusTender records scanned: **178,211**.
+Strict semantic review/evaluation rows: **1,121**.
 
-Precision findings:
+v3.2 supersedes the earlier broad `PROGRAM_EVALUATION` aggregate after QA found Defence **Test and Evaluation Services** contamination.
 
-- **Expert witness**: **11,681 awards · 241 buyers · 2,648 suppliers · median ~$7.8k · top share 4.7%**.
-  - heuristic supplier shape: 8,017 awards / 1,754 suppliers are organization-like vs 3,664 / 894 individual-like.
-  - **Expert-network/intermediary thesis PROMOTED as a hypothesis**, not yet proven as the dominant winner archetype.
-- **Litigation consultant**: 658 · 53 buyers · 262 suppliers · median ~$16.6k · top 3.7%.
-- **Court reporting precision**: **5,204 · 260 buyers · 358 suppliers · median ~$3.8k · top 14.0%** — **PROMOTED**. v1 broad 12,478 is superseded due notebook/renovation contamination.
-- **Language interpretation precision**: **1,017 · 260 buyers · 216 suppliers · median ~$17.3k · top 7.6%** — **PROMOTED**. v1 broad 23,666 is superseded due non-language interpretation contamination.
-- Precision QA shows recurring agency-like winners in court reporting and genuine phone/video/sign-language interpretation examples.
+Current split:
+- **Project/program assurance:** 607 remote-analytical-plausible · 19 buyers · 115 suppliers · median AUD17.65k · top supplier5.9% → real market, but **PARTNER/HOLD** because assurance panels/seniority/credentials may dominate.
+- **Generic evaluation unresolved:** 168 · 31 buyers · 115 suppliers · median AUD94.7k → **HOLD**, no forced interpretation.
+- **Policy/program evaluation:** 113 remote-analytical · 22 buyers · 64 suppliers · median **AUD238.8k** · top12.4% plus 2 specialist rows → **PROMOTE CONDITIONALLY NETWORK+PARTNER**.
+- **Independent review:** 91 · 38 buyers · 80 suppliers · median **AUD68.9k** · top4.4% → **PROMOTE CONDITIONALLY NETWORK+PARTNER**.
+- Research/monitoring/evaluation: 72 remote +1 human-heavy · 25 buyers · 41 suppliers · median AUD197.5k → conditional.
+- **Technical Test & Evaluation:** 67 · 2 buyers · 46 suppliers · median AUD510.5k → **HARD / RECLASSIFIED**, not evidence for lean program evaluation.
 
-USAspending is award-first. These facts do not prove open competition, current set-aside eligibility or contract-vehicle access.
+QA examples for policy/program evaluation are real government-program evaluations in health, social policy, drought, mental health and related programs. Independent-review samples are overwhelmingly report/review/analysis deliverables but span many domains, so expert partnering remains important.
 
-## Information-work — newest asymmetric branch
+## Australia recruitment / digital learning — prior strong expansions retained
 
-### Recall layer v1
-`control/historical_information_work_v1/`
+Authority: `control/historical_australia_asymmetric_services_v2/` plus description-backed QA.
 
-- 4,816 broad historical matches
-- 4,446 initially digital-first/remote-plausible
+- General recruitment/search: **2,130 awards · 94 buyers · ~359 normalized supplier keys · top normalized6.6%** → **Tier A network/automation thesis**.
+- Executive search: 118 · 40 buyers · ~46 normalized keys → high, more relationship-heavy.
+- Digital/e-learning/platform/content: 92 · 51 buyers · ~56 normalized keys → high conditional.
+- Training design/content broad bucket remains held because delivery models mix.
 
-v1 is **recall/discovery only**. QA revealed major collisions: generic French `catalogue` procurement wording, medical scanner equipment in digitization, and scope-only data terminology. No records were deleted.
+## Open-world expansion — current native-code/economic authority v4
 
-### Precision authority v2
-`control/historical_information_work_v2/`
+Discovery authority: `control/historical_open_world_next_wave_v3/`
+Economic routing: `control/historical_open_world_economic_archetypes_v4/`
+Broker QA: `control/historical_open_world_broker_qa_v4/`
 
-Global Core 2,250,547 notice-first records scanned; **525 precision information-work notices** retained.
+A mechanism-regex scan of an additional **3,500** unknown clusters recognized only 3 cluster×mechanism pairs; **3,497 remained untagged**, proving that more keyword ontologies are not enough.
 
-Main precision families:
-- Content/data migration: **165**
-- Document digitization services: **82**
-- Data entry/keying: **57**
-- Data cleaning/enrichment/MDM: **50**
-- Data collection/research: **48**
-- Evidence/literature synthesis: **37**
-- Metadata/cataloguing/indexing: **24**
-- eDiscovery/document review: **17**
-- Desk research/benchmarking: **17**
-- Document/data conversion: **12**
-- OCR/text extraction: **9**
-- Data validation/coding: **4**
-- Data annotation/labeling: **1**
+The next layer therefore classified the top **1,000** untagged clusters by native code/economic archetype:
+- 55 broker/resell candidates
+- 51 local-network candidates
+- 77 core/partner-service candidates
+- 5 complex broker hypotheses
+- 93 hard/regulated
+- 719 open review
 
-Delivery composition:
-- **421 digital-first / remote-plausible**
-- 76 physical-input-likely
-- 17 legal-specialist-risk
-- 8 physical-storage/input
-- 3 onsite/location-dependent
+Broker QA on the 55 candidates:
+- 16 office/IT equipment clusters
+- 9 food supply
+- 8 lab reagents/consumables
+- 11 furniture clusters including one supply/install cluster
+- 7 telecom/electrical clusters
+- 2 office-stationery
+- 2 sport/recreation equipment
 
-### Strict SPM asymmetry view
-`control/historical_information_work_asymmetry_v1/summary.json`
+Most promising new broker test: **office consumables / toner / selected IT equipment**, but only fragmented cohorts. Examples include:
+- a 24-record /15-buyer /10-supplier office-consumable cohort with median 5 bidders;
+- a 16-record /12-buyer /8-supplier toner/print-consumables cohort with top supplier share23%;
+- other toner/IT clusters are heavily concentrated and should be avoided.
 
-Of the 525 precision rows, **149 are both TITLE_SIGNAL and digital-first**.
+Food supply is held for logistics/perishability/margin friction. Lab reagents are held for compatibility/regulatory friction. Furniture is medium-friction due installation/logistics.
 
-Strongest explicit title-led digital surfaces by volume:
-- Data collection/research: **36**
-- Data cleaning/enrichment/MDM: **27**
-- Content/data migration: **44**
-- Evidence/literature synthesis: **13**
-- Data entry/keying: **7**
-- Metadata/cataloguing/indexing: **7**
-- OCR/text extraction: **4**
+## Current SPM asymmetric archetypes
 
-Important semantic/business verdicts:
-- **Data entry/keying — PROMOTED / VERY HIGH ASYMMETRY.** QA includes open-bid Data Capture Services with explicit error-rate/security/turnaround requirements and explicit `Saisie de données` work.
-- **Evidence/literature synthesis — PROMOTED / VERY HIGH ASYMMETRY.** QA includes PHAC rapid scientific evidence reviews; domain credentials can still be required on specific opportunities.
-- **Desk research/benchmarking — PROMOTED / HIGH ASYMMETRY.** QA includes an explicit Belgian desk-research market study.
-- **Data collection/research — PROMOTED / HIGH CONDITIONAL.** Remote/document/web collection is attractive; fieldwork subsets are not equally lean.
-- **Data cleaning/enrichment/MDM — PROMOTED / HIGH CONDITIONAL.** Real MDM/data-quality market, but enterprise platform implementations must be separated from actual data operations.
-- **Content/data migration — HOLD as one broad lean lane.** Pure migration jobs exist, but many large SAP/KIS/platform projects merely include migration.
-- **Metadata/cataloguing/indexing precision subset — PROMOTED / MEDIUM-HIGH.** v1 broad `catalogue` family is explicitly rejected; v2 strict family is the only promotable subset.
-- **Document digitization — PROMOTED as BROKER/HYBRID, not pure AI.** Physical custody/intake dominates many jobs.
-- **OCR/text extraction — HOLD / VERY HIGH ASYMMETRY, LOW SAMPLE.** Expand multilingual discovery without loosening precision.
-- **Data annotation/AI labeling — PROMOTED HYPOTHESIS, LOW SAMPLE.** One exact Digital Africa labeling procurement is exceptionally on-thesis but not a market-size proof.
-- **eDiscovery — HOLD / legal-specialist risk.**
+The project should discover and rank by **economic mechanism**, not only named sectors:
 
-## Highest-priority SPM asymmetric theses now
+1. **Information in → structured output out** — data entry, validation, synthesis, research, selected migration/cleaning.
+2. **Demand in → right human out** — recruitment, court reporters, interpreters, reviewers, specialist networks.
+3. **Specification in → sourced SKU out** — toner/office/IT consumables, print, promo goods, standardized supply.
+4. **Buyer need in → orchestrated specialist deliverable out** — independent reviews, policy evaluations, selected assurance/expert work.
 
-1. **Information-work automation** — data entry, evidence synthesis, desk research, selected data cleaning, OCR/extraction, validation, metadata, remote data collection.
-2. **Recruitment/search/matching** — candidate sourcing/matching itself is a recurring public-sector product, not merely a staffing adjacency.
-3. **Contractor/talent brokerage** — Australia ICT/digital roles remain broadly fragmented.
-4. **Digital learning/content** — real market, especially content/e-learning/platform work, but platform concentration matters.
-5. **Translation/transcription/DTP/accessibility/media-monitoring** — previously validated AI-compressible lanes remain core.
-6. **Print/mail/fulfilment + standardized-goods sourcing** — supplier/geographic arbitrage is strong where logistics/cash burden stays manageable.
-7. **Expert/language service networks** — expert witness, court reporting and interpretation now have real historical structure; licensing/credentials/access require separate economics.
-8. **Review/evaluation** — attractive when the output is document/evidence analysis; specialist credential requirements can dominate.
+This framing is the current strategic authority because it can surface businesses that were not present in the original ontology.
 
-## Explicitly corrected / superseded interpretations
+## Highest priority now
 
-- `ICT_HARDWARE_VAR — France`: false label (`Var` geography vs Value Added Reseller); records preserved/reclassified.
-- `PROCUREMENT_AGENT — France`: broad centrale-d'achat wording did not mean supplier-as-procurement-agent; records preserved.
-- old PPE/EPI matcher: superseded after EPIC/EPICERIE/Kiltipper collisions.
-- open-world v1 example attribution: superseded by v2 composite-key attribution.
-- USA broad court-reporting and interpretation counts: superseded by precision v2.
-- information-work v1 broad catalogue/metadata/digitization counts: recall-only; v2 precision authority.
+### Tier A
+- data entry / capture / keying — CORE
+- evidence / literature synthesis — CORE + specialist QA where required
+- court-reporting agency — NETWORK
+- sign-language interpretation — NETWORK
+- recruitment/search — NETWORK + automation
+- general language interpretation — NETWORK conditional
+- digital/e-learning — CORE/PARTNER/RESELL conditional
+
+### Tier A-
+- Australia independent review — NETWORK+PARTNER
+- Australia policy/program evaluation — NETWORK+PARTNER
+- data collection/research orchestration — CORE/NETWORK
+- data validation/coding — CORE
+- translation/transcription/DTP/accessibility — existing core historical lanes
+- web maintenance/redesign — existing core historical lanes
+
+### Tier B+
+- toner / office-consumables resale — BROKER, dedicated margin test required
+- pure data/content migration — CORE/PARTNER
+- print/mail/fulfilment — BROKER
+- promotional merchandise / standardized goods — BROKER
+
+## Explicit supersessions
+
+- `ICT_HARDWARE_VAR France`: label rejected only; `Var` geography ≠ Value Added Reseller. Records preserved.
+- broad procurement-agent France classification: superseded; records preserved.
+- old PPE/EPI matcher: superseded; records preserved.
+- open-world example attribution v1: superseded by composite-key v2.
+- USA broad court-reporting/interpreting counts: superseded by strict v3.2 network authority.
+- information-work v1/v2/v3.0 strategic pure counts: v3.1 is pure-core authority; earlier layers remain recall evidence.
+- Australia review v3.0 title-only: invalid because AusTender titles are often opaque references.
+- Australia broad PROGRAM_EVALUATION v3.1: superseded by v3.2 policy/test/generic split.
+- failed USA network v3.0/v3.1 computes produced no strategic authority; v3.2 is first successful authority.
 
 ## Next analysis order
 
-1. Split **PURE_DATA_MIGRATION** from platform implementations containing migration.
-2. Expand **OCR / extraction / annotation / redaction / metadata** multilingual terminology while retaining strict semantic QA.
-3. Decompose **expert-witness winners** into direct experts vs consulting firms vs true expert-network/placement intermediaries.
-4. Decompose AU **program evaluation / assurance review** by deliverable and credential burden.
-5. Build **margin/capital/barrier model** for top asymmetric lanes: unit labor compression, subcontractor cost, working capital, insurance, licenses, locality, panel/channel requirements.
-6. Continue ontology-independent review beyond the current 3,000 semantic + 1,500 code-only queues.
-7. Fold adjudicated new lanes into the next Atlas version only after dedupe against v4.
+1. Build **unit-economics / margin / capital / credential** models for Tier A and A- lanes using historical value distributions and supplier models.
+2. For USA court reporting / interpretation, split **remote vs onsite** and infer certification/geography friction from historical titles/buyers without claiming current eligibility.
+3. For AU independent reviews / policy evaluations, decompose deliverables into desk research, stakeholder work, specialist sign-off and final report; identify small-repeat specialist suppliers.
+4. Deep-dive the fragmented **toner/office consumables** cohorts and benchmark historical buyer recurrence/supplier concentration before any supplier quote exercise.
+5. Continue open-world native-code review beyond the current top 1,000 unknowns; do not return to regex-only discovery.
+6. Consolidate adjudicated lanes into the next deduplicated Atlas version without double-counting prior lanes.
