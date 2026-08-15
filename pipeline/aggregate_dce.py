@@ -66,6 +66,7 @@ def review_template(gate_snippets: dict, gate_readiness: bool) -> dict:
 def quality_key(row: dict) -> tuple:
     return (
         bool(row.get("gate_readiness")),
+        not bool(row.get("deadline_conflict")),
         row.get("status") == "DOWNLOADED_PUBLIC",
         int(row.get("corpus_chars") or 0),
         int(row.get("documents_extracted") or 0),
@@ -93,12 +94,16 @@ def main():
         candidate = manifest.get("candidate") or load(candidate_root / "candidate.json") or {}
         gates = load(candidate_root / "gate_snippets.json") or {}
         evidence = load(candidate_root / "evidence_quality.json") or {}
+        authority = load(candidate_root / "authority_conflicts.json") or {}
+        deadline_authority = authority.get("deadline") if isinstance(authority, dict) else {}
         doc_index = load(candidate_root / "document_index.json") or []
         corpus_path = candidate_root / "corpus.txt"
         raw_status = str(manifest.get("status") or "UNKNOWN")
         files = manifest.get("files") or []
         status, content_quality, gate_readiness = resolve_evidence(raw_status, files, evidence)
         gate_snippets = gates.get("categories") or {}
+        deadline_conflict = bool(deadline_authority.get("conflict")) if isinstance(deadline_authority, dict) else False
+        deadline_authority_status = deadline_authority.get("status") if isinstance(deadline_authority, dict) else None
         cid = str(manifest.get("candidate_id"))
         row = {
             "candidate_id": cid,
@@ -112,6 +117,9 @@ def main():
             "eligible_for_gate_review": gate_readiness,
             "finalization_allowed": False,
             "evidence_quality": evidence,
+            "authority_conflicts": authority,
+            "deadline_authority_status": deadline_authority_status,
+            "deadline_conflict": deadline_conflict,
             "deadline": candidate.get("deadline"),
             "estimated_value": candidate.get("estimated_value"),
             "currency": candidate.get("currency"),
@@ -129,6 +137,7 @@ def main():
                 "DOWNLOADED_PUBLIC is transport success, not proof of DCE. Only review mandatory gates when gate_readiness=true. "
                 "ACCESS_GUIDE_ONLY / PORTAL_GENERIC_ONLY / DCE_CONTENT_UNVERIFIED are not authoritative DCE evidence. "
                 "Fill every review_template gate as PASS/PASS_CONDITIONAL/FAIL_HARD/UNKNOWN/NOT_APPLICABLE with source evidence. "
+                "Resolve authority_conflicts explicitly; a deadline conflict or unknown authoritative DCE deadline blocks finalization. "
                 "FINAL_SUPER_GREEN or score >=90 is forbidden while any potentially disqualifying gate is UNKNOWN/FAIL or lacks evidence. "
                 "Never infer a PASS from absence of a snippet; missing evidence remains UNKNOWN."
             ),
@@ -141,6 +150,7 @@ def main():
     counts = Counter(str(r.get("status") or "UNKNOWN") for r in rows)
     raw_counts = Counter(str(r.get("raw_status") or "UNKNOWN") for r in rows)
     quality_counts = Counter(str(r.get("content_quality") or "UNKNOWN") for r in rows)
+    deadline_authority_counts = Counter(str(r.get("deadline_authority_status") or "MISSING") for r in rows)
 
     with (out / "deep_review_queue.jsonl").open("w", encoding="utf-8") as f:
         for row in rows:
@@ -164,6 +174,7 @@ def main():
     rate_limited = sum(1 for x in batch_results if x.get("rate_limited"))
     worker_failures = sum(1 for x in batch_results if int(x.get("returncode") or 0) != 0)
     gate_ready_count = sum(1 for r in rows if r.get("gate_readiness"))
+    deadline_conflict_count = sum(1 for r in rows if r.get("deadline_conflict"))
 
     summary = {
         "candidates": len(rows),
@@ -172,6 +183,8 @@ def main():
         "raw_status_counts": dict(raw_counts),
         "derived_status_counts": dict(counts),
         "content_quality_counts": dict(quality_counts),
+        "deadline_authority_status_counts": dict(deadline_authority_counts),
+        "deadline_conflicts": deadline_conflict_count,
         "raw_downloaded_public": raw_counts.get("DOWNLOADED_PUBLIC", 0),
         "gate_ready_substantive_dce": gate_ready_count,
         "gate_blocked_or_unverified": max(0, len(rows) - gate_ready_count),
@@ -188,7 +201,7 @@ def main():
         "handoff_storage_reduction_ratio": round((1 - slim_bytes / raw_bytes) if raw_bytes else 0, 6),
         "raw_archives_in_final_artifact": False,
         "mandatory_gate_names": REQUIRED_GATES,
-        "contract": "Only gate_ready_substantive_dce rows may advance to mandatory-gate adjudication; final 90+/FINAL_SUPER_GREEN requires all mandatory gate statuses resolved with evidence and validation by final_verdict_guard.py.",
+        "contract": "Only gate_ready_substantive_dce rows may advance to mandatory-gate adjudication; authority conflicts remain explicit; final 90+/FINAL_SUPER_GREEN requires all mandatory gate statuses resolved with evidence and validation by final_verdict_guard.py.",
     }
     (out / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(summary, indent=2, ensure_ascii=False))
