@@ -1,0 +1,51 @@
+name: Historical Asymmetry Interim QA v3
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - historical_lab/build_asymmetry_interim_qa_v3.py
+      - .github/workflows/historical-asymmetry-interim-qa-v3.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Download completed v3 branch assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input out
+          TAG=historical-asymmetry-deepdive-v3
+          for f in global_info_pure_core.csv global_info_examples.csv open_world_tagged_clusters.csv open_world_untagged_top.jsonl; do
+            gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "$f" --dir input --clobber
+          done
+      - name: Build semantic QA packet
+        run: python historical_lab/build_asymmetry_interim_qa_v3.py --input input --out out
+      - name: Persist interim QA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-asymmetry-interim-qa-v3
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target main --title 'Historical Asymmetry Interim QA v3' --notes 'Historical-only semantic QA of completed Global information-work and open-world next-wave outputs.'
+          gh release upload "$TAG" out/summary.json out/QA_PACKET.md --repo "$GITHUB_REPOSITORY" --clobber
+          mkdir -p control/historical_asymmetry_deepdive_v3/interim_qa
+          cp out/summary.json out/QA_PACKET.md control/historical_asymmetry_deepdive_v3/interim_qa/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_asymmetry_deepdive_v3/interim_qa/
+          git commit -m 'historical: persist asymmetry interim QA v3' || exit 0
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
