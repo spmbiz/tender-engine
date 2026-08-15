@@ -1,0 +1,53 @@
+name: Broker Resell Prefilter Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/broker_resell_prefilter.py'
+      - 'pipeline/historical_market_priors.py'
+      - 'control/historical_market_priors.json'
+      - '.github/workflows/broker-resell-prefilter-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Validate title anchoring, US gates and country isolation
+        run: |
+          python - <<'PY'
+          from pipeline.historical_market_priors import load, adjustment
+          from pipeline.broker_resell_prefilter import classify
+          p=load(); assert p and p['status']=='READY'
+
+          # Missing explicit country must not leak France printing prior onto a US record.
+          us_print={'candidate_id':'US-SAM:x','title':'Printing services for agency publications'}
+          d,r=adjustment(us_print,p); print('us-print-prior',d,r); assert d==0,(d,r)
+
+          # Pure software title remains valid and receives only the cross-country broker prior.
+          pure={'candidate_id':'US-SAM:y','title':'Adobe Software License Renewal','type':'Solicitation','set_aside':'Unrestricted'}
+          x=classify(pure,p); print('pure-software',x); assert x and x[1]=='Software licences / SaaS resale'; assert x[6]==2,x
+
+          # Incidental software licensing in body cannot convert medical equipment to SaaS.
+          medical={'candidate_id':'US-SAM:z','title':'Steris Innowave Ultra Sonic Irrigator','description':'Includes embedded software licensing and annual license support','type':'Solicitation','set_aside':'Unrestricted'}
+          x=classify(medical,p); print('medical-incidental',x); assert x is None
+
+          # Physical mixed procurement is excluded from pure software lane.
+          kiosk={'candidate_id':'IE:1','country':'IRELAND','title':'Self-Service Kiosk Terminals, Kiosk OS Integration, and Associated Software Licensing'}
+          x=classify(kiosk,p); print('kiosk-mixed',x); assert x is None
+
+          # Sole-source SAM notice is excluded even if title says software subscription.
+          sole={'candidate_id':'US-SAM:s','title':'Notice of Intent to Sole Source Software Subscription Renewal','type':'Special Notice','set_aside':'Unrestricted'}
+          x=classify(sole,p); print('sole-source',x); assert x is None
+
+          promo={'candidate_id':'FR:p','country':'FRANCE','title':'Fourniture et livraison d objets publicitaires personnalisés'}
+          x=classify(promo,p); print('promo',x); assert x and x[1]=='Promotional merchandise'
+          print('BROKER_RESELL_PREFILTER_SMOKE_PASS')
+          PY
