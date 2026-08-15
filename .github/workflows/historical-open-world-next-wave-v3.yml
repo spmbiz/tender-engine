@@ -1,0 +1,50 @@
+name: Historical Open World Next Wave v3
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - historical_lab/open_world_next_wave_v3.py
+      - .github/workflows/historical-open-world-next-wave-v3.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Download open-world v2 queues
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input out
+          gh release download historical-open-world-unknowns-v2 --repo "$GITHUB_REPOSITORY" --pattern semantic_review_queue.jsonl --dir input --clobber
+          gh release download historical-open-world-unknowns-v2 --repo "$GITHUB_REPOSITORY" --pattern code_only_review_queue.jsonl --dir input --clobber
+      - name: Run next-wave scan
+        run: python historical_lab/open_world_next_wave_v3.py --semantic input/semantic_review_queue.jsonl --code-only input/code_only_review_queue.jsonl --semantic-start 1000 --semantic-end 3000 --out out
+      - name: Persist isolated branch authority
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-open-world-next-wave-v3
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target main --title 'Historical Open World Next Wave v3' --notes 'Historical ontology-independent next-wave review of semantic clusters 1000-3000 plus code-only review queue. Discovery only; no record deletion.'
+          gh release upload "$TAG" out/summary.json out/REPORT.md out/tagged_clusters.csv out/untagged_top.jsonl --repo "$GITHUB_REPOSITORY" --clobber
+          mkdir -p control/historical_open_world_next_wave_v3
+          cp out/summary.json out/REPORT.md control/historical_open_world_next_wave_v3/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_open_world_next_wave_v3/
+          git commit -m 'historical: persist open-world next wave v3' || exit 0
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
