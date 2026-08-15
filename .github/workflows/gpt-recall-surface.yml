@@ -35,6 +35,28 @@ jobs:
             --summary control/gpt_recall_surface_latest.summary.json \
             --per-bucket 450 \
             --max-total 1800
+          python - <<'PY'
+          import json,re
+          src='control/gpt_recall_surface_latest.jsonl'
+          out='control/gpt_recall_surface_index.jsonl'
+          with open(src,encoding='utf-8') as f, open(out,'w',encoding='utf-8') as g:
+              for line in f:
+                  r=json.loads(line)
+                  d=re.sub(r'\s+',' ',str(r.get('description') or '')).strip()[:500]
+                  x={
+                      'candidate_id':r.get('candidate_id'),
+                      'source_family':r.get('source_family'),
+                      'title':r.get('title'),
+                      'buyer':r.get('buyer'),
+                      'deadline_utc':r.get('deadline_utc'),
+                      'estimated_value':r.get('estimated_value'),
+                      'currency':r.get('currency'),
+                      'recall_buckets':r.get('recall_buckets'),
+                      'excerpt':d,
+                      'urls':r.get('urls') or []
+                  }
+                  g.write(json.dumps(x,ensure_ascii=False,separators=(',',':'))+'\n')
+          PY
           cat control/gpt_recall_surface_latest.summary.json
       - name: Persist recall surface on main
         working-directory: engine
@@ -43,7 +65,7 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add control/gpt_recall_surface_latest.jsonl control/gpt_recall_surface_latest.summary.json
+          git add control/gpt_recall_surface_latest.jsonl control/gpt_recall_surface_latest.summary.json control/gpt_recall_surface_index.jsonl
           git commit -m 'tenders: refresh GPT recall surface' || exit 0
           for i in 1 2 3 4 5; do
             if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
