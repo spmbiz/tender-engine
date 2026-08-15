@@ -195,7 +195,6 @@ def _pl_api_download(candidate:dict,out:Path,manifest:dict,session:requests.Sess
                 manifest['dce_method_attempts'].append({'method':'PL_DIRECT_DOCUMENT_API','url':url,'document_name':n['name'],'identifier':did,'outcome':'DOWNLOADED' if rec else 'NOT_FILE'})
                 if rec:manifest['files'].append(rec);got=True;break
         if got:return True
-        # Exact public UI route is visible in the anonymous proceeding page.
         return _pl_try_public_browser_download(tender_id,nodes,out,manifest)
     except Exception as exc:
         manifest.setdefault('dce_method_attempts',[]).append({'method':'PL_GET_TENDER_API','url':api,'error':repr(exc)});return False
@@ -225,7 +224,15 @@ def adapter_poland(candidate:dict,out:Path,manifest:dict):
     manifest['status']=next((s for s in priority if s in statuses),'GENERIC_PUBLIC_PAGE_UNRESOLVED')
 
 
-for portal in ('GENERIC_PUBLIC_PAGE','CA_CANADABUYS','QC_SEAO','DE_DOE','FR_BOAMP','NZ_GETS','AU_AUSTENDER','US_SAM','US_SAM_BULK','NL_TENDERNED','NL_TENDERNED_RSS','CH_SIMAP','LV_IUB','NO_DOFFIN'):
+# Generic national public-page adapters. These sources are already harvested as
+# live candidates, so the DCE matrix must never drop them merely because the
+# discovery lane was added after the original matrix allowlist.
+for portal in (
+    'GENERIC_PUBLIC_PAGE','CA_CANADABUYS','QC_SEAO','DE_DOE','FR_BOAMP',
+    'NZ_GETS','AU_AUSTENDER','US_SAM','US_SAM_BULK','NL_TENDERNED',
+    'NL_TENDERNED_RSS','CH_SIMAP','LV_IUB','NO_DOFFIN','FI_HILMA',
+    'PT_BASE_OPEN','DK_UDBUD_PUBLIC','CZ_ZAKAZKY_GOV'
+):
     base.ADAPTERS[portal]=cascade_public_adapter
 for portal in ('PL_EZAMOWIENIA','PL_BZP'):base.ADAPTERS[portal]=adapter_poland
 base.ADAPTERS['GR_KHMDHS']=adapter_greece
