@@ -1,0 +1,68 @@
+name: Tender Historical Route Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/market-intelligence-route-probe.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Download Global Core v4 historical facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p core
+          gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern historical_tenders.parquet --dir core --clobber
+      - name: Profile procurement route values by source
+        run: |
+          mkdir -p control/market_intelligence_routes
+          python - <<'PY'
+          import duckdb,json
+          from pathlib import Path
+          p='core/historical_tenders.parquet'; con=duckdb.connect();con.execute("SET threads=4")
+          cols={r[0] for r in con.execute('DESCRIBE SELECT * FROM read_parquet(?)',[p]).fetchall()}
+          source='Warehouse_Source'; proc='Procedure'; title='Title'
+          assert source in cols and proc in cols and title in cols,sorted(cols)
+          rows=con.execute(f'''WITH x AS (
+            SELECT trim(cast("{source}" as varchar)) source,
+                   coalesce(nullif(trim(cast("{proc}" as varchar)),''),'UNKNOWN') procedure,
+                   count(*) n
+            FROM read_parquet(?) GROUP BY 1,2
+          ), r AS (
+            SELECT *, row_number() over(partition by source order by n desc,procedure) rn,
+                   sum(n) over(partition by source) source_total
+            FROM x
+          ) SELECT source,procedure,n,source_total,round(100.0*n/source_total,3) pct
+            FROM r WHERE rn<=40 ORDER BY source,n DESC''',[p]).fetchall()
+          out=[{'source':r[0],'procedure':r[1],'n':r[2],'source_total':r[3],'pct':r[4]} for r in rows]
+          Path('control/market_intelligence_routes/procedure_values.json').write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding='utf-8')
+          md=['# Historical procurement procedure values','','Top raw `Procedure` values by warehouse source.']
+          cur=None
+          for r in out:
+            if r['source']!=cur:
+              cur=r['source'];md+=['',f"## {cur}",'','|Procedure|N|Share|','|---|---:|---:|']
+            md.append(f"|{str(r['procedure']).replace('|','/')}|{r['n']:,}|{r['pct']}%|")
+          Path('control/market_intelligence_routes/PROCEDURES.md').write_text('\n'.join(md)+'\n',encoding='utf-8')
+          print('\n'.join(md[:120]))
+          PY
+      - name: Persist probe
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/market_intelligence_routes/
+          git commit -m 'tenders: profile historical procurement route values'
+          git pull --rebase origin main
+          git push origin HEAD:main
