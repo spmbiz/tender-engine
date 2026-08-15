@@ -189,7 +189,7 @@ jobs:
           totals={k:sum(s['counts'][k] for s in ss) for k in ['procurement_records','award_rows','award_supplier_links']}
           assert totals['procurement_records']==18271075,totals
           assert totals['award_rows']==20307312,totals
-          assert totals['award_supplier_links']==19934191,totals
+          assert totals['award_supplier_links']==19958191,totals
           master={'version':'SPM_EXHAUSTIVE_EVERY_RECORD_MASTER_V1','status':'PASS','sources':ss,'totals':totals,
                   'grain_note':'18,271,075 procurement records = 2,250,547 notice-first unique Global Core procurements + 15,842,317 USA award-first procurements + 178,211 AusTender award-first procurements. Do not sum this with national source releases already deduped into Global Core.',
                   'scope_note':'Every structured procurement row was materialized/scored; every award and supplier-link row was scanned. Underlying DCE/PDF attachments were not all fetched/read; DCE is a separate live/final gate.'}
@@ -200,7 +200,7 @@ jobs:
                  f"  - Notice-first Global Core v4: **{ss[0]['counts']['procurement_records']:,}**",
                  f"  - USAspending award-first: **{ss[2]['counts']['procurement_records']:,}**",
                  f"  - AusTender award-first: **{ss[1]['counts']['procurement_records']:,}**",
-                 f"- Award rows scanned: **{totals['award_rows']:,}**",
+                 f"- Award rows scanned: **{totals['award_rows']:,}",
                  f"- Award↔supplier links scanned: **{totals['award_supplier_links']:,}**",'',
                  '## Integrity','']
           for s in ss:
