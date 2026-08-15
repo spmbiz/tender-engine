@@ -1,0 +1,101 @@
+name: Supergreen Ready Publish
+
+on:
+  workflow_run:
+    workflows: ["DCE Fanout V2"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      dce_run:
+        description: Canonical DCE run ID
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+env:
+  GH_REPO: ${{ github.repository }}
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - id: resolve
+        name: Resolve canonical DCE run
+        shell: bash
+        env:
+          INPUT_RUN: ${{ github.event.inputs.dce_run }}
+          EVENT_RUN: ${{ github.event.workflow_run.id }}
+        run: |
+          set -euo pipefail
+          if [[ "${INPUT_RUN:-}" =~ ^[0-9]+$ ]]; then rid="$INPUT_RUN"; else rid="$EVENT_RUN"; fi
+          [[ "$rid" =~ ^[0-9]+$ ]] || { echo "No DCE run id" >&2; exit 1; }
+          echo "dce_run=$rid" >> "$GITHUB_OUTPUT"
+      - name: Download canonical DCE review aggregate
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DCE_RUN: ${{ steps.resolve.outputs.dce_run }}
+        run: |
+          set -euo pipefail
+          tag="dce-harvest-${DCE_RUN}"
+          mkdir -p payload
+          gh release download "$tag" --repo "$GH_REPO" --pattern "dce-deep-review-${DCE_RUN}.tar.gz" --dir payload
+          mkdir -p dce-aggregate
+          tar -xzf "payload/dce-deep-review-${DCE_RUN}.tar.gz" -C dce-aggregate
+          test -s dce-aggregate/deep_review_queue.jsonl
+          test -s dce-aggregate/summary.json
+      - name: Build curated GPT Supergreen-ready pack
+        run: |
+          python pipeline/build_supergreen_ready_pack.py \
+            --input dce-aggregate/deep_review_queue.jsonl \
+            --summary dce-aggregate/summary.json \
+            --out supergreen-ready \
+            --limit 250
+      - name: Validate pack contract
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('supergreen-ready/manifest.json').read_text())
+          assert m['contract']=='GPT_SUPERGREEN_READY_PACK_V1',m
+          rows=sum(1 for _ in Path('supergreen-ready/supergreen_ready.jsonl').open())
+          assert rows==m['ready_rows'],(rows,m)
+          print(json.dumps(m,indent=2))
+          PY
+      - name: Persist on canonical DCE Release and stable latest Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DCE_RUN: ${{ steps.resolve.outputs.dce_run }}
+        run: |
+          set -euo pipefail
+          asset="supergreen-ready-${DCE_RUN}.tar.gz"
+          tar -C supergreen-ready -czf "$asset" .
+          gh release upload "dce-harvest-${DCE_RUN}" "$asset" --repo "$GH_REPO" --clobber
+          latest_tag="supergreen-ready-latest"
+          if ! gh release view "$latest_tag" --repo "$GH_REPO" >/dev/null 2>&1; then
+            gh release create "$latest_tag" --repo "$GH_REPO" --target main \
+              --title "Latest Supergreen-ready Tender Pack" \
+              --notes "Stable pointer to the latest curated DCE-backed GPT review pack. This asset contains review-ready candidates, not pre-declared final Supergreens."
+          fi
+          cp "$asset" latest-supergreen-ready.tar.gz
+          printf '{"dce_run":%s,"asset":"%s","contract":"GPT_SUPERGREEN_READY_PACK_V1"}\n' "$DCE_RUN" "$asset" > latest-supergreen-ready.json
+          gh release upload "$latest_tag" --repo "$GH_REPO" latest-supergreen-ready.tar.gz latest-supergreen-ready.json --clobber
+          echo "Stable latest pack: release=$latest_tag dce_run=$DCE_RUN" >> "$GITHUB_STEP_SUMMARY"
+          cat supergreen-ready/manifest.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish one-day ChatGPT transport artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: supergreen-ready-${{ steps.resolve.outputs.dce_run }}-${{ github.run_id }}
+          path: supergreen-ready/
+          retention-days: 1
+          compression-level: 9
+          if-no-files-found: error
