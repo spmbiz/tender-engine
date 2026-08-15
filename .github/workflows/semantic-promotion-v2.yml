@@ -34,6 +34,16 @@ jobs:
           mkdir -p source out
           gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern historical_tenders.parquet --dir source --clobber
           gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern awards.parquet --dir source --clobber
+      - name: Runtime SQL compatibility patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('pipeline/semantic_promotion_v2.py')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('{tscope} scope, {tcpv}', '{tscope} scope_text, {tcpv}')
+          s=s.replace('currency,title,scope,cpv_code,estimated_value', 'currency,title,scope_text,cpv_code,estimated_value')
+          p.write_text(s,encoding='utf-8')
+          PY
       - name: Run strict semantic promotion gate
         run: |
           python pipeline/semantic_promotion_v2.py \
