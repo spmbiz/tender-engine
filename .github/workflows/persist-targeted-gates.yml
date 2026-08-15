@@ -1,0 +1,69 @@
+name: Persist Targeted DCE Gates
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'benchmarks/gpt-targeted-dce-review-trigger.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read target set
+        id: cfg
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          x=json.load(open('benchmarks/gpt-targeted-dce-review-trigger.json'))
+          print('run='+str(x['dce_run']))
+          print('ids='+json.dumps(x['candidate_ids'],separators=(',',':')))
+          PY
+      - name: Download and expand exact candidate packs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DCE_RUN: ${{ steps.cfg.outputs.run }}
+          IDS_JSON: ${{ steps.cfg.outputs.ids }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="dce-harvest-${DCE_RUN}"
+          mkdir -p packs expanded
+          python - <<'PY' > /tmp/targets.tsv
+          import json,os,re
+          for cid in json.loads(os.environ['IDS_JSON']):
+              slug=re.sub(r'[^A-Za-z0-9._-]+','-',cid).strip('-')[:120] or 'candidate'
+              print(cid+'\t'+'candidate-'+slug+'.tar.gz')
+          PY
+          while IFS=$'\t' read -r cid asset; do
+            if gh release download "$tag" --pattern "$asset" --dir packs 2>/dev/null; then
+              dir="expanded/$(echo "$asset" | sed 's/^candidate-//;s/\.tar\.gz$//')"
+              mkdir -p "$dir"
+              tar -xzf "packs/$asset" -C "$dir"
+            else
+              echo "Missing target pack: $cid ($asset)" >&2
+            fi
+          done < /tmp/targets.tsv
+          test -n "$(find expanded -name gate_snippets.json -print -quit)"
+      - name: Build compact evidence dossier
+        run: |
+          python pipeline/compact_targeted_gates.py --root expanded --out benchmarks/world-targeted-gates-latest.json --max-snippets 4
+      - name: Persist evidence to repository
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add benchmarks/world-targeted-gates-latest.json
+          git commit -m 'Persist targeted worldwide DCE gate evidence' || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
