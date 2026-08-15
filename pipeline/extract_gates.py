@@ -7,62 +7,88 @@ import re
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
-PATTERNS = {
+CANONICAL_PATTERNS = {
+    "entity_geography": [
+        r"eligible economic operator", r"eligibility", r"participation is reserved", r"reserved participation", r"economic operator", r"country of establishment",
+        r"registered in", r"local presence", r"resident", r"nationality", r"EU member state", r"EEA", r"third countr", r"sanctions", r"exclusion grounds",
+        r"opérateur économique", r"conditions de participation", r"participation réservée", r"pays d'établissement", r"implantation locale",
+        r"wirtschaftsteilnehmer", r"teilnahmeberechtigt", r"niederlassung", r"teilnahme vorbehalten",
+    ],
     "turnover_financial": [
-        r"turnover", r"annual turnover", r"financial capacity", r"economic and financial",
-        r"chiffre d'affaires", r"capacit[ée] financi", r"omzet", r"financi[eë]le draagkracht",
+        r"turnover", r"annual turnover", r"minimum turnover", r"financial capacity", r"economic and financial", r"financial standing", r"balance sheet",
+        r"chiffre d'affaires", r"capacit[ée] financi", r"situation financière", r"omzet", r"financi[eë]le draagkracht", r"umsatz", r"wirtschaftliche.*leistungsfähigkeit",
     ],
     "references_experience": [
-        r"reference[s]?", r"similar contract", r"similar project", r"professional experience",
-        r"références?", r"prestations similaires", r"expérience professionnelle", r"ervaring", r"referentie",
+        r"reference[s]?", r"similar contract", r"similar project", r"comparable contract", r"professional experience", r"previous experience",
+        r"références?", r"prestations similaires", r"expérience professionnelle", r"ervaring", r"referentie", r"vergleichbare referenz", r"referenzprojekt",
     ],
-    "insurance": [
-        r"insurance", r"professional indemnity", r"public liability", r"employer.?s liability", r"cyber liability",
-        r"assurance", r"responsabilit[ée] civile", r"garantie d'assurance", r"verzekering", r"beroepsaansprakelijkheid",
+    "certifications_partner": [
+        r"certification", r"accreditation", r"ISO\s?\d+", r"certificate", r"authori[sz]ed reseller", r"reseller status", r"partner status", r"manufacturer authori[sz]ation",
+        r"certificat", r"accréditation", r"revendeur agréé", r"partenaire agréé", r"autorisation du fabricant", r"certificering", r"geautoriseerde partner",
+        r"zertifizierung", r"herstellerautorisierung", r"partnerstatus",
     ],
-    "tax_clearance": [
-        r"tax clearance", r"tax compliance", r"fiscal", r"social security", r"attestation fiscale",
-        r"obligations fiscales", r"cotisations sociales", r"belast", r"sociale zekerheid",
+    "staffing_team": [
+        r"curriculum vitae", r"\bCVs?\b", r"key personnel", r"project manager", r"team members", r"minimum team", r"named personnel", r"staffing",
+        r"équipe", r"chef de projet", r"personnel clé", r"effectif minimum", r"sleutelpersoneel", r"projectleider", r"projektleiter", r"schlüsselpersonal",
     ],
-    "team_cvs": [
-        r"curriculum vitae", r"\bCVs?\b", r"key personnel", r"project manager", r"team members",
-        r"équipe", r"chef de projet", r"personnel clé", r"sleutelpersoneel", r"projectleider",
-    ],
-    "language": [
-        r"language requirement", r"English language", r"French language", r"official language",
-        r"langue", r"français", r"anglais", r"néerlandais", r"taal", r"Nederlands",
-    ],
-    "certifications": [
-        r"certification", r"accreditation", r"ISO\s?\d+", r"certificate", r"certificat", r"accréditation", r"certificering",
-    ],
-    "onsite_geography": [
-        r"on[- ]?site", r"site visit", r"in person", r"physical meeting", r"travel", r"local presence",
-        r"sur site", r"présentiel", r"déplacement", r"réunion.*sur site", r"ter plaatse", r"fysieke vergadering",
+    "insurance_bonds": [
+        r"insurance", r"professional indemnity", r"public liability", r"employer.?s liability", r"product liability", r"cyber liability", r"performance bond", r"bid bond", r"bank guarantee",
+        r"assurance", r"responsabilit[ée] civile", r"garantie bancaire", r"caution", r"verzekering", r"beroepsaansprakelijkheid", r"haftpflicht", r"bürgschaft",
     ],
     "subcontracting_consortium": [
-        r"subcontract", r"consortium", r"joint tender", r"rely on the capacities", r"group of economic operators",
-        r"sous-trait", r"groupement", r"cotrait", r"capacités d'autres entités", r"onderaannem", r"combinatie",
-    ],
-    "hosting_security_data": [
-        r"hosting", r"SLA", r"service level", r"cyber", r"GDPR", r"data protection", r"security requirement",
-        r"hébergement", r"RGPD", r"protection des données", r"sécurité", r"hosting", r"AVG",
-    ],
-    "award_criteria": [
-        r"award criteria", r"quality.*price", r"price.*quality", r"marks", r"weighting",
-        r"critères? d'attribution", r"pondération", r"notation", r"gunningscriteria", r"weging",
-    ],
-    "payment": [
-        r"payment", r"invoice", r"milestone", r"advance payment", r"days after invoice",
-        r"paiement", r"facture", r"acompte", r"échéancier", r"betaling", r"factuur",
-    ],
-    "deadline_submission": [
-        r"deadline", r"closing date", r"submission date", r"tender submission", r"validity of tender",
-        r"date limite", r"remise des offres", r"validité de l'offre", r"uiterste datum", r"indiening",
+        r"subcontract", r"consortium", r"joint tender", r"rely on the capacities", r"group of economic operators", r"third party capacities",
+        r"sous-trait", r"groupement", r"cotrait", r"capacités d'autres entités", r"onderaannem", r"combinatie", r"unterauftrag", r"bietergemeinschaft",
     ],
     "deliverables_scope": [
-        r"deliverable", r"scope of work", r"specification", r"requirements", r"outputs?",
-        r"livrable", r"cahier des charges", r"prestations", r"spécifications", r"opdracht", r"vereisten",
+        r"deliverable", r"scope of work", r"statement of work", r"specification", r"requirements", r"outputs?", r"volume", r"quantity", r"milestone",
+        r"livrable", r"cahier des charges", r"prestations", r"spécifications", r"quantités", r"opdracht", r"vereisten", r"leistungsbeschreibung", r"leistungsumfang",
     ],
+    "sla_onsite": [
+        r"SLA", r"service level", r"response time", r"resolution time", r"availability", r"uptime", r"on[- ]?site", r"site visit", r"in person", r"physical meeting", r"travel", r"local presence",
+        r"sur site", r"présentiel", r"délai d'intervention", r"temps de réponse", r"déplacement", r"ter plaatse", r"fysieke vergadering", r"vor ort", r"reaktionszeit",
+    ],
+    "term_value": [
+        r"contract duration", r"duration of the contract", r"initial term", r"renewal", r"extension", r"option year", r"estimated value", r"maximum value", r"budget", r"framework ceiling",
+        r"durée du marché", r"reconduct", r"prolongation", r"valeur estimée", r"montant maximum", r"budget", r"looptijd", r"verlenging", r"geraamde waarde", r"vertragslaufzeit", r"geschätzter wert",
+    ],
+    "award_criteria": [
+        r"award criteria", r"evaluation criteria", r"quality.*price", r"price.*quality", r"marks", r"weighting", r"minimum score", r"pass mark",
+        r"critères? d'attribution", r"critères? de jugement", r"pondération", r"notation", r"note minimale", r"gunningscriteria", r"weging", r"zuschlagskriterien", r"wertung",
+    ],
+    "forms_signatures": [
+        r"form of tender", r"mandatory form", r"signature", r"signed by", r"eESPD", r"ESPD", r"declaration", r"appendix", r"schedule.*complete", r"power of attorney",
+        r"acte d'engagement", r"formulaire obligatoire", r"signature", r"déclaration", r"annexe.*compléter", r"mandat", r"verplicht formulier", r"handtekening", r"erklärung", r"unterschrift",
+    ],
+    "submission": [
+        r"deadline", r"closing date", r"submission date", r"tender submission", r"validity of tender", r"submission portal", r"electronic submission", r"language of tender", r"language requirement",
+        r"date limite", r"remise des offres", r"validité de l'offre", r"langue de l'offre", r"plateforme de dépôt", r"uiterste datum", r"indiening", r"taal van de inschrijving",
+        r"angebotsfrist", r"einreichung", r"sprache des angebots",
+    ],
+    "ip_data_security": [
+        r"intellectual property", r"copyright", r"licen[cs]ing", r"source code", r"source files", r"ownership", r"data protection", r"GDPR", r"data residency", r"hosting", r"cyber", r"security requirement", r"penetration test",
+        r"propriété intellectuelle", r"droits d'auteur", r"fichiers sources", r"code source", r"RGPD", r"hébergement", r"protection des données", r"sécurité", r"AVG", r"gegevensbescherming",
+        r"urheberrecht", r"quellcode", r"datenschutz", r"hostingstandort", r"informationssicherheit",
+    ],
+    "payment_tax": [
+        r"payment", r"invoice", r"milestone payment", r"advance payment", r"days after invoice", r"tax clearance", r"tax compliance", r"social security",
+        r"paiement", r"facture", r"acompte", r"échéancier", r"attestation fiscale", r"cotisations sociales", r"betaling", r"factuur", r"steuer", r"rechnung",
+    ],
+}
+
+LEGACY_ALIASES = {
+    "references_experience": "references_experience",
+    "insurance": "insurance_bonds",
+    "tax_clearance": "payment_tax",
+    "team_cvs": "staffing_team",
+    "language": "submission",
+    "certifications": "certifications_partner",
+    "onsite_geography": "sla_onsite",
+    "subcontracting_consortium": "subcontracting_consortium",
+    "hosting_security_data": "ip_data_security",
+    "award_criteria": "award_criteria",
+    "payment": "payment_tax",
+    "deadline_submission": "submission",
+    "deliverables_scope": "deliverables_scope",
 }
 
 
@@ -91,6 +117,18 @@ def snippets(text: str, regexes: list[str], window: int = 650, max_hits: int = 2
     return out
 
 
+def empty_categories() -> dict:
+    canonical = {name: [] for name in CANONICAL_PATTERNS}
+    aliases = {alias: canonical[target] for alias, target in LEGACY_ALIASES.items()}
+    return {**canonical, **aliases}
+
+
+def extract_categories(text: str) -> dict:
+    canonical = {name: snippets(text, pats) for name, pats in CANONICAL_PATTERNS.items()}
+    aliases = {alias: canonical[target] for alias, target in LEGACY_ALIASES.items()}
+    return {**canonical, **aliases}
+
+
 def process(root: Path):
     corpus_path = root / "corpus.txt"
     if not corpus_path.exists():
@@ -100,7 +138,7 @@ def process(root: Path):
     gate_ready = bool(evidence.get("gate_readiness")) if evidence else None
 
     if evidence and not gate_ready:
-        gates = {name: [] for name in PATTERNS}
+        gates = empty_categories()
         result = {
             "candidate_id": None,
             "corpus_chars": len(text),
@@ -108,12 +146,13 @@ def process(root: Path):
             "skipped_due_to_evidence_quality": True,
             "content_quality": evidence.get("content_quality"),
             "derived_status": evidence.get("derived_status"),
+            "canonical_gate_names": list(CANONICAL_PATTERNS),
             "categories": gates,
             "evidence_counts": {k: 0 for k in gates},
             "warning": "Mandatory-gate extraction blocked because authoritative DCE content was not proven. Do not infer eligibility from this corpus.",
         }
     else:
-        gates = {name: snippets(text, pats) for name, pats in PATTERNS.items()}
+        gates = extract_categories(text)
         result = {
             "candidate_id": None,
             "corpus_chars": len(text),
@@ -121,9 +160,10 @@ def process(root: Path):
             "skipped_due_to_evidence_quality": False,
             "content_quality": evidence.get("content_quality") if evidence else None,
             "derived_status": evidence.get("derived_status") if evidence else None,
+            "canonical_gate_names": list(CANONICAL_PATTERNS),
             "categories": gates,
             "evidence_counts": {k: len(v) for k, v in gates.items()},
-            "warning": "These are retrieval snippets, not eligibility verdicts. GPT/human review must resolve each mandatory gate explicitly with authoritative evidence.",
+            "warning": "These are retrieval snippets, not eligibility verdicts. GPT/human review must resolve every canonical mandatory gate explicitly with authoritative evidence.",
         }
 
     candidate_path = root / "candidate.json"
@@ -134,7 +174,7 @@ def process(root: Path):
         except Exception:
             pass
     (root / "gate_snippets.json").write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
-    return {"root": str(root), "candidate_id": result.get("candidate_id"), "gate_readiness": result.get("gate_readiness"), "skipped": result.get("skipped_due_to_evidence_quality"), "evidence_counts": result["evidence_counts"]}
+    return {"root": str(root), "candidate_id": result.get("candidate_id"), "gate_readiness": result.get("gate_readiness"), "skipped": result.get("skipped_due_to_evidence_quality"), "canonical_gate_names": result.get("canonical_gate_names"), "evidence_counts": result["evidence_counts"]}
 
 
 def main():
@@ -164,7 +204,7 @@ def main():
                     results.append(rec)
 
     results.sort(key=lambda r: r.get("root", ""))
-    print(json.dumps({"workers": workers, "candidates": len(roots), "gate_ready": sum(1 for r in results if r.get("gate_readiness")), "skipped_unverified": sum(1 for r in results if r.get("skipped")), "results": results}, indent=2, ensure_ascii=False))
+    print(json.dumps({"workers": workers, "candidates": len(roots), "gate_ready": sum(1 for r in results if r.get("gate_readiness")), "skipped_unverified": sum(1 for r in results if r.get("skipped")), "canonical_gate_names": list(CANONICAL_PATTERNS), "results": results}, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":
