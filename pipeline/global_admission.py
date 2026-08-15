@@ -11,14 +11,14 @@ DEFAULT_POLICY = {
     "github": {"capacity": 20},
     "workloads": {
         "hospitality": {"enabled": True, "weight": 0.50, "min_slots_when_demanding": 6, "max_slots": 20},
-        "tenders": {"enabled": True, "weight": 0.25, "min_slots_when_demanding": 4, "max_slots": 14},
+        "tenders": {"enabled": True, "weight": 0.25, "min_slots_when_demanding": 4, "max_slots": 20},
         "gws": {"enabled": True, "weight": 0.25, "min_slots_when_demanding": 4, "max_slots": 10},
     },
 }
 
 
 def _request(url: str):
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.0"})
+    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.1"})
     tok = os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")
     if tok:
         req.add_header("Authorization", f"Bearer {tok}")
@@ -54,26 +54,36 @@ def _classify(repo: str, name: str, path: str) -> str:
     return "external"
 
 
-def _repo_commitments(repo: str, ignore_run_id: str = "") -> Counter:
-    counts: Counter[str] = Counter()
+def _repo_capacity_state(repo: str, ignore_run_id: str = "") -> tuple[Counter, Counter]:
+    """Return (active slots, queued jobs) by workload.
+
+    GitHub queued jobs are backlog/demand, not currently occupied hosted-runner
+    capacity. Counting them as active commitments caused a self-deadlock where a
+    large queued Tender matrix could make the DCE fast lane admit zero new work.
+    We therefore use only in-progress jobs for slot occupancy while retaining
+    queued counts for observability and demand protection.
+    """
+    active: Counter[str] = Counter()
+    queued: Counter[str] = Counter()
     seen: set[str] = set()
-    for status in ("in_progress", "queued"):
-        data = _json(f"{API}/repos/{repo}/actions/runs?status={status}&per_page=30", {})
+    for run_status in ("in_progress", "queued"):
+        data = _json(f"{API}/repos/{repo}/actions/runs?status={run_status}&per_page=30", {})
         for run in (data or {}).get("workflow_runs") or []:
             rid = str(run.get("id") or "")
             if not rid or rid in seen or rid == ignore_run_id:
                 continue
             seen.add(rid)
+            workload = _classify(repo, str(run.get("name") or run.get("display_title") or ""), str(run.get("path") or ""))
             jobs = _json(run.get("jobs_url") or "", {})
             rows = (jobs or {}).get("jobs") or []
             if rows:
-                committed = sum(j.get("status") in {"in_progress", "queued"} for j in rows)
-            else:
-                committed = 1 if run.get("status") in {"in_progress", "queued"} else 0
-            if committed:
-                w = _classify(repo, str(run.get("name") or run.get("display_title") or ""), str(run.get("path") or ""))
-                counts[w] += committed
-    return counts
+                active[workload] += sum(j.get("status") == "in_progress" for j in rows)
+                queued[workload] += sum(j.get("status") == "queued" for j in rows)
+            elif run_status == "in_progress":
+                active[workload] += 1
+            elif run_status == "queued":
+                queued[workload] += 1
+    return active, queued
 
 
 def _fair_target(total: int, demand: int, cfg: dict) -> int:
@@ -88,9 +98,10 @@ def _fair_target(total: int, demand: int, cfg: dict) -> int:
 def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     """Admission-control new DCE runners without preempting any running job.
 
-    Existing active/queued jobs remain untouched. New Tender shards can borrow
-    genuinely idle shares, but cannot consume slots needed to restore a demanding
-    sibling workload to its fair target.
+    Actual in-progress jobs consume capacity. Queued jobs are demand/backlog and
+    never consume a slot in this local admission calculation. Sibling workloads
+    with durable demand still receive fair-target headroom before Tender borrows
+    idle capacity.
     """
     requested = max(0, int(requested))
     if os.getenv("DCE_DISABLE_GLOBAL_ADMISSION", "").lower() in {"1", "true", "yes"}:
@@ -102,42 +113,59 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     state = _global_state()
     last = state.get("last_decision") if isinstance(state, dict) else {}
     demand = (last or {}).get("demand") or {}
-    # Fail safe toward fairness if the remote demand snapshot is temporarily absent.
     hospitality_demand = int(demand.get("hospitality") or 1)
     gws_demand = int(demand.get("gws") or 0)
     tender_demand = int(demand.get("tenders") or max(requested, 1))
 
     current_run = str(os.getenv("GITHUB_RUN_ID") or "")
-    counts: Counter[str] = Counter()
-    counts.update(_repo_commitments(GLOBAL_REPO))
-    counts.update(_repo_commitments("walidgdg1-ai/tender-engine", ignore_run_id=current_run))
+    active: Counter[str] = Counter()
+    queued: Counter[str] = Counter()
+    for repo, ignore in ((GLOBAL_REPO, ""), ("walidgdg1-ai/tender-engine", current_run)):
+        repo_active, repo_queued = _repo_capacity_state(repo, ignore_run_id=ignore)
+        active.update(repo_active)
+        queued.update(repo_queued)
 
     sibling_targets = {
         "hospitality": _fair_target(total, hospitality_demand, workloads.get("hospitality") or {}),
         "gws": _fair_target(total, gws_demand, workloads.get("gws") or {}),
     }
-    sibling_missing = sum(max(0, sibling_targets[w] - int(counts.get(w, 0))) for w in sibling_targets)
-    committed = sum(int(v) for v in counts.values())
-    global_room_after_protection = max(0, total - committed - sibling_missing)
+    sibling_missing = sum(max(0, sibling_targets[w] - int(active.get(w, 0))) for w in sibling_targets)
+    active_total = sum(int(v) for v in active.values())
+    global_room_after_protection = max(0, total - active_total - sibling_missing)
 
     tender_cfg = workloads.get("tenders") or {}
     tender_max = int(tender_cfg.get("max_slots") or total)
-    existing_tender = int(counts.get("tenders", 0))
-    tender_room = max(0, tender_max - existing_tender)
-    allowed = min(requested, global_room_after_protection, tender_room, max(0, tender_demand - existing_tender))
+    existing_tender_active = int(active.get("tenders", 0))
+    tender_room = max(0, tender_max - existing_tender_active)
+
+    # Remote demand snapshots can lag behind the durable DCE selection. The
+    # explicit requested parallelism is therefore a lower bound on effective DCE
+    # demand, while active jobs still count against the account capacity.
+    effective_tender_demand = max(tender_demand, requested + existing_tender_active)
+    unmet_tender_demand = max(0, effective_tender_demand - existing_tender_active)
+    allowed = min(requested, global_room_after_protection, tender_room, unmet_tender_demand)
 
     report = {
-        "mode": "fair-share-admission",
+        "mode": "active-slot-fair-share-admission",
         "capacity": total,
         "requested": requested,
         "allowed": allowed,
-        "commitments": dict(counts),
-        "demand": {"hospitality": hospitality_demand, "gws": gws_demand, "tenders": tender_demand},
+        "active_commitments": dict(active),
+        "queued_backlog": dict(queued),
+        "active_total": active_total,
+        "demand": {
+            "hospitality": hospitality_demand,
+            "gws": gws_demand,
+            "tenders_remote": tender_demand,
+            "tenders_effective": effective_tender_demand,
+        },
         "sibling_targets": sibling_targets,
         "sibling_missing_reserved": sibling_missing,
         "global_room_after_protection": global_room_after_protection,
-        "existing_tender_commitment": existing_tender,
+        "existing_tender_active": existing_tender_active,
+        "queued_tender_backlog": int(queued.get("tenders", 0)),
         "tender_max": tender_max,
         "preemption": "none; admission control only",
+        "queue_rule": "queued jobs are backlog/demand, not occupied runner slots",
     }
     return allowed, report
