@@ -1,0 +1,134 @@
+name: Curated Current Green DCE Resolver
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'queues/dce_curated_greens_20260815.jsonl'
+      - '.github/workflows/curated-green-dce.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: curated-current-green-dce
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install resolver dependencies
+        run: |
+          python -m pip install --disable-pip-version-check -q requests beautifulsoup4 lxml pypdf python-docx openpyxl python-pptx 'playwright>=1.46,<2'
+      - name: Reuse runner Chrome
+        shell: bash
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
+          command -v 7z >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq p7zip-full)
+      - name: Resolve six current TED greens
+        env:
+          DCE_LOCAL_CONCURRENCY: '4'
+          DCE_ITEM_RETRIES: '2'
+          DCE_ITEM_TIMEOUT_SECONDS: '180'
+        run: |
+          python pipeline/dce_batch_worker.py \
+            --queue queues/dce_curated_greens_20260815.jsonl \
+            --lines '1,2,3,4,5,6' \
+            --out out \
+            --concurrency 4 \
+            --retries 2 \
+            --timeout-seconds 180
+      - name: Extract and classify retrieved evidence
+        if: always()
+        shell: bash
+        run: |
+          python pipeline/extract_corpus.py --root out || true
+          python pipeline/dce_evidence_quality.py --root out || true
+          python pipeline/extract_gates.py --root out || true
+          python pipeline/durable_dce_pack.py --root out --out-dir durable || true
+      - name: Build compact durable status
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('out')
+          rows=[]
+          for mp in sorted(root.glob('*/manifest.json')):
+              try:m=json.loads(mp.read_text(encoding='utf-8',errors='replace'))
+              except Exception:continue
+              d=mp.parent
+              q={}
+              for p in [d/'evidence_quality.json', d/'evidence'/'evidence_quality.json']:
+                  if p.exists():
+                      try:q=json.loads(p.read_text(encoding='utf-8',errors='replace'))
+                      except Exception:pass
+                      break
+              gate_files=list(d.rglob('*gate*.json'))
+              c=m.get('candidate') or {}
+              rows.append({
+                'candidate_id':m.get('candidate_id'),
+                'title':c.get('title'),
+                'preliminary_score':c.get('preliminary_score'),
+                'status':m.get('status'),
+                'files':len(m.get('files') or []),
+                'evidence_quality':q.get('status') or q.get('evidence_quality') or q.get('classification'),
+                'gate_files':[str(x.relative_to(d)) for x in gate_files[:10]],
+                'error':m.get('error'),
+                'ted_resolution':m.get('ted_resolution'),
+                'downstream_attempts':m.get('ted_downstream_attempts') or []
+              })
+          out=Path('control/curated_dce_latest');out.mkdir(parents=True,exist_ok=True)
+          payload={'version':'CURATED_GREEN_DCE_20260815_V1','run_id':'${{ github.run_id }}','rows':rows}
+          (out/'STATUS.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
+          lines=['# Curated current-green DCE resolution','',f"Run `${{ github.run_id }}`",'',
+                 '|Candidate|Score|Resolver status|Files|Evidence quality|','|---|---:|---|---:|---|']
+          for r in rows:
+              lines.append(f"|{r['candidate_id']}|{r.get('preliminary_score') or ''}|{r.get('status') or ''}|{r.get('files') or 0}|{r.get('evidence_quality') or 'UNKNOWN'}|")
+          lines += ['','Resolver transport success is not an eligibility PASS. Mandatory gates remain controlled by authoritative DCE evidence.']
+          (out/'REPORT.md').write_text('\n'.join(lines),encoding='utf-8')
+          print(json.dumps(payload,ensure_ascii=False,indent=2))
+          PY
+      - name: Publish candidate packs and compact status
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="curated-dce-${GITHUB_RUN_ID}"
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "Curated Green DCE ${GITHUB_RUN_ID}" \
+            --notes "Current SPM green candidates. Resolver status is transport evidence only; DCE gate adjudication remains authoritative."
+          gh release upload "$tag" control/curated_dce_latest/STATUS.json control/curated_dce_latest/REPORT.md --repo "$GITHUB_REPOSITORY" --clobber
+          if [ -d durable ]; then
+            find durable -maxdepth 1 -type f -name 'candidate-*.tar.gz' -print0 | xargs -0 -r gh release upload "$tag" --repo "$GITHUB_REPOSITORY" --clobber
+          fi
+      - name: Persist compact status on main
+        if: always()
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/curated_dce_latest/
+          git commit -m 'tenders: persist curated current-green DCE status' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
