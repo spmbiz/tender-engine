@@ -22,11 +22,9 @@ def count_releases(data):
     return 0
 
 def resource_rank(r:dict):
-    text=' '.join(str(r.get(k) or '') for k in ('name','description','url','last_modified','created')).lower()
-    nums=[int(x) for x in re.findall(r'(?<!\d)(20\d{2})[_\-/ .](0?[1-9]|1[0-2])(?!\d)',text) for x in x]
-    # explicit sortable year/month from common resource names, then metadata timestamp.
+    text=' '.join(str(r.get(k) or '') for k in ('name','description','url')).lower()
     m=re.search(r'(?<!\d)(20\d{2})[_\-/ .](0?[1-9]|1[0-2])(?!\d)',text)
-    ym=(int(m.group(1)),int(m.group(2))) if m else (0,0)
+    ym=(int(m.group(1)),int(m.group(2))) if m else (int(r.get('package_year') or 0),0)
     stamp=str(r.get('last_modified') or r.get('created') or '')
     return (ym[0],ym[1],stamp,str(r.get('name') or ''))
 
@@ -74,9 +72,10 @@ def download_resource(rsrc:dict,idx:int):
         return meta
     except Exception as exc:return {'resource_id':rsrc.get('id'),'name':rsrc.get('name'),'url':url,'error':repr(exc)}
 
-def legacy_probe(years:list[int]):
+def legacy_probe():
     inv=[]
-    for y in years:
+    # The old filesystem layout is known to exist for historical years; scan broadly only if CKAN metadata fails.
+    for y in range(min(NOW.year,2023),2016,-1):
         for m in range(12,0,-1):
             url=LEGACY.format(year=y,month=m)
             try:r=S.get(url,timeout=45,stream=True);inv.append({'year':y,'month':m,'url':url,'status':r.status_code,'content_length':int(r.headers.get('content-length') or 0),'content_type':r.headers.get('content-type')})
@@ -98,11 +97,9 @@ def main():
     downloaded=[]
     for i,r in enumerate(resources[:max(DOWNLOAD_RESOURCES,1)]):
         if len(downloaded)>=DOWNLOAD_RESOURCES:break
-        rec=download_resource(r,i);downloaded.append(rec)
+        downloaded.append(download_resource(r,i))
     fallback_inventory=[];fallback_hit=None
-    if not resources:
-        # Preserve compatibility with the historical 2018-era filesystem pattern.
-        fallback_inventory,fallback_hit=legacy_probe(list(range(min(NOW.year,2023),NOW.year-YEARS,-1)))
+    if not resources:fallback_inventory,fallback_hit=legacy_probe()
     (OUT/'package_inventory.json').write_text(json.dumps(package_inventory,indent=2,ensure_ascii=False),encoding='utf-8')
     (OUT/'resource_inventory.json').write_text(json.dumps(resources or fallback_inventory,indent=2,ensure_ascii=False),encoding='utf-8')
     (OUT/'current.jsonl').write_text('',encoding='utf-8')
