@@ -40,9 +40,12 @@ jobs:
           s=s.replace('sum(share*share)*10000', 'sum(supplier_share*supplier_share)*10000')
           s=s.replace('share*100 supplier_share_pct', 'supplier_share*100 supplier_share_pct')
           s=s.replace('EXCLUDE(rn,share)', 'EXCLUDE(rn,supplier_share)')
+          s=s.replace('month(publication_date) month,', 'month(publication_date) publication_month,')
+          s=s.replace("get('month')", "get('publication_month')")
           p.write_text(s,encoding='utf-8')
           assert '{proc} procedure,' not in s
           assert '),0) share FROM sx' not in s
+          assert 'month(publication_date) month,' not in s
           PY
       - name: Download canonical Global Core v4
         env:
