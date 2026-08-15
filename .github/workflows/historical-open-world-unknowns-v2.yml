@@ -1,0 +1,54 @@
+name: Historical Open World Unknowns v2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - historical_lab/open_world_unknowns_v2.py
+      - .github/workflows/historical-open-world-unknowns-v2.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-open-world-unknowns-v2
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Download commercial miner cluster assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input out
+          for p in global_core_high_signal_clusters.csv global_core_cluster_examples.csv usa_high_signal_clusters.csv usa_cluster_examples.csv australia_high_signal_clusters.csv australia_cluster_examples.csv; do
+            gh release download historical-commercial-miner-v1 --repo "$GITHUB_REPOSITORY" --pattern "$p" --dir input --clobber
+          done
+      - name: Build exact-attribution unknown queues
+        run: python historical_lab/open_world_unknowns_v2.py --input input --out out
+      - name: Persist durable v2 outputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-open-world-unknowns-v2
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target main --title 'Historical Open World Unknowns v2' --notes 'Historical-only ontology-independent discovery with full composite example attribution; weak signatures preserved in a code-only queue.'
+          for f in summary.json semantic_review_queue.jsonl code_only_review_queue.jsonl SEMANTIC_REVIEW_PACKET.md CODE_ONLY_REVIEW_PACKET.md; do gh release upload "$TAG" "out/$f" --repo "$GITHUB_REPOSITORY" --clobber; done
+          mkdir -p control/historical_open_world_unknowns_v2
+          cp out/summary.json out/SEMANTIC_REVIEW_PACKET.md out/CODE_ONLY_REVIEW_PACKET.md control/historical_open_world_unknowns_v2/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_open_world_unknowns_v2/
+          git commit -m 'historical: persist open-world unknowns v2' || exit 0
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
