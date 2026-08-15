@@ -1,0 +1,52 @@
+name: Historical USA Network Intermediary v3.1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - historical_lab/usa_network_intermediary_economics_v3.py
+      - .github/workflows/historical-usa-network-intermediary-v3-1.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Download canonical USAspending facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          for a in historical_tenders.csv.gz awards.csv.gz; do
+            gh release download tender-normalized-usa-awards-v1 --repo walidgdg1-ai/coldemailtool --pattern "$a" --dir source --clobber
+          done
+      - name: Run network/intermediary economics v3.1
+        run: python historical_lab/usa_network_intermediary_economics_v3.py --historical source/historical_tenders.csv.gz --awards source/awards.csv.gz --out out
+      - name: Persist isolated branch authority
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-usa-network-intermediary-v3-1
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target main --title 'Historical USA Network Intermediary v3.1' --notes 'Historical USAspending network/intermediary economics for expert witness, litigation support, court reporting and interpretation. No current eligibility inference.'
+          gh release upload "$TAG" out/summary.json out/REPORT.md out/family_intermediation_scorecard.csv out/supplier_archetypes.csv out/top_buyers.csv out/examples.csv --repo "$GITHUB_REPOSITORY" --clobber
+          mkdir -p control/historical_usa_network_intermediary_v3_1
+          cp out/summary.json out/REPORT.md control/historical_usa_network_intermediary_v3_1/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_usa_network_intermediary_v3_1/
+          git commit -m 'historical: persist USA network intermediary v3.1' || exit 0
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
