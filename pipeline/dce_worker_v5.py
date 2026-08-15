@@ -101,12 +101,7 @@ def adapter_greece_robust(candidate: dict, out: Path, manifest: dict):
 
 
 def adapter_ted_public_fast(candidate: dict, out: Path, manifest: dict):
-    """Bounded HTTP-only fallback for previously unclassified TED public routes.
-
-    This deliberately avoids Playwright so long-tail unknown portals cannot turn a
-    320-candidate wave into hundreds of browser-minutes. Recognized portal families
-    still use their richer adapters. Barriers stay explicit and no login is bypassed.
-    """
+    """Bounded HTTP-only fallback for previously unclassified TED public routes."""
     manifest.setdefault('dce_method_attempts', [])
     route = candidate.get('route') or {}
     detail_url = route.get('detail_url') or candidate.get('notice_url')
@@ -180,6 +175,10 @@ def adapter_ted_public_fast(candidate: dict, out: Path, manifest: dict):
 base.ADAPTERS['GR_KHMDHS'] = adapter_greece_robust
 base.ADAPTERS['GENERIC_EPPS'] = v2.optimized_epps
 base.ADAPTERS['TED_PUBLIC_PAGE_FAST'] = adapter_ted_public_fast
+# Discovery aliases emitted by live national adapters. Keep aliases explicit so
+# matrix and worker contracts cannot silently diverge again.
+base.ADAPTERS['PT_BASE'] = v4.cascade_public_adapter
+base.ADAPTERS['CZ_NIPEZ'] = v4.cascade_public_adapter
 
 if __name__ == '__main__':
     v2.main()
