@@ -1,0 +1,50 @@
+name: Historical USA Knowledge Local Services QA v2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/historical-usa-knowledge-local-services-qa-v2.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download precision v2 evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input
+          for f in examples.csv top_winners.csv top_buyers.csv; do
+            gh release download historical-usa-knowledge-local-services-v2 --repo "$GITHUB_REPOSITORY" --pattern "$f" --dir input --clobber
+          done
+      - name: Build precision QA packet
+        run: |
+          python historical_lab/build_decomposition_qa_packet.py \
+            --examples input/examples.csv --winners input/top_winners.csv --buyers input/top_buyers.csv \
+            --group-cols family,subtype --title 'USA Knowledge + Local Services — Precision QA v2' --out QA_PACKET.md
+      - name: Persist QA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-usa-knowledge-local-services-qa-v2
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target main --title 'Historical USA Knowledge Local Services QA v2' --notes 'Representative title/winner/buyer evidence for precision expert, litigation, court-reporting, language interpretation and local-service markets.'
+          gh release upload "$TAG" QA_PACKET.md --repo "$GITHUB_REPOSITORY" --clobber
+          mkdir -p control/historical_usa_knowledge_local_services_qa_v2
+          cp QA_PACKET.md control/historical_usa_knowledge_local_services_qa_v2/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_usa_knowledge_local_services_qa_v2/
+          git commit -m 'historical: persist USA knowledge/local services QA v2' || exit 0
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
