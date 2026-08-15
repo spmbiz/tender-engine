@@ -66,7 +66,7 @@ def run_one(queue: str, line_no: int, out: str, retries: int, timeout_seconds: i
     for attempt in range(1, effective_retries + 2):
         cmd = [
             sys.executable,
-            "pipeline/dce_worker_v6.py",
+            "pipeline/dce_worker_v7.py",
             "--queue",
             queue,
             "--line",
