@@ -1,0 +1,111 @@
+name: Germany OpenData API Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/germany-opendata-api-probe.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Inspect official Swagger and locate OpenAPI spec
+        shell: bash
+        run: |
+          set -u
+          mkdir -p probe
+          base='https://oeffentlichevergabe.de'
+          page="$base/documentation/swagger-ui/opendata/index.html"
+          curl -fsSL --retry 3 --max-time 30 "$page" -o probe/swagger.html || true
+          grep -Eo 'https?://[^" ]+|url:[[:space:]]*[^,}]+' probe/swagger.html | head -100 > probe/swagger_refs.txt || true
+          for u in \
+            "$base/documentation/swagger-ui/opendata/swagger-initializer.js" \
+            "$base/documentation/swagger-ui/opendata/openapi.json" \
+            "$base/documentation/swagger-ui/opendata/openapi.yaml" \
+            "$base/documentation/swagger-ui/opendata/swagger.json" \
+            "$base/documentation/swagger-ui/opendata/swagger.yaml" \
+            "$base/v3/api-docs/opendata" \
+            "$base/v3/api-docs" \
+            "$base/documentation/openapi/opendata.json" \
+            "$base/documentation/openapi/opendata.yaml"; do
+              code="$(curl -L -sS -o /tmp/spec --max-time 25 -w '%{http_code}' "$u" || true)"
+              printf '%s\t%s\t%s\n' "$code" "$(wc -c </tmp/spec 2>/dev/null || echo 0)" "$u" >> probe/spec_attempts.tsv
+              if [ "$code" = 200 ] && grep -Eq 'notice-exports|openapi|swagger' /tmp/spec; then
+                cp /tmp/spec probe/openapi_spec
+                echo "$u" > probe/openapi_spec_url.txt
+                break
+              fi
+          done
+          echo '=== swagger refs ==='; cat probe/swagger_refs.txt || true
+          echo '=== spec attempts ==='; cat probe/spec_attempts.tsv || true
+          if [ -f probe/openapi_spec ]; then head -c 5000 probe/openapi_spec; fi
+
+      - name: Extract notice-exports operation contract
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          p=Path('probe/openapi_spec')
+          out={'spec_found':p.exists(),'spec_url':Path('probe/openapi_spec_url.txt').read_text().strip() if Path('probe/openapi_spec_url.txt').exists() else None}
+          if p.exists():
+            raw=p.read_text(encoding='utf-8',errors='replace')
+            out['spec_bytes']=len(raw)
+            try:
+              data=json.loads(raw)
+            except Exception:
+              data=None
+            if isinstance(data,dict):
+              out['servers']=data.get('servers')
+              op=((data.get('paths') or {}).get('/api/notice-exports') or {}).get('get') or {}
+              out['operation']={'operationId':op.get('operationId'),'summary':op.get('summary'),'parameters':op.get('parameters'),'responses':op.get('responses')}
+            else:
+              ix=raw.find('/api/notice-exports')
+              out['operation_raw']=raw[max(0,ix-1000):ix+9000] if ix>=0 else None
+          Path('probe/contract.json').write_text(json.dumps(out,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print(json.dumps(out,indent=2,ensure_ascii=False)[:20000])
+          PY
+
+      - name: Probe likely official export parameter shapes safely
+        shell: bash
+        run: |
+          set -u
+          endpoint='https://oeffentlichevergabe.de/api/notice-exports'
+          : > probe/api_attempts.tsv
+          for qs in \
+            'pubDay=2026-05-21' \
+            'pubDay=2026-05-21&format=eforms' \
+            'pubMonth=2026-05' \
+            'pubMonth=2026-05&format=eforms' \
+            'publicationDate=2026-05-21'; do
+            file="probe/attempt-$(echo "$qs" | tr '?&=/' '_____').bin"
+            code="$(curl -L -sS --max-time 45 -D "$file.headers" -o "$file" -w '%{http_code}' "$endpoint?$qs" || true)"
+            ctype="$(grep -i '^content-type:' "$file.headers" | tail -1 | tr -d '\r' || true)"
+            printf '%s\t%s\t%s\t%s\n' "$code" "$(wc -c <"$file" 2>/dev/null || echo 0)" "$ctype" "$qs" >> probe/api_attempts.tsv
+          done
+          cat probe/api_attempts.tsv
+
+      - name: Persist probe regardless of API outcome
+        shell: bash
+        run: |
+          mkdir -p control/germany_opendata_api_probe_v1
+          cp -r probe/. control/germany_opendata_api_probe_v1/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/germany_opendata_api_probe_v1/
+          git commit -m 'tenders: persist Germany OpenData API probe v1' || exit 0
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
