@@ -1,0 +1,53 @@
+name: Historical Open-World Review Packet v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/historical-open-world-review-packet-v1.yml'
+      - 'historical_lab/build_open_world_review_packet_v1.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-open-world-review-packet-v1
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download exhaustive open-world cohort surfaces
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          TAG=market-intelligence-exhaustive-every-record-v1
+          for f in global_core_open_world_clusters.csv usa_open_world_clusters.csv australia_open_world_clusters.csv; do
+            gh release download "$TAG" --repo walidgdg1-ai/tender-engine --pattern "$f" --dir source --clobber
+          done
+      - name: Build bias-reduced review packet
+        run: |
+          python historical_lab/build_open_world_review_packet_v1.py \
+            --global-core source/global_core_open_world_clusters.csv \
+            --usa source/usa_open_world_clusters.csv \
+            --australia source/australia_open_world_clusters.csv \
+            --out out
+      - name: Persist compact review authority
+        run: |
+          mkdir -p control/historical_open_world_review_v1
+          cp out/summary.json out/REVIEW_PACKET.md out/review_packet.csv control/historical_open_world_review_v1/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_open_world_review_v1/
+          git commit -m 'historical: persist open-world review packet v1' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
