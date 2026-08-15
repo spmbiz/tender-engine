@@ -184,7 +184,6 @@ def main():
 
         def fetch_page(page_no, page_size):
             payload = {"includeOrganisationChildren": True, "page": page_no, "pageSize": page_size}
-            # First choice: BrowserContext APIRequestContext shares this anonymous browser cookie jar.
             try:
                 rr = context.request.post(SEARCH_API, headers=replay_headers, data=payload, timeout=45000)
                 text = rr.text()
@@ -194,7 +193,6 @@ def main():
                     return data
             except Exception as exc:
                 telemetry.append({"page": page_no, "page_size": page_size, "method": "context.request", "error": repr(exc)})
-            # Fallback: execute fetch inside the already-authorized public SPA origin.
             try:
                 result = page.evaluate(
                     """async ({url,payload,headers}) => {
@@ -213,7 +211,6 @@ def main():
                 telemetry.append({"page": page_no, "page_size": page_size, "method": "page.fetch", "error": repr(exc)})
             return None
 
-        # Prefer larger pages for efficient exhaustive recent/open traversal, fall back to the SPA's native 25.
         data = fetch_page(1, effective_page_size)
         if data is None and effective_page_size != 25:
             effective_page_size = 25
@@ -238,9 +235,9 @@ def main():
 
             pub_dates = [parse_dt(x.get("publicationDate")) for x in rows if isinstance(x, dict)]
             pub_dates = [x for x in pub_dates if x]
-            # The public UI is newest-first. Once the oldest row on a complete page is outside
-            # the configured scan horizon, later pages cannot add newer/open notices within it.
-            if pub_dates and min(pub_dates) < scan_cutoff:
+            # Public search is newest-first. Stop only when every dated row on the page is
+            # already older than the configured scan horizon; one stray old row cannot truncate recall.
+            if pub_dates and max(pub_dates) < scan_cutoff:
                 break
             if len(rows) < effective_page_size:
                 break
@@ -270,7 +267,6 @@ def main():
         if not rec:
             continue
         published = parse_dt(rec.get("published"))
-        # Preserve recent publications plus every future-deadline competition found in the scan horizon.
         if (published and published >= raw_cutoff) or rec.get("current"):
             seen[rec["candidate_id"]] = rec
     raw = list(seen.values())
