@@ -69,11 +69,7 @@ def cascade_public_adapter(candidate: dict,out:Path,manifest:dict):
 
 
 def adapter_ungm_guarded(candidate:dict,out:Path,manifest:dict):
-    """Use public UNGM attachments when available, but surface interest-gated notices explicitly.
-
-    A public attachment may itself be only an access guide. Evidence-quality classification later
-    decides whether a downloaded file is authoritative DCE; this adapter only reports transport/access state.
-    """
+    """Use public UNGM attachments when available, but surface interest-gated notices explicitly."""
     manifest.setdefault('dce_method_attempts',[])
     v2.optimized_ungm(candidate,out,manifest)
     if manifest.get('files'):
@@ -96,14 +92,10 @@ def adapter_ungm_guarded(candidate:dict,out:Path,manifest:dict):
         interest=bool(re.search(r'express interest|record(?:ing)? your interest|register interest',text,re.I))
         view_docs=bool(re.search(r'view documents|view document|e[- ]?sourcing portal',text,re.I))
         manifest['dce_method_attempts'].append({'method':'UNGM_ACCESS_STATE','url':notice_url,'http_status':r.status_code,'interest_signal':interest,'view_documents_signal':view_docs})
-        if interest or view_docs:
-            manifest['status']='INTEREST_RECORDING_REQUIRED'
-        elif r.status_code in (401,403):
-            manifest['status']='AUTH_REQUIRED'
-        elif not r.ok:
-            manifest['status']='ERROR_RETRYABLE'
-        else:
-            manifest['status']='NO_PUBLIC_FILE'
+        if interest or view_docs:manifest['status']='INTEREST_RECORDING_REQUIRED'
+        elif r.status_code in (401,403):manifest['status']='AUTH_REQUIRED'
+        elif not r.ok:manifest['status']='ERROR_RETRYABLE'
+        else:manifest['status']='NO_PUBLIC_FILE'
     except Exception as exc:
         manifest['status']='ERROR_RETRYABLE';manifest['error']=repr(exc)
 
@@ -114,16 +106,71 @@ def adapter_greece(candidate:dict,out:Path,manifest:dict):
 
 
 def _pl_document_nodes(obj):
-    """Yield likely public procurement document descriptors from GetTender JSON."""
+    """Yield public eZamowienia document descriptors from GetTender JSON.
+
+    Current GetTender records place the authoritative file metadata under
+    tenderDocuments[].attachment while the downloadable public document id is
+    the parent tenderDocuments[].objectId. Keep both ids because platform
+    versions have used each of them in download routes.
+    """
     if isinstance(obj,dict):
         low={str(k).lower():v for k,v in obj.items()}
-        fname=next((low.get(k) for k in ('filename','file_name','name','documentname','originalfilename','title') if low.get(k)),None)
-        did=next((low.get(k) for k in ('documentid','document_id','fileid','file_id','id') if low.get(k)),None)
-        if fname and did and re.search(r'\.(pdf|zip|7z|rar|docx?|xlsx?|xls|pptx?|odt|ods|xml|txt)$',str(fname),re.I):
-            yield {'id':str(did),'name':str(fname)}
+        attachment=low.get('attachment') if isinstance(low.get('attachment'),dict) else None
+        if attachment:
+            alow={str(k).lower():v for k,v in attachment.items()}
+            fname=alow.get('filename') or alow.get('file_name') or low.get('name')
+            object_id=low.get('objectid') or low.get('documentid') or low.get('id')
+            attachment_id=alow.get('uniqueattachmentidentifier') or alow.get('attachmentid') or alow.get('id')
+            if fname and (object_id or attachment_id) and not alow.get('isdeleted'):
+                yield {
+                    'id':str(object_id or attachment_id),
+                    'object_id':str(object_id) if object_id else None,
+                    'attachment_id':str(attachment_id) if attachment_id else None,
+                    'name':str(fname),
+                    'mime_type':alow.get('mimetype'),
+                    'size':alow.get('filesize'),
+                }
+        else:
+            fname=next((low.get(k) for k in ('filename','file_name','documentname','originalfilename') if low.get(k)),None)
+            did=next((low.get(k) for k in ('objectid','documentid','document_id','fileid','file_id','id') if low.get(k)),None)
+            if fname and did:
+                yield {'id':str(did),'object_id':str(did),'attachment_id':None,'name':str(fname),'mime_type':low.get('mimetype'),'size':low.get('filesize')}
         for v in obj.values():yield from _pl_document_nodes(v)
     elif isinstance(obj,list):
         for v in obj:yield from _pl_document_nodes(v)
+
+
+def _pl_try_public_browser_download(tender_id:str,nodes:list[dict],out:Path,manifest:dict)->bool:
+    """Click only publicly rendered tender-document links; never authenticates."""
+    pw=browser=context=page=None;got=False
+    try:
+        pw,browser,context=v2.optimized_browser_context();page=context.new_page()
+        proceeding=f'https://ezamowienia.gov.pl/mp-client/search/list/{tender_id}'
+        page.goto(proceeding,wait_until='domcontentloaded',timeout=45000);page.wait_for_timeout(1200)
+        for n in nodes[:80]:
+            oid=n.get('object_id') or n.get('id')
+            if not oid:continue
+            url=f'https://ezamowienia.gov.pl/mp-client/search/tenderdocument/{tender_id}/{oid}'
+            try:
+                with page.expect_download(timeout=20000) as dl:
+                    page.evaluate("u => { const a=document.createElement('a'); a.href=u; a.style.display='none'; document.body.appendChild(a); a.click(); a.remove(); }",url)
+                rec=base.persist_download(out,dl.value,url);manifest['files'].append(rec);got=True
+                manifest['dce_method_attempts'].append({'method':'PL_PUBLIC_BROWSER_DOCUMENT','url':url,'document_name':n.get('name'),'outcome':'DOWNLOADED'})
+            except Exception as exc:
+                manifest['dce_method_attempts'].append({'method':'PL_PUBLIC_BROWSER_DOCUMENT','url':url,'document_name':n.get('name'),'outcome':'NO_DOWNLOAD','error':repr(exc)[:300]})
+        return got
+    except Exception as exc:
+        manifest['dce_method_attempts'].append({'method':'PL_PUBLIC_BROWSER_DOCUMENTS','error':repr(exc)[:500]});return got
+    finally:
+        try:
+            if page:page.close()
+        except Exception:pass
+        try:
+            if browser:browser.close()
+        except Exception:pass
+        try:
+            if pw:pw.stop()
+        except Exception:pass
 
 
 def _pl_api_download(candidate:dict,out:Path,manifest:dict,session:requests.Session)->bool:
@@ -134,16 +181,22 @@ def _pl_api_download(candidate:dict,out:Path,manifest:dict,session:requests.Sess
         if not r.ok:return False
         data=r.json();nodes=[];seen=set()
         for n in _pl_document_nodes(data):
-            key=(n['id'],n['name'])
+            key=(n.get('object_id'),n.get('attachment_id'),n.get('name'))
             if key not in seen:seen.add(key);nodes.append(n)
         manifest['pl_tender_document_descriptors']=nodes[:300]
         got=False
-        for n in nodes[:200]:
-            url=(template or f'https://ezamowienia.gov.pl/mp-readmodels/api/Tender/DownloadDocument/{tender_id}/{{document_id}}').replace('{document_id}',requests.utils.quote(n['id'],safe=''))
-            rec=base.direct_download(url,out,session)
-            manifest['dce_method_attempts'].append({'method':'PL_DIRECT_DOCUMENT_API','url':url,'document_name':n['name'],'outcome':'DOWNLOADED' if rec else 'NOT_FILE'})
-            if rec:manifest['files'].append(rec);got=True
-        return got
+        for n in nodes[:120]:
+            identifiers=[]
+            for x in (n.get('object_id'),n.get('attachment_id'),n.get('id')):
+                if x and x not in identifiers:identifiers.append(x)
+            for did in identifiers:
+                url=(template or f'https://ezamowienia.gov.pl/mp-readmodels/api/Tender/DownloadDocument/{tender_id}/{{document_id}}').replace('{document_id}',requests.utils.quote(str(did),safe=''))
+                rec=base.direct_download(url,out,session)
+                manifest['dce_method_attempts'].append({'method':'PL_DIRECT_DOCUMENT_API','url':url,'document_name':n['name'],'identifier':did,'outcome':'DOWNLOADED' if rec else 'NOT_FILE'})
+                if rec:manifest['files'].append(rec);got=True;break
+        if got:return True
+        # Exact public UI route is visible in the anonymous proceeding page.
+        return _pl_try_public_browser_download(tender_id,nodes,out,manifest)
     except Exception as exc:
         manifest.setdefault('dce_method_attempts',[]).append({'method':'PL_GET_TENDER_API','url':api,'error':repr(exc)});return False
 
@@ -151,7 +204,7 @@ def _pl_api_download(candidate:dict,out:Path,manifest:dict,session:requests.Sess
 def adapter_poland(candidate:dict,out:Path,manifest:dict):
     manifest.setdefault('dce_method_attempts',[])
     if _attempt_direct(candidate,out,manifest):manifest['status']='DOWNLOADED_PUBLIC';return
-    session=requests.Session();session.headers.update({'User-Agent':'Tender-Engine/5.0 public procurement research'})
+    session=requests.Session();session.headers.update({'User-Agent':'Tender-Engine/5.1 public procurement research'})
     if _pl_api_download(candidate,out,manifest,session):manifest['status']='DOWNLOADED_PUBLIC';return
     routes=_route_urls(candidate);extra=[]
     for method,url in routes:
