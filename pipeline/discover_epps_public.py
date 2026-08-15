@@ -4,7 +4,7 @@ import json
 import os
 import re
 import time
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 from urllib.parse import urljoin
 from zoneinfo import ZoneInfo
@@ -25,7 +25,7 @@ NOW = datetime.now(TZ)
 
 S = requests.Session()
 S.headers.update({
-    "User-Agent": "Tender-Engine/6.0 (+public procurement research; public ePPS pages only)",
+    "User-Agent": "Tender-Engine/6.1 (+public procurement research; public ePPS recent-tenders pages only)",
     "Accept": "text/html,application/xhtml+xml,*/*",
 })
 
@@ -38,8 +38,12 @@ TEXTUAL_DEADLINE_RE = re.compile(
     re.I,
 )
 NUMERIC_DEADLINE_RE = re.compile(r"\b(\d{1,2}/\d{1,2}/\d{4})\s+(\d{1,2}:\d{2}(?::\d{2})?)\b")
-EXPIRED_STATUS = re.compile(r"\b(?:awarded|archived|cancelled|canceled|closed|evaluation|completed|withdrawn|ακυρώθηκε|κατακυρώθηκε)\b", re.I)
-LIVE_STATUS = re.compile(r"\b(?:tender submission|open|awaiting tender opening|submission|υποβολ|προσφορ)\b", re.I)
+EXPIRED_STATUS = re.compile(
+    r"\b(?:awarded|archived|cancelled|canceled|closed|evaluation|completed|withdrawn|concluded|for archival)\b"
+    r"|(?:Ακυρώ|Κατακυρ|Παγιωμ|Ολοκληρ)",
+    re.I,
+)
+LIVE_STATUS = re.compile(r"\b(?:tender submission|open|awaiting tender opening|submission)\b|(?:Υποβολ|Προσφορ)", re.I)
 
 
 def clean(v: str | None) -> str:
@@ -89,12 +93,29 @@ def parse_deadline(text: str):
     return None
 
 
-def infer_cells(tr):
+def cells_for(tr):
     return [clean(td.get_text(" ", strip=True)) for td in tr.find_all("td")]
+
+
+def header_map(soup: BeautifulSoup):
+    best = []
+    for tr in soup.find_all("tr"):
+        headers = [clean(x.get_text(" ", strip=True)).lower() for x in tr.find_all("th")]
+        if len(headers) > len(best):
+            best = headers
+    return best
+
+
+def pick(cells: list[str], headers: list[str], needles: tuple[str, ...]):
+    for i, h in enumerate(headers):
+        if any(n in h for n in needles) and i < len(cells):
+            return cells[i]
+    return None
 
 
 def parse_page(html: str, page_url: str, page_no: int):
     soup = BeautifulSoup(html, "html.parser")
+    headers = header_map(soup)
     rows = []
     for tr in soup.find_all("tr"):
         rid = None
@@ -110,7 +131,6 @@ def parse_page(html: str, page_url: str, page_no: int):
             title = clean(a.get_text(" ", strip=True)) or title
             break
         if not rid:
-            # Some ePPS result rows expose resourceId only on image/action attributes.
             raw = str(tr)
             m = RESOURCE_RE.search(raw)
             if not m:
@@ -119,21 +139,36 @@ def parse_page(html: str, page_url: str, page_no: int):
             detail_url = f"{BASE_URL}/epps/cft/prepareViewCfTWS.do?resourceId={rid}"
 
         text = clean(tr.get_text(" ", strip=True))
-        cells = infer_cells(tr)
+        cells = cells_for(tr)
         deadline = parse_deadline(text)
         if deadline and deadline < NOW:
+            continue
+
+        status = pick(cells, headers, ("status", "κατάσταση"))
+        if status and EXPIRED_STATUS.search(status) and not LIVE_STATUS.search(status):
             continue
         if EXPIRED_STATUS.search(text) and not LIVE_STATUS.search(text):
             continue
 
-        # Common ePPS result layout: ordinal, title, CA unique id, authority, info,
-        # deadline, procedure, status, notice, award date. Fall back to text safely.
-        if not title and len(cells) >= 2:
-            title = cells[1]
-        ca_unique = cells[2] if len(cells) >= 3 else None
-        buyer = cells[3] if len(cells) >= 4 else None
-        procedure = cells[6] if len(cells) >= 7 else None
-        status = cells[7] if len(cells) >= 8 else None
+        title = title or pick(cells, headers, ("cft title", "τίτλος")) or (cells[1] if len(cells) > 1 else None)
+        buyer = pick(cells, headers, ("contracting authority", " ca ", "αναθέτουσα"))
+        if not buyer:
+            # Malta common layout: #, title, CA unique ID, CA, info, deadline...
+            buyer = cells[3] if len(cells) > 4 else None
+        ca_unique = pick(cells, headers, ("unique id", "μοναδικός"))
+        if not ca_unique:
+            ca_unique = cells[2] if len(cells) > 3 else None
+        procedure = pick(cells, headers, ("procedure", "διαδικασία"))
+        value = pick(cells, headers, ("estimated value", "εκτιμώμενη αξία"))
+        estimated_value = None
+        if value:
+            m = re.search(r"\d[\d,. ]*", value)
+            if m:
+                try:
+                    estimated_value = float(m.group(0).replace(" ", "").replace(",", ""))
+                except ValueError:
+                    pass
+
         rows.append({
             "candidate_id": f"{PREFIX}:{rid}",
             "source": SOURCE,
@@ -148,6 +183,7 @@ def parse_page(html: str, page_url: str, page_no: int):
             "description": text,
             "procurement_method": clean(procedure) or None,
             "source_status": clean(status) or None,
+            "estimated_value": estimated_value,
             "currency": "EUR",
             "route": {
                 "resource_id": rid,
@@ -162,12 +198,12 @@ def parse_page(html: str, page_url: str, page_no: int):
 
 
 def page_url(pg: int) -> str:
-    # searchSelect=5 is the public registry search used by ePPS installations.
-    # It avoids submitting CAPTCHA forms; we only consume already-public result pages.
+    # European Dynamics exposes a public "Recent tenders" registry at
+    # latest=true&searchSelect=4. This is a read-only listing, unlike advanced
+    # search forms that require CAPTCHA. Pagination stays on the server-rendered table.
     return (
-        f"{BASE_URL}/epps/quickSearchAction.do?T01_ps={PAGE_SIZE}"
-        f"&d-3680175-n=1&d-3680175-o=1&d-3680175-p={pg}"
-        f"&d-3680175-s=deadline&searchSelect=5"
+        f"{BASE_URL}/epps/quickSearchAction.do?latest=true&searchSelect=4"
+        f"&T01_ps={PAGE_SIZE}&d-3680175-p={pg}"
     )
 
 
@@ -182,10 +218,7 @@ def main():
             r = request(url)
             records = parse_page(r.text, r.url, pg)
             pages += 1
-            if not records:
-                empty_streak += 1
-            else:
-                empty_streak = 0
+            empty_streak = empty_streak + 1 if not records else 0
             for rec in records:
                 by_id.setdefault(rec["candidate_id"], rec)
             if empty_streak >= 2:
@@ -201,6 +234,7 @@ def main():
     stats = {
         "source": SOURCE,
         "base_url": BASE_URL,
+        "listing_contract": "EPPS_RECENT_TENDERS_PUBLIC_V1",
         "page_start": PAGE_START,
         "page_end_requested": PAGE_END,
         "pages_fetched": pages,
@@ -208,12 +242,16 @@ def main():
         "raw_materialized": len(rows),
         "deadline_parsed": sum(1 for r in rows if r.get("deadline")),
         "buyer_parsed": sum(1 for r in rows if r.get("buyer")),
+        "value_parsed": sum(1 for r in rows if r.get("estimated_value") is not None),
         "errors": errors,
         "generated_at": NOW.isoformat(),
     }
     (OUT / "stats.json").write_text(json.dumps(stats, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(stats, indent=2, ensure_ascii=False))
-    if errors and not rows:
+    # A green CI job with zero public records is not useful. Fail the lane so coverage truth is honest.
+    if not rows:
+        raise SystemExit(3)
+    if errors and len(rows) < 3:
         raise SystemExit(2)
 
 
