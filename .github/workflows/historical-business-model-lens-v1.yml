@@ -1,0 +1,89 @@
+name: Historical Business Model Lens v1
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Historical Commercial Review Book v1']
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/historical-business-model-lens-v1.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-business-model-lens-v1
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Classify business-model hypotheses without dropping cohorts
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          src=Path('control/historical_commercial_review_v1/review_book.json')
+          rows=json.loads(src.read_text(encoding='utf-8'))
+          families={
+            'DIGITAL_SOFTWARE': r'\b(software|website|web site|webseite|site internet|cms|portal|platform|cloud|hosting|ict|it services|digital|data services|data processing|saas|licen[cs]|application development|software support)\b',
+            'STAFFING_BROKER': r'\b(labou?r hire|temporary personnel|temporary staff|staffing|recruit|business analyst|project management|program management|consultant broker|konsultmäklare|professional services|contracted services)\b',
+            'CREATIVE_LANGUAGE': r'\b(translation|traduction|übersetz|oversatt|transcription|interpreting|graphic|design|layout|dtp|editorial|media|video|communication|marketing|public relations|publication)\b',
+            'PRINT_FULFILMENT': r'\b(print|printing|impression|druck|mailing|postal|postzustell|courier|delivery of notices|signage|brochure|publishing)\b',
+            'STANDARD_GOODS_BROKER': r'\b(supplies|consumables|tarvikkeet|office supplies|stationery|furniture|uniform|promotional|merchandise|cleaning supplies|hygiene supplies)\b',
+            'ADMIN_BPO': r'\b(contract closeout|administrative support|business support|back office|call cent|contact cent|customer service|document management|records management|support services)\b',
+            'TRAINING_EDTECH': r'\b(training|apprentice|e-learning|learning management|education programme|upskilling|course delivery)\b',
+            'FACILITY_BROKER': r'\b(cleaning services|entretien ménager|gebäudereinigung|grounds maintenance|snow removal|déneigement|catering|security agency|agence de sécurité)\b',
+          }
+          hard=r'\b(construction|building works|road works|engineering services|medical|healthcare|physician|hospital|drug|pharma|medicine|electricity|gas supply|waste collection|forestry|architectur|hydrogeolog|security agency|insurance|maritime transport)\b'
+          findings=[]
+          for r in rows:
+            text=' '.join(str(r.get(k,'') or '') for k in ('phrase_signature','code_description'))
+            examples=r.get('examples') or []
+            text+=' '+' '.join(str(e.get('title','') or '') for e in examples)
+            low=text.lower()
+            hits=[name for name,pat in families.items() if re.search(pat,low,re.I)]
+            if not hits: continue
+            penalty=bool(re.search(hard,low,re.I))
+            rec=int(float(r.get('records') or 0)); buyers=int(float(r.get('buyers') or 0)); repeat=int(float(r.get('repeat_buyers') or 0))
+            top=r.get('top_supplier_share')
+            try: top=float(top) if top not in ('',None) else None
+            except: top=None
+            base=float(r.get('market_structure_signal') or 0)
+            fragmentation=10 if top is not None and top<=.15 else 5 if top is not None and top<=.30 else -8 if top is not None and top>=.60 else 0
+            score=base + min(8,rec/20) + min(5,buyers/10) + min(4,repeat) + fragmentation - (22 if penalty else 0)
+            findings.append((score,penalty,hits,r))
+          findings.sort(key=lambda x:-x[0])
+          out=Path('control/historical_business_model_lens_v1');out.mkdir(parents=True,exist_ok=True)
+          lines=['# Historical Business Model Lens v1','',
+                 'Historical-only hypothesis layer. Every label below is a review aid, not an eligibility or profitability conclusion.','',
+                 f'- empirical cohorts read: **{len(rows)}**',f'- cohorts matching at least one broad execution model: **{len(findings)}**','']
+          compact=[]
+          for i,(score,penalty,hits,r) in enumerate(findings,1):
+            lines += [f"## {i}. {r.get('country')} — {r.get('phrase_signature')}",
+                      f"- Hypothesis families: **{', '.join(hits)}** · lens score **{score:.1f}** · specialist/heavy penalty **{'YES' if penalty else 'NO'}**",
+                      f"- records {r.get('records')} · buyers {r.get('buyers')} · repeat buyers {r.get('repeat_buyers')} · median {r.get('median_value') or 'UNKNOWN'} {r.get('currency') or ''} · bidders {r.get('median_bidders') or 'UNKNOWN'} · top supplier share {r.get('top_supplier_share') or 'UNKNOWN'}",
+                      f"- route `{r.get('route_band')}` · code `{r.get('native_code')}`", '- examples:']
+            for e in (r.get('examples') or [])[:3]: lines.append(f"  - {e.get('buyer_name') or 'UNKNOWN'} — {e.get('title') or ''} — {e.get('reference_value') or 'UNKNOWN'}")
+            lines.append('')
+            compact.append({'lens_score':round(score,2),'specialist_heavy_penalty':penalty,'hypothesis_families':hits,**{k:v for k,v in r.items() if k!='examples'},'examples':(r.get('examples') or [])[:3]})
+          (out/'LENS.md').write_text('\n'.join(lines),encoding='utf-8')
+          (out/'lens.json').write_text(json.dumps(compact,indent=2,ensure_ascii=False),encoding='utf-8')
+          (out/'summary.json').write_text(json.dumps({'cohorts_read':len(rows),'matched':len(findings),'historical_only':True,'live_used':False,'dce_used':False},indent=2),encoding='utf-8')
+          PY
+      - name: Persist lens
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_business_model_lens_v1/
+          git commit -m 'historical: persist business-model lens v1' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
