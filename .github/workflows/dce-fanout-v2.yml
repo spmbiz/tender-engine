@@ -16,7 +16,7 @@ on:
         required: false
         default: '320'
       max_parallel:
-        description: Maximum GitHub shard runners in parallel; globally clamped to 10 so sibling fleets retain headroom
+        description: Maximum GitHub shard runners in parallel; hard-capped at 20 and normally supplied by the live fleet controller
         required: false
         default: '10'
       max_shards:
@@ -107,11 +107,11 @@ jobs:
               requested=int(os.environ.get('DCE_REQUESTED_MAX_PARALLEL') or 10)
           except Exception:
               requested=10
-          print(max(1,min(10,requested)))
+          print(max(1,min(20,requested)))
           PY
           )"
           export DCE_MAX_PARALLEL
-          echo "Global runner safety clamp: DCE max_parallel=$DCE_MAX_PARALLEL"
+          echo "Dynamic runner safety clamp: DCE max_parallel=$DCE_MAX_PARALLEL (hard cap 20)"
           python pipeline/build_dce_shards.py --queue generated/dce_candidates.jsonl
       - id: release
         name: Create durable canonical harvest release
