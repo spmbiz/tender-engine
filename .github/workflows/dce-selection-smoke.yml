@@ -1,0 +1,109 @@
+name: DCE Selection Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      discovery_run_id:
+        description: Durable Discovery Harvest run ID
+        required: true
+  push:
+    branches: [main]
+    paths:
+      - 'control/selector_smoke_trigger.txt'
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - id: resolve
+        shell: bash
+        env:
+          INPUT_RUN: ${{ github.event.inputs.discovery_run_id }}
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = 'workflow_dispatch' ] && [[ "${INPUT_RUN:-}" =~ ^[0-9]+$ ]]; then
+            rid="$INPUT_RUN"
+          else
+            rid="$(sed -nE 's/^discovery_run_id=([0-9]+).*$/\1/p' control/selector_smoke_trigger.txt | tail -1)"
+          fi
+          [[ "$rid" =~ ^[0-9]+$ ]] || { echo "Invalid discovery run id: $rid" >&2; exit 1; }
+          echo "id=$rid" >> "$GITHUB_OUTPUT"
+      - name: Download canonical discovery and durable controller state
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RID: ${{ steps.resolve.outputs.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p smoke/discovery
+          gh release download "discovery-harvest-$RID" --pattern "supergreen-wide-read-$RID.tar.gz" --dir smoke
+          tar -xzf "smoke/supergreen-wide-read-$RID.tar.gz" -C smoke/discovery
+          gh release download fleet-state --pattern controller-state.json --dir smoke
+          candidate_file="$(find smoke/discovery -type f -name current_candidates.jsonl -printf '%s %p\n' | sort -nr | head -1 | cut -d' ' -f2-)"
+          test -s "$candidate_file"
+          cp "$candidate_file" smoke/current_candidates.jsonl
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          state=json.loads(Path('smoke/controller-state.json').read_text())
+          ids=list(state.get('processed_candidate_ids') or [])
+          ids.extend((state.get('pending_dce_batch') or {}).get('candidate_ids') or [])
+          seen=set()
+          with Path('smoke/blocked.jsonl').open('w',encoding='utf-8') as f:
+              for cid in ids:
+                  cid=str(cid).strip()
+                  if not cid or cid in seen: continue
+                  seen.add(cid)
+                  f.write(json.dumps({'candidate_id':cid},separators=(',',':'))+'\n')
+          print(json.dumps({'processed':len(state.get('processed_candidate_ids') or []),'pending':len((state.get('pending_dce_batch') or {}).get('candidate_ids') or []),'blocked_unique':len(seen)}))
+          PY
+      - name: Run diversified selector without dispatching DCE
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/auto_select_dce.py \
+            --input smoke/current_candidates.jsonl \
+            --blocked smoke/blocked.jsonl \
+            --out smoke/selection.jsonl \
+            --minimum 34 \
+            --limit 320
+          test "$(wc -l < smoke/selection.jsonl)" -gt 0
+      - name: Regression assertions and report
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          rows=[json.loads(x) for x in Path('smoke/selection.jsonl').read_text().splitlines() if x.strip()]
+          counts=Counter(str(x.get('selection_portal') or 'UNKNOWN') for x in rows)
+          total=len(rows)
+          max_portal,max_count=(counts.most_common(1)[0] if counts else ('NONE',0))
+          sam=counts.get('US_SAM',0)+counts.get('US_SAM_BULK',0)
+          report={
+              'selected':total,
+              'portal_counts':dict(counts),
+              'unique_portals':len(counts),
+              'max_portal':max_portal,
+              'max_portal_count':max_count,
+              'max_portal_share':round(max_count/max(1,total),6),
+              'sam_count':sam,
+              'sam_share':round(sam/max(1,total),6),
+          }
+          Path('smoke/regression-report.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
+          print(json.dumps(report,indent=2))
+          if total >= 160 and len(counts) > 1 and max_count >= int(total*0.90):
+              raise SystemExit('Selector regression: one portal still monopolizes >=90% of a multi-portal batch')
+          PY
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat smoke/regression-report.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
