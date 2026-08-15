@@ -1,0 +1,132 @@
+name: GPT DCE Request Router
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/gpt_dce_request.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: gpt-dce-request-router
+  cancel-in-progress: false
+
+jobs:
+  route:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - id: validate
+        name: Validate semantic GPT selection contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('control/gpt_dce_request.json')
+          if not p.exists():
+              raise SystemExit('control/gpt_dce_request.json is missing')
+          x=json.loads(p.read_text(encoding='utf-8'))
+          if x.get('schema') != 'GPT_DCE_REQUEST_V1':
+              raise SystemExit('schema must be GPT_DCE_REQUEST_V1')
+          run=x.get('source_discovery_run')
+          if not str(run or '').isdigit():
+              raise SystemExit('source_discovery_run must be a numeric canonical discovery run id')
+          wide=x.get('wide_read_run_id', run)
+          if str(wide) != str(run):
+              raise SystemExit('wide_read_run_id must match source_discovery_run')
+          ids=x.get('candidate_ids')
+          if not isinstance(ids,list) or not ids:
+              raise SystemExit('candidate_ids must be a non-empty list')
+          ids=[str(v).strip() for v in ids if str(v).strip()]
+          if len(ids) != len(set(ids)):
+              raise SystemExit('candidate_ids contains duplicates')
+          if len(ids) > 320:
+              raise SystemExit('GPT DCE request exceeds 320 candidate safety cap')
+          score=int(x.get('default_preliminary_score',84))
+          if score > 89:
+              raise SystemExit('Pre-DCE score cannot exceed 89')
+          if str(x.get('status') or 'DCE_PENDING').upper() not in {'DCE_PENDING','QUEUE_DCE','READY','QUEUED'}:
+              raise SystemExit('status is not a DCE queue status')
+          print(json.dumps({'source_discovery_run':run,'candidate_count':len(ids),'mode':x.get('mode'),'preliminary_score':score},indent=2))
+          with open('/tmp/router.env','w') as f:
+              f.write(f'SOURCE_RUN={run}\nCOUNT={len(ids)}\n')
+          PY
+          cat /tmp/router.env >> "$GITHUB_ENV"
+          echo "source_run=$SOURCE_RUN" >> "$GITHUB_OUTPUT"
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Verify source snapshot exists and request IDs belong to it
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release view "discovery-harvest-${SOURCE_RUN}" >/dev/null
+          assets="$(gh release view "discovery-harvest-${SOURCE_RUN}" --json assets --jq '.assets[].name')"
+          if ! grep -Eq "^supergreen-wide-read-${SOURCE_RUN}(-repaired)?\.tar\.gz$" <<< "$assets"; then
+            echo "Canonical discovery wide-read asset is missing for ${SOURCE_RUN}" >&2
+            exit 1
+          fi
+
+      - name: Dispatch exact GPT-selected DCE fanout
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          parallel=14
+          if [ "$COUNT" -le 20 ]; then parallel=10; fi
+          if [ "$COUNT" -le 8 ]; then parallel=8; fi
+          gh workflow run dce-fanout-v2.yml \
+            --ref main \
+            -f selection_path='control/gpt_dce_request.json' \
+            -f source_discovery_run="$SOURCE_RUN" \
+            -f max_jobs="$COUNT" \
+            -f max_parallel="$parallel" \
+            -f max_shards='256' \
+            -f jobs_per_shard='0'
+          echo "Dispatched DCE fanout for $COUNT GPT-selected candidates from discovery $SOURCE_RUN"
+
+      - name: Persist router receipt
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          req={}
+          try:req=json.load(open('control/gpt_dce_request.json'))
+          except Exception:pass
+          receipt={
+            'schema':'GPT_DCE_ROUTER_RECEIPT_V1',
+            'router_run_id':'${{ github.run_id }}',
+            'router_conclusion_note':'If this workflow is green, an explicit DCE Fanout V2 workflow_dispatch was issued.',
+            'source_discovery_run':req.get('source_discovery_run'),
+            'candidate_count':len(req.get('candidate_ids') or []),
+            'mode':req.get('mode'),
+            'requested_candidate_ids':req.get('candidate_ids') or [],
+            'created_at':datetime.now(timezone.utc).isoformat(),
+            'selection_path':'control/gpt_dce_request.json'
+          }
+          Path('control/gpt_dce_dispatch_latest.json').write_text(json.dumps(receipt,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/gpt_dce_dispatch_latest.json
+          git commit -m "tenders: record GPT DCE dispatch ${{ github.run_id }}" || exit 0
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
