@@ -1,0 +1,33 @@
+{
+  "version": "SPM_MICRO_NICHE_INTELLIGENCE_V2_TITLE_PRECISION",
+  "generated_at": "2026-08-15T17:54:34.636968+00:00",
+  "source_grain": "GLOBAL_CORE_V4_NOTICE_FIRST",
+  "counts": {
+    "classified_records": 7427,
+    "distinct_tenders": 7427,
+    "micro_niches": 23,
+    "buyers": 3168
+  },
+  "safety": {
+    "historical_only": true,
+    "satisfies_dce_gates": false,
+    "affects_final_verdict": false,
+    "no_fx_mixing": true,
+    "consortium_award_fractionalized": true,
+    "unknown_is_not_zero": true
+  },
+  "scoring": {
+    "label": "historical_spm_score",
+    "meaning": "retrieval/market prior only; not bid eligibility",
+    "components": [
+      "volume",
+      "buyer breadth",
+      "repeat buyers",
+      "competition where covered",
+      "supplier fragmentation",
+      "value fit",
+      "lean feasibility prior",
+      "route quality"
+    ]
+  }
+}
