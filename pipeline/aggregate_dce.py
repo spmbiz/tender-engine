@@ -6,7 +6,9 @@ import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
+from authority_conflicts import process as process_authority_conflicts
 from final_verdict_guard import REQUIRED_GATES
+from multilingual_gate_rescue import process as process_multilingual_gate_rescue
 
 PORTAL_GENERIC_FILE_PATTERNS = [
     re.compile(r"^depot[-_ ]?pli\.pdf$", re.I),
@@ -165,9 +167,23 @@ def main():
         raw_manifest_rows += 1
         candidate_root = manifest_path.parent
         candidate = manifest.get("candidate") or load(candidate_root / "candidate.json") or {}
-        gates = load(candidate_root / "gate_snippets.json") or {}
         evidence = load(candidate_root / "evidence_quality.json") or {}
-        authority = load(candidate_root / "authority_conflicts.json") or {}
+
+        # Rescue local-language evidence before the model sees the row. This only
+        # adds source snippets; it never decides a gate verdict.
+        try:
+            process_multilingual_gate_rescue(candidate_root)
+        except Exception:
+            pass
+        gates = load(candidate_root / "gate_snippets.json") or {}
+
+        # Authority reconciliation belongs on the fast evidence path, not behind
+        # durable-pack compression. Compute it here so a shard can legitimately
+        # become FINAL_SUPER_GREEN before large archives finish building.
+        try:
+            authority = process_authority_conflicts(candidate_root)
+        except Exception:
+            authority = load(candidate_root / "authority_conflicts.json") or {}
         deadline_authority = authority.get("deadline") if isinstance(authority, dict) else {}
         doc_index = load(candidate_root / "document_index.json") or []
         corpus_path = candidate_root / "corpus.txt"
@@ -258,27 +274,24 @@ def main():
         "raw_status_counts": dict(raw_counts),
         "derived_status_counts": dict(counts),
         "content_quality_counts": dict(quality_counts),
-        "deadline_authority_status_counts": dict(deadline_authority_counts),
-        "deadline_conflicts": deadline_conflict_count,
-        "raw_downloaded_public": raw_counts.get("DOWNLOADED_PUBLIC", 0),
-        "gate_ready_substantive_dce": gate_ready_count,
-        "gate_blocked_or_unverified": max(0, len(rows) - gate_ready_count),
-        "access_guide_only": quality_counts.get("ACCESS_GUIDE_ONLY", 0),
-        "portal_generic_only": quality_counts.get("PORTAL_GENERIC_ONLY", 0),
-        "content_unverified": quality_counts.get("UNKNOWN_RETRIEVED_DOCUMENT", 0),
-        "fully_extracted_gate_ready": sum(1 for r in rows if r.get("gate_readiness") and r.get("corpus_chars", 0) > 0),
-        "worker_retries": retries,
+        "gate_ready_count": gate_ready_count,
+        "gate_blocked_count": len(rows) - gate_ready_count,
+        "deadline_authority_counts": dict(deadline_authority_counts),
+        "deadline_conflict_count": deadline_conflict_count,
+        "exact_gate_review_ready_count": sum(
+            1 for r in rows
+            if r.get("gate_readiness")
+            and not r.get("deadline_conflict")
+            and r.get("deadline_authority_status") not in {None, "UNKNOWN_NO_DCE_DEADLINE_PARSED", "NOT_APPLICABLE_DCE_NOT_GATE_READY"}
+        ),
         "worker_failures": worker_failures,
+        "retries": retries,
         "rate_limit_signals": rate_limited,
-        "shard_metric_count": len(shard_metrics),
         "raw_worker_tree_bytes": raw_bytes,
         "slim_handoff_bytes": slim_bytes,
-        "handoff_storage_reduction_ratio": round((1 - slim_bytes / raw_bytes) if raw_bytes else 0, 6),
+        "slim_ratio": round(slim_bytes / raw_bytes, 6) if raw_bytes else None,
         "portal_yield": portal_yield,
-        "portal_yield_time_basis": "candidate_processing_minutes; not yet exact GitHub runner wall-time",
-        "raw_archives_in_final_artifact": False,
-        "mandatory_gate_names": REQUIRED_GATES,
-        "contract": "Only gate_ready_substantive_dce rows may advance to mandatory-gate adjudication; authority conflicts remain explicit; final 90+/FINAL_SUPER_GREEN requires all mandatory gate statuses resolved with evidence and validation by final_verdict_guard.py.",
+        "finalization_rule": "No aggregate row is final. GPT/manual review must resolve every mandatory gate with authoritative evidence, and deadline authority must be explicitly reconciled before FINAL_SUPER_GREEN/90+.",
     }
     (out / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(summary, indent=2, ensure_ascii=False))
