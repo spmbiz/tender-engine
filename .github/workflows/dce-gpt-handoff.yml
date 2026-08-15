@@ -9,18 +9,22 @@ on:
       dce_run_id:
         description: DCE Fanout V2 run ID to rebuild handoff for
         required: true
+  push:
+    branches: [main]
+    paths:
+      - 'control/dce_gpt_handoff_trigger.txt'
 
 permissions:
   contents: write
   actions: read
 
 concurrency:
-  group: dce-gpt-handoff-${{ github.event.workflow_run.id || github.event.inputs.dce_run_id }}
+  group: dce-gpt-handoff-${{ github.event.workflow_run.id || github.event.inputs.dce_run_id || github.sha }}
   cancel-in-progress: false
 
 jobs:
   publish:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -32,11 +36,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [ '${{ github.event_name }}' = 'workflow_dispatch' ]; then
-            rid='${{ github.event.inputs.dce_run_id }}'
-          else
-            rid='${{ github.event.workflow_run.id }}'
-          fi
+          case '${{ github.event_name }}' in
+            workflow_dispatch)
+              rid='${{ github.event.inputs.dce_run_id }}'
+              ;;
+            workflow_run)
+              rid='${{ github.event.workflow_run.id }}'
+              ;;
+            push)
+              rid="$(sed -nE 's/^dce_run_id=([0-9]+).*$/\1/p' control/dce_gpt_handoff_trigger.txt | tail -1)"
+              ;;
+          esac
+          [[ "$rid" =~ ^[0-9]+$ ]] || { echo "Invalid DCE run id: $rid" >&2; exit 1; }
           echo "id=$rid" >> "$GITHUB_OUTPUT"
           echo "tag=dce-harvest-$rid" >> "$GITHUB_OUTPUT"
       - name: Download durable deep-review pack
