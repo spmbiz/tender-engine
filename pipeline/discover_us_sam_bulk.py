@@ -9,7 +9,7 @@ OUT=Path(os.getenv('DISCOVERY_OUT','discovery/global/US_SAM_BULK')); OUT.mkdir(p
 NOW=datetime.now(timezone.utc)
 URL=os.getenv('SAM_BULK_URL','https://s3.amazonaws.com/falextracts/Contract%20Opportunities/datagov/ContractOpportunitiesFullCSV.csv')
 S=requests.Session(); S.headers.update({'User-Agent':'Tender-Engine/4.9 (+public procurement research)','Accept':'text/csv,*/*'})
-URL_RE=re.compile(r'https?://[^\s\]"\'>,}]+',re.I)
+URL_RE=re.compile(r"https?://[^\s\]\"'>,}]+",re.I)
 DOC_FIELD_RE=re.compile(r'(resource|attachment|document|download|file|link)',re.I)
 FILE_RE=re.compile(r'\.(pdf|zip|docx?|xlsx?|xls|pptx?|csv|7z)(?:\?|$)',re.I)
 
