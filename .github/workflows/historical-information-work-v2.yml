@@ -1,0 +1,54 @@
+name: Historical Information Work v2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - historical_lab/information_work_precision_v2.py
+      - .github/workflows/historical-information-work-v2.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-information-work-v2
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Download canonical Global Core historical facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          for a in historical_tenders.parquet awards.parquet award_suppliers.parquet; do gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern "$a" --dir source --clobber; done
+      - name: Run information-work precision v2
+        run: python historical_lab/information_work_precision_v2.py --historical source/historical_tenders.parquet --awards source/awards.parquet --bridge source/award_suppliers.parquet --out out
+      - name: Persist durable v2 outputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-information-work-v2
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target main --title 'Historical Information Work v2' --notes 'Precision historical decomposition after semantic QA. v1 recall layer preserved; no source records deleted.'
+          for f in summary.json REPORT.md family_summary.csv market_matrix.csv top_winners.csv top_buyers.csv examples.csv excluded_classification_matches_preserved.csv; do gh release upload "$TAG" "out/$f" --repo "$GITHUB_REPOSITORY" --clobber; done
+          mkdir -p control/historical_information_work_v2
+          cp out/summary.json out/REPORT.md control/historical_information_work_v2/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_information_work_v2/
+          git commit -m 'historical: persist information-work precision v2' || exit 0
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
