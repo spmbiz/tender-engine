@@ -35,6 +35,7 @@ BROWSER_PORTALS = {
     "ES_PLACSP",
     "FI_HILMA",
     "PT_BASE_OPEN",
+    "DK_UDBUD",
     "DK_UDBUD_PUBLIC",
     "CZ_ZAKAZKY_GOV",
 }
