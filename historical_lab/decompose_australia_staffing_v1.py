@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse,csv,json,re
+import argparse,csv,json
 from pathlib import Path
 import duckdb
 
@@ -12,18 +12,25 @@ def write(path,header,rows):
 
 
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument('--input',required=True);ap.add_argument('--out',required=True);a=ap.parse_args()
+    ap=argparse.ArgumentParser();ap.add_argument('--historical',required=True);ap.add_argument('--awards',required=True);ap.add_argument('--out',required=True);a=ap.parse_args()
     out=Path(a.out);out.mkdir(parents=True,exist_ok=True)
     con=duckdb.connect();con.execute('SET threads=4')
-    rel=f"read_csv_auto('{a.input}',header=true,all_varchar=true,sample_size=200000,compression='auto')"
+    h=f"read_csv_auto('{a.historical}',header=true,all_varchar=true,sample_size=200000,compression='auto')"
+    aw=f"read_csv_auto('{a.awards}',header=true,all_varchar=true,sample_size=200000,compression='auto')"
     con.execute(f"""
     CREATE TABLE x AS
-    SELECT Historical_Tender_ID tender_id,Agency_Name buyer,Supplier_Name supplier,Title title,
-           coalesce(nullif(Subcategory,''),nullif(Raw_Spend_Category,''),nullif(Category,''),'UNKNOWN') native_subcategory,
-           try_cast(Award_Value as double) award_value,
-           upper(coalesce(nullif(Currency,''),'AUD')) currency,
-           lower(concat_ws(' ',coalesce(Title,''),coalesce(Description,''),coalesce(Subcategory,''),coalesce(Raw_Spend_Category,''))) txt
-    FROM {rel}
+    WITH hh AS (
+      SELECT Historical_Tender_ID tender_id,Buyer_Name buyer,Title title,
+             coalesce(nullif(Subcategory,''),nullif(Category,''),'UNKNOWN') native_subcategory,
+             lower(concat_ws(' ',coalesce(Title,''),coalesce(Description,''),coalesce(Subcategory,''),coalesce(Category,''))) txt
+      FROM {h}
+    ), aa AS (
+      SELECT Historical_Tender_ID tender_id,Supplier_Name supplier,try_cast(Award_Value as double) award_value,
+             upper(coalesce(nullif(Currency,''),'AUD')) currency
+      FROM {aw}
+    )
+    SELECT hh.*,aa.supplier,aa.award_value,aa.currency
+    FROM hh LEFT JOIN aa USING(tender_id)
     """)
     con.execute("""
     CREATE TABLE scoped AS
@@ -31,8 +38,8 @@ def main():
       WHEN regexp_matches(txt,'(?i)(ict labour hire|it labour hire|ict contractor|ict staff|business analyst|software developer|developer|data analyst|cyber.*(staff|consult)|technical writer)') THEN 'ICT_DIGITAL_TALENT'
       WHEN regexp_matches(txt,'(?i)(temporary personnel|temporary staff|labou?r hire|contracted services|staffing)') THEN 'GENERAL_STAFFING'
       WHEN regexp_matches(txt,'(?i)(project management|project manager|program management|programme management|program manager|pmo)') THEN 'PROJECT_PROGRAM_TALENT'
-      WHEN regexp_matches(txt,'(?i)(professional services|consulting services|consultancy services|business support services|support services)') THEN 'PROFESSIONAL_SUPPORT'
       WHEN regexp_matches(txt,'(?i)(software support services|application support|ict services|it support services)') THEN 'IT_MANAGED_SUPPORT'
+      WHEN regexp_matches(txt,'(?i)(professional services|consulting services|consultancy services|business support services|support services)') THEN 'PROFESSIONAL_SUPPORT'
       ELSE NULL END family
     FROM x
     """)
