@@ -11,173 +11,256 @@ from typing import Iterable
 
 from materialize_dce_selection import identity
 
-# The autonomous selector is a retrieval scheduler, not the business source of truth.
-# Its first duty is nevertheless to avoid wasting DCE runners on opportunities that
-# are plainly outside SPM Business's lean/digital execution envelope.
+# ---------------------------------------------------------------------------
+# High-recall notice selector
+# ---------------------------------------------------------------------------
+# This stage is intentionally permissive. Its job is to decide which notices are
+# worth spending DCE retrieval capacity on, NOT to decide final bid eligibility.
+# False positives are acceptable here; false negatives are expensive.
 #
-# Generic words such as "digital", "portal", "software", "application", "data",
-# "maintenance", "content" or "communications" NEVER qualify an opportunity alone.
-CORE_SIGNAL_GROUPS: dict[str, dict[str, int]] = {
+# The strict truth gate lives downstream in authoritative DCE reading.
+# ---------------------------------------------------------------------------
+
+STRONG_SCOPE_SIGNALS: dict[str, dict[str, int]] = {
     "SPM_WEB": {
-        "website": 84,
-        "web site": 84,
-        "website redesign": 90,
-        "website development": 90,
-        "web development": 88,
-        "web design": 88,
-        "web portal": 82,
-        "landing page": 80,
-        "cms": 78,
+        "website redesign": 94,
+        "website development": 94,
+        "web development": 92,
+        "web design": 92,
+        "web portal": 90,
+        "website migration": 90,
+        "cms migration": 88,
+        "landing page": 86,
+        "web accessibility": 84,
+        "intranet redesign": 84,
         "wordpress": 84,
         "drupal": 84,
         "typo3": 84,
-        "web accessibility": 78,
-        "intranet redesign": 76,
+        "website": 78,
+        "web site": 78,
+        "cms": 72,
     },
     "SPM_DESIGN": {
-        "graphic design": 86,
-        "visual identity": 84,
-        "branding": 82,
-        "layout design": 80,
-        "publication design": 80,
-        "annual report design": 82,
-        "typesetting": 76,
-        "illustration": 76,
-        "creative design": 80,
+        "graphic design": 92,
+        "visual identity": 90,
+        "brand identity": 90,
+        "branding": 86,
+        "layout design": 86,
+        "publication design": 86,
+        "annual report design": 88,
+        "typesetting": 82,
+        "illustration": 80,
+        "creative design": 84,
     },
     "SPM_VIDEO": {
-        "video production": 86,
-        "video editing": 88,
-        "animation": 82,
-        "motion graphics": 86,
-        "audiovisual production": 82,
-        "audio visual production": 82,
-        "post-production": 82,
-        "post production": 82,
-        "explainer video": 84,
-        "film production": 76,
+        "video production": 92,
+        "video editing": 94,
+        "motion graphics": 92,
+        "audiovisual production": 90,
+        "audio visual production": 90,
+        "post-production": 88,
+        "post production": 88,
+        "explainer video": 90,
+        "animation production": 88,
+        "film production": 84,
+        "animation": 78,
     },
     "SPM_CONTENT_MARKETING": {
-        "digital marketing": 78,
-        "social media management": 78,
-        "social media content": 82,
-        "content production": 78,
-        "content creation": 76,
-        "copywriting": 76,
-        "search engine optimization": 80,
-        "search engine optimisation": 80,
-        "seo services": 80,
-        "online campaign": 74,
-        "digital campaign": 76,
+        "digital marketing": 88,
+        "social media management": 88,
+        "social media content": 90,
+        "content production": 86,
+        "content creation": 84,
+        "copywriting": 82,
+        "search engine optimization": 84,
+        "search engine optimisation": 84,
+        "seo services": 84,
+        "digital campaign": 84,
+        "online campaign": 80,
+        "communications campaign": 78,
     },
     "SPM_TRANSCRIPTION": {
-        "transcription": 86,
-        "subtitling": 84,
-        "captioning": 84,
-        "closed captions": 82,
+        "transcription": 92,
+        "subtitling": 90,
+        "captioning": 88,
+        "closed captions": 88,
+        "speech to text": 82,
     },
     "SPM_SOFTWARE_AUTOMATION": {
-        "workflow automation": 84,
-        "robotic process automation": 82,
-        "rpa development": 82,
-        "low-code": 80,
-        "low code": 80,
-        "no-code": 80,
-        "no code": 80,
-        "api integration": 80,
-        "software development": 76,
-        "application development": 76,
-        "app development": 80,
-        "web application": 80,
-        "database development": 72,
-        "data processing services": 72,
-        "data entry services": 70,
-        "system integration": 70,
+        "workflow automation": 90,
+        "robotic process automation": 88,
+        "rpa development": 88,
+        "api integration": 88,
+        "software development": 86,
+        "application development": 86,
+        "app development": 86,
+        "web application": 88,
+        "database development": 82,
+        "data migration": 80,
+        "system integration": 80,
+        "systems integration": 80,
+        "low-code": 82,
+        "low code": 82,
+        "no-code": 82,
+        "no code": 82,
+        "data processing services": 78,
+        "data entry services": 76,
     },
     "SPM_PRINT_MIDDLEMAN": {
-        "printing services": 84,
-        "printing service": 84,
-        "print services": 82,
-        "brochure printing": 86,
-        "leaflet printing": 86,
-        "booklet printing": 86,
-        "poster printing": 82,
-        "printed materials": 80,
-        "publication printing": 80,
-        "annual report printing": 82,
-        "printing": 74,
-        "brochure": 70,
-        "leaflet": 70,
-        "booklet": 70,
+        "printing services": 92,
+        "printing service": 92,
+        "print services": 90,
+        "brochure printing": 94,
+        "leaflet printing": 94,
+        "booklet printing": 94,
+        "poster printing": 90,
+        "printed materials": 86,
+        "publication printing": 88,
+        "annual report printing": 90,
+        "printing": 76,
+        "brochure": 72,
+        "leaflet": 72,
+        "booklet": 72,
+    },
+    "SPM_DIGITAL_TRAINING": {
+        "digital skills training": 84,
+        "digital training": 82,
+        "it training": 82,
+        "ict training": 82,
+        "software training": 82,
+        "cybersecurity training": 80,
+        "cyber security training": 80,
+        "web training": 78,
+        "online training": 76,
+        "e-learning": 84,
+        "e learning": 84,
+        "learning management system": 88,
+        "lms development": 88,
+        "training video production": 88,
+        "e-learning content": 84,
+        "e learning content": 84,
     },
 }
 
-# The narrow CPV families below are strong enough to qualify a notice even when its
-# title is not English. Broad IT CPVs are deliberately not accepted by themselves.
+# Broader signals are kept on purpose. They are not enough to call something a
+# SUPER GREEN, but they ARE enough to justify DCE retrieval when capacity exists.
+RECALL_SCOPE_SIGNALS: dict[str, dict[str, int]] = {
+    "SPM_IT_POTENTIAL": {
+        "it services": 68,
+        "ict services": 68,
+        "information technology services": 70,
+        "software services": 68,
+        "software": 58,
+        "saas": 66,
+        "cloud services": 64,
+        "cloud platform": 64,
+        "digital services": 64,
+        "digital platform": 66,
+        "technology services": 60,
+        "it consulting": 62,
+        "technology consulting": 60,
+        "digital transformation": 68,
+        "managed services": 54,
+        "application support": 60,
+        "software maintenance": 58,
+        "data services": 54,
+        "data management": 58,
+        "database": 54,
+        "portal": 52,
+    },
+    "SPM_TRAINING_POTENTIAL": {
+        "training services": 52,
+        "training course": 50,
+        "training courses": 50,
+        "workshop": 48,
+        "workshops": 48,
+        "coaching services": 46,
+        "trainer": 44,
+        "facilitator": 44,
+    },
+    "SPM_COMMS_POTENTIAL": {
+        "communications services": 58,
+        "communication services": 58,
+        "public relations": 62,
+        "media services": 58,
+        "content services": 56,
+        "communications support": 54,
+        "campaign services": 56,
+    },
+    "SPM_RESALE_POTENTIAL": {
+        "software licences": 62,
+        "software licenses": 62,
+        "licence renewal": 58,
+        "license renewal": 58,
+        "subscription services": 56,
+        "cloud subscription": 60,
+    },
+}
+
+# Narrow CPVs are strong; broad digital/IT CPVs are deliberately accepted at a
+# lower score to preserve recall for non-English notices.
 CPV_FIT_PREFIXES: tuple[tuple[str, str, int], ...] = (
-    ("72413", "SPM_WEB", 82),
-    ("72415", "SPM_WEB", 76),
-    ("798", "SPM_PRINT_MIDDLEMAN", 80),
-    ("9211", "SPM_VIDEO", 78),
-    ("7934", "SPM_CONTENT_MARKETING", 72),
-    ("7953", "SPM_TRANSCRIPTION", 72),
+    ("72413", "SPM_WEB", 88),
+    ("72415", "SPM_WEB", 82),
+    ("724", "SPM_WEB", 68),
+    ("722", "SPM_SOFTWARE_AUTOMATION", 72),
+    ("720", "SPM_IT_POTENTIAL", 60),
+    ("798", "SPM_PRINT_MIDDLEMAN", 84),
+    ("9211", "SPM_VIDEO", 82),
+    ("7934", "SPM_CONTENT_MARKETING", 78),
+    ("7953", "SPM_TRANSCRIPTION", 78),
+    ("805", "SPM_TRAINING_POTENTIAL", 48),
 )
 
-# These are pre-DCE scheduling exclusions, not legal eligibility findings. The DCE
-# gate reader remains authoritative on the final bid/no-bid verdict.
-HARD_REJECT_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
-    ("physical-works", re.compile(
-        r"\b(construction|civil works?|road works?|building works?|roofing|roof works?|"
-        r"plumbing|hvac|heating system|electrical installation|renovation works?|"
-        r"excavation|asphalt|bridge works?|demolition|masonry)\b", re.I)),
-    ("physical-operations", re.compile(
-        r"\b(cleaning services?|catering|food supply|waste collection|security guards?|"
-        r"grounds maintenance|vehicle maintenance|fleet maintenance|janitorial)\b", re.I)),
-    ("medical-regulated", re.compile(
-        r"\b(pharmaceutical|clinical services?|medical equipment|laboratory testing|"
-        r"medical devices?|surgical|patient care)\b", re.I)),
-    ("regulated-professional", re.compile(
-        r"\b(legal services?|statutory audit|audit services?|architectural services?|"
-        r"engineering services?|engineering design|quantity surveying|land surveying)\b", re.I)),
-    ("staffing-bodyshop", re.compile(
-        r"\b(staff augmentation|temporary staff|temporary personnel|recruitment services?|"
-        r"personnel supply|body ?shop(?:ping)?|consultant resources?|resource profiles?|"
-        r"fte\b|full[- ]time equivalent|man[- ]days?|person[- ]days?)\b", re.I)),
-    ("hardware-infrastructure", re.compile(
-        r"\b(server hardware|network equipment|network switches?|routers?|structured cabling|"
-        r"workstations?|laptops?|desktop computers?|storage appliances?|data centre hardware|"
-        r"data center hardware|telecommunications equipment)\b", re.I)),
-    ("onsite-field", re.compile(
-        r"\b(on[- ]site services?|onsite services?|field services?|installation of equipment|"
-        r"equipment installation|commissioning services?)\b", re.I)),
+# SAM NAICS families that are plausibly digital/creative/print/service work. These
+# are a *positive* signal, not a mandatory eligibility requirement.
+SAM_DIGITAL_NAICS_PREFIXES: tuple[tuple[str, str, int], ...] = (
+    ("541511", "SPM_SOFTWARE_AUTOMATION", 74),
+    ("541512", "SPM_SOFTWARE_AUTOMATION", 72),
+    ("541513", "SPM_IT_POTENTIAL", 62),
+    ("541519", "SPM_IT_POTENTIAL", 62),
+    ("518210", "SPM_IT_POTENTIAL", 62),
+    ("519", "SPM_CONTENT_MARKETING", 52),
+    ("541430", "SPM_DESIGN", 78),
+    ("541810", "SPM_CONTENT_MARKETING", 72),
+    ("541613", "SPM_CONTENT_MARKETING", 58),
+    ("512110", "SPM_VIDEO", 74),
+    ("512191", "SPM_VIDEO", 72),
+    ("561410", "SPM_TRANSCRIPTION", 62),
+    ("323111", "SPM_PRINT_MIDDLEMAN", 78),
+    ("323113", "SPM_PRINT_MIDDLEMAN", 76),
+    ("611420", "SPM_DIGITAL_TRAINING", 64),
+    ("611430", "SPM_TRAINING_POTENTIAL", 52),
 )
 
-TRAINING_RE = re.compile(
-    r"\b(training services?|training course|training courses|workshops?|coaching services?|"
-    r"trainer|instructor|facilitator|classroom training|vocational training)\b", re.I
-)
-DIGITAL_PRODUCTION_EXCEPTION_RE = re.compile(
-    r"\b(e[- ]learning platform|learning management system|lms development|"
-    r"training video production|e[- ]learning content (?:creation|production|development))\b", re.I
+# Truly obvious physical commodity / construction titles can be hard-rejected when
+# there is no title-level digital signal. We intentionally keep this list narrow.
+OBVIOUS_PHYSICAL_TITLE_RX = re.compile(
+    r"\b(transmitter|pressure transmitter|valve|washer|bearing|pump|gasket|seal assembly|"
+    r"cable assembly|connector|fastener|bolt|screw|nut,|motor,|gearbox|compressor|"
+    r"roof replacement|roofing works?|road construction|asphalt paving|bridge repair|"
+    r"plumbing works?|hvac replacement|boiler replacement|electrical rewiring|"
+    r"demolition works?|excavation works?)\b",
+    re.I,
 )
 
 SAM_OPEN_SET_ASIDE_VALUES = {
-    "", "none", "n/a", "na", "not applicable", "no set aside used", "no set-aside used",
-    "not set aside", "unrestricted", "full and open competition",
+    "", "none", "n/a", "na", "not applicable", "no set aside used",
+    "no set-aside used", "not set aside", "unrestricted", "full and open competition",
 }
 SAM_HARD_NON_BID_TYPES = (
     "award", "justification", "intent to bundle", "fair opportunity / limited sources justification",
 )
 SAM_SOFT_NON_BID_TYPES = {
-    "sources sought": -60,
-    "special notice": -50,
-    "presolicitation": -18,
-    "presolicitation notice": -18,
-    "request for information": -55,
-    "rfi": -55,
+    "sources sought": -24,
+    "special notice": -22,
+    "presolicitation": -8,
+    "presolicitation notice": -8,
+    "request for information": -24,
+    "rfi": -24,
 }
 SAM_PORTALS = {"US_SAM", "US_SAM_BULK"}
-EXPLORE_SHARE = 0.15
+EXPLORE_SHARE = 0.20
 MIN_HISTORY_FOR_EXPLOIT = 20
 
 
@@ -226,12 +309,17 @@ def performance_record(portal_performance: dict | None, pkey: str) -> dict:
     return (((portal_performance or {}).get("portals") or {}).get(pkey) or {})
 
 
-def _record_text(rec: dict) -> str:
-    keys = (
-        "title", "description", "buyer", "cpv", "cpv_codes", "cpv_or_category",
-        "category", "categories", "procedure", "notice_eligibility",
-    )
-    return " " + re.sub(r"\s+", " ", " ".join(str(rec.get(k) or "") for k in keys)).casefold() + " "
+def _clean(value: object) -> str:
+    return re.sub(r"\s+", " ", str(value or "")).strip().casefold()
+
+
+def _title_text(rec: dict) -> str:
+    return f" {_clean(rec.get('title'))} "
+
+
+def _description_text(rec: dict) -> str:
+    keys = ("description", "category", "categories", "procedure", "notice_eligibility")
+    return " " + " ".join(_clean(rec.get(k)) for k in keys if rec.get(k)) + " "
 
 
 def _cpv_tokens(rec: dict) -> list[str]:
@@ -239,26 +327,51 @@ def _cpv_tokens(rec: dict) -> list[str]:
     return re.findall(r"\b\d{5,8}\b", raw)
 
 
+def _naics_tokens(rec: dict) -> list[str]:
+    raw = " ".join(str(rec.get(k) or "") for k in ("naics", "naics_code", "naics_codes", "classification"))
+    return re.findall(r"\b\d{5,6}\b", raw)
+
+
+def _signal_scan(text: str, groups: dict[str, dict[str, int]], *, generic_description: bool = False):
+    scores: dict[str, int] = {}
+    hits: dict[str, list[str]] = defaultdict(list)
+    for fit_class, signals in groups.items():
+        for phrase, pts in signals.items():
+            # In long descriptions, single generic tokens are too vulnerable to
+            # procurement boilerplate. Keep only multiword/strong phrases there.
+            if generic_description and " " not in phrase and phrase in {"website", "printing", "brochure", "leaflet", "booklet", "software", "database", "portal", "animation"}:
+                continue
+            if phrase in text:
+                scores[fit_class] = max(scores.get(fit_class, 0), pts)
+                hits[fit_class].append(phrase)
+    return scores, hits
+
+
 def business_fit(rec: dict) -> tuple[bool, str, int, list[str]]:
-    """Fail closed on obvious non-core work; require a concrete SPM execution signal."""
-    text = _record_text(rec)
+    """High-recall fit gate. Unknown/ambiguous digital work stays alive for DCE reading."""
+    title = _title_text(rec)
+    desc = _description_text(rec)
+    portal = portal_key(rec)
     reasons: list[str] = []
 
-    for label, rx in HARD_REJECT_RULES:
-        m = rx.search(text)
-        if m:
-            return False, "REJECT_NONCORE", -100, [f"reject:{label}:{m.group(0)[:80]}"]
-
-    if TRAINING_RE.search(text) and not DIGITAL_PRODUCTION_EXCEPTION_RE.search(text):
-        return False, "REJECT_TRAINING_DELIVERY", -100, ["reject:human-training-delivery"]
+    title_scores, title_hits = _signal_scan(title, STRONG_SCOPE_SIGNALS)
+    broad_title_scores, broad_title_hits = _signal_scan(title, RECALL_SCOPE_SIGNALS)
+    desc_scores, desc_hits = _signal_scan(desc, STRONG_SCOPE_SIGNALS, generic_description=True)
+    broad_desc_scores, broad_desc_hits = _signal_scan(desc, RECALL_SCOPE_SIGNALS, generic_description=True)
 
     class_scores: dict[str, int] = {}
     signal_hits: dict[str, list[str]] = defaultdict(list)
-    for fit_class, signals in CORE_SIGNAL_GROUPS.items():
-        for phrase, pts in signals.items():
-            if phrase in text:
-                class_scores[fit_class] = max(class_scores.get(fit_class, 0), pts)
-                signal_hits[fit_class].append(phrase)
+
+    def merge(scores, hits, weight=0):
+        for cls, score in scores.items():
+            class_scores[cls] = max(class_scores.get(cls, 0), max(0, score + weight))
+            signal_hits[cls].extend(hits.get(cls, []))
+
+    merge(title_scores, title_hits, 0)
+    merge(broad_title_scores, broad_title_hits, 0)
+    # Description signals are useful, but slightly discounted versus title-level scope.
+    merge(desc_scores, desc_hits, -6)
+    merge(broad_desc_scores, broad_desc_hits, -8)
 
     for cpv in _cpv_tokens(rec):
         for prefix, fit_class, pts in CPV_FIT_PREFIXES:
@@ -266,22 +379,52 @@ def business_fit(rec: dict) -> tuple[bool, str, int, list[str]]:
                 class_scores[fit_class] = max(class_scores.get(fit_class, 0), pts)
                 signal_hits[fit_class].append(f"cpv:{cpv}")
 
+    naics_tokens = _naics_tokens(rec)
+    for naics in naics_tokens:
+        for prefix, fit_class, pts in SAM_DIGITAL_NAICS_PREFIXES:
+            if naics.startswith(prefix):
+                class_scores[fit_class] = max(class_scores.get(fit_class, 0), pts)
+                signal_hits[fit_class].append(f"naics:{naics}")
+
+    # Anti-boilerplate rule for SAM: obvious manufactured/physical item title +
+    # manufacturing NAICS + no title-level digital signal means the "website" or
+    # "printing" hit in boilerplate is not a plausible SPM opportunity.
+    title_has_digital = bool(title_scores or broad_title_scores)
+    sam_manufacturing = any(n.startswith(("31", "32", "33")) for n in naics_tokens)
+    if portal in SAM_PORTALS and OBVIOUS_PHYSICAL_TITLE_RX.search(title) and sam_manufacturing and not title_has_digital:
+        return False, "REJECT_SAM_PHYSICAL_COMMODITY", -100, [
+            "reject:sam-physical-title-plus-manufacturing-naics",
+            f"title:{_clean(rec.get('title'))[:120]}",
+            f"naics:{','.join(naics_tokens[:4])}",
+        ]
+
+    # Non-SAM obvious physical titles are rejected only when there is no digital
+    # signal or digital/creative CPV at all. This remains intentionally narrow.
+    if portal not in SAM_PORTALS and OBVIOUS_PHYSICAL_TITLE_RX.search(title) and not title_has_digital:
+        if not any(cls.startswith("SPM_") and class_scores.get(cls, 0) >= 60 for cls in class_scores):
+            return False, "REJECT_OBVIOUS_PHYSICAL", -100, ["reject:obvious-physical-title-no-digital-signal"]
+
     if not class_scores:
-        return False, "REJECT_NO_CORE_SIGNAL", -100, ["reject:no-concrete-spm-core-signal"]
+        return False, "REJECT_NO_RECALL_SIGNAL", -100, ["reject:no-digital-creative-print-training-it-recall-signal"]
 
     fit_class, base = max(class_scores.items(), key=lambda kv: (kv[1], kv[0]))
-    all_hits = sum(len(v) for v in signal_hits.values())
-    breadth_bonus = min(10, max(0, all_hits - 1) * 2)
-    fit_score = min(100, base + breadth_bonus)
+    # Breadth bonus is intentionally small: multiple clues improve confidence but
+    # should not swamp a strong title or classification signal.
+    unique_hits = sorted({h for values in signal_hits.values() for h in values})
+    fit_score = min(100, base + min(8, max(0, len(unique_hits) - 1) * 2))
     reasons.append(f"fit:{fit_class}:{fit_score}")
+    if title_has_digital:
+        reasons.append("scope-signal:title")
+    elif desc_scores or broad_desc_scores:
+        reasons.append("scope-signal:description")
     for cls, hits in sorted(signal_hits.items()):
         if hits:
-            reasons.append(f"signals:{cls}:{','.join(hits[:5])}")
+            reasons.append(f"signals:{cls}:{','.join(sorted(set(hits))[:6])}")
     return True, fit_class, fit_score, reasons
 
 
 def history_adjustment(rec: dict, portal_performance: dict | None) -> tuple[int, list[str]]:
-    """Portal yield is a tiebreaker inside the SPM-fit pool, never a fit substitute."""
+    """Portal DCE yield is a small tiebreaker, never a business-fit substitute."""
     pkey = portal_key(rec)
     hist = performance_record(portal_performance, pkey)
     n = int(hist.get("candidates") or 0)
@@ -293,8 +436,8 @@ def history_adjustment(rec: dict, portal_performance: dict | None) -> tuple[int,
     generic = float(hist.get("generic_or_unresolved_rate") or 0.0)
     delta = 0
     reasons = [f"history:n={n},yield={smooth:.3f}"]
-
     scale = 0.5 if n < MIN_HISTORY_FOR_EXPLOIT else 1.0
+
     if smooth >= 0.45:
         base = 6
     elif smooth >= 0.20:
@@ -332,23 +475,24 @@ def history_adjustment(rec: dict, portal_performance: dict | None) -> tuple[int,
 
 
 def portal_cap(limit: int, pkey: str, portal_performance: dict | None) -> int:
-    """Diversify DCE work after business-fit gating; no portal may dominate the queue."""
+    # Diversity without starving large markets. A single portal may still consume a
+    # substantial share when it has genuinely relevant work.
     if pkey in SAM_PORTALS:
-        return max(12, math.ceil(limit * 0.125))
+        return max(24, math.ceil(limit * 0.20))
     hist = performance_record(portal_performance, pkey)
     n = int(hist.get("candidates") or 0)
     smooth = float(hist.get("smoothed_useful_rate") or 0.0)
     if n >= 80 and smooth >= 0.35:
-        share = 0.30
+        share = 0.35
     elif n >= 20 and smooth >= 0.18:
-        share = 0.25
+        share = 0.30
     elif n >= 30 and smooth <= 0.03:
-        share = 0.08
-    elif n >= 20 and smooth <= 0.10:
         share = 0.12
+    elif n >= 20 and smooth <= 0.10:
+        share = 0.18
     else:
-        share = 0.20
-    return max(8, math.ceil(limit * share))
+        share = 0.25
+    return max(16, math.ceil(limit * share))
 
 
 def sam_adjustment(rec: dict) -> tuple[int, list[str]]:
@@ -357,13 +501,15 @@ def sam_adjustment(rec: dict) -> tuple[int, list[str]]:
         return 0, []
 
     score = 0
-    reasons = []
-    set_aside = re.sub(r"\s+", " ", str(rec.get("set_aside") or "").strip()).casefold()
+    reasons: list[str] = []
+    set_aside = _clean(rec.get("set_aside"))
+    # Keep set-asides visible for partnering/subcontracting possibilities, but rank
+    # them below unrestricted solicitations.
     if set_aside not in SAM_OPEN_SET_ASIDE_VALUES:
-        score -= 100
-        reasons.append("-100:us-set-aside")
+        score -= 34
+        reasons.append("-34:us-set-aside-risk-not-hard-reject")
 
-    notice_type = re.sub(r"\s+", " ", str(rec.get("type") or "").strip()).casefold()
+    notice_type = _clean(rec.get("type"))
     if notice_type:
         if any(term in notice_type for term in SAM_HARD_NON_BID_TYPES):
             score -= 100
@@ -384,13 +530,13 @@ def sam_adjustment(rec: dict) -> tuple[int, list[str]]:
         score += 6
         reasons.append("+6:sam-direct-public-doc-route")
     else:
-        score -= 4
-        reasons.append("-4:sam-no-direct-doc-route")
+        score -= 2
+        reasons.append("-2:sam-no-direct-doc-route")
     return score, reasons
 
 
 def retrieval_score(rec: dict, portal_performance: dict | None = None) -> tuple[int, list[str]]:
-    eligible, fit_class, fit_score, fit_reasons = business_fit(rec)
+    eligible, _fit_class, fit_score, fit_reasons = business_fit(rec)
     if not eligible:
         return -100, fit_reasons
 
@@ -410,8 +556,8 @@ def retrieval_score(rec: dict, portal_performance: dict | None = None) -> tuple[
             score += 3
             reasons.append("+3:moderate-value-band")
         elif value >= 5_000_000:
-            score -= 10
-            reasons.append("-10:very-large-value")
+            score -= 8
+            reasons.append("-8:very-large-value")
 
     deadline = parse_deadline(rec.get("deadline"))
     now = datetime.now(timezone.utc)
@@ -423,8 +569,8 @@ def retrieval_score(rec: dict, portal_performance: dict | None = None) -> tuple[
             score -= 100
             reasons.append("-100:expired")
         elif days < 2:
-            score -= 20
-            reasons.append("-20:deadline-too-close")
+            score -= 16
+            reasons.append("-16:deadline-too-close")
         elif days <= 30:
             score += 4
             reasons.append("+4:actionable-deadline")
@@ -433,8 +579,6 @@ def retrieval_score(rec: dict, portal_performance: dict | None = None) -> tuple[
     score += sam_delta
     reasons.extend(sam_reasons)
 
-    # Crucial ordering: portal yield can move an already-fit opportunity only a few
-    # points. It can never rescue a non-core candidate because business_fit failed above.
     hist_delta, hist_reasons = history_adjustment(rec, portal_performance)
     score += hist_delta
     reasons.extend(hist_reasons)
@@ -466,7 +610,7 @@ def _emit(out, item, emitted_ids, emitted_tb, counts, bucket: str):
         "status": "AUTO_DCE_PREFETCH",
         "selection_portal": pkey,
         "selection_bucket": bucket,
-        "selection_reason": "SPM business-fit gated first; portal DCE yield is secondary | " + ", ".join(reasons[:18]),
+        "selection_reason": "HIGH_RECALL notice selection; authoritative DCE decides truth | " + ", ".join(reasons[:20]),
     })
     return True
 
@@ -486,7 +630,7 @@ def _fill_explore_round_robin(items, out, emitted_ids, emitted_tb, counts, targe
     for item in items:
         grouped[portal_key(item[3])].append(item)
     active = sorted(grouped, key=lambda p: (-grouped[p][0][0], p))
-    explore_portal_cap = max(4, math.ceil(limit * EXPLORE_SHARE / 2))
+    explore_portal_cap = max(8, math.ceil(limit * EXPLORE_SHARE / 2))
     while active and len(out) < target:
         next_active = []
         for pkey in active:
@@ -504,7 +648,7 @@ def _fill_explore_round_robin(items, out, emitted_ids, emitted_tb, counts, targe
         active = next_active
 
 
-def select(records: Iterable[dict], minimum: int = 34, limit: int = 320, blocked_ids: set[str] | None = None, portal_performance: dict | None = None) -> list[dict]:
+def select(records: Iterable[dict], minimum: int = 0, limit: int = 640, blocked_ids: set[str] | None = None, portal_performance: dict | None = None) -> list[dict]:
     rows = list(records)
     blocked_norm = {str(x).strip().casefold() for x in (blocked_ids or set()) if str(x).strip()}
     blocked_tb: set[tuple[str, str]] = set()
@@ -523,14 +667,16 @@ def select(records: Iterable[dict], minimum: int = 34, limit: int = 320, blocked
         if not eligible:
             continue
         score, reasons = retrieval_score(rec, portal_performance=portal_performance)
+        # Hard non-bid/current/expired states can push a row below zero. Ambiguous
+        # business-fit rows stay eligible because minimum is normally zero.
+        if score < minimum:
+            continue
         all_scored.append((score, cid, reasons, rec, cid_key, tb_key, fit_class, fit_score))
 
     all_scored.sort(key=lambda x: (-x[0], -x[7], str(x[3].get("deadline") or "9999"), x[1]))
-    recall_floor = max(0, minimum - 12)
-    eligible = [x for x in all_scored if x[0] >= recall_floor]
     exploit = []
     explore = []
-    for item in eligible:
+    for item in all_scored:
         pkey = portal_key(item[3])
         n = int(performance_record(portal_performance, pkey).get("candidates") or 0)
         (exploit if n >= MIN_HISTORY_FOR_EXPLOIT else explore).append(item)
@@ -542,29 +688,23 @@ def select(records: Iterable[dict], minimum: int = 34, limit: int = 320, blocked
     explore_target_count = min(limit, max(1, round(limit * EXPLORE_SHARE)))
     exploit_target_count = max(0, limit - explore_target_count)
 
-    exploit_primary = [x for x in exploit if x[0] >= minimum]
-    exploit_recall = [x for x in exploit if x[0] < minimum]
-    _fill_ranked(exploit_primary, out, emitted_ids, emitted_tb, counts, exploit_target_count, limit, portal_performance, "exploit")
-    _fill_ranked(exploit_recall, out, emitted_ids, emitted_tb, counts, exploit_target_count, limit, portal_performance, "exploit-recall")
-
+    _fill_ranked(exploit, out, emitted_ids, emitted_tb, counts, exploit_target_count, limit, portal_performance, "exploit")
     explore_absolute_target = min(limit, len(out) + explore_target_count)
     _fill_explore_round_robin(explore, out, emitted_ids, emitted_tb, counts, explore_absolute_target, limit, portal_performance)
 
-    # Fill only from the already business-fit pool. Capacity is allowed to remain
-    # unused rather than backfilling garbage simply to hit a numeric batch target.
-    _fill_ranked(eligible, out, emitted_ids, emitted_tb, counts, limit, limit, portal_performance, "elastic-fit-only")
+    # Elastic fill comes only from the high-recall relevant pool. Relax portal share
+    # before ever inventing non-fit candidates.
+    _fill_ranked(all_scored, out, emitted_ids, emitted_tb, counts, limit, limit, portal_performance, "elastic-recall")
     if len(out) < limit:
-        for relax_share in (0.35, 0.45):
-            for item in eligible:
+        for relax_share in (0.40, 0.55, 0.70):
+            for item in all_scored:
                 if len(out) >= limit:
                     break
                 pkey = portal_key(item[3])
-                cap = portal_cap(limit, pkey, portal_performance) if pkey in SAM_PORTALS else max(
-                    portal_cap(limit, pkey, portal_performance), math.ceil(limit * relax_share)
-                )
+                cap = max(portal_cap(limit, pkey, portal_performance), math.ceil(limit * relax_share))
                 if counts[pkey] >= cap:
                     continue
-                _emit(out, item, emitted_ids, emitted_tb, counts, "elastic-portal-relaxed-fit-only")
+                _emit(out, item, emitted_ids, emitted_tb, counts, "elastic-portal-relaxed-recall")
             if len(out) >= limit:
                 break
     return out
@@ -594,7 +734,7 @@ def modeled_expected(selected: list[dict], portal_performance: dict | None) -> d
         "modeled_expected_useful_rate": round(expected / max(1, len(selected)), 6),
         "selected_with_history": known,
         "by_portal": by_portal,
-        "note": "DCE-route yield model inside the already SPM-fit pool; never a business-fit or eligibility signal.",
+        "note": "Portal yield is only a retrieval tiebreaker inside a high-recall business-relevant pool.",
     }
 
 
@@ -602,8 +742,8 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True)
     ap.add_argument("--out", required=True)
-    ap.add_argument("--minimum", type=int, default=34)
-    ap.add_argument("--limit", type=int, default=320)
+    ap.add_argument("--minimum", type=int, default=0)
+    ap.add_argument("--limit", type=int, default=640)
     ap.add_argument("--blocked", action="append", default=[])
     ap.add_argument("--performance", default="")
     args = ap.parse_args()
@@ -627,31 +767,25 @@ def main() -> None:
     portal_counts = dict(Counter(str(x.get("selection_portal") or "UNKNOWN") for x in selected))
     bucket_counts = dict(Counter(str(x.get("selection_bucket") or "UNKNOWN") for x in selected))
     fit_counts = dict(Counter(str(x.get("selection_fit_class") or "UNKNOWN") for x in selected))
-    sam_count = sum(portal_counts.get(p, 0) for p in SAM_PORTALS)
-    sam_cap = max(12, math.ceil(args.limit * 0.125))
     fit_results = [business_fit(rec) for rec in rows]
     total_fit = sum(1 for ok, _, _, _ in fit_results if ok)
-    fit_reject_counts = Counter(cls for ok, cls, _, _ in fit_results if not ok)
+    reject_counts = Counter(cls for ok, cls, _, _ in fit_results if not ok)
 
     summary = {
         "input": len(rows),
         "blocked_ids": len(blocked),
-        "spm_business_fit_pool": total_fit,
-        "rejected_noncore": len(rows) - total_fit,
-        "fit_reject_counts": dict(fit_reject_counts),
+        "high_recall_business_pool": total_fit,
+        "rejected_as_no_recall_signal_or_obvious_physical": len(rows) - total_fit,
+        "reject_counts": dict(reject_counts),
         "selected": len(selected),
         "minimum": args.minimum,
-        "recall_floor": max(0, args.minimum - 12),
         "limit": args.limit,
-        "fit_policy": "Concrete SPM digital/creative/print/automation signal required before portal-yield scoring; no non-core elastic backfill.",
+        "fit_policy": "Recall-first: ambiguous digital/IT/training/communications/portal work is retained for DCE reading. Only obvious non-bid or physical commodity noise is suppressed early.",
         "explore_share_target": EXPLORE_SHARE,
         "selection_fit_counts": fit_counts,
         "selection_portal_counts": portal_counts,
         "selection_bucket_counts": bucket_counts,
         "max_portal_share": round(max(portal_counts.values(), default=0) / max(1, len(selected)), 6),
-        "sam_count": sam_count,
-        "sam_hard_cap": sam_cap,
-        "sam_cap_respected": sam_count <= sam_cap,
         "history_run_ids": (performance.get("run_ids") or [])[-8:],
         "modeled_yield": modeled_expected(selected, performance),
     }
