@@ -16,6 +16,8 @@ MATRIX_JOB_LIMIT = 256
 RUNNER_PARALLEL_LIMIT = 20
 DEFAULT_BROWSER_MAX_JOBS_PER_SHARD = 12
 DEFAULT_HTTP_MAX_JOBS_PER_SHARD = 32
+DEFAULT_BROWSER_TARGET_JOBS_PER_SHARD = 2
+DEFAULT_HTTP_TARGET_JOBS_PER_SHARD = 8
 
 
 def _norm(value: object) -> str:
@@ -105,15 +107,60 @@ def _adaptive_count(n: int, active_slots: int, target_waves: int, max_jobs_per_s
     return shard_count, jobs_per_shard
 
 
+def _bounded_fixed_shards(n: int, target: int, max_per_shard: int) -> tuple[int, int]:
+    if n <= 0:
+        return 0, 0
+    target = max(1, min(max_per_shard, target))
+    return math.ceil(n / target), target
+
+
+def _fit_matrix_limit(
+    browser_n: int,
+    http_n: int,
+    browser_target: int,
+    http_target: int,
+    browser_cap: int,
+    http_cap: int,
+    max_shards: int,
+) -> tuple[int, int, int, int]:
+    browser_target = max(1, min(browser_cap, browser_target)) if browser_n else 0
+    http_target = max(1, min(http_cap, http_target)) if http_n else 0
+    while True:
+        browser_shards = math.ceil(browser_n / browser_target) if browser_n else 0
+        http_shards = math.ceil(http_n / http_target) if http_n else 0
+        if browser_shards + http_shards <= max_shards:
+            return browser_shards, http_shards, browser_target, http_target
+        # Grow the target with the largest shard pressure first. This preserves
+        # short browser units as long as possible while never exceeding the
+        # Actions matrix ceiling.
+        browser_pressure = (browser_shards / max(1, browser_target)) if browser_n and browser_target < browser_cap else -1
+        http_pressure = (http_shards / max(1, http_target)) if http_n and http_target < http_cap else -1
+        if browser_pressure < 0 and http_pressure < 0:
+            return browser_shards, http_shards, browser_target, http_target
+        if browser_pressure >= http_pressure and browser_target < browser_cap:
+            browser_target += 1
+        elif http_target < http_cap:
+            http_target += 1
+        elif browser_target < browser_cap:
+            browser_target += 1
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--queue", default="queues/dce_candidates.jsonl")
     ap.add_argument("--exclude-queue", default=os.getenv("DCE_EXCLUDE_QUEUE", ""))
     ap.add_argument("--max-shards", type=int, default=int(os.getenv("DCE_MAX_SHARDS", str(MATRIX_JOB_LIMIT))))
-    ap.add_argument("--jobs-per-shard", type=int, default=int(os.getenv("DCE_TARGET_JOBS_PER_SHARD", "0")), help="0/1/2 = adaptive legacy-compatible; >2 = manual")
+    ap.add_argument(
+        "--jobs-per-shard",
+        type=int,
+        default=int(os.getenv("DCE_TARGET_JOBS_PER_SHARD", "0")),
+        help="0/1/2 = streaming kind-aware defaults; >2 = manual fixed target for both kinds",
+    )
     ap.add_argument("--target-waves", type=int, default=int(os.getenv("DCE_TARGET_WAVES", "1")))
     ap.add_argument("--browser-max-jobs-per-shard", type=int, default=int(os.getenv("DCE_BROWSER_MAX_JOBS_PER_SHARD", str(DEFAULT_BROWSER_MAX_JOBS_PER_SHARD))))
     ap.add_argument("--http-max-jobs-per-shard", type=int, default=int(os.getenv("DCE_HTTP_MAX_JOBS_PER_SHARD", str(DEFAULT_HTTP_MAX_JOBS_PER_SHARD))))
+    ap.add_argument("--browser-target-jobs-per-shard", type=int, default=int(os.getenv("DCE_BROWSER_TARGET_JOBS_PER_SHARD", str(DEFAULT_BROWSER_TARGET_JOBS_PER_SHARD))))
+    ap.add_argument("--http-target-jobs-per-shard", type=int, default=int(os.getenv("DCE_HTTP_TARGET_JOBS_PER_SHARD", str(DEFAULT_HTTP_TARGET_JOBS_PER_SHARD))))
     ap.add_argument("--max-jobs", type=int, default=int(os.getenv("MAX_DCE_JOBS", "320")))
     ap.add_argument("--max-parallel", type=int, default=_requested_parallel_default())
     ap.add_argument("--browser-local-concurrency", type=int, default=int(os.getenv("DCE_BROWSER_LOCAL_CONCURRENCY", "2")))
@@ -193,28 +240,28 @@ def main():
     browser_jobs = [j for j in jobs if j["needs_browser"]]
     http_jobs = [j for j in jobs if not j["needs_browser"]]
 
-    sizing_mode = "adaptive"
+    sizing_mode = "streaming_kind_fixed"
     browser_target = 0
     http_target = 0
     if jobs and args.jobs_per_shard > 2:
-        sizing_mode = "manual"
+        sizing_mode = "manual_fixed"
         fixed = max(3, args.jobs_per_shard)
-        desired = min(max_shards, len(jobs), math.ceil(len(jobs) / fixed))
-        browser_shards, http_shards = _allocate_shards(len(browser_jobs), len(http_jobs), desired)
-        browser_target = fixed
-        http_target = fixed
+        browser_target = min(browser_cap, fixed) if browser_jobs else 0
+        http_target = min(http_cap, fixed) if http_jobs else 0
+        browser_shards, http_shards, browser_target, http_target = _fit_matrix_limit(
+            len(browser_jobs), len(http_jobs),
+            browser_target or 1, http_target or 1,
+            browser_cap, http_cap, max_shards,
+        )
     elif jobs:
-        active_target = min(max_parallel, len(jobs))
-        browser_slots, http_slots = _allocate_shards(len(browser_jobs), len(http_jobs), active_target)
-        browser_shards, browser_target = _adaptive_count(len(browser_jobs), browser_slots, target_waves, browser_cap)
-        http_shards, http_target = _adaptive_count(len(http_jobs), http_slots, target_waves, http_cap)
-        total_shards = browser_shards + http_shards
-        if total_shards > max_shards:
-            scale = total_shards / max_shards
-            browser_target = max(browser_target, math.ceil(browser_target * scale)) if browser_jobs else 0
-            http_target = max(http_target, math.ceil(http_target * scale)) if http_jobs else 0
-            browser_shards = math.ceil(len(browser_jobs) / browser_target) if browser_jobs else 0
-            http_shards = math.ceil(len(http_jobs) / http_target) if http_jobs else 0
+        browser_target = max(1, min(browser_cap, args.browser_target_jobs_per_shard)) if browser_jobs else 0
+        http_target = max(1, min(http_cap, args.http_target_jobs_per_shard)) if http_jobs else 0
+        browser_shards, http_shards, browser_target, http_target = _fit_matrix_limit(
+            len(browser_jobs), len(http_jobs),
+            browser_target or DEFAULT_BROWSER_TARGET_JOBS_PER_SHARD,
+            http_target or DEFAULT_HTTP_TARGET_JOBS_PER_SHARD,
+            browser_cap, http_cap, max_shards,
+        )
     else:
         browser_shards = 0
         http_shards = 0
