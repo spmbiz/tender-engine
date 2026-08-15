@@ -9,7 +9,25 @@
   },
   "packet_count": 87,
   "coverage_status": "PARTIAL_WORLD_COVERAGE",
-  "failed_sources": [],
+  "failed_sources": [
+    "discovery-global-cyprus-epps",
+    "discovery-global-malta-epps",
+    "discovery-global-si-ejn",
+    "discovery-global-sk-uvo"
+  ],
+  "missing_packs": [
+    "discovery-global-cyprus-epps",
+    "discovery-global-malta-epps",
+    "discovery-global-si-ejn",
+    "discovery-global-sk-uvo"
+  ],
+  "degraded_packs": [
+    "discovery-global-au-austender",
+    "discovery-global-it-anac-delta"
+  ],
+  "external_missing_lanes": [
+    "UNGM_PUBLIC"
+  ],
   "world_exhaustive_claim_allowed": false,
   "direct_read_branch": "live-snapshot",
   "packet_path_template": "gpt-packets/packet-XXXX.jsonl",
@@ -17,5 +35,5 @@
   "stable_release_tag": "live-world-snapshot-latest",
   "immutable_release_tag": "live-world-snapshot-31902477505",
   "dce_request_path": "control/gpt_dce_request.json",
-  "rule": "GPT selects candidate IDs semantically; GitHub retrieves DCE only after selection. Failed source lanes remain missing/UNKNOWN. No notice-only FINAL_SUPER_GREEN."
+  "rule": "GPT selects candidate IDs semantically; GitHub retrieves DCE only after selection. Missing/degraded source lanes remain explicit UNKNOWN coverage. No notice-only FINAL_SUPER_GREEN."
 }
