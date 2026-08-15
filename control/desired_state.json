@@ -17,15 +17,16 @@
   },
   "dce": {
     "enabled": true,
-    "max_candidates_per_cycle": 10,
+    "max_candidates_per_cycle": 500,
     "minimum_retrieval_priority": 0,
     "minimum_free_github_slots": 3,
     "latency_policy": {
-      "goal": "surface the highest-priority DCE-verified candidates with approximately one candidate per available tender runner, then immediately refill from the remaining durable backlog",
-      "target_candidates_per_batch": 10,
-      "expected_github_parallel_slots": 10,
-      "expected_adaptive_jobs_per_shard": 1,
-      "mode": "micro_wave_low_latency"
+      "goal": "maximize guarded supergreens per runner-minute: keep a deep DCE matrix queued, use small shards for load balancing, and publish candidate/shard verdicts before the full canonical aggregate completes",
+      "target_candidates_per_batch": 500,
+      "expected_github_parallel_slots": 20,
+      "target_browser_candidates_per_shard": 2,
+      "target_http_candidates_per_shard": 8,
+      "mode": "deep_queue_streaming_hotpath"
     },
     "benchmark_basis": {
       "previous_batch_candidates": 313,
@@ -33,7 +34,7 @@
       "previous_runner_minutes_exact": 76.166667,
       "previous_useful_per_runner_minute_exact": 1.746171,
       "baseline_useful_per_runner_minute_exact": 1.084,
-      "decision": "favor 10-candidate micro-waves for time-to-first-guarded-green; preserve the full backlog and refill immediately after each completed DCE run"
+      "decision": "do not trade throughput for tiny batches; keep hundreds of ranked candidates queued while reducing shard size and eliminating batch-level verdict latency"
     }
   },
   "circleci": {

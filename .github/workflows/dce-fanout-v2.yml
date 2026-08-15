@@ -14,17 +14,17 @@ on:
       max_jobs:
         description: Maximum queue candidates to materialize
         required: false
-        default: '320'
+        default: '500'
       max_parallel:
         description: Maximum GitHub shard runners in parallel; hard-capped at 20 and normally supplied by the live fleet controller
         required: false
-        default: '10'
+        default: '20'
       max_shards:
         description: Maximum queued matrix shards (1-256)
         required: false
         default: '256'
       jobs_per_shard:
-        description: '0 = adaptive sizing from candidate count and live runner budget; positive value = manual target'
+        description: '0/1/2 = streaming kind-aware defaults; >2 = manual fixed target'
         required: false
         default: '0'
   push:
@@ -88,15 +88,16 @@ jobs:
           cp "$queue_asset" queue-transport/
           echo "queue_asset=$queue_asset" >> "$GITHUB_OUTPUT"
       - id: matrix
-        name: Compile adaptive browser/HTTP shard queue
+        name: Compile short browser/HTTP shard queue
         env:
-          DCE_REQUESTED_MAX_PARALLEL: ${{ github.event.inputs.max_parallel || '10' }}
+          DCE_REQUESTED_MAX_PARALLEL: ${{ github.event.inputs.max_parallel || '20' }}
           DCE_MAX_SHARDS: ${{ github.event.inputs.max_shards || '256' }}
           DCE_TARGET_JOBS_PER_SHARD: ${{ github.event.inputs.jobs_per_shard || '0' }}
-          DCE_TARGET_WAVES: '1'
+          DCE_BROWSER_TARGET_JOBS_PER_SHARD: '2'
+          DCE_HTTP_TARGET_JOBS_PER_SHARD: '8'
           DCE_BROWSER_MAX_JOBS_PER_SHARD: '12'
           DCE_HTTP_MAX_JOBS_PER_SHARD: '32'
-          MAX_DCE_JOBS: ${{ github.event.inputs.max_jobs || '320' }}
+          MAX_DCE_JOBS: ${{ github.event.inputs.max_jobs || '500' }}
           DCE_BROWSER_LOCAL_CONCURRENCY: '2'
           DCE_HTTP_LOCAL_CONCURRENCY: '8'
         shell: bash
@@ -105,9 +106,9 @@ jobs:
           DCE_MAX_PARALLEL="$(python - <<'PY'
           import os
           try:
-              requested=int(os.environ.get('DCE_REQUESTED_MAX_PARALLEL') or 10)
+              requested=int(os.environ.get('DCE_REQUESTED_MAX_PARALLEL') or 20)
           except Exception:
-              requested=10
+              requested=20
           print(max(1,min(20,requested)))
           PY
           )"
@@ -126,7 +127,7 @@ jobs:
           gh release create "$tag" \
             --target "$GITHUB_SHA" \
             --title "DCE Harvest ${GITHUB_RUN_ID}" \
-            --notes "Canonical durable DCE harvest. Worker transport uses short-lived Actions artifacts; only the aggregate job writes durable Release bundles. DOWNLOADED_PUBLIC is transport success only; evidence_quality.json determines whether retrieved material is authoritative enough for gate review."
+            --notes "Canonical durable DCE harvest. Shards publish guarded hot verdicts as soon as authoritative evidence is ready; canonical DCE packs are still aggregated durably. DOWNLOADED_PUBLIC is transport success only; evidence_quality.json determines whether retrieved material is authoritative enough for gate review."
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
       - name: Persist exact materialized queue and provenance durably
         if: steps.matrix.outputs.count != '0'
@@ -231,6 +232,52 @@ jobs:
         env:
           DCE_GATE_WORKERS: '4'
         run: python pipeline/extract_gates.py --root out
+      - name: Build immediate per-shard review queue
+        run: python pipeline/aggregate_dce.py --root out --out fast-aggregate
+      - name: Adjudicate gate-ready DCE rows immediately
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ADJUDICATION_MODEL: gpt-5-mini
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/auto_adjudicate_dce.py \
+            --queue fast-aggregate/deep_review_queue.jsonl \
+            --out fast-adjudication \
+            --max-model-reviews 16
+      - name: Enforce deterministic final-verdict guard on hot verdicts
+        run: python pipeline/final_verdict_guard.py --review fast-adjudication/adjudication.jsonl
+      - name: Publish guarded shard verdict and refresh ChatGPT hot feed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
+          RUN_ID: ${{ github.run_id }}
+          SHARD_ID: ${{ matrix.shard }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp fast-adjudication/adjudication.jsonl "fast-adjudication-shard-${SHARD_ID}.jsonl"
+          cp fast-adjudication/summary.json "fast-adjudication-summary-shard-${SHARD_ID}.json"
+          cp fast-adjudication/supergreen_shortlist.json "fast-supergreen-shortlist-shard-${SHARD_ID}.json"
+          for attempt in 1 2 3 4; do
+            if gh release upload "$RELEASE_TAG" \
+              "fast-adjudication-shard-${SHARD_ID}.jsonl" \
+              "fast-adjudication-summary-shard-${SHARD_ID}.json" \
+              "fast-supergreen-shortlist-shard-${SHARD_ID}.json" --clobber; then
+              break
+            fi
+            if [ "$attempt" -eq 4 ]; then
+              echo "Failed to publish hot shard verdict assets" >&2
+              exit 1
+            fi
+            sleep "$((attempt * 3))"
+          done
+          python pipeline/publish_supergreen_hot.py \
+            --review fast-adjudication/adjudication.jsonl \
+            --run-id "$RUN_ID" \
+            --shard "$SHARD_ID" \
+            --repo "$REPO"
       - name: Build canonical immutable packs and compact handoff
         shell: bash
         run: |

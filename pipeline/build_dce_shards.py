@@ -16,6 +16,8 @@ MATRIX_JOB_LIMIT = 256
 RUNNER_PARALLEL_LIMIT = 20
 DEFAULT_BROWSER_MAX_JOBS_PER_SHARD = 12
 DEFAULT_HTTP_MAX_JOBS_PER_SHARD = 32
+DEFAULT_BROWSER_TARGET_JOBS_PER_SHARD = 2
+DEFAULT_HTTP_TARGET_JOBS_PER_SHARD = 8
 
 
 def _norm(value: object) -> str:
@@ -24,10 +26,6 @@ def _norm(value: object) -> str:
 
 
 def _requested_parallel_default() -> int:
-    # The autonomous controller computes the actually available global runner
-    # capacity and exports it as DCE_REQUESTED_MAX_PARALLEL. Prefer that live
-    # budget over the workflow's legacy DCE_MAX_PARALLEL fallback. A hard cap of
-    # RUNNER_PARALLEL_LIMIT is still enforced below.
     for key in ("DCE_REQUESTED_MAX_PARALLEL", "DCE_MAX_PARALLEL"):
         raw = os.getenv(key)
         if not raw:
@@ -72,37 +70,32 @@ def _split_buckets(jobs: list[dict], count: int) -> list[list[dict]]:
     return [b for b in buckets if b]
 
 
-def _allocate_shards(browser_n: int, http_n: int, desired: int) -> tuple[int, int]:
-    total = browser_n + http_n
-    if total == 0:
-        return 0, 0
-    if browser_n == 0:
-        return 0, min(desired, http_n)
-    if http_n == 0:
-        return min(desired, browser_n), 0
-    browser_share = max(1, round(desired * browser_n / total))
-    http_share = max(1, desired - browser_share)
-    browser_share = min(browser_share, browser_n)
-    http_share = min(http_share, http_n)
-    while browser_share + http_share < desired:
-        if browser_share < browser_n:
-            browser_share += 1
-        elif http_share < http_n:
-            http_share += 1
-        else:
-            break
-    return browser_share, http_share
-
-
-def _adaptive_count(n: int, active_slots: int, target_waves: int, max_jobs_per_shard: int) -> tuple[int, int]:
-    if n <= 0:
-        return 0, 0
-    active_slots = max(1, min(active_slots, n))
-    target_waves = max(1, target_waves)
-    natural = math.ceil(n / (active_slots * target_waves))
-    jobs_per_shard = max(1, min(max_jobs_per_shard, natural))
-    shard_count = math.ceil(n / jobs_per_shard)
-    return shard_count, jobs_per_shard
+def _fit_matrix_limit(
+    browser_n: int,
+    http_n: int,
+    browser_target: int,
+    http_target: int,
+    browser_cap: int,
+    http_cap: int,
+    max_shards: int,
+) -> tuple[int, int, int, int]:
+    browser_target = max(1, min(browser_cap, browser_target)) if browser_n else 0
+    http_target = max(1, min(http_cap, http_target)) if http_n else 0
+    while True:
+        browser_shards = math.ceil(browser_n / browser_target) if browser_n else 0
+        http_shards = math.ceil(http_n / http_target) if http_n else 0
+        if browser_shards + http_shards <= max_shards:
+            return browser_shards, http_shards, browser_target, http_target
+        browser_pressure = (browser_shards / max(1, browser_target)) if browser_n and browser_target < browser_cap else -1
+        http_pressure = (http_shards / max(1, http_target)) if http_n and http_target < http_cap else -1
+        if browser_pressure < 0 and http_pressure < 0:
+            return browser_shards, http_shards, browser_target, http_target
+        if browser_pressure >= http_pressure and browser_target < browser_cap:
+            browser_target += 1
+        elif http_target < http_cap:
+            http_target += 1
+        elif browser_target < browser_cap:
+            browser_target += 1
 
 
 def main():
@@ -110,11 +103,17 @@ def main():
     ap.add_argument("--queue", default="queues/dce_candidates.jsonl")
     ap.add_argument("--exclude-queue", default=os.getenv("DCE_EXCLUDE_QUEUE", ""))
     ap.add_argument("--max-shards", type=int, default=int(os.getenv("DCE_MAX_SHARDS", str(MATRIX_JOB_LIMIT))))
-    ap.add_argument("--jobs-per-shard", type=int, default=int(os.getenv("DCE_TARGET_JOBS_PER_SHARD", "0")), help="0/1/2 = adaptive legacy-compatible; >2 = manual")
-    ap.add_argument("--target-waves", type=int, default=int(os.getenv("DCE_TARGET_WAVES", "1")))
+    ap.add_argument(
+        "--jobs-per-shard",
+        type=int,
+        default=int(os.getenv("DCE_TARGET_JOBS_PER_SHARD", "0")),
+        help="0/1/2 = streaming kind-aware defaults; >2 = manual fixed target for both kinds",
+    )
     ap.add_argument("--browser-max-jobs-per-shard", type=int, default=int(os.getenv("DCE_BROWSER_MAX_JOBS_PER_SHARD", str(DEFAULT_BROWSER_MAX_JOBS_PER_SHARD))))
     ap.add_argument("--http-max-jobs-per-shard", type=int, default=int(os.getenv("DCE_HTTP_MAX_JOBS_PER_SHARD", str(DEFAULT_HTTP_MAX_JOBS_PER_SHARD))))
-    ap.add_argument("--max-jobs", type=int, default=int(os.getenv("MAX_DCE_JOBS", "320")))
+    ap.add_argument("--browser-target-jobs-per-shard", type=int, default=int(os.getenv("DCE_BROWSER_TARGET_JOBS_PER_SHARD", str(DEFAULT_BROWSER_TARGET_JOBS_PER_SHARD))))
+    ap.add_argument("--http-target-jobs-per-shard", type=int, default=int(os.getenv("DCE_HTTP_TARGET_JOBS_PER_SHARD", str(DEFAULT_HTTP_TARGET_JOBS_PER_SHARD))))
+    ap.add_argument("--max-jobs", type=int, default=int(os.getenv("MAX_DCE_JOBS", "500")))
     ap.add_argument("--max-parallel", type=int, default=_requested_parallel_default())
     ap.add_argument("--browser-local-concurrency", type=int, default=int(os.getenv("DCE_BROWSER_LOCAL_CONCURRENCY", "2")))
     ap.add_argument("--http-local-concurrency", type=int, default=int(os.getenv("DCE_HTTP_LOCAL_CONCURRENCY", "8")))
@@ -126,7 +125,6 @@ def main():
     admitted_parallel, admission = dynamic_tender_parallel(requested_parallel)
     max_parallel = max(0, min(RUNNER_PARALLEL_LIMIT, admitted_parallel))
     max_jobs = max(1, args.max_jobs)
-    target_waves = max(1, args.target_waves)
     browser_cap = max(1, args.browser_max_jobs_per_shard)
     http_cap = max(1, args.http_max_jobs_per_shard)
     exclude_path = Path(args.exclude_queue) if args.exclude_queue else None
@@ -163,8 +161,6 @@ def main():
         if len(jobs) >= max_jobs:
             break
 
-    # Zero admission is a deliberate defer, not a failure: preserve the durable
-    # source selection and let the next controller cycle retry after capacity frees.
     if jobs and max_parallel <= 0:
         payload = {"include": []}
         Path(args.out).write_text(json.dumps(payload, indent=2), encoding="utf-8")
@@ -193,49 +189,58 @@ def main():
     browser_jobs = [j for j in jobs if j["needs_browser"]]
     http_jobs = [j for j in jobs if not j["needs_browser"]]
 
-    sizing_mode = "adaptive"
-    browser_target = 0
-    http_target = 0
     if jobs and args.jobs_per_shard > 2:
-        sizing_mode = "manual"
+        sizing_mode = "manual_fixed"
         fixed = max(3, args.jobs_per_shard)
-        desired = min(max_shards, len(jobs), math.ceil(len(jobs) / fixed))
-        browser_shards, http_shards = _allocate_shards(len(browser_jobs), len(http_jobs), desired)
-        browser_target = fixed
-        http_target = fixed
-    elif jobs:
-        active_target = min(max_parallel, len(jobs))
-        browser_slots, http_slots = _allocate_shards(len(browser_jobs), len(http_jobs), active_target)
-        browser_shards, browser_target = _adaptive_count(len(browser_jobs), browser_slots, target_waves, browser_cap)
-        http_shards, http_target = _adaptive_count(len(http_jobs), http_slots, target_waves, http_cap)
-        total_shards = browser_shards + http_shards
-        if total_shards > max_shards:
-            scale = total_shards / max_shards
-            browser_target = max(browser_target, math.ceil(browser_target * scale)) if browser_jobs else 0
-            http_target = max(http_target, math.ceil(http_target * scale)) if http_jobs else 0
-            browser_shards = math.ceil(len(browser_jobs) / browser_target) if browser_jobs else 0
-            http_shards = math.ceil(len(http_jobs) / http_target) if http_jobs else 0
+        browser_target = min(browser_cap, fixed) if browser_jobs else 0
+        http_target = min(http_cap, fixed) if http_jobs else 0
+    else:
+        sizing_mode = "streaming_kind_fixed"
+        browser_target = max(1, min(browser_cap, args.browser_target_jobs_per_shard)) if browser_jobs else 0
+        http_target = max(1, min(http_cap, args.http_target_jobs_per_shard)) if http_jobs else 0
+
+    if jobs:
+        browser_shards, http_shards, browser_target, http_target = _fit_matrix_limit(
+            len(browser_jobs),
+            len(http_jobs),
+            browser_target or DEFAULT_BROWSER_TARGET_JOBS_PER_SHARD,
+            http_target or DEFAULT_HTTP_TARGET_JOBS_PER_SHARD,
+            browser_cap,
+            http_cap,
+            max_shards,
+        )
     else:
         browser_shards = 0
         http_shards = 0
 
     include: list[dict] = []
-    shard_idx = 0
-    for kind, buckets, local_concurrency in (
-        ("browser", _split_buckets(browser_jobs, browser_shards), max(1, args.browser_local_concurrency)),
-        ("http", _split_buckets(http_jobs, http_shards), max(1, args.http_local_concurrency)),
-    ):
-        for bucket in buckets:
+    browser_buckets = _split_buckets(browser_jobs, browser_shards)
+    http_buckets = _split_buckets(http_jobs, http_shards)
+    # Interleave route kinds so fast HTTP work is not stuck behind a long browser
+    # prefix in the matrix. GitHub can continuously recycle finished runners.
+    while browser_buckets or http_buckets:
+        if browser_buckets:
+            bucket = browser_buckets.pop(0)
             include.append({
-                "shard": shard_idx,
-                "kind": kind,
+                "kind": "browser",
                 "lines": ",".join(str(x["line"]) for x in bucket),
                 "count": len(bucket),
-                "needs_browser": kind == "browser",
-                "local_concurrency": min(local_concurrency, len(bucket)),
+                "needs_browser": True,
+                "local_concurrency": min(max(1, args.browser_local_concurrency), len(bucket)),
                 "portals": ",".join(sorted({x["portal"] for x in bucket})),
             })
-            shard_idx += 1
+        if http_buckets:
+            bucket = http_buckets.pop(0)
+            include.append({
+                "kind": "http",
+                "lines": ",".join(str(x["line"]) for x in bucket),
+                "count": len(bucket),
+                "needs_browser": False,
+                "local_concurrency": min(max(1, args.http_local_concurrency), len(bucket)),
+                "portals": ",".join(sorted({x["portal"] for x in bucket})),
+            })
+    for shard_idx, item in enumerate(include):
+        item["shard"] = shard_idx
 
     payload = {"include": include}
     Path(args.out).write_text(json.dumps(payload, indent=2), encoding="utf-8")
@@ -250,7 +255,6 @@ def main():
         "matrix_job_limit": MATRIX_JOB_LIMIT,
         "sizing_mode": sizing_mode,
         "manual_jobs_per_shard": args.jobs_per_shard if args.jobs_per_shard > 2 else None,
-        "target_waves": target_waves,
         "browser_jobs_per_shard_target": browser_target,
         "http_jobs_per_shard_target": http_target,
         "browser_max_jobs_per_shard": browser_cap,
