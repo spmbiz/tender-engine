@@ -19,10 +19,9 @@ DIRECT_ROUTE_FIELDS = [
     "tool-url-part",
 ]
 
-# Empirically observed unresolved TED downstream domains from the 128-candidate
-# live A/B corpus. These receive a conservative public-page first pass in v4;
-# an unresolved generic pass remains explicitly distinguishable from proof that
-# no public DCE exists.
+# Empirically observed unresolved TED downstream domains. The public-page family
+# is deliberately conservative: it only follows anonymous public links and never
+# bypasses authentication/CAPTCHA barriers.
 WAVE2_GENERIC_HOSTS = {
     "www.vergabe.metropoleruhr.de",
     "www.meinauftrag.rib.de",
@@ -72,7 +71,41 @@ WAVE2_GENERIC_HOSTS = {
     "bbg.vergabeportal.at",
     "s2c.mercell.com",
     "www.simap.ch",
+    # High-frequency hosts observed in the 2026-08-15 320-candidate DCE wave.
+    "app.eop.bg",
+    "e-licitatie.ro",
+    "www.eis.gov.lv",
+    "nen.nipez.cz",
+    "nepps-search.eprocurement.gov.gr",
+    "nepps.eprocurement.gov.gr",
+    "portal.eprocurement.gov.gr",
+    "www.uvo.gov.sk",
+    "www.subreport.de",
+    "ekr.gov.hu",
+    "eojn.hr",
+    "contratos-publicos.comunidad.madrid",
+    "plateforme.alsacemarchespublics.eu",
+    "fwp.vergabeportal.at",
+    "www.deutsches-ausschreibungsblatt.de",
+    "www.egordion.cz",
+    "zakazky.spucr.cz",
+    "www.bandi-altoadige.it",
+    "www.comdia.com",
+    "contractaciopublica.gencat.cat",
+    "app.artifik.no",
 }
+
+GENERIC_SUFFIXES = (
+    ".ezamawiajacy.pl",
+    ".logintrade.net",
+    ".eb2b.com.pl",
+    ".safetender.com",
+    ".vemap.com",
+    ".tuttogare.it",
+    ".traspare.com",
+    ".maggiolicloud.it",
+    ".e-pal.it",
+)
 
 
 def local(tag: str) -> str:
@@ -139,13 +172,20 @@ def classify_downstream(url: str):
     low = url.lower()
     parsed = urlparse(url)
     host = parsed.netloc.lower().split(":")[0]
+    path = parsed.path.lower()
     qs = parse_qs(parsed.query)
-    if "etenders.gov.ie" in low:
-        return "IRELAND_ETENDERS", epps_route(url)
-    if "eprocurement.gov.cy" in low and "/epps/" in low:
-        return "CYPRUS_EPPS", epps_route(url)
-    if "viesiejipirkimai.lt" in low and "/epps/" in low:
-        return "LITHUANIA_EPPS", epps_route(url)
+
+    # ePPS is a shared procurement platform family. Match by product path, not
+    # only country hostname; this immediately covers Malta and future ePPS hosts.
+    if "/epps/cft/" in low and "resourceid=" in low:
+        if "etenders.gov.ie" in low:
+            return "IRELAND_ETENDERS", epps_route(url)
+        if "eprocurement.gov.cy" in low:
+            return "CYPRUS_EPPS", epps_route(url)
+        if "viesiejipirkimai.lt" in low:
+            return "LITHUANIA_EPPS", epps_route(url)
+        return "GENERIC_EPPS", epps_route(url)
+
     if "marches-publics.gouv.fr" in low:
         m = re.search(r"/consultation/(\d+)", url)
         consultation_id = m.group(1) if m else (qs.get("id") or [None])[0]
@@ -166,8 +206,6 @@ def classify_downstream(url: str):
         m = re.search(r"/Notice/(\d+)", url, re.I)
         return "UNGM", {"notice_id": m.group(1) if m else None, "detail_url": url}
 
-    # Wave 1: highest-volume TED downstream portals. Explicit keys let us measure
-    # retrieval uplift and preserve each barrier type rather than hiding failures.
     if host in {"www.dtvp.de", "dtvp.de"}:
         return "DE_DTVP", {"detail_url": url}
     if host.endswith("marches-publics.info") or host.endswith("aws-achat.info"):
@@ -179,13 +217,23 @@ def classify_downstream(url: str):
     if host in {"www.evergabe-online.de", "evergabe-online.de"}:
         return "DE_EVERGABE", {"detail_url": url}
 
-    # Wave 2: empirically observed long-tail portals. French e-marchespublics buyer
-    # subdomains share a public-page family and are included by suffix.
-    if host in WAVE2_GENERIC_HOSTS or host.endswith(".e-marchespublics.com"):
+    # NetServer is reused by many German/Austrian procurement hosts. One generic
+    # public adapter therefore resolves an entire host family instead of adding
+    # one hostname at a time.
+    if "/netserver/" in path or "tenderingproceduredetails" in low or "publicationcontrollerservlet" in low:
+        return "GENERIC_PUBLIC_PAGE", {"detail_url": url, "downstream_host": host, "portal_family": "NETSERVER"}
+
+    if host in WAVE2_GENERIC_HOSTS or host.endswith(".e-marchespublics.com") or host.endswith(GENERIC_SUFFIXES):
         return "GENERIC_PUBLIC_PAGE", {"detail_url": url, "downstream_host": host}
 
     if FILE_RE.search(url):
         return "DIRECT_HTTP", {"document_urls": [url]}
+
+    # Do not leave an anonymous public HTTP(S) TED route unattempted merely
+    # because its vendor hostname is not classified yet. The fast unknown-page
+    # adapter is HTTP-only (no browser), bounded, and keeps barriers explicit.
+    if parsed.scheme in {"http", "https"} and host:
+        return "TED_PUBLIC_PAGE_FAST", {"detail_url": url, "downstream_host": host}
     return None, {"detail_url": url}
 
 
