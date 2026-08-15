@@ -1,0 +1,58 @@
+name: SPM Exhaustive USA Corrected v1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/exhaustive-usa-corrected-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  TAG: market-intelligence-exhaustive-every-record-v1
+
+jobs:
+  usa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Runtime hardening patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('pipeline/exhaustive_record_reader_v1.py')
+          s=p.read_text(encoding='utf-8').replace('sample_size=-1','sample_size=200000').replace("SET memory_limit='10GB'","SET memory_limit='5GB'")
+          s=s.replace("con = duckdb.connect(str(out / 'work.duckdb'))","(out/'ducktmp').mkdir(parents=True,exist_ok=True)\n    con = duckdb.connect(str(out / 'work.duckdb'))")
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Download USAspending canonical award-first facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          for a in historical_tenders.csv.gz awards.csv.gz award_suppliers.csv.gz data_quality.json; do
+            gh release download tender-normalized-usa-awards-v1 --repo walidgdg1-ai/coldemailtool --pattern "$a" --dir source --clobber
+          done
+      - name: Process all 15.8M USA procurement records
+        run: |
+          python pipeline/exhaustive_record_reader_v1.py \
+            --label USASPENDING_V1 --grain AWARD_FIRST_PROCUREMENT \
+            --historical source/historical_tenders.csv.gz --awards source/awards.csv.gz --bridge source/award_suppliers.csv.gz \
+            --expected-tenders 15842317 --expected-awards 15842317 --expected-links 15842312 --out out
+      - name: Publish corrected compact outputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -f out/processed_records.parquet out/award_stats.parquet out/supplier_stats.parquet out/work.duckdb out/work.duckdb.wal
+          rm -rf out/ducktmp
+          for f in summary.json REPORT.md broad_families.csv lanes_by_route.csv source_route_coverage.csv repeat_buyers.csv open_world_clusters.csv top_record_review_queue.csv; do
+            cp "out/$f" "usa_$f"
+            gh release upload "$TAG" "usa_$f" --repo walidgdg1-ai/tender-engine --clobber
+          done
