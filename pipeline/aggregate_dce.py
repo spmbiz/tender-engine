@@ -8,6 +8,7 @@ from pathlib import Path
 
 from authority_conflicts import process as process_authority_conflicts
 from final_verdict_guard import REQUIRED_GATES
+from multilingual_gate_rescue import process as process_multilingual_gate_rescue
 
 PORTAL_GENERIC_FILE_PATTERNS = [
     re.compile(r"^depot[-_ ]?pli\.pdf$", re.I),
@@ -166,8 +167,16 @@ def main():
         raw_manifest_rows += 1
         candidate_root = manifest_path.parent
         candidate = manifest.get("candidate") or load(candidate_root / "candidate.json") or {}
-        gates = load(candidate_root / "gate_snippets.json") or {}
         evidence = load(candidate_root / "evidence_quality.json") or {}
+
+        # Rescue local-language evidence before the model sees the row. This only
+        # adds source snippets; it never decides a gate verdict.
+        try:
+            process_multilingual_gate_rescue(candidate_root)
+        except Exception:
+            pass
+        gates = load(candidate_root / "gate_snippets.json") or {}
+
         # Authority reconciliation belongs on the fast evidence path, not behind
         # durable-pack compression. Compute it here so a shard can legitimately
         # become FINAL_SUPER_GREEN before large archives finish building.
