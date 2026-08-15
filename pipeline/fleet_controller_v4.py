@@ -10,6 +10,7 @@ import fleet_controller_v3 as v3
 STATE_SCHEMA_VERSION = 4
 MAX_DEFERRED_DISCOVERY_RUNS = 1_000
 BUNDLE_MANIFEST_ASSET = "dce-canonical-packs-manifest.json"
+AGGREGATE_RECOVERY_WORKFLOW = "dce-aggregate-recovery.yml"
 v3.STATE_SCHEMA_VERSION = STATE_SCHEMA_VERSION
 
 
@@ -22,6 +23,37 @@ def _slugify(value: str) -> str:
     return (s or "candidate")[:120]
 
 
+def _release_assets(dce_run_id: str):
+    try:
+        rel = fc.get_release(f"dce-harvest-{dce_run_id}")
+        if not rel:
+            return None, []
+        asset_rows: list[dict] = []
+        page = 1
+        while page <= 20:
+            rows = fc.api(
+                f"/repos/{fc.REPO}/releases/{rel['id']}/assets?per_page=100&page={page}"
+            ).json()
+            if not isinstance(rows, list):
+                return None, []
+            if not rows:
+                break
+            asset_rows.extend(x for x in rows if isinstance(x, dict))
+            if len(rows) < 100:
+                break
+            page += 1
+        return rel, asset_rows
+    except Exception:
+        return None, []
+
+
+def _bundle_manifest_ready(dce_run_id: str) -> bool:
+    rel, rows = _release_assets(dce_run_id)
+    if not rel:
+        return False
+    return any(str(x.get("name") or "") == BUNDLE_MANIFEST_ASSET for x in rows)
+
+
 def _executed_candidate_ids(dce_run_id: str, leased_candidate_ids: list[str]) -> list[str] | None:
     """Resolve exact candidates backed by durable canonical execution evidence.
 
@@ -31,24 +63,9 @@ def _executed_candidate_ids(dce_run_id: str, leased_candidate_ids: list[str]) ->
     forms so controller reconciliation remains transactional across the migration.
     """
     try:
-        rel = fc.get_release(f"dce-harvest-{dce_run_id}")
+        rel, asset_rows = _release_assets(dce_run_id)
         if not rel:
             return None
-        asset_rows: list[dict] = []
-        page = 1
-        while page <= 20:
-            rows = fc.api(
-                f"/repos/{fc.REPO}/releases/{rel['id']}/assets?per_page=100&page={page}"
-            ).json()
-            if not isinstance(rows, list):
-                return None
-            if not rows:
-                break
-            asset_rows.extend(x for x in rows if isinstance(x, dict))
-            if len(rows) < 100:
-                break
-            page += 1
-
         asset_names = {str(x.get("name") or "") for x in asset_rows}
         executed_slugs = {
             name[len("candidate-") : -len(".tar.gz")]
@@ -56,8 +73,6 @@ def _executed_candidate_ids(dce_run_id: str, leased_candidate_ids: list[str]) ->
             if name.startswith("candidate-") and name.endswith(".tar.gz")
         }
 
-        # New single-writer contract: use the durable bundle manifest as execution
-        # evidence rather than requiring hundreds of Release assets/API mutations.
         if BUNDLE_MANIFEST_ASSET in asset_names:
             manifest_blob = fc.download_asset({**rel, "assets": asset_rows}, BUNDLE_MANIFEST_ASSET)
             if manifest_blob is None:
@@ -72,6 +87,43 @@ def _executed_candidate_ids(dce_run_id: str, leased_candidate_ids: list[str]) ->
                         executed_slugs.add(name[len("candidate-") : -len(".tar.gz")])
 
         return [cid for cid in leased_candidate_ids if _slugify(cid) in executed_slugs]
+    except Exception:
+        return None
+
+
+def _run_job_state(run_id: str) -> dict | None:
+    """Inspect live matrix health without trusting the parent run status alone."""
+    try:
+        jobs: list[dict] = []
+        for page in range(1, 10):
+            payload = fc.api(
+                f"/repos/{fc.REPO}/actions/runs/{run_id}/jobs?per_page=100&page={page}"
+            ).json()
+            rows = payload.get("jobs") if isinstance(payload, dict) else None
+            if not isinstance(rows, list):
+                return None
+            jobs.extend(x for x in rows if isinstance(x, dict))
+            if len(rows) < 100:
+                break
+        shards = [j for j in jobs if str(j.get("name") or "").startswith("shard-")]
+        aggregates = [j for j in jobs if str(j.get("name") or "") == "aggregate"]
+        active_states = {"queued", "in_progress", "waiting", "pending", "requested"}
+        active_shards = [j for j in shards if str(j.get("status") or "") in active_states]
+        return {
+            "total_jobs": len(jobs),
+            "shards": len(shards),
+            "active_shards": len(active_shards),
+            "completed_success_shards": sum(
+                1 for j in shards
+                if str(j.get("status") or "") == "completed" and str(j.get("conclusion") or "") == "success"
+            ),
+            "aggregate_present": bool(aggregates),
+            "aggregate_active": any(str(j.get("status") or "") in active_states for j in aggregates),
+            "aggregate_success": any(
+                str(j.get("status") or "") == "completed" and str(j.get("conclusion") or "") == "success"
+                for j in aggregates
+            ),
+        }
     except Exception:
         return None
 
@@ -157,6 +209,7 @@ def _dispatch_postprocessing(dce_run_id: str, actions: list[dict], state: dict):
     for workflow, inputs in (
         ("dce-gpt-handoff.yml", {"dce_run_id": dce_run_id}),
         ("auto-dce-adjudication.yml", {"dce_run_id": dce_run_id}),
+        ("tender-portal-yield-backfill.yml", {"dce_run_id": dce_run_id}),
     ):
         try:
             fc.dispatch(workflow, inputs)
@@ -169,8 +222,29 @@ def _dispatch_postprocessing(dce_run_id: str, actions: list[dict], state: dict):
     actions.append({"type": "dce_postprocessing", "workflow_run_id": dce_run_id, "results": results})
 
 
+def _commit_durable_batch(state: dict, actions: list[dict], pending: dict, leased_ids: list[str], run_id: str, executed_ids: list[str]) -> bool:
+    merged = list(state.get("processed_candidate_ids", [])) + executed_ids
+    state["processed_candidate_ids"] = _dedupe(merged)[-v3.MAX_REMEMBERED_CANDIDATES:]
+    executed_set = set(executed_ids)
+    returned = [cid for cid in leased_ids if cid not in executed_set]
+    actions.append({
+        "type": "dce_batch_committed",
+        "workflow_run_id": run_id,
+        "source_run": pending.get("source_run"),
+        "leased_candidates": len(leased_ids),
+        "executed_candidates": len(executed_ids),
+        "returned_to_queue": len(returned),
+        "execution_coverage": round(len(executed_ids) / max(1, len(leased_ids)), 6),
+        "durable_transport": "single_writer_bundle" if _bundle_manifest_ready(run_id) else "legacy_individual_assets",
+    })
+    state["pending_dce_batch"] = None
+    if run_id and executed_ids:
+        _dispatch_postprocessing(run_id, actions, state)
+    return False
+
+
 def _reconcile_pending(state: dict, actions: list[dict]) -> bool:
-    """Commit only durable executed candidates, then close DCE -> review loop."""
+    """Commit only durable executed candidates, then close DCE -> review/yield loop."""
     pending = state.get("pending_dce_batch")
     if not isinstance(pending, dict) or not pending.get("candidate_ids"):
         state["pending_dce_batch"] = None
@@ -181,13 +255,55 @@ def _reconcile_pending(state: dict, actions: list[dict]) -> bool:
     if run:
         status = str(run.get("status") or "")
         conclusion = str(run.get("conclusion") or "")
+        run_id = str(run.get("id") or "")
+
         if status in {"queued", "in_progress", "requested", "waiting", "pending"}:
             pending["workflow_run_id"] = run.get("id")
+
+            # Stronger than the parent run state: if a single-writer manifest exists,
+            # all immutable candidate packs have already been durably aggregated.
+            if run_id and _bundle_manifest_ready(run_id):
+                executed_ids = _executed_candidate_ids(run_id, leased_ids)
+                if executed_ids is not None:
+                    actions.append({
+                        "type": "dce_parent_status_stale_but_durable_aggregate_ready",
+                        "workflow_run_id": run_id,
+                        "parent_status": status,
+                        "executed_candidates": len(executed_ids),
+                    })
+                    return _commit_durable_batch(state, actions, pending, leased_ids, run_id, executed_ids)
+
+            # GitHub occasionally leaves a matrix parent in_progress after every
+            # shard has produced its immutable artifact and fails to materialize the
+            # dependent aggregate job. Detect that exact state and self-heal once.
+            health = _run_job_state(run_id) if run_id else None
+            if (
+                health
+                and health.get("shards", 0) > 0
+                and health.get("active_shards", 0) == 0
+                and not health.get("aggregate_present")
+                and not pending.get("aggregate_recovery_dispatched")
+            ):
+                try:
+                    fc.dispatch(AGGREGATE_RECOVERY_WORKFLOW, {"dce_run_id": run_id})
+                    pending["aggregate_recovery_dispatched"] = fc.iso(fc.NOW)
+                    actions.append({
+                        "type": "dce_aggregate_recovery_dispatched",
+                        "workflow_run_id": run_id,
+                        "job_health": health,
+                    })
+                except Exception as exc:
+                    actions.append({
+                        "type": "dce_aggregate_recovery_dispatch_error",
+                        "workflow_run_id": run_id,
+                        "error": str(exc)[:500],
+                        "job_health": health,
+                    })
+
             state["pending_dce_batch"] = pending
             return True
 
         if status == "completed" and conclusion == "success":
-            run_id = str(run.get("id") or "")
             executed_ids = _executed_candidate_ids(run_id, leased_ids) if run_id else None
             if executed_ids is None:
                 tries = int(pending.get("durability_verification_attempts") or 0) + 1
@@ -210,24 +326,7 @@ def _reconcile_pending(state: dict, actions: list[dict]) -> bool:
                 })
                 state["pending_dce_batch"] = None
                 return False
-
-            merged = list(state.get("processed_candidate_ids", [])) + executed_ids
-            state["processed_candidate_ids"] = _dedupe(merged)[-v3.MAX_REMEMBERED_CANDIDATES:]
-            executed_set = set(executed_ids)
-            returned = [cid for cid in leased_ids if cid not in executed_set]
-            actions.append({
-                "type": "dce_batch_committed",
-                "workflow_run_id": run.get("id"),
-                "source_run": pending.get("source_run"),
-                "leased_candidates": len(leased_ids),
-                "executed_candidates": len(executed_ids),
-                "returned_to_queue": len(returned),
-                "execution_coverage": round(len(executed_ids) / max(1, len(leased_ids)), 6),
-            })
-            state["pending_dce_batch"] = None
-            if run_id and executed_ids:
-                _dispatch_postprocessing(run_id, actions, state)
-            return False
+            return _commit_durable_batch(state, actions, pending, leased_ids, run_id, executed_ids)
 
         actions.append({
             "type": "dce_batch_returned_to_queue",
