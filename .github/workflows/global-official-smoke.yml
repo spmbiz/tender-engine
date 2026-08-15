@@ -53,8 +53,21 @@ jobs:
             *) python pipeline/discover_global_official.py ;;
           esac
           rc=$?
+          stats="discovery/global/${{ matrix.source }}/stats.json"
           echo "adapter_exit_code=$rc"
-          cat "discovery/global/${{ matrix.source }}/stats.json" || true
+          cat "$stats" || true
           echo sample_current:
           head -n 2 "discovery/global/${{ matrix.source }}/current.jsonl" || true
-          exit 0
+          if [ ! -f "$stats" ]; then
+            echo "missing stats.json"
+            [ "$rc" -ne 0 ] && exit "$rc"
+            exit 2
+          fi
+          python - "$stats" <<'PY'
+          import json, sys
+          s=json.load(open(sys.argv[1], encoding='utf-8'))
+          if s.get('errors') or s.get('error'):
+              print('source stats report errors', json.dumps(s.get('errors') or s.get('error'), ensure_ascii=False))
+              raise SystemExit(3)
+          PY
+          exit "$rc"
