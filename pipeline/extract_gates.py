@@ -66,6 +66,13 @@ PATTERNS = {
 }
 
 
+def load_json(path: Path, default=None):
+    try:
+        return json.loads(path.read_text(encoding="utf-8", errors="replace"))
+    except Exception:
+        return {} if default is None else default
+
+
 def snippets(text: str, regexes: list[str], window: int = 650, max_hits: int = 24):
     out = []
     seen = set()
@@ -89,14 +96,36 @@ def process(root: Path):
     if not corpus_path.exists():
         return None
     text = corpus_path.read_text(encoding="utf-8", errors="replace")
-    gates = {name: snippets(text, pats) for name, pats in PATTERNS.items()}
-    result = {
-        "candidate_id": None,
-        "corpus_chars": len(text),
-        "categories": gates,
-        "evidence_counts": {k: len(v) for k, v in gates.items()},
-        "warning": "These are retrieval snippets, not eligibility verdicts. GPT must read the DCE/corpus and resolve each gate explicitly.",
-    }
+    evidence = load_json(root / "evidence_quality.json", {})
+    gate_ready = bool(evidence.get("gate_readiness")) if evidence else None
+
+    if evidence and not gate_ready:
+        gates = {name: [] for name in PATTERNS}
+        result = {
+            "candidate_id": None,
+            "corpus_chars": len(text),
+            "gate_readiness": False,
+            "skipped_due_to_evidence_quality": True,
+            "content_quality": evidence.get("content_quality"),
+            "derived_status": evidence.get("derived_status"),
+            "categories": gates,
+            "evidence_counts": {k: 0 for k in gates},
+            "warning": "Mandatory-gate extraction blocked because authoritative DCE content was not proven. Do not infer eligibility from this corpus.",
+        }
+    else:
+        gates = {name: snippets(text, pats) for name, pats in PATTERNS.items()}
+        result = {
+            "candidate_id": None,
+            "corpus_chars": len(text),
+            "gate_readiness": bool(gate_ready) if gate_ready is not None else None,
+            "skipped_due_to_evidence_quality": False,
+            "content_quality": evidence.get("content_quality") if evidence else None,
+            "derived_status": evidence.get("derived_status") if evidence else None,
+            "categories": gates,
+            "evidence_counts": {k: len(v) for k, v in gates.items()},
+            "warning": "These are retrieval snippets, not eligibility verdicts. GPT/human review must resolve each mandatory gate explicitly with authoritative evidence.",
+        }
+
     candidate_path = root / "candidate.json"
     if candidate_path.exists():
         try:
@@ -105,7 +134,7 @@ def process(root: Path):
         except Exception:
             pass
     (root / "gate_snippets.json").write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
-    return {"root": str(root), "candidate_id": result.get("candidate_id"), "evidence_counts": result["evidence_counts"]}
+    return {"root": str(root), "candidate_id": result.get("candidate_id"), "gate_readiness": result.get("gate_readiness"), "skipped": result.get("skipped_due_to_evidence_quality"), "evidence_counts": result["evidence_counts"]}
 
 
 def main():
@@ -135,7 +164,7 @@ def main():
                     results.append(rec)
 
     results.sort(key=lambda r: r.get("root", ""))
-    print(json.dumps({"workers": workers, "candidates": len(roots), "results": results}, indent=2, ensure_ascii=False))
+    print(json.dumps({"workers": workers, "candidates": len(roots), "gate_ready": sum(1 for r in results if r.get("gate_readiness")), "skipped_unverified": sum(1 for r in results if r.get("skipped")), "results": results}, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":
