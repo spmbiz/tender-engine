@@ -1,0 +1,56 @@
+name: Fleet capacity benchmark
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fleet-capacity-benchmark.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  cpu-fanout:
+    strategy:
+      fail-fast: false
+      max-parallel: 19
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Saturate all runner CPUs and measure throughput
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,multiprocessing as mp,os,time
+          shard=int(os.environ['SHARD'])
+          cpus=os.cpu_count() or 1
+          duration=12.0
+          def burn(worker):
+              seed=f'{shard}:{worker}'.encode()
+              n=0
+              start=time.monotonic()
+              x=seed
+              while time.monotonic()-start < duration:
+                  x=hashlib.sha256(x).digest()
+                  n+=1
+              return n
+          wall=time.monotonic()
+          with mp.Pool(processes=cpus) as pool:
+              counts=pool.map(burn,range(cpus))
+          elapsed=time.monotonic()-wall
+          result={
+              'shard':shard,
+              'logical_cpus':cpus,
+              'processes':cpus,
+              'elapsed_seconds':round(elapsed,3),
+              'sha256_iterations':sum(counts),
+              'iterations_per_second':round(sum(counts)/elapsed,2),
+              'runner_name':os.environ.get('RUNNER_NAME'),
+          }
+          print('FLEET_CPU_BENCHMARK '+json.dumps(result,sort_keys=True))
+          assert cpus >= 2, result
+          PY
