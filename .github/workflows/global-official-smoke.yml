@@ -14,19 +14,19 @@ jobs:
   source:
     name: ${{ matrix.source }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     strategy:
       fail-fast: false
-      max-parallel: 7
+      max-parallel: 10
       matrix:
-        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP]
+        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4 playwright
-      - name: Reuse runner Chrome for AusTender browser fallback
+      - name: Reuse runner Chrome for browser fallbacks
         if: matrix.source == 'AU_AUSTENDER'
         shell: bash
         run: |
@@ -45,6 +45,9 @@ jobs:
             DE_DOE) python pipeline/discover_de_doe_csv.py ;;
             AU_AUSTENDER) python pipeline/discover_austender_browser.py ;;
             ES_PLACSP) python pipeline/discover_es_placsp_atom.py ;;
+            US_SAM_BULK) python pipeline/discover_us_sam_bulk.py ;;
+            NL_TENDERNED_RSS) python pipeline/discover_nl_tenderned_rss.py ;;
+            GR_KHMDHS) python pipeline/discover_gr_khmdhs.py ;;
             *) python pipeline/discover_global_official.py ;;
           esac
           rc=$?
