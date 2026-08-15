@@ -17,9 +17,17 @@
   },
   "dce": {
     "enabled": true,
-    "max_candidates_per_cycle": 320,
+    "max_candidates_per_cycle": 640,
     "minimum_retrieval_priority": 0,
-    "minimum_free_github_slots": 3
+    "minimum_free_github_slots": 3,
+    "benchmark_basis": {
+      "previous_batch_candidates": 313,
+      "previous_batch_gate_ready": 133,
+      "previous_runner_minutes_exact": 76.166667,
+      "previous_useful_per_runner_minute_exact": 1.746171,
+      "baseline_useful_per_runner_minute_exact": 1.084,
+      "decision": "test_640_keep_only_if_neutral_or_beneficial"
+    }
   },
   "circleci": {
     "desired_enabled": false,
