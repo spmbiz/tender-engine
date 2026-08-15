@@ -1,0 +1,75 @@
+name: DCE GPT Web Handoff
+
+on:
+  workflow_run:
+    workflows: ["DCE Fanout V2"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      dce_run_id:
+        description: DCE Fanout V2 run ID to rebuild handoff for
+        required: true
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: dce-gpt-handoff-${{ github.event.workflow_run.id || github.event.inputs.dce_run_id }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Resolve DCE run
+        id: run
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = 'workflow_dispatch' ]; then
+            rid='${{ github.event.inputs.dce_run_id }}'
+          else
+            rid='${{ github.event.workflow_run.id }}'
+          fi
+          echo "id=$rid" >> "$GITHUB_OUTPUT"
+          echo "tag=dce-harvest-$rid" >> "$GITHUB_OUTPUT"
+      - name: Download durable deep-review pack
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RID: ${{ steps.run.outputs.id }}
+          TAG: ${{ steps.run.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dce-aggregate
+          gh release download "$TAG" --pattern "dce-deep-review-$RID.tar.gz" --dir .
+          tar -xzf "dce-deep-review-$RID.tar.gz" -C dce-aggregate
+          test -s dce-aggregate/deep_review_queue.jsonl
+          test -s dce-aggregate/summary.json
+      - name: Build GPT-readable release body
+        run: >-
+          python pipeline/build_gpt_release_notes.py
+          --queue dce-aggregate/deep_review_queue.jsonl
+          --summary dce-aggregate/summary.json
+          --out dce-aggregate/gpt_release_notes.md
+          --top 120
+          --evidence-top 20
+          --max-chars 120000
+      - name: Publish handoff into canonical DCE Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.run.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release edit "$TAG" --notes-file dce-aggregate/gpt_release_notes.md
+          gh release upload "$TAG" dce-aggregate/gpt_release_notes.md --clobber
+          body="$(gh release view "$TAG" --json body --jq '.body')"
+          test ${#body} -gt 100
+          echo "GPT-readable DCE handoff published to $TAG" >> "$GITHUB_STEP_SUMMARY"
