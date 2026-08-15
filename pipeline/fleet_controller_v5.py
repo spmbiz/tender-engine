@@ -1,11 +1,15 @@
 from __future__ import annotations
 
-"""Broker-aware wrapper around the transactional Tender controller v4.
+"""Broker- and yield-aware wrapper around the transactional Tender controller v4.
 
 GitHub Actions concurrency groups do not serialize planners across repositories.
 This wrapper therefore treats guaranteed sibling capacity as virtual observed
 occupancy before v4 computes its available DCE slots. Existing live sibling jobs
 satisfy the guarantee, so productive jobs are never killed merely to rebalance.
+
+It also injects the bounded rolling portal-performance state into the deterministic
+DCE selector. Historical yield changes retrieval priority/capacity only; it never
+changes tender eligibility or final adjudication.
 """
 
 import json
@@ -18,6 +22,7 @@ import fleet_controller as fc
 EVERGREEN_REPO = "walidgdg1-ai/evergreenleadminer"
 BROKER_TAG = "global-fleet-broker"
 BROKER_ASSET = "global-capacity.json"
+PORTAL_PERFORMANCE_ASSET = "portal-performance.json"
 DEFAULT_MINIMUMS = {"hospitality": 6, "gws": 3}
 
 
@@ -25,7 +30,7 @@ def _release_asset_json(repo: str, tag: str, name: str):
     try:
         rel = requests.get(
             f"https://api.github.com/repos/{repo}/releases/tags/{tag}",
-            headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-fleet-broker/1.0"},
+            headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-fleet-broker/1.1"},
             timeout=20,
         )
         if rel.status_code != 200:
@@ -35,7 +40,7 @@ def _release_asset_json(repo: str, tag: str, name: str):
             return None
         r = requests.get(
             asset["url"],
-            headers={"Accept": "application/octet-stream", "User-Agent": "tender-fleet-broker/1.0"},
+            headers={"Accept": "application/octet-stream", "User-Agent": "tender-fleet-broker/1.1"},
             timeout=20,
         )
         if r.status_code != 200:
@@ -49,7 +54,7 @@ def _policy():
     try:
         r = requests.get(
             f"https://raw.githubusercontent.com/{EVERGREEN_REPO}/main/config/global_fleet.json",
-            headers={"User-Agent": "tender-fleet-broker/1.0"},
+            headers={"User-Agent": "tender-fleet-broker/1.1"},
             timeout=20,
         )
         if r.status_code == 200:
@@ -65,8 +70,6 @@ def _sibling_missing_headroom(fleet_detail: list[dict]) -> tuple[int, dict]:
     state = _release_asset_json(EVERGREEN_REPO, BROKER_TAG, BROKER_ASSET) or {}
     demand = ((state.get("last_decision") or {}).get("demand") or {})
 
-    # If broker telemetry is temporarily unavailable, protect Hospitality's floor
-    # rather than letting Tender seize all 20 slots based on a monitoring failure.
     if not demand:
         demand = {"hospitality": 1, "gws": 0}
 
@@ -98,6 +101,7 @@ def _sibling_missing_headroom(fleet_detail: list[dict]) -> tuple[int, dict]:
 
 
 _original_public_fleet_jobs = fc.public_fleet_jobs
+_original_select = fc.select
 
 
 def _broker_aware_public_fleet_jobs():
@@ -115,10 +119,29 @@ def _broker_aware_public_fleet_jobs():
     return active + missing, queued, detail
 
 
+def _yield_aware_select(records, minimum=34, limit=320, blocked_ids=None, **kwargs):
+    performance = _release_asset_json(fc.REPO, fc.FLEET_TAG, PORTAL_PERFORMANCE_ASSET) or {}
+    print(json.dumps({
+        "portal_yield_scheduler": {
+            "history_run_ids": performance.get("run_ids") or [],
+            "observed_portals": len((performance.get("portals") or {})),
+            "exploit_explore": "85/15",
+        }
+    }, separators=(",", ":")))
+    return _original_select(
+        records,
+        minimum=minimum,
+        limit=limit,
+        blocked_ids=blocked_ids,
+        portal_performance=performance,
+    )
+
+
 fc.public_fleet_jobs = _broker_aware_public_fleet_jobs
+fc.select = _yield_aware_select
 
 # Import only after monkey-patching the shared fleet_controller module. v4 delegates
-# execution to v3.main(), which reads fc.public_fleet_jobs at runtime.
+# execution to v3.main(), which reads fc.public_fleet_jobs / fc.select at runtime.
 import fleet_controller_v4 as v4  # noqa: E402,F401
 import fleet_controller_v3 as v3  # noqa: E402
 
