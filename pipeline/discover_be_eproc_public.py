@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import json
 import os
 import shutil
@@ -71,12 +70,8 @@ def pick_text(items, preferred=()):
 def buyer_from(pub, langs):
     org = pub.get("organisation") if isinstance(pub.get("organisation"), dict) else {}
     candidates = [
-        org.get("organisationNames"),
-        org.get("names"),
-        org.get("name"),
-        pub.get("organisationName"),
-        pub.get("buyerName"),
-        pub.get("contractingAuthorityName"),
+        org.get("organisationNames"), org.get("names"), org.get("name"),
+        pub.get("organisationName"), pub.get("buyerName"), pub.get("contractingAuthorityName"),
     ]
     for value in candidates:
         text = pick_text(value, langs)
@@ -160,7 +155,6 @@ def main():
     from playwright.sync_api import sync_playwright
 
     pw = browser = context = page = None
-    captured_headers = None
     captured_payload = None
     first_data = None
     telemetry = []
@@ -168,6 +162,7 @@ def main():
     publications = []
     total_count = None
     pages_fetched = 0
+    paginator_candidates = []
     scan_cutoff = NOW - timedelta(days=SCAN_DAYS)
     raw_cutoff = NOW - timedelta(days=LOOKBACK_DAYS)
 
@@ -178,13 +173,12 @@ def main():
         page = context.new_page()
 
         def on_request(req):
-            nonlocal captured_headers, captured_payload
+            nonlocal captured_payload
             try:
-                if req.url.startswith(SEARCH_API) and req.method == "POST" and captured_headers is None:
+                if req.url.startswith(SEARCH_API) and req.method == "POST" and captured_payload is None:
                     raw = req.post_data or ""
                     payload = json.loads(raw) if raw else None
                     if isinstance(payload, dict):
-                        captured_headers = req.all_headers()
                         captured_payload = payload
             except Exception:
                 pass
@@ -203,66 +197,101 @@ def main():
         page.on("response", on_response)
         page.goto(BDA, wait_until="domcontentloaded", timeout=60000)
         for _ in range(50):
-            if captured_headers and captured_payload and first_data:
+            if captured_payload and first_data:
                 break
             page.wait_for_timeout(400)
-        if not captured_headers or not captured_payload or not first_data:
-            raise RuntimeError("Belgian public BDA search bootstrap did not yield a complete 200 publication request/response pair")
+        if not captured_payload or not first_data:
+            raise RuntimeError("Belgian public BDA bootstrap did not yield a complete publication request/response pair")
 
-        # The endpoint validates the complete SPA request schema. Replay the exact anonymous public
-        # payload and alter only page. Keep the native pageSize rather than guessing a larger value.
         native_page_size = int(captured_payload.get("pageSize") or 25)
-        allowed = {"authorization", "content-type", "accept", "accept-language", "account-type"}
-        replay_headers = {k: v for k, v in captured_headers.items() if k.lower() in allowed and v}
-        replay_headers.setdefault("content-type", "application/json")
-        replay_headers.setdefault("accept", "application/json, text/plain, */*")
-        replay_headers.setdefault("account-type", "public")
 
-        def make_payload(page_no):
-            payload = copy.deepcopy(captured_payload)
-            payload["page"] = page_no
-            payload["pageSize"] = native_page_size
-            return payload
-
-        def fetch_page(page_no):
-            payload = make_payload(page_no)
-            # Same-origin fetch first: it reuses the browser's exact anonymous session/cookie state.
+        def button_metadata():
+            result = []
+            buttons = page.locator("button")
             try:
-                js_headers = {k: v for k, v in replay_headers.items() if k.lower() not in {"origin", "referer", "cookie"}}
-                result = page.evaluate(
-                    """async ({url,payload,headers}) => {
-                      const r = await fetch(url,{method:'POST',headers,credentials:'include',body:JSON.stringify(payload)});
-                      const text = await r.text();
-                      return {status:r.status,text};
-                    }""",
-                    {"url": SEARCH_API, "payload": payload, "headers": js_headers},
-                )
-                text = result.get("text") or ""
-                data = json.loads(text) if text else None
-                telemetry.append({"page": page_no, "page_size": native_page_size, "method": "page.fetch_exact_payload", "status": result.get("status"), "bytes": len(text)})
-                if result.get("status") == 200 and isinstance(data, dict) and isinstance(data.get("publications"), list):
+                count = min(buttons.count(), 120)
+            except Exception:
+                return result
+            for i in range(count):
+                b = buttons.nth(i)
+                try:
+                    result.append({
+                        "index": i,
+                        "text": clean(b.inner_text(timeout=1000)),
+                        "aria": clean(b.get_attribute("aria-label")),
+                        "title": clean(b.get_attribute("title")),
+                        "class": clean(b.get_attribute("class")),
+                        "disabled": b.is_disabled(),
+                    })
+                except Exception:
+                    continue
+            return result
+
+        def find_next_button():
+            selectors = [
+                "button.mat-mdc-paginator-navigation-next",
+                "button.mat-paginator-navigation-next",
+                "button[aria-label='Next page']",
+                "button[aria-label='Volgende pagina']",
+                "button[aria-label='Page suivante']",
+                "button[aria-label='Nächste Seite']",
+                "button[title='Next page']",
+            ]
+            for selector in selectors:
+                loc = page.locator(selector)
+                try:
+                    if loc.count() and loc.first.is_visible() and not loc.first.is_disabled():
+                        return loc.first, selector
+                except Exception:
+                    pass
+            hints = ("next", "volgende", "suivant", "suivante", "nächste", "chevron_right", "arrow_forward")
+            buttons = page.locator("button")
+            try:
+                count = min(buttons.count(), 120)
+            except Exception:
+                count = 0
+            for i in range(count):
+                b = buttons.nth(i)
+                try:
+                    meta = " ".join([
+                        clean(b.inner_text(timeout=800)), clean(b.get_attribute("aria-label")),
+                        clean(b.get_attribute("title")), clean(b.get_attribute("class")),
+                    ]).lower()
+                    if any(h in meta for h in hints) and b.is_visible() and not b.is_disabled():
+                        return b, f"button-index:{i}"
+                except Exception:
+                    continue
+            return None, None
+
+        def fetch_next_via_official_ui(target_page):
+            nonlocal paginator_candidates
+            button, selector = find_next_button()
+            if button is None:
+                paginator_candidates = button_metadata()
+                telemetry.append({"page": target_page, "method": "official_ui_paginator", "error": "NEXT_BUTTON_NOT_FOUND", "button_count": len(paginator_candidates)})
+                return None
+            try:
+                with page.expect_response(lambda r: r.url.startswith(SEARCH_API) and r.status == 200, timeout=25000) as info:
+                    button.click(force=True)
+                resp = info.value
+                data = resp.json()
+                rows = data.get("publications") if isinstance(data, dict) else None
+                telemetry.append({"page": target_page, "page_size": native_page_size, "method": "official_ui_paginator", "selector": selector, "status": resp.status, "rows": len(rows) if isinstance(rows, list) else None})
+                if isinstance(data, dict) and isinstance(rows, list):
+                    page.wait_for_timeout(120)
                     return data
             except Exception as exc:
-                telemetry.append({"page": page_no, "page_size": native_page_size, "method": "page.fetch_exact_payload", "error": repr(exc)})
-            # APIRequestContext fallback shares browser storage and uses the exact captured schema.
-            try:
-                rr = context.request.post(SEARCH_API, headers=replay_headers, data=payload, timeout=45000)
-                text = rr.text()
-                data = json.loads(text) if text else None
-                telemetry.append({"page": page_no, "page_size": native_page_size, "method": "context.request_exact_payload", "status": rr.status, "bytes": len(text)})
-                if rr.status == 200 and isinstance(data, dict) and isinstance(data.get("publications"), list):
-                    return data
-            except Exception as exc:
-                telemetry.append({"page": page_no, "page_size": native_page_size, "method": "context.request_exact_payload", "error": repr(exc)})
+                paginator_candidates = button_metadata()
+                telemetry.append({"page": target_page, "method": "official_ui_paginator", "selector": selector, "error": repr(exc), "button_count": len(paginator_candidates)})
             return None
 
         data = first_data
         for page_no in range(1, MAX_PAGES + 1):
             if page_no > 1:
-                data = fetch_page(page_no)
+                data = fetch_next_via_official_ui(page_no)
             if not data:
                 if page_no == 1:
-                    raise RuntimeError("Belgian publication API returned no usable first page")
+                    raise RuntimeError("Belgian publication UI returned no usable first page")
                 errors.append({"type": "PAGE_FETCH_FAILED", "page": page_no})
                 break
             rows = data.get("publications") or []
@@ -327,7 +356,7 @@ def main():
         "ted_published": sum(bool(x.get("ted_published")) for x in raw),
         "national_only": sum(not bool(x.get("ted_published")) for x in raw),
         "pages_fetched": pages_fetched,
-        "page_size": native_page_size if captured_payload else None,
+        "page_size": int(captured_payload.get("pageSize") or 25) if isinstance(captured_payload, dict) else None,
         "api_total_count": total_count,
         "lookback_days": LOOKBACK_DAYS,
         "scan_days": SCAN_DAYS,
@@ -335,10 +364,11 @@ def main():
         "errors": errors,
         "official_url": BDA,
         "public_search_api": SEARCH_API,
-        "auth_mode": "ANONYMOUS_PUBLIC_SPA_SESSION",
+        "auth_mode": "ANONYMOUS_PUBLIC_SPA_UI",
         "credentials_persisted": False,
         "request_schema_keys": sorted(captured_payload.keys()) if isinstance(captured_payload, dict) else [],
         "telemetry": telemetry,
+        "paginator_candidates": paginator_candidates[:120],
     }
     (OUT / "stats.json").write_text(json.dumps(stats, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(stats, indent=2, ensure_ascii=False))
