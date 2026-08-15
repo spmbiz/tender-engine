@@ -1,0 +1,51 @@
+name: Historical USA Network QA v3.2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - historical_lab/usa_network_qa_v3_2.py
+      - .github/workflows/historical-usa-network-qa-v3-2.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Download USA v3.2 detailed evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input out
+          TAG=historical-usa-network-intermediary-v3-2
+          for f in family_intermediation_scorecard.csv supplier_archetypes.csv examples.csv top_buyers.csv; do
+            gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "$f" --dir input --clobber
+          done
+      - name: Build semantic business QA
+        run: python historical_lab/usa_network_qa_v3_2.py --scorecard input/family_intermediation_scorecard.csv --suppliers input/supplier_archetypes.csv --examples input/examples.csv --buyers input/top_buyers.csv --out out
+      - name: Persist QA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-usa-network-qa-v3-2
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target main --title 'Historical USA Network QA v3.2' --notes 'Semantic/business QA of USA network/intermediary historical markets.'
+          gh release upload "$TAG" out/summary.json out/QA_PACKET.md out/qa_scorecard.csv --repo "$GITHUB_REPOSITORY" --clobber
+          mkdir -p control/historical_usa_network_qa_v3_2
+          cp out/summary.json out/QA_PACKET.md control/historical_usa_network_qa_v3_2/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_usa_network_qa_v3_2/
+          git commit -m 'historical: persist USA network QA v3.2' || exit 0
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
