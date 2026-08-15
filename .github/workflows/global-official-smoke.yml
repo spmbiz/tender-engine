@@ -19,14 +19,14 @@ jobs:
       fail-fast: false
       max-parallel: 20
       matrix:
-        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP, NO_DOFFIN, FI_HILMA, BE_EPROC_PUBLIC, PT_BASE_OPEN, AT_DATAGV, IT_ANAC_DELTA, IT_ANAC_OCDS_BULK]
+        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP, NO_DOFFIN, FI_HILMA, BE_EPROC_PUBLIC, PT_BASE_OPEN, AT_DATAGV, DK_UDBUD_PUBLIC, CZ_ZAKAZKY_GOV, IT_ANAC_DELTA, IT_ANAC_OCDS_BULK]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4 playwright
       - name: Syntax gate
-        run: python -m py_compile pipeline/discover_*.py pipeline/probe_be_eproc_public.py pipeline/dce_worker_v5.py
+        run: python -m py_compile pipeline/discover_*.py pipeline/probe_*.py pipeline/dce_worker_v5.py
       - name: Run source probe
         env: {GLOBAL_SOURCE: '${{ matrix.source }}', DISCOVERY_OUT: 'discovery/global/${{ matrix.source }}', LOOKBACK_DAYS: '14'}
         shell: bash
@@ -48,6 +48,8 @@ jobs:
             BE_EPROC_PUBLIC) python pipeline/probe_be_eproc_public.py ;;
             PT_BASE_OPEN) python pipeline/discover_pt_base_open.py ;;
             AT_DATAGV) python pipeline/discover_at_datagv.py ;;
+            DK_UDBUD_PUBLIC) python pipeline/probe_dk_udbud_public.py ;;
+            CZ_ZAKAZKY_GOV) python pipeline/probe_cz_zakazky_public.py ;;
             IT_ANAC_DELTA) python pipeline/discover_it_anac_delta.py ;;
             IT_ANAC_OCDS_BULK) python pipeline/discover_it_anac_ocds_bulk.py ;;
             *) python pipeline/discover_global_official.py ;;
