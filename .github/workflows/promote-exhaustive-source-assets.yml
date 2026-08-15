@@ -2,7 +2,7 @@ name: Promote Exhaustive Source Outputs
 
 on:
   workflow_run:
-    workflows: ["SPM Exhaustive Every-Record Historical Read v1"]
+    workflows: ["SPM Exhaustive Every-Record Historical Read v1", "SPM Exhaustive USA Corrected v1"]
     types: [completed]
   workflow_dispatch:
   push:
