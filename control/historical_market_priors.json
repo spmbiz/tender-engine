@@ -1,15 +1,15 @@
 {
   "contract": "TENDER_MARKET_BRAIN_PRIORS_V1",
   "status": "READY",
-  "generated_at": "2026-08-15T17:22:00Z",
-  "source_release": "walidgdg1-ai/tender-engine:market-intelligence-v9-final-qa",
-  "source_scope": "Global Core v4 notice-first; route-aware, final semantic QA. Only OPEN_BID high-precision lanes are used for live prioritization.",
+  "generated_at": "2026-08-15T17:38:00Z",
+  "source_release": "walidgdg1-ai/tender-engine:market-intelligence-v9-final-qa + Exhaustive Every-Record v1 / Semantic Promotion v2.1",
+  "source_scope": "Global Core v4 notice-first. v9 remains authority for cleaned named lean lanes. Two additional broker lanes are admitted only after strict semantic QA plus persisted manual sample review.",
   "safety": {
     "affects_final_verdict": false,
     "satisfies_dce_gates": false,
     "pre_dce_only": true,
     "max_total_priority_adjustment": 12,
-    "route_policy": "OPEN_BID historical priors only; direct-buyer lanes excluded from live open-tender bonus",
+    "route_policy": "Historical priors are retrieval hints. Direct-buyer facts are not converted into open-bid competition claims.",
     "unknown_is_not_pass": true
   },
   "country_cpv": {},
@@ -72,7 +72,7 @@
       "historical_score": 77.8,
       "priority_bonus": 5,
       "decision": "PROMOTE_CORE",
-      "patterns": ["site web.{0,80}(maintenance|support|h[eé]bergement|accessibil)", "website.{0,80}(maintenance|support|hosting|accessibil)", "portail web.{0,80}(maintenance|support|h[eé]bergement)"] ,
+      "patterns": ["site web.{0,80}(maintenance|support|h[eé]bergement|accessibil)", "website.{0,80}(maintenance|support|hosting|accessibil)", "portail web.{0,80}(maintenance|support|h[eé]bergement)"],
       "negative_patterns": ["construction", "hardware", "security portal", "x-ray"]
     },
     {
@@ -102,7 +102,7 @@
       "historical_score": 72.94,
       "priority_bonus": 4,
       "decision": "PROMOTE_CORE",
-      "patterns": ["webseite.{0,80}(pflege|betrieb|support|hosting|barrierefrei)", "website.{0,80}(maintenance|support|hosting|accessibil)", "internetauftritt.{0,80}(pflege|betrieb)"] ,
+      "patterns": ["webseite.{0,80}(pflege|betrieb|support|hosting|barrierefrei)", "website.{0,80}(maintenance|support|hosting|accessibil)", "internetauftritt.{0,80}(pflege|betrieb)"],
       "negative_patterns": ["construction", "hardware", "security portal"]
     },
     {
@@ -144,10 +144,36 @@
       "decision": "PROMOTE_CORE",
       "patterns": ["market research", "survey services?", "opinion poll", "customer survey"],
       "negative_patterns": ["geotechn", "soil", "drilling", "borehole"]
+    },
+    {
+      "lane": "Software licences / SaaS resale",
+      "country": "",
+      "sample_size": 438,
+      "historical_score": null,
+      "priority_bonus": 2,
+      "decision": "PROMOTE_BROKER",
+      "patterns": ["software licen[cs](e|es|ing)", "software subscription", "licences? logicielles?", "software licensing", "software licencing", "saas subscription"],
+      "negative_patterns": ["custom software development", "application development", "system integration", "implementation project", "professional licence", "medical licence"]
+    },
+    {
+      "lane": "Promotional merchandise — cross-country expansion",
+      "country": "",
+      "sample_size": 142,
+      "historical_score": null,
+      "priority_bonus": 2,
+      "decision": "PROMOTE_BROKER",
+      "patterns": ["promotional merchandise", "branded merchandise", "promotional items", "objets publicitaires", "articles promotionnels", "articles promotionnels", "corporate gifts"],
+      "negative_patterns": ["full service marketing", "event management", "campaign management"]
     }
   ],
+  "manual_reviewed_expansion": {
+    "authority": "control/semantic_promotion_v2/MANUAL_REVIEW_VERDICT.md",
+    "promoted": ["Software licences / SaaS resale", "Promotional merchandise"],
+    "held": ["Training / e-learning"],
+    "note": "Training/e-learning remains HOLD despite automatic PROMOTE_CORE because the persisted 40-row manual sample still contains semantic collisions."
+  },
   "pending_expansion": {
     "authority": "control/semantic_promotion_v2/promotion_decisions.csv",
-    "rule": "No new exhaustive/open-world lane is added to lane_rules until Semantic Promotion QA v2 and manual sample review both pass."
+    "rule": "No further exhaustive/open-world lane is added to lane_rules until strict semantic QA and manual sample review both pass."
   }
 }
