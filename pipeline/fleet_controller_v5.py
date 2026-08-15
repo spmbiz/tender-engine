@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 import requests
 
 import auto_select_dce as selector_mod
+import dce_orphan_reconcile
 import fleet_controller as fc
 import historical_market_priors as historical_priors
 from github_api_resilience import install as install_github_resilience
@@ -179,6 +180,19 @@ fc.dispatch = _delta_aware_dispatch
 # at runtime.
 import fleet_controller_v4 as v4  # noqa: E402,F401
 import fleet_controller_v3 as v3  # noqa: E402
+
+# A durable DCE Release is stronger than mutable controller state. Recover recent
+# single-writer bundles that are no longer the current pending lease before normal
+# reconciliation/selection so they can never be paid for twice.
+_original_reconcile_pending = v3._reconcile_pending
+
+
+def _reconcile_pending_with_orphans(state: dict, actions: list[dict]) -> bool:
+    dce_orphan_reconcile.reconcile(fc, state, actions, recent_limit=20)
+    return _original_reconcile_pending(state, actions)
+
+
+v3._reconcile_pending = _reconcile_pending_with_orphans
 
 
 if __name__ == "__main__":
