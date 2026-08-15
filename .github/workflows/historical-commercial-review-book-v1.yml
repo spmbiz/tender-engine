@@ -1,0 +1,61 @@
+name: Historical Commercial Review Book v1
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Historical Commercial Miner v1']
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/historical-commercial-review-book-v1.yml'
+      - 'historical_lab/build_commercial_review_book_v1.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-commercial-review-book-v1
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download currently available empirical miner assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source out
+          TAG=historical-commercial-miner-v1
+          assets="$(gh release view "$TAG" --repo walidgdg1-ai/tender-engine --json assets --jq '.assets[].name')"
+          found=0
+          for p in global_core australia usa; do
+            for suffix in high_signal_clusters.csv cluster_examples.csv; do
+              f="${p}_${suffix}"
+              if grep -Fxq "$f" <<< "$assets"; then
+                gh release download "$TAG" --repo walidgdg1-ai/tender-engine --pattern "$f" --dir source --clobber
+                found=$((found+1))
+              fi
+            done
+          done
+          [ "$found" -ge 2 ] || { echo 'No complete source pair available'; exit 1; }
+      - name: Build human-readable historical review book
+        run: python historical_lab/build_commercial_review_book_v1.py --root source --out out
+      - name: Persist review book
+        run: |
+          mkdir -p control/historical_commercial_review_v1
+          cp out/REVIEW_BOOK.md out/review_book.json out/summary.json control/historical_commercial_review_v1/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_commercial_review_v1/
+          git commit -m 'historical: persist commercial review book v1' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
