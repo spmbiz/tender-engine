@@ -1,0 +1,107 @@
+name: Historical SEAO DCE Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/historical-seao-dce-probe.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-seao-dce-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded DCE probe dependencies
+        run: |
+          python -m pip install --disable-pip-version-check -q requests 'playwright>=1.46,<2'
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Build six-candidate historical SEAO queue
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          src=Path('control/historical_subniche_dce_access_v1/resolver_candidates.jsonl')
+          rows=[]
+          for line in src.read_text(encoding='utf-8').splitlines():
+              if not line.strip(): continue
+              r=json.loads(line)
+              if str(r.get('portal') or '').upper()=='QC_SEAO': rows.append(r)
+          assert len(rows)==6,len(rows)
+          Path('seao_queue.jsonl').write_text(''.join(json.dumps(r,ensure_ascii=False,separators=(',',':'))+'\n' for r in rows),encoding='utf-8')
+          print('SEAO_QUEUE',len(rows))
+          PY
+      - name: Run current public HTTP/browser cascade
+        env:
+          DCE_LOCAL_CONCURRENCY: '2'
+          DCE_ITEM_RETRIES: '1'
+          DCE_ITEM_TIMEOUT_SECONDS: '150'
+        run: python pipeline/dce_batch_worker.py --queue seao_queue.jsonl --lines '1,2,3,4,5,6' --out out --concurrency 2
+      - name: Summarize historical access evidence
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          rows=[]
+          for p in sorted(Path('out').glob('*/manifest.json')):
+              m=json.loads(p.read_text(encoding='utf-8'))
+              c=m.get('candidate') or {}
+              rows.append({
+                'candidate_id':m.get('candidate_id'),'sub_niche':c.get('historical_sub_niche'),'buyer':c.get('buyer'),
+                'title':c.get('title'),'status':m.get('status'),'files':m.get('files') or [],
+                'method_attempts':m.get('dce_method_attempts') or [],'error':m.get('error')
+              })
+          assert len(rows)==6,len(rows)
+          summary={
+            'contract':'HISTORICAL_SEAO_DCE_PROBE_V1','total':len(rows),
+            'states':dict(Counter(r['status'] for r in rows)),
+            'downloaded_files':sum(len(r['files']) for r in rows),
+            'results':rows,'final_verdict_allowed':False,
+            'note':'Historical public-access research only; no auth/CAPTCHA bypass.'
+          }
+          Path('summary.json').write_text(json.dumps(summary,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print(json.dumps({k:v for k,v in summary.items() if k!='results'},indent=2,ensure_ascii=False))
+          PY
+      - name: Persist compact SEAO probe
+        run: |
+          mkdir -p control/historical_seao_dce_probe_v1
+          cp summary.json control/historical_seao_dce_probe_v1/summary.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_seao_dce_probe_v1/summary.json
+          git commit -m 'tenders: persist historical SEAO DCE probe' || true
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && break
+            git rebase --abort >/dev/null 2>&1 || true
+            [ "$i" = 5 ] && exit 1
+            sleep $((i*3))
+          done
+      - name: Publish durable SEAO evidence bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tar -czf historical-seao-dce-probe-v1.tar.gz out seao_queue.jsonl summary.json
+          tag='historical-seao-dce-probe-v1'
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --target main \
+            --title 'Historical SEAO DCE Probe v1' \
+            --notes 'Browser-aware public-access probe over six audited Quebec print examples. Files, manifests and access states preserved; no access controls bypassed.'
+          gh release upload "$tag" historical-seao-dce-probe-v1.tar.gz summary.json --clobber
