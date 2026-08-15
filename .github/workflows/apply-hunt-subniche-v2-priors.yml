@@ -1,0 +1,68 @@
+name: Apply Hunt Sub-Niche v2 Priors
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/apply_hunt_subniche_v2_priors.py'
+      - '.github/workflows/apply-hunt-subniche-v2-priors.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Apply audited v2 sub-niche decisions
+        run: python pipeline/apply_hunt_subniche_v2_priors.py
+
+      - name: Validate contract and exact retrieval behavior
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pipeline.historical_market_priors import adjustment,load
+          p=load('control/historical_market_priors.json'); assert p
+          cases=[
+            ({'country':'GERMANY','title':'IT-Betreuung - Pflege und Wartung bestehender Webseite'},6,'DE web maintenance'),
+            ({'country':'FRANCE','title':'Prestations de traduction de documents en langues étrangères et vers le français'},5,'FR written translation'),
+            ({'country':'FRANCE','title':'Prestations de retranscription de débats et réunions'},4,'FR pure transcription'),
+            ({'country':'CANADA','title':'Professional Translation Services English to French'},3,'CA written translation'),
+            ({'country':'FRANCE','title':'Construction du Site Internet institutionnel avec prestations d hébergement et maintenance'},5,'FR legitimate web construction+support'),
+            ({'country':'FRANCE','title':'Prestations d interprétariat en langue des signes française'},0,'FR interpreting staffing HOLD'),
+            ({'country':'FRANCE','title':'Prestations de sténotypie et retranscription des débats'},0,'FR stenotypy staffing HOLD'),
+            ({'country':'CANADA','title':'Remote Simultaneous Interpretation Services ASL LSQ'},0,'CA interpretation staffing HOLD'),
+            ({'country':'FRANCE','title':'Création d un centre d interprétation touristique'},0,'FR interpretation-center false positive'),
+            ({'country':'FRANCE','title':'Fourniture de logiciel d interprétation médicale'},0,'FR interpretation-software false positive'),
+          ]
+          out=[]
+          for rec,expect,label in cases:
+            got,reasons=adjustment(rec,p)
+            assert got==expect,(label,got,expect,reasons)
+            out.append({'case':label,'delta':got,'reasons':reasons})
+          print(json.dumps(out,indent=2,ensure_ascii=False))
+          PY
+
+      - name: Persist verified prior contract
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_market_priors.json
+          git commit -m 'tenders: apply hunt sub-niche v2 precision priors' || exit 0
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
