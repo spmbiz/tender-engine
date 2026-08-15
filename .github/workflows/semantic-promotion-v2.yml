@@ -41,6 +41,7 @@ jobs:
           p=Path('pipeline/semantic_promotion_v2.py')
           s=p.read_text(encoding='utf-8')
           s=s.replace('{tscope} scope, {tcpv}', '{tscope} scope_text, {tcpv}')
+          s=s.replace('{tproc} procedure,', '{tproc} procedure_text,')
           s=s.replace('currency,title,scope,cpv_code,estimated_value', 'currency,title,scope_text,cpv_code,estimated_value')
           p.write_text(s,encoding='utf-8')
           PY
