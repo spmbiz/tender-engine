@@ -1,0 +1,51 @@
+name: Historical Priors Live Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/historical_market_priors.py'
+      - 'control/historical_market_priors.json'
+      - '.github/workflows/historical-priors-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate pre-DCE historical bonuses and false-positive guards
+        run: |
+          python - <<'PY'
+          from pipeline.historical_market_priors import load, adjustment
+          p=load()
+          assert p and p.get('status')=='READY'
+          cases=[
+            ({'country':'FRA','title':'Conception graphique et mise en page du magazine municipal'},6,'fr_design'),
+            ({'country':'FRA','title':'Numérisation OCR des archives documentaires'},6,'fr_ocr'),
+            ({'country':'DEU','title':'Relaunch der Website und CMS Drupal'},5,'de_web'),
+            ({'country':'GBR','title':'Website redesign and content management system'},4,'uk_web'),
+          ]
+          for rec,expected,name in cases:
+              d,r=adjustment(rec,p)
+              print(name,d,r)
+              assert d==expected,(name,d,r)
+          negatives=[
+            {'country':'DEU','title':'X-ray medical security portal hardware supply'},
+            {'country':'FRA','title':'Maintenance du parc imprimantes et copieurs'},
+            {'country':'FRA','title':'Médecine translationnelle et recherche clinique'},
+          ]
+          for rec in negatives:
+              d,r=adjustment(rec,p)
+              print('negative',rec['title'],d,r)
+              assert d==0,(rec,d,r)
+          assert p['safety']['affects_final_verdict'] is False
+          assert p['safety']['satisfies_dce_gates'] is False
+          print('HISTORICAL_PRIORS_SMOKE_PASS')
+          PY
