@@ -1,0 +1,124 @@
+name: Historical Sub-Niche DCE Deep Review
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/summarize_historical_subniche_dce.py'
+      - '.github/workflows/historical-subniche-dce-deep-review.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-subniche-dce-deep-review
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Recover access-positive historical queue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out review
+          gh release download historical-subniche-dce-access-v1 \
+            --pattern 'resolver_candidates.jsonl' --dir source --clobber
+          test -s source/resolver_candidates.jsonl
+          echo "queue_count=$(wc -l < source/resolver_candidates.jsonl)"
+
+      - name: Install DCE resolver dependencies
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check -q \
+            requests pypdf python-docx openpyxl python-pptx 'playwright>=1.46,<2'
+          command -v 7z >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq p7zip-full)
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+            echo "Using preinstalled browser: $chrome"
+          else
+            python -m playwright install --with-deps chromium
+          fi
+
+      - name: Resolve historical DCE candidates with live worker
+        env:
+          DCE_LOCAL_CONCURRENCY: '4'
+          DCE_ITEM_RETRIES: '1'
+          DCE_ITEM_TIMEOUT_SECONDS: '180'
+        shell: bash
+        run: |
+          set -euo pipefail
+          n="$(wc -l < source/resolver_candidates.jsonl)"
+          lines="$(seq -s, 1 "$n")"
+          python pipeline/dce_batch_worker.py \
+            --queue source/resolver_candidates.jsonl \
+            --lines "$lines" --out out --concurrency 4 --retries 1 --timeout-seconds 180
+
+      - name: Extract corpora and authoritative evidence quality
+        env:
+          DCE_EXTRACT_WORKERS: '4'
+          DCE_GATE_WORKERS: '4'
+        run: |
+          python pipeline/extract_corpus.py --root out
+          python pipeline/dce_evidence_quality.py --root out
+          python pipeline/extract_gates.py --root out
+
+      - name: Aggregate sub-niche DCE/gate reality check
+        run: python pipeline/summarize_historical_subniche_dce.py --root out --out review
+
+      - name: Validate research-only output
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          s=json.load(open('review/summary.json',encoding='utf-8'))
+          assert s['contract']=='HISTORICAL_SUBNICHE_DCE_GATE_RESEARCH_V1',s
+          assert s['total_candidates']>=20,s
+          assert s['final_verdict_allowed'] is False,s
+          assert os.path.getsize('review/candidate_dce_review.jsonl')>0
+          print(json.dumps({k:v for k,v in s.items() if k!='subniches'},indent=2,ensure_ascii=False))
+          PY
+
+      - name: Persist compact DCE reality check
+        shell: bash
+        run: |
+          mkdir -p control/historical_subniche_dce_review_v1
+          cp review/REPORT.md control/historical_subniche_dce_review_v1/REPORT.md
+          cp review/summary.json control/historical_subniche_dce_review_v1/summary.json
+          cp review/candidate_dce_review.jsonl control/historical_subniche_dce_review_v1/candidate_dce_review.jsonl
+          cp out/batch_summary.json control/historical_subniche_dce_review_v1/batch_summary.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_subniche_dce_review_v1/
+          git commit -m 'tenders: persist historical subniche DCE reality check v1' || true
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then break; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            if [ "$i" = 5 ]; then exit 1; fi
+            sleep $((i*3))
+          done
+
+      - name: Publish durable review bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          tag='historical-subniche-dce-review-v1'
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --target main \
+            --title 'Historical Sub-Niche DCE Reality Check v1' \
+            --notes 'Historical public-DCE retrieval and gate-signal research through the same resolver/evidence pipeline as live tenders. No final verdict allowed.'
+          tar -C out -czf historical-dce-worker-output.tar.gz .
+          gh release upload "$tag" \
+            review/REPORT.md review/summary.json review/candidate_dce_review.jsonl \
+            out/batch_results.json out/batch_summary.json historical-dce-worker-output.tar.gz --clobber
