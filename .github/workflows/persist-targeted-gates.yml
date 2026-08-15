@@ -55,15 +55,20 @@ jobs:
             fi
           done < /tmp/targets.tsv
           test -n "$(find expanded -name gate_snippets.json -print -quit)"
-      - name: Build compact evidence dossier
+      - name: Build compact evidence dossiers
         run: |
-          python pipeline/compact_targeted_gates.py --root expanded --out benchmarks/world-targeted-gates-latest.json --max-snippets 4
+          rm -rf benchmarks/world-targeted-gates
+          python pipeline/compact_targeted_gates.py \
+            --root expanded \
+            --out benchmarks/world-targeted-gates-latest.json \
+            --split-dir benchmarks/world-targeted-gates \
+            --max-snippets 4
       - name: Persist evidence to repository
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add benchmarks/world-targeted-gates-latest.json
+          git add benchmarks/world-targeted-gates-latest.json benchmarks/world-targeted-gates
           git commit -m 'Persist targeted worldwide DCE gate evidence' || exit 0
           git pull --rebase origin main
           git push origin HEAD:main
