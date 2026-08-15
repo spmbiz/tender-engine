@@ -119,14 +119,14 @@ jobs:
       fail-fast: false
       max-parallel: 15
       matrix:
-        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP, NO_DOFFIN, IT_ANAC_DELTA]
+        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP, NO_DOFFIN, FI_HILMA, PT_BASE_OPEN, IT_ANAC_DELTA]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4 playwright
       - name: Syntax gate
-        run: python -m py_compile pipeline/discover_*.py pipeline/dce_worker_v4.py
+        run: python -m py_compile pipeline/discover_*.py pipeline/dce_worker_v5.py
       - name: Harvest official national source
         env: {GLOBAL_SOURCE: '${{ matrix.source }}', DISCOVERY_OUT: 'discovery/global/${{ matrix.source }}', LOOKBACK_DAYS: '14'}
         shell: bash
@@ -144,11 +144,16 @@ jobs:
             LV_IUB) python pipeline/discover_lv_iub.py ;;
             CH_SIMAP) python pipeline/discover_ch_simap.py ;;
             NO_DOFFIN) python pipeline/discover_no_doffin.py ;;
+            FI_HILMA) python pipeline/discover_fi_hilma_public.py ;;
+            PT_BASE_OPEN) python pipeline/discover_pt_base_open.py ;;
             IT_ANAC_DELTA) python pipeline/discover_it_anac_delta.py ;;
             *) python pipeline/discover_global_official.py ;;
           esac
           rc=$?;echo "source_exit_code=$rc"
+          mkdir -p "discovery/global/${{ matrix.source }}"
+          echo "$rc" > "discovery/global/${{ matrix.source }}/adapter_exit_code.txt"
           test -f "discovery/global/${{ matrix.source }}/stats.json" || exit "$rc"
+          # Preserve degraded source evidence; coverage_guard will label the pack DEGRADED from stats.json.
           exit 0
       - name: Persist official source durably
         env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
