@@ -8,7 +8,7 @@ import dce_worker_v3 as v3
 
 
 def generic_public_page_adapter(candidate: dict, out: Path, manifest: dict):
-    """Conservative long-tail TED downstream first pass.
+    """Conservative public-page DCE first pass for long-tail portals.
 
     Reuse the validated v3 public-page extractor, but never interpret failure to
     find a visible/direct document link as proof that the portal has no public
@@ -20,7 +20,19 @@ def generic_public_page_adapter(candidate: dict, out: Path, manifest: dict):
         manifest["status"] = "GENERIC_PUBLIC_PAGE_UNRESOLVED"
 
 
-base.ADAPTERS["GENERIC_PUBLIC_PAGE"] = generic_public_page_adapter
+# These discovery sources expose public notice/detail URLs. Start with the same
+# conservative HTTP + browser link discovery used for TED long-tail downstream
+# portals. This does not bypass login, CAPTCHA, MFA, or controlled attachments.
+for portal in (
+    "GENERIC_PUBLIC_PAGE",
+    "CA_CANADABUYS",
+    "QC_SEAO",
+    "DE_DOE",
+    "FR_BOAMP",
+    "NZ_GETS",
+    "AU_AUSTENDER",
+):
+    base.ADAPTERS[portal] = generic_public_page_adapter
 
 
 if __name__ == "__main__":
