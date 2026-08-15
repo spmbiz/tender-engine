@@ -1,0 +1,17 @@
+{
+  "schema": "LIVE_WORLD_SNAPSHOT_POINTER_V1",
+  "source_discovery_run": 31893737133,
+  "generated_at": "2026-08-15T18:11:36.438859+00:00",
+  "snapshot_rows": 42226,
+  "open_state_counts": {
+    "OPEN_CONFIRMED_BY_DEADLINE": 39186,
+    "OPEN_UNVERIFIED_NO_PARSEABLE_DEADLINE": 3040
+  },
+  "packet_count": 85,
+  "direct_read_branch": "live-snapshot",
+  "packet_path_template": "gpt-packets/packet-XXXX.jsonl",
+  "stable_release_tag": "live-world-snapshot-latest",
+  "immutable_release_tag": "live-world-snapshot-31893737133",
+  "dce_request_path": "control/gpt_dce_request.json",
+  "rule": "GPT selects candidate IDs semantically; GitHub retrieves DCE only after selection. No notice-only FINAL_SUPER_GREEN."
+}
