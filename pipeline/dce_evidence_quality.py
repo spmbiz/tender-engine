@@ -6,59 +6,53 @@ import re
 from pathlib import Path
 
 ACCESS_GUIDE_FILENAME_PATTERNS = [
-    r"instructions?.*(?:access|tender|portal)",
-    r"how.*access.*tender",
-    r"user.?guide",
-    r"supplier.*guide",
-    r"portal.*guide",
-    r"terms.*use",
-    r"nutzungsbedingungen",
-    r"datenschutz",
-    r"cgu.*march",
-    r"depot[-_ ]?pli",
+    r"instructions?.*(?:access|tender|portal)", r"how.*access.*tender", r"user.?guide", r"supplier.*guide", r"portal.*guide", r"terms.*use",
+    r"guide.*utilisateur", r"notice.*utilisation", r"mode.*emploi", r"nutzungsbedingungen", r"bedienungsanleitung", r"benutzerhandbuch", r"datenschutz",
+    r"gebruikershandleiding", r"instrukcja", r"podręcznik użytkownika", r"manual.*usuario", r"gu[ií]a.*usuario", r"manuale.*utente", r"guida.*utente",
+    r"manual.*utilizador", r"guia.*utilizador", r"cgu.*march", r"depot[-_ ]?pli",
 ]
 
 ACCESS_GUIDE_TEXT_PATTERNS = [
-    r"instructions? on how to access",
-    r"how to access .*tenders?",
-    r"express interest",
-    r"view documents",
-    r"register(?:ed|ing|ation)? (?:on|at|with) (?:the )?(?:ungm|portal|e[- ]?tender)",
-    r"supplier registration",
-    r"complete your registration",
-    r"login to (?:the )?(?:portal|system)",
-    r"click (?:on )?[\"']?(?:express interest|view documents)",
-    r"redirected to .*tender",
+    r"instructions? on how to access", r"how to access .*tenders?", r"express interest", r"view documents",
+    r"register(?:ed|ing|ation)? (?:on|at|with) (?:the )?(?:ungm|portal|e[- ]?tender)", r"supplier registration", r"complete your registration",
+    r"login to (?:the )?(?:portal|system)", r"click (?:on )?[\"']?(?:express interest|view documents)", r"redirected to .*tender",
+    r"guide (?:d['’])?utilisation", r"comment accéder", r"se connecter au portail", r"créer (?:un|votre) compte",
+    r"anleitung.*zugang", r"benutzerhandbuch", r"anmelden.*portal", r"registrier(?:en|ung).*portal",
+    r"gebruikershandleiding", r"inloggen.*portaal", r"registreren.*portaal",
+    r"instrukcja.*dostęp", r"zaloguj.*portal", r"rejestracja.*portal",
+    r"manual de usuario", r"gu[ií]a de usuario", r"acceder al portal", r"registrarse.*portal",
+    r"manuale utente", r"guida utente", r"accedere al portale", r"registrazione.*portale",
+    r"manual do utilizador", r"guia do utilizador", r"aceder ao portal", r"registo.*portal",
 ]
 
 INTEREST_REQUIRED_PATTERNS = [
-    r"express interest",
-    r"record(?:ing)? (?:your )?interest",
-    r"register interest",
+    r"express interest", r"record(?:ing)? (?:your )?interest", r"register interest", r"manifest(?:er|ation).*intérêt", r"interesse bekunden",
+    r"belangstelling registreren", r"wyrazić zainteresowanie", r"manifestar inter[eé]s", r"manifestare interesse", r"manifestar interesse",
 ]
 
 SUBSTANTIVE_PATTERNS = [
-    r"request for tender",
-    r"request for proposal",
-    r"invitation to tender",
-    r"invitation to submit",
-    r"terms of reference",
-    r"scope of work",
-    r"statement of work",
-    r"requirements and specifications",
-    r"technical specifications?",
-    r"award criteria",
-    r"selection criteria",
-    r"evaluation criteria",
-    r"pricing schedule",
-    r"form of tender",
-    r"conditions of contract",
-    r"contract duration",
-    r"submission deadline",
-    r"deadline for (?:receipt|submission)",
-    r"minimum turnover",
-    r"professional indemnity",
-    r"public liability",
+    # English
+    r"request for tender", r"request for proposal", r"invitation to tender", r"invitation to submit", r"terms of reference", r"scope of work",
+    r"statement of work", r"requirements and specifications", r"technical specifications?", r"award criteria", r"selection criteria", r"evaluation criteria",
+    r"pricing schedule", r"form of tender", r"conditions of contract", r"contract duration", r"submission deadline", r"deadline for (?:receipt|submission)",
+    r"minimum turnover", r"professional indemnity", r"public liability",
+    # French
+    r"r[eè]glement de (?:la )?consultation", r"cahier des clauses", r"cahier des charges", r"sp[eé]cifications techniques?", r"crit[eè]res? d['’]attribution",
+    r"crit[eè]res? de s[eé]lection", r"date limite de remise", r"date limite de r[eé]ception", r"acte d['’]engagement", r"bordereau des prix", r"m[eé]moire technique",
+    # German
+    r"leistungsbeschreibung", r"vergabeunterlagen", r"zuschlagskriterien", r"eignungskriterien", r"angebotsfrist", r"preisblatt", r"vertragsbedingungen",
+    # Dutch
+    r"aanbestedingsleidraad", r"programma van eisen", r"gunningscriteria", r"geschiktheidseisen", r"inschrijvings(?:termijn|deadline)", r"prijzenblad",
+    # Polish
+    r"specyfikacja warunk[oó]w zam[oó]wienia", r"\bSWZ\b", r"opis przedmiotu zam[oó]wienia", r"kryteria oceny ofert", r"termin sk[łl]adania ofert",
+    # Spanish
+    r"pliego de prescripciones t[eé]cnicas", r"pliego de cl[aá]usulas administrativas", r"criterios de adjudicaci[oó]n", r"plazo de presentaci[oó]n", r"presupuesto base",
+    # Italian
+    r"capitolato tecnico", r"disciplinare di gara", r"criteri di aggiudicazione", r"termine (?:di )?presentazione", r"offerta economica",
+    # Portuguese
+    r"caderno de encargos", r"programa do procedimento", r"crit[eé]rios de adjudica[cç][aã]o", r"prazo para apresenta[cç][aã]o", r"proposta financeira",
+    # Irish / Gaeilge common procurement headings
+    r"iarratas ar thairiscint", r"cuireadh chun tairisceana", r"crit[eé]ir d[aá]mhachtana", r"riachtanais agus sonra[ií]ochta[ií]",
 ]
 
 GENERIC_FILENAME_RX = [re.compile(p, re.I) for p in ACCESS_GUIDE_FILENAME_PATTERNS]
@@ -129,7 +123,8 @@ def classify_candidate(root: Path) -> dict:
             derived_status = "DOWNLOADED_PUBLIC_EMPTY"
             reasons.append("downloaded_files_but_no_extractable_authoritative_text")
         else:
-            all_named_generic = bool(filenames) and len(generic_names) == len([n for n in filenames if n])
+            named = [n for n in filenames if n]
+            all_named_generic = bool(named) and len(generic_names) == len(named)
             strong_access_guide = len(access_hits) >= 2 and len(substantive_hits) <= 1
             weak_specificity = title_match["ratio"] < 0.25
             if all_named_generic or (strong_access_guide and (weak_specificity or text_chars < 120_000)):
