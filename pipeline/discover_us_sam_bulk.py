@@ -61,7 +61,7 @@ def _document_urls(row:dict):
         urls=URL_RE.findall(sv)
         if sv.startswith(('http://','https://')) and sv not in urls:urls.insert(0,sv)
         for u in urls:
-            u=u.rstrip(').,;\'"')
+            u=u.rstrip(").,;'\"")
             if DOC_FIELD_RE.search(key) or FILE_RE.search(u):out.append(u)
     return list(dict.fromkeys(out))
 
