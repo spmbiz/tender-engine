@@ -92,8 +92,10 @@ def validate_record(rec: dict) -> list[str]:
             evidence = item.get("evidence") or item.get("source_refs") or item.get("snippets")
             if not evidence:
                 errors.append(f"{cid}: mandatory gate {gate} has {status} without evidence")
-        elif status == "NOT_APPLICABLE" and not item.get("reason"):
-            errors.append(f"{cid}: mandatory gate {gate} marked NOT_APPLICABLE without reason")
+        elif status == "NOT_APPLICABLE":
+            reason = item.get("reason") or item.get("notes")
+            if not reason:
+                errors.append(f"{cid}: mandatory gate {gate} marked NOT_APPLICABLE without reason")
 
     if classification == "FINAL_SUPER_GREEN" and score and score < 90:
         errors.append(f"{cid}: FINAL_SUPER_GREEN requires coherent score >=90 when a final score is supplied")
