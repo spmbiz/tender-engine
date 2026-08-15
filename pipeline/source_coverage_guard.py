@@ -27,6 +27,7 @@ GLOBAL_PACKS = [
     "discovery-global-fi-hilma",
     "discovery-global-pt-base-open",
     "discovery-global-dk-udbud-public",
+    "discovery-global-cz-zakazky-gov",
     "discovery-global-it-anac-delta",
 ]
 REQUIRED_SHARDED = {
