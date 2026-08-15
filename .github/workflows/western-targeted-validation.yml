@@ -1,0 +1,123 @@
+name: Western Targeted Validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'control/western_validation_trigger.txt'
+
+permissions:
+  contents: read
+
+jobs:
+  source:
+    name: source-${{ matrix.source }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        source: [PL_BZP, CH_SIMAP, NO_DOFFIN, IT_OCP_MIRROR, GR_KHMDHS, NL_TENDERNED_RSS]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4 playwright
+      - name: Syntax
+        run: python -m py_compile pipeline/discover_*.py pipeline/dce_worker_v4.py
+      - name: Run bounded source
+        env:
+          DISCOVERY_OUT: discovery/${{ matrix.source }}
+          LOOKBACK_DAYS: '7'
+          PL_MAX_PAGES: '6'
+          CH_MAX_PAGES: '12'
+          CH_MAX_DETAILS: '180'
+          NO_MAX_NOTICES: '300'
+          NO_DETAIL_MAX: '200'
+          GR_MAX_PAGES: '5'
+          IT_OCP_MAX_BYTES: '300000000'
+        shell: bash
+        run: |
+          set +e
+          case '${{ matrix.source }}' in
+            PL_BZP) python pipeline/discover_pl_bzp.py ;;
+            CH_SIMAP) python pipeline/discover_ch_simap.py ;;
+            NO_DOFFIN) python pipeline/discover_no_doffin.py ;;
+            IT_OCP_MIRROR) python pipeline/discover_it_ocp_mirror.py ;;
+            GR_KHMDHS) python pipeline/discover_gr_khmdhs.py ;;
+            NL_TENDERNED_RSS) python pipeline/discover_nl_tenderned_rss.py ;;
+          esac
+          rc=$?
+          echo "adapter_exit_code=$rc"
+          cat "discovery/${{ matrix.source }}/stats.json" || true
+          echo sample_current
+          head -n 3 "discovery/${{ matrix.source }}/current.jsonl" || true
+          exit 0
+
+  dce:
+    name: dce-${{ matrix.source }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        source: [PL_BZP, CH_SIMAP, NO_DOFFIN, GR_KHMDHS]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4 playwright pypdf python-docx openpyxl
+      - name: Reuse system Chrome
+        shell: bash
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
+      - name: Discover sample and select documentable candidate
+        env:
+          DISCOVERY_OUT: discovery/${{ matrix.source }}
+          LOOKBACK_DAYS: '7'
+          PL_MAX_PAGES: '2'
+          CH_MAX_PAGES: '5'
+          CH_MAX_DETAILS: '80'
+          NO_MAX_NOTICES: '200'
+          NO_DETAIL_MAX: '160'
+          GR_MAX_PAGES: '3'
+        shell: bash
+        run: |
+          case '${{ matrix.source }}' in
+            PL_BZP) python pipeline/discover_pl_bzp.py ;;
+            CH_SIMAP) python pipeline/discover_ch_simap.py ;;
+            NO_DOFFIN) python pipeline/discover_no_doffin.py ;;
+            GR_KHMDHS) python pipeline/discover_gr_khmdhs.py ;;
+          esac
+          python - <<'PY'
+          import json, os
+          src=os.environ.get('MATRIX_SOURCE','${{ matrix.source }}')
+          rows=[json.loads(x) for x in open(f'discovery/{src}/current.jsonl',encoding='utf-8') if x.strip()]
+          def rank(r):
+              route=r.get('route') or {}
+              return (
+                  100*bool(route.get('document_urls'))+
+                  80*bool(route.get('tender_api_url'))+
+                  60*bool(route.get('proceeding_url') or route.get('competition_docs_url'))+
+                  40*bool(route.get('has_project_documents'))+
+                  20*bool(route.get('detail_url'))+
+                  5*bool(r.get('deadline'))
+              )
+          rows.sort(key=rank,reverse=True)
+          assert rows, 'no current candidate'
+          pick=rows[0]
+          open('queue.jsonl','w',encoding='utf-8').write(json.dumps(pick,ensure_ascii=False)+'\n')
+          print('selected',pick.get('candidate_id'),'rank',rank(pick),'route',json.dumps(pick.get('route'),ensure_ascii=False))
+          PY
+      - name: Run multi-method DCE cascade
+        env: {PYTHONPATH: pipeline}
+        run: python pipeline/dce_worker_v4.py --queue queue.jsonl --line 1 --out dce_out
+      - name: Inspect DCE manifest
+        shell: bash
+        run: |
+          find dce_out -maxdepth 4 -type f -printf '%p %s bytes\n' | head -100
+          find dce_out -name manifest.json -exec cat {} \;
