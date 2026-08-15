@@ -5,6 +5,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'pipeline/discover_dk_udbud_public.py'
       - 'pipeline/probe_dk_udbud_public.py'
       - 'control/dk_udbud_test.txt'
       - '.github/workflows/dk-udbud-smoke.yml'
@@ -20,7 +21,26 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - run: python -m pip install --disable-pip-version-check -q playwright
-      - run: python -m py_compile pipeline/probe_dk_udbud_public.py
-      - env: {DISCOVERY_OUT: 'discovery/global/DK_UDBUD_PUBLIC'}
-        run: python pipeline/probe_dk_udbud_public.py
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - run: python -m py_compile pipeline/discover_dk_udbud_public.py
+      - name: Harvest complete active Danish window
+        env:
+          DISCOVERY_OUT: discovery/global/DK_UDBUD_PUBLIC
+          DK_PAGE_SIZE: '25'
+          DK_MAX_PAGES: '80'
+        run: python pipeline/discover_dk_udbud_public.py
+      - name: Verify materialization and completeness
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('discovery/global/DK_UDBUD_PUBLIC/stats.json'))
+          print(json.dumps(s,indent=2,ensure_ascii=False))
+          assert not s.get('errors'), s
+          assert s.get('active_window_complete') is True, s
+          assert s.get('current_materialized',0) >= 500, s
+          assert s.get('title_parsed') == s.get('current_materialized'), s
+          assert s.get('buyer_parsed',0) > 0, s
+          assert s.get('rate_limit_signals',0) == 0, s
+          PY
+          echo sample_current:
+          head -n 3 discovery/global/DK_UDBUD_PUBLIC/current.jsonl
