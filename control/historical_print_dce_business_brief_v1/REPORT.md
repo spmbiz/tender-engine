@@ -11,6 +11,6 @@ Signals: quantity_or_run, delivery_logistics, finishing
 ## Impression des supports de communication de la Communauté de communes du Pays de l'Ourcq à Ocquerre
 Buyer: Communauté de communes du Pays de l'Ourcq · Sub-niche: FR · Communication collateral printing
 Signals: similar_references, mandatory_insurance, mandatory_sample_or_proof, quantity_or_run, delivery_logistics
-Price-weight candidates: 0
-Quality/technical-weight candidates: 0, 0
+Price-weight candidates: 60
+Quality/technical-weight candidates: 50
 
