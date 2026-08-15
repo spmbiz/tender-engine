@@ -43,8 +43,16 @@ The most interesting combinations for further historical buyer/winner analysis a
 
 Cyber Security and Architecture remain attractive historically but may carry materially more clearance/security/specialist burden.
 
-## Pending correction inherited from Atlas v3
+## Corrected standard-goods signal
 
-Atlas v3 row #64 `France — PPE / workwear` remains **SUPERSEDED_PENDING_BOUNDARY_RERUN** until the corrected title-led standard-goods miner finishes after enforcing strict word boundaries for `EPI`/`PPE`.
+The strict `EPI` / `PPE` word-boundary rerun is complete and **PASS**. The precision standard-goods census now contains **8,079** title-led matches across **274** family-country-currency buckets.
 
-All other v3 correction/rejection notes remain in force.
+The previously superseded France workwear/PPE lane is restored with corrected title-led metrics:
+
+- France — workwear/PPE supply: **829 records**, **681 buyers**, **111 repeat buyers**, median historical value **€207,766.79**, **303 linked suppliers**, top supplier share **1.3%**.
+- Germany — workwear/PPE supply: **140 records**, **48 buyers**, median bidders **2**, top supplier share **8.2%**.
+- UK — workwear/PPE supply: **60 records**, **48 buyers**, median bidders **11.5**, top supplier share **11.7%**.
+
+The boundary fix removed false short-token matches such as `EPICERIE`, `EPIC` and `Kiltipper` while preserving the underlying workwear/PPE market signal.
+
+All other Atlas v3 correction/rejection notes remain in force. Historical evidence remains a prioritization prior only; live DCE/eligibility gates remain unresolved until authoritative current documents are inspected.
