@@ -45,7 +45,7 @@ def test_manual_main_run_still_uses_broker(monkeypatch):
         },
     })
     monkeypatch.setattr(ga, "_global_state", lambda: {
-        "last_decision": {"demand": {"hospitality": 100, "gws": 0, "tenders": 100}}
+        "last_decision": {"demand": {"hospitality": 6, "gws": 0, "tenders": 100}}
     })
 
     def fake_repo_state(repo, ignore_run_id=""):
