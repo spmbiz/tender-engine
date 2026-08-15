@@ -111,7 +111,7 @@ jobs:
           gh release create "$tag" \
             --target "$GITHUB_SHA" \
             --title "DCE Harvest ${GITHUB_RUN_ID}" \
-            --notes "Canonical durable DCE harvest. Candidate queue is derived from a durable discovery harvest + selection manifest. Original public procurement files and extracted evidence are persisted as Release assets. GitHub Actions artifacts are not the canonical store."
+            --notes "Canonical durable DCE harvest. DOWNLOADED_PUBLIC is transport success only; evidence_quality.json determines whether retrieved material is authoritative enough for gate review. Original public procurement files and extracted evidence are persisted as Release assets."
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
       - name: Persist exact materialized queue and provenance durably
         if: steps.matrix.outputs.count != '0'
@@ -142,7 +142,7 @@ jobs:
     needs: prepare
     if: needs.prepare.outputs.count != '0'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       max-parallel: ${{ fromJSON(needs.prepare.outputs.max_parallel) }}
@@ -191,8 +191,8 @@ jobs:
       - name: Resolve DCE candidates
         env:
           DCE_LOCAL_CONCURRENCY: ${{ matrix.local_concurrency }}
-          DCE_ITEM_RETRIES: '1'
-          DCE_ITEM_TIMEOUT_SECONDS: '150'
+          DCE_ITEM_RETRIES: '2'
+          DCE_ITEM_TIMEOUT_SECONDS: '180'
         run: >-
           python pipeline/dce_batch_worker.py
           --queue generated/dce_candidates.jsonl
@@ -203,7 +203,9 @@ jobs:
         env:
           DCE_EXTRACT_WORKERS: '4'
         run: python pipeline/extract_corpus.py --root out
-      - name: Extract mandatory-gate snippets in parallel
+      - name: Classify whether retrieved material is authoritative DCE evidence
+        run: python pipeline/dce_evidence_quality.py --root out
+      - name: Extract mandatory-gate snippets only from gate-ready DCE corpora
         env:
           DCE_GATE_WORKERS: '4'
         run: python pipeline/extract_gates.py --root out
