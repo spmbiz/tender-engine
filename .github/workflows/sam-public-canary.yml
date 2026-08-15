@@ -64,7 +64,7 @@ jobs:
         run: |
           python - <<'PY'
           import json,pathlib
-          roots=list(pathlib.Path('canary/out').glob('*'))
+          roots=[p for p in pathlib.Path('canary/out').glob('*') if p.is_dir()]
           assert len(roots)==3, roots
           statuses=[]; downloaded=0
           for root in roots:
