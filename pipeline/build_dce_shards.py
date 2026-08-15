@@ -93,7 +93,7 @@ def main():
     ap.add_argument("--queue", default="queues/dce_candidates.jsonl")
     ap.add_argument("--exclude-queue", default=os.getenv("DCE_EXCLUDE_QUEUE", ""))
     ap.add_argument("--max-shards", type=int, default=int(os.getenv("DCE_MAX_SHARDS", str(MATRIX_JOB_LIMIT))))
-    ap.add_argument("--jobs-per-shard", type=int, default=int(os.getenv("DCE_TARGET_JOBS_PER_SHARD", "0")), help="0 = adaptive")
+    ap.add_argument("--jobs-per-shard", type=int, default=int(os.getenv("DCE_TARGET_JOBS_PER_SHARD", "0")), help="0/1/2 = adaptive legacy-compatible; >2 = manual")
     ap.add_argument("--target-waves", type=int, default=int(os.getenv("DCE_TARGET_WAVES", "1")))
     ap.add_argument("--browser-max-jobs-per-shard", type=int, default=int(os.getenv("DCE_BROWSER_MAX_JOBS_PER_SHARD", str(DEFAULT_BROWSER_MAX_JOBS_PER_SHARD))))
     ap.add_argument("--http-max-jobs-per-shard", type=int, default=int(os.getenv("DCE_HTTP_MAX_JOBS_PER_SHARD", str(DEFAULT_HTTP_MAX_JOBS_PER_SHARD))))
@@ -150,9 +150,9 @@ def main():
     sizing_mode = "adaptive"
     browser_target = 0
     http_target = 0
-    if jobs and args.jobs_per_shard > 0:
+    if jobs and args.jobs_per_shard > 2:
         sizing_mode = "manual"
-        fixed = max(1, args.jobs_per_shard)
+        fixed = max(3, args.jobs_per_shard)
         desired = min(max_shards, len(jobs), math.ceil(len(jobs) / fixed))
         browser_shards, http_shards = _allocate_shards(len(browser_jobs), len(http_jobs), desired)
         browser_target = fixed
@@ -201,7 +201,7 @@ def main():
         "max_shards": max_shards,
         "matrix_job_limit": MATRIX_JOB_LIMIT,
         "sizing_mode": sizing_mode,
-        "manual_jobs_per_shard": args.jobs_per_shard if args.jobs_per_shard > 0 else None,
+        "manual_jobs_per_shard": args.jobs_per_shard if args.jobs_per_shard > 2 else None,
         "target_waves": target_waves,
         "browser_jobs_per_shard_target": browser_target,
         "http_jobs_per_shard_target": http_target,
