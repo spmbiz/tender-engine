@@ -49,9 +49,12 @@ jobs:
           from pathlib import Path
           p = Path('pipeline/build_spm_micro_niche_intelligence_v1.py')
           s = p.read_text(encoding='utf-8')
-          # DuckDB treats SOURCE as a reserved keyword. Rename only the standalone
-          # lowercase identifier; canonical Warehouse_Source field names are untouched.
+          # DuckDB reserved identifiers: SOURCE and AT.
           s = re.sub(r'\bsource\b', 'warehouse_source', s)
+          s = s.replace('aw_tender at USING', 'aw_tender awt USING')
+          s = s.replace('at.median_bidders', 'awt.median_bidders')
+          s = s.replace('at.bidder_rows', 'awt.bidder_rows')
+          s = s.replace('at.one_bid_rows', 'awt.one_bid_rows')
           p.write_text(s, encoding='utf-8')
           PY
 
