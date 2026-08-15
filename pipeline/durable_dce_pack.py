@@ -13,6 +13,7 @@ METADATA_FILES = {
     "ted_resolution.json",
     "document_index.json",
     "corpus.txt",
+    "evidence_quality.json",
     "gate_snippets.json",
     "portal_page.txt",
 }
@@ -73,6 +74,7 @@ def add_file(tar: tarfile.TarFile, path: Path, arcname: str, inventory: list[dic
 def build_candidate_pack(candidate_root: Path, out_dir: Path) -> dict:
     manifest_path = candidate_root / "manifest.json"
     manifest = load_json(manifest_path) or {}
+    evidence = load_json(candidate_root / "evidence_quality.json") or {}
     cid = str(manifest.get("candidate_id") or candidate_root.name)
     archive = out_dir / f"candidate-{slugify(cid)}.tar.gz"
     inventory: list[dict] = []
@@ -87,12 +89,15 @@ def build_candidate_pack(candidate_root: Path, out_dir: Path) -> dict:
             add_file(tar, p, str(Path("originals") / p.name), inventory, "original_download")
 
         payload = {
-            "contract": "CANONICAL_DCE_RELEASE_PACK_V1",
+            "contract": "CANONICAL_DCE_RELEASE_PACK_V2",
             "candidate_id": cid,
             "original_download_count": len(originals),
             "inventory_count": len(inventory),
+            "evidence_quality": evidence.get("content_quality"),
+            "gate_readiness": evidence.get("gate_readiness", False),
+            "derived_status": evidence.get("derived_status") or manifest.get("status"),
             "inventory": inventory,
-            "note": "Original downloaded procurement files + normalized evidence. Recursive unpack duplicates excluded because reconstructible from originals.",
+            "note": "Original downloaded procurement files + normalized evidence + evidence-quality verdict. Recursive unpack duplicates excluded because reconstructible from originals.",
         }
         raw = json.dumps(payload, indent=2, ensure_ascii=False).encode("utf-8")
         info = tarfile.TarInfo("_canonical_pack_manifest.json")
@@ -109,6 +114,9 @@ def build_candidate_pack(candidate_root: Path, out_dir: Path) -> dict:
         "archive_sha256": sha256_file(archive),
         "original_download_count": len(originals),
         "inventory_count": len(inventory),
+        "evidence_quality": evidence.get("content_quality"),
+        "gate_readiness": evidence.get("gate_readiness", False),
+        "derived_status": evidence.get("derived_status") or manifest.get("status"),
     }
 
 
@@ -130,8 +138,10 @@ def main():
         if p.is_file():
             batch_payload[name] = load_json(p)
     index = {
-        "contract": "CANONICAL_DCE_RELEASE_INDEX_V1",
+        "contract": "CANONICAL_DCE_RELEASE_INDEX_V2",
         "candidate_count": len(packs),
+        "gate_ready_count": sum(1 for p in packs if p.get("gate_readiness")),
+        "gate_blocked_count": sum(1 for p in packs if not p.get("gate_readiness")),
         "original_download_count": sum(p["original_download_count"] for p in packs),
         "total_archive_bytes": sum(p["archive_size"] for p in packs),
         "packs": packs,
