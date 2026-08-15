@@ -1,0 +1,102 @@
+name: Historical Sub-Niche DCE Access Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/build_historical_subniche_dce_queue.py'
+      - 'pipeline/probe_historical_dce_access.py'
+      - '.github/workflows/historical-subniche-dce-access-probe.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-subniche-dce-access-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q requests
+
+      - name: Download audited v2 representative examples
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source probe-out
+          gh release download market-intelligence-hunt-subniches-v2-precision \
+            --pattern 'representative_examples_subniche.csv' --dir source --clobber
+          test -s source/representative_examples_subniche.csv
+
+      - name: Build bounded historical DCE queue
+        run: |
+          python pipeline/build_historical_subniche_dce_queue.py \
+            --examples source/representative_examples_subniche.csv \
+            --out probe-out/historical_queue.jsonl \
+            --per-subniche 3
+
+      - name: Probe public access cheaply
+        run: |
+          python pipeline/probe_historical_dce_access.py \
+            --queue probe-out/historical_queue.jsonl \
+            --out probe-out/access \
+            --workers 12 --timeout 18 --max-bytes 2000000
+
+      - name: Validate research contract
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          q=json.load(open('probe-out/historical_queue.jsonl.summary.json',encoding='utf-8'))
+          s=json.load(open('probe-out/access/summary.json',encoding='utf-8'))
+          assert q['contract']=='HISTORICAL_SUBNICHE_DCE_QUEUE_V1',q
+          assert q['selected']>=20,q
+          assert s['contract']=='HISTORICAL_DCE_ACCESS_PROBE_V1',s
+          assert s['total']==q['selected'],(s['total'],q['selected'])
+          assert s['final_verdict_allowed'] is False
+          for f in ['probe-out/access/access_probe.jsonl','probe-out/access/resolver_candidates.jsonl','probe-out/access/summary.json']:
+            assert os.path.isfile(f),f
+          print(json.dumps({'queue':q,'access':s},indent=2,ensure_ascii=False))
+          PY
+
+      - name: Persist compact access intelligence
+        shell: bash
+        run: |
+          mkdir -p control/historical_subniche_dce_access_v1
+          cp probe-out/historical_queue.jsonl.summary.json control/historical_subniche_dce_access_v1/queue_summary.json
+          cp probe-out/access/summary.json control/historical_subniche_dce_access_v1/summary.json
+          cp probe-out/access/access_probe.jsonl control/historical_subniche_dce_access_v1/access_probe.jsonl
+          cp probe-out/access/resolver_candidates.jsonl control/historical_subniche_dce_access_v1/resolver_candidates.jsonl
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_subniche_dce_access_v1/
+          git commit -m 'tenders: persist historical subniche DCE access probe' || true
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then break; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            if [ "$i" = 5 ]; then exit 1; fi
+            sleep $((i*3))
+          done
+
+      - name: Publish durable probe bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag='historical-subniche-dce-access-v1'
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --target main \
+            --title 'Historical Sub-Niche DCE Access Probe v1' \
+            --notes 'Bounded public-access research over audited historical sub-niche examples. No authentication bypass and no final tender verdict.'
+          gh release upload "$tag" \
+            probe-out/historical_queue.jsonl probe-out/historical_queue.jsonl.summary.json \
+            probe-out/access/access_probe.jsonl probe-out/access/resolver_candidates.jsonl \
+            probe-out/access/summary.json --clobber
