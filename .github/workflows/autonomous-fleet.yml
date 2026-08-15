@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
+  workflow_run:
+    workflows: ["DCE Fanout V2"]
+    types: [completed]
   push:
     branches: [main]
     paths:
@@ -80,6 +83,7 @@ jobs:
           echo 'Transactional checkpoint fallback: control/controller_state_checkpoint.json' >> "$GITHUB_STEP_SUMMARY"
           echo 'Durable live status: Release fleet-state / fleet-status-latest.json' >> "$GITHUB_STEP_SUMMARY"
           echo 'GPT handoff: Release fleet-state / gpt-latest-summary.json' >> "$GITHUB_STEP_SUMMARY"
+          echo 'DCE completion triggers an immediate controller reconciliation; the 5-minute cron is only a safety net.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Fresh usable discovery Releases preempt stale active backlogs; older harvests are deferred, not dropped.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Sibling workload minimums are protected as virtual occupancy until satisfied by live jobs.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Successful DCE batches automatically dispatch GPT-readable handoff + guarded adjudication.' >> "$GITHUB_STEP_SUMMARY"

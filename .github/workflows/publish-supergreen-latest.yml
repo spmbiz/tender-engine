@@ -1,0 +1,185 @@
+name: Publish Supergreen Latest
+
+on:
+  workflow_run:
+    workflows: ["Auto DCE Adjudication"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-supergreen-latest
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Resolve newest guarded adjudication release
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          chosen=''
+          chosen_rid=''
+          while IFS= read -r tag; do
+            [ -n "$tag" ] || continue
+            rid="${tag#dce-harvest-}"
+            [[ "$rid" =~ ^[0-9]+$ ]] || continue
+            assets="$(gh release view "$tag" --json assets --jq '.assets[].name' 2>/dev/null || true)"
+            grep -Fxq "dce-supergreen-shortlist-$rid.json" <<< "$assets" || continue
+            grep -Fxq "dce-adjudication-summary-$rid.json" <<< "$assets" || continue
+            grep -Fxq "dce-review-required-$rid.json" <<< "$assets" || continue
+            chosen="$tag"
+            chosen_rid="$rid"
+            break
+          done < <(gh release list --limit 60 --json tagName,publishedAt --jq 'sort_by(.publishedAt) | reverse | .[].tagName | select(startswith("dce-harvest-"))')
+          [ -n "$chosen" ] || { echo 'No guarded adjudication release found'; exit 1; }
+          echo "tag=$chosen" >> "$GITHUB_OUTPUT"
+          echo "rid=$chosen_rid" >> "$GITHUB_OUTPUT"
+          echo "Resolved latest guarded adjudication: $chosen"
+      - name: Download compact adjudication assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.resolve.outputs.tag }}
+          RID: ${{ steps.resolve.outputs.rid }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p input
+          gh release download "$TAG" --dir input \
+            --pattern "dce-supergreen-shortlist-$RID.json" \
+            --pattern "dce-adjudication-summary-$RID.json" \
+            --pattern "dce-review-required-$RID.json"
+      - name: Build tiny ChatGPT-readable latest pointer
+        env:
+          RID: ${{ steps.resolve.outputs.rid }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          rid = os.environ['RID']
+          repo = os.environ['REPO']
+          root = Path('input')
+          shortlist = json.loads((root / f'dce-supergreen-shortlist-{rid}.json').read_text(encoding='utf-8'))
+          summary = json.loads((root / f'dce-adjudication-summary-{rid}.json').read_text(encoding='utf-8'))
+          review = json.loads((root / f'dce-review-required-{rid}.json').read_text(encoding='utf-8'))
+          if not isinstance(review, list):
+              review = []
+
+          resolved = {'PASS', 'PASS_CONDITIONAL', 'NOT_APPLICABLE'}
+          def compact(rec):
+              gates = rec.get('gates') or {}
+              statuses = {}
+              for name, item in gates.items():
+                  if isinstance(item, dict):
+                      statuses[str(name)] = str(item.get('status') or 'UNKNOWN').upper()
+              unresolved = [k for k, v in statuses.items() if v not in resolved]
+              hard_fail = [k for k, v in statuses.items() if v == 'FAIL_HARD']
+              return {
+                  'candidate_id': rec.get('candidate_id'),
+                  'title': rec.get('title'),
+                  'buyer': rec.get('buyer'),
+                  'notice_url': rec.get('notice_url'),
+                  'deadline': rec.get('deadline'),
+                  'estimated_value': rec.get('estimated_value'),
+                  'currency': rec.get('currency'),
+                  'classification': rec.get('classification'),
+                  'final_score': rec.get('final_score'),
+                  'summary': rec.get('summary'),
+                  'content_quality': rec.get('content_quality'),
+                  'gate_readiness': bool(rec.get('gate_readiness')),
+                  'gate_statuses': statuses,
+                  'unresolved_gates': unresolved,
+                  'hard_fail_gates': hard_fail,
+              }
+
+          items = [compact(x) for x in (shortlist.get('items') or []) if isinstance(x, dict)]
+          items.sort(key=lambda x: int(x.get('final_score') or 0), reverse=True)
+          finals = [x for x in items if x.get('classification') == 'FINAL_SUPER_GREEN']
+          greens = [x for x in items if x.get('classification') in {'GREEN', 'GREEN_PARTNERABLE'}]
+          review_top = [compact(x) for x in review[:20] if isinstance(x, dict)]
+          review_top.sort(key=lambda x: int(x.get('final_score') or 0), reverse=True)
+
+          out = {
+              'schema': 'SUPERGREEN_LATEST_V1',
+              'generated_at': datetime.now(timezone.utc).isoformat(),
+              'dce_run_id': int(rid),
+              'release_tag': f'dce-harvest-{rid}',
+              'release_url': f'https://github.com/{repo}/releases/tag/dce-harvest-{rid}',
+              'counts': {
+                  'candidates': summary.get('candidates'),
+                  'gate_ready': summary.get('gate_ready'),
+                  'final_supergreen': summary.get('final_supergreen'),
+                  'green_or_partnerable': summary.get('green_or_partnerable'),
+                  'review_required': summary.get('review_required'),
+                  'classification_counts': summary.get('classification_counts') or {},
+              },
+              'final_supergreens': finals,
+              'greens': greens,
+              'review_required_top': review_top,
+              'rule': 'FINAL_SUPER_GREEN is DCE-guarded; unresolved evidence remains UNKNOWN and cannot be upgraded to PASS.',
+              'canonical_assets': {
+                  'shortlist': f'dce-supergreen-shortlist-{rid}.json',
+                  'summary': f'dce-adjudication-summary-{rid}.json',
+                  'review_required': f'dce-review-required-{rid}.json',
+              },
+          }
+          Path('/tmp/supergreen_latest.json').write_text(json.dumps(out, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+          print(json.dumps(out['counts'], indent=2))
+          PY
+      - name: Publish monotonic latest pointer to main
+        env:
+          RID: ${{ steps.resolve.outputs.rid }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            existing="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('control/supergreen_latest.json')
+          try:
+              print(int(json.loads(p.read_text(encoding='utf-8')).get('dce_run_id') or 0))
+          except Exception:
+              print(0)
+          PY
+          )"
+            if [ "$existing" -gt "$RID" ]; then
+              echo "A newer pointer already exists ($existing > $RID); leaving it untouched."
+              exit 0
+            fi
+            mkdir -p control
+            cp /tmp/supergreen_latest.json control/supergreen_latest.json
+            git add control/supergreen_latest.json
+            if git diff --cached --quiet; then
+              echo 'Latest pointer already current.'
+              exit 0
+            fi
+            git commit -m "tender: publish guarded supergreen latest $RID"
+            if git push origin HEAD:main; then
+              echo "Published control/supergreen_latest.json for DCE $RID"
+              exit 0
+            fi
+            sleep "$((attempt * 4))"
+          done
+          echo 'Failed to publish latest supergreen pointer after bounded retries' >&2
+          exit 1

@@ -17,16 +17,22 @@
   },
   "dce": {
     "enabled": true,
-    "max_candidates_per_cycle": 320,
+    "max_candidates_per_cycle": 40,
     "minimum_retrieval_priority": 0,
     "minimum_free_github_slots": 3,
+    "latency_policy": {
+      "goal": "surface the highest-priority DCE-verified candidates in one runner wave, then immediately refill from the remaining durable backlog",
+      "target_candidates_per_batch": 40,
+      "expected_github_parallel_slots": 20,
+      "expected_adaptive_jobs_per_shard": 2
+    },
     "benchmark_basis": {
       "previous_batch_candidates": 313,
       "previous_batch_gate_ready": 133,
       "previous_runner_minutes_exact": 76.166667,
       "previous_useful_per_runner_minute_exact": 1.746171,
       "baseline_useful_per_runner_minute_exact": 1.084,
-      "decision": "test_640_keep_only_if_neutral_or_beneficial"
+      "decision": "favor low-latency rolling 40-candidate waves; preserve the full backlog and refill immediately after each completed DCE run"
     }
   },
   "circleci": {
