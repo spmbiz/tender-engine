@@ -24,6 +24,7 @@ BROKER_TAG = "global-fleet-broker"
 BROKER_ASSET = "global-capacity.json"
 PORTAL_PERFORMANCE_ASSET = "portal-performance.json"
 DEFAULT_MINIMUMS = {"hospitality": 6, "gws": 3}
+DISCOVERY_WORKFLOW = "supergreen-discovery-v2.yml"
 
 # Historical priors are loaded only from a versioned READY contract. The current
 # file intentionally remains BLOCKED_SOURCE_ACCESS until canonical v3/v4 analytics
@@ -41,9 +42,6 @@ def _retrieval_score_with_historical_prior(rec: dict, portal_performance: dict |
     return score, reasons
 
 
-# auto_select_dce.select resolves retrieval_score from its module globals at runtime.
-# This monkey-patch therefore preserves the selector implementation while adding a
-# small, separately auditable historical prior layer.
 selector_mod.retrieval_score = _retrieval_score_with_historical_prior
 
 
@@ -123,6 +121,7 @@ def _sibling_missing_headroom(fleet_detail: list[dict]) -> tuple[int, dict]:
 
 _original_public_fleet_jobs = fc.public_fleet_jobs
 _original_select = fc.select
+_original_dispatch = fc.dispatch
 
 
 def _broker_aware_public_fleet_jobs():
@@ -159,11 +158,25 @@ def _yield_aware_select(records, minimum=34, limit=320, blocked_ids=None, **kwar
     )
 
 
+def _delta_aware_dispatch(workflow: str, inputs: dict | None = None):
+    # Autonomous hourly refreshes are explicitly DELTA. The discovery workflow's
+    # independent daily schedule is the deep RECONCILE safety net, so late/index-
+    # shifted publications remain covered without paying the deep-window cost hourly.
+    if workflow == DISCOVERY_WORKFLOW:
+        merged = dict(inputs or {})
+        merged.setdefault("mode", "delta")
+        print(json.dumps({"discovery_dispatch": {"workflow": workflow, "mode": merged["mode"]}}, separators=(",", ":")))
+        return _original_dispatch(workflow, merged)
+    return _original_dispatch(workflow, inputs)
+
+
 fc.public_fleet_jobs = _broker_aware_public_fleet_jobs
 fc.select = _yield_aware_select
+fc.dispatch = _delta_aware_dispatch
 
 # Import only after monkey-patching the shared fleet_controller module. v4 delegates
-# execution to v3.main(), which reads fc.public_fleet_jobs / fc.select at runtime.
+# execution to v3.main(), which reads fc.public_fleet_jobs / fc.select / fc.dispatch
+# at runtime.
 import fleet_controller_v4 as v4  # noqa: E402,F401
 import fleet_controller_v3 as v3  # noqa: E402
 
