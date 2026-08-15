@@ -52,7 +52,7 @@ def deadline_info(r):
 
 def compact_review(r,run_id,shard,ts):
     ev=r.get("gate_evidence_candidates") or {}; cov=sum(1 for x in ev.values() if isinstance(x,list) and x); d,s,res=deadline_info(r)
-    return {"candidate_id":r.get("candidate_id"),"title":r.get("title"),"buyer":r.get("buyer"),"portal":r.get("portal"),"notice_url":r.get("notice_url"),"deadline":r.get("deadline"),"estimated_value":r.get("estimated_value"),"currency":r.get("currency"),"preliminary_score":r.get("preliminary_score"),"priority_score":int(r.get("final_score") or 0),"content_quality":r.get("content_quality"),"gate_readiness":bool(r.get("gate_readiness")),"deadline_authority":d,"deadline_authority_status":s,"deadline_resolved":res,"evidence_gate_coverage":cov,"evidence_by_gate":ev,"source_dce_run_id":int(run_id) if str(run_id).isdigit() else run_id,"source_shard":int(shard) if str(shard).isdigit() else shard,"hot_ready_at":ts,"review_contract":"Gate-ready authoritative DCE evidence pack. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation."}
+    return {"candidate_id":r.get("candidate_id"),"title":r.get("title"),"buyer":r.get("buyer"),"portal":r.get("portal"),"notice_url":r.get("notice_url"),"deadline":r.get("deadline"),"estimated_value":r.get("estimated_value"),"currency":r.get("currency"),"preliminary_score":r.get("preliminary_score"),"priority_score":int(r.get("final_score") or 0),"content_quality":r.get("content_quality"),"gate_readiness":bool(r.get("gate_readiness")),"deadline_authority":d,"deadline_authority_status":s,"deadline_resolved":res,"evidence_gate_coverage":cov,"evidence_by_gate":ev,"source_dce_run_id":int(run_id) if str(run_id).isdigit() else run_id,"source_shard":int(shard) if str(shard).isdigit() else shard,"hot_ready_at":ts,"review_contract":"Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation."}
 
 def deadline_open(r):
     try:return date.fromisoformat(str(r.get("deadline") or "")[:10])>=datetime.now(timezone.utc).date()
@@ -60,19 +60,35 @@ def deadline_open(r):
 
 def review_sort(r):return (bool(r.get("deadline_resolved")),int(r.get("priority_score") or 0),int(r.get("evidence_gate_coverage") or 0),str(r.get("hot_ready_at") or ""))
 
+def _run_number(value):
+    try:return int(str(value).strip())
+    except Exception:return None
+
 def merge_review(existing,incoming,resolved_keys,run_id,shard,max_items):
+    """Maintain a monotonic, current-generation ChatGPT review bank.
+
+    Historical DCE packs remain durable in Releases. The *hot* bank is deliberately
+    different: when a newer DCE run publishes its first shard, older review items
+    are purged so stale evidence cannot survive forever. A late shard from an older
+    run is ignored rather than contaminating the newer generation.
+    """
+    incoming_run=_run_number(run_id); current_run=_run_number(existing.get("latest_dce_run_id"))
+    if incoming_run is not None and current_run is not None and incoming_run<current_run:
+        return existing
+    reset=bool(incoming_run is not None and current_run is not None and incoming_run>current_run)
     merged={}
-    for r in existing.get("items") or []:
-        if isinstance(r,dict) and item_key(r) not in resolved_keys and deadline_open(r):merged[item_key(r)]=r
+    if not reset:
+        for r in existing.get("items") or []:
+            if isinstance(r,dict) and item_key(r) not in resolved_keys and deadline_open(r):merged[item_key(r)]=r
     for r in incoming:
         if not deadline_open(r):continue
         k=item_key(r); cur=merged.get(k)
         if cur is None or review_sort(r)>=review_sort(cur):merged[k]=r
     items=sorted(merged.values(),key=review_sort,reverse=True)[:max_items]
-    return {"schema":"GPT_REVIEW_HOT_V1","updated_at":utc_now(),"latest_dce_run_id":int(run_id) if str(run_id).isdigit() else run_id,"latest_shard":int(shard) if str(shard).isdigit() else shard,"count":len(items),"items":items,"instruction":"Review highest-ranked items first. These are DCE evidence packs, not final verdicts. Unknown is never PASS."}
+    return {"schema":"GPT_REVIEW_HOT_V2","updated_at":utc_now(),"latest_dce_run_id":int(run_id) if str(run_id).isdigit() else run_id,"latest_shard":int(shard) if str(shard).isdigit() else shard,"generation_reset":reset,"count":len(items),"items":items,"instruction":"Review highest-ranked items first. Hot bank contains only the latest DCE generation; historical packs remain in immutable Releases. These are DCE evidence packs, not final verdicts. Unknown is never PASS."}
 
 def gh_get(repo,path,branch,token):
-    url=f"https://api.github.com/repos/{repo}/contents/{path}"; h={"Authorization":f"Bearer {token}","Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"tender-hot-publisher/2.0"}; r=requests.get(url,headers=h,params={"ref":branch},timeout=30)
+    url=f"https://api.github.com/repos/{repo}/contents/{path}"; h={"Authorization":f"Bearer {token}","Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"tender-hot-publisher/2.1"}; r=requests.get(url,headers=h,params={"ref":branch},timeout=30)
     if r.status_code==404:return {},None
     r.raise_for_status(); o=r.json(); raw=base64.b64decode(o.get("content") or b"").decode("utf-8",errors="replace")
     try:cur=json.loads(raw) if raw.strip() else {}
@@ -80,7 +96,7 @@ def gh_get(repo,path,branch,token):
     return cur if isinstance(cur,dict) else {},o.get("sha")
 
 def gh_put(repo,path,branch,token,payload,sha,msg):
-    url=f"https://api.github.com/repos/{repo}/contents/{path}"; h={"Authorization":f"Bearer {token}","Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"tender-hot-publisher/2.0"}; body={"message":msg,"content":base64.b64encode((json.dumps(payload,indent=2,ensure_ascii=False)+"\n").encode()).decode(),"branch":branch}
+    url=f"https://api.github.com/repos/{repo}/contents/{path}"; h={"Authorization":f"Bearer {token}","Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"tender-hot-publisher/2.1"}; body={"message":msg,"content":base64.b64encode((json.dumps(payload,indent=2,ensure_ascii=False)+"\n").encode()).decode(),"branch":branch}
     if sha:body["sha"]=sha
     return requests.put(url,headers=h,json=body,timeout=45)
 
