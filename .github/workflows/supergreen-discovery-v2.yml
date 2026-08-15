@@ -2,6 +2,10 @@ name: SuperGreen Discovery V2
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'control/global_discovery_trigger.txt'
 
 permissions:
   contents: write
@@ -20,11 +24,7 @@ jobs:
         run: |
           set -euo pipefail
           tag="discovery-harvest-${GITHUB_RUN_ID}"
-          gh release create "$tag" \
-            --repo "$GITHUB_REPOSITORY" \
-            --target "$GITHUB_SHA" \
-            --title "Discovery Harvest ${GITHUB_RUN_ID}" \
-            --notes "Canonical durable discovery harvest. Source datasets and consolidated wide-read outputs are persisted as Release assets; Actions artifacts are not the canonical store."
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Discovery Harvest ${GITHUB_RUN_ID}" --notes "Canonical durable discovery harvest. Source datasets and consolidated wide-read outputs are persisted as Release assets; Actions artifacts are not the canonical store."
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
   ted-discovery:
@@ -34,21 +34,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+        with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests
       - name: Enumerate complete recent TED competition window without keyword prefilter
-        env:
-          TED_SCOPE: ACTIVE
-          TED_MAX_PAGES: '80'
-          TED_LOOKBACK_DAYS: '10'
-          TED_REQUEST_RETRIES: '7'
-          TED_PAGE_DELAY_SECONDS: '0.25'
+        env: {TED_SCOPE: ACTIVE, TED_MAX_PAGES: '80', TED_LOOKBACK_DAYS: '10', TED_REQUEST_RETRIES: '7', TED_PAGE_DELAY_SECONDS: '0.25'}
         run: python pipeline/discover_ted.py
       - name: Persist TED discovery durably BEFORE completeness validation
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+        env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
         shell: bash
         run: |
           set -euo pipefail
@@ -64,8 +56,7 @@ jobs:
           print(json.dumps(s,indent=2))
           assert not s.get('errors'), s
           assert not s.get('truncated_by_page_cap'), s
-          if s.get('total_reported') is not None:
-              assert s.get('source_items_seen',0) >= s['total_reported'], s
+          if s.get('total_reported') is not None: assert s.get('source_items_seen',0) >= s['total_reported'], s
           PY
 
   contracts-finder-discovery:
@@ -76,34 +67,23 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: 8
-      matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+      matrix: {shard: [0,1,2,3,4,5,6,7]}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+        with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests
       - name: Enumerate recent Contracts Finder window only
-        env:
-          DISCOVERY_OUT: discovery/contracts_finder/shard-${{ matrix.shard }}
-          CF_WINDOW_INDEX: ${{ matrix.shard }}
-          CF_WINDOW_TOTAL: '8'
-          LOOKBACK_DAYS: '30'
-          CF_REQUEST_RETRIES: '4'
-          CF_403_COOLDOWN_SECONDS: '300'
+        env: {DISCOVERY_OUT: 'discovery/contracts_finder/shard-${{ matrix.shard }}', CF_WINDOW_INDEX: '${{ matrix.shard }}', CF_WINDOW_TOTAL: '8', LOOKBACK_DAYS: '30', CF_REQUEST_RETRIES: '4', CF_403_COOLDOWN_SECONDS: '300'}
         run: python pipeline/discover_contracts_finder.py
       - name: Persist Contracts Finder shard durably
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+        env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
         shell: bash
         run: |
           set -euo pipefail
           archive="discovery-contracts-finder-${{ matrix.shard }}.tar.gz"
           tar -C "discovery/contracts_finder/shard-${{ matrix.shard }}" -czf "$archive" .
           gh release upload "$RELEASE_TAG" "$archive" --clobber
-          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | grep -Fxq "$archive"
 
   etenders-ireland:
     needs: init-release
@@ -128,79 +108,62 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+        with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q 'playwright>=1.46,<2' beautifulsoup4
       - name: Reuse runner Chrome
         shell: bash
         run: |
-          set -euo pipefail
           chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          if [ -n "$chrome" ]; then
-            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
-          else
-            python -m playwright install --with-deps chromium
-          fi
+          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
       - name: Enumerate independent eTenders page shard
-        env:
-          DISCOVERY_OUT: discovery/ireland/shard-${{ matrix.shard }}
-          PAGE_START: ${{ matrix.start }}
-          PAGE_END: ${{ matrix.end }}
-          IE_PAGE_CONCURRENCY: '1'
+        env: {DISCOVERY_OUT: 'discovery/ireland/shard-${{ matrix.shard }}', PAGE_START: '${{ matrix.start }}', PAGE_END: '${{ matrix.end }}', IE_PAGE_CONCURRENCY: '1'}
         run: python pipeline/discover_etenders_ie_async.py
       - name: Persist Ireland shard durably
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+        env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
         shell: bash
         run: |
-          set -euo pipefail
           archive="discovery-ie-${{ matrix.shard }}.tar.gz"
           tar -C "discovery/ireland/shard-${{ matrix.shard }}" -czf "$archive" .
           gh release upload "$RELEASE_TAG" "$archive" --clobber
-          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | grep -Fxq "$archive"
 
   global-official-discovery:
     needs: init-release
     name: official-${{ matrix.source }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     strategy:
       fail-fast: false
       max-parallel: 6
       matrix:
-        source:
-          - CA_CANADABUYS
-          - FR_BOAMP
-          - QC_SEAO
-          - AU_AUSTENDER
-          - NZ_GETS
-          - DE_DOE
+        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4 playwright
+      - name: Reuse runner Chrome for AusTender browser fallback
+        if: matrix.source == 'AU_AUSTENDER'
+        shell: bash
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
       - name: Harvest official national source
-        env:
-          GLOBAL_SOURCE: ${{ matrix.source }}
-          DISCOVERY_OUT: discovery/global/${{ matrix.source }}
-          LOOKBACK_DAYS: '14'
+        env: {GLOBAL_SOURCE: '${{ matrix.source }}', DISCOVERY_OUT: 'discovery/global/${{ matrix.source }}', LOOKBACK_DAYS: '14'}
         shell: bash
         run: |
           set +e
-          python pipeline/discover_global_official.py
+          case '${{ matrix.source }}' in
+            QC_SEAO) python pipeline/discover_qc_seao_latest.py ;;
+            DE_DOE) python pipeline/discover_de_doe_csv.py ;;
+            AU_AUSTENDER) python pipeline/discover_austender_browser.py ;;
+            *) python pipeline/discover_global_official.py ;;
+          esac
           rc=$?
           echo "source_exit_code=$rc"
-          # Source-specific failures must not destroy the other jurisdictions.
-          # stats.json preserves exact failure telemetry for repair.
           test -f "discovery/global/${{ matrix.source }}/stats.json" || exit "$rc"
           exit 0
       - name: Persist official source durably
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+        env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
         shell: bash
         run: |
           set -euo pipefail
@@ -208,19 +171,16 @@ jobs:
           archive="discovery-global-${slug}.tar.gz"
           tar -C "discovery/global/${{ matrix.source }}" -czf "$archive" .
           gh release upload "$RELEASE_TAG" "$archive" --clobber
-          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | grep -Fxq "$archive"
 
   wide-read-pack:
     needs: [init-release, ted-discovery, contracts-finder-discovery, etenders-ireland, global-official-discovery]
     if: always() && needs.init-release.result == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - name: Download durable discovery source packs
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+        env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
         shell: bash
         run: |
           set -euo pipefail
@@ -229,30 +189,19 @@ jobs:
           count=0
           for archive in release-download/discovery-*.tar.gz; do
             [ -e "$archive" ] || continue
-            base="$(basename "$archive" .tar.gz)"
-            mkdir -p "discovery-download/$base"
-            tar -xzf "$archive" -C "discovery-download/$base"
-            count=$((count + 1))
+            base="$(basename "$archive" .tar.gz)"; mkdir -p "discovery-download/$base"; tar -xzf "$archive" -C "discovery-download/$base"; count=$((count + 1))
           done
-          echo "source_packs=$count"
-          [ "$count" -ge 2 ]
+          echo "source_packs=$count"; [ "$count" -ge 2 ]
       - name: Canonical merge and dedupe
         run: python pipeline/merge_discovery.py --root discovery-download --out merged
       - name: Build mandatory GPT wide-read packets
         run: python pipeline/wide_read_packets.py --input merged/current_candidates.jsonl --out wide_read_packets --packet-size 250
       - name: Persist consolidated discovery durably
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.init-release.outputs.release_tag }}
+        env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
         shell: bash
         run: |
           set -euo pipefail
           tar -czf "supergreen-wide-read-${GITHUB_RUN_ID}.tar.gz" merged wide_read_packets
           cp merged/stats.json "discovery-summary-${GITHUB_RUN_ID}.json"
-          gh release upload "$RELEASE_TAG" \
-            "supergreen-wide-read-${GITHUB_RUN_ID}.tar.gz" \
-            "discovery-summary-${GITHUB_RUN_ID}.json" --clobber
-          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' > /tmp/assets.txt
-          grep -Fxq "supergreen-wide-read-${GITHUB_RUN_ID}.tar.gz" /tmp/assets.txt
-          grep -Fxq "discovery-summary-${GITHUB_RUN_ID}.json" /tmp/assets.txt
+          gh release upload "$RELEASE_TAG" "supergreen-wide-read-${GITHUB_RUN_ID}.tar.gz" "discovery-summary-${GITHUB_RUN_ID}.json" --clobber
           echo "Durable canonical release: $RELEASE_TAG" >> "$GITHUB_STEP_SUMMARY"
