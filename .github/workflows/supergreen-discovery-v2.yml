@@ -117,10 +117,41 @@ jobs:
         run: |
           archive="discovery-contracts-finder-${{ matrix.shard }}.tar.gz";tar -C "discovery/contracts_finder/shard-${{ matrix.shard }}" -czf "$archive" .;gh release upload "$RELEASE_TAG" "$archive" --clobber
 
-  etenders-ireland:
+  etenders-ireland-delta:
     needs: init-release
-    name: ie-pages-${{ matrix.start }}-${{ matrix.end }}
-    if: needs.init-release.outputs.mode == 'reconcile' || matrix.start <= 20
+    if: needs.init-release.outputs.mode == 'delta'
+    name: ie-delta-pages-${{ matrix.start }}-${{ matrix.end }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include:
+          - {shard: 0, start: 1, end: 5}
+          - {shard: 1, start: 6, end: 10}
+          - {shard: 2, start: 11, end: 15}
+          - {shard: 3, start: 16, end: 20}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q 'playwright>=1.46,<2' beautifulsoup4
+      - name: Reuse runner Chrome
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)";if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
+      - name: Enumerate independent eTenders delta page shard
+        env: {DISCOVERY_OUT: 'discovery/ireland/shard-${{ matrix.shard }}', PAGE_START: '${{ matrix.start }}', PAGE_END: '${{ matrix.end }}', IE_PAGE_CONCURRENCY: '1'}
+        run: python pipeline/discover_etenders_ie_async.py
+      - name: Persist Ireland delta shard durably
+        env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
+        run: |
+          archive="discovery-ie-${{ matrix.shard }}.tar.gz";tar -C "discovery/ireland/shard-${{ matrix.shard }}" -czf "$archive" .;gh release upload "$RELEASE_TAG" "$archive" --clobber
+
+  etenders-ireland-reconcile:
+    needs: init-release
+    if: needs.init-release.outputs.mode == 'reconcile'
+    name: ie-reconcile-pages-${{ matrix.start }}-${{ matrix.end }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
@@ -146,10 +177,10 @@ jobs:
       - name: Reuse runner Chrome
         run: |
           chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)";if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
-      - name: Enumerate independent eTenders page shard
+      - name: Enumerate independent eTenders reconcile page shard
         env: {DISCOVERY_OUT: 'discovery/ireland/shard-${{ matrix.shard }}', PAGE_START: '${{ matrix.start }}', PAGE_END: '${{ matrix.end }}', IE_PAGE_CONCURRENCY: '1'}
         run: python pipeline/discover_etenders_ie_async.py
-      - name: Persist Ireland shard durably
+      - name: Persist Ireland reconcile shard durably
         env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
         run: |
           archive="discovery-ie-${{ matrix.shard }}.tar.gz";tar -C "discovery/ireland/shard-${{ matrix.shard }}" -czf "$archive" .;gh release upload "$RELEASE_TAG" "$archive" --clobber
@@ -211,7 +242,7 @@ jobs:
           slug="$(echo '${{ matrix.source }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')";archive="discovery-global-${slug}.tar.gz";tar -C "discovery/global/${{ matrix.source }}" -czf "$archive" .;gh release upload "$RELEASE_TAG" "$archive" --clobber
 
   wide-read-pack:
-    needs: [init-release, ted-discovery, contracts-finder-discovery, etenders-ireland, global-official-discovery]
+    needs: [init-release, ted-discovery, contracts-finder-discovery, etenders-ireland-delta, etenders-ireland-reconcile, global-official-discovery]
     if: always() && needs.init-release.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 20
