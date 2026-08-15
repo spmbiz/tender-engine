@@ -18,7 +18,7 @@ DEFAULT_POLICY = {
 
 
 def _request(url: str):
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.1"})
+    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.2"})
     tok = os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")
     if tok:
         req.add_header("Authorization", f"Bearer {tok}")
@@ -95,6 +95,30 @@ def _fair_target(total: int, demand: int, cfg: dict) -> int:
     return min(demand, cap, max(floor, weighted))
 
 
+def _controller_preauthorized() -> bool:
+    """True when the live controller already admitted this DCE wave.
+
+    Autonomous DCE dispatches are pinned to the dedicated ``fleet-dce`` branch
+    only after fleet_controller has measured account capacity, protected sibling
+    headroom, and supplied a bounded max_parallel value. Re-running the same
+    fair-share calculation several seconds later inside the prepare job creates a
+    race: auxiliary Tender jobs can appear in between and make the second vote
+    return zero, even though the controller already leased the queue.
+
+    Explicit env opt-in is supported for tests/future controllers. Manual runs on
+    main remain broker-controlled.
+    """
+    flag = str(os.getenv("DCE_ADMISSION_PREAUTHORIZED") or "").strip().lower()
+    if flag in {"1", "true", "yes"}:
+        return True
+    ref_name = str(os.getenv("GITHUB_REF_NAME") or "").strip()
+    if not ref_name:
+        ref = str(os.getenv("GITHUB_REF") or "").strip()
+        if ref.startswith("refs/heads/"):
+            ref_name = ref[len("refs/heads/"):]
+    return ref_name == "fleet-dce"
+
+
 def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     """Admission-control new DCE runners without preempting any running job.
 
@@ -102,8 +126,24 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     never consume a slot in this local admission calculation. Sibling workloads
     with durable demand still receive fair-target headroom before Tender borrows
     idle capacity.
+
+    Autonomous waves dispatched on ``fleet-dce`` are an exception: their
+    ``requested`` value is already the controller-approved capacity budget, so the
+    sharder must consume that budget rather than performing a contradictory second
+    admission vote.
     """
     requested = max(0, int(requested))
+    if _controller_preauthorized():
+        allowed = min(requested, 20)
+        return allowed, {
+            "mode": "controller-preauthorized-budget",
+            "requested": requested,
+            "allowed": allowed,
+            "hard_cap": 20,
+            "authority": "fleet_controller",
+            "reason": "controller already performed global capacity and sibling-headroom admission before dispatch; skip duplicate in-workflow fair-share vote",
+            "preemption": "none; consume only the controller-approved budget",
+        }
     if os.getenv("DCE_DISABLE_GLOBAL_ADMISSION", "").lower() in {"1", "true", "yes"}:
         return requested, {"mode": "disabled", "requested": requested, "allowed": requested}
 
