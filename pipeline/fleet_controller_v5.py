@@ -1,15 +1,9 @@
 from __future__ import annotations
 
-"""Broker- and yield-aware wrapper around the transactional Tender controller v4.
+"""Broker-, yield- and historical-prior-aware Tender controller wrapper.
 
-GitHub Actions concurrency groups do not serialize planners across repositories.
-This wrapper therefore treats guaranteed sibling capacity as virtual observed
-occupancy before v4 computes its available DCE slots. Existing live sibling jobs
-satisfy the guarantee, so productive jobs are never killed merely to rebalance.
-
-It also injects the bounded rolling portal-performance state into the deterministic
-DCE selector. Historical yield changes retrieval priority/capacity only; it never
-changes tender eligibility or final adjudication.
+Historical Market Brain priors are strictly a bounded pre-DCE retrieval signal.
+They cannot satisfy eligibility, DCE authority, or final verdict gates.
 """
 
 import json
@@ -17,12 +11,12 @@ from datetime import datetime, timezone
 
 import requests
 
+import auto_select_dce as selector_mod
 import fleet_controller as fc
+import historical_market_priors as historical_priors
 from github_api_resilience import install as install_github_resilience
 
 # Install low-call retrying GitHub transport before v4/v3 import and execution.
-# This makes controller state resilient to installation-level API exhaustion and
-# prefers the newer semantic repo checkpoint whenever the mutable Release lags.
 install_github_resilience(fc)
 
 EVERGREEN_REPO = "walidgdg1-ai/evergreenleadminer"
@@ -30,6 +24,27 @@ BROKER_TAG = "global-fleet-broker"
 BROKER_ASSET = "global-capacity.json"
 PORTAL_PERFORMANCE_ASSET = "portal-performance.json"
 DEFAULT_MINIMUMS = {"hospitality": 6, "gws": 3}
+
+# Historical priors are loaded only from a versioned READY contract. The current
+# file intentionally remains BLOCKED_SOURCE_ACCESS until canonical v3/v4 analytics
+# can be regenerated from the private historical warehouse.
+_HISTORICAL_PRIORS = historical_priors.load()
+_ORIGINAL_RETRIEVAL_SCORE = selector_mod.retrieval_score
+
+
+def _retrieval_score_with_historical_prior(rec: dict, portal_performance: dict | None = None):
+    score, reasons = _ORIGINAL_RETRIEVAL_SCORE(rec, portal_performance=portal_performance)
+    delta, hist_reasons = historical_priors.adjustment(rec, _HISTORICAL_PRIORS)
+    if delta:
+        score = max(-100, min(100, score + delta))
+        reasons = list(reasons) + hist_reasons
+    return score, reasons
+
+
+# auto_select_dce.select resolves retrieval_score from its module globals at runtime.
+# This monkey-patch therefore preserves the selector implementation while adding a
+# small, separately auditable historical prior layer.
+selector_mod.retrieval_score = _retrieval_score_with_historical_prior
 
 
 def _release_asset_json(repo: str, tag: str, name: str):
@@ -132,6 +147,7 @@ def _yield_aware_select(records, minimum=34, limit=320, blocked_ids=None, **kwar
             "history_run_ids": performance.get("run_ids") or [],
             "observed_portals": len((performance.get("portals") or {})),
             "exploit_explore": "85/15",
+            "historical_market_brain": "READY" if _HISTORICAL_PRIORS else "INACTIVE",
         }
     }, separators=(",", ":")))
     return _original_select(
