@@ -6,27 +6,9 @@ This layer is deliberately weak and pre-DCE only. Historical evidence may help
 choose which live notices deserve scarce DCE retrieval compute, but it can never
 satisfy an eligibility gate, alter evidence_quality, or create a final GREEN.
 
-Supported compact JSON contract::
-
-  {
-    "contract": "TENDER_MARKET_BRAIN_PRIORS_V1",
-    "status": "READY",
-    "country_cpv": {"FRA|72": {"sample_size": 123, "priority_bonus": 4}},
-    "buyers": {"fra|buyer": {"sample_size": 19, "priority_bonus": 3}},
-    "lane_rules": [
-      {
-        "lane": "Website / CMS build or redesign",
-        "country": "GERMANY",
-        "sample_size": 230,
-        "priority_bonus": 5,
-        "patterns": ["website", "webseite"],
-        "negative_patterns": ["hardware"]
-      }
-    ]
-  }
-
-Lane rules are allowed only when the JSON has already passed upstream semantic QA.
-The live engine does not infer or promote historical lanes by itself.
+Country-scoped rules are fail-closed: when a country cannot be resolved, they do
+not fire. A small set of deterministic candidate/source prefixes may be used to
+recover country; no fuzzy geography inference is performed.
 """
 
 import json
@@ -51,7 +33,41 @@ def _country(rec: dict) -> str:
         value = str(rec.get(key) or "").strip().upper()
         if value:
             return value
-    return ""
+
+    # Deterministic recovery only. This prevents country-scoped historical priors
+    # from leaking onto records whose discovery payload omitted a country field.
+    cid = str(
+        rec.get("candidate_id") or rec.get("id") or rec.get("notice_id") or
+        rec.get("tender_id") or rec.get("ocid") or ""
+    ).strip().upper()
+    prefix_map = (
+        ("US-SAM:", "USA"),
+        ("IE:", "IRELAND"),
+        ("FR:", "FRANCE"),
+        ("DE:", "GERMANY"),
+        ("UK:", "UNITED KINGDOM"),
+        ("CF:", "UNITED KINGDOM"),
+        ("CA:", "CANADA"),
+        ("QC:", "CANADA - QUEBEC"),
+        ("AU:", "AUSTRALIA"),
+        ("NZ:", "NEW ZEALAND"),
+        ("LU:", "LUXEMBOURG"),
+    )
+    for prefix, country in prefix_map:
+        if cid.startswith(prefix):
+            return country
+
+    source = _norm(rec.get("source") or rec.get("source_name") or rec.get("portal"))
+    exact_source_map = {
+        "sam.gov": "USA",
+        "sam": "USA",
+        "contracts finder": "UNITED KINGDOM",
+        "boamp": "FRANCE",
+        "canadabuys": "CANADA",
+        "seao": "CANADA - QUEBEC",
+        "austender": "AUSTRALIA",
+    }
+    return exact_source_map.get(source, "")
 
 
 def _cpv(rec: dict) -> str:
@@ -93,6 +109,28 @@ def load(path: str | Path = "control/historical_market_priors.json") -> dict:
     return data
 
 
+def _country_matches(rule_country: str, record_country: str) -> bool:
+    """Strict country match with explicit aliases; missing country never matches."""
+    if not rule_country:
+        return True
+    if not record_country:
+        return False
+    aliases = {
+        "FRANCE": {"FRA", "FR", "FRANCE"},
+        "GERMANY": {"DEU", "DE", "GERMANY"},
+        "UNITED KINGDOM": {"GBR", "GB", "UK", "UNITED KINGDOM"},
+        "IRELAND": {"IRL", "IE", "IRELAND"},
+        "CANADA": {"CAN", "CA", "CANADA"},
+        "CANADA - QUEBEC": {"CANADA - QUEBEC", "QUEBEC", "QC"},
+        "USA": {"USA", "US", "UNITED STATES", "UNITED STATES OF AMERICA"},
+        "AUSTRALIA": {"AUS", "AU", "AUSTRALIA"},
+        "NEW ZEALAND": {"NZL", "NZ", "NEW ZEALAND"},
+        "LUXEMBOURG": {"LUX", "LU", "LUXEMBOURG"},
+    }
+    allowed = aliases.get(rule_country, {rule_country})
+    return record_country in allowed
+
+
 def _lane_adjustment(rec: dict, priors: dict) -> tuple[int, list[str]]:
     text = _search_text(rec)
     country = _country(rec)
@@ -110,19 +148,8 @@ def _lane_adjustment(rec: dict, priors: dict) -> tuple[int, list[str]]:
         if decision not in {"PROMOTE_CORE", "PROMOTE_BROKER"}:
             continue
         rcountry = str(rule.get("country") or "").strip().upper()
-        if rcountry and country and rcountry not in {country, country.replace(" ", "_"), country.replace("_", " ")}:
-            # Accept a few canonical synonyms without allowing arbitrary fuzzy matching.
-            aliases = {
-                "FRANCE": {"FRA", "FR", "FRANCE"},
-                "GERMANY": {"DEU", "DE", "GERMANY"},
-                "UNITED KINGDOM": {"GBR", "GB", "UK", "UNITED KINGDOM"},
-                "IRELAND": {"IRL", "IE", "IRELAND"},
-                "CANADA": {"CAN", "CA", "CANADA", "CANADA - QUEBEC"},
-                "CANADA - QUEBEC": {"CANADA - QUEBEC", "QUEBEC", "QC"},
-            }
-            allowed = aliases.get(rcountry, {rcountry})
-            if country not in allowed:
-                continue
+        if not _country_matches(rcountry, country):
+            continue
         pats = [str(x) for x in (rule.get("patterns") or []) if str(x).strip()]
         negs = [str(x) for x in (rule.get("negative_patterns") or []) if str(x).strip()]
         if not pats:
