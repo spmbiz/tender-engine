@@ -5,7 +5,6 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "pipeline"))
 
 import discover_us_sam_bulk as samdisc
-import dce_worker_v7 as v7
 import publish_supergreen_hot as hot
 
 
@@ -13,7 +12,7 @@ def test_sam_workspace_link_is_canonicalized_to_public_supplier_page():
     nid = "7686bd844b36486a882c70d5a5436545"
     workspace = f"https://sam.gov/workspace/contract/opp/{nid}/view"
     assert samdisc._public_notice_url(nid, workspace) == f"https://sam.gov/opp/{nid}/view"
-    assert v7._sam_public_url({"notice_id": nid, "notice_url": workspace}) == f"https://sam.gov/opp/{nid}/view"
+    assert samdisc._public_notice_url(None, workspace) == f"https://sam.gov/opp/{nid}/view"
 
 
 def test_sam_resource_links_keep_opaque_attachment_urls():
