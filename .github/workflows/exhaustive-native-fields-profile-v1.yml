@@ -42,49 +42,45 @@ jobs:
           present=[x for x in wanted if x in cols]
           profiles={}
           for c in present:
-            q=f'''select coalesce(nullif(trim(cast("{c}" as varchar)),''),'__NULL_OR_EMPTY__') value,count(*) n
-                  from read_parquet(?) group by 1 order by n desc limit 200'''
+            q=f'''select coalesce(nullif(trim(cast("{c}" as varchar)),''),'__NULL_OR_EMPTY__') as field_value,count(*) as n_rows
+                  from read_parquet(?) group by 1 order by n_rows desc limit 200'''
             rows=con.execute(q,[p]).fetchall()
             profiles[c]=[{'value':r[0],'n':r[1],'pct':round(100*r[1]/n,6)} for r in rows]
           Path('out/native_field_profiles.json').write_text(json.dumps({'version':'NATIVE_FIELDS_PROFILE_V1','rows':n,'present_fields':present,'profiles':profiles},ensure_ascii=False,indent=2),encoding='utf-8')
 
-          # Category/Subcategory/source/country coverage across every row; do not filter on presumed lean score.
-          rows=con.execute('''select Warehouse_Source,Country,coalesce(nullif(trim(cast(Category as varchar)),''),'UNKNOWN') Category,
-              coalesce(nullif(trim(cast(Subcategory as varchar)),''),'UNKNOWN') Subcategory,count(*) n,
-              count(distinct Buyer_Name) buyers,
-              median(try_cast(Official_Estimated_Value as double)) filter(where try_cast(Official_Estimated_Value as double)>=0) median_est,
-              median(try_cast(Official_Bidder_Count as double)) filter(where try_cast(Official_Bidder_Count as double)>=0) median_bidders,
-              count(*) filter(where try_cast(Official_Bidder_Count as double)=1) one_bidder_rows
-            from read_parquet(?) group by 1,2,3,4 order by n desc''',[p]).fetchall()
+          rows=con.execute('''select Warehouse_Source,Country,coalesce(nullif(trim(cast(Category as varchar)),''),'UNKNOWN') as category_value,
+              coalesce(nullif(trim(cast(Subcategory as varchar)),''),'UNKNOWN') as subcategory_value,count(*) as n_rows,
+              count(distinct Buyer_Name) as buyers,
+              median(try_cast(Official_Estimated_Value as double)) filter(where try_cast(Official_Estimated_Value as double)>=0) as median_est,
+              median(try_cast(Official_Bidder_Count as double)) filter(where try_cast(Official_Bidder_Count as double)>=0) as median_bidders,
+              count(*) filter(where try_cast(Official_Bidder_Count as double)=1) as one_bidder_rows
+            from read_parquet(?) group by 1,2,3,4 order by n_rows desc''',[p]).fetchall()
           with open('out/category_subcategory_census.csv','w',newline='',encoding='utf-8') as f:
             w=csv.writer(f);w.writerow(['warehouse_source','country','category','subcategory','records','buyers','median_estimated_value','median_bidders','one_bidder_rows']);w.writerows(rows)
 
-          # Exact combinations of native strategic fields; keep all combinations, even null/unknown.
           rows2=con.execute('''select
-              coalesce(nullif(trim(cast(Lean_Fit as varchar)),''),'UNKNOWN') lean_fit,
-              coalesce(nullif(trim(cast(Automation_Potential as varchar)),''),'UNKNOWN') automation_potential,
-              coalesce(nullif(trim(cast(Onsite_Requirement as varchar)),''),'UNKNOWN') onsite_requirement,
-              coalesce(nullif(trim(cast(Subcontracting_Status as varchar)),''),'UNKNOWN') subcontracting_status,
-              coalesce(nullif(trim(cast(References_Required as varchar)),''),'UNKNOWN') references_required,
-              coalesce(nullif(trim(cast(Required_Certifications as varchar)),''),'UNKNOWN') required_certifications,
-              count(*) n
-            from read_parquet(?) group by 1,2,3,4,5,6 order by n desc''',[p]).fetchall()
+              coalesce(nullif(trim(cast(Lean_Fit as varchar)),''),'UNKNOWN') as lean_fit,
+              coalesce(nullif(trim(cast(Automation_Potential as varchar)),''),'UNKNOWN') as automation_potential,
+              coalesce(nullif(trim(cast(Onsite_Requirement as varchar)),''),'UNKNOWN') as onsite_requirement,
+              coalesce(nullif(trim(cast(Subcontracting_Status as varchar)),''),'UNKNOWN') as subcontracting_status,
+              coalesce(nullif(trim(cast(References_Required as varchar)),''),'UNKNOWN') as references_required,
+              coalesce(nullif(trim(cast(Required_Certifications as varchar)),''),'UNKNOWN') as required_certifications,
+              count(*) as n_rows
+            from read_parquet(?) group by 1,2,3,4,5,6 order by n_rows desc''',[p]).fetchall()
           with open('out/native_strategy_combinations.csv','w',newline='',encoding='utf-8') as f:
             w=csv.writer(f);w.writerow(['lean_fit','automation_potential','onsite_requirement','subcontracting_status','references_required','required_certifications','records']);w.writerows(rows2)
 
-          # Materially useful categories: native Category/Subcategory + populated strategic hints. This is evidence inventory, not eligibility pass.
           rows3=con.execute('''select Warehouse_Source,Country,Category,Subcategory,
-              coalesce(nullif(trim(cast(Lean_Fit as varchar)),''),'UNKNOWN') Lean_Fit,
-              coalesce(nullif(trim(cast(Automation_Potential as varchar)),''),'UNKNOWN') Automation_Potential,
-              coalesce(nullif(trim(cast(Onsite_Requirement as varchar)),''),'UNKNOWN') Onsite_Requirement,
-              count(*) n,count(distinct Buyer_Name) buyers,
-              median(try_cast(Official_Estimated_Value as double)) filter(where try_cast(Official_Estimated_Value as double)>=0) median_est,
-              median(try_cast(Official_Bidder_Count as double)) filter(where try_cast(Official_Bidder_Count as double)>=0) median_bidders
-            from read_parquet(?) group by 1,2,3,4,5,6,7 order by n desc limit 20000''',[p]).fetchall()
+              coalesce(nullif(trim(cast(Lean_Fit as varchar)),''),'UNKNOWN') as lean_fit,
+              coalesce(nullif(trim(cast(Automation_Potential as varchar)),''),'UNKNOWN') as automation_potential,
+              coalesce(nullif(trim(cast(Onsite_Requirement as varchar)),''),'UNKNOWN') as onsite_requirement,
+              count(*) as n_rows,count(distinct Buyer_Name) as buyers,
+              median(try_cast(Official_Estimated_Value as double)) filter(where try_cast(Official_Estimated_Value as double)>=0) as median_est,
+              median(try_cast(Official_Bidder_Count as double)) filter(where try_cast(Official_Bidder_Count as double)>=0) as median_bidders
+            from read_parquet(?) group by 1,2,3,4,5,6,7 order by n_rows desc limit 20000''',[p]).fetchall()
           with open('out/native_business_cells.csv','w',newline='',encoding='utf-8') as f:
             w=csv.writer(f);w.writerow(['warehouse_source','country','category','subcategory','lean_fit','automation_potential','onsite_requirement','records','buyers','median_estimated_value','median_bidders']);w.writerows(rows3)
 
-          # Completeness check for every requested field.
           completeness=[]
           for c in present:
             nonempty=con.execute(f'''select count(*) from read_parquet(?) where nullif(trim(cast("{c}" as varchar)),'') is not null''',[p]).fetchone()[0]
