@@ -1,0 +1,32 @@
+{
+  "version": "HISTORICAL_OPEN_WORLD_UNKNOWNS_V2",
+  "source_counts": {
+    "global_core": {
+      "input_high_signal": 12000,
+      "after_known_lane_exclusion": 11350
+    },
+    "usa": {
+      "input_high_signal": 12000,
+      "after_known_lane_exclusion": 10473
+    },
+    "australia": {
+      "input_high_signal": 5874,
+      "after_known_lane_exclusion": 4676
+    }
+  },
+  "semantic_candidates": 24657,
+  "code_only_candidates": 1842,
+  "semantic_review_queue": 3000,
+  "code_only_review_queue": 1500,
+  "join_key": [
+    "warehouse_source",
+    "country",
+    "currency",
+    "route_band",
+    "native_code",
+    "phrase_signature"
+  ],
+  "v1_bug_fixed": "examples are joined on full cluster key, not phrase_signature alone",
+  "historical_only": true,
+  "record_deletion": false
+}
