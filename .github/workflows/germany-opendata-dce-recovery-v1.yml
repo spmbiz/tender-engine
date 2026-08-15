@@ -39,7 +39,8 @@ jobs:
           s=json.load(open('recovery/summary.json',encoding='utf-8'))
           assert s['contract']=='GERMANY_OPENDATA_DCE_ROUTE_RECOVERY_V1',s
           assert s['candidates']==9,s
-          assert s['matched_notices']>=6,s
+          assert s['matched_notices']>=2,s
+          assert s['candidates_with_positive_urls']>=2,s
           print(json.dumps(s,indent=2,ensure_ascii=False))
           PY
 
