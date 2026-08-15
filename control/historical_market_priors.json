@@ -1,7 +1,7 @@
 {
   "contract": "TENDER_MARKET_BRAIN_PRIORS_V1",
   "status": "READY",
-  "generated_at": "2026-08-15T18:50:38.651517+00:00",
+  "generated_at": "2026-08-15T19:02:26.452087+00:00",
   "source_release": "walidgdg1-ai/tender-engine:market-intelligence-v9-final-qa + market-intelligence-micro-niche-v2-precision + market-intelligence-hunt-subniches-v2-precision",
   "source_scope": "Global Core v4 notice-first. Route-aware and title-led historical priors; staffing-dependent language services are explicitly held from live promotion.",
   "safety": {
@@ -202,8 +202,10 @@
         "security portal",
         "x-ray",
         "medical",
-        "construction",
-        "hardware"
+        "hardware",
+        "assistance [àa] ma[iî]trise d.?ouvrage",
+        "\\bamo\\b.{0,50}(?:site|web|refonte)",
+        "mission.{0,30}ma[iî]trise d.?ouvrage"
       ]
     },
     {
@@ -552,5 +554,61 @@
       "Canada interpretation/sign-language"
     ],
     "rule": "HOLD_* is audit-only and ignored by the live loader; only PROMOTE_CORE/PROMOTE_BROKER affects retrieval priority."
+  },
+  "historical_dce_reality_check_v1": {
+    "authority": "control/historical_subniche_dce_review_v1/REPORT.md",
+    "evidence_pack": "control/historical_gate_evidence_pack_v1/index.json",
+    "sampled_candidates": 43,
+    "downloaded_gate_ready": 17,
+    "retrieval_refinement": [
+      "France web build: exclude AMO/owner-assistance scopes from implementation prior"
+    ],
+    "gate_watchlist": {
+      "FRANCE|Website support / hosting": [
+        "references/experience",
+        "stack-specific certifications where stated",
+        "submission",
+        "security/IP/SLA where stated"
+      ],
+      "FRANCE|Website redesign / development": [
+        "references/experience",
+        "turnover declaration where stated",
+        "staffing where stated",
+        "tax/social attestations",
+        "exclude AMO from build motion"
+      ],
+      "FRANCE|Publication layout / DTP": [
+        "turnover declaration",
+        "professional insurance",
+        "references over recent years",
+        "staffing/equipment",
+        "award quality weighting"
+      ],
+      "FRANCE|Written translation": [
+        "references/qualifications where stated",
+        "technical-quality weighting",
+        "language/submission",
+        "framework min/max volumes"
+      ],
+      "FRANCE|Transcription": [
+        "references/qualifications or equivalent proof where stated",
+        "quality certification/authorization where stated",
+        "confidentiality/accuracy/turnaround to verify"
+      ],
+      "FRANCE|Promotional goods": [
+        "reserved-participation check",
+        "turnover/references where stated",
+        "RSE/product quality/marking",
+        "working capital/logistics"
+      ],
+      "FRANCE|Municipal magazine printing": [
+        "quantities/frequency",
+        "delivery",
+        "payment delay",
+        "grouping/subcontracting",
+        "paper/print specifications from DCE"
+      ]
+    },
+    "safety": "Watchlist is retrieval/review guidance only; each live DCE must resolve the actual mandatory wording."
   }
 }
