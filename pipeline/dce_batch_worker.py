@@ -11,6 +11,8 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
+from build_matrix import BROWSER_PORTALS
+
 RETRYABLE_STATUSES = {"ERROR_RETRYABLE"}
 RATE_LIMIT_RE = re.compile(r"(?:\b429\b|too many requests|rate.?limit|retry-after)", re.I)
 
@@ -38,13 +40,30 @@ def load_manifest(out: str, candidate_id: str) -> dict:
         return {}
 
 
+def _fast_lane_policy(candidate: dict, requested_retries: int, requested_timeout: int) -> tuple[int, int, str]:
+    portal = str(candidate.get("portal") or candidate.get("portal_key") or candidate.get("source") or "").upper()
+    if portal in BROWSER_PORTALS:
+        # Browser failures are expensive and are returned to the durable queue by
+        # the fleet controller. Do not burn the same runner on repeated inline
+        # 180s retries; give the route one meaningful fast-lane attempt and move on.
+        retries = min(max(0, requested_retries), max(0, int(os.getenv("DCE_BROWSER_INLINE_RETRIES", "0"))))
+        timeout_seconds = min(max(30, requested_timeout), max(30, int(os.getenv("DCE_BROWSER_FAST_TIMEOUT_SECONDS", "150"))))
+        return retries, timeout_seconds, "browser_fast_lane"
+
+    retries = min(max(0, requested_retries), max(0, int(os.getenv("DCE_HTTP_INLINE_RETRIES", "1"))))
+    timeout_seconds = min(max(30, requested_timeout), max(30, int(os.getenv("DCE_HTTP_FAST_TIMEOUT_SECONDS", "90"))))
+    return retries, timeout_seconds, "http_fast_lane"
+
+
 def run_one(queue: str, line_no: int, out: str, retries: int, timeout_seconds: int):
     candidate = load_candidate(queue, line_no)
     candidate_id = str(candidate.get("candidate_id") or f"line-{line_no}")
+    portal = str(candidate.get("portal") or candidate.get("portal_key") or candidate.get("source") or "").upper()
+    effective_retries, effective_timeout, lane = _fast_lane_policy(candidate, retries, timeout_seconds)
     attempts = []
     started = time.monotonic()
 
-    for attempt in range(1, retries + 2):
+    for attempt in range(1, effective_retries + 2):
         cmd = [
             sys.executable,
             "pipeline/dce_worker_v6.py",
@@ -57,14 +76,14 @@ def run_one(queue: str, line_no: int, out: str, retries: int, timeout_seconds: i
         ]
         t0 = time.monotonic()
         try:
-            proc = subprocess.run(cmd, text=True, capture_output=True, timeout=timeout_seconds)
+            proc = subprocess.run(cmd, text=True, capture_output=True, timeout=effective_timeout)
             returncode = proc.returncode
             stdout = proc.stdout[-12000:]
             stderr = proc.stderr[-12000:]
         except subprocess.TimeoutExpired as exc:
             returncode = 124
             stdout = (exc.stdout or "")[-12000:] if isinstance(exc.stdout, str) else ""
-            stderr = ((exc.stderr or "")[-12000:] if isinstance(exc.stderr, str) else "") + f"\nWORKER_TIMEOUT_{timeout_seconds}s"
+            stderr = ((exc.stderr or "")[-12000:] if isinstance(exc.stderr, str) else "") + f"\nWORKER_TIMEOUT_{effective_timeout}s"
 
         manifest = load_manifest(out, candidate_id)
         status = str(manifest.get("status") or ("WORKER_ERROR" if returncode else "UNKNOWN"))
@@ -83,7 +102,7 @@ def run_one(queue: str, line_no: int, out: str, retries: int, timeout_seconds: i
         )
 
         retryable = returncode != 0 or status in RETRYABLE_STATUSES or rate_limited
-        if not retryable or attempt > retries:
+        if not retryable or attempt > effective_retries:
             break
         time.sleep(min(4.0, 0.75 * attempt + random.random()))
 
@@ -91,11 +110,16 @@ def run_one(queue: str, line_no: int, out: str, retries: int, timeout_seconds: i
     return {
         "line": line_no,
         "candidate_id": candidate_id,
-        "portal": str(candidate.get("portal") or candidate.get("source") or "").upper(),
+        "portal": portal,
+        "lane": lane,
         "returncode": final["returncode"],
         "status": final["status"],
         "attempt_count": len(attempts),
         "retries": max(0, len(attempts) - 1),
+        "requested_retries": max(0, retries),
+        "effective_retries": effective_retries,
+        "requested_timeout_seconds": max(30, timeout_seconds),
+        "effective_timeout_seconds": effective_timeout,
         "rate_limited": any(a["rate_limited"] for a in attempts),
         "elapsed_seconds": round(time.monotonic() - started, 3),
         "attempts": attempts,
@@ -129,6 +153,7 @@ def main():
                     "line": futs[fut],
                     "candidate_id": None,
                     "portal": None,
+                    "lane": None,
                     "returncode": 99,
                     "status": "BATCH_EXCEPTION",
                     "attempt_count": 1,
@@ -151,10 +176,12 @@ def main():
         "rate_limited": sum(1 for r in results if r.get("rate_limited")),
         "wall_seconds": round(time.monotonic() - wall_start, 3),
         "local_concurrency": max(1, min(args.concurrency, len(lines) or 1)),
+        "lane_counts": dict(Counter(r.get("lane") for r in results if r.get("lane"))),
     }
     Path(args.out, "batch_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(json.dumps(summary, indent=2))
 
 
 if __name__ == "__main__":
+    from collections import Counter
     main()
