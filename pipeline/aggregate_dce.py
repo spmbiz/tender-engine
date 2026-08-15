@@ -17,6 +17,22 @@ PORTAL_GENERIC_FILE_PATTERNS = [
     re.compile(r"^BOE-A-2017-12902-E\.pdf$", re.I),
 ]
 
+# Candidate-specific relevance is deliberately independent from business fit. It
+# answers only: "does this retrieved procurement document actually belong to this
+# notice?" A mismatch blocks use of the document as evidence but NEVER discards the
+# tender itself; the candidate remains retriable through another DCE route.
+RELEVANCE_STOPWORDS = {
+    "the", "and", "for", "with", "from", "this", "that", "into", "public", "service",
+    "services", "supply", "supplies", "contract", "tender", "procurement", "request",
+    "proposal", "solicitation", "notice", "digital", "online", "support", "provision",
+    "development", "system", "systems", "project", "framework", "agreement", "management",
+}
+REFERENCE_KEYS = (
+    "solicitation_number", "solicitationNumber", "notice_number", "noticeNumber",
+    "reference", "reference_number", "referenceNumber", "tender_reference",
+    "procurement_reference", "opportunity_id", "opportunityId", "publication_number",
+)
+
 
 def load(path: Path):
     try:
@@ -51,6 +67,80 @@ def resolve_evidence(raw_status: str, files: list[dict], evidence: dict) -> tupl
     return legacy_content_quality(raw_status, files)
 
 
+def _norm(value: object) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", str(value or "").casefold()).strip()
+
+
+def _compact(value: object) -> str:
+    return re.sub(r"[^a-z0-9]+", "", str(value or "").casefold())
+
+
+def _distinctive_title_tokens(title: str) -> list[str]:
+    toks = re.findall(r"[a-z0-9]{4,}", _norm(title))
+    return sorted({t for t in toks if t not in RELEVANCE_STOPWORDS})
+
+
+def candidate_document_relevance(candidate: dict, corpus: str) -> dict:
+    """Prove that a substantive procurement corpus is candidate-specific.
+
+    This is intentionally stricter than generic DCE classification. Multiple
+    procurement markers prove "this is a procurement document"; they do not prove
+    "this is the procurement document for candidate X".
+    """
+    corpus_norm = _norm(corpus)
+    corpus_compact = _compact(corpus)
+    title = str(candidate.get("title") or "").strip()
+    title_norm = _norm(title)
+    title_tokens = _distinctive_title_tokens(title)
+
+    reference_hits = []
+    references = []
+    for key in REFERENCE_KEYS:
+        value = str(candidate.get(key) or "").strip()
+        if not value:
+            continue
+        compact = _compact(value)
+        if len(compact) < 5:
+            continue
+        references.append({"key": key, "value": value})
+        if compact in corpus_compact:
+            reference_hits.append({"key": key, "value": value})
+
+    title_phrase_hit = bool(title_norm and len(title_norm) >= 10 and title_norm in corpus_norm)
+    token_hits = [t for t in title_tokens if re.search(rf"\b{re.escape(t)}\b", corpus_norm)]
+    token_ratio = len(token_hits) / len(title_tokens) if title_tokens else 0.0
+
+    # Candidate identity can be proven by an explicit reference, by the normalized
+    # title phrase, or by several distinctive title tokens. One generic token is
+    # never enough; this is what prevents a huge generic PIEE manual from becoming
+    # the DCE for "CCA, DIGITAL I/O" merely because it contains "digital".
+    if reference_hits:
+        status = "PROVEN_BY_REFERENCE"
+        proven = True
+    elif title_phrase_hit:
+        status = "PROVEN_BY_TITLE_PHRASE"
+        proven = True
+    elif len(token_hits) >= 2 and token_ratio >= 0.5:
+        status = "PROVEN_BY_TITLE_TOKENS"
+        proven = True
+    else:
+        status = "UNPROVEN_CANDIDATE_DOCUMENT_MATCH"
+        proven = False
+
+    return {
+        "status": status,
+        "proven": proven,
+        "title": title,
+        "title_phrase_hit": title_phrase_hit,
+        "title_distinctive_tokens": title_tokens[:30],
+        "title_token_hits": token_hits[:30],
+        "title_token_ratio": round(token_ratio, 4),
+        "candidate_references": references[:20],
+        "reference_hits": reference_hits[:20],
+        "rule": "Procurement markers prove document type only. Gate evidence is allowed only when candidate-specific title/reference relevance is independently proven.",
+    }
+
+
 def review_template(gate_snippets: dict, gate_readiness: bool) -> dict:
     out = {}
     for gate in REQUIRED_GATES:
@@ -66,6 +156,7 @@ def review_template(gate_snippets: dict, gate_readiness: bool) -> dict:
 def quality_key(row: dict) -> tuple:
     return (
         bool(row.get("gate_readiness")),
+        bool((row.get("candidate_document_relevance") or {}).get("proven")),
         not bool(row.get("deadline_conflict")),
         row.get("status") == "DOWNLOADED_PUBLIC",
         int(row.get("corpus_chars") or 0),
@@ -74,18 +165,13 @@ def quality_key(row: dict) -> tuple:
 
 
 def portal_yield_metrics(rows: list[dict], batch_results: list[dict]) -> dict[str, dict]:
-    """Compute scheduler-grade portal yield without pretending CPU time is runner wall time.
-
-    Candidate subprocess elapsed time is available for every DCE attempt and is a
-    stable source/adapter cost signal. Exact GitHub runner wall-time is instrumented
-    separately; until then this field is deliberately named candidate_processing_minutes.
-    """
     stats: dict[str, dict] = defaultdict(lambda: {
         "candidates": 0,
         "gate_ready_substantive_dce": 0,
         "raw_downloaded_public": 0,
         "auth_required": 0,
         "generic_or_unresolved": 0,
+        "candidate_relevance_unproven": 0,
         "candidate_processing_seconds": 0.0,
         "retries": 0,
         "rate_limit_signals": 0,
@@ -104,9 +190,13 @@ def portal_yield_metrics(rows: list[dict], batch_results: list[dict]) -> dict[st
         s["gate_ready_substantive_dce"] += int(bool(row.get("gate_readiness")))
         s["raw_downloaded_public"] += int(str(row.get("raw_status") or "") == "DOWNLOADED_PUBLIC")
         s["auth_required"] += int(str(row.get("raw_status") or "") in {"AUTH_REQUIRED", "INTEREST_RECORDING_REQUIRED"})
+        s["candidate_relevance_unproven"] += int(
+            str((row.get("candidate_document_relevance") or {}).get("status") or "").startswith("UNPROVEN")
+        )
         s["generic_or_unresolved"] += int(str(row.get("status") or "") in {
             "GENERIC_PUBLIC_PAGE_UNRESOLVED", "PORTAL_GENERIC_ONLY", "DCE_CONTENT_UNVERIFIED",
-            "TED_DOWNSTREAM_ADAPTER_PENDING", "TED_ROUTE_UNRESOLVED", "ROUTE_INCOMPLETE",
+            "DCE_CANDIDATE_RELEVANCE_UNVERIFIED", "TED_DOWNSTREAM_ADAPTER_PENDING",
+            "TED_ROUTE_UNRESOLVED", "ROUTE_INCOMPLETE",
         })
         s["raw_status_counts"][str(row.get("raw_status") or "UNKNOWN")] += 1
         s["derived_status_counts"][str(row.get("status") or "UNKNOWN")] += 1
@@ -134,6 +224,7 @@ def portal_yield_metrics(rows: list[dict], batch_results: list[dict]) -> dict[st
             "auth_required": int(s["auth_required"]),
             "auth_rate": round(int(s["auth_required"]) / candidates, 6) if candidates else 0.0,
             "generic_or_unresolved": int(s["generic_or_unresolved"]),
+            "candidate_relevance_unproven": int(s["candidate_relevance_unproven"]),
             "candidate_processing_seconds": round(seconds, 3),
             "candidate_processing_minutes": round(minutes, 6),
             "useful_per_candidate_processing_minute": round(useful / minutes, 6) if minutes > 0 else 0.0,
@@ -171,9 +262,21 @@ def main():
         deadline_authority = authority.get("deadline") if isinstance(authority, dict) else {}
         doc_index = load(candidate_root / "document_index.json") or []
         corpus_path = candidate_root / "corpus.txt"
+        corpus_text = corpus_path.read_text(encoding="utf-8", errors="replace") if corpus_path.exists() else ""
         raw_status = str(manifest.get("status") or "UNKNOWN")
         files = manifest.get("files") or []
         status, content_quality, gate_readiness = resolve_evidence(raw_status, files, evidence)
+
+        candidate_relevance = candidate_document_relevance(candidate, corpus_text) if gate_readiness else {
+            "status": "NOT_EVALUATED_EVIDENCE_NOT_GATE_READY",
+            "proven": False,
+            "rule": "Candidate-specific relevance is evaluated only after the material is substantively procurement-like.",
+        }
+        if gate_readiness and not candidate_relevance.get("proven"):
+            gate_readiness = False
+            status = "DCE_CANDIDATE_RELEVANCE_UNVERIFIED"
+            content_quality = "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED"
+
         gate_snippets = gates.get("categories") or {}
         deadline_conflict = bool(deadline_authority.get("conflict")) if isinstance(deadline_authority, dict) else False
         deadline_authority_status = deadline_authority.get("status") if isinstance(deadline_authority, dict) else None
@@ -190,6 +293,7 @@ def main():
             "eligible_for_gate_review": gate_readiness,
             "finalization_allowed": False,
             "evidence_quality": evidence,
+            "candidate_document_relevance": candidate_relevance,
             "authority_conflicts": authority,
             "deadline_authority_status": deadline_authority_status,
             "deadline_conflict": deadline_conflict,
@@ -200,7 +304,7 @@ def main():
             "preliminary_score": candidate.get("preliminary_score") or candidate.get("pre_score"),
             "files": files,
             "documents_extracted": len(doc_index) if isinstance(doc_index, list) else 0,
-            "corpus_chars": corpus_path.stat().st_size if corpus_path.exists() else 0,
+            "corpus_chars": len(corpus_text),
             "gate_evidence_counts": gates.get("evidence_counts") or {},
             "gate_snippets": gate_snippets,
             "mandatory_gate_names": REQUIRED_GATES,
@@ -208,7 +312,8 @@ def main():
             "artifact_relative_root": str(candidate_root.relative_to(root)),
             "gpt_instruction": (
                 "DOWNLOADED_PUBLIC is transport success, not proof of DCE. Only review mandatory gates when gate_readiness=true. "
-                "ACCESS_GUIDE_ONLY / PORTAL_GENERIC_ONLY / DCE_CONTENT_UNVERIFIED are not authoritative DCE evidence. "
+                "A procurement-like document must also be independently proven relevant to this exact candidate by title/reference evidence. "
+                "DCE_CANDIDATE_RELEVANCE_UNVERIFIED means retry/inspect another route; it does NOT mean reject the tender. "
                 "Fill every review_template gate as PASS/PASS_CONDITIONAL/FAIL_HARD/UNKNOWN/NOT_APPLICABLE with source evidence. "
                 "Resolve authority_conflicts explicitly; a deadline conflict or unknown authoritative DCE deadline blocks finalization. "
                 "FINAL_SUPER_GREEN or score >=90 is forbidden while any potentially disqualifying gate is UNKNOWN/FAIL or lacks evidence. "
@@ -224,6 +329,7 @@ def main():
     raw_counts = Counter(str(r.get("raw_status") or "UNKNOWN") for r in rows)
     quality_counts = Counter(str(r.get("content_quality") or "UNKNOWN") for r in rows)
     deadline_authority_counts = Counter(str(r.get("deadline_authority_status") or "MISSING") for r in rows)
+    relevance_counts = Counter(str((r.get("candidate_document_relevance") or {}).get("status") or "MISSING") for r in rows)
 
     with (out / "deep_review_queue.jsonl").open("w", encoding="utf-8") as f:
         for row in rows:
@@ -248,6 +354,9 @@ def main():
     worker_failures = sum(1 for x in batch_results if int(x.get("returncode") or 0) != 0)
     gate_ready_count = sum(1 for r in rows if r.get("gate_readiness"))
     deadline_conflict_count = sum(1 for r in rows if r.get("deadline_conflict"))
+    relevance_unproven_count = sum(
+        1 for r in rows if str((r.get("candidate_document_relevance") or {}).get("status") or "").startswith("UNPROVEN")
+    )
     portal_yield = portal_yield_metrics(rows, batch_results)
     (out / "portal_yield.json").write_text(json.dumps(portal_yield, indent=2, ensure_ascii=False), encoding="utf-8")
 
@@ -258,6 +367,8 @@ def main():
         "raw_status_counts": dict(raw_counts),
         "derived_status_counts": dict(counts),
         "content_quality_counts": dict(quality_counts),
+        "candidate_document_relevance_counts": dict(relevance_counts),
+        "candidate_relevance_unproven": relevance_unproven_count,
         "deadline_authority_status_counts": dict(deadline_authority_counts),
         "deadline_conflicts": deadline_conflict_count,
         "raw_downloaded_public": raw_counts.get("DOWNLOADED_PUBLIC", 0),
@@ -278,7 +389,7 @@ def main():
         "portal_yield_time_basis": "candidate_processing_minutes; not yet exact GitHub runner wall-time",
         "raw_archives_in_final_artifact": False,
         "mandatory_gate_names": REQUIRED_GATES,
-        "contract": "Only gate_ready_substantive_dce rows may advance to mandatory-gate adjudication; authority conflicts remain explicit; final 90+/FINAL_SUPER_GREEN requires all mandatory gate statuses resolved with evidence and validation by final_verdict_guard.py.",
+        "contract": "Only candidate-specific gate_ready_substantive_dce rows may advance to mandatory-gate adjudication. A relevance mismatch blocks the document as evidence, not the tender; alternative DCE routes remain eligible for retry.",
     }
     (out / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(summary, indent=2, ensure_ascii=False))
