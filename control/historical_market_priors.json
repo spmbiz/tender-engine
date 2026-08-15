@@ -1,9 +1,9 @@
 {
   "contract": "TENDER_MARKET_BRAIN_PRIORS_V1",
   "status": "READY",
-  "generated_at": "2026-08-15T18:02:18.564650+00:00",
-  "source_release": "walidgdg1-ai/tender-engine:market-intelligence-v9-final-qa + market-intelligence-micro-niche-v2-precision",
-  "source_scope": "Global Core v4 notice-first. v9 cleaned lanes plus title-led Micro-Niche v2 Precision lanes admitted only after persisted manual QA. Direct/noncompetitive evidence remains buyer-demand intelligence only.",
+  "generated_at": "2026-08-15T18:50:38.651517+00:00",
+  "source_release": "walidgdg1-ai/tender-engine:market-intelligence-v9-final-qa + market-intelligence-micro-niche-v2-precision + market-intelligence-hunt-subniches-v2-precision",
+  "source_scope": "Global Core v4 notice-first. Route-aware and title-led historical priors; staffing-dependent language services are explicitly held from live promotion.",
   "safety": {
     "affects_final_verdict": false,
     "satisfies_dce_gates": false,
@@ -99,26 +99,29 @@
       ]
     },
     {
-      "lane": "Translation",
+      "lane": "Written translation",
       "country": "FRANCE",
-      "sample_size": 139,
-      "historical_score": 84.28,
+      "sample_size": 63,
+      "historical_score": 78.25,
       "priority_bonus": 5,
       "decision": "PROMOTE_CORE",
       "match_field": "title",
       "patterns": [
         "\\btraduction\\b",
-        "\\binterpr[eé]tariat\\b",
-        "translation services?",
-        "linguistic translation"
+        "traduction de textes?",
+        "traduction de documents?",
+        "translation services?"
       ],
       "negative_patterns": [
-        "translational",
+        "interpr[eé]tariat",
+        "interpr[eé]tation",
+        "mat[eé]riel",
+        "[eé]quipement",
+        "audiovisuel",
+        "location",
         "translationnelle",
-        "m[eé]decine",
-        "mat[eé]riel.{0,40}traduction",
-        "audiovisuel.{0,50}traduction",
-        "translation.{0,40}equipment"
+        "translational",
+        "m[eé]decine"
       ]
     },
     {
@@ -146,8 +149,8 @@
     {
       "lane": "Website support / accessibility / hosting",
       "country": "FRANCE",
-      "sample_size": 121,
-      "historical_score": 81.97,
+      "sample_size": 111,
+      "historical_score": 78.32,
       "priority_bonus": 5,
       "decision": "PROMOTE_CORE",
       "match_field": "title",
@@ -156,8 +159,8 @@
         "(?:maintenance|support|h[eé]bergement|entretien|mise [àa] jour).{0,90}(?:site web|site internet|website|portail web)"
       ],
       "negative_patterns": [
-        "construction",
         "hardware",
+        "mat[eé]riel informatique",
         "security portal",
         "x-ray"
       ]
@@ -206,9 +209,9 @@
     {
       "lane": "Website support / accessibility / hosting",
       "country": "GERMANY",
-      "sample_size": 90,
-      "historical_score": 86.29,
-      "priority_bonus": 5,
+      "sample_size": 123,
+      "historical_score": 81.91,
+      "priority_bonus": 6,
       "decision": "PROMOTE_CORE",
       "match_field": "title",
       "patterns": [
@@ -216,7 +219,6 @@
         "(?:pflege|wartung|betreuung|support|hosting|betrieb).{0,90}(?:webseite|website|internetauftritt|webauftritt)"
       ],
       "negative_patterns": [
-        "construction",
         "hardware",
         "security portal",
         "portal crane"
@@ -355,20 +357,22 @@
     {
       "lane": "Transcription / speech-to-text",
       "country": "FRANCE",
-      "sample_size": 58,
-      "historical_score": 82.42,
+      "sample_size": 45,
+      "historical_score": 76.21,
       "priority_bonus": 4,
       "decision": "PROMOTE_CORE",
       "match_field": "title",
       "patterns": [
         "\\btranscription\\b",
         "\\bretranscription\\b",
-        "st[eé]notyp",
         "speech[- ]to[- ]text"
       ],
       "negative_patterns": [
+        "st[eé]notyp",
+        "st[eé]nograph",
         "dna transcription",
         "gene transcription",
+        "g[eè]ne",
         "transcription factor"
       ]
     },
@@ -397,10 +401,10 @@
       ]
     },
     {
-      "lane": "Translation",
+      "lane": "Written translation",
       "country": "CANADA",
-      "sample_size": 35,
-      "historical_score": 81.5,
+      "sample_size": 37,
+      "historical_score": 77.02,
       "priority_bonus": 3,
       "decision": "PROMOTE_CORE",
       "match_field": "title",
@@ -408,13 +412,79 @@
         "translation services?",
         "professional translation",
         "technical translation",
-        "sign language translation",
-        "interpretation services?"
+        "english to french",
+        "french to english"
       ],
       "negative_patterns": [
-        "translational",
-        "translation.{0,40}equipment",
-        "simultaneous interpretation equipment"
+        "interpretation",
+        "interpreting",
+        "simultaneous",
+        "sign language",
+        "\\basl\\b",
+        "\\blsq\\b",
+        "equipment",
+        "hardware",
+        "translational"
+      ]
+    },
+    {
+      "lane": "Human interpreting",
+      "country": "FRANCE",
+      "sample_size": 150,
+      "historical_score": 81.27,
+      "priority_bonus": 0,
+      "decision": "HOLD_STAFFING_MODEL",
+      "match_field": "title",
+      "patterns": [
+        "interpr[eé]tariat",
+        "interpr[eé]tation.{0,60}(?:langue|linguistique|simultan|conf[eé]rence|traduct)"
+      ],
+      "negative_patterns": [
+        "logiciel d.?interpr[eé]tation",
+        "centre d.?interpr[eé]tation",
+        "sentier d.?interpr[eé]tation",
+        "signal[eé]tique.{0,30}interpr[eé]tation",
+        "mobilier d.?interpr[eé]tation",
+        "barrage",
+        "auscultation",
+        "mat[eé]riel",
+        "[eé]quipement"
+      ]
+    },
+    {
+      "lane": "Stenotypy / stenography",
+      "country": "FRANCE",
+      "sample_size": 31,
+      "historical_score": 71.93,
+      "priority_bonus": 0,
+      "decision": "HOLD_STAFFING_MODEL",
+      "match_field": "title",
+      "patterns": [
+        "st[eé]notyp",
+        "st[eé]nograph"
+      ],
+      "negative_patterns": []
+    },
+    {
+      "lane": "Interpretation / sign-language services",
+      "country": "CANADA",
+      "sample_size": 34,
+      "historical_score": 74.64,
+      "priority_bonus": 0,
+      "decision": "HOLD_STAFFING_MODEL",
+      "match_field": "title",
+      "patterns": [
+        "interpretation services?",
+        "interpreting",
+        "simultaneous interpretation",
+        "sign language",
+        "\\basl\\b",
+        "\\blsq\\b"
+      ],
+      "negative_patterns": [
+        "equipment",
+        "hardware",
+        "audiovisual equipment"
       ]
     }
   ],
@@ -461,5 +531,26 @@
     ],
     "title_led": true,
     "note": "Only PROMOTE_CORE/PROMOTE_BROKER rules can affect live retrieval. HOLD_* rules are persisted for audit but ignored by the loader."
+  },
+  "hunt_subniche_v2_precision": {
+    "authority": "control/spm_hunt_subniches_v2_precision/REPORT.md",
+    "source_release": "market-intelligence-hunt-subniches-v2-precision",
+    "classified_notice_first_tenders": 3780,
+    "sub_niches": 31,
+    "strengthened": [
+      "Germany website maintenance/support"
+    ],
+    "refined": [
+      "France website support",
+      "France written translation",
+      "France pure transcription",
+      "Canada written translation"
+    ],
+    "held": [
+      "France human interpreting",
+      "France stenotypy/stenography",
+      "Canada interpretation/sign-language"
+    ],
+    "rule": "HOLD_* is audit-only and ignored by the live loader; only PROMOTE_CORE/PROMOTE_BROKER affects retrieval priority."
   }
 }
