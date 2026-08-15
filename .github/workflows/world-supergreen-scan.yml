@@ -5,22 +5,31 @@ on:
     branches: [main]
     paths:
       - 'control/world_supergreen_trigger.json'
+      - 'pipeline/world_supergreen_prefilter.py'
+      - 'pipeline/historical_market_priors.py'
+      - 'control/historical_market_priors.json'
+      - '.github/workflows/world-supergreen-scan.yml'
   workflow_dispatch:
     inputs:
       source_discovery_run:
         description: Discovery run to scan
         required: false
-        default: '31856526716'
+        default: '31893462184'
 
 permissions:
   contents: write
 
+concurrency:
+  group: worldwide-supergreen-scan
+  cancel-in-progress: true
+
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -35,7 +44,7 @@ jobs:
             run="$(python - <<'PY'
           import json
           x=json.load(open('control/world_supergreen_trigger.json'))
-          print(x.get('source_discovery_run',31856526716))
+          print(x.get('source_discovery_run',31893462184))
           PY
           )"
           fi
@@ -48,9 +57,12 @@ jobs:
         run: |
           set -euo pipefail
           tag="discovery-harvest-${SOURCE_RUN}"
-          asset="supergreen-wide-read-${SOURCE_RUN}.tar.gz"
+          normal="supergreen-wide-read-${SOURCE_RUN}.tar.gz"
+          repaired="supergreen-wide-read-${SOURCE_RUN}-repaired.tar.gz"
+          assets="$(gh release view "$tag" --json assets --jq '.assets[].name')"
+          if grep -Fxq "$repaired" <<< "$assets"; then asset="$repaired"; else asset="$normal"; fi
           mkdir -p corpus
-          gh release download "$tag" --pattern "$asset" --dir .
+          gh release download "$tag" --pattern "$asset" --dir . --clobber
           tar -xzf "$asset" -C corpus
           find corpus -name current_candidates.jsonl -print -quit | grep . > /tmp/candidate_path
       - name: Rank high-recall lean candidates and build DCE selection
@@ -84,4 +96,9 @@ jobs:
             exit 0
           fi
           git commit -m "Persist worldwide supergreen prefilter for discovery ${SOURCE_RUN}"
-          git push origin HEAD:main
+          for i in 1 2 3 4 5 6 7 8; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
