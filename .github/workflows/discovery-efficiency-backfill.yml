@@ -85,7 +85,40 @@ jobs:
             --run-id "$CUR" \
             --novelty "discovery-novelty-$CUR.json" \
             --out "discovery-efficiency-$CUR.json"
-      - name: Persist immutable benchmark on current discovery Release
+      - name: Stamp discovery mode into efficiency record
+        env:
+          CUR: ${{ steps.ids.outputs.current }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          cur=os.environ['CUR']
+          stats=json.load(open('current/merged/stats.json',encoding='utf-8'))
+          p=f'discovery-efficiency-{cur}.json'
+          x=json.load(open(p,encoding='utf-8'))
+          x['discovery_mode']=stats.get('discovery_mode','legacy-deep')
+          open(p,'w',encoding='utf-8').write(json.dumps(x,indent=2,ensure_ascii=False)+'\n')
+          PY
+      - name: Update bounded rolling source performance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CUR: ${{ steps.ids.outputs.current }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p source-performance
+          existing=''
+          if gh release view fleet-state --json assets --jq '.assets[].name' | grep -Fxq 'discovery-source-performance.json'; then
+            gh release download fleet-state --pattern discovery-source-performance.json --dir source-performance
+            existing='--existing source-performance/discovery-source-performance.json'
+          fi
+          python pipeline/update_discovery_source_performance.py \
+            $existing \
+            --efficiency "discovery-efficiency-$CUR.json" \
+            --run-id "$CUR" \
+            --max-runs 8 \
+            --out discovery-source-performance.json
+      - name: Persist immutable benchmark and mutable rolling state
         env:
           GH_TOKEN: ${{ github.token }}
           CUR: ${{ steps.ids.outputs.current }}
@@ -96,6 +129,7 @@ jobs:
           gh release upload "$tag" \
             "discovery-novelty-$CUR.json" \
             "discovery-efficiency-$CUR.json" --clobber
+          gh release upload fleet-state discovery-source-performance.json --clobber
           echo '### Discovery novelty' >> "$GITHUB_STEP_SUMMARY"
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
           cat "discovery-novelty-$CUR.json" >> "$GITHUB_STEP_SUMMARY"
@@ -103,4 +137,8 @@ jobs:
           echo '### Discovery runner efficiency' >> "$GITHUB_STEP_SUMMARY"
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
           cat "discovery-efficiency-$CUR.json" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo '### Rolling source performance' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat discovery-source-performance.json >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
