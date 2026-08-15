@@ -7,6 +7,8 @@ on:
       - 'pipeline/**'
       - 'tests/**'
       - '.github/workflows/dce-fanout-v2.yml'
+      - '.github/workflows/supergreen-discovery-v2.yml'
+      - '.github/workflows/tender-live-canary.yml'
       - '.github/workflows/tender-pipeline-regression.yml'
   workflow_dispatch:
 
@@ -22,10 +24,27 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Syntax gate
+      - name: Python syntax gate
         run: python -m py_compile pipeline/*.py
-      - name: Install test dependency
-        run: python -m pip install --disable-pip-version-check -q pytest
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check -q pytest pyyaml
+      - name: Workflow YAML syntax gate
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+          files=[
+            Path('.github/workflows/dce-fanout-v2.yml'),
+            Path('.github/workflows/supergreen-discovery-v2.yml'),
+            Path('.github/workflows/tender-live-canary.yml'),
+            Path('.github/workflows/tender-pipeline-regression.yml'),
+          ]
+          for p in files:
+              with p.open(encoding='utf-8') as f:
+                  yaml.safe_load(f)
+              print('YAML_OK',p)
+          PY
       - name: Run pipeline invariants
         run: python -m pytest -q tests
       - name: Assert final-verdict guard rejects missing DCE evidence
