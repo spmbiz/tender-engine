@@ -9,6 +9,7 @@ on:
     branches: [main]
     paths:
       - 'pipeline/build_live_spm_review_pool.py'
+      - 'pipeline/build_live_spm_review_pool_fast.py'
       - '.github/workflows/live-spm-review-pool-v1.yml'
 
 permissions:
@@ -38,10 +39,10 @@ jobs:
             gh release download "$tag" --pattern "$asset" --dir snapshot --clobber
             test -s "snapshot/$asset"
           done
-      - name: Build exhaustive SPM review pool
+      - name: Build exhaustive SPM review pool with precompiled rules
         run: |
           set -euo pipefail
-          python pipeline/build_live_spm_review_pool.py \
+          python pipeline/build_live_spm_review_pool_fast.py \
             --snapshot snapshot/live-open-tenders-latest.jsonl.gz \
             --manifest snapshot/snapshot-manifest-latest.json \
             --coverage snapshot/discovery-coverage-latest.json \
@@ -54,7 +55,9 @@ jobs:
           s=json.load(open('review/summary.json',encoding='utf-8'))
           assert s['contract']=='LIVE_SPM_REVIEW_POOL_V1',s
           assert s['snapshot_rows']==s['playbook_or_lean_hits']+s['residual_open_world'],s
+          assert s['snapshot_rows']==43191,s
           assert s['final_verdict_allowed'] is False
+          assert s['compiled_historical_rules']>0,s
           assert os.path.getsize('review/playbook_lean_hits.jsonl')>0
           print(json.dumps(s,indent=2,ensure_ascii=False))
           PY
