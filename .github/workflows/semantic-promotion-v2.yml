@@ -15,6 +15,7 @@ concurrency:
   group: spm-semantic-promotion-v2
   cancel-in-progress: false
 
+# Rerun marker: 2026-08-15T19:40+02:00
 jobs:
   qa:
     runs-on: ubuntu-latest
@@ -45,15 +46,10 @@ jobs:
           s=s.replace('{tproc} procedure,', '{tproc} procedure_text,')
           s=s.replace('currency,title,scope,cpv_code,estimated_value', 'currency,title,scope_text,cpv_code,estimated_value')
           s=s.replace('ORDER BY records DESC', 'ORDER BY 6 DESC')
-          # Manual review found medical/professional-service false positives where the
-          # body text mentioned a professional licence renewal. Require software-
-          # licensing language in the procurement TITLE, not merely anywhere in scope.
           s=s.replace(
             "WHEN regexp_matches({text}, '(software licen[cs](e|ing|es)?|licen[cs]e renewal|software subscription|subscription renewal|saas subscription|cloud software subscription|licence logiciel|licences logicielles)')",
             "WHEN regexp_matches(lower({ttitle}), '(software licen[cs](e|ing|es)?|software subscription|subscription renewal|saas subscription|cloud software subscription|licence(s)? logiciel(le)?s?|licences logicielles|software licenses?|software licences?)')"
           )
-          # Bare LMS is ambiguous (Learning / Library / Load / Land Management System).
-          # Require explicit learning/e-learning/Moodle semantics.
           s=s.replace(
             "WHEN regexp_matches({text}, '(e[- ]learning content|digital learning content|online learning modules?|online training modules?|e[- ]learning modules?|learning management system|\\\\blms\\\\b|virtual learning content|interactive learning content)')",
             "WHEN regexp_matches(lower(concat_ws(' ',{ttitle},{tscope})), '(e[- ]learning|elearning|digital learning|online learning|online training modules?|e[- ]learning modules?|learning management system|learning platform|moodle|virtual learning content|interactive learning content)')"
@@ -81,8 +77,6 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add control/semantic_promotion_v2/
           git commit -m 'tenders: persist semantic promotion QA v2.1 manual hardening' || exit 0
-          # Runtime edits are intentionally not persisted into the generic discovery
-          # script until the audited output is reviewed. Avoid rebase conflicts.
           git restore pipeline/semantic_promotion_v2.py || true
           for i in 1 2 3 4 5; do
             if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
