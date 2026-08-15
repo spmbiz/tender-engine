@@ -6,6 +6,8 @@ import shutil
 from collections import Counter
 from pathlib import Path
 
+from authority_conflicts import process as process_authority_conflicts
+
 KEEP_FILES = {
     "candidate.json",
     "manifest.json",
@@ -14,6 +16,7 @@ KEEP_FILES = {
     "corpus.txt",
     "evidence_quality.json",
     "gate_snippets.json",
+    "authority_conflicts.json",
 }
 ROOT_KEEP = {"batch_results.json", "batch_summary.json"}
 
@@ -44,7 +47,9 @@ def main():
     raw_bytes = tree_bytes(root)
     statuses = Counter()
     evidence_qualities = Counter()
+    authority_statuses = Counter()
     gate_ready = 0
+    deadline_conflicts = 0
     candidates = 0
     copied_files = 0
 
@@ -62,6 +67,14 @@ def main():
         if evidence:
             evidence_qualities[str(evidence.get("content_quality") or "UNKNOWN")] += 1
             gate_ready += int(bool(evidence.get("gate_readiness")))
+        try:
+            authority = process_authority_conflicts(candidate_root)
+        except Exception:
+            authority = load_json(candidate_root / "authority_conflicts.json") or {}
+        deadline = authority.get("deadline") if isinstance(authority, dict) else {}
+        if isinstance(deadline, dict):
+            authority_statuses[str(deadline.get("status") or "UNKNOWN")] += 1
+            deadline_conflicts += int(bool(deadline.get("conflict")))
         candidates += 1
 
         for name in KEEP_FILES:
@@ -88,6 +101,8 @@ def main():
         "candidates": candidates,
         "status_counts": dict(statuses),
         "evidence_quality_counts": dict(evidence_qualities),
+        "authority_deadline_status_counts": dict(authority_statuses),
+        "deadline_conflicts": deadline_conflicts,
         "gate_ready": gate_ready,
         "gate_blocked": max(0, candidates - gate_ready),
         "raw_worker_tree_bytes": raw_bytes,
@@ -96,7 +111,7 @@ def main():
         "reduction_ratio": round((1 - slim_bytes_before_metrics / raw_bytes) if raw_bytes else 0, 6),
         "copied_files": copied_files,
         "raw_archives_retained_in_artifact": False,
-        "contract": "handoff keeps manifests, evidence quality, extracted corpus, document index, gate snippets and batch metrics; raw DCE files stay runner-local",
+        "contract": "handoff keeps manifests, evidence quality, authority conflicts, extracted corpus, document index, gate snippets and batch metrics; raw DCE files stay runner-local",
     }
     (out / "_shard_metrics.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")
     metrics["slim_handoff_bytes"] = tree_bytes(out)
