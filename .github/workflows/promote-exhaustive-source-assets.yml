@@ -5,6 +5,10 @@ on:
     workflows: ["SPM Exhaustive Every-Record Historical Read v1"]
     types: [completed]
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/promote-exhaustive-source-assets.yml'
 
 permissions:
   contents: write
@@ -16,31 +20,36 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Download all compact exhaustive outputs
+      - name: Download available compact exhaustive outputs
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           TAG=market-intelligence-exhaustive-every-record-v1
           mkdir -p control/exhaustive_every_record_v1/source_assets
+          : > /tmp/prefixes.txt
           for prefix in global_core australia usa; do
-            for suffix in summary.json REPORT.md broad_families.csv lanes_by_route.csv source_route_coverage.csv repeat_buyers.csv open_world_clusters.csv top_record_review_queue.csv; do
-              name="${prefix}_${suffix}"
-              gh release download "$TAG" --repo walidgdg1-ai/tender-engine --pattern "$name" --dir control/exhaustive_every_record_v1/source_assets --clobber
-            done
+            if gh release download "$TAG" --repo walidgdg1-ai/tender-engine --pattern "${prefix}_summary.json" --dir control/exhaustive_every_record_v1/source_assets --clobber >/dev/null 2>&1; then
+              echo "$prefix" >> /tmp/prefixes.txt
+              for suffix in REPORT.md broad_families.csv lanes_by_route.csv source_route_coverage.csv repeat_buyers.csv open_world_clusters.csv top_record_review_queue.csv; do
+                name="${prefix}_${suffix}"
+                gh release download "$TAG" --repo walidgdg1-ai/tender-engine --pattern "$name" --dir control/exhaustive_every_record_v1/source_assets --clobber
+              done
+            fi
           done
-      - name: Build cross-source review synthesis from compact every-record outputs
+          test -s /tmp/prefixes.txt
+          cp /tmp/prefixes.txt control/exhaustive_every_record_v1/source_assets/AVAILABLE_PREFIXES.txt
+      - name: Build cross-source review synthesis from available every-record outputs
         run: |
           python - <<'PY'
           import csv,json
           from pathlib import Path
           root=Path('control/exhaustive_every_record_v1/source_assets')
-          prefixes=['global_core','australia','usa']
+          prefixes=[x.strip() for x in (root/'AVAILABLE_PREFIXES.txt').read_text().splitlines() if x.strip()]
           summaries=[]
           for p in prefixes:
             summaries.append(json.load(open(root/f'{p}_summary.json',encoding='utf-8')))
 
-          # Named lanes: preserve route/currency; do not mix currencies.
           lanes=[]
           for p in prefixes:
             with open(root/f'{p}_lanes_by_route.csv',encoding='utf-8',newline='') as f:
@@ -53,7 +62,6 @@ jobs:
                 lanes.append(r)
           lanes.sort(key=lambda r:(r['avg_priority_n'],r['records_n']),reverse=True)
 
-          # Open-world clusters: rank by observed priority and materiality. These are hypothesis generators, not final lanes.
           clusters=[]
           for p in prefixes:
             with open(root/f'{p}_open_world_clusters.csv',encoding='utf-8',newline='') as f:
@@ -66,7 +74,6 @@ jobs:
                 clusters.append(r)
           clusters.sort(key=lambda r:(r['avg_priority_n'],min(r['records_n'],100),r['records_n']),reverse=True)
 
-          # Record queues: these are the highest-scored individual records after every source row was scored.
           records=[]
           for p in prefixes:
             with open(root/f'{p}_top_record_review_queue.csv',encoding='utf-8',newline='') as f:
@@ -76,8 +83,6 @@ jobs:
                 except:r['priority_n']=0
                 records.append(r)
           records.sort(key=lambda r:r['priority_n'],reverse=True)
-
-          # Diversity-preserving shortlist: no single exact title/code cluster can swamp review.
           seen=set(); diverse=[]
           for r in records:
             sig=(r.get('source_group'),r.get('country'),r.get('lean_lane'),r.get('broad_family'),r.get('code'),(r.get('title') or '')[:90].casefold())
@@ -87,13 +92,14 @@ jobs:
 
           out={
             'version':'SPM_EXHAUSTIVE_CROSS_SOURCE_REVIEW_V1',
-            'status':'PASS',
+            'status':'PASS' if set(prefixes)=={'global_core','australia','usa'} else 'PARTIAL_SOURCE_PROMOTION',
+            'available_sources':prefixes,
             'source_summaries':summaries,
             'top_named_lanes':lanes[:200],
             'top_open_world_clusters':clusters[:500],
             'diverse_top_records':diverse,
             'notes':[
-              'Every canonical procurement row was scored upstream before these compact queues were created.',
+              'Every canonical procurement row in each available source was scored upstream before these compact queues were created.',
               'Open-world clusters are hypothesis generators and require semantic QA before being promoted to a named business lane.',
               'USA/Australia are award-first evidence and must not be represented as original live notice competition.',
               'No currencies are converted or mixed here.'
@@ -101,17 +107,17 @@ jobs:
           }
           Path('control/exhaustive_every_record_v1/CROSS_SOURCE_REVIEW.json').write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding='utf-8')
 
-          lines=['# Exhaustive historical cross-source review','',
+          lines=['# Exhaustive historical cross-source review','',f"**Status: {out['status']}** — available: {', '.join(prefixes)}",'',
                  'This review is downstream of the every-record scan. It surfaces named lanes, residual/open-world clusters, and a diversity-preserving individual-record queue for semantic QA.','',
                  '## Source accounting','']
           for s in summaries:
             c=s['counts'];d=s['discovery_bucket_counts']
             lines += [f"### {s['label']}",f"- Procurement records: {c['procurement_records']:,}",f"- Awards: {c['award_rows']:,}",f"- Supplier links: {c['award_supplier_links']:,}",f"- Known lane: {d.get('KNOWN_LANE',0):,}; open-world candidate: {d.get('OPEN_WORLD_CANDIDATE',0):,}; residual: {d.get('RESIDUAL',0):,}",'']
           lines += ['## Highest-priority named lane cohorts','', '|Source|Lane|Route|Currency|Records|Median value|Median bidders|Avg priority|','|---|---|---|---|---:|---:|---:|---:|']
-          for r in lanes[:40]:
+          for r in lanes[:60]:
             lines.append(f"|{r['source_group']}|{r.get('lean_lane','')}|{r.get('route_band','')}|{r.get('currency','')}|{r.get('records','')}|{r.get('median_value','')}|{r.get('median_bidders','')}|{r.get('avg_priority','')}|")
           lines += ['','## Open-world clusters requiring semantic QA','', '|Source|Family|Code|Title signature|Records|Median value|Median bidders|Avg priority|','|---|---|---|---|---:|---:|---:|---:|']
-          for r in clusters[:100]:
+          for r in clusters[:150]:
             t=(r.get('title_signature') or '').replace('|','/')[:140]
             lines.append(f"|{r['source_group']}|{r.get('broad_family','')}|{r.get('code','')}|{t}|{r.get('records','')}|{r.get('median_value','')}|{r.get('median_bidders','')}|{r.get('avg_priority','')}|")
           Path('control/exhaustive_every_record_v1/CROSS_SOURCE_REVIEW.md').write_text('\n'.join(lines),encoding='utf-8')
