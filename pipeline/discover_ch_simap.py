@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-import json, os
+import json, os, shutil
 from datetime import datetime, timezone
 from pathlib import Path
 import requests
 
 OUT=Path(os.getenv('DISCOVERY_OUT','discovery/global/CH_SIMAP'));OUT.mkdir(parents=True,exist_ok=True)
 NOW=datetime.now(timezone.utc);MAX_PAGES=max(1,min(30,int(os.getenv('CH_MAX_PAGES','8'))))
-HOSTS=['https://www.simap.ch','https://simap.ch'];PATH='/api/publications/v2/project/project-search'
-S=requests.Session();S.headers.update({'User-Agent':'Tender-Engine/4.5 (+public procurement research)','Accept':'application/json,*/*'})
+HOST='https://www.simap.ch';PATH='/api/publications/v2/project/project-search'
+S=requests.Session();S.headers.update({'User-Agent':'Tender-Engine/4.6 (+public procurement research)','Accept':'application/json,*/*'})
 def clean(v):return ' '.join(str(v or '').split())
 def pdt(v):
     if isinstance(v,dict):v=v.get('dateTime') or v.get('date') or v.get('value')
@@ -29,58 +29,82 @@ def val(o,*names):
     for n in names:
         if n.lower() in low and low[n.lower()] not in (None,''):return low[n.lower()]
     return None
-def main():
-    chosen=None;first=None;tele=[]
-    variants=[
-      {'search':'a'}, {'search':'e'}, {'search':'*'},
-      {'search':'a','lang':'en'}, {'search':'a','orderAddressCountryOnlySwitzerland':'true'},
-      {'search':'a','page':0,'size':100}, {'search':'a','page':0,'pageSize':100},
-    ]
-    for host in HOSTS:
-        for q in variants:
-            try:r=S.get(host+PATH,params=q,timeout=60)
-            except Exception as exc:tele.append({'host':host,'query':q,'error':repr(exc)});continue
-            entry={'host':host,'query':q,'status':r.status_code,'bytes':len(r.content),'content_type':r.headers.get('content-type'),'preview':clean(r.text)[:350]}
-            tele.append(entry)
-            if not r.ok:continue
-            try:data=r.json();entry['json_keys']=list(data.keys()) if isinstance(data,dict) else None
-            except Exception:continue
-            if items(data):chosen=(host,q);first=data;break
-        if first is not None:break
-    if first is None:
-        stats={'source':'CH_SIMAP','raw_materialized':0,'current_materialized':0,'generated_at':NOW.isoformat(),'errors':[{'type':'NO_WORKING_PUBLIC_QUERY','telemetry':tele}],'official_url':HOSTS[0]+PATH}
-        (OUT/'stats.json').write_text(json.dumps(stats,indent=2,ensure_ascii=False),encoding='utf-8');print(json.dumps(stats,indent=2,ensure_ascii=False));raise SystemExit(2)
-    rows=[];host,q0=chosen
-    for page in range(MAX_PAGES):
-        if page==0:data=first
-        else:
-            q=dict(q0);q['page']=page;q.setdefault('size',100)
-            try:r=S.get(host+PATH,params=q,timeout=60);r.raise_for_status();data=r.json();tele.append({'page':page,'status':r.status_code,'bytes':len(r.content)})
-            except Exception:break
-        its=items(data)
-        if not its:break
-        for o in its:
+
+def browser_capture(tele):
+    """Use the official anonymous frontend itself to reveal the exact public API call.
+    This is a fallback, not an access-control bypass: only responses available to an
+    unauthenticated browser session are used.
+    """
+    from playwright.sync_api import sync_playwright
+    captured=[]; dom=[]
+    chrome=shutil.which('google-chrome') or shutil.which('google-chrome-stable') or shutil.which('chromium')
+    with sync_playwright() as pw:
+        kw={'headless':True}
+        if chrome:kw['executable_path']=chrome
+        browser=pw.chromium.launch(**kw);ctx=browser.new_context();page=ctx.new_page()
+        def onresp(resp):
+            if 'project-search' not in resp.url:return
+            try:
+                if resp.ok:
+                    data=resp.json()
+                    if items(data):captured.append((resp.url,data))
+                tele.append({'browser_api_url':resp.url,'browser_api_status':resp.status})
+            except Exception as exc:tele.append({'browser_api_url':resp.url,'browser_api_status':resp.status,'parse_error':repr(exc)})
+        page.on('response',onresp)
+        urls=[
+          HOST+'/en?newestPubTypes=%5B%22call_for_bids%22%5D',
+          HOST+'/fr?newestPubTypes=%5B%22call_for_bids%22%5D&orderAddressCountryOnlySwitzerland=true',
+          HOST+'/en?search=%22service%22&newestPubTypes=%5B%22call_for_bids%22%5D',
+        ]
+        for u in urls:
+            try:
+                page.goto(u,wait_until='domcontentloaded',timeout=70000);page.wait_for_timeout(4500)
+                dom.append({'url':u,'title':page.title(),'body':clean(page.locator('body').inner_text(timeout=10000))[:20000]})
+                if captured:break
+            except Exception as exc:tele.append({'browser_url':u,'error':repr(exc)})
+        browser.close()
+    return captured,dom
+
+def emit_rows(datas,tele):
+    rows=[]
+    for source_url,data in datas:
+        for o in items(data):
             if not isinstance(o,dict):continue
             pid=clean(val(o,'projectId','id','projectNumber'));title=clean(val(o,'title','projectTitle','name','description'))
             if not (pid or title):continue
             pubtype=clean(val(o,'publicationType','pubType','projectType','projectKind','newestPubType'));lpt=pubtype.lower()
             if any(x in lpt for x in ('award','direct_award','advanced_notice')) and 'call' not in lpt:continue
-            deadline=pdt(val(o,'offerDeadline','submissionDeadline','deadline','participationRequestDeadline'));pub=pdt(val(o,'publicationDate','publishedAt','date'))
+            deadline=pdt(val(o,'offerDeadline','submissionDeadline','deadline','participationRequestDeadline'));pub=pdt(val(o,'publicationDate','publishedAt','date','newestPublicationDate'))
             buyer=val(o,'procOfficeName','procurementOfficeName','buyerName','organizationName','procOffice')
             if isinstance(buyer,dict):buyer=val(buyer,'name','displayName','companyName')
             hasdocs=bool(val(o,'hasProjectDocuments','hasDocuments'))
-            public_page=f'{host}/en/project-detail/{pid}' if pid else None
-            header=f'{host}/api/publications/v2/project/{pid}/project-header' if pid else None
-            rows.append({'candidate_id':f'CH-SIMAP:{pid or abs(hash(title))}','source':'CH_SIMAP','portal':'CH_SIMAP','notice_id':pid or None,'title':title or pid,'buyer':clean(buyer) or None,'deadline':deadline.isoformat() if deadline else None,'published':pub.isoformat() if pub else None,'current':not deadline or deadline>=NOW,'notice_url':public_page or header,'description':clean(val(o,'description','shortDescription')),'cpv':val(o,'cpvCode','cpvCodes'),'route':{'document_urls':[],'has_project_documents':hasdocs,'project_id':pid,'detail_url':public_page or header,'header_url':header},'publication_type':pubtype or None,'discovered_at':NOW.isoformat()})
-        if isinstance(data,dict) and data.get('last') is True:break
-        if page>0 and len(its)<5:break
+            public_page=f'{HOST}/en/project-detail/{pid}' if pid else None;header=f'{HOST}/api/publications/v2/project/{pid}/project-header' if pid else None
+            rows.append({'candidate_id':f'CH-SIMAP:{pid or abs(hash(title))}','source':'CH_SIMAP','portal':'CH_SIMAP','notice_id':pid or None,'title':title or pid,'buyer':clean(buyer) or None,'deadline':deadline.isoformat() if deadline else None,'published':pub.isoformat() if pub else None,'current':not deadline or deadline>=NOW,'notice_url':public_page or header,'description':clean(val(o,'description','shortDescription')),'cpv':val(o,'cpvCode','cpvCodes'),'route':{'document_urls':[],'has_project_documents':hasdocs,'project_id':pid,'detail_url':public_page or header,'header_url':header},'publication_type':pubtype or None,'api_source_url':source_url,'discovered_at':NOW.isoformat()})
+    return rows
+
+def main():
+    tele=[];datas=[]
+    # Cheap direct probes first; exact frontend network call is fallback.
+    for q in ({'newestPubTypes':'call_for_bids'},{'newestPubTypes':'["call_for_bids"]'},{'search':'service','newestPubTypes':'call_for_bids'}):
+        r=S.get(HOST+PATH,params=q,timeout=45);tele.append({'query':q,'status':r.status_code,'bytes':len(r.content),'preview':clean(r.text)[:220] if not r.ok else None})
+        if r.ok:
+            try:data=r.json()
+            except Exception:data=None
+            if data and items(data):datas.append((r.url,data));break
+    dom=[]
+    if not datas:
+        captured,dom=browser_capture(tele);datas.extend(captured)
+    rows=emit_rows(datas,tele)
+    # Last-resort DOM evidence is retained for adapter development; it is never promoted as structured notices without IDs.
+    (OUT/'frontend_capture.json').write_text(json.dumps({'telemetry':tele,'dom':dom,'captured_urls':[u for u,_ in datas]},indent=2,ensure_ascii=False),encoding='utf-8')
     seen={}
     for x in rows:seen[x['candidate_id']]=x
     rows=list(seen.values());cur=[x for x in rows if x['current']]
     for fn,data in (('raw.jsonl',rows),('current.jsonl',cur)):
         with (OUT/fn).open('w',encoding='utf-8') as f:
             for x in data:f.write(json.dumps(x,ensure_ascii=False)+'\n')
-    stats={'source':'CH_SIMAP','raw_materialized':len(rows),'current_materialized':len(cur),'generated_at':NOW.isoformat(),'errors':[],'official_url':host+PATH,'chosen_query':q0,'telemetry':tele}
+    errs=[] if rows else [{'type':'PUBLIC_FRONTEND_API_UNRESOLVED','captured_urls':[u for u,_ in datas]}]
+    stats={'source':'CH_SIMAP','raw_materialized':len(rows),'current_materialized':len(cur),'generated_at':NOW.isoformat(),'errors':errs,'official_url':HOST+PATH,'captured_api_urls':[u for u,_ in datas],'telemetry':tele,'archive':'https://archiv.simap.ch/'}
     (OUT/'stats.json').write_text(json.dumps(stats,indent=2,ensure_ascii=False),encoding='utf-8');print(json.dumps(stats,indent=2,ensure_ascii=False))
     if not rows:raise SystemExit(2)
 if __name__=='__main__':main()
