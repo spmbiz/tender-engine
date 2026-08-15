@@ -2,6 +2,15 @@ name: SuperGreen Discovery V2
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'delta = frequent short-window harvest; reconcile = deep completeness window'
+        required: false
+        default: delta
+        type: choice
+        options: [delta, reconcile]
+  schedule:
+    - cron: '17 2 * * *'
   push:
     branches: [main]
     paths:
@@ -14,16 +23,30 @@ jobs:
   init-release:
     runs-on: ubuntu-latest
     timeout-minutes: 3
-    outputs: {release_tag: '${{ steps.release.outputs.tag }}'}
+    outputs:
+      release_tag: ${{ steps.release.outputs.tag }}
+      mode: ${{ steps.release.outputs.mode }}
     steps:
       - id: release
-        env: {GH_TOKEN: '${{ github.token }}'}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_MODE: ${{ github.event.inputs.mode }}
         shell: bash
         run: |
           set -euo pipefail
+          if [ '${{ github.event_name }}' = 'schedule' ]; then
+            mode='reconcile'
+          elif [ "${INPUT_MODE:-}" = 'reconcile' ]; then
+            mode='reconcile'
+          else
+            mode='delta'
+          fi
           tag="discovery-harvest-${GITHUB_RUN_ID}"
-          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Discovery Harvest ${GITHUB_RUN_ID}" --notes "Canonical durable discovery harvest. Source datasets and consolidated wide-read outputs are persisted as Release assets; Actions artifacts are not canonical. Coverage status is measured explicitly and PARTIAL_WORLD_COVERAGE must never be represented as exhaustive worldwide coverage."
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "Discovery Harvest ${GITHUB_RUN_ID} [$mode]" \
+            --notes "Canonical durable discovery harvest. mode=$mode. DELTA uses bounded recent windows for hourly freshness; RECONCILE runs daily with deep windows to catch late/index-shifted publications. Coverage status is measured explicitly and PARTIAL_WORLD_COVERAGE must never be represented as exhaustive worldwide coverage."
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
 
   ted-discovery:
     needs: init-release
@@ -34,9 +57,19 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests
-      - name: Enumerate complete recent TED competition window without keyword prefilter
-        env: {TED_SCOPE: ACTIVE, TED_MAX_PAGES: '80', TED_LOOKBACK_DAYS: '10', TED_REQUEST_RETRIES: '7', TED_PAGE_DELAY_SECONDS: '0.25'}
-        run: python pipeline/discover_ted.py
+      - name: Enumerate TED with delta/reconcile safety window
+        env:
+          DISCOVERY_MODE: ${{ needs.init-release.outputs.mode }}
+          TED_SCOPE: ACTIVE
+          TED_MAX_PAGES: '80'
+          TED_REQUEST_RETRIES: '7'
+          TED_PAGE_DELAY_SECONDS: '0.25'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$DISCOVERY_MODE" = reconcile ]; then export TED_LOOKBACK_DAYS=10; else export TED_LOOKBACK_DAYS=3; fi
+          echo "TED mode=$DISCOVERY_MODE lookback=$TED_LOOKBACK_DAYS days"
+          python pipeline/discover_ted.py
       - name: Persist TED discovery durably BEFORE completeness validation
         env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
         shell: bash
@@ -66,9 +99,19 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests
-      - name: Enumerate recent Contracts Finder window only
-        env: {DISCOVERY_OUT: 'discovery/contracts_finder/shard-${{ matrix.shard }}', CF_WINDOW_INDEX: '${{ matrix.shard }}', CF_WINDOW_TOTAL: '8', LOOKBACK_DAYS: '30', CF_REQUEST_RETRIES: '4', CF_403_COOLDOWN_SECONDS: '300'}
-        run: python pipeline/discover_contracts_finder.py
+      - name: Enumerate Contracts Finder with delta/reconcile window
+        env:
+          DISCOVERY_MODE: ${{ needs.init-release.outputs.mode }}
+          DISCOVERY_OUT: discovery/contracts_finder/shard-${{ matrix.shard }}
+          CF_WINDOW_INDEX: ${{ matrix.shard }}
+          CF_WINDOW_TOTAL: '8'
+          CF_REQUEST_RETRIES: '4'
+          CF_403_COOLDOWN_SECONDS: '300'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$DISCOVERY_MODE" = reconcile ]; then export LOOKBACK_DAYS=30; else export LOOKBACK_DAYS=5; fi
+          python pipeline/discover_contracts_finder.py
       - name: Persist Contracts Finder shard durably
         env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
         run: |
@@ -77,6 +120,7 @@ jobs:
   etenders-ireland:
     needs: init-release
     name: ie-pages-${{ matrix.start }}-${{ matrix.end }}
+    if: needs.init-release.outputs.mode == 'reconcile' || matrix.start <= 20
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
@@ -127,11 +171,15 @@ jobs:
       - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4 playwright
       - name: Syntax gate
         run: python -m py_compile pipeline/discover_*.py pipeline/dce_worker_v5.py
-      - name: Harvest official national source
-        env: {GLOBAL_SOURCE: '${{ matrix.source }}', DISCOVERY_OUT: 'discovery/global/${{ matrix.source }}', LOOKBACK_DAYS: '14'}
+      - name: Harvest official national source with delta/reconcile window
+        env:
+          DISCOVERY_MODE: ${{ needs.init-release.outputs.mode }}
+          GLOBAL_SOURCE: ${{ matrix.source }}
+          DISCOVERY_OUT: discovery/global/${{ matrix.source }}
         shell: bash
         run: |
           set +e
+          if [ "$DISCOVERY_MODE" = reconcile ]; then export LOOKBACK_DAYS=14; else export LOOKBACK_DAYS=3; fi
           case '${{ matrix.source }}' in
             QC_SEAO) python pipeline/discover_qc_seao_latest.py ;;
             DE_DOE) python pipeline/discover_de_doe_csv.py ;;
@@ -155,7 +203,6 @@ jobs:
           mkdir -p "discovery/global/${{ matrix.source }}"
           echo "$rc" > "discovery/global/${{ matrix.source }}/adapter_exit_code.txt"
           test -f "discovery/global/${{ matrix.source }}/stats.json" || exit "$rc"
-          # Preserve degraded source evidence; coverage_guard will label the pack DEGRADED from stats.json.
           exit 0
       - name: Persist official source durably
         env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
@@ -183,9 +230,18 @@ jobs:
         run: python pipeline/merge_discovery.py --root discovery-download --out merged
       - name: Build mandatory GPT wide-read packets
         run: python pipeline/wide_read_packets.py --input merged/current_candidates.jsonl --out wide_read_packets --packet-size 250
+      - name: Stamp discovery mode into canonical harvest
+        env: {DISCOVERY_MODE: '${{ needs.init-release.outputs.mode }}'}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          p='merged/stats.json';x=json.load(open(p));x['discovery_mode']=os.environ['DISCOVERY_MODE'];open(p,'w').write(json.dumps(x,indent=2))
+          PY
       - name: Publish coverage truth to job summary
         shell: bash
         run: |
+          echo "### Discovery mode: ${{ needs.init-release.outputs.mode }}" >> "$GITHUB_STEP_SUMMARY"
           echo '### Source coverage' >> "$GITHUB_STEP_SUMMARY"
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
           cat merged/source_coverage.json >> "$GITHUB_STEP_SUMMARY"
