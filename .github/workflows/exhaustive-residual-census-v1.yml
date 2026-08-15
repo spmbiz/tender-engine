@@ -1,0 +1,106 @@
+name: SPM Exhaustive Residual Census v1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/exhaustive-residual-census-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Download canonical Global Core v4
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern historical_tenders.parquet --dir source --clobber
+      - name: Census every residual row by source and procurement code
+        run: |
+          python - <<'PY'
+          import csv,json
+          from pathlib import Path
+          import duckdb
+          p='source/historical_tenders.parquet';con=duckdb.connect();con.execute('set threads=4')
+          n=con.execute('select count(*) from read_parquet(?)',[p]).fetchone()[0];assert n==2250547
+          # All rows first: count the native taxonomy and explicit residual universe.
+          totals=con.execute('''select
+            count(*) n,
+            count(*) filter(where coalesce(Category,'Other')='Other') native_other,
+            count(*) filter(where coalesce(Subcategory,'UNKNOWN')='UNKNOWN') native_unknown_subcategory,
+            count(*) filter(where try_cast(Lean_Fit as double)>=70) native_lean70,
+            count(*) filter(where try_cast(Automation_Potential as double)>=70) native_auto70
+            from read_parquet(?)''',[p]).fetchone()
+
+          # EVERY residual record contributes to this grouping; output is code-level, not sampled rows.
+          con.execute('''copy (
+            select Warehouse_Source,Country,
+              coalesce(nullif(trim(cast(CPV_NAICS_or_Local_Code as varchar)),''),'NO_CODE') code,
+              coalesce(nullif(trim(cast(Raw_CPV_Description as varchar)),''),'NO_DESCRIPTION') description,
+              coalesce(nullif(trim(cast(Category as varchar)),''),'UNKNOWN') category,
+              coalesce(nullif(trim(cast(Subcategory as varchar)),''),'UNKNOWN') subcategory,
+              coalesce(nullif(trim(cast(Lean_Fit as varchar)),''),'UNKNOWN') lean_fit,
+              coalesce(nullif(trim(cast(Automation_Potential as varchar)),''),'UNKNOWN') automation_potential,
+              count(*) records,count(distinct Buyer_Name) buyers,
+              min(Publication_Date) first_date,max(Publication_Date) last_date,
+              median(try_cast(Official_Estimated_Value as double)) filter(where try_cast(Official_Estimated_Value as double)>=0) median_estimated_value,
+              median(try_cast(Official_Bidder_Count as double)) filter(where try_cast(Official_Bidder_Count as double)>=0) median_bidders,
+              count(*) filter(where try_cast(Official_Bidder_Count as double)=1) one_bidder_rows
+            from read_parquet(?)
+            where coalesce(Category,'Other')='Other' or coalesce(Subcategory,'UNKNOWN')='UNKNOWN'
+            group by 1,2,3,4,5,6,7,8
+            order by records desc
+          ) to 'out/full_residual_code_census.csv' (header,delimiter ',')''',[p])
+
+          # Build compact report from the full census (no source rows omitted from aggregation).
+          rows=[]
+          with open('out/full_residual_code_census.csv',encoding='utf-8',newline='') as f:
+            for r in csv.DictReader(f):
+              try:nr=int(r['records']);buyers=int(r['buyers'])
+              except:continue
+              desc=(r['description'] or '').casefold();code=(r['code'] or '').casefold()
+              broker_terms=['software','license','licence','subscription','computer','hardware','office','furniture','printing','print','signage','promotional','uniform','clothing','ppe','temporary personnel','recruitment','training','consultancy','consulting','audit','research','marketing','advertising','translation','digitization','digitisation','scanning','data processing','document','courier','mail','event','conference','hosting','website','web site','cloud']
+              physical_bad=['construction work','civil engineering','road works','building work','medical services','surgery','hospital services','cleaning services','transport services','waste services','sewage','grounds maintenance']
+              score=sum(1 for t in broker_terms if t in desc)*15 - sum(1 for t in physical_bad if t in desc)*20
+              try:lf=float(r['lean_fit']) if r['lean_fit']!='UNKNOWN' else 0
+              except:lf=0
+              try:ap=float(r['automation_potential']) if r['automation_potential']!='UNKNOWN' else 0
+              except:ap=0
+              r['_candidate_score']=score+0.35*max(lf,ap)+min(20,nr/50)+min(10,buyers/50)
+              r['_records_n']=nr;rows.append(r)
+          by_volume=sorted(rows,key=lambda r:r['_records_n'],reverse=True)[:3000]
+          by_candidate=sorted(rows,key=lambda r:(r['_candidate_score'],min(r['_records_n'],1000),r['_records_n']),reverse=True)[:3000]
+          def write(name,rr):
+            fields=['Warehouse_Source','Country','code','description','category','subcategory','lean_fit','automation_potential','records','buyers','first_date','last_date','median_estimated_value','median_bidders','one_bidder_rows']
+            with open(name,'w',encoding='utf-8',newline='') as f:
+              w=csv.DictWriter(f,fieldnames=fields);w.writeheader();
+              for r in rr:w.writerow({k:r.get(k,'') for k in fields})
+          write('out/top_residual_by_volume.csv',by_volume);write('out/top_residual_candidate_codes.csv',by_candidate)
+          summary={'version':'EXHAUSTIVE_RESIDUAL_CENSUS_V1','rows_scanned':n,'native_other_rows':totals[1],'native_unknown_subcategory_rows':totals[2],'native_lean70_rows':totals[3],'native_automation70_rows':totals[4],'residual_code_groups':len(rows),'status':'PASS','note':'Every Global Core row was included in the census predicates/aggregation. Candidate score is only triage; descriptions must be semantically QAed before promotion.'}
+          Path('out/summary.json').write_text(json.dumps(summary,indent=2),encoding='utf-8')
+          lines=['# Exhaustive residual procurement census','',f"Rows scanned: **{n:,}**",f"Native Category=Other: **{totals[1]:,}**",f"Native Subcategory=UNKNOWN: **{totals[2]:,}**",f"Native Lean_Fit>=70: **{totals[3]:,}**",f"Native Automation_Potential>=70: **{totals[4]:,}**",f"Residual code groups: **{len(rows):,}**",'', 'The entire residual universe contributes to the code census. Candidate ranking is triage only; no code/description is promoted without semantic QA.','']
+          Path('out/REPORT.md').write_text('\n'.join(lines),encoding='utf-8')
+          PY
+      - name: Persist compact census (omit huge full CSV from git)
+        run: |
+          mkdir -p control/exhaustive_every_record_v1/residual_census
+          cp out/summary.json out/REPORT.md out/top_residual_by_volume.csv out/top_residual_candidate_codes.csv control/exhaustive_every_record_v1/residual_census/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/exhaustive_every_record_v1/residual_census/
+          git commit -m 'tenders: persist exhaustive residual code census' || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
