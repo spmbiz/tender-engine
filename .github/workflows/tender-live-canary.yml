@@ -1,0 +1,83 @@
+name: Tender Live Canary
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/tender-live-canary.yml'
+      - 'control/live_canary_trigger.txt'
+
+permissions:
+  contents: read
+
+jobs:
+  live-canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install resolver dependencies
+        run: python -m pip install --disable-pip-version-check -q requests pypdf python-docx openpyxl python-pptx playwright
+      - name: Reuse runner Chrome
+        shell: bash
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
+      - name: Ensure archive extractor
+        run: command -v 7z >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq p7zip-full)
+      - name: Build two real canary candidates
+        shell: bash
+        run: |
+          mkdir -p canary
+          cat > canary/queue.jsonl <<'JSONL'
+          {"candidate_id":"CANARY:WMO:308742","portal":"UNGM","notice_id":"308742","notice_url":"https://www.ungm.org/Public/Notice/308742","title":"Provision of Website Hosting, Maintenance, Security and Development Services for wmo.int"}
+          {"candidate_id":"CANARY:COGG:8763200","portal":"IRELAND_ETENDERS","resource_id":"8763200","notice_url":"https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8763200","deadline":"2026-08-24T17:30:00+01:00","title":"AN TOBAR – Invitation to Tender for Creation of an Educational Website"}
+          JSONL
+      - name: Resolve real portal documents
+        env:
+          DCE_ITEM_RETRIES: '1'
+          DCE_ITEM_TIMEOUT_SECONDS: '150'
+        run: python pipeline/dce_batch_worker.py --queue canary/queue.jsonl --lines 1,2 --out canary/out --concurrency 2
+      - name: Extract and classify real retrieved material
+        run: |
+          python pipeline/extract_corpus.py --root canary/out
+          python pipeline/dce_evidence_quality.py --root canary/out
+          python pipeline/extract_gates.py --root canary/out --workers 2
+          python pipeline/authority_conflicts.py --root canary/out
+      - name: Assert WMO access guide can never become gate-ready
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path('canary/out/CANARY-WMO-308742/evidence_quality.json')
+          if not p.exists():
+              raise SystemExit('WMO evidence_quality.json missing')
+          x=json.loads(p.read_text())
+          print('WMO',json.dumps(x,indent=2,ensure_ascii=False))
+          assert x.get('gate_readiness') is False, x
+          assert x.get('content_quality') in {'ACCESS_GUIDE_ONLY','PORTAL_GENERIC_ONLY','UNKNOWN_RETRIEVED_DOCUMENT','NOT_APPLICABLE'}, x
+          PY
+      - name: Report COGG canary without hiding portal degradation
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          root=pathlib.Path('canary/out/CANARY-COGG-8763200')
+          m=json.loads((root/'manifest.json').read_text()) if (root/'manifest.json').exists() else {}
+          q=json.loads((root/'evidence_quality.json').read_text()) if (root/'evidence_quality.json').exists() else {}
+          print(json.dumps({'COGG_manifest_status':m.get('status'),'COGG_evidence_quality':q.get('content_quality'),'COGG_gate_readiness':q.get('gate_readiness')},indent=2))
+          if m.get('status')=='DOWNLOADED_PUBLIC':
+              assert q.get('gate_readiness') is True, q
+          PY
+      - name: Upload canary evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: tender-live-canary-${{ github.run_id }}
+          path: canary/out/
+          retention-days: 2
+          compression-level: 9
+          if-no-files-found: error
