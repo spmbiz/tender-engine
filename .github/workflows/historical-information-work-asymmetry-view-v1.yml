@@ -1,0 +1,44 @@
+name: Historical Information Work Asymmetry View v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - historical_lab/information_work_asymmetry_view_v1.py
+      - .github/workflows/historical-information-work-asymmetry-view-v1.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Download information-work v2 assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input out
+          gh release download historical-information-work-v2 --repo "$GITHUB_REPOSITORY" --pattern market_matrix.csv --dir input --clobber
+          gh release download historical-information-work-v2 --repo "$GITHUB_REPOSITORY" --pattern examples.csv --dir input --clobber
+      - name: Build SPM asymmetry view
+        run: python historical_lab/information_work_asymmetry_view_v1.py --matrix input/market_matrix.csv --examples input/examples.csv --out out
+      - name: Persist view
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-information-work-asymmetry-v1
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target main --title 'Historical Information Work Asymmetry v1' --notes 'SPM-specific historical routing view separating title-led digital evidence from scope-only, physical, onsite and legal work.'
+          for f in summary.json REPORT.md family_asymmetry.csv; do gh release upload "$TAG" "out/$f" --repo "$GITHUB_REPOSITORY" --clobber; done
+          mkdir -p control/historical_information_work_asymmetry_v1
+          cp out/summary.json out/REPORT.md control/historical_information_work_asymmetry_v1/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_information_work_asymmetry_v1/
+          git commit -m 'historical: persist information-work asymmetry view v1' || exit 0
+          for i in 1 2 3 4 5; do git fetch origin main; if git rebase origin/main && git push origin HEAD:main; then exit 0; fi; git rebase --abort >/dev/null 2>&1 || true; sleep $((i*3)); done
+          exit 1
