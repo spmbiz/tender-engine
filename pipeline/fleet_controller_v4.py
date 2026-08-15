@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from datetime import timedelta
 
 import fleet_controller as fc
@@ -14,6 +15,47 @@ def _dedupe(values):
     return list(dict.fromkeys(str(x) for x in values if str(x).strip()))
 
 
+def _slugify(value: str) -> str:
+    s = re.sub(r"[^A-Za-z0-9._-]+", "-", value or "candidate").strip("-")
+    return (s or "candidate")[:120]
+
+
+def _executed_candidate_ids(dce_run_id: str, leased_candidate_ids: list[str]) -> list[str] | None:
+    """Resolve the exact candidates that produced durable candidate packs.
+
+    A successful workflow badge is not enough: matrix compilation can legitimately
+    skip rows. The canonical candidate-*.tar.gz Release assets are the durable proof
+    that a candidate worker actually executed. Return None only when GitHub evidence
+    could not be read, never when the executed set is genuinely empty.
+    """
+    try:
+        rel = fc.get_release(f"dce-harvest-{dce_run_id}")
+        if not rel:
+            return None
+        asset_names: set[str] = set()
+        page = 1
+        while page <= 20:
+            rows = fc.api(
+                f"/repos/{fc.REPO}/releases/{rel['id']}/assets?per_page=100&page={page}"
+            ).json()
+            if not isinstance(rows, list):
+                return None
+            if not rows:
+                break
+            asset_names.update(str(x.get("name") or "") for x in rows if isinstance(x, dict))
+            if len(rows) < 100:
+                break
+            page += 1
+        executed_slugs = {
+            name[len("candidate-") : -len(".tar.gz")]
+            for name in asset_names
+            if name.startswith("candidate-") and name.endswith(".tar.gz")
+        }
+        return [cid for cid in leased_candidate_ids if _slugify(cid) in executed_slugs]
+    except Exception:
+        return None
+
+
 def _migrate_state(state: dict, actions: list[dict]):
     version = int(state.get("schema_version") or 0)
     state.setdefault("deferred_discovery_runs", [])
@@ -21,9 +63,6 @@ def _migrate_state(state: dict, actions: list[dict]):
     if version >= STATE_SCHEMA_VERSION:
         return
 
-    # v1/v2 treated dispatched rows as completed. Preserve the old safety migration
-    # only for those schemas. v3 -> v4 MUST preserve durable processed IDs and any
-    # live DCE lease.
     if version < 3:
         legacy = list(state.get("processed_candidate_ids", []))
         if legacy:
@@ -56,8 +95,6 @@ def _pick_discovery(state: dict):
     latest = fc.latest_usable_discovery()
     latest_id = str((latest or {}).get("id") or "").strip()
 
-    # Freshness preemption: a newer usable release wins immediately. The previous
-    # active harvest is deferred, never discarded, and resumes after the fresh one drains.
     if latest_id and latest_id not in completed and latest_id != active_id:
         if active_id and active_id not in completed and v3._usable_discovery(active_id):
             deferred.append(active_id)
@@ -73,7 +110,6 @@ def _pick_discovery(state: dict):
             return active
         state["active_discovery_run_id"] = None
 
-    # Resume deferred backlog newest-first once the freshest harvest is drained.
     for rid in reversed(deferred):
         if rid in completed:
             continue
@@ -106,8 +142,6 @@ def _dispatch_postprocessing(dce_run_id: str, actions: list[dict], state: dict):
             fc.dispatch(workflow, inputs)
             results.append({"workflow": workflow, "status": "DISPATCHED"})
         except Exception as exc:
-            # Never lose a successfully retrieved DCE batch because a downstream
-            # review transport could not start. The next controller tick can retry.
             results.append({"workflow": workflow, "status": "ERROR_RETRYABLE", "error": str(exc)[:500]})
 
     if results and all(x["status"] == "DISPATCHED" for x in results):
@@ -116,12 +150,13 @@ def _dispatch_postprocessing(dce_run_id: str, actions: list[dict], state: dict):
 
 
 def _reconcile_pending(state: dict, actions: list[dict]) -> bool:
-    """Commit a successful lease, then immediately close the DCE -> review loop."""
+    """Commit only durable executed candidates, then close DCE -> review loop."""
     pending = state.get("pending_dce_batch")
     if not isinstance(pending, dict) or not pending.get("candidate_ids"):
         state["pending_dce_batch"] = None
         return False
 
+    leased_ids = [str(x) for x in pending.get("candidate_ids", [])]
     run = v3._match_pending_run(pending)
     if run:
         status = str(run.get("status") or "")
@@ -132,17 +167,45 @@ def _reconcile_pending(state: dict, actions: list[dict]) -> bool:
             return True
 
         if status == "completed" and conclusion == "success":
-            merged = list(state.get("processed_candidate_ids", [])) + list(pending.get("candidate_ids", []))
-            state["processed_candidate_ids"] = _dedupe(merged)[-v3.MAX_REMEMBERED_CANDIDATES:]
             run_id = str(run.get("id") or "")
+            executed_ids = _executed_candidate_ids(run_id, leased_ids) if run_id else None
+            if executed_ids is None:
+                tries = int(pending.get("durability_verification_attempts") or 0) + 1
+                pending["durability_verification_attempts"] = tries
+                pending["workflow_run_id"] = run.get("id")
+                if tries < 4:
+                    state["pending_dce_batch"] = pending
+                    actions.append({
+                        "type": "dce_commit_waiting_for_durable_execution_evidence",
+                        "workflow_run_id": run.get("id"),
+                        "leased_candidates": len(leased_ids),
+                        "verification_attempt": tries,
+                    })
+                    return True
+                actions.append({
+                    "type": "dce_batch_returned_to_queue_unverified_execution",
+                    "workflow_run_id": run.get("id"),
+                    "source_run": pending.get("source_run"),
+                    "candidates": len(leased_ids),
+                })
+                state["pending_dce_batch"] = None
+                return False
+
+            merged = list(state.get("processed_candidate_ids", [])) + executed_ids
+            state["processed_candidate_ids"] = _dedupe(merged)[-v3.MAX_REMEMBERED_CANDIDATES:]
+            executed_set = set(executed_ids)
+            returned = [cid for cid in leased_ids if cid not in executed_set]
             actions.append({
                 "type": "dce_batch_committed",
                 "workflow_run_id": run.get("id"),
                 "source_run": pending.get("source_run"),
-                "candidates": len(pending.get("candidate_ids", [])),
+                "leased_candidates": len(leased_ids),
+                "executed_candidates": len(executed_ids),
+                "returned_to_queue": len(returned),
+                "execution_coverage": round(len(executed_ids) / max(1, len(leased_ids)), 6),
             })
             state["pending_dce_batch"] = None
-            if run_id:
+            if run_id and executed_ids:
                 _dispatch_postprocessing(run_id, actions, state)
             return False
 
@@ -151,7 +214,7 @@ def _reconcile_pending(state: dict, actions: list[dict]) -> bool:
             "workflow_run_id": run.get("id"),
             "conclusion": conclusion or "unknown",
             "source_run": pending.get("source_run"),
-            "candidates": len(pending.get("candidate_ids", [])),
+            "candidates": len(leased_ids),
         })
         state["pending_dce_batch"] = None
         return False
@@ -161,7 +224,7 @@ def _reconcile_pending(state: dict, actions: list[dict]) -> bool:
         actions.append({
             "type": "dce_lease_expired_returned_to_queue",
             "source_run": pending.get("source_run"),
-            "candidates": len(pending.get("candidate_ids", [])),
+            "candidates": len(leased_ids),
         })
         state["pending_dce_batch"] = None
         return False
