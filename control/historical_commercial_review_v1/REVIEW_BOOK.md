@@ -254,8 +254,8 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
 - Route `OPEN_PUBLIC` · currency `EUR` · p25 **922463.75** · median **1214285.0** · p75 **1214285.0**
 - Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `MULTI_BUYER_MARKET`
 - Historical examples:
-  - Stadt Waiblingen -GB Hochbau und Gebäudemanagement- — Kita Ringstraße — value 1214285.0
   - Stadt Waiblingen -FB Hochbau und Gebäudemanagement- — Kita Ringstraße — value 1214285.0
+  - Stadt Waiblingen -GB Hochbau und Gebäudemanagement- — Kita Ringstraße — value 1214285.0
   - Stadt Waiblingen -FB Hochbau und Gebäudemanagement- — Kita Ringstraße — value 1214285.0
 
 ### 29. ESP · `33652100` · suministro sucesivo del medicamento axicabtagen ciloleucel other
@@ -375,16 +375,7 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - Servicio Andaluz de Salud. Hospital Universitario de Jaén. — Acuerdo Marco Suministro (CONTR 2023 0001044970) — value 43810734.91
   - Servicio Andaluz de Salud. Hospital Universitario de Jaén. — Acuerdo Marco Suministro (CONTR 2023 0001153871) — value 40946628.95
 
-### 42. CZE · `45000000` · výstavba dobíjecích stanic other
-- Structure: **99.16** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `CZK` · p25 **500000000.0** · median **500000000.0** · p75 **675000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - ORLEN Unipetrol RPA s.r.o. — Výstavba dobíjecích stanic — value 850000000.0
-  - ČEZ, a. s. — Výstavba dobíjecích stanic — value 500000000.0
-  - ČEZ, a. s. — Výstavba dobíjecích stanic — value 500000000.0
-
-### 43. United Kingdom · `NO_CODE` · competitive land design and build framework for nihe belfast north and south regions the project is for the delivery of social housing units in nihe belfast north and south regions
+### 42. United Kingdom · `NO_CODE` · competitive land design and build framework for nihe belfast north and south regions the project is for the delivery of social housing units in nihe belfast north and south regions
 - Structure: **99.16** · records **3** · buyers **2** · repeat buyers **1**
 - Route `OPEN_PUBLIC` · currency `GBP` · p25 **20000000.0** · median **20000000.0** · p75 **20000000.0**
 - Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
@@ -392,6 +383,15 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - Arbour Housing Ltd — Provision of Competitive Land, Design and Build Framework for NIHE Belfast, North and South Regions — value 20000000.0
   - Arbour Housing Ltd — Provision of Competitive Land, Design and Build Framework for NIHE Belfast, North and South Regions — value 20000000.0
   - Arbour Housing — Provision of Competitive Land, Design and Build Framework for NIHE Belfast, North and South Regions — value UNKNOWN
+
+### 43. CZE · `45000000` · výstavba dobíjecích stanic other
+- Structure: **99.16** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `CZK` · p25 **500000000.0** · median **500000000.0** · p75 **675000000.0**
+- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+- Historical examples:
+  - ORLEN Unipetrol RPA s.r.o. — Výstavba dobíjecích stanic — value 850000000.0
+  - ČEZ, a. s. — Výstavba dobíjecích stanic — value 500000000.0
+  - ČEZ, a. s. — Výstavba dobíjecích stanic — value 500000000.0
 
 ### 44. ESP · `85100000` · contrato de servicios contr <n> <n> other
 - Structure: **99.14** · records **7** · buyers **5** · repeat buyers **2**
@@ -525,8 +525,8 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
 - Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
 - Historical examples:
   - Junta de Gobierno de la Diputación Provincial de Jaén — Servicio para la realización de operaciones de conservación en la Red Viaria Provincial años 2026-2028 — value 22214876.03
-  - Presidencia de la Diputación Provincial de Jaén — Servicio para la realización de operaciones de conservación en la Red Viaria Provincial años 2026-2028 — value 22214876.03
   - Junta de Gobierno de la Diputación Provincial de Jaén — Servicio para la realización de operaciones de conservación en la Red Viaria Provincial años 2026-2028 — value 22214876.03
+  - Presidencia de la Diputación Provincial de Jaén — Servicio para la realización de operaciones de conservación en la Red Viaria Provincial años 2026-2028 — value 22214876.03
 
 ### 59. ESP · `33100000` · acuerdo marco suministro contr <n> <n> other
 - Structure: **98.93** · records **4** · buyers **2** · repeat buyers **1**
@@ -780,16 +780,7 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - Prefettura di Pescara — Gara europea a procedura aperta per la conclusione di un accordo quadro per l’affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità ricettiva massima di 50 posti. Periodo 2025-2028 — value 55092462.5
   - PREFETTURA - UFFICIO TERRITORIALE DEL GOVERNO DI PISA — gara europea a procedura aperta per la conclusione di un accordo quadro per l'affidamento dei servizi di gestione di centri collettivi di accoglienza con capacità ricettiva massima da 101 a 300 posti - triennio 2024-2027 — value 26986275.0
 
-### 87. CZE · `15000000` · dynamický nákupní systém na dodávky potravin a nápoj other
-- Structure: **98.62** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `CZK` · p25 **192900000.0** · median **231000000.0** · p75 **231000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - Fakultní nemocnice Brno — Dynamický nákupní systém na dodávky potravin a nápojů — value 231000000.0
-  - Fakultní nemocnice Brno — Dynamický nákupní systém na dodávky potravin a nápojů — value 231000000.0
-  - Fakultní nemocnice Královské Vinohrady — Dynamický nákupní systém na dodávky potravin a nápojů — value 154800000.0
-
-### 88. AUT · `48000000` · security software <n> automation software
+### 87. AUT · `48000000` · security software <n> automation software
 - Structure: **98.62** · records **3** · buyers **2** · repeat buyers **1**
 - Route `UNKNOWN` · currency `EUR` · p25 **63000000.0** · median **66000000.0** · p75 **115500000.0**
 - Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
@@ -798,16 +789,16 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - Auftraggeber sind die Republik Österreich (Bund), die Bundesbeschaffung GmbH sowie alle weiteren Auftraggeber gemäß der den Ausschreibungsunterlagen beiliegenden Kundenliste, im Vergabeverfahren alle vertreten durch die Bundesbeschaffung GmbH. — Security Software 2026 — value 66000000.0
   - Auftraggeber sind die Republik Österreich (Bund), die Bundesbeschaffung GmbH sowie alle weiteren Auftraggeber gemäß der den Ausschreibungsunterlagen beiliegenden Kundenliste. — Security Software 2024 — value 60000000.0
 
-### 89. ITA · `34114200` · fornitura in acquisto di veicoli per le forze di sicurezza id <n> other
-- Structure: **98.6** · records **4** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **514252500.0** · median **517711800.0** · p75 **517711800.0**
+### 88. CZE · `15000000` · dynamický nákupní systém na dodávky potravin a nápoj other
+- Structure: **98.62** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `CZK` · p25 **192900000.0** · median **231000000.0** · p75 **231000000.0**
 - Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
 - Historical examples:
-  - CONSIP SPA — Fornitura in acquisto di veicoli per le Forze di Sicurezza – (ID 2876) — value 517711800.0
-  - CONSIP SPA — Fornitura in acquisto di veicoli per le Forze di Sicurezza – (ID 2876) — value 517711800.0
-  - CONSIP SPA — Fornitura in acquisto di veicoli per le Forze di Sicurezza – (ID 2876) — value 517711800.0
+  - Fakultní nemocnice Brno — Dynamický nákupní systém na dodávky potravin a nápojů — value 231000000.0
+  - Fakultní nemocnice Brno — Dynamický nákupní systém na dodávky potravin a nápojů — value 231000000.0
+  - Fakultní nemocnice Královské Vinohrady — Dynamický nákupní systém na dodávky potravin a nápojů — value 154800000.0
 
-### 90. ESP · `33600000` · acuerdo marco de suministro contr <n> <n> other
+### 89. ESP · `33600000` · acuerdo marco de suministro contr <n> <n> other
 - Structure: **98.6** · records **4** · buyers **3** · repeat buyers **1**
 - Route `UNKNOWN` · currency `EUR` · p25 **9654953.704999998** · median **13368335.2** · p75 **15273601.04**
 - Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
@@ -815,6 +806,15 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO REINA SOFÍA — Acuerdo Marco de suministro (CONTR 2023 0000714922) — value 19202709.8
   - SERVICIO ANDALUZ DE SALUD. ÁREA HOSPITALARIA VIRGEN DEL ROCÍO — Acuerdo Marco de Suministro (CONTR 2023 0000031723) — value 13963898.12
   - Servicio Andaluz de Salud. Hospital Universitario Reina Sofía. — Acuerdo marco de suministro (CONTR 2024 0000233712) — value 12772772.28
+
+### 90. ITA · `34114200` · fornitura in acquisto di veicoli per le forze di sicurezza id <n> other
+- Structure: **98.6** · records **4** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **514252500.0** · median **517711800.0** · p75 **517711800.0**
+- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+- Historical examples:
+  - CONSIP SPA — Fornitura in acquisto di veicoli per le Forze di Sicurezza – (ID 2876) — value 517711800.0
+  - CONSIP SPA — Fornitura in acquisto di veicoli per le Forze di Sicurezza – (ID 2876) — value 517711800.0
+  - CONSIP SPA — Fornitura in acquisto di veicoli per le Forze di Sicurezza – (ID 2876) — value 517711800.0
 
 ### 91. LTU · `63510000` · tarnybini kelioni organizavimo paslaug pirkimas other
 - Structure: **98.6** · records **3** · buyers **3** · repeat buyers **0**
@@ -1050,16 +1050,7 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - Telge Inköp AB — Dynamiskt inköpssystem Tekniska konsulter — value 1200000000.0
   - Värmdö kommun — Dynamiskt inköpssystem tekniska konsulter — value 180000000.0
 
-### 117. ESP · `33700000` · acuerdo marco suministro contr <n> <n> other
-- Structure: **98.25** · records **3** · buyers **3** · repeat buyers **0**
-- Route `UNKNOWN` · currency `EUR` · p25 **8933890.845** · median **11693331.89** · p75 **21727133.075000003**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - SERVICIO ANDALUZ DE SALUD. SERVICIOS CENTRALES — Acuerdo Marco Suministro (CONTR 2022/0001024061) — value 31760934.26
-  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO REGIONAL DE MÁLAGA — Acuerdo Marco Suministro CONTR 2023 0000851595 — value 11693331.89
-  - Servicio Andaluz de Salud. Hospital Universitario de Jaén — Acuerdo Marco Suministro (CONTR 2025 0000118812) — value 6174449.8
-
-### 118. ESP · `50700000` · contrato de servicios contr <n> <n> other
+### 117. ESP · `50700000` · contrato de servicios contr <n> <n> other
 - Structure: **98.25** · records **3** · buyers **3** · repeat buyers **0**
 - Route `UNKNOWN` · currency `EUR` · p25 **11336803.75** · median **11730284.11** · p75 **15537351.205**
 - Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
@@ -1067,6 +1058,15 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - Servicio Andaluz de Salud. Hospital Universitario de Málaga — Contrato de Servicios (CONTR 2025 0000327965) — value 19344418.3
   - Servicio Andaluz de Salud. Hospital Regional Universitario de Málaga — Contrato de Servicios (CONTR 2026 0000156727) — value 11730284.11
   - Servicio Andaluz de Salud. Hospital Universitario Virgen del Rocío — Contrato de Servicios (CONTR 2024 0001160143) — value 10943323.39
+
+### 118. ESP · `33700000` · acuerdo marco suministro contr <n> <n> other
+- Structure: **98.25** · records **3** · buyers **3** · repeat buyers **0**
+- Route `UNKNOWN` · currency `EUR` · p25 **8933890.845** · median **11693331.89** · p75 **21727133.075000003**
+- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+- Historical examples:
+  - SERVICIO ANDALUZ DE SALUD. SERVICIOS CENTRALES — Acuerdo Marco Suministro (CONTR 2022/0001024061) — value 31760934.26
+  - SERVICIO ANDALUZ DE SALUD. HOSPITAL UNIVERSITARIO REGIONAL DE MÁLAGA — Acuerdo Marco Suministro CONTR 2023 0000851595 — value 11693331.89
+  - Servicio Andaluz de Salud. Hospital Universitario de Jaén — Acuerdo Marco Suministro (CONTR 2025 0000118812) — value 6174449.8
 
 ### 119. ITA · `15890000` · procedura aperta in ambito europeo finalizzata alla conclusione di un accordo quadro per la fornitura del vitto dei detenuti ed internati ristretti negli istituti penitenziari per 
 - Structure: **98.24** · records **7** · buyers **2** · repeat buyers **2**
@@ -1176,16 +1176,7 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - DIREZIONE GENERALE COMMISSARIATO E SERVIZI GENERALI — Procedura aperta europea per l’appalto del servizio di ristorazione, catering completo, catering veicolato presso EDRC del Ministero della Difesa — value 724583265.75
   - DIREZIONE GENERALE DEL COMMISSARIATO E DEI SERVIZI GENERALI — Procedura aperta europea per l’appalto del servizio di ristorazione, catering completo, catering veicolato presso EDRC del Ministero della Difesa — value 38196070.58
 
-### 131. ITA · `66512000` · procedura aperta ai sensi dell art <n> del d lgs <n> <n> per l affidamento di una copertura assicurativa finalizzata alla pre stazione del servizio di assistenza sanitaria integrat
-- Structure: **98.09** · records **3** · buyers **2** · repeat buyers **1**
-- Route `UNKNOWN` · currency `EUR` · p25 **510000000.0** · median **510000000.0** · p75 **510000000.0**
-- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
-- Historical examples:
-  - EMAPI — PROCEDURA APERTA AI SENSI DELL’ART. 71 DEL D.LGS. 36/2023 PER L’AFFIDAMENTO DI UNA COPERTURA ASSICURATIVA FINALIZZATA ALLA PRE-STAZIONE DEL SERVIZIO DI ASSISTENZA SANITARIA INTEGRATIVA (ASI), IN FORMA DI CONVENZIONE, A FAVORE DEGLI ISCRITTI AGLI ENTI PREVIDENZIALI ASSOCIATI A EMAPI — value 510000000.0
-  - EMAPI - Ente di Mutua Assistenza per i Professionisti Italiani — PROCEDURA APERTA AI SENSI DELL’ART. 71 DEL D.LGS. 36/2023 PER L’AFFIDAMENTO DI UNA COPERTURA ASSICURATIVA FINALIZZATA ALLA PRE-STAZIONE DEL SERVIZIO DI ASSISTENZA SANITARIA INTEGRATIVA (ASI), IN FORMA DI CONVENZIONE, A FAVORE DEGLI ISCRITTI AGLI ENTI PREVIDENZIALI ASSOCIATI A EMAPI — value 510000000.0
-  - EMAPI - Ente di Mutua Assistenza per i Professionisti Italiani — PROCEDURA APERTA AI SENSI DELL’ART. 71 DEL D.LGS. 36/2023 PER L’AFFIDAMENTO DI UNA COPERTURA ASSICURATIVA FINALIZZATA ALLA PRE-STAZIONE DEL SERVIZIO DI ASSISTENZA SANITARIA INTEGRATIVA (ASI), IN FORMA DI CONVENZIONE, A FAVORE DEGLI ISCRITTI AGLI ENTI PREVIDENZIALI ASSOCIATI A EMAPI — value 510000000.0
-
-### 132. SVK · `09123000` · zemný plyn other
+### 131. SVK · `09123000` · zemný plyn other
 - Structure: **98.09** · records **3** · buyers **2** · repeat buyers **1**
 - Route `UNKNOWN` · currency `EUR` · p25 **8166653.215** · median **15649706.43** · p75 **775774853.215**
 - Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
@@ -1194,7 +1185,7 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - Žilinský samosprávny kraj — ZEMNÝ PLYN — value 15649706.43
   - Národný ústav tuberkulózy, pľúcnych chorôb a hrudníkovej chirurgie Vyšné Hágy — Zemný plyn — value 683600.0
 
-### 133. HRV · `33140000` · testovi i potro ni materijal za patologiju i citologiju za zdravstvene ustanove u republici hrvatskoj other
+### 132. HRV · `33140000` · testovi i potro ni materijal za patologiju i citologiju za zdravstvene ustanove u republici hrvatskoj other
 - Structure: **98.09** · records **3** · buyers **2** · repeat buyers **1**
 - Route `UNKNOWN` · currency `EUR` · p25 **15395990.31** · median **28880559.1** · p75 **28880559.1**
 - Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
@@ -1202,6 +1193,15 @@ Clusters are ranked by the new empirical market-structure miner. This book only 
   - Klinički bolnički centar Rijeka — Testovi i potrošni materijal za patologiju i citologiju za zdravstvene ustanove u Republici Hrvatskoj — value 28880559.1
   - Klinički bolnički centar Rijeka — Testovi i potrošni materijal za patologiju i citologiju za zdravstvene ustanove u Republici Hrvatskoj — value 28880559.1
   - KLINIČKI BOLNIČKI CENTAR RIJEKA — Testovi i potrošni materijal za patologiju i citologiju za zdravstvene ustanove u Republici Hrvatskoj — value 1911421.52
+
+### 133. ITA · `66512000` · procedura aperta ai sensi dell art <n> del d lgs <n> <n> per l affidamento di una copertura assicurativa finalizzata alla pre stazione del servizio di assistenza sanitaria integrat
+- Structure: **98.09** · records **3** · buyers **2** · repeat buyers **1**
+- Route `UNKNOWN` · currency `EUR` · p25 **510000000.0** · median **510000000.0** · p75 **510000000.0**
+- Median bidders **UNKNOWN** · suppliers **UNKNOWN** · top supplier share **UNKNOWN** · shape `RECURRING_NICHE`
+- Historical examples:
+  - EMAPI — PROCEDURA APERTA AI SENSI DELL’ART. 71 DEL D.LGS. 36/2023 PER L’AFFIDAMENTO DI UNA COPERTURA ASSICURATIVA FINALIZZATA ALLA PRE-STAZIONE DEL SERVIZIO DI ASSISTENZA SANITARIA INTEGRATIVA (ASI), IN FORMA DI CONVENZIONE, A FAVORE DEGLI ISCRITTI AGLI ENTI PREVIDENZIALI ASSOCIATI A EMAPI — value 510000000.0
+  - EMAPI - Ente di Mutua Assistenza per i Professionisti Italiani — PROCEDURA APERTA AI SENSI DELL’ART. 71 DEL D.LGS. 36/2023 PER L’AFFIDAMENTO DI UNA COPERTURA ASSICURATIVA FINALIZZATA ALLA PRE-STAZIONE DEL SERVIZIO DI ASSISTENZA SANITARIA INTEGRATIVA (ASI), IN FORMA DI CONVENZIONE, A FAVORE DEGLI ISCRITTI AGLI ENTI PREVIDENZIALI ASSOCIATI A EMAPI — value 510000000.0
+  - EMAPI - Ente di Mutua Assistenza per i Professionisti Italiani — PROCEDURA APERTA AI SENSI DELL’ART. 71 DEL D.LGS. 36/2023 PER L’AFFIDAMENTO DI UNA COPERTURA ASSICURATIVA FINALIZZATA ALLA PRE-STAZIONE DEL SERVIZIO DI ASSISTENZA SANITARIA INTEGRATIVA (ASI), IN FORMA DI CONVENZIONE, A FAVORE DEGLI ISCRITTI AGLI ENTI PREVIDENZIALI ASSOCIATI A EMAPI — value 510000000.0
 
 ### 134. SWE · `15000000` · livsmedel huvudgrossist other
 - Structure: **98.05** · records **8** · buyers **8** · repeat buyers **0**
