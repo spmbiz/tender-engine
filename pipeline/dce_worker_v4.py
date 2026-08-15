@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import html
 import re
 from pathlib import Path
 
@@ -61,10 +62,50 @@ def cascade_public_adapter(candidate: dict,out:Path,manifest:dict):
         if method=='DIRECT_DOCUMENT':continue
         status=_try_page(candidate,url,out,manifest,method);statuses.append(status)
         if manifest['files']:manifest['status']='DOWNLOADED_PUBLIC';return
-    priority=['CAPTCHA_REQUIRED','AUTH_REQUIRED','ERROR_RETRYABLE','ROUTE_INCOMPLETE','NO_PUBLIC_FILE']
+    priority=['CAPTCHA_REQUIRED','AUTH_REQUIRED','INTEREST_RECORDING_REQUIRED','ERROR_RETRYABLE','ROUTE_INCOMPLETE','NO_PUBLIC_FILE']
     final=next((s for s in priority if s in statuses),'GENERIC_PUBLIC_PAGE_UNRESOLVED')
     if final=='NO_PUBLIC_FILE':final='GENERIC_PUBLIC_PAGE_UNRESOLVED'
     manifest['status']=final
+
+
+def adapter_ungm_guarded(candidate:dict,out:Path,manifest:dict):
+    """Use public UNGM attachments when available, but surface interest-gated notices explicitly.
+
+    A public attachment may itself be only an access guide. Evidence-quality classification later
+    decides whether a downloaded file is authoritative DCE; this adapter only reports transport/access state.
+    """
+    manifest.setdefault('dce_method_attempts',[])
+    v2.optimized_ungm(candidate,out,manifest)
+    if manifest.get('files'):
+        manifest['dce_method_attempts'].append({'method':'UNGM_PUBLIC_ATTACHMENTS','outcome':'DOWNLOADED_PUBLIC','files':len(manifest.get('files') or [])})
+        return
+    route=candidate.get('route') or {}
+    notice_id=str(route.get('notice_id') or candidate.get('notice_id') or '').strip()
+    notice_url=candidate.get('notice_url') or (f'https://www.ungm.org/Public/Notice/{notice_id}' if notice_id else None)
+    if not notice_url:
+        manifest['status']='ROUTE_INCOMPLETE';return
+    session=requests.Session();session.headers.update({'User-Agent':'Tender-Engine/5.0 public procurement research'})
+    try:
+        r=session.get(notice_url,timeout=45,allow_redirects=True)
+        raw=html.unescape(r.text if r.ok else '')
+        text=re.sub(r'<script\b[^>]*>.*?</script>',' ',raw,flags=re.I|re.S)
+        text=re.sub(r'<style\b[^>]*>.*?</style>',' ',text,flags=re.I|re.S)
+        text=re.sub(r'<[^>]+>',' ',text)
+        text=re.sub(r'\s+',' ',html.unescape(text)).strip()
+        if text:(out/'portal_page.txt').write_text(text[:500_000],encoding='utf-8')
+        interest=bool(re.search(r'express interest|record(?:ing)? your interest|register interest',text,re.I))
+        view_docs=bool(re.search(r'view documents|view document|e[- ]?sourcing portal',text,re.I))
+        manifest['dce_method_attempts'].append({'method':'UNGM_ACCESS_STATE','url':notice_url,'http_status':r.status_code,'interest_signal':interest,'view_documents_signal':view_docs})
+        if interest or view_docs:
+            manifest['status']='INTEREST_RECORDING_REQUIRED'
+        elif r.status_code in (401,403):
+            manifest['status']='AUTH_REQUIRED'
+        elif not r.ok:
+            manifest['status']='ERROR_RETRYABLE'
+        else:
+            manifest['status']='NO_PUBLIC_FILE'
+    except Exception as exc:
+        manifest['status']='ERROR_RETRYABLE';manifest['error']=repr(exc)
 
 
 def adapter_greece(candidate:dict,out:Path,manifest:dict):
@@ -135,5 +176,6 @@ for portal in ('GENERIC_PUBLIC_PAGE','CA_CANADABUYS','QC_SEAO','DE_DOE','FR_BOAM
     base.ADAPTERS[portal]=cascade_public_adapter
 for portal in ('PL_EZAMOWIENIA','PL_BZP'):base.ADAPTERS[portal]=adapter_poland
 base.ADAPTERS['GR_KHMDHS']=adapter_greece
+base.ADAPTERS['UNGM']=adapter_ungm_guarded
 
 if __name__=='__main__':v2.main()
