@@ -1,0 +1,43 @@
+name: Active Prefilter Historical Prior Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/world_supergreen_prefilter.py'
+      - 'pipeline/solo_lean_prefilter.py'
+      - 'pipeline/historical_market_priors.py'
+      - 'control/historical_market_priors.json'
+      - '.github/workflows/prefilter-historical-integration-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify active scorers consume QA-clean priors and remain fail-closed
+        run: |
+          python - <<'PY'
+          from pipeline.historical_market_priors import load
+          from pipeline.world_supergreen_prefilter import score_record
+          from pipeline.solo_lean_prefilter import score as solo_score
+          p=load(); assert p and p['status']=='READY'
+
+          positive={'candidate_id':'FR:SMOKE:1','country':'FRA','title':'Conception graphique et mise en page du magazine municipal','buyer_name':'Ville test','estimated_value':80000}
+          false_portal={'candidate_id':'DE:SMOKE:2','country':'DEU','title':'X-ray medical security portal hardware supply','buyer_name':'Hospital test','estimated_value':80000}
+          translation_med={'candidate_id':'FR:SMOKE:3','country':'FRA','title':'Recherche en médecine translationnelle et clinique','buyer_name':'Université test','estimated_value':80000}
+
+          w=score_record(positive,p); print('world-positive',w); assert w[4]==6
+          s=solo_score(positive,p); print('solo-positive',s); assert s[5]==6
+          w2=score_record(false_portal,p); print('world-false-portal',w2); assert w2[4]==0
+          w3=score_record(translation_med,p); print('world-med-translation',w3); assert w3[4]==0
+          assert p['safety']['affects_final_verdict'] is False
+          assert p['safety']['satisfies_dce_gates'] is False
+          print('ACTIVE_PREFILTER_HISTORICAL_PRIOR_SMOKE_PASS')
+          PY
