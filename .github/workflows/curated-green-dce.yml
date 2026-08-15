@@ -76,30 +76,43 @@ jobs:
               for p in [d/'evidence_quality.json', d/'evidence'/'evidence_quality.json']:
                   if p.exists():
                       try:q=json.loads(p.read_text(encoding='utf-8',errors='replace'))
-                      except Exception:pass
+                      except Exception:q={}
                       break
               gate_files=list(d.rglob('*gate*.json'))
               c=m.get('candidate') or {}
+              raw=m.get('status') or 'UNKNOWN'
+              derived=q.get('derived_status') or raw
+              quality=q.get('content_quality') or 'NOT_CLASSIFIED'
+              gate_ready=bool(q.get('gate_readiness')) if q else False
               rows.append({
                 'candidate_id':m.get('candidate_id'),
                 'title':c.get('title'),
                 'preliminary_score':c.get('preliminary_score'),
-                'status':m.get('status'),
+                'transport_status':raw,
+                'derived_status':derived,
+                'content_quality':quality,
+                'substantive_dce_ready':gate_ready,
                 'files':len(m.get('files') or []),
-                'evidence_quality':q.get('status') or q.get('evidence_quality') or q.get('classification'),
                 'gate_files':[str(x.relative_to(d)) for x in gate_files[:10]],
                 'error':m.get('error'),
                 'ted_resolution':m.get('ted_resolution'),
                 'downstream_attempts':m.get('ted_downstream_attempts') or []
               })
           out=Path('control/curated_dce_latest');out.mkdir(parents=True,exist_ok=True)
-          payload={'version':'CURATED_GREEN_DCE_20260815_V1','run_id':'${{ github.run_id }}','rows':rows}
+          payload={
+            'version':'CURATED_GREEN_DCE_20260815_V2_FAIL_CLOSED_QUALITY',
+            'run_id':'${{ github.run_id }}',
+            'rule':'Transport DOWNLOADED_PUBLIC is never enough. Only evidence_quality.gate_readiness=true permits mandatory-gate review.',
+            'substantive_ready_count':sum(1 for r in rows if r['substantive_dce_ready']),
+            'rows':rows
+          }
           (out/'STATUS.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
           lines=['# Curated current-green DCE resolution','',f"Run `${{ github.run_id }}`",'',
-                 '|Candidate|Score|Resolver status|Files|Evidence quality|','|---|---:|---|---:|---|']
+                 '**Fail-closed rule:** a successful HTTP/file download is transport evidence only. A candidate is DCE-ready only when the evidence-quality layer proves substantive procurement content.','',
+                 '|Candidate|Score|Transport|Derived status|Content quality|Substantive DCE?|Files|','|---|---:|---|---|---|---|---:|']
           for r in rows:
-              lines.append(f"|{r['candidate_id']}|{r.get('preliminary_score') or ''}|{r.get('status') or ''}|{r.get('files') or 0}|{r.get('evidence_quality') or 'UNKNOWN'}|")
-          lines += ['','Resolver transport success is not an eligibility PASS. Mandatory gates remain controlled by authoritative DCE evidence.']
+              lines.append(f"|{r['candidate_id']}|{r.get('preliminary_score') or ''}|{r['transport_status']}|{r['derived_status']}|{r['content_quality']}|{'YES' if r['substantive_dce_ready'] else 'NO'}|{r['files']}|")
+          lines += ['','Mandatory eligibility, references, turnover, insurance, language, onsite burden, subcontracting and contract obligations remain unresolved unless `Substantive DCE? = YES`.']
           (out/'REPORT.md').write_text('\n'.join(lines),encoding='utf-8')
           print(json.dumps(payload,ensure_ascii=False,indent=2))
           PY
@@ -113,7 +126,7 @@ jobs:
           tag="curated-dce-${GITHUB_RUN_ID}"
           gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
             --title "Curated Green DCE ${GITHUB_RUN_ID}" \
-            --notes "Current SPM green candidates. Resolver status is transport evidence only; DCE gate adjudication remains authoritative."
+            --notes "Current SPM green candidates. Transport status is not DCE validity; evidence-quality gate_readiness controls substantive review."
           gh release upload "$tag" control/curated_dce_latest/STATUS.json control/curated_dce_latest/REPORT.md --repo "$GITHUB_REPOSITORY" --clobber
           if [ -d durable ]; then
             find durable -maxdepth 1 -type f -name 'candidate-*.tar.gz' -print0 | xargs -0 -r gh release upload "$tag" --repo "$GITHUB_REPOSITORY" --clobber
