@@ -1,0 +1,60 @@
+name: Western Archive Refresh
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 2 * * 0'
+  push:
+    branches: [main]
+    paths:
+      - 'control/western_archive_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        lane: [IT_OCP_MIRROR, LV_IUB_45D, COVERAGE_SNAPSHOT]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Harvest archive lane
+        env:
+          DISCOVERY_OUT: archive/${{ matrix.lane }}
+          LOOKBACK_DAYS: '45'
+          IT_OCP_MAX_BYTES: '300000000'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "archive/${{ matrix.lane }}"
+          case '${{ matrix.lane }}' in
+            IT_OCP_MIRROR) python pipeline/discover_it_ocp_mirror.py ;;
+            LV_IUB_45D) python pipeline/discover_lv_iub.py ;;
+            COVERAGE_SNAPSHOT)
+              cp control/western_coverage_matrix.json "archive/${{ matrix.lane }}/western_coverage_matrix.json"
+              cp control/global_source_registry.json "archive/${{ matrix.lane }}/global_source_registry.json"
+              python - <<'PY'
+          import json,datetime,pathlib
+          p=pathlib.Path('archive/COVERAGE_SNAPSHOT/stats.json')
+          p.write_text(json.dumps({'source':'COVERAGE_SNAPSHOT','generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'errors':[]},indent=2))
+          PY
+              ;;
+          esac
+      - name: Persist archive as immutable Release
+        env: {GH_TOKEN: '${{ github.token }}'}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="western-archive-${GITHUB_RUN_ID}"
+          if ! gh release view "$tag" >/dev/null 2>&1; then gh release create "$tag" --target "$GITHUB_SHA" --title "Western Archive ${GITHUB_RUN_ID}" --notes "Durable Western procurement archive refresh. Individual lane assets retain provenance; live discovery remains separate."; fi
+          lane="$(echo '${{ matrix.lane }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')"
+          tar -C "archive/${{ matrix.lane }}" -czf "${lane}.tar.gz" .
+          gh release upload "$tag" "${lane}.tar.gz" --clobber
