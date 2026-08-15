@@ -1,0 +1,87 @@
+name: Worldwide SuperGreen Scan
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/world_supergreen_trigger.json'
+  workflow_dispatch:
+    inputs:
+      source_discovery_run:
+        description: Discovery run to scan
+        required: false
+        default: '31856526716'
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Resolve source run
+        id: src
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = 'workflow_dispatch' ]; then
+            run='${{ github.event.inputs.source_discovery_run }}'
+          else
+            run="$(python - <<'PY'
+          import json
+          x=json.load(open('control/world_supergreen_trigger.json'))
+          print(x.get('source_discovery_run',31856526716))
+          PY
+          )"
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+      - name: Download canonical worldwide discovery corpus
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ steps.src.outputs.run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="discovery-harvest-${SOURCE_RUN}"
+          asset="supergreen-wide-read-${SOURCE_RUN}.tar.gz"
+          mkdir -p corpus
+          gh release download "$tag" --pattern "$asset" --dir .
+          tar -xzf "$asset" -C corpus
+          find corpus -name current_candidates.jsonl -print -quit | grep . > /tmp/candidate_path
+      - name: Rank high-recall lean candidates and build DCE selection
+        env:
+          SOURCE_RUN: ${{ steps.src.outputs.run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          candidates="$(cat /tmp/candidate_path)"
+          mkdir -p generated queues benchmarks
+          python pipeline/world_supergreen_prefilter.py \
+            --input "$candidates" \
+            --out generated/world_supergreen_top.jsonl \
+            --selection "queues/dce_selection_${SOURCE_RUN}.jsonl" \
+            --top 1600 --select 320 --run-id "$SOURCE_RUN"
+          cp generated/world_supergreen_top.jsonl benchmarks/world-supergreen-prefilter-latest.jsonl
+          cp generated/world_supergreen_top.jsonl.summary.json benchmarks/world-supergreen-prefilter-latest.summary.json
+      - name: Persist scan and exact DCE manifest to main
+        env:
+          SOURCE_RUN: ${{ steps.src.outputs.run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add benchmarks/world-supergreen-prefilter-latest.jsonl \
+                  benchmarks/world-supergreen-prefilter-latest.summary.json \
+                  "queues/dce_selection_${SOURCE_RUN}.jsonl"
+          if git diff --cached --quiet; then
+            echo 'No scan changes to persist'
+            exit 0
+          fi
+          git commit -m "Persist worldwide supergreen prefilter for discovery ${SOURCE_RUN}"
+          git push origin HEAD:main
