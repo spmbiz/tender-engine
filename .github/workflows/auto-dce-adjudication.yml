@@ -1,0 +1,98 @@
+name: Auto DCE Adjudication
+
+on:
+  workflow_dispatch:
+    inputs:
+      dce_run_id:
+        description: Canonical successful DCE Fanout V2 run ID
+        required: true
+  push:
+    branches: [main]
+    paths:
+      - 'control/auto_adjudication_trigger.txt'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: auto-dce-adjudication-${{ github.event.inputs.dce_run_id || github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  adjudicate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install adjudicator dependency only
+        run: python -m pip install --disable-pip-version-check -q requests
+      - id: resolve
+        name: Resolve canonical DCE run
+        shell: bash
+        env:
+          INPUT_RUN: ${{ github.event.inputs.dce_run_id }}
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = 'workflow_dispatch' ] && [[ "${INPUT_RUN:-}" =~ ^[0-9]+$ ]]; then
+            rid="$INPUT_RUN"
+          else
+            rid="$(sed -nE 's/^dce_run_id=([0-9]+).*$/\1/p' control/auto_adjudication_trigger.txt | tail -1)"
+          fi
+          [[ "$rid" =~ ^[0-9]+$ ]] || { echo "Invalid DCE run id: $rid" >&2; exit 1; }
+          echo "id=$rid" >> "$GITHUB_OUTPUT"
+          echo "tag=dce-harvest-$rid" >> "$GITHUB_OUTPUT"
+      - name: Download authoritative compact DCE review pack
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RID: ${{ steps.resolve.outputs.id }}
+          TAG: ${{ steps.resolve.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p input
+          gh release download "$TAG" --pattern "dce-deep-review-$RID.tar.gz" --dir input
+          mkdir -p input/aggregate
+          tar -xzf "input/dce-deep-review-$RID.tar.gz" -C input/aggregate
+          test -s input/aggregate/deep_review_queue.jsonl
+          test -s input/aggregate/summary.json
+      - name: Adjudicate gate-ready DCE rows conservatively
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ADJUDICATION_MODEL: gpt-5-mini
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/auto_adjudicate_dce.py \
+            --queue input/aggregate/deep_review_queue.jsonl \
+            --out adjudication \
+            --max-model-reviews 80
+      - name: Enforce deterministic final-verdict guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/final_verdict_guard.py --review adjudication/adjudication.jsonl
+      - name: Publish durable adjudication into the canonical DCE Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RID: ${{ steps.resolve.outputs.id }}
+          TAG: ${{ steps.resolve.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp adjudication/adjudication.jsonl "dce-adjudication-$RID.jsonl"
+          cp adjudication/summary.json "dce-adjudication-summary-$RID.json"
+          cp adjudication/supergreen_shortlist.json "dce-supergreen-shortlist-$RID.json"
+          cp adjudication/review_required.json "dce-review-required-$RID.json"
+          gh release upload "$TAG" \
+            "dce-adjudication-$RID.jsonl" \
+            "dce-adjudication-summary-$RID.json" \
+            "dce-supergreen-shortlist-$RID.json" \
+            "dce-review-required-$RID.json" --clobber
+          echo "Guarded adjudication published to $TAG" >> "$GITHUB_STEP_SUMMARY"
+          cat "dce-adjudication-summary-$RID.json" >> "$GITHUB_STEP_SUMMARY"
