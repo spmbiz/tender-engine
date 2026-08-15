@@ -67,6 +67,17 @@ def validate_record(rec: dict) -> list[str]:
     if not gate_ready or quality not in {"SUBSTANTIVE_DCE_PRESENT", "MIXED_SUBSTANTIVE_AND_GUIDE"}:
         errors.append(f"{cid}: final/90+ forbidden: authoritative DCE gate_readiness not proven (quality={quality!r})")
 
+    authority = rec.get("authority_conflicts") or {}
+    deadline_authority = authority.get("deadline") if isinstance(authority, dict) else None
+    if not isinstance(deadline_authority, dict):
+        errors.append(f"{cid}: final/90+ forbidden: authoritative deadline reconciliation missing")
+    else:
+        deadline_status = str(deadline_authority.get("status") or "UNKNOWN")
+        if deadline_authority.get("conflict") or deadline_status == "DEADLINE_CONFLICT_REVIEW_REQUIRED":
+            errors.append(f"{cid}: final/90+ forbidden: deadline conflict requires explicit reconciliation")
+        elif deadline_status in {"UNKNOWN_NO_DCE_DEADLINE_PARSED", "UNKNOWN"}:
+            errors.append(f"{cid}: final/90+ forbidden: DCE submission deadline not authoritatively resolved")
+
     gates = rec.get("gates") or rec.get("gate_verdicts") or {}
     for gate in REQUIRED_GATES:
         item = gates.get(gate)
