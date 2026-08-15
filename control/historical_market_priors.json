@@ -1,16 +1,153 @@
 {
   "contract": "TENDER_MARKET_BRAIN_PRIORS_V1",
-  "status": "BLOCKED_SOURCE_ACCESS",
-  "generated_at": "2026-08-15T14:32:00Z",
-  "source_release": "walidgdg1-ai/coldemailtool:tender-global-market-intelligence-v3",
-  "source_scope": "GLOBAL CORE historical analytics; canonical warehouse already DONE/PASS",
-  "blocker": "private coldemailtool GitHub Actions runner blocked before start by Billing & plans / spending-limit state; compact Market Intelligence v3 CSV assets are not mirrored in Drive",
+  "status": "READY",
+  "generated_at": "2026-08-15T17:22:00Z",
+  "source_release": "walidgdg1-ai/tender-engine:market-intelligence-v9-final-qa",
+  "source_scope": "Global Core v4 notice-first; route-aware, final semantic QA. Only OPEN_BID high-precision lanes are used for live prioritization.",
   "safety": {
     "affects_final_verdict": false,
     "satisfies_dce_gates": false,
     "pre_dce_only": true,
-    "max_total_priority_adjustment": 12
+    "max_total_priority_adjustment": 12,
+    "route_policy": "OPEN_BID historical priors only; direct-buyer lanes excluded from live open-tender bonus",
+    "unknown_is_not_pass": true
   },
   "country_cpv": {},
-  "buyers": {}
+  "buyers": {},
+  "lane_rules": [
+    {
+      "lane": "Printing / mailing / routing",
+      "country": "FRANCE",
+      "sample_size": 915,
+      "historical_score": 91.5,
+      "priority_bonus": 6,
+      "decision": "PROMOTE_CORE",
+      "patterns": ["\\bprinting\\b", "\\bimpression\\b", "imprimerie", "routage", "mise sous pli", "mailing"],
+      "negative_patterns": ["3d print", "printer maintenance", "imprimante", "copier rental", "managed print"]
+    },
+    {
+      "lane": "Graphic design / layout / DTP",
+      "country": "FRANCE",
+      "sample_size": 194,
+      "historical_score": 88.79,
+      "priority_bonus": 6,
+      "decision": "PROMOTE_CORE",
+      "patterns": ["conception graphique", "design graphique", "graphisme", "mise en page", "identit[eé] visuelle", "desktop publishing", "infograph"],
+      "negative_patterns": ["architect", "engineering", "ma[iî]trise d.oeuvre", "construction"]
+    },
+    {
+      "lane": "Document digitization / OCR / scanning",
+      "country": "FRANCE",
+      "sample_size": 173,
+      "historical_score": 87.45,
+      "priority_bonus": 6,
+      "decision": "PROMOTE_CORE",
+      "patterns": ["num[eé]risation", "digitization", "digitisation", "document scanning", "\\bocr\\b", "digitalisation d.{0,20}documents"],
+      "negative_patterns": ["microscope", "medical", "scanner m[eé]dical", "laser scanning", "street", "voirie"]
+    },
+    {
+      "lane": "Translation",
+      "country": "FRANCE",
+      "sample_size": 124,
+      "historical_score": 84.9,
+      "priority_bonus": 5,
+      "decision": "PROMOTE_CORE",
+      "patterns": ["traduction", "translation services?", "linguistic"],
+      "negative_patterns": ["translational", "translationnelle", "medicine", "m[eé]decine"]
+    },
+    {
+      "lane": "Website / CMS build or redesign",
+      "country": "GERMANY",
+      "sample_size": 230,
+      "historical_score": 81.36,
+      "priority_bonus": 5,
+      "decision": "PROMOTE_CORE",
+      "patterns": ["website", "webseite", "internetauftritt", "webportal", "web portal", "\\bcms\\b", "wordpress", "drupal"],
+      "negative_patterns": ["portal crane", "security portal", "x-ray", "medical", "construction", "hardware supply"]
+    },
+    {
+      "lane": "Website support / accessibility / hosting",
+      "country": "FRANCE",
+      "sample_size": 118,
+      "historical_score": 77.8,
+      "priority_bonus": 5,
+      "decision": "PROMOTE_CORE",
+      "patterns": ["site web.{0,80}(maintenance|support|h[eé]bergement|accessibil)", "website.{0,80}(maintenance|support|hosting|accessibil)", "portail web.{0,80}(maintenance|support|h[eé]bergement)"] ,
+      "negative_patterns": ["construction", "hardware", "security portal", "x-ray"]
+    },
+    {
+      "lane": "Promotional merchandise",
+      "country": "FRANCE",
+      "sample_size": 81,
+      "historical_score": 76.77,
+      "priority_bonus": 4,
+      "decision": "PROMOTE_BROKER",
+      "patterns": ["objets publicitaires", "articles promotionnels", "goodies", "promotional merchandise", "branded merchandise"],
+      "negative_patterns": ["event management", "full service marketing"]
+    },
+    {
+      "lane": "Website / CMS build or redesign",
+      "country": "FRANCE",
+      "sample_size": 100,
+      "historical_score": 74.5,
+      "priority_bonus": 4,
+      "decision": "PROMOTE_CORE",
+      "patterns": ["site web", "site internet", "website", "portail web", "\\bcms\\b", "wordpress", "drupal"],
+      "negative_patterns": ["portal crane", "security portal", "x-ray", "medical", "construction", "hardware"]
+    },
+    {
+      "lane": "Website support / accessibility / hosting",
+      "country": "GERMANY",
+      "sample_size": 97,
+      "historical_score": 72.94,
+      "priority_bonus": 4,
+      "decision": "PROMOTE_CORE",
+      "patterns": ["webseite.{0,80}(pflege|betrieb|support|hosting|barrierefrei)", "website.{0,80}(maintenance|support|hosting|accessibil)", "internetauftritt.{0,80}(pflege|betrieb)"] ,
+      "negative_patterns": ["construction", "hardware", "security portal"]
+    },
+    {
+      "lane": "Website / CMS build or redesign",
+      "country": "UNITED KINGDOM",
+      "sample_size": 60,
+      "historical_score": 70.1,
+      "priority_bonus": 4,
+      "decision": "PROMOTE_CORE",
+      "patterns": ["website", "web site", "web redesign", "web development", "content management system", "\\bcms\\b", "wordpress", "drupal"],
+      "negative_patterns": ["portal crane", "security portal", "x-ray", "medical", "construction", "hardware"]
+    },
+    {
+      "lane": "Social media / community management",
+      "country": "FRANCE",
+      "sample_size": 54,
+      "historical_score": 69.37,
+      "priority_bonus": 3,
+      "decision": "PROMOTE_CORE",
+      "patterns": ["r[eé]seaux sociaux", "social media", "community management", "gestion des m[eé]dias sociaux"],
+      "negative_patterns": ["physical event", "infrastructure"]
+    },
+    {
+      "lane": "Website support / accessibility / hosting",
+      "country": "IRELAND",
+      "sample_size": 53,
+      "historical_score": 66.57,
+      "priority_bonus": 3,
+      "decision": "PROMOTE_CORE",
+      "patterns": ["website.{0,80}(maintenance|support|hosting|accessibil)", "web support", "web maintenance", "web hosting"],
+      "negative_patterns": ["construction", "hardware"]
+    },
+    {
+      "lane": "Survey / market research",
+      "country": "IRELAND",
+      "sample_size": 30,
+      "historical_score": 63.25,
+      "priority_bonus": 3,
+      "decision": "PROMOTE_CORE",
+      "patterns": ["market research", "survey services?", "opinion poll", "customer survey"],
+      "negative_patterns": ["geotechn", "soil", "drilling", "borehole"]
+    }
+  ],
+  "pending_expansion": {
+    "authority": "control/semantic_promotion_v2/promotion_decisions.csv",
+    "rule": "No new exhaustive/open-world lane is added to lane_rules until Semantic Promotion QA v2 and manual sample review both pass."
+  }
 }
