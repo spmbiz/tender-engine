@@ -1,0 +1,214 @@
+name: Historical Asymmetry Deep Dive v3
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - historical_lab/information_work_pure_core_v3.py
+      - historical_lab/usa_network_intermediary_economics_v3.py
+      - historical_lab/australia_review_evaluation_precision_v3.py
+      - historical_lab/open_world_next_wave_v3.py
+      - .github/workflows/historical-asymmetry-deepdive-v3.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-asymmetry-deepdive-v3
+  cancel-in-progress: false
+
+env:
+  TAG: historical-asymmetry-deepdive-v3
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure durable release exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target main \
+            --title 'Historical Asymmetry Deep Dive v3' \
+            --notes 'Historical-only four-way deep dive: pure information-work, USA network/intermediary economics, Australia review/evaluation precision, and next-wave ontology-free discovery. No live tenders, no DCE, no record deletion.'
+
+  global_information_work:
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Download canonical Global Core facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          for a in historical_tenders.parquet awards.parquet award_suppliers.parquet; do
+            gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern "$a" --dir source --clobber
+          done
+      - name: Mine strict pure information-work core
+        run: python historical_lab/information_work_pure_core_v3.py --historical source/historical_tenders.parquet --awards source/awards.parquet --bridge source/award_suppliers.parquet --out out
+      - name: Publish information-work outputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for f in summary.json REPORT.md pure_core.csv family_purity_summary.csv market_matrix.csv examples.csv; do
+            cp "out/$f" "global_info_$f"
+            gh release upload "$TAG" "global_info_$f" --repo "$GITHUB_REPOSITORY" --clobber
+          done
+
+  usa_network_economics:
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Download canonical USAspending facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          for a in historical_tenders.csv.gz awards.csv.gz; do
+            gh release download tender-normalized-usa-awards-v1 --repo walidgdg1-ai/coldemailtool --pattern "$a" --dir source --clobber
+          done
+      - name: Measure network/intermediary economics
+        run: python historical_lab/usa_network_intermediary_economics_v3.py --historical source/historical_tenders.csv.gz --awards source/awards.csv.gz --out out
+      - name: Publish USA outputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for f in summary.json REPORT.md family_intermediation_scorecard.csv supplier_archetypes.csv top_buyers.csv examples.csv; do
+            cp "out/$f" "usa_network_$f"
+            gh release upload "$TAG" "usa_network_$f" --repo "$GITHUB_REPOSITORY" --clobber
+          done
+
+  australia_review_evaluation:
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Download canonical AusTender facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          for a in historical_tenders.csv.gz awards.csv.gz; do
+            gh release download tender-normalized-austender-v1 --repo walidgdg1-ai/coldemailtool --pattern "$a" --dir source --clobber
+          done
+      - name: Decompose review/evaluation into delivery-risk classes
+        run: python historical_lab/australia_review_evaluation_precision_v3.py --historical source/historical_tenders.csv.gz --awards source/awards.csv.gz --out out
+      - name: Publish Australia outputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for f in summary.json REPORT.md family_risk_summary.csv market_matrix.csv top_winners.csv examples.csv; do
+            cp "out/$f" "australia_review_$f"
+            gh release upload "$TAG" "australia_review_$f" --repo "$GITHUB_REPOSITORY" --clobber
+          done
+
+  open_world_next_wave:
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Download open-world v2 queues
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input out
+          gh release download historical-open-world-unknowns-v2 --repo "$GITHUB_REPOSITORY" --pattern semantic_review_queue.jsonl --dir input --clobber
+          gh release download historical-open-world-unknowns-v2 --repo "$GITHUB_REPOSITORY" --pattern code_only_review_queue.jsonl --dir input --clobber
+      - name: Scan next semantic tranche plus all code-only clusters
+        run: python historical_lab/open_world_next_wave_v3.py --semantic input/semantic_review_queue.jsonl --code-only input/code_only_review_queue.jsonl --semantic-start 1000 --semantic-end 3000 --out out
+      - name: Publish next-wave outputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for f in summary.json REPORT.md tagged_clusters.csv untagged_top.jsonl; do
+            cp "out/$f" "open_world_$f"
+            gh release upload "$TAG" "open_world_$f" --repo "$GITHUB_REPOSITORY" --clobber
+          done
+
+  consolidate:
+    needs: [global_information_work, usa_network_economics, australia_review_evaluation, open_world_next_wave]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Download core outputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p all
+          for p in global_info_summary.json global_info_REPORT.md usa_network_summary.json usa_network_REPORT.md australia_review_summary.json australia_review_REPORT.md open_world_summary.json open_world_REPORT.md; do
+            gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "$p" --dir all --clobber
+          done
+      - name: Build master manifest
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('all')
+          gi=json.load(open(p/'global_info_summary.json',encoding='utf-8'))
+          us=json.load(open(p/'usa_network_summary.json',encoding='utf-8'))
+          au=json.load(open(p/'australia_review_summary.json',encoding='utf-8'))
+          ow=json.load(open(p/'open_world_summary.json',encoding='utf-8'))
+          master={
+            'version':'HISTORICAL_ASYMMETRY_DEEPDIVE_V3',
+            'status':'PASS','scope':'HISTORICAL_ONLY_NO_LIVE_NO_DCE',
+            'global_information_work':gi,'usa_network_economics':us,'australia_review_evaluation':au,'open_world_next_wave':ow,
+            'record_deletion':False,
+            'interpretation':'Each branch is an empirical discovery/triage layer. Strategic promotion remains a separate versioned model verdict.'
+          }
+          Path('MASTER_SUMMARY.json').write_text(json.dumps(master,indent=2,ensure_ascii=False),encoding='utf-8')
+          lines=['# Historical Asymmetry Deep Dive v3','', '**STATUS: PASS**','',
+                 '- Scope: historical archive intelligence only; no live tender retrieval and no DCE.','',
+                 f"- Global pure information-work: {gi['pure_digital_remote_rows']:,} strict pure digital/remote rows from {gi['archive_records_scanned']:,} notices.",
+                 f"- USA network economics: {us['strict_title_rows']:,} strict title-led award rows from {us['archive_records_scanned']:,} awards.",
+                 f"- Australia review/evaluation: {au['strict_title_review_rows']:,} strict title-led rows; {au['remote_analytical_rows']:,} remote-analytical plausible.",
+                 f"- Open-world next wave: {ow['clusters_reviewed']:,} additional clusters reviewed; {ow['tagged_cluster_mechanism_pairs']:,} mechanism pairs; {ow['untagged_clusters']:,} remain untagged.",'',
+                 'All classifications are reversible mappings. Underlying procurement records remain preserved.']
+          Path('MASTER_REPORT.md').write_text('\n'.join(lines),encoding='utf-8')
+          PY
+      - name: Persist master and branch checkpoints
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "$TAG" MASTER_SUMMARY.json MASTER_REPORT.md --repo "$GITHUB_REPOSITORY" --clobber
+          mkdir -p control/historical_asymmetry_deepdive_v3/{global_information_work,usa_network_economics,australia_review_evaluation,open_world_next_wave}
+          cp MASTER_SUMMARY.json MASTER_REPORT.md control/historical_asymmetry_deepdive_v3/
+          cp all/global_info_summary.json control/historical_asymmetry_deepdive_v3/global_information_work/summary.json
+          cp all/global_info_REPORT.md control/historical_asymmetry_deepdive_v3/global_information_work/REPORT.md
+          cp all/usa_network_summary.json control/historical_asymmetry_deepdive_v3/usa_network_economics/summary.json
+          cp all/usa_network_REPORT.md control/historical_asymmetry_deepdive_v3/usa_network_economics/REPORT.md
+          cp all/australia_review_summary.json control/historical_asymmetry_deepdive_v3/australia_review_evaluation/summary.json
+          cp all/australia_review_REPORT.md control/historical_asymmetry_deepdive_v3/australia_review_evaluation/REPORT.md
+          cp all/open_world_summary.json control/historical_asymmetry_deepdive_v3/open_world_next_wave/summary.json
+          cp all/open_world_REPORT.md control/historical_asymmetry_deepdive_v3/open_world_next_wave/REPORT.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_asymmetry_deepdive_v3/
+          git commit -m 'historical: persist asymmetry deep dive v3' || exit 0
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
