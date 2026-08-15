@@ -1,0 +1,47 @@
+name: Historical Open World Economic Archetypes v4.1 Full
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/historical-open-world-economic-archetypes-v4-1.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Download complete remaining unknown queue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input out
+          gh release download historical-open-world-untagged-full-v3-1 --repo "$GITHUB_REPOSITORY" --pattern untagged_all.jsonl --dir input --clobber
+      - name: Classify all remaining unknown clusters economically
+        run: python historical_lab/open_world_economic_archetypes_v4.py --input input/untagged_all.jsonl --out out
+      - name: Persist full economic routing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=historical-open-world-economic-archetypes-v4-1-full
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target main --title 'Historical Open World Economic Archetypes v4.1 Full' --notes 'Economic/native-code routing across the full remaining open-world unknown queue, not only top 1000.'
+          gh release upload "$TAG" out/summary.json out/REPORT.md out/classified_clusters.csv --repo "$GITHUB_REPOSITORY" --clobber
+          mkdir -p control/historical_open_world_economic_archetypes_v4_1_full
+          cp out/summary.json out/REPORT.md control/historical_open_world_economic_archetypes_v4_1_full/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/historical_open_world_economic_archetypes_v4_1_full/
+          git commit -m 'historical: persist full open-world economic routing v4.1' || exit 0
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
