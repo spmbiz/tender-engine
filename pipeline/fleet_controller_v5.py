@@ -18,6 +18,12 @@ from datetime import datetime, timezone
 import requests
 
 import fleet_controller as fc
+from github_api_resilience import install as install_github_resilience
+
+# Install low-call retrying GitHub transport before v4/v3 import and execution.
+# This makes controller state resilient to installation-level API exhaustion and
+# prefers the newer semantic repo checkpoint whenever the mutable Release lags.
+install_github_resilience(fc)
 
 EVERGREEN_REPO = "walidgdg1-ai/evergreenleadminer"
 BROKER_TAG = "global-fleet-broker"
