@@ -1,0 +1,127 @@
+from __future__ import annotations
+
+"""Broker-aware wrapper around the transactional Tender controller v4.
+
+GitHub Actions concurrency groups do not serialize planners across repositories.
+This wrapper therefore treats guaranteed sibling capacity as virtual observed
+occupancy before v4 computes its available DCE slots. Existing live sibling jobs
+satisfy the guarantee, so productive jobs are never killed merely to rebalance.
+"""
+
+import json
+from datetime import datetime, timezone
+
+import requests
+
+import fleet_controller as fc
+
+EVERGREEN_REPO = "walidgdg1-ai/evergreenleadminer"
+BROKER_TAG = "global-fleet-broker"
+BROKER_ASSET = "global-capacity.json"
+DEFAULT_MINIMUMS = {"hospitality": 6, "gws": 3}
+
+
+def _release_asset_json(repo: str, tag: str, name: str):
+    try:
+        rel = requests.get(
+            f"https://api.github.com/repos/{repo}/releases/tags/{tag}",
+            headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-fleet-broker/1.0"},
+            timeout=20,
+        )
+        if rel.status_code != 200:
+            return None
+        asset = next((a for a in rel.json().get("assets") or [] if a.get("name") == name), None)
+        if not asset:
+            return None
+        r = requests.get(
+            asset["url"],
+            headers={"Accept": "application/octet-stream", "User-Agent": "tender-fleet-broker/1.0"},
+            timeout=20,
+        )
+        if r.status_code != 200:
+            return None
+        return r.json()
+    except Exception:
+        return None
+
+
+def _policy():
+    try:
+        r = requests.get(
+            f"https://raw.githubusercontent.com/{EVERGREEN_REPO}/main/config/global_fleet.json",
+            headers={"User-Agent": "tender-fleet-broker/1.0"},
+            timeout=20,
+        )
+        if r.status_code == 200:
+            return r.json()
+    except Exception:
+        pass
+    return {}
+
+
+def _sibling_missing_headroom(fleet_detail: list[dict]) -> tuple[int, dict]:
+    policy = _policy()
+    workloads = policy.get("workloads") or {}
+    state = _release_asset_json(EVERGREEN_REPO, BROKER_TAG, BROKER_ASSET) or {}
+    demand = ((state.get("last_decision") or {}).get("demand") or {})
+
+    # If broker telemetry is temporarily unavailable, protect Hospitality's floor
+    # rather than letting Tender seize all 20 slots based on a monitoring failure.
+    if not demand:
+        demand = {"hospitality": 1, "gws": 0}
+
+    active_evergreen = sum(
+        int(x.get("active_jobs") or 0)
+        for x in fleet_detail
+        if str(x.get("repo") or "") == EVERGREEN_REPO
+    )
+    target = 0
+    components = {}
+    for name in ("hospitality", "gws"):
+        cfg = workloads.get(name) or {}
+        enabled = bool(cfg.get("enabled", True))
+        backlog = int(demand.get(name, 0) or 0)
+        floor = int(cfg.get("min_slots_when_demanding") or DEFAULT_MINIMUMS[name])
+        need = min(backlog, floor) if enabled and backlog > 0 else 0
+        components[name] = {"demand": backlog, "minimum": floor, "target": need}
+        target += need
+
+    missing = max(0, target - active_evergreen)
+    return missing, {
+        "at": datetime.now(timezone.utc).isoformat(),
+        "active_evergreen_jobs": active_evergreen,
+        "guaranteed_target": target,
+        "missing_virtual_headroom": missing,
+        "components": components,
+        "broker_state_updated_at": state.get("updated_at"),
+    }
+
+
+_original_public_fleet_jobs = fc.public_fleet_jobs
+
+
+def _broker_aware_public_fleet_jobs():
+    active, queued, detail = _original_public_fleet_jobs()
+    missing, decision = _sibling_missing_headroom(detail)
+    if missing:
+        detail = list(detail) + [{
+            "repo": "virtual://global-capacity-broker",
+            "active_jobs": missing,
+            "queued_jobs": 0,
+            "reason": "guaranteed sibling headroom not yet satisfied by live jobs",
+            "decision": decision,
+        }]
+    print(json.dumps({"global_capacity_guard": decision}, separators=(",", ":")))
+    return active + missing, queued, detail
+
+
+fc.public_fleet_jobs = _broker_aware_public_fleet_jobs
+
+# Import only after monkey-patching the shared fleet_controller module. v4 delegates
+# execution to v3.main(), which reads fc.public_fleet_jobs at runtime.
+import fleet_controller_v4 as v4  # noqa: E402,F401
+import fleet_controller_v3 as v3  # noqa: E402
+
+
+if __name__ == "__main__":
+    v3.main()
