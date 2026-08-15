@@ -7,12 +7,16 @@ from urllib.parse import urljoin
 import requests
 
 OUT=Path(os.getenv('DISCOVERY_OUT','discovery/global/ES_PLACSP')); OUT.mkdir(parents=True,exist_ok=True)
-NOW=datetime.now(timezone.utc); LOOKBACK=max(1,int(os.getenv('LOOKBACK_DAYS','14'))); CUTOFF=NOW-timedelta(days=LOOKBACK)
+NOW=datetime.now(timezone.utc)
+LOOKBACK=max(1,int(os.getenv('LOOKBACK_DAYS','3')))
+MAX_PAGES=max(1,min(12,int(os.getenv('ES_MAX_PAGES','4'))))
+REQUEST_TIMEOUT=max(10,min(90,int(os.getenv('ES_REQUEST_TIMEOUT','40'))))
+CUTOFF=NOW-timedelta(days=LOOKBACK)
 FEEDS=[
  ('hosted','https://contrataciondelsectorpublico.gob.es/sindicacion/sindicacion_643/licitacionesPerfilesContratanteCompleto3.atom'),
  ('aggregated','https://contrataciondelsectorpublico.gob.es/sindicacion/sindicacion_1044/PlataformasAgregadasSinMenores.atom'),
 ]
-S=requests.Session(); S.headers.update({'User-Agent':'Tender-Engine/4.2 (+public procurement research)','Accept':'application/atom+xml,application/xml,text/xml,*/*'})
+S=requests.Session(); S.headers.update({'User-Agent':'Tender-Engine/4.3 (+public procurement research)','Accept':'application/atom+xml,application/xml,text/xml,*/*'})
 
 def clean(v): return ' '.join(str(v or '').split())
 def local(tag): return tag.rsplit('}',1)[-1] if '}' in tag else tag
@@ -46,25 +50,24 @@ def find_links(entry):
     return list(dict.fromkeys(out))
 
 def deadline_from(entry):
-    # CODICE/UBL uses several deadline field names across versions.
     vals=[]
     for n in ('EndDate','EndDateTime','TenderSubmissionDeadlinePeriod','DeadlineDate','ReceiptDeadlineDate','SubmissionDueDate'):
         vals.extend(texts(entry,n))
     for v in vals:
         x=pdt(v)
         if x:return x
-    # Date + time sibling fallback.
     dates=texts(entry,'EndDate')+texts(entry,'DeadlineDate')
     times=texts(entry,'EndTime')+texts(entry,'DeadlineTime')
-    if dates:
-        return pdt(dates[0] + ('T'+times[0] if times else ''))
+    if dates:return pdt(dates[0] + ('T'+times[0] if times else ''))
     return None
 
-def parse_feed(kind,start,max_pages=12):
+def parse_feed(kind,start):
     url=start; page=0; records=[]; telemetry=[]; seen=set()
-    while url and page<max_pages and url not in seen:
+    while url and page<MAX_PAGES and url not in seen:
         seen.add(url); page+=1
-        r=S.get(url,timeout=90); telemetry.append({'page':page,'url':url,'status':r.status_code,'bytes':len(r.content)}); r.raise_for_status()
+        r=S.get(url,timeout=REQUEST_TIMEOUT)
+        telemetry.append({'page':page,'url':url,'status':r.status_code,'bytes':len(r.content)})
+        r.raise_for_status()
         root=ET.fromstring(r.content)
         entries=[x for x in root if local(x.tag)=='entry']
         oldest=None
@@ -101,7 +104,6 @@ def main():
         try:r,t=parse_feed(kind,url);tele[kind]=t
         except Exception as exc:tele[kind]=[{'error':repr(exc),'url':url}];continue
         for x in r:
-            # newest update wins for same PLACSP atom id
             old=allr.get(x['candidate_id'])
             if not old or str(x.get('published') or '')>=str(old.get('published') or ''):allr[x['candidate_id']]=x
     rows=list(allr.values()); current=[x for x in rows if x.get('current',True)]
@@ -110,7 +112,7 @@ def main():
             for x in data:f.write(json.dumps(x,ensure_ascii=False)+'\n')
     errors=[]
     if not rows:errors.append({'type':'NO_ROWS','telemetry':tele})
-    stats={'source':'ES_PLACSP','raw_materialized':len(rows),'current_materialized':len(current),'lookback_days':LOOKBACK,'generated_at':NOW.isoformat(),'errors':errors,'official_feeds':[x[1] for x in FEEDS],'telemetry':tele}
+    stats={'source':'ES_PLACSP','raw_materialized':len(rows),'current_materialized':len(current),'lookback_days':LOOKBACK,'max_pages_per_feed':MAX_PAGES,'generated_at':NOW.isoformat(),'errors':errors,'official_feeds':[x[1] for x in FEEDS],'telemetry':tele}
     (OUT/'stats.json').write_text(json.dumps(stats,indent=2,ensure_ascii=False),encoding='utf-8');print(json.dumps(stats,indent=2,ensure_ascii=False))
 
 if __name__=='__main__':main()
