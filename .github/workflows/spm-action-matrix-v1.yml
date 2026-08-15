@@ -1,0 +1,63 @@
+name: SPM Historical Action Matrix v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/build_spm_action_matrix_v1.py'
+      - '.github/workflows/spm-action-matrix-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download full audited Micro-Niche v2 bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p source out
+          gh release download market-intelligence-micro-niche-v2-precision --repo "$GITHUB_REPOSITORY" --dir source --clobber
+      - name: Build audited market-hunting matrix
+        run: python pipeline/build_spm_action_matrix_v1.py --dir source --out out
+      - name: Persist compact matrix to repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p control/spm_action_matrix_v1
+          cp out/SPM_ACTION_MATRIX_V1.md control/spm_action_matrix_v1/SPM_ACTION_MATRIX_V1.md
+          cp out/SPM_ACTION_MATRIX_V1.csv control/spm_action_matrix_v1/SPM_ACTION_MATRIX_V1.csv
+          cp out/manifest.json control/spm_action_matrix_v1/manifest.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/spm_action_matrix_v1/
+          git commit -m 'tenders: persist SPM historical action matrix v1' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
+      - name: Publish full matrix bundle durably
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag='spm-historical-action-matrix-v1'
+          if ! gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target main \
+              --title 'SPM Historical Action Matrix v1' \
+              --notes 'Audited SPM market-hunting matrix derived from Micro-Niche v2 Precision. Historical prioritisation only; live DCE gates remain authoritative.'
+          fi
+          gh release upload "$tag" --repo "$GITHUB_REPOSITORY" \
+            out/SPM_ACTION_MATRIX_V1.md out/SPM_ACTION_MATRIX_V1.csv out/SPM_ACTION_MATRIX_V1.json out/manifest.json --clobber
