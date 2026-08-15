@@ -1,0 +1,198 @@
+name: Market Intelligence v5 GPT Snapshot
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/market-intelligence-v5-snapshot.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: market-intelligence-v5-snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download compact Market Intelligence v5 assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/mi-v5
+          for f in weird_money_rank.csv micro_niche_rank.csv repeat_buyers.csv winner_archetypes.csv historical_examples.csv price_bands.csv seasonality.csv cpv4_micro_niche_rank.csv market_summary.json; do
+            gh release download market-intelligence-v5 --pattern "$f" --dir /tmp/mi-v5 --clobber
+          done
+
+      - name: Build GPT-readable deep snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p control/market_intelligence_v5
+          python - <<'PY'
+          import csv,json,math
+          from pathlib import Path
+          from datetime import datetime,timezone
+
+          src=Path('/tmp/mi-v5')
+          out=Path('control/market_intelligence_v5')
+          out.mkdir(parents=True,exist_ok=True)
+
+          def rows(name):
+              with open(src/name,encoding='utf-8-sig',newline='') as f:
+                  return list(csv.DictReader(f))
+
+          def key(r):
+              return tuple(r.get(k,'') for k in ('warehouse_source','country','category','subcategory','currency'))
+
+          weird=rows('weird_money_rank.csv')
+          micro=rows('micro_niche_rank.csv')
+          repeats=rows('repeat_buyers.csv')
+          winners=rows('winner_archetypes.csv')
+          examples=rows('historical_examples.csv')
+          prices=rows('price_bands.csv')
+          seasons=rows('seasonality.csv')
+          cpv4=rows('cpv4_micro_niche_rank.csv')
+
+          top100=weird[:100]
+          deep_keys={key(r) for r in weird[:50]}
+
+          idx_w={}
+          for r in winners:
+              if key(r) in deep_keys:
+                  idx_w.setdefault(key(r),[]).append(r)
+          for k in idx_w:
+              idx_w[k]=sorted(idx_w[k],key=lambda r:int(float(r.get('supplier_rank') or 999)))[:5]
+
+          idx_e={}
+          for r in examples:
+              if key(r) in deep_keys:
+                  idx_e.setdefault(key(r),[]).append(r)
+          for k in idx_e:
+              idx_e[k]=idx_e[k][:3]
+
+          idx_r={}
+          for r in repeats:
+              if key(r) in deep_keys:
+                  idx_r.setdefault(key(r),[]).append(r)
+          for k in idx_r:
+              idx_r[k]=sorted(idx_r[k],key=lambda r:float(r.get('tender_count') or 0),reverse=True)[:8]
+
+          idx_p={key(r):r for r in prices if key(r) in deep_keys}
+          idx_s={key(r):r for r in seasons if key(r) in deep_keys}
+
+          deep=[]
+          for rank,r in enumerate(weird[:50],1):
+              k=key(r)
+              deep.append({
+                  'rank':rank,
+                  'cohort':r,
+                  'price_band':idx_p.get(k),
+                  'seasonality':idx_s.get(k),
+                  'top_repeat_buyers':idx_r.get(k,[]),
+                  'top_winners':idx_w.get(k,[]),
+                  'historical_examples':idx_e.get(k,[]),
+              })
+
+          # CPV4 cuts that map into the top-50 category/country/source/currency space.
+          top_context={(r.get('warehouse_source',''),r.get('country',''),r.get('category',''),r.get('subcategory',''),r.get('currency','')) for r in weird[:50]}
+          cpv_hits=[]
+          seen={}
+          for r in cpv4:
+              ctx=(r.get('warehouse_source',''),r.get('country',''),r.get('category',''),r.get('subcategory',''),r.get('currency',''))
+              if ctx not in top_context: continue
+              n=seen.get(ctx,0)
+              if n>=10: continue
+              seen[ctx]=n+1
+              cpv_hits.append(r)
+
+          payload={
+              'version':'SPM_MARKET_INTELLIGENCE_V5_GPT_SNAPSHOT',
+              'generated_at':datetime.now(timezone.utc).isoformat(),
+              'source_release':'market-intelligence-v5',
+              'top_100_weird_money':top100,
+              'top_50_deep':deep,
+              'cpv4_cuts_for_top_50':cpv_hits,
+              'interpretation_guardrails':[
+                  'Historical derived intelligence only; never a live eligibility or bid verdict.',
+                  'Currencies are isolated; no FX mixing in monetary cohorts.',
+                  'Supplier shares fractionalize consortium award groups.',
+                  'Competition score is neutral where bidder coverage is below 30 percent.',
+                  'Broad classifier buckets such as Design / publishing and Software / automation require title/CPV/scope QA before business conclusions.'
+              ]
+          }
+          (out/'snapshot.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
+
+          def fnum(v,d=0):
+              try:return f'{float(v):,.{d}f}'
+              except:return str(v or '')
+          md=[]
+          md.append('# SPM Market Intelligence v5 — GPT Snapshot')
+          md.append('')
+          md.append('Historical derived evidence from canonical Global Core v4. Not a DCE/eligibility verdict.')
+          md.append('')
+          md.append('## Top 30 weird-money cohorts')
+          md.append('')
+          md.append('|#|Source / country|Niche|Tenders|Buyers|Median award|Median bidders|Single-bid|Repeat buyers|Top supplier share|Score|')
+          md.append('|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|')
+          for i,r in enumerate(weird[:30],1):
+              md.append('|{}|{} / {}|{} → {}|{}|{}|{} {}|{}|{}%|{}|{}%|{}|'.format(
+                  i,r.get('warehouse_source',''),r.get('country',''),r.get('category',''),r.get('subcategory',''),
+                  fnum(r.get('tender_count')),fnum(r.get('unique_buyers')),r.get('currency',''),fnum(r.get('median_award_value'),2),
+                  fnum(r.get('median_bidder_count'),1),fnum(r.get('single_bid_pct'),1),fnum(r.get('repeat_buyer_count')),
+                  fnum(r.get('top_supplier_share_pct'),1),fnum(r.get('weird_money_score'),2)))
+          md.append('')
+          md.append('## Deep evidence — top 15')
+          md.append('')
+          for item in deep[:15]:
+              r=item['cohort']; md.append(f"### {item['rank']}. {r.get('warehouse_source')} / {r.get('country')} — {r.get('category')} → {r.get('subcategory')}")
+              md.append('')
+              md.append(f"- Tenders: {r.get('tender_count')} | buyers: {r.get('unique_buyers')} | median award: {r.get('currency')} {r.get('median_award_value')} | median bidders: {r.get('median_bidder_count')} | single-bid: {r.get('single_bid_pct')}% | repeat buyers: {r.get('repeat_buyer_count')} | supplier HHI: {r.get('supplier_hhi')}")
+              if item['price_band']:
+                  p=item['price_band']; md.append(f"- Award band: P10 {p.get('p10_award_value')} / P25 {p.get('p25_award_value')} / P50 {p.get('median_award_value')} / P75 {p.get('p75_award_value')} / P90 {p.get('p90_award_value')} {r.get('currency')}")
+              if item['seasonality']:
+                  s=item['seasonality']; md.append(f"- Peak publication month: {s.get('peak_month')} ({s.get('peak_month_share_pct')}% of dated tenders)")
+              if item['top_repeat_buyers']:
+                  md.append('- Repeat buyers: ' + '; '.join(f"{x.get('buyer_name')} ({x.get('tender_count')})" for x in item['top_repeat_buyers'][:5]))
+              if item['top_winners']:
+                  md.append('- Top historical winners: ' + '; '.join(f"{x.get('supplier_name') or x.get('supplier_id')} ({x.get('supplier_share_pct')}%)" for x in item['top_winners'][:5]))
+              if item['historical_examples']:
+                  md.append('- Examples:')
+                  for x in item['historical_examples']:
+                      md.append(f"  - {x.get('title') or '(untitled)'} — buyer {x.get('buyer_name')} — award {x.get('currency')} {x.get('award_value')} — bidders {x.get('bidder_count')} — winner(s) {x.get('supplier_names') or 'UNKNOWN'} — {x.get('official_url') or 'no URL'}")
+              md.append('')
+          md.append('## Guardrails')
+          md.append('')
+          for g in payload['interpretation_guardrails']:md.append(f'- {g}')
+          (out/'REPORT.md').write_text('\n'.join(md)+'\n',encoding='utf-8')
+          print(json.dumps({'top100':len(top100),'deep':len(deep),'cpv_hits':len(cpv_hits)},indent=2))
+          PY
+
+      - name: Persist snapshot to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/market_intelligence_v5/snapshot.json control/market_intelligence_v5/REPORT.md
+          if git diff --cached --quiet; then
+            echo 'Snapshot unchanged'
+            exit 0
+          fi
+          git commit -m 'tenders: persist Market Intelligence v5 GPT snapshot'
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((attempt * 3))"
+          done
+          exit 1
