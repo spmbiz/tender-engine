@@ -91,6 +91,41 @@ jobs:
             --run-id "$RID" \
             --max-runs 8 \
             --out portal-performance.json
+      - name: Evidence-based batch-size autotune
+        env:
+          RID: ${{ steps.resolve.outputs.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/autotune_dce_batch.py \
+            --desired control/desired_state.json \
+            --runner-yield "runner-yield-$RID.json" \
+            --out control/desired_state.json \
+            --decision-out "dce-batch-autotune-$RID.json"
+      - name: Persist scheduler/autotune state transactionally
+        env:
+          RID: ${{ steps.resolve.outputs.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/desired_state.json
+          if git diff --cached --quiet; then
+            echo 'No batch-size state change to commit'
+            exit 0
+          fi
+          git commit -m "throughput: autotune DCE batch after $RID"
+          for attempt in 1 2 3 4; do
+            if git pull --rebase origin main && git push origin HEAD:main; then
+              echo 'Autotuned desired state persisted'
+              exit 0
+            fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((attempt * 5))"
+          done
+          echo 'Could not persist autotuned desired state' >&2
+          exit 1
       - name: Persist immutable run metrics and mutable scheduler state
         env:
           GH_TOKEN: ${{ github.token }}
@@ -102,11 +137,16 @@ jobs:
           gh release upload "$tag" \
             "portal-yield-$RID.json" \
             "dce-yield-summary-$RID.json" \
-            "runner-yield-$RID.json" --clobber
+            "runner-yield-$RID.json" \
+            "dce-batch-autotune-$RID.json" --clobber
           gh release upload fleet-state portal-performance.json --clobber
           echo '### Exact runner yield' >> "$GITHUB_STEP_SUMMARY"
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
           cat "runner-yield-$RID.json" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo '### Batch autotune' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat "dce-batch-autotune-$RID.json" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           echo '### Rolling portal performance' >> "$GITHUB_STEP_SUMMARY"
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
