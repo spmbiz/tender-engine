@@ -27,7 +27,7 @@ jobs:
           python-version: '3.12'
       - name: Install DuckDB
         run: python -m pip install --disable-pip-version-check -q duckdb
-      - name: Patch reserved SQL alias in v6 builder
+      - name: Patch reserved SQL aliases in v6 builder
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -35,8 +35,14 @@ jobs:
           s=p.read_text(encoding='utf-8')
           s=s.replace('{proc} procedure,','{proc} procurement_procedure,')
           s=s.replace('t.procedure,t.official_url','t.procurement_procedure,t.official_url')
+          s=s.replace('),0) share FROM sx', '),0) supplier_share FROM sx')
+          s=s.replace('max(share)*100', 'max(supplier_share)*100')
+          s=s.replace('sum(share*share)*10000', 'sum(supplier_share*supplier_share)*10000')
+          s=s.replace('share*100 supplier_share_pct', 'supplier_share*100 supplier_share_pct')
+          s=s.replace('EXCLUDE(rn,share)', 'EXCLUDE(rn,supplier_share)')
           p.write_text(s,encoding='utf-8')
           assert '{proc} procedure,' not in s
+          assert '),0) share FROM sx' not in s
           PY
       - name: Download canonical Global Core v4
         env:
@@ -58,7 +64,7 @@ jobs:
       - name: QA and show top lanes
         run: |
           python - <<'PY'
-          import json,csv,os
+          import json
           s=json.load(open('clean-v6/clean_summary.json',encoding='utf-8'))
           assert s['version']=='SPM_MARKET_INTELLIGENCE_V6_CLEAN'
           assert len(s['top_50'])>=20,len(s['top_50'])
