@@ -1,0 +1,79 @@
+name: Persist Current Gate Review
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/persist-current-gate-review.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download current durable deep-review pack
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RID: '31902472750'
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release download "dce-harvest-${RID}" --pattern "dce-deep-review-${RID}.tar.gz" --dir /tmp
+          mkdir -p /tmp/review
+          tar -xzf "/tmp/dce-deep-review-${RID}.tar.gz" -C /tmp/review
+          find /tmp/review -maxdepth 2 -type f -print
+      - name: Persist all snippets for gate-ready candidates
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          rid='31902472750'
+          q=next(Path('/tmp/review').rglob('deep_review_queue.jsonl'))
+          rows=[]
+          for line in q.read_text(encoding='utf-8',errors='replace').splitlines():
+              if not line.strip(): continue
+              r=json.loads(line)
+              if r.get('gate_readiness'):
+                  rows.append({
+                      'candidate_id':r.get('candidate_id'),
+                      'title':r.get('title'),
+                      'buyer':r.get('buyer'),
+                      'portal':r.get('portal'),
+                      'deadline':r.get('deadline'),
+                      'estimated_value':r.get('estimated_value'),
+                      'currency':r.get('currency'),
+                      'notice_url':r.get('notice_url'),
+                      'content_quality':r.get('content_quality'),
+                      'deadline_authority_status':r.get('deadline_authority_status'),
+                      'deadline_conflict':r.get('deadline_conflict'),
+                      'documents_extracted':r.get('documents_extracted'),
+                      'corpus_chars':r.get('corpus_chars'),
+                      'gate_evidence_counts':r.get('gate_evidence_counts') or {},
+                      'gate_snippets':r.get('gate_snippets') or {},
+                      'review_template':r.get('review_template') or {},
+                  })
+          out=Path(f'control/deep_gate_review_{rid}.json')
+          out.write_text(json.dumps({'schema':'DEEP_GATE_REVIEW_V1','dce_run_id':rid,'gate_ready_count':len(rows),'rows':rows},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps({'gate_ready_count':len(rows),'candidate_ids':[x['candidate_id'] for x in rows]},indent=2))
+          PY
+      - name: Commit compact gate review
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/deep_gate_review_31902472750.json
+          git commit -m 'tenders: persist deep gate review 31902472750' || exit 0
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
