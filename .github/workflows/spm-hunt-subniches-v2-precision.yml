@@ -1,0 +1,111 @@
+name: SPM Hunt Sub-Niches v2 Precision
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/spm-hunt-subniches-v2-precision.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: spm-hunt-subniches-v2-precision
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q duckdb
+
+      - name: Download canonical Global Core v4
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source out
+          for asset in historical_tenders.parquet awards.parquet award_suppliers.parquet; do
+            gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern "$asset" --dir source --clobber
+          done
+
+      - name: Build hardened v2 classifier from audited v1 code
+        shell: bash
+        run: |
+          cp pipeline/build_spm_hunt_subniches_v1.py /tmp/build_v2.py
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('/tmp/build_v2.py'); s=p.read_text(encoding='utf-8')
+          reps=[
+            ('VERSION = "SPM_HUNT_SUBNICHES_V1"','VERSION = "SPM_HUNT_SUBNICHES_V2_PRECISION"'),
+            ("regexp_matches(title_l,'(sténotyp|sténograph)')", "regexp_matches(title_l,'(st[eé]notyp|st[eé]nograph)')"),
+            ("WHEN lower(warehouse_source)='france' AND regexp_matches(title_l,'(interprétariat|interprétation)') AND NOT regexp_matches(title_l,'(matériel|équipement|audiovisuel|location)') THEN 'FR · Human interpreting'", "WHEN lower(warehouse_source)='france' AND (regexp_matches(title_l,'interprétariat') OR (regexp_matches(title_l,'interprétation') AND regexp_matches(title_l,'(langue|linguistique|simultan|conférence|conference|traduct)'))) AND NOT regexp_matches(title_l,'(matériel|équipement|audiovisuel|location|logiciel d.?interprétation|centre d.?interprétation|sentier d.?interprétation|signalétique.{0,30}interprétation|mobilier d.?interprétation|barrage|auscultation)') THEN 'FR · Human interpreting'"),
+            ("AND regexp_matches(title_l,'(impression|imprimer|fourniture)') THEN 'FR · Forms / stationery / cards printing'", "AND regexp_matches(title_l,'(impression|imprimer|imprimé)') THEN 'FR · Forms / stationery / cards printing'"),
+            ("AND NOT regexp_matches(title_l,'(equipment|hardware|translational)') THEN 'CA · Written translation'", "AND NOT regexp_matches(title_l,'(equipment|hardware|translational|interpretation|interpreting|simultaneous)') THEN 'CA · Written translation'"),
+          ]
+          for old,new in reps:
+            n=s.count(old)
+            assert n==1,(old,n)
+            s=s.replace(old,new)
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Run full-corpus precision v2
+        run: |
+          python /tmp/build_v2.py \
+            --historical source/historical_tenders.parquet \
+            --awards source/awards.parquet \
+            --bridge source/award_suppliers.parquet \
+            --out out
+
+      - name: Validate semantic corrections
+        shell: bash
+        run: |
+          python - <<'PY'
+          import csv,json,os,re
+          m=json.load(open('out/manifest.json',encoding='utf-8'))
+          assert m['version']=='SPM_HUNT_SUBNICHES_V2_PRECISION',m
+          assert m['counts']['classified_records']>=3000,m['counts']
+          ex=list(csv.DictReader(open('out/representative_examples_subniche.csv',encoding='utf-8')))
+          for r in ex:
+            t=r['title'].lower(); n=r['sub_niche']
+            if n=='FR · Human interpreting':
+              assert not re.search(r'(logiciel d.?interprétation|centre d.?interprétation|sentier d.?interprétation|signalétique.{0,30}interprétation|mobilier d.?interprétation|barrage|auscultation)',t),t
+            if n=='FR · Forms / stationery / cards printing':
+              assert re.search(r'(impression|imprimer|imprimé)',t),t
+            if n=='CA · Written translation':
+              assert not re.search(r'(interpretation|interpreting|simultaneous)',t),t
+            if n=='FR · Meeting / debate transcription':
+              assert not re.search(r'st[eé]notyp|st[eé]nograph',t),t
+          print(json.dumps({'counts':m['counts'],'semantic_corrections':'PASS'},indent=2))
+          PY
+
+      - name: Persist compact v2 authority
+        shell: bash
+        run: |
+          rm -f out/work.duckdb out/work.duckdb.wal
+          mkdir -p control/spm_hunt_subniches_v2_precision
+          cp out/REPORT.md control/spm_hunt_subniches_v2_precision/REPORT.md
+          cp out/manifest.json control/spm_hunt_subniches_v2_precision/manifest.json
+          cp out/open_hunt_subniches.csv control/spm_hunt_subniches_v2_precision/open_hunt_subniches.csv
+          cp out/direct_buyer_subniches.csv control/spm_hunt_subniches_v2_precision/direct_buyer_subniches.csv
+          cp out/hunt_playbook.csv control/spm_hunt_subniches_v2_precision/hunt_playbook.csv
+          git config user.name 'github-actions[bot]'; git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/spm_hunt_subniches_v2_precision/
+          git commit -m 'tenders: persist SPM hunt subniches v2 precision' || true
+          for i in 1 2 3 4 5; do git pull --rebase origin main && git push origin HEAD:main && break; git rebase --abort >/dev/null 2>&1 || true; sleep $((i*3)); done
+
+      - name: Publish durable v2 bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag='market-intelligence-hunt-subniches-v2-precision'
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --target main --title 'SPM Market Intelligence — Hunt Sub-Niches v2 Precision' --notes 'Hardened title-led sub-niche intelligence after v1 semantic QA. Historical/retrieval prior only.'
+          gh release upload "$tag" out/REPORT.md out/manifest.json out/subniche_rank.csv out/open_hunt_subniches.csv out/direct_buyer_subniches.csv out/repeat_buyers_subniche.csv out/top_winners_subniche.csv out/representative_examples_subniche.csv out/hunt_playbook.csv --clobber
