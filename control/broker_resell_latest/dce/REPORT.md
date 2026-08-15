@@ -1,0 +1,172 @@
+# Broker DCE aggregate — run 31899175067
+
+This summary is downstream of title-anchored broker candidate selection and DCE evidence-quality classification. Transport success alone is not a DCE eligibility pass.
+
+```json
+{
+  "candidates": 13,
+  "raw_manifest_rows": 13,
+  "duplicate_manifest_rows_removed": 0,
+  "raw_status_counts": {
+    "AUTH_REQUIRED": 8,
+    "GENERIC_PUBLIC_PAGE_UNRESOLVED": 2,
+    "DOWNLOADED_PUBLIC": 3
+  },
+  "derived_status_counts": {
+    "AUTH_REQUIRED": 8,
+    "GENERIC_PUBLIC_PAGE_UNRESOLVED": 2,
+    "DOWNLOADED_PUBLIC": 3
+  },
+  "content_quality_counts": {
+    "NOT_APPLICABLE": 10,
+    "SUBSTANTIVE_DCE_PRESENT": 3
+  },
+  "deadline_authority_status_counts": {
+    "NOT_APPLICABLE_DCE_NOT_GATE_READY": 10,
+    "CONSISTENT_NOTICE_DATE_FOUND_IN_DCE": 3
+  },
+  "deadline_conflicts": 0,
+  "raw_downloaded_public": 3,
+  "gate_ready_substantive_dce": 3,
+  "gate_blocked_or_unverified": 10,
+  "access_guide_only": 0,
+  "portal_generic_only": 0,
+  "content_unverified": 0,
+  "fully_extracted_gate_ready": 3,
+  "worker_retries": 0,
+  "worker_failures": 0,
+  "rate_limit_signals": 0,
+  "shard_metric_count": 7,
+  "raw_worker_tree_bytes": 32197820,
+  "slim_handoff_bytes": 13598805,
+  "handoff_storage_reduction_ratio": 0.577648,
+  "portal_yield": {
+    "CA_CANADABUYS": {
+      "candidates": 1,
+      "gate_ready_substantive_dce": 0,
+      "useful_rate": 0.0,
+      "raw_downloaded_public": 0,
+      "auth_required": 1,
+      "auth_rate": 1.0,
+      "generic_or_unresolved": 0,
+      "candidate_processing_seconds": 12.338,
+      "candidate_processing_minutes": 0.205633,
+      "useful_per_candidate_processing_minute": 0.0,
+      "retries": 0,
+      "rate_limit_signals": 0,
+      "worker_failures": 0,
+      "raw_status_counts": {
+        "AUTH_REQUIRED": 1
+      },
+      "derived_status_counts": {
+        "AUTH_REQUIRED": 1
+      }
+    },
+    "DK_UDBUD": {
+      "candidates": 1,
+      "gate_ready_substantive_dce": 0,
+      "useful_rate": 0.0,
+      "raw_downloaded_public": 0,
+      "auth_required": 0,
+      "auth_rate": 0.0,
+      "generic_or_unresolved": 1,
+      "candidate_processing_seconds": 14.688,
+      "candidate_processing_minutes": 0.2448,
+      "useful_per_candidate_processing_minute": 0.0,
+      "retries": 0,
+      "rate_limit_signals": 0,
+      "worker_failures": 0,
+      "raw_status_counts": {
+        "GENERIC_PUBLIC_PAGE_UNRESOLVED": 1
+      },
+      "derived_status_counts": {
+        "GENERIC_PUBLIC_PAGE_UNRESOLVED": 1
+      }
+    },
+    "IRELAND_ETENDERS": {
+      "candidates": 3,
+      "gate_ready_substantive_dce": 3,
+      "useful_rate": 1.0,
+      "raw_downloaded_public": 3,
+      "auth_required": 0,
+      "auth_rate": 0.0,
+      "generic_or_unresolved": 0,
+      "candidate_processing_seconds": 63.513,
+      "candidate_processing_minutes": 1.05855,
+      "useful_per_candidate_processing_minute": 2.834065,
+      "retries": 0,
+      "rate_limit_signals": 0,
+      "worker_failures": 0,
+      "raw_status_counts": {
+        "DOWNLOADED_PUBLIC": 3
+      },
+      "derived_status_counts": {
+        "DOWNLOADED_PUBLIC": 3
+      }
+    },
+    "TED": {
+      "candidates": 1,
+      "gate_ready_substantive_dce": 0,
+      "useful_rate": 0.0,
+      "raw_downloaded_public": 0,
+      "auth_required": 1,
+      "auth_rate": 1.0,
+      "generic_or_unresolved": 0,
+      "candidate_processing_seconds": 20.716,
+      "candidate_processing_minutes": 0.345267,
+      "useful_per_candidate_processing_minute": 0.0,
+      "retries": 0,
+      "rate_limit_signals": 0,
+      "worker_failures": 0,
+      "raw_status_counts": {
+        "AUTH_REQUIRED": 1
+      },
+      "derived_status_counts": {
+        "AUTH_REQUIRED": 1
+      }
+    },
+    "US_SAM": {
+      "candidates": 7,
+      "gate_ready_substantive_dce": 0,
+      "useful_rate": 0.0,
+      "raw_downloaded_public": 0,
+      "auth_required": 6,
+      "auth_rate": 0.857143,
+      "generic_or_unresolved": 1,
+      "candidate_processing_seconds": 81.634,
+      "candidate_processing_minutes": 1.360567,
+      "useful_per_candidate_processing_minute": 0.0,
+      "retries": 0,
+      "rate_limit_signals": 0,
+      "worker_failures": 0,
+      "raw_status_counts": {
+        "AUTH_REQUIRED": 6,
+        "GENERIC_PUBLIC_PAGE_UNRESOLVED": 1
+      },
+      "derived_status_counts": {
+        "AUTH_REQUIRED": 6,
+        "GENERIC_PUBLIC_PAGE_UNRESOLVED": 1
+      }
+    }
+  },
+  "portal_yield_time_basis": "candidate_processing_minutes; not yet exact GitHub runner wall-time",
+  "raw_archives_in_final_artifact": false,
+  "mandatory_gate_names": [
+    "entity_geography",
+    "turnover_financial",
+    "references_experience",
+    "certifications_partner",
+    "staffing_team",
+    "insurance_bonds",
+    "subcontracting_consortium",
+    "deliverables_scope",
+    "sla_onsite",
+    "term_value",
+    "award_criteria",
+    "forms_signatures",
+    "submission",
+    "ip_data_security"
+  ],
+  "contract": "Only gate_ready_substantive_dce rows may advance to mandatory-gate adjudication; authority conflicts remain explicit; final 90+/FINAL_SUPER_GREEN requires all mandatory gate statuses resolved with evidence and validation by final_verdict_guard.py."
+}
+```
