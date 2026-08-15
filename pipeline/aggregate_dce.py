@@ -6,6 +6,7 @@ import re
 from collections import Counter
 from pathlib import Path
 
+from final_verdict_guard import REQUIRED_GATES
 
 PORTAL_GENERIC_FILE_PATTERNS = [
     re.compile(r"^depot[-_ ]?pli\.pdf$", re.I),
@@ -50,6 +51,18 @@ def resolve_evidence(raw_status: str, files: list[dict], evidence: dict) -> tupl
     return legacy_content_quality(raw_status, files)
 
 
+def review_template(gate_snippets: dict, gate_readiness: bool) -> dict:
+    out = {}
+    for gate in REQUIRED_GATES:
+        out[gate] = {
+            "status": "UNKNOWN",
+            "evidence": [],
+            "evidence_candidates": (gate_snippets.get(gate) or [])[:8] if gate_readiness else [],
+            "notes": "",
+        }
+    return out
+
+
 def quality_key(row: dict) -> tuple:
     return (
         bool(row.get("gate_readiness")),
@@ -85,6 +98,7 @@ def main():
         raw_status = str(manifest.get("status") or "UNKNOWN")
         files = manifest.get("files") or []
         status, content_quality, gate_readiness = resolve_evidence(raw_status, files, evidence)
+        gate_snippets = gates.get("categories") or {}
         cid = str(manifest.get("candidate_id"))
         row = {
             "candidate_id": cid,
@@ -95,6 +109,8 @@ def main():
             "status": status,
             "content_quality": content_quality,
             "gate_readiness": gate_readiness,
+            "eligible_for_gate_review": gate_readiness,
+            "finalization_allowed": False,
             "evidence_quality": evidence,
             "deadline": candidate.get("deadline"),
             "estimated_value": candidate.get("estimated_value"),
@@ -105,13 +121,16 @@ def main():
             "documents_extracted": len(doc_index) if isinstance(doc_index, list) else 0,
             "corpus_chars": corpus_path.stat().st_size if corpus_path.exists() else 0,
             "gate_evidence_counts": gates.get("evidence_counts") or {},
-            "gate_snippets": gates.get("categories") or {},
+            "gate_snippets": gate_snippets,
+            "mandatory_gate_names": REQUIRED_GATES,
+            "review_template": review_template(gate_snippets, gate_readiness),
             "artifact_relative_root": str(candidate_root.relative_to(root)),
             "gpt_instruction": (
                 "DOWNLOADED_PUBLIC is transport success, not proof of DCE. Only review mandatory gates when gate_readiness=true. "
                 "ACCESS_GUIDE_ONLY / PORTAL_GENERIC_ONLY / DCE_CONTENT_UNVERIFIED are not authoritative DCE evidence. "
-                "Resolve every mandatory gate as PASS/PASS_CONDITIONAL/FAIL_HARD/UNKNOWN/NOT_APPLICABLE with source evidence. "
-                "FINAL_SUPER_GREEN or score >=90 is forbidden while any potentially disqualifying gate is UNKNOWN/FAIL or lacks evidence."
+                "Fill every review_template gate as PASS/PASS_CONDITIONAL/FAIL_HARD/UNKNOWN/NOT_APPLICABLE with source evidence. "
+                "FINAL_SUPER_GREEN or score >=90 is forbidden while any potentially disqualifying gate is UNKNOWN/FAIL or lacks evidence. "
+                "Never infer a PASS from absence of a snippet; missing evidence remains UNKNOWN."
             ),
         }
         current = by_candidate.get(cid.casefold())
@@ -168,7 +187,8 @@ def main():
         "slim_handoff_bytes": slim_bytes,
         "handoff_storage_reduction_ratio": round((1 - slim_bytes / raw_bytes) if raw_bytes else 0, 6),
         "raw_archives_in_final_artifact": False,
-        "contract": "Only gate_ready_substantive_dce rows may advance to mandatory-gate adjudication; final 90+/FINAL_SUPER_GREEN still requires complete evidenced gate resolution.",
+        "mandatory_gate_names": REQUIRED_GATES,
+        "contract": "Only gate_ready_substantive_dce rows may advance to mandatory-gate adjudication; final 90+/FINAL_SUPER_GREEN requires all mandatory gate statuses resolved with evidence and validation by final_verdict_guard.py.",
     }
     (out / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(summary, indent=2, ensure_ascii=False))
