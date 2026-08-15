@@ -1,0 +1,95 @@
+name: SPM Market Intelligence v8 Route Aware
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/build_market_intelligence_v8_route_aware.py'
+      - '.github/workflows/market-intelligence-v8-route-aware.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: spm-market-intelligence-v8-route-aware
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install DuckDB
+        run: python -m pip install --disable-pip-version-check -q duckdb
+      - name: Download canonical Global Core v4
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p core v8
+          for asset in historical_tenders.parquet awards.parquet award_suppliers.parquet data_quality.json; do
+            gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern "$asset" --dir core --clobber
+            test -s "core/$asset"
+          done
+          python - <<'PY'
+          import json
+          q=json.load(open('core/data_quality.json',encoding='utf-8'))
+          assert q.get('status')=='PASS',q
+          assert q['counts_notice_first']['historical_tenders']==2250547,q
+          PY
+      - name: Build route-aware intelligence
+        run: |
+          python pipeline/build_market_intelligence_v8_route_aware.py \
+            --historical core/historical_tenders.parquet \
+            --awards core/awards.parquet \
+            --award-suppliers core/award_suppliers.parquet \
+            --out v8
+      - name: QA route separation
+        run: |
+          python - <<'PY'
+          import json,csv,os
+          s=json.load(open('v8/route_aware_summary.json',encoding='utf-8'))
+          assert s['version']=='SPM_MARKET_INTELLIGENCE_V8_ROUTE_AWARE'
+          assert len(s['open_bid_top30'])>=10,len(s['open_bid_top30'])
+          assert len(s['direct_buyer_top30'])>=5,len(s['direct_buyer_top30'])
+          with open('v8/open_bid_rank.csv',encoding='utf-8-sig') as f:
+            assert all(r['route_band']=='OPEN_PUBLIC' for r in csv.DictReader(f))
+          with open('v8/direct_buyer_rank.csv',encoding='utf-8-sig') as f:
+            assert all(r['route_band']=='DIRECT_NONCOMPETITIVE' for r in csv.DictReader(f))
+          report=open('v8/REPORT.md',encoding='utf-8').read()
+          assert 'OPEN BID' in report and 'DIRECT BUYER' in report
+          print(json.dumps({'top_open':[x['cohort'] for x in s['open_bid_top30'][:10]],'top_direct':[x['cohort'] for x in s['direct_buyer_top30'][:10]]},ensure_ascii=False,indent=2))
+          PY
+      - name: Publish v8 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG='market-intelligence-v8-route-aware'
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title 'SPM Market Intelligence v8 — Route Aware' --notes 'Separates historical OPEN_PUBLIC procurement from DIRECT_NONCOMPETITIVE buyer demand, invitation/limited routes, and framework/DPS/calloff activity. Title-led high-precision service classifier; Global Core v4 notice-first; historical priors only.'
+          fi
+          find v8 -maxdepth 1 -type f -print0 | while IFS= read -r -d '' f; do gh release upload "$TAG" "$f" --clobber; done
+      - name: Persist GPT-readable v8 snapshot
+        run: |
+          set -euo pipefail
+          mkdir -p control/market_intelligence_v8
+          cp v8/REPORT.md control/market_intelligence_v8/REPORT.md
+          cp v8/route_aware_summary.json control/market_intelligence_v8/snapshot.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/market_intelligence_v8/REPORT.md control/market_intelligence_v8/snapshot.json
+          git commit -m 'tenders: persist route-aware Market Intelligence v8 snapshot' || exit 0
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((attempt*3))"
+          done
+          exit 1
