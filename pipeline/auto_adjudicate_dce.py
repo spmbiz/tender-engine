@@ -3,8 +3,11 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import random
 import re
+import time
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import requests
@@ -21,6 +24,7 @@ MODEL_CLASSIFICATIONS = {
     "RED",
     "MODEL_REVIEW_REQUIRED",
 }
+RETRYABLE_HTTP = {408, 409, 429, 500, 502, 503, 504}
 
 SYSTEM_PROMPT = """You are adjudicating public procurement opportunities for a very small Belgian supplier.
 Use ONLY the authoritative DCE evidence supplied in the JSON input. Never infer a PASS from missing text.
@@ -73,7 +77,7 @@ def output_text(response: dict) -> str:
     return ""
 
 
-def call_model(row: dict, model: str, api_key: str):
+def call_model(row: dict, model: str, api_key: str, retries: int = 2):
     refs, gates = number_evidence(row)
     payload = {
         "candidate": {
@@ -108,22 +112,39 @@ def call_model(row: dict, model: str, api_key: str):
         "max_output_tokens": 5000,
         "store": False,
     }
-    r = requests.post(
-        "https://api.openai.com/v1/responses",
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-        json=body,
-        timeout=180,
-    )
-    if r.status_code >= 400:
-        raise RuntimeError(f"OpenAI {r.status_code}: {r.text[:800]}")
-    text = output_text(r.json()).strip()
-    if not text:
-        raise RuntimeError("OpenAI response contained no output_text")
-    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.I | re.S).strip()
-    obj = json.loads(text)
-    if not isinstance(obj, dict):
-        raise RuntimeError("model output was not a JSON object")
-    return obj, refs
+    last_error = None
+    for attempt in range(1, max(0, retries) + 2):
+        try:
+            r = requests.post(
+                "https://api.openai.com/v1/responses",
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                json=body,
+                timeout=180,
+            )
+            if r.status_code >= 400:
+                last_error = RuntimeError(f"OpenAI {r.status_code}: {r.text[:800]}")
+                if r.status_code not in RETRYABLE_HTTP or attempt > retries:
+                    raise last_error
+            else:
+                text = output_text(r.json()).strip()
+                if not text:
+                    raise RuntimeError("OpenAI response contained no output_text")
+                text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.I | re.S).strip()
+                obj = json.loads(text)
+                if not isinstance(obj, dict):
+                    raise RuntimeError("model output was not a JSON object")
+                return obj, refs
+        except (requests.RequestException, json.JSONDecodeError, RuntimeError) as exc:
+            last_error = exc
+            if attempt > retries:
+                raise
+        retry_after = None
+        try:
+            retry_after = float(r.headers.get("retry-after") or 0) if 'r' in locals() else 0
+        except Exception:
+            retry_after = 0
+        time.sleep(max(retry_after or 0, min(8.0, 0.7 * attempt + random.random())))
+    raise RuntimeError(str(last_error or "model call failed"))
 
 
 def fallback_record(row: dict, reason: str, model: str | None = None):
@@ -215,11 +236,21 @@ def normalize_model_record(row: dict, obj: dict, refs: dict, model: str):
     return rec
 
 
+def adjudicate_one(index: int, row: dict, model: str, api_key: str, retries: int):
+    try:
+        obj, refs = call_model(row, model, api_key, retries=retries)
+        return index, normalize_model_record(row, obj, refs, model), False
+    except Exception as exc:
+        return index, fallback_record(row, f"Model adjudication error: {str(exc)[:700]}", model), True
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--queue", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--max-model-reviews", type=int, default=80)
+    ap.add_argument("--model-concurrency", type=int, default=int(os.getenv("OPENAI_ADJUDICATION_CONCURRENCY", "4")))
+    ap.add_argument("--model-retries", type=int, default=int(os.getenv("OPENAI_ADJUDICATION_RETRIES", "2")))
     args = ap.parse_args()
 
     rows = list(load_jsonl(Path(args.queue)))
@@ -228,43 +259,48 @@ def main():
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
     model = os.getenv("OPENAI_ADJUDICATION_MODEL", "gpt-5-mini").strip() or "gpt-5-mini"
 
-    records = []
-    model_attempts = 0
-    model_errors = 0
+    records: list[dict | None] = [None] * len(rows)
+    review_jobs: list[tuple[int, dict]] = []
     gate_ready_rows = [r for r in rows if r.get("gate_readiness")]
+    review_budget = max(0, args.max_model_reviews)
 
-    for row in rows:
+    for idx, row in enumerate(rows):
         if not row.get("gate_readiness"):
             rec = fallback_record(row, "Not gate-ready: authoritative DCE evidence is incomplete or unverified.")
             rec["classification"] = "YELLOW"
-            records.append(rec)
+            records[idx] = rec
             continue
-
         if not api_key:
-            records.append(fallback_record(row, "OPENAI_API_KEY unavailable: queued for model/manual gate adjudication.", model))
+            records[idx] = fallback_record(row, "OPENAI_API_KEY unavailable: queued for model/manual gate adjudication.", model)
             continue
-
-        if model_attempts >= args.max_model_reviews:
-            records.append(fallback_record(row, "Per-run model review cap reached; queued for next/manual adjudication.", model))
+        if len(review_jobs) >= review_budget:
+            records[idx] = fallback_record(row, "Per-run model review cap reached; queued for next/manual adjudication.", model)
             continue
+        review_jobs.append((idx, row))
 
-        model_attempts += 1
-        try:
-            obj, refs = call_model(row, model, api_key)
-            records.append(normalize_model_record(row, obj, refs, model))
-        except Exception as exc:
-            model_errors += 1
-            records.append(fallback_record(row, f"Model adjudication error: {str(exc)[:700]}", model))
+    model_errors = 0
+    workers = max(1, min(max(1, args.model_concurrency), len(review_jobs) or 1))
+    if review_jobs:
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            futures = {
+                pool.submit(adjudicate_one, idx, row, model, api_key, max(0, args.model_retries)): idx
+                for idx, row in review_jobs
+            }
+            for fut in as_completed(futures):
+                idx, rec, errored = fut.result()
+                records[idx] = rec
+                model_errors += int(errored)
 
+    final_records = [r for r in records if isinstance(r, dict)]
     all_path = out / "adjudication.jsonl"
     with all_path.open("w", encoding="utf-8") as f:
-        for rec in records:
+        for rec in final_records:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
-    counts = Counter(str(r.get("classification") or "UNKNOWN") for r in records)
-    finals = [r for r in records if r.get("classification") == "FINAL_SUPER_GREEN"]
-    greens = [r for r in records if r.get("classification") in {"FINAL_SUPER_GREEN", "GREEN", "GREEN_PARTNERABLE"}]
-    review_required = [r for r in records if r.get("classification") == "MODEL_REVIEW_REQUIRED"]
+    counts = Counter(str(r.get("classification") or "UNKNOWN") for r in final_records)
+    finals = [r for r in final_records if r.get("classification") == "FINAL_SUPER_GREEN"]
+    greens = [r for r in final_records if r.get("classification") in {"FINAL_SUPER_GREEN", "GREEN", "GREEN_PARTNERABLE"}]
+    review_required = [r for r in final_records if r.get("classification") == "MODEL_REVIEW_REQUIRED"]
     review_required.sort(key=lambda r: int(r.get("final_score") or 0), reverse=True)
 
     shortlist = {
@@ -282,8 +318,9 @@ def main():
         "gate_ready": len(gate_ready_rows),
         "model_available": bool(api_key),
         "model": model if api_key else None,
-        "model_attempts": model_attempts,
+        "model_attempts": len(review_jobs),
         "model_errors": model_errors,
+        "model_concurrency": workers if review_jobs else 0,
         "classification_counts": dict(counts),
         "final_supergreen": len(finals),
         "green_or_partnerable": len(greens),
