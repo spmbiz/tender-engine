@@ -3,6 +3,13 @@ import argparse, json, re
 from pathlib import Path
 from datetime import datetime, timezone
 
+try:
+    from pipeline.historical_market_priors import load as load_historical_priors, adjustment as historical_adjustment
+except ImportError:
+    from historical_market_priors import load as load_historical_priors, adjustment as historical_adjustment
+
+# High-recall discovery vocabulary. Historical intelligence is applied separately
+# as a small QA-clean pre-DCE bonus; it never changes eligibility or DCE gates.
 POSITIVE = [
     (22, ["website", "web site", "webdesign", "web design", "web development", "site web", "site internet", "internetseite", "webseite", "wordpress", "drupal", "cms", "content management system", "digital portal", "web portal", "online portal"]),
     (18, ["graphic design", "design graphique", "grafikdesign", "visual identity", "branding", "brand identity", "creative services", "communication design", "layout design"]),
@@ -10,7 +17,7 @@ POSITIVE = [
     (16, ["transcription", "captioning", "subtitling", "translation services", "traduction", "übersetzung", "localisation services"]),
     (15, ["printing", "print services", "impression", "druckleistungen", "brochure", "leaflet", "flyer", "booklet", "promotional material", "promotional items", "signage supply"]),
     (13, ["social media", "content creation", "digital content", "copywriting", "content production", "communications campaign", "marketing campaign"]),
-    (12, ["e-learning", "elearning", "learning platform", "lms", "training content", "online training", "digital learning", "course development"]),
+    (12, ["e-learning", "elearning", "learning platform", "learning management system", "training content", "online training", "digital learning", "course development", "moodle"]),
     (10, ["photography", "photo services", "illustration", "infographic", "presentation design"]),
     (8, ["survey design", "data entry", "document digitisation", "document digitization", "scanning services", "records digitisation"]),
 ]
@@ -81,7 +88,7 @@ def numeric_value(rec):
     return None
 
 
-def score_record(rec):
+def score_record(rec, priors=None):
     text=" \n ".join(flatten_strings(rec)).lower()
     score=0; hits=[]; neg=[]
     for w, terms in POSITIVE:
@@ -103,7 +110,10 @@ def score_record(rec):
     if seen is True or str(seen).lower()=="true": score -= 18
     # Keep specialist IT from dominating merely because it says portal/cloud.
     if any(x in text for x in ["software licences","software licenses","license renewal","licence renewal","managed service provider"]): score -= 10
-    return score, sorted(set(hits)), sorted(set(neg)), val
+
+    hist_delta, hist_reasons = historical_adjustment(rec, priors or {})
+    score += hist_delta
+    return score, sorted(set(hits)), sorted(set(neg)), val, hist_delta, hist_reasons
 
 
 def main():
@@ -116,6 +126,7 @@ def main():
     ap.add_argument("--run-id", type=int, required=True)
     args=ap.parse_args()
 
+    priors=load_historical_priors()
     rows=[]
     with open(args.input,"r",encoding="utf-8") as f:
         for line in f:
@@ -124,7 +135,7 @@ def main():
             except: continue
             cid=candidate_id(rec)
             if not cid: continue
-            score,hits,neg,val=score_record(rec)
+            score,hits,neg,val,hist_delta,hist_reasons=score_record(rec,priors)
             if score < 12: continue
             title=first(rec,["title","name","tender_title","notice_title","description_title"])
             deadline=first(rec,["deadline","submission_deadline","closing_date","close_date","tender_deadline"])
@@ -139,6 +150,8 @@ def main():
                 "estimated_value":val,
                 "positive_hits":hits,
                 "negative_hits":neg,
+                "historical_priority_adjustment":hist_delta,
+                "historical_priority_reasons":hist_reasons,
                 "record":rec,
             })
     rows.sort(key=lambda x:(x["score"], x.get("estimated_value") or 0), reverse=True)
@@ -163,7 +176,8 @@ def main():
         "wide_read_run_id":args.run_id,
         "default_preliminary_score":82,
         "status":"DCE_PENDING",
-        "selection_reason":"Worldwide high-recall lean-services prefilter only; DCE required before any supergreen verdict.",
+        "selection_reason":"Worldwide high-recall lean-services prefilter with bounded QA-clean historical priors. DCE required before any supergreen verdict.",
+        "historical_priors_status":priors.get("status") if priors else "UNAVAILABLE",
         "candidate_ids":[r["candidate_id"] for r in selected]
     }
     with open(args.selection,"w",encoding="utf-8") as f:
@@ -173,6 +187,8 @@ def main():
         "eligible_prefilter":len(rows),
         "saved_top":len(top),
         "selected_for_dce":len(selected),
+        "historical_priors_status":priors.get("status") if priors else "UNAVAILABLE",
+        "historically_adjusted_selected":sum(1 for r in selected if r.get("historical_priority_adjustment")),
         "by_source":{},
         "generated_at":datetime.now(timezone.utc).isoformat()
     }
