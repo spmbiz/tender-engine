@@ -1,0 +1,99 @@
+{
+  "version": "SPM_SEMANTIC_PROMOTION_V2",
+  "generated_at": "2026-08-15T17:29:19.006671+00:00",
+  "source_grain": "GLOBAL_CORE_V4_NOTICE_FIRST",
+  "safety": {
+    "historical_only": true,
+    "satisfies_dce_gates": false,
+    "affects_final_verdict": false,
+    "no_fx_mixing": true,
+    "award_first_used": false
+  },
+  "counts": {
+    "loose_candidates": 41301,
+    "strict_candidates": 4990,
+    "strict_open_public": 2631
+  },
+  "decisions": [
+    {
+      "lane": "Software licences / SaaS resale",
+      "decision": "PROMOTE_BROKER",
+      "strict_hits": 819,
+      "open_public_hits": 194,
+      "strict_share_pct": 25.24,
+      "reason": "Low-delivery software resale/subscription motion; validate reseller/channel constraints per DCE."
+    },
+    {
+      "lane": "Hardware / AV resale",
+      "decision": "HOLD_BROKER",
+      "strict_hits": 0,
+      "open_public_hits": 0,
+      "strict_share_pct": 0.0,
+      "reason": "Potential broker margin but working-capital, warranty, delivery and installation burden can dominate."
+    },
+    {
+      "lane": "Office supplies / consumables resale",
+      "decision": "HOLD_BROKER",
+      "strict_hits": 1983,
+      "open_public_hits": 1512,
+      "strict_share_pct": 68.64,
+      "reason": "Easy fulfilment but likely commodity margins/logistics; require margin and payment-term proof."
+    },
+    {
+      "lane": "Uniforms / PPE resale",
+      "decision": "HOLD_BROKER",
+      "strict_hits": 0,
+      "open_public_hits": 0,
+      "strict_share_pct": 0.0,
+      "reason": "Brokerable but sizing, standards, samples and inventory may create execution pain."
+    },
+    {
+      "lane": "Training / e-learning",
+      "decision": "PROMOTE_CORE",
+      "strict_hits": 472,
+      "open_public_hits": 162,
+      "strict_share_pct": 24.41,
+      "reason": "Only strict digital-learning/LMS/content subset; classroom/trainer-heavy work is excluded."
+    },
+    {
+      "lane": "Promotional merchandise",
+      "decision": "PROMOTE_BROKER",
+      "strict_hits": 142,
+      "open_public_hits": 97,
+      "strict_share_pct": 74.74,
+      "reason": "Brokerable physical production lane; DCE must allow subcontracting and acceptable samples/logistics."
+    },
+    {
+      "lane": "Signage / display production",
+      "decision": "HOLD_BROKER",
+      "strict_hits": 0,
+      "open_public_hits": 0,
+      "strict_share_pct": 0.0,
+      "reason": "Pure production can be brokered, but installation/site burden is common and explicitly filtered."
+    },
+    {
+      "lane": "Courier / mail fulfilment",
+      "decision": "REJECT_CORE",
+      "strict_hits": 137,
+      "open_public_hits": 64,
+      "strict_share_pct": 14.94,
+      "reason": "Operational physical network business; useful only as buyer/subcontractor intelligence."
+    },
+    {
+      "lane": "Event support / production",
+      "decision": "HOLD",
+      "strict_hits": 14,
+      "open_public_hits": 7,
+      "strict_share_pct": 3.62,
+      "reason": "Even clean titles frequently conceal onsite/cadence burden; no live bonus until DCE/sample validation."
+    },
+    {
+      "lane": "Recruitment / temporary staffing",
+      "decision": "REJECT_CORE",
+      "strict_hits": 1328,
+      "open_public_hits": 546,
+      "strict_share_pct": 24.33,
+      "reason": "Labour/employer/compliance motion is outside lean SPM core."
+    }
+  ]
+}
