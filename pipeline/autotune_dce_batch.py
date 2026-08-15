@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-"""Evidence-based DCE batch size tuner.
+"""Evidence-based DCE batch-size tuner for the streaming refinery.
 
-One variable at a time: candidate batch size. The tuner never changes DCE
-eligibility, portal weights, or local concurrency. It compares exact useful DCE
-per GitHub runner-minute against the last accepted benchmark and either keeps,
-rolls back, or advances one rung after a successful benchmark.
+The hot path publishes useful shard results before the whole batch completes, so
+batch size is now primarily a queue-depth / runner-saturation control. Tune it on
+useful authoritative DCE per exact runner-minute, shard health and rate limiting.
+Candidate-level retryable failures are intentionally advisory: the fast lane
+returns difficult routes to the durable retry/slow lane instead of burning the
+same runner on repeated inline timeouts.
 """
 
 import argparse
@@ -18,7 +20,6 @@ LADDER = [320, 640, 1000]
 MIN_KEEP_RATIO = 0.92
 MIN_ADVANCE_RATIO = 0.97
 MAX_SHARD_FAILURE_RATE = 0.01
-MAX_CANDIDATE_RETRYABLE_FAILURE_RATE = 0.01
 MAX_RATE_LIMIT_SIGNALS = 0
 
 
@@ -65,13 +66,12 @@ def main() -> None:
         useful > 0
         and runner_minutes > 0
         and shard_failure_rate <= MAX_SHARD_FAILURE_RATE
-        and candidate_retryable_failure_rate <= MAX_CANDIDATE_RETRYABLE_FAILURE_RATE
         and rate_limits <= MAX_RATE_LIMIT_SIGNALS
     )
 
     action = "KEEP"
     next_size = current
-    reason = "benchmark neutral/healthy"
+    reason = "streaming batch healthy"
 
     if not healthy or ratio < MIN_KEEP_RATIO:
         if reference_size in LADDER and reference_size < current:
@@ -81,22 +81,21 @@ def main() -> None:
             next_size = max(lower) if lower else current
         action = "ROLLBACK" if next_size < current else "KEEP"
         reason = (
-            f"unhealthy or yield ratio {ratio:.3f} below keep floor {MIN_KEEP_RATIO:.2f}; "
-            f"shard_failure_rate={shard_failure_rate:.4f}, "
-            f"candidate_retryable_failure_rate={candidate_retryable_failure_rate:.4f}, "
-            f"rate_limits={rate_limits}"
+            f"shard/rate-limit health or useful runner-yield ratio {ratio:.3f} below keep floor {MIN_KEEP_RATIO:.2f}; "
+            f"shard_failure_rate={shard_failure_rate:.4f}, rate_limits={rate_limits}; "
+            f"candidate_retryable_failure_rate={candidate_retryable_failure_rate:.4f} is advisory only because fast-lane misses are durably retried later"
         )
     elif current in LADDER and ratio >= MIN_ADVANCE_RATIO:
         higher = [x for x in LADDER if x > current]
         if higher:
             next_size = min(higher)
             action = "ADVANCE"
-            reason = f"healthy exact yield ratio {ratio:.3f} >= advance floor {MIN_ADVANCE_RATIO:.2f}"
+            reason = f"healthy exact useful runner-yield ratio {ratio:.3f} >= advance floor {MIN_ADVANCE_RATIO:.2f}"
         else:
-            reason = "top tested batch-size rung reached"
+            reason = "top tested streaming queue-depth rung reached"
 
     decision = {
-        "contract": "DCE_BATCH_AUTOTUNE_V3",
+        "contract": "DCE_BATCH_AUTOTUNE_V4_STREAMING",
         "at": datetime.now(timezone.utc).isoformat(),
         "action": action,
         "current_batch_size": current,
@@ -108,7 +107,7 @@ def main() -> None:
         "gate_ready_substantive_dce": useful,
         "runner_minutes_exact": runner_minutes,
         "shard_job_failure_rate": round(shard_failure_rate, 6),
-        "candidate_retryable_failure_rate": round(candidate_retryable_failure_rate, 6),
+        "candidate_retryable_failure_rate_advisory": round(candidate_retryable_failure_rate, 6),
         "rate_limit_signals": rate_limits,
         "healthy": healthy,
         "reason": reason,
@@ -128,6 +127,11 @@ def main() -> None:
         dce["benchmark_basis"] = basis
     else:
         dce.setdefault("benchmark_basis", basis)
+
+    latency = dce.get("latency_policy") or {}
+    if latency:
+        latency["target_candidates_per_batch"] = dce.get("max_candidates_per_cycle", next_size)
+        dce["latency_policy"] = latency
 
     Path(args.out).write_text(json.dumps(desired, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     Path(args.decision_out).write_text(json.dumps(decision, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
