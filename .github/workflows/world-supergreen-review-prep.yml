@@ -1,0 +1,65 @@
+name: Worldwide SuperGreen Review Prep
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/world_review_trigger.json'
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  prepare-review-and-dispatch-dce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read trigger
+        id: cfg
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          x=json.load(open('control/world_review_trigger.json'))
+          print(f"run={x['source_discovery_run']}")
+          print(f"selection={x.get('selection_path', 'queues/dce_selection_'+str(x['source_discovery_run'])+'.jsonl')}")
+          print(f"max_jobs={x.get('max_jobs',320)}")
+          PY
+      - name: Build connector-readable compact top view
+        shell: bash
+        run: |
+          python pipeline/compact_world_prefilter.py \
+            --input benchmarks/world-supergreen-prefilter-latest.jsonl \
+            --out benchmarks/world-supergreen-top-compact.json --limit 250
+      - name: Persist compact review file
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add benchmarks/world-supergreen-top-compact.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Persist compact worldwide supergreen review view'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Dispatch exact DCE fanout
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ steps.cfg.outputs.run }}
+          SELECTION: ${{ steps.cfg.outputs.selection }}
+          MAX_JOBS: ${{ steps.cfg.outputs.max_jobs }}
+        shell: bash
+        run: |
+          gh workflow run dce-fanout-v2.yml \
+            --ref main \
+            -f source_discovery_run="$SOURCE_RUN" \
+            -f selection_path="$SELECTION" \
+            -f max_jobs="$MAX_JOBS" \
+            -f max_parallel=20 \
+            -f max_shards=256 \
+            -f jobs_per_shard=0
