@@ -15,6 +15,10 @@ permissions:
   actions: read
   contents: write
 
+concurrency:
+  group: tender-portal-performance-writer
+  cancel-in-progress: false
+
 jobs:
   backfill:
     runs-on: ubuntu-latest
@@ -66,7 +70,6 @@ jobs:
           python pipeline/aggregate_dce.py --root dce-artifacts --out backfill
           cp backfill/portal_yield.json "portal-yield-$RID.json"
           cp backfill/summary.json "dce-yield-summary-$RID.json"
-          cat "portal-yield-$RID.json"
       - name: Measure exact GitHub shard runner-minutes
         env:
           GH_TOKEN: ${{ github.token }}
@@ -81,7 +84,27 @@ jobs:
             --summary "dce-yield-summary-$RID.json" \
             --portal-yield "portal-yield-$RID.json" \
             --out "runner-yield-$RID.json"
-      - name: Persist measured portal yield beside immutable DCE harvest
+      - name: Update bounded rolling portal performance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RID: ${{ steps.resolve.outputs.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p performance
+          existing=""
+          if gh release view fleet-state --json assets --jq '.assets[].name' | grep -Fxq 'portal-performance.json'; then
+            gh release download fleet-state --pattern portal-performance.json --dir performance
+            existing="--existing performance/portal-performance.json"
+          fi
+          python pipeline/update_portal_performance.py \
+            $existing \
+            --portal-yield "portal-yield-$RID.json" \
+            --runner-yield "runner-yield-$RID.json" \
+            --run-id "$RID" \
+            --max-runs 8 \
+            --out portal-performance.json
+      - name: Persist immutable run metrics and mutable scheduler state
         env:
           GH_TOKEN: ${{ github.token }}
           RID: ${{ steps.resolve.outputs.id }}
@@ -93,7 +116,12 @@ jobs:
             "portal-yield-$RID.json" \
             "dce-yield-summary-$RID.json" \
             "runner-yield-$RID.json" --clobber
+          gh release upload fleet-state portal-performance.json --clobber
           echo '### Exact runner yield' >> "$GITHUB_STEP_SUMMARY"
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
           cat "runner-yield-$RID.json" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo '### Rolling portal performance' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat portal-performance.json >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
