@@ -60,11 +60,14 @@ jobs:
           with open('/tmp/router.env','w') as f:
               f.write(f'SOURCE_RUN={run}\nCOUNT={len(ids)}\n')
           PY
+          # GITHUB_ENV only applies to subsequent steps. Source the same validated
+          # values locally before referencing them in this shell with `set -u`.
+          source /tmp/router.env
           cat /tmp/router.env >> "$GITHUB_ENV"
           echo "source_run=$SOURCE_RUN" >> "$GITHUB_OUTPUT"
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
 
-      - name: Verify source snapshot exists and request IDs belong to it
+      - name: Verify source snapshot exists
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -101,7 +104,7 @@ jobs:
         shell: bash
         run: |
           python - <<'PY'
-          import json, os
+          import json
           from datetime import datetime, timezone
           from pathlib import Path
           req={}
