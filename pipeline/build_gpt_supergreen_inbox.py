@@ -29,6 +29,17 @@ def open_deadline(r):
     try:return date.fromisoformat(v[:10])>=datetime.now(timezone.utc).date()
     except Exception:return True
 
+def numeric_run_id(value):
+    s=str(value or '').strip()
+    return int(s) if s.isdigit() else None
+
+def source_run_from_row(r):
+    if not isinstance(r,dict): return None
+    for name in ('source_dce_run_id','source_run','dce_run_id'):
+        value=numeric_run_id(r.get(name))
+        if value is not None:return value
+    return None
+
 def normalize_for_inbox(r):
     if not isinstance(r,dict): return r
     x=dict(r)
@@ -65,12 +76,13 @@ def main():
     ap=argparse.ArgumentParser();ap.add_argument('--triage',action='append',default=[]);ap.add_argument('--existing');ap.add_argument('--final-bank');ap.add_argument('--out',required=True);ap.add_argument('--max-items',type=int,default=40);ap.add_argument('--source-run',required=True);args=ap.parse_args()
     existing=load_json(Path(args.existing)) if args.existing else {}
     final=load_json(Path(args.final_bank)) if args.final_bank else {}
+    triage_rows=load_jsonl(args.triage)
     resolved={key(x) for x in final.get('items',[]) if isinstance(x,dict) and key(x)}
     merged={}
     for raw in existing.get('pending_final_review',[]) or []:
         r=normalize_for_inbox(raw)
         if user_inbox_eligible(r) and key(r) not in resolved: merged[key(r)]=r
-    for raw in load_jsonl(args.triage):
+    for raw in triage_rows:
         r=normalize_for_inbox(raw)
         if key(r) in resolved or not user_inbox_eligible(r): continue
         cur=merged.get(key(r))
@@ -78,8 +90,13 @@ def main():
     pending=sorted(merged.values(),key=rank,reverse=True)[:max(0,args.max_items)]
     confirmed=[x for x in (final.get('items') or []) if isinstance(x,dict) and open_deadline(x) and str(x.get('classification') or '') in {'FINAL_SUPER_GREEN','GREEN','YELLOW','RED'}]
     confirmed.sort(key=lambda r:(str(r.get('classification') or '')=='FINAL_SUPER_GREEN',int(r.get('final_score') or 0)),reverse=True)
+    numeric_sources=[numeric_run_id(args.source_run),numeric_run_id(existing.get('latest_source_dce_run_id'))]
+    numeric_sources.extend(source_run_from_row(x) for x in (final.get('items') or []))
+    numeric_sources.extend(source_run_from_row(x) for x in triage_rows)
+    numeric_sources=[x for x in numeric_sources if x is not None]
+    latest_source=max(numeric_sources) if numeric_sources else args.source_run
     payload={
-      'schema':'GPT_INSTANT_SUPERGREEN_INBOX_V3','updated_at':datetime.now(timezone.utc).isoformat(),'latest_source_dce_run_id':int(args.source_run) if str(args.source_run).isdigit() else args.source_run,
+      'schema':'GPT_INSTANT_SUPERGREEN_INBOX_V3','updated_at':datetime.now(timezone.utc).isoformat(),'latest_source_dce_run_id':latest_source,
       'confirmed_supergreens':confirmed,'pending_final_review':pending,
       'counts':{'confirmed_supergreens':sum(str(x.get('classification'))=='FINAL_SUPER_GREEN' for x in confirmed),'confirmed_green_total':sum(str(x.get('classification')) in {'FINAL_SUPER_GREEN','GREEN'} for x in confirmed),'resolved_total':len(confirmed),'pending_final_review':len(pending),'review_now':sum(x.get('recommended_gpt_action')=='FINAL_REVIEW_NOW' for x in pending),'recall_overrides':sum(bool(x.get('inbox_recall_override')) for x in pending)},
       'answer_contract':'When the user asks what supergreens exist, read this file first. Report live FINAL_SUPER_GREEN/GREEN verdicts immediately. Then adjudicate FINAL_REVIEW_NOW. If capacity allows, review SPM-core gate-ready rows retained by the recall override when Qwen was inconclusive. This user-facing inbox excludes obvious non-core and evidence-empty rows. Qwen is pre-read only; missing evidence is UNKNOWN.',
