@@ -7,8 +7,10 @@ on:
         description: Successful DCE Fanout V2 run to persist and continue
         required: false
         default: ''
-  # Bootstrap only when this workflow itself changes. Future normal operation is
-  # dispatched explicitly by DCE Fanout V2, avoiding unreliable workflow_run gaps.
+  workflow_run:
+    workflows: ["DCE Fanout V2"]
+    types: [completed]
+  # Bootstrap the latest successful durable run when this workflow changes.
   push:
     branches: [main]
     paths:
@@ -24,6 +26,7 @@ concurrency:
 
 jobs:
   persist-and-continue:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -39,7 +42,7 @@ jobs:
         id: recover
         env:
           GH_TOKEN: ${{ github.token }}
-          INPUT_DCE_RUN_ID: ${{ github.event.inputs.dce_run_id }}
+          INPUT_DCE_RUN_ID: ${{ github.event.inputs.dce_run_id || github.event.workflow_run.id }}
         shell: bash
         run: |
           set -euo pipefail
