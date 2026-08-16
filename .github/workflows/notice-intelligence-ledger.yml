@@ -1,0 +1,136 @@
+name: Notice Intelligence Ledger
+
+on:
+  workflow_run:
+    workflows: ["Live World Snapshot for GPT"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: notice-intelligence-ledger
+  cancel-in-progress: true
+
+jobs:
+  ledger:
+    # Shadow control-plane stage. It never deletes/rejects a tender and never
+    # establishes DCE or eligibility truth.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download newest normalized live snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p snapshot previous
+          gh release download live-world-snapshot-latest \
+            --pattern 'live-open-tenders-latest.jsonl.gz' \
+            --pattern 'snapshot-manifest-latest.json' \
+            --dir snapshot
+          test -s snapshot/live-open-tenders-latest.jsonl.gz
+          test -s snapshot/snapshot-manifest-latest.json
+          source_run="$(python - <<'PY'
+          import json
+          m=json.load(open('snapshot/snapshot-manifest-latest.json',encoding='utf-8'))
+          print(m['source_discovery_run'])
+          PY
+          )"
+          [[ "$source_run" =~ ^[0-9]+$ ]] || { echo "Invalid source run: $source_run" >&2; exit 1; }
+          echo "SOURCE_RUN=$source_run" >> "$GITHUB_ENV"
+
+      - name: Recover previous durable ledger when available
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view notice-intelligence-ledger-latest >/dev/null 2>&1; then
+            assets="$(gh release view notice-intelligence-ledger-latest --json assets --jq '.assets[].name')"
+            if grep -Fxq 'notice-intelligence-ledger-latest.jsonl.gz' <<< "$assets"; then
+              gh release download notice-intelligence-ledger-latest \
+                --pattern 'notice-intelligence-ledger-latest.jsonl.gz' \
+                --dir previous
+              echo 'PREVIOUS_LEDGER=previous/notice-intelligence-ledger-latest.jsonl.gz' >> "$GITHUB_ENV"
+              exit 0
+            fi
+          fi
+          echo 'PREVIOUS_LEDGER=' >> "$GITHUB_ENV"
+          echo 'No prior ledger found: this run is the one-time backfill.'
+
+      - name: Build NEW/UPDATED ledger and shadow classifier queues
+        shell: bash
+        run: |
+          set -euo pipefail
+          prev=()
+          if [ -n "${PREVIOUS_LEDGER:-}" ]; then prev=(--previous "$PREVIOUS_LEDGER"); fi
+          python pipeline/build_notice_intelligence_ledger.py \
+            --current snapshot/live-open-tenders-latest.jsonl.gz \
+            "${prev[@]}" \
+            --ledger-out "notice-intelligence-ledger-${SOURCE_RUN}.jsonl.gz" \
+            --change-queue-out "notice-change-queue-${SOURCE_RUN}.jsonl.gz" \
+            --classification-queue-out "notice-classification-queue-${SOURCE_RUN}.jsonl.gz" \
+            --summary-out "notice-ledger-summary-${SOURCE_RUN}.json" \
+            --classifier-version qwen-shadow-v1
+
+      - name: Publish immutable ledger generation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="notice-intelligence-ledger-${SOURCE_RUN}"
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" \
+            --target main \
+            --title "Notice Intelligence Ledger ${SOURCE_RUN}" \
+            --notes "Shadow high-recall ledger for normalized live notices. NEW/UPDATED controls semantic reclassification; no ledger event establishes DCE/eligibility truth or deletes a tender."
+          gh release upload "$tag" \
+            "notice-intelligence-ledger-${SOURCE_RUN}.jsonl.gz" \
+            "notice-change-queue-${SOURCE_RUN}.jsonl.gz" \
+            "notice-classification-queue-${SOURCE_RUN}.jsonl.gz" \
+            "notice-ledger-summary-${SOURCE_RUN}.json" --clobber
+
+      - name: Atomically refresh stable latest ledger
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp "notice-intelligence-ledger-${SOURCE_RUN}.jsonl.gz" notice-intelligence-ledger-latest.jsonl.gz
+          cp "notice-change-queue-${SOURCE_RUN}.jsonl.gz" notice-change-queue-latest.jsonl.gz
+          cp "notice-classification-queue-${SOURCE_RUN}.jsonl.gz" notice-classification-queue-latest.jsonl.gz
+          cp "notice-ledger-summary-${SOURCE_RUN}.json" notice-ledger-summary-latest.json
+          tag=notice-intelligence-ledger-latest
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" \
+            --target main --title 'Notice Intelligence Ledger — LATEST' \
+            --notes 'Stable pointer to the current live Notice Intelligence Ledger.'
+          summary="$(python - <<'PY'
+          import json,os
+          s=json.load(open('notice-ledger-summary-latest.json'))
+          print(f"run={os.environ['SOURCE_RUN']} current={s['current_unique']} new={s['new']} updated={s['updated']} unchanged={s['unchanged']} change_queue={s['change_queue']} classification_queue={s['classification_queue']}")
+          PY
+          )"
+          gh release edit "$tag" --title "Notice Intelligence Ledger — LATEST (${SOURCE_RUN})" --notes "$summary"
+          gh release upload "$tag" \
+            notice-intelligence-ledger-latest.jsonl.gz \
+            notice-change-queue-latest.jsonl.gz \
+            notice-classification-queue-latest.jsonl.gz \
+            notice-ledger-summary-latest.json --clobber
+
+      - name: Ledger summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -s "notice-ledger-summary-${SOURCE_RUN:-unknown}.json" ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat "notice-ledger-summary-${SOURCE_RUN}.json" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
