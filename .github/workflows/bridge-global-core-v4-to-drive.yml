@@ -10,35 +10,69 @@ permissions:
   contents: read
 
 jobs:
-  bridge:
+  bridge-assets:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 16
+      matrix:
+        asset:
+          - historical_tenders.parquet
+          - historical_tenders.jsonl.gz
+          - awards.parquet
+          - awards.jsonl.gz
+          - award_suppliers.parquet
+          - award_suppliers.jsonl.gz
+          - buyers.parquet
+          - buyers.csv.gz
+          - suppliers.parquet
+          - suppliers.csv.gz
+          - source_country_summary.csv
+          - dedupe_overlap_summary.csv
+          - schema_report.json
+          - data_quality_report.json
+          - run_manifest.json
+          - SHA256SUMS
     steps:
-      - name: Download canonical historical release assets
+      - name: Download canonical release asset
         env:
           GH_TOKEN: ${{ github.token }}
+          ASSET: ${{ matrix.asset }}
         run: |
           set -euo pipefail
           mkdir -p bundle
           gh release download tender-normalized-global-core-v4 \
             --repo walidgdg1-ai/coldemailtool \
+            --pattern "$ASSET" \
             --dir bundle
-          ls -lah bundle
+          test -s "bundle/$ASSET"
+          ls -lah "bundle/$ASSET"
 
-      - name: Add bridge provenance
-        run: |
-          cat > bundle/DRIVE_BRIDGE_PROVENANCE.txt <<'EOF'
-          Source repository: walidgdg1-ai/coldemailtool
-          Source release: tender-normalized-global-core-v4
-          Destination purpose: Google Drive mirror of canonical historical tender warehouse
-          Transfer semantics: byte-preserving GitHub Release -> GitHub Actions Artifact -> Google Drive
-          EOF
-
-      - name: Upload byte-preserving bridge artifact
+      - name: Upload connector-safe artifact
         uses: actions/upload-artifact@v4
         with:
-          name: tender-normalized-global-core-v4-drive-bridge
-          path: bundle/*
+          name: core-v4-${{ strategy.job-index }}-${{ matrix.asset }}
+          path: bundle/${{ matrix.asset }}
           compression-level: 0
           if-no-files-found: error
+          retention-days: 1
+
+  provenance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write transfer provenance
+        run: |
+          cat > DRIVE_BRIDGE_PROVENANCE.txt <<'EOF'
+          Source repository: walidgdg1-ai/coldemailtool
+          Source release: tender-normalized-global-core-v4
+          Destination: Google Drive / Public Tender Intelligence — Archive / Releases / tender-normalized-global-core-v4
+          Transfer semantics: byte-preserving GitHub Release asset -> GitHub Actions Artifact -> Google Drive
+          Integrity authority: SHA256SUMS from the canonical GitHub Release
+          EOF
+      - uses: actions/upload-artifact@v4
+        with:
+          name: core-v4-provenance
+          path: DRIVE_BRIDGE_PROVENANCE.txt
+          compression-level: 0
           retention-days: 1
