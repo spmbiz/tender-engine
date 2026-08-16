@@ -1,0 +1,84 @@
+name: Persist Qwen Shadow Smoke Push
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/qwen_persist_trigger.json'
+      - '.github/workflows/persist-qwen-shadow-smoke-push.yml'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: persist-qwen-shadow-smoke-push
+  cancel-in-progress: false
+
+jobs:
+  persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Resolve source run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_id="$(python - <<'PY'
+          import json
+          x=json.load(open('control/qwen_persist_trigger.json'))
+          print(int(x['source_run_id']))
+          PY
+          )"
+          conclusion="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}" --jq '.conclusion // "unknown"')"
+          head_sha="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}" --jq '.head_sha')"
+          echo "SOURCE_RUN_ID=$run_id" >> "$GITHUB_ENV"
+          echo "SOURCE_CONCLUSION=$conclusion" >> "$GITHUB_ENV"
+          echo "SOURCE_HEAD_SHA=$head_sha" >> "$GITHUB_ENV"
+          [ "$conclusion" = success ] || { echo "source run not successful: $conclusion" >&2; exit 1; }
+      - name: Download and hash evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "qwen3-4b-shadow-smoke-${SOURCE_RUN_ID}" --dir evidence
+          python - <<'PY'
+          import json,os,pathlib,datetime
+          pathlib.Path('evidence/PERSISTENCE_METADATA.json').write_text(json.dumps({
+            'schema':'QWEN_SHADOW_SMOKE_PERSISTENCE_V1',
+            'source_workflow_run_id':os.environ['SOURCE_RUN_ID'],
+            'source_conclusion':os.environ['SOURCE_CONCLUSION'],
+            'source_head_sha':os.environ['SOURCE_HEAD_SHA'],
+            'persisted_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            'storage_contract':'Immutable GitHub Release is canonical durable evidence; Actions artifact is temporary transport only.',
+            'destructive_rejection_enabled':False
+          },indent=2)+'\n')
+          PY
+          (cd evidence && sha256sum * > SHA256SUMS.txt)
+      - name: Publish immutable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="qwen-shadow-smoke-${SOURCE_RUN_ID}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" evidence/* --clobber
+          else
+            gh release create "$tag" --target "$SOURCE_HEAD_SHA" --title "Qwen Shadow Smoke ${SOURCE_RUN_ID}" --notes "Durable Qwen shadow evidence. source_run=${SOURCE_RUN_ID}; no destructive rejection enabled."
+            gh release upload "$tag" evidence/*
+          fi
+          latest=qwen-shadow-smoke-latest
+          gh release view "$latest" >/dev/null 2>&1 || gh release create "$latest" --target "$SOURCE_HEAD_SHA" --title 'Qwen Shadow Smoke — LATEST' --notes 'Stable pointer; immutable generations authoritative.'
+          mkdir -p latest
+          [ -s evidence/qwen-shadow-results.jsonl ] && cp evidence/qwen-shadow-results.jsonl latest/qwen-shadow-results-latest.jsonl
+          [ -s evidence/qwen-shadow-summary.json ] && cp evidence/qwen-shadow-summary.json latest/qwen-shadow-summary-latest.json
+          cp evidence/PERSISTENCE_METADATA.json latest/PERSISTENCE_METADATA-latest.json
+          cp evidence/SHA256SUMS.txt latest/SHA256SUMS-latest.txt
+          gh release edit "$latest" --title "Qwen Shadow Smoke — LATEST (${SOURCE_RUN_ID})" --notes "immutable=${tag}; no destructive rejection enabled."
+          gh release upload "$latest" latest/* --clobber
