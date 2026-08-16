@@ -1,10 +1,10 @@
 {
   "schema": "GPT_REVIEW_HOT_V3",
-  "updated_at": "2026-08-16T22:26:44.271082+00:00",
+  "updated_at": "2026-08-16T22:27:46.300050+00:00",
   "latest_dce_run_id": 31975985612,
-  "latest_shard": 13,
+  "latest_shard": 14,
   "generation_reset": false,
-  "count": 18,
+  "count": 19,
   "items": [
     {
       "candidate_id": "US-SAM:9a24738b176840fda8a12ed16279bdea",
@@ -2107,6 +2107,224 @@
       "hot_ready_at": "2026-08-16T22:23:25.377299+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 16,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
+      "candidate_id": "EE-RHR:05404e27-bfe9-4729-af65-48df1e68cf0b",
+      "title": "Ida-Viru maakond, Kohtla-Järve linn, Kase tänav 5 liitumispunkti asukoha muutmine ja peakaitsme nimivoolu suurendamine (LC4978, IK1787)",
+      "buyer": "Elektrilevi OÜ",
+      "portal": "EE_RHR",
+      "notice_url": "https://riigihanked.riik.ee/rhr-web/#/procurement/10670305/general-info",
+      "deadline": "2026-08-17T08:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 60,
+      "priority_score": 60,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-17T08:00:00+00:00",
+        "notice_deadline_date": "2026-08-17",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 8,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "><ds:SignatureValue Id=\"value-id-399b68dfe7e9eadf61c8626f0cef5e60\">PzB0f79zbBM3z1l6XJI4fDADl+DULv4vUCzW3qUfTY6ZXfwOTjHECtHt2Pa08018JXjOc5jTyTIv+WvYE4mcs2UWa36QtI1sb4ZuuxtOi8z4EU5oPAi/+M7cH3JHtZUh</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIDxTCCAyagAwIBAgIQSaI6/ALmcc9jagRSRQDcAjAKBggqhkjOPQQDBDBYMQswCQYDVQQGEwJFRTEbMBkGA1UECgwSU0sgSUQgU29sdXRpb25zIEFTMRcwFQYDVQRhDA5OVFJFRS0xMDc0NzAxMzETMBEGA1UEAwwKRVNURUlEMjAxODAeFw0yMjExMDgwNzI1MDZaFw0yNzExMDcyMTU5NTlaMG0xCzAJBgNVBAYTAkVFMSEwHwYDVQQDDBhBRVRUSUssS0FJRE8sMzY5MDIxNzI3MTAxDzANBgNVBAQMBkFFVFRJSzEOMAwGA1UEKgwFS0FJRE8xGjAYBgNVBAUTEVBOT0VFLTM2OTAyMTcyNzEwMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEsa8ztmASrnzI76yT6R/zjb08QdrrCdcj4WEgLVn1OKRP4KfwXx/1kAwgE2+zJVoBiNPKWSwHgyEQWLMhziol89qNHb5O1mOtZPAAxJkJzoDtQvtbVxIiA7FIvizEkAfNo4IBnjCCAZowCQYDVR0TBAIwADAOBgNVHQ8BAf8EBAMCBkAwSAYDVR0gBEEwPzAyBgsrBgEEAYORIQEBATAjMCEGCCsGAQUFBwIBFhVodHRwczovL3d3dy5zay5lZS9DUFMwCQYHBACL7EABAjAdBgNVHQ4EFgQU7x2+GOcikdwFiXyCTHY64MbjcTwwgYoGCCsGAQUFBwEDBH4wfDAIBgYEAI5GAQEwCAYGBACORgEEMBMGBgQAjkYBBjAJBgcEAI5GAQYBMFEGBgQAjkYBBTBHMEUWP2h0dHBzOi8vc2suZWUvZW4vcmVwb3NpdG9yeS9jb25kaXRpb25zLWZvci11c2Utb2YtY2VydGlmaWNhdGVzLxMCRU4wHwYDVR0jBBgwFoAU2axw219+vpT4oOS+R6LQNK2aKhIwZgYIKwYBBQUHAQEEWjBYMCcGCCsGAQUFBzABhhtodHRwOi8vYWlhLnNrLmVlL2VzdGVpZDIwMTgwLQYIKwYBBQUHMAKGIWh",
+            "source": null,
+            "match": "EEA"
+          },
+          {
+            "text": "eValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIDxTCCAyagAwIBAgIQSaI6/ALmcc9jagRSRQDcAjAKBggqhkjOPQQDBDBYMQswCQYDVQQGEwJFRTEbMBkGA1UECgwSU0sgSUQgU29sdXRpb25zIEFTMRcwFQYDVQRhDA5OVFJFRS0xMDc0NzAxMzETMBEGA1UEAwwKRVNURUlEMjAxODAeFw0yMjExMDgwNzI1MDZaFw0yNzExMDcyMTU5NTlaMG0xCzAJBgNVBAYTAkVFMSEwHwYDVQQDDBhBRVRUSUssS0FJRE8sMzY5MDIxNzI3MTAxDzANBgNVBAQMBkFFVFRJSzEOMAwGA1UEKgwFS0FJRE8xGjAYBgNVBAUTEVBOT0VFLTM2OTAyMTcyNzEwMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEsa8ztmASrnzI76yT6R/zjb08QdrrCdcj4WEgLVn1OKRP4KfwXx/1kAwgE2+zJVoBiNPKWSwHgyEQWLMhziol89qNHb5O1mOtZPAAxJkJzoDtQvtbVxIiA7FIvizEkAfNo4IBnjCCAZowCQYDVR0TBAIwADAOBgNVHQ8BAf8EBAMCBkAwSAYDVR0gBEEwPzAyBgsrBgEEAYORIQEBATAjMCEGCCsGAQUFBwIBFhVodHRwczovL3d3dy5zay5lZS9DUFMwCQYHBACL7EABAjAdBgNVHQ4EFgQU7x2+GOcikdwFiXyCTHY64MbjcTwwgYoGCCsGAQUFBwEDBH4wfDAIBgYEAI5GAQEwCAYGBACORgEEMBMGBgQAjkYBBjAJBgcEAI5GAQYBMFEGBgQAjkYBBTBHMEUWP2h0dHBzOi8vc2suZWUvZW4vcmVwb3NpdG9yeS9jb25kaXRpb25zLWZvci11c2Utb2YtY2VydGlmaWNhdGVzLxMCRU4wHwYDVR0jBBgwFoAU2axw219+vpT4oOS+R6LQNK2aKhIwZgYIKwYBBQUHAQEEWjBYMCcGCCsGAQUFBzABhhtodHRwOi8vYWlhLnNrLmVlL2VzdGVpZDIwMTgwLQYIKwYBBQUHMAKGIWh0dHA6Ly9jLnNrLmVlL2VzdGVpZDIwMTguZGVyLmNydDAKBggqhkjOPQQDBAOBjAAwgYgCQgHYwrn0neexwds1cCZw7Y/j+qrWUu9Yl19adUh/X4bc1NNC9aGxo/mHnlnu0EU/BgdspWEQQTuW2JGKbFjfgXAU+QJCAfyZEU3ZwkzqeVgetp48DHKJUfajE0IpF/8eL1mDX3y2TyI",
+            "source": null,
+            "match": "EEA"
+          },
+          {
+            "text": "xGzAZBgNVBAoMElNLIElEIFNvbHV0aW9ucyBBUzEXMBUGA1UEYQwOTlRSRUUtMTA3NDcwMTMxITAfBgNVBAMMGFNLIElEIFNvbHV0aW9ucyBST09UIEcxRTCBmzAQBgcqhkjOPQIBBgUrgQQAIwOBhgAEAN+zN0QNRH0pL6ozIEqFSBiqASoVlcgoi2+epQ6fU/gJ5ZbySnNtjcfxqqi3sW+XHK3IXN2kwMImzWx/P7S4ZhRfAJNJi6qPmyyDnXIE17jUuqVBcPZwpap3cqQND3FA3/wgs3r/dnBHyQD4M2ihf3j4IDy/ANl6IiI2D4Z50ik4QUfYo2MwYTAPBgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUhnRPOus48rCn7u25hZudgwlFMWswHwYDVR0jBBgwFoAUhnRPOus48rCn7u25hZudgwlFMWswCgYIKoZIzj0EAwQDgYsAMIGHAkF+pYLDdJjsHc7hvW0dlIPk6riZKr3PDe6+3t3Paq+Udb4OGw3yzJoxCKQbnLULtlN6weO6wupBn91X+wX6QbCy/gJCAK/JtP1UsWLkmxCannuKGOIH8CgcKIXdW/z7/TQLfrygdJMgZ5TjzLMHXoX3gKSTNpCuZEeamEYBzd8HKLDnKYWV</xades:EncapsulatedX509Certificate><xades:EncapsulatedX509Certificate>MIIFVzCCBLigAwIBAgIQdUf6rBR0S4tbo2bU/mZV7TAKBggqhkjOPQQDBDBaMQswCQYDVQQGEwJFRTEbMBkGA1UECgwSU0sgSUQgU29sdXRpb25zIEFTMRcwFQYDVQRhDA5OVFJFRS0xMDc0NzAxMzEVMBMGA1UEAwwMRUUtR292Q0EyMDE4MB4XDTE4MDkyMDA5MjIyOFoXDTMzMDkwNTA5MTEwM1owWDELMAkGA1UEBhMCRUUxGzAZBgNVBAoMElNLIElEIFNvbHV0aW9ucyBBUzEXMBUGA1UEYQwOTlRSRUUtMTA3NDcwMTMxEzARBgNVBAMMCkVTVEVJRDIwMTgwgZswEAYHKoZIzj0CAQYFK4EEACMDgYYABAHHOBlv7UrRPYP1yHhOb7RA/YBDbtgynSVMqYdxnFrKHUXh6tFkghvHuA1k2DSom1hE5kqhB5VspDembwWDJBOQWQGOI/0t3EtccLYjeM7F9xOPdzUbZaIbpNRHpQgVBpFX0xpLTgW27MpIMhU8DHBWFpeAaNX3eUpD4gC5cvhsK0RFEqOCAx0wggM",
+            "source": null,
+            "match": "Eea"
+          },
+          {
+            "text": "dgwlFMWswCgYIKoZIzj0EAwQDgYsAMIGHAkF+pYLDdJjsHc7hvW0dlIPk6riZKr3PDe6+3t3Paq+Udb4OGw3yzJoxCKQbnLULtlN6weO6wupBn91X+wX6QbCy/gJCAK/JtP1UsWLkmxCannuKGOIH8CgcKIXdW/z7/TQLfrygdJMgZ5TjzLMHXoX3gKSTNpCuZEeamEYBzd8HKLDnKYWV</xades:EncapsulatedX509Certificate><xades:EncapsulatedX509Certificate>MIIFVzCCBLigAwIBAgIQdUf6rBR0S4tbo2bU/mZV7TAKBggqhkjOPQQDBDBaMQswCQYDVQQGEwJFRTEbMBkGA1UECgwSU0sgSUQgU29sdXRpb25zIEFTMRcwFQYDVQRhDA5OVFJFRS0xMDc0NzAxMzEVMBMGA1UEAwwMRUUtR292Q0EyMDE4MB4XDTE4MDkyMDA5MjIyOFoXDTMzMDkwNTA5MTEwM1owWDELMAkGA1UEBhMCRUUxGzAZBgNVBAoMElNLIElEIFNvbHV0aW9ucyBBUzEXMBUGA1UEYQwOTlRSRUUtMTA3NDcwMTMxEzARBgNVBAMMCkVTVEVJRDIwMTgwgZswEAYHKoZIzj0CAQYFK4EEACMDgYYABAHHOBlv7UrRPYP1yHhOb7RA/YBDbtgynSVMqYdxnFrKHUXh6tFkghvHuA1k2DSom1hE5kqhB5VspDembwWDJBOQWQGOI/0t3EtccLYjeM7F9xOPdzUbZaIbpNRHpQgVBpFX0xpLTgW27MpIMhU8DHBWFpeAaNX3eUpD4gC5cvhsK0RFEqOCAx0wggMZMB8GA1UdIwQYMBaAFH4pVuc0knhOd+FvLjMqmHHB/TSfMB0GA1UdDgQWBBTZrHDbX36+lPig5L5HotA0rZoqEjAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgwBgEB/wIBADCCAc0GA1UdIASCAcQwggHAMAgGBgQAj3oBAjAJBgcEAIvsQAECMDIGCysGAQQBg5EhAQEBMCMwIQYIKwYBBQUHAgEWFWh0dHBzOi8vd3d3LnNrLmVlL0NQUzANBgsrBgEEAYORIQEBAjANBgsrBgEEAYORfwEBATANBgsrBgEEAYORIQEBBTANBgsrBgEEAYORIQEBBjANBgsrBgEEAYORIQEBBzANBgsrBgEEAYORIQEBAzANBgsrBgEEAYORIQEBBDANBgsrBgEEAYORIQEBCDANBgsrBgEEAYORIQEBCTANBgsrBgEEAYORIQEBCjA",
+            "source": null,
+            "match": "EEA"
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "am\"/></manifest:manifest> ===== FILE: files/files_unpacked/EPP-947477-1_Tellimuse_teostusdokumendid_unpacked/EPP-947477-1_Tellimuse_teostusdokumendid/1.6. LC4978 Kase tn 5. Eesti Raudtee KK_2607211356_unpacked/META-INF/signatures0.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><asic:XAdESSignatures xmlns:asic=\"http://uri.etsi.org/02918/v1.2.1#\"><ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" Id=\"id-399b68dfe7e9eadf61c8626f0cef5e60\"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256\"/><ds:Reference Id=\"r-id-399b68dfe7e9eadf61c8626f0cef5e60-1\" URI=\"2026_06_nr_1444_3_Oru_raudteejaam_elektrivarustus_Kase_tn_5.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>u5QW5AU07CCdjyBql3k8uGC07Y6cSwMfkD3UTsdRR4Q=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-399b68dfe7e9eadf61c8626f0cef5e60-2\" URI=\"IKO_pohitingimused_2025_07_22.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>4VNNSxum/dg8B01t8FYir6LT5yXkQ9u1WnmZmjjAut4=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-399b68dfe7e9eadf61c8626f0cef5e60-3\" URI=\"Tooloa_taotlusvorm_2026.pdf\"><ds:DigestMethod A",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "\" standalone=\"no\"?><asic:XAdESSignatures xmlns:asic=\"http://uri.etsi.org/02918/v1.2.1#\"><ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" Id=\"id-399b68dfe7e9eadf61c8626f0cef5e60\"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256\"/><ds:Reference Id=\"r-id-399b68dfe7e9eadf61c8626f0cef5e60-1\" URI=\"2026_06_nr_1444_3_Oru_raudteejaam_elektrivarustus_Kase_tn_5.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>u5QW5AU07CCdjyBql3k8uGC07Y6cSwMfkD3UTsdRR4Q=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-399b68dfe7e9eadf61c8626f0cef5e60-2\" URI=\"IKO_pohitingimused_2025_07_22.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>4VNNSxum/dg8B01t8FYir6LT5yXkQ9u1WnmZmjjAut4=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-399b68dfe7e9eadf61c8626f0cef5e60-3\" URI=\"Tooloa_taotlusvorm_2026.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>WJvNKnp5z/qwyMQBWLhkw42y64VJ8kfIRUZ6eJ0Q0YQ=</ds:DigestValue></ds:Reference><ds:Reference Type=\"http://uri.etsi.org/01903#SignedProperties\" URI=\"#xades-id-399b68dfe7e9eadf61c8626f0cef5e60\"><ds:Transforms><ds:T",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "no\"?><asic:XAdESSignatures xmlns:asic=\"http://uri.etsi.org/02918/v1.2.1#\"><ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" Id=\"id-399b68dfe7e9eadf61c8626f0cef5e60\"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256\"/><ds:Reference Id=\"r-id-399b68dfe7e9eadf61c8626f0cef5e60-1\" URI=\"2026_06_nr_1444_3_Oru_raudteejaam_elektrivarustus_Kase_tn_5.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>u5QW5AU07CCdjyBql3k8uGC07Y6cSwMfkD3UTsdRR4Q=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-399b68dfe7e9eadf61c8626f0cef5e60-2\" URI=\"IKO_pohitingimused_2025_07_22.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>4VNNSxum/dg8B01t8FYir6LT5yXkQ9u1WnmZmjjAut4=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-399b68dfe7e9eadf61c8626f0cef5e60-3\" URI=\"Tooloa_taotlusvorm_2026.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>WJvNKnp5z/qwyMQBWLhkw42y64VJ8kfIRUZ6eJ0Q0YQ=</ds:DigestValue></ds:Reference><ds:Reference Type=\"http://uri.etsi.org/01903#SignedProperties\" URI=\"#xades-id-399b68dfe7e9eadf61c8626f0cef5e60\"><ds:Transforms><ds:Transform Algor",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256\"/><ds:Reference Id=\"r-id-399b68dfe7e9eadf61c8626f0cef5e60-1\" URI=\"2026_06_nr_1444_3_Oru_raudteejaam_elektrivarustus_Kase_tn_5.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>u5QW5AU07CCdjyBql3k8uGC07Y6cSwMfkD3UTsdRR4Q=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-399b68dfe7e9eadf61c8626f0cef5e60-2\" URI=\"IKO_pohitingimused_2025_07_22.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>4VNNSxum/dg8B01t8FYir6LT5yXkQ9u1WnmZmjjAut4=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-399b68dfe7e9eadf61c8626f0cef5e60-3\" URI=\"Tooloa_taotlusvorm_2026.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>WJvNKnp5z/qwyMQBWLhkw42y64VJ8kfIRUZ6eJ0Q0YQ=</ds:DigestValue></ds:Reference><ds:Reference Type=\"http://uri.etsi.org/01903#SignedProperties\" URI=\"#xades-id-399b68dfe7e9eadf61c8626f0cef5e60\"><ds:Transforms><ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/></ds:Transforms><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>lLLTZGSmtar++AKqT+zrl0ujBuEsmAWzx0t3dX3r4A4=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:S",
+            "source": null,
+            "match": "Reference"
+          }
+        ],
+        "certifications_partner": [
+          {
+            "text": "/ds:Reference><ds:Reference Type=\"http://uri.etsi.org/01903#SignedProperties\" URI=\"#xades-id-399b68dfe7e9eadf61c8626f0cef5e60\"><ds:Transforms><ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/></ds:Transforms><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>lLLTZGSmtar++AKqT+zrl0ujBuEsmAWzx0t3dX3r4A4=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue Id=\"value-id-399b68dfe7e9eadf61c8626f0cef5e60\">PzB0f79zbBM3z1l6XJI4fDADl+DULv4vUCzW3qUfTY6ZXfwOTjHECtHt2Pa08018JXjOc5jTyTIv+WvYE4mcs2UWa36QtI1sb4ZuuxtOi8z4EU5oPAi/+M7cH3JHtZUh</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIDxTCCAyagAwIBAgIQSaI6/ALmcc9jagRSRQDcAjAKBggqhkjOPQQDBDBYMQswCQYDVQQGEwJFRTEbMBkGA1UECgwSU0sgSUQgU29sdXRpb25zIEFTMRcwFQYDVQRhDA5OVFJFRS0xMDc0NzAxMzETMBEGA1UEAwwKRVNURUlEMjAxODAeFw0yMjExMDgwNzI1MDZaFw0yNzExMDcyMTU5NTlaMG0xCzAJBgNVBAYTAkVFMSEwHwYDVQQDDBhBRVRUSUssS0FJRE8sMzY5MDIxNzI3MTAxDzANBgNVBAQMBkFFVFRJSzEOMAwGA1UEKgwFS0FJRE8xGjAYBgNVBAUTEVBOT0VFLTM2OTAyMTcyNzEwMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEsa8ztmASrnzI76yT6R/zjb08QdrrCdcj4WEgLVn1OKRP4KfwXx/1kAwgE2+zJVoBiNPKWSwHgyEQWLMhziol89qNHb5O1mOtZPAAxJkJzoDtQvtbVxIiA7FIvizEkAfNo4IBnjCCAZowCQYDVR0TBAIwADAOBgNVHQ8BAf8EBAMCBkAwSAYDVR0gBEEwPzAyBgsrBgEEAYORIQEBATAjMCEGCCsGAQUFBwIBFhVodHRwczovL3d3dy5za",
+            "source": null,
+            "match": "Certificate"
+          },
+          {
+            "text": "lZS9DUFMwCQYHBACL7EABAjAdBgNVHQ4EFgQU7x2+GOcikdwFiXyCTHY64MbjcTwwgYoGCCsGAQUFBwEDBH4wfDAIBgYEAI5GAQEwCAYGBACORgEEMBMGBgQAjkYBBjAJBgcEAI5GAQYBMFEGBgQAjkYBBTBHMEUWP2h0dHBzOi8vc2suZWUvZW4vcmVwb3NpdG9yeS9jb25kaXRpb25zLWZvci11c2Utb2YtY2VydGlmaWNhdGVzLxMCRU4wHwYDVR0jBBgwFoAU2axw219+vpT4oOS+R6LQNK2aKhIwZgYIKwYBBQUHAQEEWjBYMCcGCCsGAQUFBzABhhtodHRwOi8vYWlhLnNrLmVlL2VzdGVpZDIwMTgwLQYIKwYBBQUHMAKGIWh0dHA6Ly9jLnNrLmVlL2VzdGVpZDIwMTguZGVyLmNydDAKBggqhkjOPQQDBAOBjAAwgYgCQgHYwrn0neexwds1cCZw7Y/j+qrWUu9Yl19adUh/X4bc1NNC9aGxo/mHnlnu0EU/BgdspWEQQTuW2JGKbFjfgXAU+QJCAfyZEU3ZwkzqeVgetp48DHKJUfajE0IpF/8eL1mDX3y2TyIqhoxaiA2tYM04Rjwi5Ptuslet5WGparV4DNEFahAD</ds:X509Certificate></ds:X509Data></ds:KeyInfo><ds:Object><xades:QualifyingProperties xmlns:xades=\"http://uri.etsi.org/01903/v1.3.2#\" Target=\"#id-399b68dfe7e9eadf61c8626f0cef5e60\"><xades:SignedProperties Id=\"xades-id-399b68dfe7e9eadf61c8626f0cef5e60\"><xades:SignedSignatureProperties><xades:SigningTime>2026-06-09T12:50:15Z</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>NJizv+Cu7gTzVZSWnmjzv7qBY3L3zqnjF2fQ9nuLMBo=</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>CN=ESTEID2018,2.5.4.97=#0c0e4e545245452d3130373437303133,O=SK ID",
+            "source": null,
+            "match": "Certificate"
+          },
+          {
+            "text": "LnNrLmVlL2VzdGVpZDIwMTgwLQYIKwYBBQUHMAKGIWh0dHA6Ly9jLnNrLmVlL2VzdGVpZDIwMTguZGVyLmNydDAKBggqhkjOPQQDBAOBjAAwgYgCQgHYwrn0neexwds1cCZw7Y/j+qrWUu9Yl19adUh/X4bc1NNC9aGxo/mHnlnu0EU/BgdspWEQQTuW2JGKbFjfgXAU+QJCAfyZEU3ZwkzqeVgetp48DHKJUfajE0IpF/8eL1mDX3y2TyIqhoxaiA2tYM04Rjwi5Ptuslet5WGparV4DNEFahAD</ds:X509Certificate></ds:X509Data></ds:KeyInfo><ds:Object><xades:QualifyingProperties xmlns:xades=\"http://uri.etsi.org/01903/v1.3.2#\" Target=\"#id-399b68dfe7e9eadf61c8626f0cef5e60\"><xades:SignedProperties Id=\"xades-id-399b68dfe7e9eadf61c8626f0cef5e60\"><xades:SignedSignatureProperties><xades:SigningTime>2026-06-09T12:50:15Z</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>NJizv+Cu7gTzVZSWnmjzv7qBY3L3zqnjF2fQ9nuLMBo=</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>CN=ESTEID2018,2.5.4.97=#0c0e4e545245452d3130373437303133,O=SK ID Solutions AS,C=EE</ds:X509IssuerName><ds:X509SerialNumber>97875992129533026600503703603544906754</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate><xades:SignerRole><xades:ClaimedRoles><xades:ClaimedRole/></xades:ClaimedRoles></xades:SignerRole></xades:SignedSignatureProperties><xades:SignedDataObjectProperties><xad",
+            "source": null,
+            "match": "Certificate"
+          },
+          {
+            "text": ":SignedProperties Id=\"xades-id-399b68dfe7e9eadf61c8626f0cef5e60\"><xades:SignedSignatureProperties><xades:SigningTime>2026-06-09T12:50:15Z</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>NJizv+Cu7gTzVZSWnmjzv7qBY3L3zqnjF2fQ9nuLMBo=</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>CN=ESTEID2018,2.5.4.97=#0c0e4e545245452d3130373437303133,O=SK ID Solutions AS,C=EE</ds:X509IssuerName><ds:X509SerialNumber>97875992129533026600503703603544906754</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate><xades:SignerRole><xades:ClaimedRoles><xades:ClaimedRole/></xades:ClaimedRoles></xades:SignerRole></xades:SignedSignatureProperties><xades:SignedDataObjectProperties><xades:DataObjectFormat ObjectReference=\"#r-id-399b68dfe7e9eadf61c8626f0cef5e60-1\"><xades:MimeType>application/octet-stream</xades:MimeType></xades:DataObjectFormat><xades:DataObjectFormat ObjectReference=\"#r-id-399b68dfe7e9eadf61c8626f0cef5e60-2\"><xades:MimeType>application/octet-stream</xades:MimeType></xades:DataObjectFormat><xades:DataObjectFormat ObjectReference=\"#r-id-399b68dfe7e9eadf61c8626f0cef5e60-3\"><xades:MimeType>application/octet-stream</xades:MimeType></xades:DataO",
+            "source": null,
+            "match": "Certificate"
+          }
+        ],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [
+          {
+            "text": "–Oru km 0,000–1,640 lõigu rekonstrueerimine“ (Roadplan OÜ töö nr 22037). 3.19. Juhul kui projekteerimise või ehitustööde käigus sisenetakse riigitee tee piiridesse või tee kaitsevööndisse, tuleb projekt kooskõlastada Transpordiametiga vastavalt ehitusseadustiku §-dele 70, 71, 72 ja § 99 lõikele 3. 3.20. Projekti koosseisus tuleb esitada riigitee maa -alale kavandatavate tehnorajatiste isikliku kasutusõiguse plaanid. 3.21. Raudteemaale ja/või raudtee või raudtee kommunikatsioonide kaitsevööndisse ulatuvate ehitiste projekteerimiseks tuleb taotleda AS -ilt Eesti Raudtee tehnilised tingimused. Tehniliste tingimuste taotlus koos eskiislahendusega esitada e -posti aadressile infra@evr.ee. 3.22. Projekti koosseisus tuleb esitada riigitee teemaale kavandatavate tehnorajatiste isikliku kasutusõiguse või sundvalduse plaanid. 4. VAJALIKUD KOOSKÕLASTUSED Projekt kooskõlastada: 4.1. kõikide tehnovõrkude valdajatega; 4.2. kõikide kinnistute omanikega. 5. ÜLDNÕUDED 5.1. Projekteerimistingimused on kehtivad viis aastat. 5.2. Ehitusseadustiku § 34 punkti 1 kohaselt võib Kohtla -Järve Linnavalitsus projekteerimistingimuste nõuete mittetäitmisel tunnistada projekteerimistingimused kehtetuks. 5.3. Projekti võib koostada vastavat tegevusõigust omav füüsiline või juriidi",
+            "source": null,
+            "match": "sla"
+          },
+          {
+            "text": "13138 Lagedi–Oru tee piirides ja tee kaitsevööndis Kohtla-Järve linna Oru linnaosas ning juhtis tähelepanu vajadusele arvestada riigitee rekonstrueerimise projektiga „Riigitee 13138 Lagedi –Oru km 0,000 –1,640 lõigu rekonstrueerimine“ (Roadplan OÜ töö nr 22037). Esitatud tingimustega on projekteerimistingimuste lisas arvestatud. AS Eesti Raudtee kooskõlastas projekteerimistingimuste eelnõu tingimusel, et raudteemaale ja/või raudtee või raudtee kommunikatsioonide kaitsevööndisse ulatuvate ehitiste projekteerimiseks tuleb taotleda AS-ilt Eesti Raudtee tehnilised tingimused. Tehniliste tingimuste taotlus koos eskiislahendusega tuleb esitada e-posti aadressile infra@evr.ee. Kohtla-Järve Linnavalitsuse planeerimis - ja ehituskomisjon vaatas projekteerimistingimuste eelnõu koos asendiskeemiga läbi 28. aprillil 2026. a ning kiitis selle heaks protokolliga nr 13. Lähtudes eeltoodust ning kohaliku omavalitsuse korralduse seaduse § 30 lõike 1 punkti 2, ehitusseadustiku § 28 lõike 1, § 31 lõigete 3 –5, § 83 lõike 1 punkti 2, § 99 lõike 3 ja Kohtla-Järve Linnavolikogu 21. juuni 2017. a määruse nr 152 „Ehitusseadustikus ja planeerimisseaduses ning ehitusseadustiku ja planeerimisseaduse rakendamise seaduses sätestatud küsimuste lahendam",
+            "source": null,
+            "match": "sla"
+          }
+        ],
+        "term_value": [
+          {
+            "text": "lkiri Taotluse esitamise kuupäev | Taotluse esitamise kuupäev | Taotluse esitamise kuupäev | 21.05.2026 | 21.05.2026 | 21.05.2026 | 21.05.2026 ===== FILE: files/files_unpacked/EPP-947477-1_Tellimuse_teostusdokumendid_unpacked/EPP-947477-1_Tellimuse_teostusdokumendid/2.2. LC4978 Kase tn 5. Transpordiameti KK_2607211356_unpacked/LC4978 Kase tn 5, Oru raudteejaam. Elektrivarustuse projekt_unpacked/Transpordiamet_taotlus tehnovorgu-rajatise projekti kooskõlastamiseks_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"jpg\" ContentType=\"image/jpeg\"/><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/><Override PartName=\"/customXml/itemProps1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXmlProperties+xml\"/><Override PartName=\"/customXml/itemProps2.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXmlProperties+xml\"/><Override PartName=\"/customXml/itemProps3.xml\" ContentType=\"app",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "ise kuupäev | Taotluse esitamise kuupäev | 21.05.2026 | 21.05.2026 | 21.05.2026 | 21.05.2026 ===== FILE: files/files_unpacked/EPP-947477-1_Tellimuse_teostusdokumendid_unpacked/EPP-947477-1_Tellimuse_teostusdokumendid/2.2. LC4978 Kase tn 5. Transpordiameti KK_2607211356_unpacked/LC4978 Kase tn 5, Oru raudteejaam. Elektrivarustuse projekt_unpacked/Transpordiamet_taotlus tehnovorgu-rajatise projekti kooskõlastamiseks_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"jpg\" ContentType=\"image/jpeg\"/><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/><Override PartName=\"/customXml/itemProps1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXmlProperties+xml\"/><Override PartName=\"/customXml/itemProps2.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXmlProperties+xml\"/><Override PartName=\"/customXml/itemProps3.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXm",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "===== FILE: files/files_unpacked/EPP-947477-1_Tellimuse_teostusdokumendid_unpacked/EPP-947477-1_Tellimuse_teostusdokumendid/2.2. LC4978 Kase tn 5. Transpordiameti KK_2607211356_unpacked/LC4978 Kase tn 5, Oru raudteejaam. Elektrivarustuse projekt_unpacked/Transpordiamet_taotlus tehnovorgu-rajatise projekti kooskõlastamiseks_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"jpg\" ContentType=\"image/jpeg\"/><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/><Override PartName=\"/customXml/itemProps1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXmlProperties+xml\"/><Override PartName=\"/customXml/itemProps2.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXmlProperties+xml\"/><Override PartName=\"/customXml/itemProps3.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXmlProperties+xml\"/><Override PartName=\"/customXml/itemProps4.xml\" ContentType=\"application/vnd.open",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "\"http://schemas.microsoft.com/office/2006/documentManagement/types\" xmlns:pc=\"http://schemas.microsoft.com/office/infopath/2007/PartnerControls\"> <xsd:import namespace=\"http://schemas.microsoft.com/office/2006/documentManagement/types\"/> <xsd:import namespace=\"http://schemas.microsoft.com/office/infopath/2007/PartnerControls\"/> <xsd:element name=\"TaxCatchAll\" ma:index=\"14\" nillable=\"true\" ma:displayName=\"Taxonomy Catch All Column\" ma:hidden=\"true\" ma:list=\"{239611ab-42fc-42f1-a2d5-10fae37e3a40}\" ma:internalName=\"TaxCatchAll\" ma:showField=\"CatchAllData\" ma:web=\"22f67bf9-ca1d-4f01-9de4-ddafd5f875f8\"> <xsd:complexType> <xsd:complexContent> <xsd:extension base=\"dms:MultiChoiceLookup\"> <xsd:sequence> <xsd:element name=\"Value\" type=\"dms:Lookup\" maxOccurs=\"unbounded\" minOccurs=\"0\" nillable=\"true\"/> </xsd:sequence> </xsd:extension> </xsd:complexContent> </xsd:complexType> </xsd:element> </xsd:schema> <xsd:schema targetNamespace=\"http://schemas.openxmlformats.org/package/2006/metadata/core-properties\" elementFormDefault=\"qualified\" attributeFormDefault=\"unqualified\" blockDefault=\"#all\" xmlns=\"http://schemas.openxmlformats.org/package/2006/metadata/core-properties\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:dc=\"http://purl.org/dc/element",
+            "source": null,
+            "match": "extension"
+          }
+        ],
+        "award_criteria": [
+          {
+            "text": "\"xsd:string\" ma:index=\"0\" ma:displayName=\"Content Type\"/> <xsd:element ref=\"dc:title\" minOccurs=\"0\" maxOccurs=\"1\" ma:index=\"4\" ma:displayName=\"Titel\"/> <xsd:element ref=\"dc:subject\" minOccurs=\"0\" maxOccurs=\"1\"/> <xsd:element ref=\"dc:description\" minOccurs=\"0\" maxOccurs=\"1\"/> <xsd:element name=\"keywords\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element ref=\"dc:language\" minOccurs=\"0\" maxOccurs=\"1\"/> <xsd:element name=\"category\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element name=\"version\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element name=\"revision\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"> <xsd:annotation> <xsd:documentation> This value indicates the number of saves or revisions. The application is responsible for updating this value after each revision. </xsd:documentation> </xsd:annotation> </xsd:element> <xsd:element name=\"lastModifiedBy\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element ref=\"dcterms:modified\" minOccurs=\"0\" maxOccurs=\"1\"/> <xsd:element name=\"contentStatus\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> </xsd:all> </xsd:complexType> </xsd:schema> <xs:schema targetNamespace=\"http://schemas.microsoft.com/office/infopath/2007/PartnerControls\" elementFormDefault=\"qualified",
+            "source": null,
+            "match": "notation"
+          },
+          {
+            "text": "escription\" minOccurs=\"0\" maxOccurs=\"1\"/> <xsd:element name=\"keywords\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element ref=\"dc:language\" minOccurs=\"0\" maxOccurs=\"1\"/> <xsd:element name=\"category\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element name=\"version\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element name=\"revision\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"> <xsd:annotation> <xsd:documentation> This value indicates the number of saves or revisions. The application is responsible for updating this value after each revision. </xsd:documentation> </xsd:annotation> </xsd:element> <xsd:element name=\"lastModifiedBy\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element ref=\"dcterms:modified\" minOccurs=\"0\" maxOccurs=\"1\"/> <xsd:element name=\"contentStatus\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> </xsd:all> </xsd:complexType> </xsd:schema> <xs:schema targetNamespace=\"http://schemas.microsoft.com/office/infopath/2007/PartnerControls\" elementFormDefault=\"qualified\" attributeFormDefault=\"unqualified\" xmlns:pc=\"http://schemas.microsoft.com/office/infopath/2007/PartnerControls\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"> <xs:element name=\"Person\"> <xs:complexType> <xs:sequence> <xs:element ref=\"",
+            "source": null,
+            "match": "notation"
+          },
+          {
+            "text": "w:rsidR=\"00056AC8\" w:rsidRDefault=\"00056AC8\"><w:pPr><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r w:rsidR=\"00235FAE\"><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr><w:fldChar w:fldCharType=\"begin\"><w:ffData><w:name w:val=\"Text2\"/><w:enabled/><w:calcOnExit w:val=\"0\"/><w:textInput><w:default w:val=\"Leonhard Weiss OÜ\"/></w:textInput></w:ffData></w:fldChar></w:r><w:bookmarkStart w:id=\"0\" w:name=\"Text2\"/><w:r w:rsidR=\"00235FAE\"><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr><w:instrText xml:space=\"preserve\"> FORMTEXT </w:instrText></w:r><w:r w:rsidR=\"00235FAE\"><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr></w:r><w:r w:rsidR=\"00235FAE\"><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr><w:fldChar w:fldCharType=\"separate\"/></w:r><w:r w:rsidR=\"00235FAE\"><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"",
+            "source": null,
+            "match": "markS"
+          },
+          {
+            "text": "293DC63\" w:rsidR=\"00056AC8\" w:rsidRDefault=\"00056AC8\"><w:pPr><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r w:rsidR=\"00235FAE\"><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/></w:rPr><w:fldChar w:fldCharType=\"begin\"><w:ffData><w:name w:val=\"Text3\"/><w:enabled/><w:calcOnExit w:val=\"0\"/><w:textInput><w:default w:val=\"12083348\"/></w:textInput></w:ffData></w:fldChar></w:r><w:bookmarkStart w:id=\"1\" w:name=\"Text3\"/><w:r w:rsidR=\"00235FAE\"><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/></w:rPr><w:instrText xml:space=\"preserve\"> FORMTEXT </w:instrText></w:r><w:r w:rsidR=\"00235FAE\"><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/></w:rPr></w:r><w:r w:rsidR=\"00235FAE\"><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/></w:rPr><w:fldChar w:fldCharType=\"separate\"/></w:r><w:r w:rsidR=\"00235FAE\"><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"",
+            "source": null,
+            "match": "markS"
+          }
+        ],
+        "forms_signatures": [
+          {
+            "text": "tusõiguse alal teostatud ehitus -, hooldus -, remont - või likvideerimistööde lõpetamist on Rajatise omanik kohustatud heakorrastama kasutusõiguse ala ning taastama oma kulul Hoonestusõigusega koormatud kinnistu tööde alustamisele eelnenud seisundi. 2.14. Rajatise omanik võib isiklikust kasutusõigusest tu lenevate õiguste ja kohustuste teostamise üle anda kolman dale isikule, teatades sellest H oonestusõiguse omanikku 30 päeva jooksul alates kasutusõiguse üleandmisest. 2.15. Hoonestusõiguse igakordne omanik ja Rajatis e omanik kohustuvad järgima ja samuti nõudma nende volitusel Hoonest usõigusega koormatud kinnistul tegutsevatelt kolmandatelt isikutelt kehtivate õigusaktidega kaitsevö öndites kehtestatud piirangute järgimist. 2.16. Hoonestusõiguse omanik võib avariiremondi vajaduse korral viivitamata kooskõlastust taotlemata alustada vajalike töödega, kui ta teat ab sellest esimesel võimalusel Rajatise omanikule. 2.17. Hoonestusõiguse igakordne omanik ja Rajatise omanik kohustuvad informeerima kirjalikku taasesitamist võimaldavas vormis teist poolt Hoonestusõiguse võõrandamisest, ühendamis est ja jagamisest või isikliku kasutusõiguse võõrandamisest. 2.18. Hoonestusõiguse igakordne omanik ja Rajatise omanik tagavad Hoones tusõiguse võõrandamise korral kõigi lepingust",
+            "source": null,
+            "match": "mandat"
+          },
+          {
+            "text": "ku ja Rajatise omaniku vahelise notariaalselt tõestatud kokkuleppega või muudel seaduses toodud alustel. 6. Rajatise omaniku nõusolek Kinnistu jagamiseks ja koormamiseks 6.1. Rajatise omanik annab Hoonestusõiguse igakordsele omanikule oma tagasivõetamatu nõusoleku: 6.1.1. Kinnistu jagamiseks selliselt, et Rajatise omaniku kasuks seatud isiklik kasutusõigus jääb koormama , vaid Kinnist u jagamise tulemusena tekkivat kinnistut, kus asub rajatis ja Rajatise o maniku kasuks seatud isiklikku kasutusõigust ei kanta üle Kinnistu j agamise tulemusena tekkivatele kinnistutele/katastriüksustele, kus rajatis ei asu. 6.1.2. Hoonestusõiguse kolmandate isikute õigustega, sealhulgas hüpoteeki dega ja servituutidega, koormamiseks ning H oonestusõiguse suhtes kasutuskorra kokkulepete sõlmimiseks ja Rajatise omanik u kasuks seatud servituutidega samale järjekohale kandmiseks tingimuste l hoonestusõiguse omaniku enda äranägemisel, samuti Kinnistule ja Hoonestusõigusele enne käesoleva lepinguga seatavat isiklikku kasutusõigust seatud kolmandate isikute õiguste, sh servituutide, muutmiseks ja vastavate kannete tegemiseks kinnistusraamatusse, tingimustel Hoonestusõiguse / Kinnistu omaniku enda äranägemisel. 6.1.3. Hoonestusõiguse lõppemiseni Hoonestusõigust koormava isikliku kasutusõiguse",
+            "source": null,
+            "match": "mandat"
+          },
+          {
+            "text": "gamise tulemusena tekkivat kinnistut, kus asub rajatis ja Rajatise o maniku kasuks seatud isiklikku kasutusõigust ei kanta üle Kinnistu j agamise tulemusena tekkivatele kinnistutele/katastriüksustele, kus rajatis ei asu. 6.1.2. Hoonestusõiguse kolmandate isikute õigustega, sealhulgas hüpoteeki dega ja servituutidega, koormamiseks ning H oonestusõiguse suhtes kasutuskorra kokkulepete sõlmimiseks ja Rajatise omanik u kasuks seatud servituutidega samale järjekohale kandmiseks tingimuste l hoonestusõiguse omaniku enda äranägemisel, samuti Kinnistule ja Hoonestusõigusele enne käesoleva lepinguga seatavat isiklikku kasutusõigust seatud kolmandate isikute õiguste, sh servituutide, muutmiseks ja vastavate kannete tegemiseks kinnistusraamatusse, tingimustel Hoonestusõiguse / Kinnistu omaniku enda äranägemisel. 6.1.3. Hoonestusõiguse lõppemiseni Hoonestusõigust koormava isikliku kasutusõiguse kinnistusraamatust kustutamiseks tingimusel, et kinnistamisavalduse Hoonestusõiguse ja isikliku kasutusõiguse kinnistusraamatust kustutamiseks esitatakse üheaegselt ja ühes dokumendis. 6.1.4. Hoonestusõiguse ühendamiseks ja jaga miseks H oonestusõiguse omaniku äranägemisel. ===== FILE: files/files_unpacked/EPP-947477-1_Tellimuse_teostusdokumendid_unpacked/EPP-947477-1_Tellimuse_teostusd",
+            "source": null,
+            "match": "mandat"
+          },
+          {
+            "text": "ype=\"application/vnd.etsi.asic-e+zip\"/><manifest:file-entry manifest:full-path=\"2026_06_nr_1444_3_Oru_raudteejaam_elektrivarustus_Kase_tn_5.pdf\" manifest:media-type=\"application/octet-stream\"/><manifest:file-entry manifest:full-path=\"IKO_pohitingimused_2025_07_22.pdf\" manifest:media-type=\"application/octet-stream\"/><manifest:file-entry manifest:full-path=\"Tooloa_taotlusvorm_2026.pdf\" manifest:media-type=\"application/octet-stream\"/></manifest:manifest> ===== FILE: files/files_unpacked/EPP-947477-1_Tellimuse_teostusdokumendid_unpacked/EPP-947477-1_Tellimuse_teostusdokumendid/1.6. LC4978 Kase tn 5. Eesti Raudtee KK_2607211356_unpacked/META-INF/signatures0.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><asic:XAdESSignatures xmlns:asic=\"http://uri.etsi.org/02918/v1.2.1#\"><ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" Id=\"id-399b68dfe7e9eadf61c8626f0cef5e60\"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256\"/><ds:Reference Id=\"r-id-399b68dfe7e9eadf61c8626f0cef5e60-1\" URI=\"2026_06_nr_1444_3_Oru_raudteejaam_elektrivarustus_Kase_tn_5.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>u5QW5AU07CCdjyBql3",
+            "source": null,
+            "match": "signature"
+          }
+        ],
+        "submission": [],
+        "ip_data_security": [
+          {
+            "text": "mused ver.5.pdf ===== Elektrilevi OÜ Kehtiv alates: 17.06.2025 Dokumendi tähis: P1111 / 5 Kinnitas: C. Linnumäe Ülemdokument: P167 Koostas Triin Kihuoja Lk: 1 / 5 ISIKUANDMETE TÖÖTLEMISE TINGIMUSED Elektrilevi OÜ (edaspidi Tellija) isikuandmete töötlemise tüüptingimused reguleerivad Tellija poolt Täitjale Lepingu täitmiseks edastatavate isikuandmete töötlemist. Tingimused on Tellija ja Täitja vahel sõlmitud Lepingu lahutamatu osa. 1. Mõisted Pool/Pooled Täitja või Tellija, koos Pooled Tingimused Käesolevad Isikuandmete töötlemise tingimused Leping Poolte vahel sõlmitud leping tööde teostamiseks ja/või teenuse osutamiseks GDPR Euroopa Liidu isikuandmete kaitse üldmäärus (EL) 2016/679 Andmesubjekt Otseselt või kaudselt tuvastatav füüsiline isik, nt Tellija kliendid, töötajad ning muud füüsilised isikud, kelle isikuandmeid Tellija töötleb Isikuandmed Igasugune teave, mille kaudu saab otseselt või kaudselt tuvastada füüsilist isikut ning mis on Tellija poolt edastatud Täitjale Lepingu täitmise raames Isikuandmete töötlemine Ükskõik milline toiming Isikuandmetega Isikuandmetega seotud rikkumine Isikuandmete juhuslik või tahtlik muutmine, hävimine, kahjustumine või muul moel volitamata isiku valdusesse sattumine Vastutav töötleja Elektrilevi OÜ, registr",
+            "source": null,
+            "match": "GDPR"
+          },
+          {
+            "text": "e Ükskõik milline toiming Isikuandmetega Isikuandmetega seotud rikkumine Isikuandmete juhuslik või tahtlik muutmine, hävimine, kahjustumine või muul moel volitamata isiku valdusesse sattumine Vastutav töötleja Elektrilevi OÜ, registrikood 11050857, Harju maakond, Tallinn, Kesklinna linnaosa, Veskiposti tn 2, 10138, Tellija Volitatud töötleja Täitja, kes töötleb Isikuandmeid Vastutava töötleja nimel Alltöötleja Täitjaga lepingulises suhtes olev isik, kes on Täitja poolt volitatud Isikuandmeid töötlema Vastutava töötleja nimel Kolmandad riigid Riigid, mis ei kuulu Euroopa Majanduspiirkonda 2. Tingimuste eesmärk ning ulatus 2.1. GDPR artikkel 28(3) järgi peavad Vastutav ning Volitatud töötleja sõlmima siduva kirjaliku lepingu, kui Vastutav töötleja kaasab Isikuandmete töötlemiseks Volitatud töötleja. GDPR artikkel 28(1) kohaselt võib Vastutav töötleja Isikuandmete töötlemiseks kaasata vaid sellised Volitatud töötlejad, kes tagavad vähemalt sama Isikuandmete kaitse taseme, mida rakendab Vastutav töötleja, ning implementeerivad vastavad organisatsioonilised ning tehnilised meetmed, et kaitsta Andmesubjektide õigusi ning huve. 2.2. Käesolevaga avaldavad Pooled soovi kokku leppida Isikuandmete töötlemise tingimustes, mis on kooskõlas isikuandmete töötlemisele kohald",
+            "source": null,
+            "match": "GDPR"
+          },
+          {
+            "text": "valdusesse sattumine Vastutav töötleja Elektrilevi OÜ, registrikood 11050857, Harju maakond, Tallinn, Kesklinna linnaosa, Veskiposti tn 2, 10138, Tellija Volitatud töötleja Täitja, kes töötleb Isikuandmeid Vastutava töötleja nimel Alltöötleja Täitjaga lepingulises suhtes olev isik, kes on Täitja poolt volitatud Isikuandmeid töötlema Vastutava töötleja nimel Kolmandad riigid Riigid, mis ei kuulu Euroopa Majanduspiirkonda 2. Tingimuste eesmärk ning ulatus 2.1. GDPR artikkel 28(3) järgi peavad Vastutav ning Volitatud töötleja sõlmima siduva kirjaliku lepingu, kui Vastutav töötleja kaasab Isikuandmete töötlemiseks Volitatud töötleja. GDPR artikkel 28(1) kohaselt võib Vastutav töötleja Isikuandmete töötlemiseks kaasata vaid sellised Volitatud töötlejad, kes tagavad vähemalt sama Isikuandmete kaitse taseme, mida rakendab Vastutav töötleja, ning implementeerivad vastavad organisatsioonilised ning tehnilised meetmed, et kaitsta Andmesubjektide õigusi ning huve. 2.2. Käesolevaga avaldavad Pooled soovi kokku leppida Isikuandmete töötlemise tingimustes, mis on kooskõlas isikuandmete töötlemisele kohalduva õigusega. Isikuandmete töötlemisel lähtuvad Pooled GDPR -is ning isikuandmete kaitse seaduses sätestatust. Kui kumbki Pool peab järgima täiendavaid õigusakte, vastutab õi",
+            "source": null,
+            "match": "GDPR"
+          },
+          {
+            "text": "tleja sõlmima siduva kirjaliku lepingu, kui Vastutav töötleja kaasab Isikuandmete töötlemiseks Volitatud töötleja. GDPR artikkel 28(1) kohaselt võib Vastutav töötleja Isikuandmete töötlemiseks kaasata vaid sellised Volitatud töötlejad, kes tagavad vähemalt sama Isikuandmete kaitse taseme, mida rakendab Vastutav töötleja, ning implementeerivad vastavad organisatsioonilised ning tehnilised meetmed, et kaitsta Andmesubjektide õigusi ning huve. 2.2. Käesolevaga avaldavad Pooled soovi kokku leppida Isikuandmete töötlemise tingimustes, mis on kooskõlas isikuandmete töötlemisele kohalduva õigusega. Isikuandmete töötlemisel lähtuvad Pooled GDPR -is ning isikuandmete kaitse seaduses sätestatust. Kui kumbki Pool peab järgima täiendavaid õigusakte, vastutab õigusaktide täitmise eest Pool, kellele õigusakt kohaldub. Elektrilevi OÜ Kehtiv alates: 17.06.2025 Dokumendi tähis: P1111 / 5 Kinnitas: C. Linnumäe Ülemdokument: P167 Koostas Triin Kihuoja Lk: 2 / 5 3. Isikuandmete töötlemine 3.1. Volitatud töötleja töötleb Isikuandmeid vaid Vastutava töötleja õiguspäraste kirjalike juhiste alusel ning vaid Pooltevahelise Lepingu täitmise eesmärgil. 3.2. Volitatud töötlejal on keelatud töödelda Isikuandmeid muul eesmärgil kui Pooltevahelise Lepingu täitmiseks. Juhul kui Voli",
+            "source": null,
+            "match": "GDPR"
+          }
+        ]
+      },
+      "source_dce_run_id": 31975985612,
+      "source_shard": 14,
+      "hot_ready_at": "2026-08-16T22:27:45.719061+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 15,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
