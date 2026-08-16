@@ -70,6 +70,7 @@ jobs:
           s=json.load(open('/tmp/za/stats.json'))
           assert not s['errors'], s
           assert s['raw_materialized'] + s['awards_materialized'] > 0, s
+          assert s['document_routes'] > 0, s
           print(json.dumps(s,indent=2))
           PY
 
@@ -84,14 +85,24 @@ jobs:
       - name: Live Public Contracts Scotland OCDS smoke
         env:
           PROACTIS_ALLOW_INCOMPLETE_TLS: '1'
+          PROACTIS_WORKERS: '8'
         run: |
           python pipeline/discover_uk_proactis_ocds.py --source UK_PCS_OCDS --output /tmp/pcs --months 2
           python - <<'PY'
           import json
           s=json.load(open('/tmp/pcs/stats.json'))
-          assert s['raw_materialized'] + s['awards_materialized'] + s['pre_tender_materialized'] > 0, s
-          if s['errors']:
-              raise AssertionError(s)
+          total=s['raw_materialized']+s['awards_materialized']+s['pre_tender_materialized']
+          ratio=s.get('requests_succeeded',0)/max(1,s.get('requests_planned',0))
+          assert total > 0, s
+          assert s['current_materialized'] > 0, s
+          assert s['document_routes'] > 0, s
+          # The official PCS API intermittently returns HTTP 500 on individual
+          # month/type combinations. Preserve those failures as evidence, but
+          # accept a materially useful partial harvest rather than throwing away
+          # hundreds of valid releases.
+          assert ratio >= 0.60, (ratio,s)
+          state='LIVE_VALIDATED' if not s.get('errors') else 'LIVE_PARTIAL_UPSTREAM'
+          print('PCS_PROBE='+state)
           print(json.dumps(s,indent=2))
           PY
 
@@ -107,6 +118,7 @@ jobs:
       - name: Probe Sell2Wales without treating upstream failure as coverage
         env:
           PROACTIS_ALLOW_INCOMPLETE_TLS: '1'
+          PROACTIS_WORKERS: '8'
         shell: bash
         run: |
           set +e
@@ -117,8 +129,13 @@ jobs:
           p='/tmp/s2w/stats.json'
           if os.path.exists(p):
               s=json.load(open(p)); print(json.dumps(s,indent=2))
-              healthy=not s.get('errors') and (s.get('raw_materialized',0)+s.get('awards_materialized',0)+s.get('pre_tender_materialized',0)>0)
-              print('SELL2WALES_PROBE=' + ('LIVE_VALIDATED' if healthy else 'DEGRADED_UPSTREAM'))
+              total=s.get('raw_materialized',0)+s.get('awards_materialized',0)+s.get('pre_tender_materialized',0)
+              ratio=s.get('requests_succeeded',0)/max(1,s.get('requests_planned',0))
+              if total>0 and ratio>=0.60:
+                  state='LIVE_VALIDATED' if not s.get('errors') else 'LIVE_PARTIAL_UPSTREAM'
+              else:
+                  state='DEGRADED_UPSTREAM'
+              print('SELL2WALES_PROBE='+state)
           else:
               print('SELL2WALES_PROBE=DEGRADED_UPSTREAM_NO_STATS')
           PY
