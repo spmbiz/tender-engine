@@ -1,0 +1,120 @@
+name: Qwen Shadow Recall Guard
+
+on:
+  workflow_run:
+    workflows: ["Qwen Notice Shadow Smoke"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Qwen smoke run ID to guard
+        required: true
+  push:
+    branches: [main]
+    paths:
+      - 'control/qwen_guard_trigger.json'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: qwen-shadow-recall-guard-${{ github.event.workflow_run.id || github.event.inputs.source_run_id || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve source smoke run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = 'workflow_run' ]; then
+            run_id='${{ github.event.workflow_run.id }}'
+            conclusion='${{ github.event.workflow_run.conclusion }}'
+            head_sha='${{ github.event.workflow_run.head_sha }}'
+          elif [ '${{ github.event_name }}' = 'workflow_dispatch' ]; then
+            run_id='${{ github.event.inputs.source_run_id }}'
+            conclusion="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}" --jq '.conclusion // "unknown"')"
+            head_sha="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}" --jq '.head_sha')"
+          else
+            run_id="$(python - <<'PY'
+          import json
+          x=json.load(open('control/qwen_guard_trigger.json'))
+          print(x['source_run_id'])
+          PY
+          )"
+            conclusion="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}" --jq '.conclusion // "unknown"')"
+            head_sha="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}" --jq '.head_sha')"
+          fi
+          [[ "$run_id" =~ ^[0-9]+$ ]]
+          echo "SOURCE_RUN_ID=$run_id" >> "$GITHUB_ENV"
+          echo "SOURCE_CONCLUSION=$conclusion" >> "$GITHUB_ENV"
+          echo "SOURCE_HEAD_SHA=$head_sha" >> "$GITHUB_ENV"
+
+      - name: Download raw Qwen smoke evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p source
+          name="qwen3-4b-shadow-smoke-${SOURCE_RUN_ID}"
+          gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$name" --dir source
+          test -s source/qwen-shadow-results.jsonl
+          test -s source/qwen-shadow-summary.json
+
+      - name: Apply non-destructive semantic recall guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/qwen_shadow_recall_guard.py \
+            --input source/qwen-shadow-results.jsonl \
+            --output qwen-shadow-guarded-results.jsonl \
+            --summary qwen-shadow-guard-summary.json
+
+      - name: Publish immutable guarded evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="qwen-shadow-guarded-${SOURCE_RUN_ID}"
+          notes="Non-destructive post-model triage guard. Raw Qwen output remains preserved. This layer changes ranking/mode only and never establishes eligibility, DCE truth, GREEN/SUPERGREEN, or deletes notices. source_run=${SOURCE_RUN_ID}."
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" qwen-shadow-guarded-results.jsonl qwen-shadow-guard-summary.json source/qwen-shadow-summary.json --clobber
+          else
+            gh release create "$tag" --target "$SOURCE_HEAD_SHA" --title "Qwen Guarded Shadow ${SOURCE_RUN_ID}" --notes "$notes"
+            gh release upload "$tag" qwen-shadow-guarded-results.jsonl qwen-shadow-guard-summary.json source/qwen-shadow-summary.json
+          fi
+          echo "IMMUTABLE_TAG=$tag" >> "$GITHUB_ENV"
+
+      - name: Refresh stable guarded pointer for successful smoke
+        if: ${{ env.SOURCE_CONCLUSION == 'success' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          latest=qwen-shadow-guarded-latest
+          cp qwen-shadow-guarded-results.jsonl qwen-shadow-guarded-results-latest.jsonl
+          cp qwen-shadow-guard-summary.json qwen-shadow-guard-summary-latest.json
+          gh release view "$latest" >/dev/null 2>&1 || gh release create "$latest" --target "$SOURCE_HEAD_SHA" --title 'Qwen Guarded Shadow — LATEST' --notes 'Stable pointer to latest successful non-destructive guarded Qwen smoke.'
+          gh release edit "$latest" --title "Qwen Guarded Shadow — LATEST (${SOURCE_RUN_ID})" --notes "immutable=${IMMUTABLE_TAG}; ranking/mode guard only; no destructive rejection."
+          gh release upload "$latest" qwen-shadow-guarded-results-latest.jsonl qwen-shadow-guard-summary-latest.json --clobber
+
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -s qwen-shadow-guard-summary.json ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat qwen-shadow-guard-summary.json >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
