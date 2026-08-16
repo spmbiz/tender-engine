@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -74,8 +75,36 @@ def is_open(row: dict[str, Any]) -> bool:
         return True
 
 
-def compact_evidence(row: dict[str, Any], per_gate: int = 4, chars: int = 1800) -> dict[str, list[dict[str, Any]]]:
+def nested_candidate(row: dict[str, Any]) -> dict[str, Any]:
+    candidate = row.get("candidate")
+    return candidate if isinstance(candidate, dict) else {}
+
+
+def first_value(row: dict[str, Any], candidate: dict[str, Any], *names: str) -> Any:
+    for source in (row, candidate):
+        for name in names:
+            value = source.get(name)
+            if value not in (None, "", [], {}):
+                return value
+    return None
+
+
+def evidence_map(row: dict[str, Any]) -> dict[str, Any]:
     snippets = row.get("gate_snippets") or row.get("evidence_by_gate") or {}
+    if not isinstance(snippets, dict):
+        return {}
+    # extract_gates.py has used both `categories` and `gate_evidence` containers
+    # across durable handoff versions. The aggregate embeds the full gate_snippets
+    # object, so unwrap either schema before reading canonical gates.
+    for nested_key in ("categories", "gate_evidence", "evidence_by_gate"):
+        nested = snippets.get(nested_key)
+        if isinstance(nested, dict):
+            return nested
+    return snippets
+
+
+def compact_evidence(row: dict[str, Any], per_gate: int = 4, chars: int = 1800) -> dict[str, list[dict[str, Any]]]:
+    snippets = evidence_map(row)
     packed: dict[str, list[dict[str, Any]]] = {}
     for gate in GATES:
         items = snippets.get(gate) if isinstance(snippets, dict) else []
@@ -83,18 +112,46 @@ def compact_evidence(row: dict[str, Any], per_gate: int = 4, chars: int = 1800) 
         for item in list(items or [])[:per_gate]:
             if isinstance(item, dict):
                 text = str(item.get("text") or item.get("snippet") or item.get("evidence") or "")
-                source = item.get("source") or item.get("file") or item.get("path")
+                source = (
+                    item.get("source")
+                    or item.get("file")
+                    or item.get("path")
+                    or item.get("document")
+                    or item.get("document_path")
+                )
+                match = item.get("match")
+                start = item.get("start")
+                end = item.get("end")
             else:
                 text = str(item or "")
                 source = None
+                match = None
+                start = None
+                end = None
             text = " ".join(text.split())[:chars]
             if text:
-                out.append({"text": text, "source": source})
+                record: dict[str, Any] = {"text": text, "source": source}
+                if match not in (None, ""):
+                    record["match"] = match
+                if start is not None:
+                    record["start"] = start
+                if end is not None:
+                    record["end"] = end
+                out.append(record)
         packed[gate] = out
     return packed
 
 
+def plain_excerpt(value: Any, max_chars: int = 1000) -> str | None:
+    if value in (None, ""):
+        return None
+    text = re.sub(r"<[^>]+>", " ", str(value))
+    text = " ".join(text.split())
+    return text[:max_chars] or None
+
+
 def compact(row: dict[str, Any], run_id: str) -> dict[str, Any]:
+    candidate = nested_candidate(row)
     evidence = compact_evidence(row)
     coverage = sum(1 for items in evidence.values() if items)
     authority = row.get("authority_conflicts") or {}
@@ -102,21 +159,29 @@ def compact(row: dict[str, Any], run_id: str) -> dict[str, Any]:
     deadline = deadline if isinstance(deadline, dict) else {}
     deadline_status = str(deadline.get("status") or row.get("deadline_authority_status") or "MISSING")
     deadline_resolved = deadline_status in RESOLVED_DEADLINE and not bool(deadline.get("conflict") or row.get("deadline_conflict"))
+    preliminary_raw = first_value(row, candidate, "preliminary_score", "priority_score", "score")
     try:
-        preliminary = int(float(row.get("preliminary_score") or row.get("priority_score") or 0))
+        preliminary = int(float(preliminary_raw or 0))
     except Exception:
         preliminary = 0
     return {
-        "candidate_id": row.get("candidate_id"),
-        "title": row.get("title"),
-        "buyer": row.get("buyer"),
-        "portal": row.get("portal"),
-        "notice_url": row.get("notice_url"),
-        "deadline": row.get("deadline"),
-        "estimated_value": row.get("estimated_value"),
-        "currency": row.get("currency"),
+        "candidate_id": first_value(row, candidate, "candidate_id"),
+        "title": first_value(row, candidate, "title"),
+        "buyer": first_value(row, candidate, "buyer", "contracting_authority"),
+        "portal": first_value(row, candidate, "portal"),
+        "source": first_value(row, candidate, "source"),
+        "notice_id": first_value(row, candidate, "notice_id"),
+        "notice_url": first_value(row, candidate, "notice_url", "source_url", "url"),
+        "deadline": first_value(row, candidate, "deadline"),
+        "published": first_value(row, candidate, "published", "publication_date"),
+        "estimated_value": first_value(row, candidate, "estimated_value", "value"),
+        "currency": first_value(row, candidate, "currency"),
         "preliminary_score": preliminary,
-        "content_quality": row.get("content_quality"),
+        "qwen_decision": first_value(row, candidate, "qwen_decision", "decision"),
+        "qwen_route": first_value(row, candidate, "qwen_route", "route"),
+        "qwen_lean": first_value(row, candidate, "qwen_lean", "lean"),
+        "description_excerpt": plain_excerpt(first_value(row, candidate, "description", "summary")),
+        "content_quality": first_value(row, candidate, "content_quality") or row.get("content_quality"),
         "gate_readiness": bool(row.get("gate_readiness")),
         "deadline_authority": deadline,
         "deadline_authority_status": deadline_status,
@@ -142,6 +207,8 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--queue", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--top-out")
+    ap.add_argument("--top-items", type=int, default=30)
     ap.add_argument("--existing")
     ap.add_argument("--run-id", required=True)
     ap.add_argument("--max-items", type=int, default=240)
@@ -171,11 +238,12 @@ def main() -> None:
             source_runs.append(normalized)
 
     payload = {
-        "schema": "GPT_WEB_DCE_REVIEW_BANK_V1",
+        "schema": "GPT_WEB_DCE_REVIEW_BANK_V2",
         "updated_at": utc_now(),
         "latest_source_dce_run_id": int(args.run_id) if str(args.run_id).isdigit() else args.run_id,
         "source_runs": source_runs[:30],
         "incoming_gate_ready": len(incoming),
+        "incoming_with_gate_evidence": sum(1 for row in incoming if row.get("evidence_gate_coverage")),
         "count": len(items),
         "items": items,
         "rule": "Persistent unresolved GPT Web review bank. New DCE generations merge; they do not erase older open unresolved candidates.",
@@ -184,7 +252,29 @@ def main() -> None:
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(json.dumps({"incoming_gate_ready": len(incoming), "pending_total": len(items), "out": str(out)}, indent=2))
+
+    if args.top_out:
+        top_path = Path(args.top_out)
+        top_path.parent.mkdir(parents=True, exist_ok=True)
+        top_payload = {
+            "schema": "GPT_WEB_DCE_REVIEW_TOP_V1",
+            "updated_at": payload["updated_at"],
+            "latest_source_dce_run_id": payload["latest_source_dce_run_id"],
+            "pending_total": payload["count"],
+            "incoming_gate_ready": payload["incoming_gate_ready"],
+            "incoming_with_gate_evidence": payload["incoming_with_gate_evidence"],
+            "count": min(max(0, args.top_items), len(items)),
+            "items": items[: max(0, args.top_items)],
+        }
+        top_path.write_text(json.dumps(top_payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    print(json.dumps({
+        "incoming_gate_ready": len(incoming),
+        "incoming_with_gate_evidence": payload["incoming_with_gate_evidence"],
+        "pending_total": len(items),
+        "out": str(out),
+        "top_out": args.top_out,
+    }, indent=2))
 
 
 if __name__ == "__main__":
