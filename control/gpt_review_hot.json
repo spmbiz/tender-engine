@@ -1,10 +1,10 @@
 {
   "schema": "GPT_REVIEW_HOT_V3",
-  "updated_at": "2026-08-16T00:06:40.679419+00:00",
+  "updated_at": "2026-08-16T00:06:43.328872+00:00",
   "latest_dce_run_id": 31916368034,
-  "latest_shard": 15,
+  "latest_shard": 18,
   "generation_reset": false,
-  "count": 19,
+  "count": 24,
   "items": [
     {
       "candidate_id": "US-SAM:54d2014bc3ee477ca7be2380edf53f90",
@@ -1107,6 +1107,110 @@
       "review_lane": "SPM_PRIORITY"
     },
     {
+      "candidate_id": "US-SAM:6ceea8e1c11f4d61b2bd9bc0d682437e",
+      "title": "INTEGRATED LIBRARY SYSTEM",
+      "buyer": "ADMINISTRATIVE OFFICE OF THE US COURTS",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/workspace/contract/opp/6ceea8e1c11f4d61b2bd9bc0d682437e/view",
+      "deadline": "2026-08-17T12:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 33,
+      "priority_score": 33,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-17T12:00:00+00:00",
+        "notice_deadline_date": "2026-08-17",
+        "dce_deadline_candidates": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Never silently overwrite deadline metadata. Deadline candidates come only from authoritative gate-ready DCE text near deadline language; unresolved/multiple/conflicting dates require review before final 90+/FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 6,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "system must be able to run analytic reports that capture the following information: Spending by consignee class (e.g. main libraries, branch libraries, circuit court judges, magistrate judges, clerks’ offices, etc.) including detailed information about each purchase (i.e. title, edition, author, publisher, date of purchase, fund information, list price and invoice price.) Usage statistics from the Online Public Access Catalog (OPAC), as well as staff usage statistics Spending by vendor and publisher Maintain historic spending trends for an indefinite period. ===== FILE: files/sam_http_resources.json ===== { \"notice_id\": \"6ceea8e1c11f4d61b2bd9bc0d682437e\", \"resources\": [ { \"resource_id\": \"97334eefd76f40a3ae09de8790b7c85b\", \"name\": \"SOW - ILS_Requirements_June_2026 RFI.pdf\", \"access\": \"0\", \"deleted\": null, \"path\": \"root._embedded.opportunityAttachmentList[0].attachments[0]\" } ] }",
+            "source": null
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [
+          {
+            "text": "===== FILE: files/SOW_-_ILS_Requirements_June_2026_RFI.pdf ===== 1 U.S. COURTS INTEGRATED LIBRARY SYSTEM REQUIREMENTS Statement of Work Table of Contents Background: ............................................................................................................................................................................ 2 Definitions: .............................................................................................................................................................................. 2 Scope: ..........................................................................................................................................",
+            "source": null
+          },
+          {
+            "text": "ry, Circuit Judge, District Judge, Clerks, etc.) Public: Public refers to court stakeholders who are not judges within the circuit. General Public: Non-court users of the library Scope: The scope of this contract includes the acquisition of a FedRAMP certified or equivalent Integrated Library System. The solution will contain fourteen ILS instances (thirteen production instances; one test instance). The AOUSC will have the option to have multiple instances combined into a single instance and others remaining separate. The instances can either have separate bibliographic databases or utilize a shared bibliographic database. Requirements 1) The Contractor shall provide 99.5% availability between the hours of 7:00 a.m. to 11:00 p.m. Eastern Time, Monday through Friday on business days. Scheduled maintenance is to be provided outside of these hours. a. The instances are to be maintained so that each instance remains unique, discrete and separate from each other instance (although some instances may share a bibliographic database) and from any external instance or system. 2) The Contractor shall ensure that the ILS software operates fully and successfully in this environment. 3) The Contractor shall ensure that each ILS instance is able to interface, through secure fi",
+            "source": null
+          },
+          {
+            "text": "een locations and desire the ability to see the history of any title’s location movements via transfer between locations, and interlibrary loans. Many of our locations are not subject to circulation (e.g. titles purchased for a judge and held in the judge’s chambers) and must not appear in a public catalog. 11) Data extraction from all modules: The Administrative office and the circuits require statistical data to be extracted from the system based on various inputs (e.g. vendor, judge type, title, location). The system must be able to produce statistics, either through static reports, or dynamic queries of the data to satisfy those requirements. See Attachment B. Network Monitoring The Contractor shall immediately notify the Contracting Officer’s Representative (COR), and other designated personnel at the Administrative Office of any network, system, or security breach which involves the federal judiciary’s ILS instances. Software Modules Software modules installed on each instance shall be included under the ILS software maintenance. Modules may be implemented in one or more than one installed instance. Contractor shall ensure that all existing data must be maintained, accessible, and searchable by judiciary staff. Contractor shall ensure, at a minimum, the same level",
+            "source": null
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "Public: Public refers to court stakeholders who are not judges within the circuit. General Public: Non-court users of the library Scope: The scope of this contract includes the acquisition of a FedRAMP certified or equivalent Integrated Library System. The solution will contain fourteen ILS instances (thirteen production instances; one test instance). The AOUSC will have the option to have multiple instances combined into a single instance and others remaining separate. The instances can either have separate bibliographic databases or utilize a shared bibliographic database. Requirements 1) The Contractor shall provide 99.5% availability between the hours of 7:00 a.m. to 11:00 p.m. Eastern Time, Monday through Friday on business days. Scheduled maintenance is to be provided outside of these hours. a. The instances are to be maintained so that each instance remains unique, discrete and separate from each other instance (although some instances may share a bibliographic database) and from any external instance or system. 2) The Contractor shall ensure that the ILS software operates fully and successfully in this environment. 3) The Contractor shall ensure that each ILS instance is able to interface, through secure file transfer, with the federal judiciary’s financial",
+            "source": null
+          },
+          {
+            "text": "pose. 6 Optional Functionality during the contract Period that requires pricing: Contractor to provide pricing and technical details for each of these configurations: Option 1: Option to include the Federal Judicial Center (FJC) Scope Contractor shall provide support to include network access and monitoring, maintenance of all related hardware, the operating system, the ILS software and help desk support. See attachment A for the software modules to be included on this instance. The FJC has approximately 8000 bibliographic records and will have no more than 5 users. 1. Contractor shall provide the same degree of support, availability and security for this instance as defined in the general scope of work for the existing instances. Network Access The Contractor shall ensure that this instance is used solely by the staff of the Federal Judicial Center. Option 2: Option to include the United States Sentencing Commission (USSC) Scope Contractor shall provide support to include network access and monitoring, maintenance of all related hardware, the operating system, the ILS software and help desk support. See attachment A for the software modules to be included on this instance. The USSC has approximately 2200 bibliographic records and will have no more than 2 us",
+            "source": null
+          },
+          {
+            "text": "work for the existing instances. Network Access The Contractor shall ensure that this instance is used solely by the staff of the Federal Judicial Center. Option 2: Option to include the United States Sentencing Commission (USSC) Scope Contractor shall provide support to include network access and monitoring, maintenance of all related hardware, the operating system, the ILS software and help desk support. See attachment A for the software modules to be included on this instance. The USSC has approximately 2200 bibliographic records and will have no more than 2 users. 1) Contractor shall provide the same degree of support, availability and security for this instance as defined in the general scope of work for the existing instances. Network Access The Contractor shall ensure that this instance is used solely by the staff of the Sentencing Commission. 7 Attachment A: Instances and Modules per Instance Integrated library System (ILS) Saas Services Unicom Collection Management System Model II (up to 150,000 title licenses) MODULES First Circuit Library (Boston) Second Circuit Library (New York) Third Circuit Library (Philadelphia) Fourth Circuit Library (Richmond) Fifth Circuit Library (New Orleans) Sixth Circuit Library",
+            "source": null
+          }
+        ],
+        "term_value": [
+          {
+            "text": ". The courts require the ability to create a standard format purchase order document that can contain multiple lines (sourced from the catalog data) and up to 3,000 consignees (sourced from the circulation/user data). These orders are then transmitted to the vendor/publisher as the official procurement document. Data contained in these documents are then securely transmitted to our external financial system. (currently CGI Momentum Enterprise) Upon receipt of the materials, and payment in our financial system, the solution will retrieve payment data from the external financial system. 2) As a majority of our orders are subscriptions/renewals, the courts require a method to perpetually track changes to the order quantities, subscribers and contract changes. We currently use a “Master Order” per title. Additionally, the acquisitions module should have the option of “auto-filling” frequently used text in acquisitions documents. 3) Authorities, the System should support separate authority files for personal names, corporate bodies, uniform titles, series, subject headings, genres, and geographic names. Batch and single record import and export should be supported, with focus on standard records based in Library of Congress systems. 4) Cataloging, including Online Computer",
+            "source": null
+          }
+        ],
+        "award_criteria": [],
+        "forms_signatures": [
+          {
+            "text": "k these materials as they are used. The system should have the ability to record demographic information about users/consignees (district, judge type, co-location with a library, judge status etc.). 6) Serials Administration. Should allow for sorting issues by date received, and editing of auto-fill data, automated prediction of forthcoming issues, and ideally automated printing of spine labels. Should allow ability to check in items as received; ability to locate missing issues for claiming; and display latest issue received and MARC holdings in bib record 7) Analytic Reporting. System allowing for complex analytic reports to be designed by users and run with either automated or manual execution. Provide for production of pre-formatted reports, with the option to view and print reports, and export data in CSV and pipe delimited format. Must have capability to generate a formatted inventory report with associated costs per title per consignee 8) System Administration should allow for APIs to interact in elevated ways with standard library resources, and with the Judiciary SharePoint website. 9) Online Public Access (restricted access) Catalog/Discovery Layer, that includes a well-developed Knowledge Base of secondary sources. (anonymous authentication). Each court requi",
+            "source": null
+          }
+        ],
+        "submission": [],
+        "ip_data_security": [
+          {
+            "text": "ay through Friday on business days. Scheduled maintenance is to be provided outside of these hours. a. The instances are to be maintained so that each instance remains unique, discrete and separate from each other instance (although some instances may share a bibliographic database) and from any external instance or system. 2) The Contractor shall ensure that the ILS software operates fully and successfully in this environment. 3) The Contractor shall ensure that each ILS instance is able to interface, through secure file transfer, with the federal judiciary’s financial system (currently CGI Momentum Enterprise) housed at a separate hosting facility. 4) The Contractor shall provide one account with shell access for each of the fourteen instances. Each account’s access shall be limited to only that instance. 5) The contractor shall maintain an IP restricted single search interface for all court libraries’ resources with ability to search only a single Court’s resources separately as well, deduplicated as necessary. a. Regular, monthly development meetings for refinement and ongoing training b. The Contractor shall provide hardware, firmware, and operating system maintenance and upgrades as prudent and necessary for technology and security purposes. c. Development of ha",
+            "source": null
+          }
+        ]
+      },
+      "source_dce_run_id": 31916368034,
+      "source_shard": 18,
+      "hot_ready_at": "2026-08-16T00:06:42.167360+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 21,
+      "spm_fit_band": "MAYBE",
+      "spm_fit_reasons": [
+        "software-maintenance"
+      ],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
       "candidate_id": "US-SAM:52d67dbb88bd4298b1d150a982785a5b",
       "title": "RFQ: Hydraulics Trainer Components",
       "buyer": "DEPT OF DEFENSE",
@@ -1560,6 +1664,193 @@
       "review_lane": "SPM_PRIORITY"
     },
     {
+      "candidate_id": "US-SAM:4bd3bb6a361b443eb4a300bb9f92d48e",
+      "title": "Vocera - ProAssure Onsite Specialist for VA Northern California Health Care System",
+      "buyer": "VETERANS AFFAIRS, DEPARTMENT OF",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/workspace/contract/opp/4bd3bb6a361b443eb4a300bb9f92d48e/view",
+      "deadline": "2026-08-17T23:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 19,
+      "priority_score": 19,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-17T23:00:00+00:00",
+        "notice_deadline_date": "2026-08-17",
+        "dce_deadline_candidates": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 2,
+          "corpus_contexts": 2,
+          "unique_contexts": 4
+        },
+        "rule": "Never silently overwrite deadline metadata. Deadline candidates come only from authoritative gate-ready DCE text near deadline language; unresolved/multiple/conflicting dates require review before final 90+/FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 11,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "se for the collection of specialized national intelligence through reconnaissance programs; (8) The intelligence elements of the Army, the Navy, the Air Force, the Marine Corps, the Coast Guard, the Federal Bureau of Investigation, the Drug Enforcement Administration, and the Department of Energy; (9) The Bureau of Intelligence and Research of the Department of State; (10) The Office of Intelligence and Analysis of the Department of the Treasury; (11) The Office of Intelligence and Analysis of the Department of Homeland Security; or (12) Such other elements of any department or agency as may be designated by the President, or designated jointly by the Director of National Intelligence and the head of the department or agency concerned, as an element of the intelligence community. Interconnection arrangement means arrangements governing the physical connection of two or more networks to allow the use of another’s network to hand off traffic where it is ultimately delivered (e.g., connecting a customer of telephone provider A to a customer of telephone company B) or sharing data and other information resources. Kaspersky Lab-covered article means any hardware, software, or service that— (1) Is developed or provided by a Kaspersky Lab-covered enti",
+            "source": null
+          },
+          {
+            "text": "(OFAC) in the Department of the Treasury, the Contractor shall not acquire, for use in the performance of this contract, any supplies or services if any proclamation, Executive order, or statute administered by OFAC, or if OFAC’s implementing regulations at 31 CFR chapter V, would prohibit such a transaction by a person subject to the jurisdiction of the United States. (ii) Except as authorized by OFAC, most transactions involving Cuba, Iran, and Sudan are prohibited, as are most imports from Burma or North Korea, into the United States or its outlying areas. (A) For lists of entities and individuals subject to economic sanctions, see OFAC’s List of Specially Designated Nationals and Blocked Persons at https://home.treasury.gov/policy- issues/financial-sanctions/specially-designated-nationals-and-blocked-persons-list-sdn-human- readable-lists. (B) For more information about these restrictions, as well as updates, see OFAC’s regulations at 31 CFR chapter V and at https://home.treasury.gov/policy-issues/office-of-foreign- assets-control-sanctions-programs-and-information. (C) To conduct electronic screens of potential parties to regulated transactions, see the consolidated screening list at https://www.trade.gov/consolidated-screening-list, which",
+            "source": null
+          },
+          {
+            "text": "or services if any proclamation, Executive order, or statute administered by OFAC, or if OFAC’s implementing regulations at 31 CFR chapter V, would prohibit such a transaction by a person subject to the jurisdiction of the United States. (ii) Except as authorized by OFAC, most transactions involving Cuba, Iran, and Sudan are prohibited, as are most imports from Burma or North Korea, into the United States or its outlying areas. (A) For lists of entities and individuals subject to economic sanctions, see OFAC’s List of Specially Designated Nationals and Blocked Persons at https://home.treasury.gov/policy- issues/financial-sanctions/specially-designated-nationals-and-blocked-persons-list-sdn-human- readable-lists. (B) For more information about these restrictions, as well as updates, see OFAC’s regulations at 31 CFR chapter V and at https://home.treasury.gov/policy-issues/office-of-foreign- assets-control-sanctions-programs-and-information. (C) To conduct electronic screens of potential parties to regulated transactions, see the consolidated screening list at https://www.trade.gov/consolidated-screening-list, which consolidates multiple export screening lists of the Departments of Commerce, State, and the Treasury. (3) Sudan prohibition. The C",
+            "source": null
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "RFP 15. DELIVER TO CODE 16. ADMINISTERED BY CODE 17a. CONTRACTOR/OFFEROR CODE FACILITY CODE 18a. PAYMENT WILL BE MADE BY CODE TELEPHONE NO. UEI: EFT: PHONE: FAX: 17b. CHECK IF REMITTANCE IS DIFFERENT AND PUT SUCH ADDRESS IN OFFER 18b. SUBMIT INVOICES TO ADDRESS SHOWN IN BLOCK 18a UNLESS BLOCK BELOW IS CHECKED SEE ADDENDUM 19. 20. 21. 22. 23. 24. ITEM NO. SCHEDULE OF SUPPLIES/SERVICES QUANTITY UNIT UNIT PRICE AMOUNT (Use Reverse and/or Attach Additional Sheets as Necessary) 25. ACCOUNTING AND APPROPRIATION DATA 26. TOTAL AWARD AMOUNT (For Govt. Use Only) 27a. SOLICITATION INCORPORATES BY REFERENCE FAR 52.212-1, 52.212-4. FAR 52.212-3 AND 52.212-5 ARE ATTACHED. ADDENDA ARE ARE NOT ATTACHED. 27b. CONTRACT/PURCHASE ORDER INCORPORATES BY REFERENCE FAR 52.212-4. FAR 52.212-5 IS ATTACHED. ADDENDA ARE ARE NOT ATTACHED 28. CONTRACTOR IS REQUIRED TO SIGN THIS DOCUMENT AND RETURN _______________ 29. AWARD OF CONTRACT: REF. ___________________________________ OFFER COPIES TO ISSUING OFFICE. CONTRACTOR AGREES TO FURNISH AND DATED ________________________________. YOUR OFFER ON SOLICITATION DELIVER ALL ITEMS SET FORTH OR OTHERWISE IDENTIFIED ABOVE AND ON ANY (BLOCK 5), INCLUDING ANY ADDITIONS OR CHANGES WHICH ARE ADDIT",
+            "source": null
+          },
+          {
+            "text": "NO. UEI: EFT: PHONE: FAX: 17b. CHECK IF REMITTANCE IS DIFFERENT AND PUT SUCH ADDRESS IN OFFER 18b. SUBMIT INVOICES TO ADDRESS SHOWN IN BLOCK 18a UNLESS BLOCK BELOW IS CHECKED SEE ADDENDUM 19. 20. 21. 22. 23. 24. ITEM NO. SCHEDULE OF SUPPLIES/SERVICES QUANTITY UNIT UNIT PRICE AMOUNT (Use Reverse and/or Attach Additional Sheets as Necessary) 25. ACCOUNTING AND APPROPRIATION DATA 26. TOTAL AWARD AMOUNT (For Govt. Use Only) 27a. SOLICITATION INCORPORATES BY REFERENCE FAR 52.212-1, 52.212-4. FAR 52.212-3 AND 52.212-5 ARE ATTACHED. ADDENDA ARE ARE NOT ATTACHED. 27b. CONTRACT/PURCHASE ORDER INCORPORATES BY REFERENCE FAR 52.212-4. FAR 52.212-5 IS ATTACHED. ADDENDA ARE ARE NOT ATTACHED 28. CONTRACTOR IS REQUIRED TO SIGN THIS DOCUMENT AND RETURN _______________ 29. AWARD OF CONTRACT: REF. ___________________________________ OFFER COPIES TO ISSUING OFFICE. CONTRACTOR AGREES TO FURNISH AND DATED ________________________________. YOUR OFFER ON SOLICITATION DELIVER ALL ITEMS SET FORTH OR OTHERWISE IDENTIFIED ABOVE AND ON ANY (BLOCK 5), INCLUDING ANY ADDITIONS OR CHANGES WHICH ARE ADDITIONAL SHEETS SUBJECT TO THE TERMS AND CONDITIONS SPECIFIED SET FORTH HEREIN IS ACCEPTED AS TO ITEMS: 30a. SIGNATURE OF OFFEROR/CONTRACTOR 31a. UNITED",
+            "source": null
+          },
+          {
+            "text": "............................................. 3 B.2 PRICE/COST SCHEDULE ....................................................................................... 4 ITEM INFORMATION ............................................................................................... 4 B.3 STATEMENT OF WORK ………………………………………………………………… 5 SECTION C - CONTRACT CLAUSES ...................................................................................... 9 C.1 52.212-4 CONTRACT TERMS AND CONDITIONS—COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES (OCT 2025) (DEVIATION) .......................................... 9 C.2 52.252-2 CLAUSES INCORPORATED BY REFERENCE (FEB 1998) ................14 C.3 52.222-90 ADDRESSING DEI DISCRIMINATION BY FEDERAL CONTRACTORS (DEVIATION APR 2026) ...............................................................................................15 C.4 52.240-91 SECURITY PROHIBITIONS AND EXCLUSIONS (NOV 2025) (DEVIATION) .................................................................................................................16 C.5 52.217-8 OPTION TO EXTEND SERVICES (NOV 1999) ......................................25 C.6 52.252-6 AUTHORIZED DEVIATIONS IN CLAUSES (NOV 2020) .......................26 SECTION D - CONTRACT DOCUMENTS, EXHIBITS, OR ATTACHM",
+            "source": null
+          }
+        ],
+        "certifications_partner": [
+          {
+            "text": "0 X 541519 $34 Million N/A X 459 See Statement of Work 459 Department of Veterans Affairs Network Contracting Office 21 (NCO 21) 459 Department of Veterans Affairs FMS VA-9(101) Financial Services Center PO Box 149971 Austin TX 78714-9971 866-372-1141 vafscenterprisesupport@va See CONTINUATION Page Description: Vocera - ProAssure Onsite Specialist for VA Northern California Health Care System Period of Performance: Base Year Only: 09/30/2026 - 09/29/2027 Offerors must be registered and verified as an SDVOSB in https://search.certifications.sba.gov on the quote due date and at time of award. Offerors shall follow the submission instructions specified in FAR Provisions 52.212-1 and 52.212-2 and their addendums included in this solicitation. Failure to follow the instructions will result in an unfavorable evaluation and may not be considered for award. Applicable Wage Determination: WD 2015-5631 Revision 27 Dated 05/13/2026 See CONTINUATION Page X X 1 Destiny Walthour Contracting Officer 36C26126Q1051 Page 2 of 38 Table of Contents SECTION A .......................................................................",
+            "source": null
+          },
+          {
+            "text": "AND COMMERCIAL SERVICES (OCT 2025) (DEVIATION) .................................................28 E.2 52.252-1 SOLICITATION PROVISIONS INCORPORATED BY REFERENCE (FEB 1998) .............................................................................................................................31 E.3 52.212-2 EVALUATION—COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES (OCT 2025) (DEVIATION) ..........................................................................31 E.4 52.219-2 EQUAL LOW BIDS (NOV 2025) (DEVIATION) ......................................33 E.5 52.240-90 SECURITY PROHIBITIONS AND EXCLUSIONS REPRESENTATIONS AND CERTIFICATIONS (NOV 2025) (DEVIATION) ......................................................33 E.6 52.252-5 AUTHORIZED DEVIATIONS IN PROVISIONS (NOV 2020) .................37 36C26126Q1051 Page 3 of 38 SECTION B - CONTINUATION OF SF 1449 BLOCKS B.1 CONTRACT ADMINISTRATION DATA 1. Contract Administration: All contract administration matters will be handled by the following individuals: a. CONTRACTOR: b. GOVERNMENT: Contracting Officer 36C261 Department of Veterans Affairs Network Contracting Office 21 (NCO 21) 2. CONTRACTOR REMITTANCE ADDRESS: All payments by the Government to the contractor",
+            "source": null
+          },
+          {
+            "text": "le from the VA Police- Security Service. The VAMC will not invalidate or make reimbursement for parking violations of the Contractor under any conditions. Smoking is prohibited inside any buildings at the VAMC. Cellular phones and two-way radios are not to be used within six feet of any medical equipment. Possession of weapons is prohibited. Enclosed containers, including tool kits, shall be subject to search. Violations of VA regulations may result in a citation answerable in the United States (Federal) District Court, not a local district state, or municipal court. 4.2 Security: The C&A requirements do not apply and that a Security Accreditation Package is not required. VHA Supplemental Contract Requirements for Combatting COVID-19 1. Contractor employees who work in or travel to VHA locations must comply with the following: a. Documentation requirements: 1) If fully vaccinated, contractors shall show proof of vaccination. i. NOTE: Acceptable proof of vaccination includes a signed record of immunization from a health care provider or pharmacy, a copy of the COVID-19 Vaccination Page 8 of 38 Record Card (CDC Form MLS-319813_r, published on September 3, 2020), or a copy of medical records documenting the vaccination. 2) If unvaccinated, contractors s",
+            "source": null
+          }
+        ],
+        "staffing_team": [],
+        "insurance_bonds": [
+          {
+            "text": "m the termination. The Contractor shall not be required to comply with the cost accounting standards or contract cost principles for this purpose. This paragraph does not give the Government any right to audit the Contractor's records. The Contractor shall not be paid for any work performed or costs incurred which reasonably could have been avoided. (m) Termination for cause. The Government may terminate this contract, or any part hereof, for cause in the event of any default by the Contractor, or if the Contractor fails to comply with any contract terms and conditions, or fails to provide the Government, upon request, with adequate assurances of future performance. The Government will send a cure notice to the Contractor, unless the reason for the termination is late delivery. In the event of termination for cause, the Government shall not be liable to the Contractor for any amount for supplies or services not accepted, and the Contractor shall be liable to the Government for any and all rights and remedies provided by law. If it is determined that the Government improperly terminated this contract for default, such termination shall be deemed a termination for convenience. (n) Title. Unless specified elsewhere in this contract, title to items furnished under this contra",
+            "source": null
+          },
+          {
+            "text": "ubmitted as a separate document. It shall contain prices for the established Contract Line-Item Numbers (CLINs) set forth in that section to include prices for the Period of Performance. No price/cost information should be included in the technical document. (End of Addendum to 52.212-1) 36C26126Q1051 Page 31 of 38 E.2 52.252-1 SOLICITATION PROVISIONS INCORPORATED BY REFERENCE (FEB 1998) This solicitation incorporates one or more solicitation provisions by reference, with the same force and effect as if they were given in full text. Upon request, the Contracting Officer will make their full text available. The offeror is cautioned that the listed provisions may include blocks that must be completed by the offeror and submitted with its quotation or offer. In lieu of submitting the full text of those provisions, the offeror may identify the provision by paragraph identifier and provide the appropriate information with its quotation or offer. Also, the full text of a solicitation provision may be accessed electronically at this/these address(es): https://www.acquisition.gov/far-overhaul/far-part-deviation-guide/far-overhaul-part- 52#FAR_52_252_1 http://www.va.gov/oal/library/vaar/index.asp (End of Provision) FAR Number Title Date 52.203-11 CERTIFICA",
+            "source": null
+          }
+        ],
+        "subcontracting_consortium": [
+          {
+            "text": "y of the supplies to a carrier, if transportation is f.o.b. origin; or 36C26126Q1051 Page 12 of 38 (2) Delivery of the supplies to the Government at the destination specified in the contract, if transportation is f.o.b. destination. (k) Taxes. The contract price includes all applicable Federal, State, and local taxes and duties. (l) Termination for the Government's convenience. The Government reserves the right to terminate this contract, or any part hereof, for its sole convenience. In the event of such termination, the Contractor shall immediately stop all work and shall immediately cause any and all of its suppliers and subcontractors to cease work. Subject to the terms of this contract, the Contractor shall be paid a percentage of the contract price reflecting the percentage of the work performed prior to the notice of termination, plus reasonable charges the Contractor can demonstrate to the satisfaction of the Government using its standard record keeping system, have resulted from the termination. The Contractor shall not be required to comply with the cost accounting standards or contract cost principles for this purpose. This paragraph does not give the Government any right to audit the Contractor's records. The Contractor shall not be paid for any work per",
+            "source": null
+          },
+          {
+            "text": "uest, the Contracting Officer will make their full text available. Also, the full text of a clause may be accessed electronically at this/these address(es): https://www.acquisition.gov/far-overhaul/far-part-deviation-guide/far-overhaul-part- 52#FAR_52_252_1 http://www.va.gov/oal/library/vaar/index.asp (End of Clause) FAR Number Title Date 52.203-17 CONTRACTOR EMPLOYEE WHISTLEBLOWER RIGHTS NOV 2023 52.203-19 PROHIBITION ON REQUIRING CERTAIN INTERNAL CONFIDENTIALITY AGREEMENTS OR STATEMENTS JAN 2017 52.204-13 SYSTEM FOR AWARD MANAGEMENT—MAINTENANCE (DEVIATION) NOV 2025 52.209-6 PROTECTING THE GOVERNMENT'S INTEREST WHEN SUBCONTRACTING WITH CONTRACTORS DEBARRED, SUSPENDED, PROPOSED FOR DEBARMENT, OR VOLUNTARILY EXCLUDED JAN 2025 52.209-10 PROHIBITION ON CONTRACTING WITH INVERTED DOMESTIC CORPORATIONS NOV 2015 52.219-6 NOTICE OF TOTAL SMALL BUSINESS SET-ASIDE (DEVIATION) NOV 2025 52.222-3 CONVICT LABOR (DEVIATION) NOV 2025 52.222-35 EQUAL OPPORTUNITY FOR VETERANS (DEVIATION) NOV 2025 52.222-36 EQUAL OPPORTUNITY FOR WORKERS WITH DISABILITIES (DEVIATION) NOV 2025 52.222-37 EMPLOYMENT REPORTS ON VETERANS (DEVIATION) NOV 2025 52.222-41 SERVICE CONTRACT LABOR STANDARDS (DEVIATION) NOV 2025 36C26126Q1051 Page 15 of 38 52.222-42 STATEMENT OF EQUIVALENT RATE",
+            "source": null
+          },
+          {
+            "text": "H DISABILITIES (DEVIATION) NOV 2025 52.222-37 EMPLOYMENT REPORTS ON VETERANS (DEVIATION) NOV 2025 52.222-41 SERVICE CONTRACT LABOR STANDARDS (DEVIATION) NOV 2025 36C26126Q1051 Page 15 of 38 52.222-42 STATEMENT OF EQUIVALENT RATES FOR FEDERAL HIRES MAY 2014 52.222-50 COMBATING TRAFFICKING IN PERSONS (DEVIATION) NOV 2025 52.222-62 PAID SICK LEAVE UNDER EXECUTIVE ORDER 13706 (DEVIATION) NOV 2025 52.226-8 ENCOURAGING CONTRACTOR POLICIES TO BAN TEXT MESSAGING WHILE DRIVING MAY 2024 52.232-33 PAYMENT BY ELECTRONIC FUNDS TRANSFER— SYSTEM FOR AWARD MANAGEMENT OCT 2018 52.232-40 PROVIDING ACCELERATED PAYMENTS TO SMALL BUSINESS SUBCONTRACTORS MAR 2023 52.233-3 PROTEST AFTER AWARD AUG 1996 52.233-4 APPLICABLE LAW FOR BREACH OF CONTRACT CLAIM OCT 2004 52.244-6 SUBCONTRACTS FOR COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES (DEVIATION) APR 2026 52.219-28 POSTAWARD SMALL BUSINESS PROGRAM REREPRESENTATION (DEVIATION) NOV 2025 52.223-5 POLLUTION PREVENTION AND RIGHT-TO-KNOW INFORMATION MAY 2024 52.237-2 PROTECTION OF GOVERNMENT BUILDINGS, EQUIPMENT, AND VEGETATION APR 1984 852.201-70 CONTRACTING OFFICER'S REPRESENTATIVE DEC 2022 852.203-70 COMMERCIAL ADVERTISING MAY 2018 852.219-73 VA NOTICE OF TOTAL SET-ASIDE FOR CERTIFIED SERVICE-DISABLED VETERAN-OWNED SMALL BUSIN",
+            "source": null
+          }
+        ],
+        "deliverables_scope": [
+          {
+            "text": "RD: 11. DELIVERY FOR FOB DESTINA- TION UNLESS BLOCK IS MARKED SEE SCHEDULE 12. DISCOUNT TERMS 13a. THIS CONTRACT IS A RATED ORDER UNDER DPAS (15 CFR 700) 13b. RATING 14. METHOD OF SOLICITATION RFQ IFB RFP 15. DELIVER TO CODE 16. ADMINISTERED BY CODE 17a. CONTRACTOR/OFFEROR CODE FACILITY CODE 18a. PAYMENT WILL BE MADE BY CODE TELEPHONE NO. UEI: EFT: PHONE: FAX: 17b. CHECK IF REMITTANCE IS DIFFERENT AND PUT SUCH ADDRESS IN OFFER 18b. SUBMIT INVOICES TO ADDRESS SHOWN IN BLOCK 18a UNLESS BLOCK BELOW IS CHECKED SEE ADDENDUM 19. 20. 21. 22. 23. 24. ITEM NO. SCHEDULE OF SUPPLIES/SERVICES QUANTITY UNIT UNIT PRICE AMOUNT (Use Reverse and/or Attach Additional Sheets as Necessary) 25. ACCOUNTING AND APPROPRIATION DATA 26. TOTAL AWARD AMOUNT (For Govt. Use Only) 27a. SOLICITATION INCORPORATES BY REFERENCE FAR 52.212-1, 52.212-4. FAR 52.212-3 AND 52.212-5 ARE ATTACHED. ADDENDA ARE ARE NOT ATTACHED. 27b. CONTRACT/PURCHASE ORDER INCORPORATES BY REFERENCE FAR 52.212-4. FAR 52.212-5 IS ATTACHED. ADDENDA ARE ARE NOT ATTACHED 28. CONTRACTOR IS REQUIRED TO SIGN THIS DOCUMENT AND RETURN _______________ 29. AWARD OF CONTRACT: REF. ___________________________________ OFFER COPIES TO ISSUING OFFICE. CONTRACTOR AGREES TO F",
+            "source": null
+          },
+          {
+            "text": "TYPE OR PRINT) 31c. DATE SIGNED AUTHORIZED FOR LOCAL REPRODUCTION (REV. NOV 2021) PREVIOUS EDITION IS NOT USABLE Prescribed by GSA - FAR (48 CFR) 53.212 7. FOR SOLICITATION INFORMATION CALL: STANDARD FORM 1449 SOLICITATION/CONTRACT/ORDER FOR COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES OFFEROR TO COMPLETE BLOCKS 12, 17, 23, 24, & 30 38 612-26-4-193-0056 36C26126Q1051 08-04-2026 Destiny Walthour None 08-18-2026 4 PM PDT 459 Department of Veterans Affairs Network Contracting Office 21 (NCO 21) X 100 X 541519 $34 Million N/A X 459 See Statement of Work 459 Department of Veterans Affairs Network Contracting Office 21 (NCO 21) 459 Department of Veterans Affairs FMS VA-9(101) Financial Services Center PO Box 149971 Austin TX 78714-9971 866-372-1141 vafscenterprisesupport@va See CONTINUATION Page Description: Vocera - ProAssure Onsite Specialist for VA Northern California Health Care System Period of Performance: Base Year Only: 09/30/2026 - 09/29/2027 Offerors must be registered and verified as an SDVOSB in https://search.certifications.sba.gov on the quote due date and at time of award. Offerors shall follow",
+            "source": null
+          },
+          {
+            "text": ".................. 1 A.1 SF 1449 SOLICITATION/CONTRACT/ORDER FOR COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES .................................................................................... 1 SECTION B - CONTINUATION OF SF 1449 BLOCKS ............................................................. 3 B.1 CONTRACT ADMINISTRATION DATA................................................................... 3 B.2 PRICE/COST SCHEDULE ....................................................................................... 4 ITEM INFORMATION ............................................................................................... 4 B.3 STATEMENT OF WORK ………………………………………………………………… 5 SECTION C - CONTRACT CLAUSES ...................................................................................... 9 C.1 52.212-4 CONTRACT TERMS AND CONDITIONS—COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES (OCT 2025) (DEVIATION) .......................................... 9 C.2 52.252-2 CLAUSES INCORPORATED BY REFERENCE (FEB 1998) ................14 C.3 52.222-90 ADDRESSING DEI DISCRIMINATION BY FEDERAL CONTRACTORS (DEVIATION APR 2026) ...............................................................................................15 C.4 52.240-91 SECURITY PROHIBITIONS AND EXCLUSIONS (NOV 2025) (DEVI",
+            "source": null
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "-0056 36C26126Q1051 08-04-2026 Destiny Walthour None 08-18-2026 4 PM PDT 459 Department of Veterans Affairs Network Contracting Office 21 (NCO 21) X 100 X 541519 $34 Million N/A X 459 See Statement of Work 459 Department of Veterans Affairs Network Contracting Office 21 (NCO 21) 459 Department of Veterans Affairs FMS VA-9(101) Financial Services Center PO Box 149971 Austin TX 78714-9971 866-372-1141 vafscenterprisesupport@va See CONTINUATION Page Description: Vocera - ProAssure Onsite Specialist for VA Northern California Health Care System Period of Performance: Base Year Only: 09/30/2026 - 09/29/2027 Offerors must be registered and verified as an SDVOSB in https://search.certifications.sba.gov on the quote due date and at time of award. Offerors shall follow the submission instructions specified in FAR Provisions 52.212-1 and 52.212-2 and their addendums included in this solicitation. Failure to follow the instructions will result in an unfavorable evaluation and may not be considered for award. Applicable Wage Determination: WD 2015-5631 Revision 27 Dated 05/13/2026 See CONTINUATION Page",
+            "source": null
+          },
+          {
+            "text": "T NO DATE 36C26126Q1051 Page 4 of 38 B.2 PRICE/COST SCHEDULE ITEM INFORMATION ITEM NUMBE R DESCRIPTION OF SUPPLIES/SERVICE S QUANTIT Y UNI T UNIT PRICE AMOUNT 0001 1.00 YR _________________ _ __________________ Vocera Premier Plus Support Services Contract Period: Base POP Begin: 09-30-2026 POP End: 09-29-2027 PRINCIPAL NAICS CODE: 541519 - Other Computer Related Services PRODUCT/SERVICE CODE: J065 - Maintenance, Repair, and Rebuilding of Equipment - Medical, Dental, and Veterinary Equipment and Supplies GRAND TOTAL _________________ _ Page 5 of 38 B.3 Statement of Work Vocera – ProAssure Onsite Specialist for the VA Northern California Healthcare System 1.0 General 1.1 Background VA Northern California Health Care Systems (VANCHS) recently installed a clinical communication system called Vocera and wants to integrate it into the hospital’s current Nurse Call system for improved clinical workflow and response. VANCHS is also seeking Vocera software licensing, support, and maintenance to ensure the high uptime and minimal impact to patient care. 1.2 Objective The objective is to integrate a Vocera communication system with the hospital’s current ASCOM Nurse Call (Model: Telligence) system and provide continued",
+            "source": null
+          },
+          {
+            "text": "intenance, Repair, and Rebuilding of Equipment - Medical, Dental, and Veterinary Equipment and Supplies GRAND TOTAL _________________ _ Page 5 of 38 B.3 Statement of Work Vocera – ProAssure Onsite Specialist for the VA Northern California Healthcare System 1.0 General 1.1 Background VA Northern California Health Care Systems (VANCHS) recently installed a clinical communication system called Vocera and wants to integrate it into the hospital’s current Nurse Call system for improved clinical workflow and response. VANCHS is also seeking Vocera software licensing, support, and maintenance to ensure the high uptime and minimal impact to patient care. 1.2 Objective The objective is to integrate a Vocera communication system with the hospital’s current ASCOM Nurse Call (Model: Telligence) system and provide continued Vocera licensing, support, and maintenance services. 1.3 Scope of Work The contractor shall provide all resources necessary to accomplish the tasks and deliverables described in this Statement of Work (SOW). The contractor shall provide integration services between the Vocera communication system and the ASCOM Nurse Call system, provide continued Vocera software licensing, and provide support and maintenance services to",
+            "source": null
+          }
+        ],
+        "term_value": [
+          {
+            "text": "hall insert the substance of this clause, including this paragraph (j) but excluding subparagraphs (d)(1) and (i)(1), in all subcontracts and other contractual instruments, including subcontracts for acquiring commercial products or commercial services. (End of Provision) C.5 52.217-8 OPTION TO EXTEND SERVICES (NOV 1999) The Government may require continued performance of any services within the limits and at the rates specified in the contract. These rates may be adjusted only as a result of revisions to prevailing labor rates provided by the Secretary of Labor. The option provision may be exercised more than once, but the total extension of performance hereunder shall not exceed 6 months. The Contracting Officer may exercise the option by written notice to the Contractor 36C26126Q1051 Page 26 of 38 within 30 days. The specified rates under this clause will be those rates in effect under the contract at the time the option is exercised. (End of Clause) C.6 52.252-6 AUTHORIZED DEVIATIONS IN CLAUSES (NOV 2020) (a) The use in this solicitation or contract of any Federal Acquisition Regulation (48 CFR Chapter 1) clause with an authorized deviation is indicated by the addition of \"(DEVIATION)\" after the date of the clause. (b) The use in this solicitation or co",
+            "source": null
+          },
+          {
+            "text": "ceived before award is made and the Contracting Officer determines that accepting the late offer would not unduly delay the acquisition. However, a late modification of an otherwise successful offer that makes its terms more favorable to the Government will be considered at any time it is received and may be accepted. (3) If an emergency or unanticipated event interrupts normal Government processes so that offers cannot be received at the Government office designated for receipt of offers by the exact time specified in the solicitation, and urgent Government requirements preclude amendment of the solicitation or other notice of an extension of the closing date, the time specified for receipt of offers will be deemed to be extended to the same time of day specified in the solicitation on the first work day on which normal Government processes resume. 36C26126Q1051 Page 29 of 38 (4) Offerors may withdraw their offers by written notice to the Government received at any time before award. (d) Contract award (not applicable to Invitation for Bids). The Government intends to evaluate offers and award a contract without discussions with Offerors. Therefore, the Offeror’s initial offer should contain the Offeror’s best terms. However, the Government reserves the right",
+            "source": null
+          },
+          {
+            "text": "s under 52.217-8. For the purposes of the award of this Contract, the Government intends to evaluate the option to extend services, provided under FAR 52.217-8, as follows: The evaluation will consider the possibility that the option can be exercised at any time, and can be exercised in increments of one to six months, but for no more than a total of six months during the life of the contract. The evaluation will assume that the prices for any option exercised under FAR 52.217-8 will be at the same rates as those in effect under the contract. The evaluation will therefore assume that the addition of the price or prices of any possible extension or extensions under FAR 52.217-8 to the total price for the basic requirement and the total price for the priced options has the same effect on the total price of all quotes relative to each other, and will not affect the ranking of quotes based on price, unless, after reviewing the quotes, the Government determines that there is a basis for finding otherwise. This evaluation will not obligate the Government to exercise any option under FAR 52.217-8. (c) Notice of award. A written notice of award or acceptance of an offer furnished to the successful Offeror within the time for acceptance specified in the offer, shall result in a bin",
+            "source": null
+          }
+        ],
+        "award_criteria": [],
+        "forms_signatures": [
+          {
+            "text": "== FILE: files/S02_-_RFQ_-_36C26126Q1051.pdf ===== PAGE 1 OF 1. REQUISITION NO. 2. CONTRACT NO. 3. AWARD/EFFECTIVE DATE 4. ORDER NO. 5. SOLICITATION NUMBER 6. SOLICITATION ISSUE DATE a. NAME b. TELEPHONE NO. (No Collect Calls) 8. OFFER DUE DATE/LOCAL TIME 9. ISSUED BY CODE 10. THIS ACQUISITION IS UNRESTRICTED OR SET ASIDE: % FOR: SMALL BUSINESS HUBZONE SMALL BUSINESS SERVICE-DISABLED VETERAN-OWNED SMALL BUSINESS WOMEN-OWNED SMALL BUSINESS (WOSB) ELIGIBLE UNDER THE WOMEN-OWNED SMALL BUSINESS PROGRAM EDWOSB 8(A) NAICS: SIZE STANDARD: 11. DELIVERY FOR FOB DESTINA- TION UNLESS BLOCK IS MARKED SEE SCHEDULE 12. DISCOUNT TERMS 13a. THIS CONTRACT IS A RATED ORDER UNDER DPAS (15 CFR 700) 13b. RATING 14. METHOD OF SOLICITATION RFQ IFB RFP 15. DELIVER TO CODE 16. ADMINISTERED BY CODE 17a. CONTRACTOR/OFFEROR CODE FACILITY CODE 18a. PAYMENT WILL BE MADE BY CODE TELEPHONE NO. UEI: EFT: PHONE: FAX: 17b. CHECK IF REMITTANCE IS DIFFERENT AND PUT SUCH ADDRESS IN OFFER 18b. SUBMIT INVOICES TO ADDRESS SHOWN IN BLOCK 18a UNLESS BLOCK BELOW IS CHECKED SEE ADDENDUM 19. 20. 21. 22. 23. 24. ITEM NO. SCHEDULE OF SUPPLIES/SERVICES QUANTITY UNIT UNIT PRICE AMOUNT (Use Reverse and/or Attach Additional Sheets as Necessary) 25. ACCOUNTING AND APPROPRIATION DATA 26. TOTAL AWARD AMOUNT (For Govt. Use Only) 27a. SOLICITATION INCORPORATES BY REFERENCE FAR 52.212-1, 52.212-4. FAR 52.212-3 AND 52.212-5 ARE ATTACHE",
+            "source": null
+          }
+        ],
+        "submission": [
+          {
+            "text": "Veterans Affairs Network Contracting Office 21 (NCO 21) 2. CONTRACTOR REMITTANCE ADDRESS: All payments by the Government to the contractor will be made in accordance with: [X] 52.232-33, Payment by Electronic Funds Transfer—System For Award Management, or [] 52.232-36, Payment by Third Party 3. INVOICES: Invoices shall be submitted in arrears: a. Quarterly [] b. Semi-Annually [] c. Other [X] Upon Government acceptance in accordance with VAAR 852.232-72 4. GOVERNMENT INVOICE ADDRESS: All Invoices from the contractor shall be submitted electronically in accordance with VAAR Clause 852.232-72 Electronic Submission of Payment Requests. • Tungsten e-Invoice Setup Information: 1-877-489-6135 • Tungsten e-Invoice email: VA.Registration@Tungsten-Network.com • FSC e-Invoice Contact Information: 1-877-353-9791 • FSC e-invoice email: vafsccshd@va.gov ACKNOWLEDGMENT OF AMENDMENTS: The offeror acknowledges receipt of amendments to the Solicitation numbered and dated as follows: AMENDMENT NO DATE 36C26126Q1051 Page 4 of 38 B.2 PRICE/COST SCHEDULE ITEM INFORMATION ITEM NUMBE R DESCRIPTION OF SUPPLIES/SERVICE S QUANTIT Y UNI T UNIT PRICE AMOUNT 0001 1.00 YR _________________ _ __________________ Vocera Premier Plus Support Ser",
+            "source": null
+          },
+          {
+            "text": "ARD AUG 1996 52.233-4 APPLICABLE LAW FOR BREACH OF CONTRACT CLAIM OCT 2004 52.244-6 SUBCONTRACTS FOR COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES (DEVIATION) APR 2026 52.219-28 POSTAWARD SMALL BUSINESS PROGRAM REREPRESENTATION (DEVIATION) NOV 2025 52.223-5 POLLUTION PREVENTION AND RIGHT-TO-KNOW INFORMATION MAY 2024 52.237-2 PROTECTION OF GOVERNMENT BUILDINGS, EQUIPMENT, AND VEGETATION APR 1984 852.201-70 CONTRACTING OFFICER'S REPRESENTATIVE DEC 2022 852.203-70 COMMERCIAL ADVERTISING MAY 2018 852.219-73 VA NOTICE OF TOTAL SET-ASIDE FOR CERTIFIED SERVICE-DISABLED VETERAN-OWNED SMALL BUSINESSES (DEVIATION) JAN 2023 852.232-72 ELECTRONIC SUBMISSION OF PAYMENT REQUESTS NOV 2018 852.242-71 ADMINISTRATIVE CONTRACTING OFFICER OCT 2020 C.3 52.222-90 ADDRESSING DEI DISCRIMINATION BY FEDERAL CONTRACTORS (DEVIATION APR 2026) (a)Definitions. As used in this clause— Program participation means membership or participation in, or access or admission to: training, mentoring, or leadership development programs; educational opportunities; clubs; associations; or similar opportunities that are sponsored or established by the contractor or subcontractor. Racially discriminatory diversity, equity, and inclusion (DEI) activities means disparate treatment based on race or ethnicity in th",
+            "source": null
+          },
+          {
+            "text": "rd is made and the Contracting Officer determines that accepting the late offer would not unduly delay the acquisition. However, a late modification of an otherwise successful offer that makes its terms more favorable to the Government will be considered at any time it is received and may be accepted. (3) If an emergency or unanticipated event interrupts normal Government processes so that offers cannot be received at the Government office designated for receipt of offers by the exact time specified in the solicitation, and urgent Government requirements preclude amendment of the solicitation or other notice of an extension of the closing date, the time specified for receipt of offers will be deemed to be extended to the same time of day specified in the solicitation on the first work day on which normal Government processes resume. 36C26126Q1051 Page 29 of 38 (4) Offerors may withdraw their offers by written notice to the Government received at any time before award. (d) Contract award (not applicable to Invitation for Bids). The Government intends to evaluate offers and award a contract without discussions with Offerors. Therefore, the Offeror’s initial offer should contain the Offeror’s best terms. However, the Government reserves the right to conduct discussi",
+            "source": null
+          }
+        ],
+        "ip_data_security": [
+          {
+            "text": "uter Related Services PRODUCT/SERVICE CODE: J065 - Maintenance, Repair, and Rebuilding of Equipment - Medical, Dental, and Veterinary Equipment and Supplies GRAND TOTAL _________________ _ Page 5 of 38 B.3 Statement of Work Vocera – ProAssure Onsite Specialist for the VA Northern California Healthcare System 1.0 General 1.1 Background VA Northern California Health Care Systems (VANCHS) recently installed a clinical communication system called Vocera and wants to integrate it into the hospital’s current Nurse Call system for improved clinical workflow and response. VANCHS is also seeking Vocera software licensing, support, and maintenance to ensure the high uptime and minimal impact to patient care. 1.2 Objective The objective is to integrate a Vocera communication system with the hospital’s current ASCOM Nurse Call (Model: Telligence) system and provide continued Vocera licensing, support, and maintenance services. 1.3 Scope of Work The contractor shall provide all resources necessary to accomplish the tasks and deliverables described in this Statement of Work (SOW). The contractor shall provide integration services between the Vocera communication system and the ASCOM Nurse Call system, provide continued Vocera software licensin",
+            "source": null
+          },
+          {
+            "text": "list for the VA Northern California Healthcare System 1.0 General 1.1 Background VA Northern California Health Care Systems (VANCHS) recently installed a clinical communication system called Vocera and wants to integrate it into the hospital’s current Nurse Call system for improved clinical workflow and response. VANCHS is also seeking Vocera software licensing, support, and maintenance to ensure the high uptime and minimal impact to patient care. 1.2 Objective The objective is to integrate a Vocera communication system with the hospital’s current ASCOM Nurse Call (Model: Telligence) system and provide continued Vocera licensing, support, and maintenance services. 1.3 Scope of Work The contractor shall provide all resources necessary to accomplish the tasks and deliverables described in this Statement of Work (SOW). The contractor shall provide integration services between the Vocera communication system and the ASCOM Nurse Call system, provide continued Vocera software licensing, and provide support and maintenance services to Vocera system. 1.4 Period of Performance The period of performance of this contract is one base year. 1.5 Place of Performance VA Northern California Health Care System, 10535 Hospital Way, Mather Ca 95655 2.0 Sp",
+            "source": null
+          },
+          {
+            "text": "icensing, support, and maintenance to ensure the high uptime and minimal impact to patient care. 1.2 Objective The objective is to integrate a Vocera communication system with the hospital’s current ASCOM Nurse Call (Model: Telligence) system and provide continued Vocera licensing, support, and maintenance services. 1.3 Scope of Work The contractor shall provide all resources necessary to accomplish the tasks and deliverables described in this Statement of Work (SOW). The contractor shall provide integration services between the Vocera communication system and the ASCOM Nurse Call system, provide continued Vocera software licensing, and provide support and maintenance services to Vocera system. 1.4 Period of Performance The period of performance of this contract is one base year. 1.5 Place of Performance VA Northern California Health Care System, 10535 Hospital Way, Mather Ca 95655 2.0 Specific Requirements/Tasks 2.1 Integrate the Vocera communication system with the ASCOM Nurse Call System 2.1.1 Design, configure, and deploy alarm and event notifications Page 6 of 38 for up to five nursing units 2.1.2 Coordinate all integration services (planning, implementation, testing, etc.) with the Contracting Officer’s Representative and/or ot",
+            "source": null
+          }
+        ]
+      },
+      "source_dce_run_id": 31916368034,
+      "source_shard": 18,
+      "hot_ready_at": "2026-08-16T00:06:42.167360+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 13,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
       "candidate_id": "US-SAM:51ef65f33d194ce1a0dcd7300037329a",
       "title": "Telecommunications support services",
       "buyer": "DEPT OF DEFENSE",
@@ -1933,6 +2224,128 @@
       "review_lane": "SPM_PRIORITY"
     },
     {
+      "candidate_id": "US-SAM:59de60ff37594d2ba200b8312af6ef1d",
+      "title": "Call to Industry: Commercial Software RFI",
+      "buyer": "DEPT OF DEFENSE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/workspace/contract/opp/59de60ff37594d2ba200b8312af6ef1d/view",
+      "deadline": "2028-04-15T20:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 37,
+      "priority_score": 37,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2028-04-15T20:00:00+00:00",
+        "notice_deadline_date": "2028-04-15",
+        "dce_deadline_candidates": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Never silently overwrite deadline metadata. Deadline candidates come only from authoritative gate-ready DCE text near deadline language; unresolved/multiple/conflicting dates require review before final 90+/FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 6,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "ess Company Web Page Points of Contact and Contact Information Other Corporate Information RFI Submission Points of Contact: Kirsten Vickers, usarmy.apg.acc.mbx.dc3oe-mailbox@army.mil Disclaimer This RFI is issued solely for information and planning purposes. This RFI is not a solicitation and is not to be construed as a commitment by the Government to issue a solicitation or ultimately award a contract. Responses will not be considered as proposals, nor will any award be made as a result of this request. Federal Acquisition Regulation (FAR) clause 52.215-3, “Request for Information or Solicitation for Planning Purposes”, is incorporated by reference. The Government does not intend to reimburse respondents for any costs associated with the submissions of their responses to this RFI; respondents to this RFI are solely responsible for all expenses associated with responding. Proprietary information and trade secrets, if any, must be clearly marked on all materials. All information received in response to this RFI that is marked “Proprietary” will be handled accordingly. Please be advised that all submissions become Government property and will not be returned nor will receipt be confirmed. In accordance with FAR 15.201(e), responses to this RFI are not offers and cannot be accepted by the",
+            "source": null
+          },
+          {
+            "text": "w:t></w:r><w:r><w:rPr><w:spacing w:val=\"-3\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r><w:t>contract. Responses will not be considered as proposals, nor will any award be made as a result of this request.</w:t></w:r></w:p><w:p w14:paraId=\"21E37B4C\" w14:textId=\"6F181055\" w:rsidR=\"00EB70BA\" w:rsidRPr=\"00272619\" w:rsidRDefault=\"00BD7F16\" w:rsidP=\"00272619\"><w:pPr><w:pStyle w:val=\"BodyText\"/><w:spacing w:before=\"1\" w:line=\"259\" w:lineRule=\"auto\"/><w:ind w:right=\"176\" w:hanging=\"10\"/></w:pPr><w:r><w:t>Federal Acquisition Regulation (FAR) clause 52.215-3, “Request for Information or Solicitation for Planning Purposes”, is incorporated by reference. The Government does not intend to reimburse respondents for any costs associated with the submissions of their responses to this RFI; respondents to this RFI are solely responsible for all expenses associated with responding. Proprietary information and trade</w:t></w:r><w:r><w:rPr><w:spacing w:val=\"-3\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r><w:t>secrets,</w:t></w:r><w:r><w:rPr><w:spacing w:val=\"-1\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r><w:t>if</w:t></w:r><w:r><w:rPr><w:spacing w:val=\"-3\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r><w:t>any,</w:t></w:r><w:r><w:rPr><w:spacing w:val=\"-2\"/></w:rPr><w:t xml",
+            "source": null
+          },
+          {
+            "text": ":r><w:r><w:t>by</w:t></w:r><w:r><w:rPr><w:spacing w:val=\"-2\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r><w:t>the</w:t></w:r><w:r><w:rPr><w:spacing w:val=\"-3\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r><w:t>Government</w:t></w:r><w:r><w:rPr><w:spacing w:val=\"-2\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r><w:t>to</w:t></w:r><w:r><w:rPr><w:spacing w:val=\"-2\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r><w:t>form</w:t></w:r><w:r><w:rPr><w:spacing w:val=\"-3\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r><w:t>a binding contract.</w:t></w:r></w:p><w:sectPr w:rsidR=\"00EB70BA\" w:rsidRPr=\"00272619\"><w:footerReference w:type=\"default\" r:id=\"rId8\"/><w:pgSz w:w=\"12240\" w:h=\"15840\"/><w:pgMar w:top=\"700\" w:right=\"1360\" w:bottom=\"940\" w:left=\"1320\" w:header=\"0\" w:footer=\"744\" w:gutter=\"0\"/><w:cols w:space=\"720\"/></w:sectPr></w:body></w:document> ===== FILE: files/Commercial_Software_RFI_Final_unpacked/word/endnotes.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <w:endnotes xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:cx=\"http://schemas.microsoft.com/office/drawing/2014/chartex\" xmlns:cx1=\"http://schemas.microsoft.com/office/drawing/2015/9/8/chartex\" xmlns:cx2=\"http://schemas.microsoft.com/office/drawi",
+            "source": null
+          }
+        ],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [
+          {
+            "text": ".docx ===== Request for Information (RFI) Call to Industry: Commercial Software RFI Background The Army is currently leveraging several enterprise contracts with leading commercial providers and actively seeking to identify and engage additional commercial companies to further enhance Army enterprise capabilities. The Enterprise Contract is the most cost-effective and efficient solution to address administrative, financial, and operational costs and establish a single IDIQ contract vehicle for all future needs, avoiding the complexities and overhead of multiple individual contracts. The Army remains committed to rigorously assessing contract requirements and driving robust competition—ensuring that innovative solutions and exceptional value are consistently delivered for both the government and the American taxpayer. Strategic sourcing through company direct enterprise contracts helps to ensure users are not overbuying on capacity and/or duplicating purchases unnecessarily, ensuring efficient spending and accelerating the delivery of proven commercial software to warfighters. This approach reduces administrative costs through volume-based buying while also removing contract and reseller passthrough fees. Utilizing enterprise contracts allows the Army to strengthen military readiness, improve",
+            "source": null
+          },
+          {
+            "text": "for all future needs, avoiding the complexities and overhead of multiple individual contracts. The Army remains committed to rigorously assessing contract requirements and driving robust competition—ensuring that innovative solutions and exceptional value are consistently delivered for both the government and the American taxpayer. Strategic sourcing through company direct enterprise contracts helps to ensure users are not overbuying on capacity and/or duplicating purchases unnecessarily, ensuring efficient spending and accelerating the delivery of proven commercial software to warfighters. This approach reduces administrative costs through volume-based buying while also removing contract and reseller passthrough fees. Utilizing enterprise contracts allows the Army to strengthen military readiness, improve operational efficiency, and deliver substantial cost savings across the enterprise. Response Guidelines Respond to this RFI by answering the below: Are you currently selling your commercial product to the government through multiple contracts/transactions (sub or prime, reseller partnerships or other indirect methods)? If yes, please reply with list of contract/agreement numbers (include credit card transactions) in Attachment 1. Responses are due by COB 3 April 2026 Please inc",
+            "source": null
+          },
+          {
+            "text": "t cost-effective and efficient solution to address administrative, financial, and operational costs and establish a single IDIQ contract vehicle for all future needs, avoiding the complexities and overhead of multiple individual contracts.</w:t></w:r></w:p><w:p w14:paraId=\"193BD97E\" w14:textId=\"77777777\" w:rsidR=\"00722479\" w:rsidRPr=\"00722479\" w:rsidRDefault=\"00722479\" w:rsidP=\"00722479\"><w:pPr><w:pStyle w:val=\"Heading1\"/><w:spacing w:before=\"148\"/><w:rPr><w:b w:val=\"0\"/><w:bCs w:val=\"0\"/></w:rPr></w:pPr><w:r w:rsidRPr=\"00722479\"><w:rPr><w:b w:val=\"0\"/><w:bCs w:val=\"0\"/></w:rPr><w:t>The Army remains committed to rigorously assessing contract requirements and driving robust competition—ensuring that innovative solutions and exceptional value are consistently delivered for both the government and the American taxpayer. Strategic sourcing through company direct enterprise contracts helps to ensure users are not overbuying on capacity and/or duplicating purchases unnecessarily, ensuring efficient spending and accelerating the delivery of proven commercial software to warfighters. This approach reduces administrative costs through volume-based buying while also removing contract and reseller passthrough fees. Utilizing enterprise contracts allows the Army to strengthen military readiness, improve",
+            "source": null
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "tn4cqGU/er3pcvwCAAD//wMAUEsDBBQABgAIAAAA&#xA;IQAI9RhTkwEAABsDAAAOAAAAZHJzL2Uyb0RvYy54bWysUsGO0zAQvSPxD5bv1EmBZRU1XQErENIK&#xA;kBY+wHXsJiL2mBm3Sf+esTdtEdwQF3vsGb957403d7MfxdEiDRBaWa8qKWww0A1h38rv3z68uJWC&#xA;kg6dHiHYVp4sybvt82ebKTZ2DT2MnUXBIIGaKbayTyk2SpHprde0gmgDJx2g14mPuFcd6onR/ajW&#xA;VXWjJsAuIhhLxLf3T0m5LfjOWZO+OEc2ibGVzC2VFcu6y6vabnSzRx37wSw09D+w8HoI3PQCda+T&#xA;Fgcc/oLyg0EgcGllwCtwbjC2aGA1dfWHmsdeR1u0sDkULzbR/4M1n4+P8SuKNL+DmQdYRFB8APOD&#xA;2Bs1RWqWmuwpNcTVWejs0OedJQh+yN6eLn7aOQnDl6/Wty/f1JwynKtvXtdVMVxdX0ek9NGCFzlo&#xA;JfK8CgN9fKCU++vmXLKQeeqfmaR5N3NJDnfQnVjExHNsJf08aLRSjJ8CG5WHfg7wHOzOAabxPZSv&#xA;kbUEeHtI4IbS+Yq7dOYJFELLb8kj/v1cqq5/evsLAAD//wMAUEsDBBQABgAIAAAAIQBlzBUt4gAA&#xA;AA0BAAAPAAAAZHJzL2Rvd25yZXYueG1sTI/BTsMwEETvSPyDtUjcqN3ShjSNU1UITkiINBx6dGI3&#xA;sRqvQ+y24e9ZTnDcmafZmXw7uZ5dzBisRwnzmQBmsPHaYivhs3p9SIGFqFCr3qOR8G0CbIvbm1xl&#xA;2l+xNJd9bBmFYMiUhC7GIeM8NJ1xKsz8YJC8ox+dinSOLdejulK46/lCiIQ7ZZE+dGowz51pTvuz&#xA;k7A7YPliv97rj/JY2qpaC3xLTlLe3027DbBopvgHw299qg4Fdar9GXVgvYRFuloSSsYyfUqAEbJO&#xA;BM2rSVrNHxPgRc7/ryh+AAAA//8DAFBLAQItABQABgAIAAAAIQC2gziS/gAAAOEBAAATAAAAAAAA&#xA;AAAAAAAAAAAAAABbQ29udGVudF9UeXBlc10ueG1sUEsBAi0AFAAGAAgAAAAhADj9If/WAAAAlAEA&#xA;AAsAAAAAAAAAAAAAAAAALwEAAF9yZWxzLy5yZWxzUEsBAi0AFAAGAAgAAAAhAAj1GFOTAQAAGwMA&#xA;AA4AAAAAAAAAAAAAAAAALgIAAGRycy9lMm9Eb2MueG1",
+            "source": null
+          }
+        ],
+        "term_value": [
+          {
+            "text": "===== FILE: files/ATTACHMENT_1_Call_to_Industry-Commercial_Software_RFI.xlsx ===== [SHEET Sheet1] Call to Industry: Commercial Software RFI | | | | | | Company | Product | Customer | Method (sub, prime, reseller etc) | Contract/Agreement # | Value | Additional Information ===== FILE: files/ATTACHMENT_1_Call_to_Industry-Commercial_Software_RFI_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/><Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/><Override PartName=\"/xl/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/><Override PartName=\"/xl/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\"/><Override PartN",
+            "source": null
+          },
+          {
+            "text": "crets, if any, must be clearly marked on all materials. All information received in response to this RFI that is marked “Proprietary” will be handled accordingly. Please be advised that all submissions become Government property and will not be returned nor will receipt be confirmed. In accordance with FAR 15.201(e), responses to this RFI are not offers and cannot be accepted by the Government to form a binding contract. ===== FILE: files/Commercial_Software_RFI_Final_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/><Override PartName=\"/word/numbering.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml\"/><Override PartName=\"/word/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml\"/><Override PartName=\"/word/settings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.se",
+            "source": null
+          },
+          {
+            "text": "is RFI that is marked “Proprietary” will be handled accordingly. Please be advised that all submissions become Government property and will not be returned nor will receipt be confirmed. In accordance with FAR 15.201(e), responses to this RFI are not offers and cannot be accepted by the Government to form a binding contract. ===== FILE: files/Commercial_Software_RFI_Final_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/><Override PartName=\"/word/numbering.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml\"/><Override PartName=\"/word/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml\"/><Override PartName=\"/word/settings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml\"/><Override PartName=\"/word/webSettings.xml\" ContentType=\"application/vnd.openxmlformat",
+            "source": null
+          }
+        ],
+        "award_criteria": [
+          {
+            "text": "ADD\"><w:rPr><w:spacing w:val=\"-2\"/></w:rPr><w:t>RFI</w:t></w:r></w:p><w:p w14:paraId=\"7A0E1636\" w14:textId=\"1437EFCA\" w:rsidR=\"00307652\" w:rsidRPr=\"003B658E\" w:rsidRDefault=\"003B658E\" w:rsidP=\"003B658E\"><w:pPr><w:spacing w:before=\"158\"/><w:ind w:left=\"104\"/><w:rPr><w:b/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:spacing w:val=\"-2\"/><w:u w:val=\"single\"/></w:rPr><w:t>Background</w:t></w:r></w:p><w:p w14:paraId=\"725AAACC\" w14:textId=\"7B0AEDBD\" w:rsidR=\"00722479\" w:rsidRPr=\"00722479\" w:rsidRDefault=\"00722479\" w:rsidP=\"00722479\"><w:pPr><w:pStyle w:val=\"Heading1\"/><w:spacing w:before=\"148\"/><w:rPr><w:b w:val=\"0\"/><w:bCs w:val=\"0\"/></w:rPr></w:pPr><w:bookmarkStart w:id=\"0\" w:name=\"_Hlk205285222\"/><w:r w:rsidRPr=\"00722479\"><w:rPr><w:b w:val=\"0\"/><w:bCs w:val=\"0\"/></w:rPr><w:t>The Army is currently leveraging several enterprise contracts with leading commercial providers and actively seeking to identify and engage additional commercial companies to further enhance Army enterprise capabilities.</w:t></w:r></w:p><w:p w14:paraId=\"7E72E804\" w14:textId=\"35D14517\" w:rsidR=\"00722479\" w:rsidRPr=\"00722479\" w:rsidRDefault=\"00722479\" w:rsidP=\"00722479\"><w:pPr><w:pStyle w:val=\"Heading1\"/><w:spacing w:before=\"148\"/><w:rPr><w:b w:val=\"0\"/><w:bCs w:val=\"0\"/></w:rPr></w:pPr><w:r w:rsidRPr=\"00722479\"><w:rPr><w:b w:v",
+            "source": null
+          },
+          {
+            "text": "=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 5\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 6\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 7\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 8\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 9\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Normal Indent\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footnote text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"annotation text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"header\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footer\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"index heading\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"caption\" w:semiHidden=\"1\" w:uiPriority=\"35\" w:unhideWhenUsed=\"1\" w:qFormat=\"1\"/><w:lsdException w:name=\"table of figures\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope address\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope return\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footnote refer",
+            "source": null
+          },
+          {
+            "text": "eader\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footer\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"index heading\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"caption\" w:semiHidden=\"1\" w:uiPriority=\"35\" w:unhideWhenUsed=\"1\" w:qFormat=\"1\"/><w:lsdException w:name=\"table of figures\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope address\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope return\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footnote reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"annotation reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"line number\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"page number\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"endnote reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"endnote text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"table of authorities\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"macro\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toa heading\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List\" w:semiHidden=\"1\" w:unhideWh",
+            "source": null
+          }
+        ],
+        "forms_signatures": [
+          {
+            "text": "w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Bullet 4\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Bullet 5\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 2\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 3\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 4\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 5\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Title\" w:uiPriority=\"10\" w:qFormat=\"1\"/><w:lsdException w:name=\"Closing\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Signature\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Default Paragraph Font\" w:semiHidden=\"1\" w:uiPriority=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Body Text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Body Text Indent\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue 2\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue 3\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue 4\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Con",
+            "source": null
+          },
+          {
+            "text": ":unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Body Text Indent 3\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Block Text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Hyperlink\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"FollowedHyperlink\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Strong\" w:uiPriority=\"22\" w:qFormat=\"1\"/><w:lsdException w:name=\"Emphasis\" w:uiPriority=\"20\" w:qFormat=\"1\"/><w:lsdException w:name=\"Document Map\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Plain Text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"E-mail Signature\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Top of Form\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Bottom of Form\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Normal (Web)\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Acronym\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Address\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Cite\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Code\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Definition\" w:semiHidden=\"1\" w:unhid",
+            "source": null
+          }
+        ],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 31916368034,
+      "source_shard": 18,
+      "hot_ready_at": "2026-08-16T00:06:42.167360+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 10,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
       "candidate_id": "US-SAM:8becb3e825cf44869530c66b467a8a69",
       "title": "Telecommunication Services Offutt AFB, NE",
       "buyer": "DEPT OF DEFENSE",
@@ -2021,6 +2434,99 @@
       "hot_ready_at": "2026-08-16T00:06:13.147969+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 10,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
+      "candidate_id": "US-SAM:ae63a088c6f944df9122f43849bfcdd1",
+      "title": "N--WHITE POCKET COMPOSTING TOILET",
+      "buyer": "INTERIOR, DEPARTMENT OF THE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/workspace/contract/opp/ae63a088c6f944df9122f43849bfcdd1/view",
+      "deadline": "2026-08-21T18:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 23,
+      "priority_score": 23,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-21T18:00:00+00:00",
+        "notice_deadline_date": "2026-08-21",
+        "dce_deadline_candidates": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Never silently overwrite deadline metadata. Deadline candidates come only from authoritative gate-ready DCE text near deadline language; unresolved/multiple/conflicting dates require review before final 90+/FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 5,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "TO DAMAGE ANY PART OF THE BUILDING, IT WOULD REQUIRE MATERIALS THAT ARE MANUFACTURED AT ACS’S FACTORY TO BE SHIPPED TO THE SITE. ASSEMBLY AND CONFIGURING ARE EXTREMELY COMPLICATED AND REQUIRES YEARS OF TRAINING TO BECOME PROFICIENT. 3. THE INSTALLATION INVOLVES ACS’S PROPRIETARY TECHNOLOGY, INCLUDING THE PHOENIX COMPOSTING TOILET, PERMANENT WOOD FOUNDATION, ROOF GUTTER SYSTEM, RAINWATERCATCHMENT SYSTEM, ELECTRICAL SYSTEM, SOLAR SYSTEM AND THE COMPUTER SYSTEM THAT CONTROLS ALL ASPECTS OF THE COMPOSTING PROCESS. 4. INSTALLATION INSTRUCTIONS ON ACS’S WEBSITE ARE FOR INSTALLING THE PHOENIX COMPOSTING TOILET INTO AN EXISTING STRUCTURE, RESIDENTIAL OR OFFICE. OUTSIDE CONTRACTORS HAVE NEVER SUCCESFULLY ASSEMBLED THE PREFABRICATED STRUCTURE WITHOUT DAMAGE OR FUNCTIONALITY ISSUES. DAMAGE OR IMPROPER INSTALLATION VOIDS ALL WARRANTIES, AND CORRECTION OR REPAIR CAN COST AS MUCH AS INITIAL INSTALLATION. 7. Other information. Although there are likely other vendors willing to install the composting system manufactured by Advanced Composting Systems, the potential for damage or improper installation significantly increases the risk of unsuccessful completion of this project and added costs for repair and/or correction. 8. The efforts to identify additional sources including the",
+            "source": null
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [
+          {
+            "text": "er to determine the method of solicitation and cost of similar requirements. This requirement is unique in the sense that the facility itself has already been purchased by FAPL. Similar requirements included the purchase and installation of a composting toilet facility, therefore the method of solicitation and cost of requirement differ significantly from BLM Arizona’s need. 9. Future plans to permit competition. This is a one-time requirement, and there are no planned acquisitions for or related to this requirement, therefore, no actions to increase future competition are required. 3 10. The ordering activity Contracting Officer’s certification that the justification is accurate and complete to the best of the Contracting Officer’s knowledge and belief and evidence that the supporting data that form a basis for the justification have been certified as complete and accurate by technical/program personnel. I certify that the facts and representations under my cognizance, which are included in this justification and which form a basis for this justification, are complete and accurate. (Signature)____________________________ (Date) ____07/23/2026_________ (Type or Print Name): _____Timothy Pananos_______________________________________ Contracting Officer’s Representative 11.",
+            "source": null
+          }
+        ],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [
+          {
+            "text": "or services. The Foundation for America's Public Lands (FAPL) has donated a composting toilet facility to BLM Arizona for use at Vermillion Cliffs National Monument. While FAPL has covered the cost of the facility itself, BLM Arizona is responsible for transportation and installation expenses. As BLM Arizona lacks the necessary resources to fully transport and install the facility, a qualified vendor is required to provide these services. 4. Estimated dollar value. The estimated value of this service is $46,600.00. 5. Statutory authority. 6.103-1 Only one responsible source and no other supplies or services will satisfy agency requirements. 2 6. Rationale supporting use of the authority stated in paragraph 5. a. MANUFACTURER (ACS) IS THE ONLY ONE THAT CAN INSTALL ITS OWN TOILET SUCCESSFULLY WITHOUT DAMAGE TO COMPONENTS. AND ITS SPECIALIZED SKILLS ARE THE ASSEMBLY OF ITS PREFABRICATED FACILITY THAT HAS THE COMPOSTING TOILET, SOLAR, AND WATER COLLECTION INTEGRATED INTO THE BUILDING. 2. THERE ARE NO OTHER VENDORS. THE CONTRACTOR IS THE MANUFACTURER AND INSTALLER. ACS HAS SPECIALIZED EQUIPMENT THAT IS USED TO INSTALL THE BUILDING. IT IS DESIGNED TO BE TRANSPORTED TO THE SITE AND ASSEMBLED. IF A GENERAL CONTRACTOR WERE TO DAMAGE ANY PART OF THE BUILDING,",
+            "source": null
+          },
+          {
+            "text": "Y ISSUES. DAMAGE OR IMPROPER INSTALLATION VOIDS ALL WARRANTIES, AND CORRECTION OR REPAIR CAN COST AS MUCH AS INITIAL INSTALLATION. 7. Other information. Although there are likely other vendors willing to install the composting system manufactured by Advanced Composting Systems, the potential for damage or improper installation significantly increases the risk of unsuccessful completion of this project and added costs for repair and/or correction. 8. The efforts to identify additional sources including the market research conducted. Marker research was conducted in order to determine the method of solicitation and cost of similar requirements. This requirement is unique in the sense that the facility itself has already been purchased by FAPL. Similar requirements included the purchase and installation of a composting toilet facility, therefore the method of solicitation and cost of requirement differ significantly from BLM Arizona’s need. 9. Future plans to permit competition. This is a one-time requirement, and there are no planned acquisitions for or related to this requirement, therefore, no actions to increase future competition are required. 3 10. The ordering activity Contracting Officer’s certification that the justification is accurate and complete to the best of",
+            "source": null
+          },
+          {
+            "text": "LATION. 7. Other information. Although there are likely other vendors willing to install the composting system manufactured by Advanced Composting Systems, the potential for damage or improper installation significantly increases the risk of unsuccessful completion of this project and added costs for repair and/or correction. 8. The efforts to identify additional sources including the market research conducted. Marker research was conducted in order to determine the method of solicitation and cost of similar requirements. This requirement is unique in the sense that the facility itself has already been purchased by FAPL. Similar requirements included the purchase and installation of a composting toilet facility, therefore the method of solicitation and cost of requirement differ significantly from BLM Arizona’s need. 9. Future plans to permit competition. This is a one-time requirement, and there are no planned acquisitions for or related to this requirement, therefore, no actions to increase future competition are required. 3 10. The ordering activity Contracting Officer’s certification that the justification is accurate and complete to the best of the Contracting Officer’s knowledge and belief and evidence that the supporting data that form a basis for the justificati",
+            "source": null
+          }
+        ],
+        "sla_onsite": [],
+        "term_value": [
+          {
+            "text": "price contract to Advanced Composting Systems (ACS) for the installation of a composting toilet at Vermillion Cliffs National Monument. 3. Description of supplies or services. The Foundation for America's Public Lands (FAPL) has donated a composting toilet facility to BLM Arizona for use at Vermillion Cliffs National Monument. While FAPL has covered the cost of the facility itself, BLM Arizona is responsible for transportation and installation expenses. As BLM Arizona lacks the necessary resources to fully transport and install the facility, a qualified vendor is required to provide these services. 4. Estimated dollar value. The estimated value of this service is $46,600.00. 5. Statutory authority. 6.103-1 Only one responsible source and no other supplies or services will satisfy agency requirements. 2 6. Rationale supporting use of the authority stated in paragraph 5. a. MANUFACTURER (ACS) IS THE ONLY ONE THAT CAN INSTALL ITS OWN TOILET SUCCESSFULLY WITHOUT DAMAGE TO COMPONENTS. AND ITS SPECIALIZED SKILLS ARE THE ASSEMBLY OF ITS PREFABRICATED FACILITY THAT HAS THE COMPOSTING TOILET, SOLAR, AND WATER COLLECTION INTEGRATED INTO THE BUILDING. 2. THERE ARE NO OTHER VENDORS. THE CONTRACTOR IS THE MANUFACTURER AND INSTALLER. ACS HAS SPECIALIZED EQUIPMENT THA",
+            "source": null
+          }
+        ],
+        "award_criteria": [],
+        "forms_signatures": [
+          {
+            "text": "are no planned acquisitions for or related to this requirement, therefore, no actions to increase future competition are required. 3 10. The ordering activity Contracting Officer’s certification that the justification is accurate and complete to the best of the Contracting Officer’s knowledge and belief and evidence that the supporting data that form a basis for the justification have been certified as complete and accurate by technical/program personnel. I certify that the facts and representations under my cognizance, which are included in this justification and which form a basis for this justification, are complete and accurate. (Signature)____________________________ (Date) ____07/23/2026_________ (Type or Print Name): _____Timothy Pananos_______________________________________ Contracting Officer’s Representative 11. I certify that the justification is accurate and complete to the best of my knowledge and belief: (Signature) _______________________________________ (Date) _______________________ (Type or Print Name): ___________________________________________________________ Contracting Officer ===== FILE: files/sam_http_resources.json ===== { \"notice_id\": \"ae63a088c6f944df9122f43849bfcdd1\", \"resources\": [ { \"resource_id\": \"7dd515d0ba6a4fbea42b16bd8",
+            "source": null
+          },
+          {
+            "text": "and belief and evidence that the supporting data that form a basis for the justification have been certified as complete and accurate by technical/program personnel. I certify that the facts and representations under my cognizance, which are included in this justification and which form a basis for this justification, are complete and accurate. (Signature)____________________________ (Date) ____07/23/2026_________ (Type or Print Name): _____Timothy Pananos_______________________________________ Contracting Officer’s Representative 11. I certify that the justification is accurate and complete to the best of my knowledge and belief: (Signature) _______________________________________ (Date) _______________________ (Type or Print Name): ___________________________________________________________ Contracting Officer ===== FILE: files/sam_http_resources.json ===== { \"notice_id\": \"ae63a088c6f944df9122f43849bfcdd1\", \"resources\": [ { \"resource_id\": \"7dd515d0ba6a4fbea42b16bd8f9d956d\", \"name\": \"Justification_for_Other_than_Full_and_Open_Competition_1.pdf\", \"access\": \"0\", \"deleted\": null, \"path\": \"root._embedded.opportunityAttachmentList[0].attachments[0]\" } ] }",
+            "source": null
+          }
+        ],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 31916368034,
+      "source_shard": 18,
+      "hot_ready_at": "2026-08-16T00:06:42.167360+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 7,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
@@ -2724,6 +3230,226 @@
       "spm_fit_reasons": [],
       "spm_friction_signals": [
         "us-small-business-set-aside"
+      ],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
+      "candidate_id": "US-SAM:1d438c4c08b0437596b5842dd0357b0a",
+      "title": "Latvia Liaison Analyst - base + 4 option periods",
+      "buyer": "DEPT OF DEFENSE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/workspace/contract/opp/1d438c4c08b0437596b5842dd0357b0a/view",
+      "deadline": "2026-09-02T16:30:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 29,
+      "priority_score": 29,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-09-02T16:30:00+00:00",
+        "notice_deadline_date": "2026-09-02",
+        "dce_deadline_candidates": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 1,
+          "corpus_contexts": 1,
+          "unique_contexts": 2
+        },
+        "rule": "Never silently overwrite deadline metadata. Deadline candidates come only from authoritative gate-ready DCE text near deadline language; unresolved/multiple/conflicting dates require review before final 90+/FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 14,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "is the DoD Federal Personal Identity Verification (PIV) credential. The DoD issues CACs per Department of Defense Manual (DoDM) 1000.13- V1, DoD Identification (ID) Cards: ID Card Life Cycle, July 01, 2025. Initial issuance of a CAC requires, at a minimum, the completion of a Federal Bureau of Investigation (FBI) fingerprint check with favorable results and submission of a National Agency Check with Inquiries (NACI) (or investigation approved in Federal Investigative Standards) to the Under Secretary of Defense for Intelligence (USD(I)) approved investigative service provider. The issuance of a CAC will be based on four criteria: (a) eligibility for a CAC; (b) verification of DoD affiliation from an authoritative data source; (c) completion of background vetting requirements according to the Federal Information Processing Standards Publication 201-3, Personal Identity Verification (PIV) of Federal Employees and Contractors, January 2022, and DoD Manual 5200.02, Procedures for the DoD Personnel Security Program (PSP), April 3, 2017, and (d) verification of a claimed identity. Each applicant must register sponsorship and enrollment information in the Defense Enrollment Eligibility Reporting System (DEERS) through either the Real-Time Automated Personnel ID System (RAPIDS) usin",
+            "source": null
+          },
+          {
+            "text": "pproved investigative service provider. The issuance of a CAC will be based on four criteria: (a) eligibility for a CAC; (b) verification of DoD affiliation from an authoritative data source; (c) completion of background vetting requirements according to the Federal Information Processing Standards Publication 201-3, Personal Identity Verification (PIV) of Federal Employees and Contractors, January 2022, and DoD Manual 5200.02, Procedures for the DoD Personnel Security Program (PSP), April 3, 2017, and (d) verification of a claimed identity. Each applicant must register sponsorship and enrollment information in the Defense Enrollment Eligibility Reporting System (DEERS) through either the Real-Time Automated Personnel ID System (RAPIDS) using the DD Form 1172-2, or the Trusted Associate Sponsorship System (TASS). 1.4.5.1.1 Background Investigation Requirements for CAC Issuance: The contractor shall ensure that all contractor and subcontractor personnel whose duties require CAC issuance obtain them and shall process all CAC applications. The contractor bears the costs associated with Secret or higher security clearances. Applicants requiring Secret or higher-level clearances should refer to their contractor for completion of requisite documents and investigations. To receiv",
+            "source": null
+          },
+          {
+            "text": "al of all required documents, including fingerprint cards to the security manager, the background investigation (BI) will be initiated. The applicant must ensure immediate compliance with all instructions regarding background investigation processing, including those provided verbally, by e-mail, or via a government system. The contractor should note that the entire process from submitting the PSIP form to return of the FBI fingerprint check may routinely take from two to six weeks and shall factor this time into its hiring/placement process. The contractor shall make all reasonable efforts to ensure that contractor employees meet CAC eligibility standards upon assignment to the contract and is liable for delaysThe Government will inform the contractor's applicant, via email, of determinations made, approval, rejection, or return for corrections or additional information. The contractor shall maintain records of all approved and rejected applications. 1.4.5.1.3 CAC Appointment and Issuance: At the RAPIDS station, the RAPIDS Verification Officer will verify the contractor employee by SSN and two forms of identification. Identity source documents must come from the list of acceptable documents included in Form I-9, OMB No. 1615-0047, \"Employment Eligibility Verification.\" Co",
+            "source": null
+          }
+        ],
+        "turnover_financial": [
+          {
+            "text": "t as specified in paragraph 3.0 as government furnished, to perform liaison, training development, administration, and consultation services, as defined in this PWS. 1.2 Background: The Michigan National Guard (MING) and the Republic of Latvia have worked closely through the State Partnership Program (SPP) since 1993. This partnership increases the capability, readiness and lethality of both formations through the joint understanding, familiarization, and standardization of each other’s process and procedures. The partnership benefits from an ongoing liaison relationship that maintains continuity of efforts during periods of staffing turnovers. 1.3 Period of Performance (PoP): The Period of Performance shall be 1 Base Year of 12 months and four 12-month option-years. 1.4 General Information: 1.4.1 Quality Control (QC): The contractor shall develop and keep an effective QC Plan (QCP) to ensure performance of services per this PWS. The contractor shall develop and implement procedures to identify, prevent, and ensure non-recurrence of defective services. The contractor’s QCP is how it assures itself that the work follows the requirements of the contract. At a minimum, the contractor shall develop QC procedures that address the areas outlined in Technical Exhibit 1, Perform",
+            "source": null
+          }
+        ],
+        "references_experience": [
+          {
+            "text": "monthly report of unit participation status that tracks all planned training events, meetings/conferences, and Joint Event Life Cycle (JELC) milestones. Report will highlight and include recommendations for areas of concern. 13 Ver. AUG 2025 5.2 Coordinate all MING and Latvian participation in EUCOM Exercises within the Republic of Latvia. 5.2.1 Primary planner for MING Overseas Deployment Training (ODT) to Latvia and Latvian NORTHERN STRIKE and State Annual Training participation. 5.2.2 Track training objectives by participating units. Translate and provide consolidated tracker prior to JELC events for senior leadership to reference. 5.3 Coordinate staff exchanges from MIARNG to Latvia for Army lines of effort. 5.3.1 Develop agendas and itineraries for Key Leader Engagements (KLEs). 5.3.2. Known upcoming ODT’s and SPP bi-lateral exercises between Michigan to Latvia are: USEURAF DEFENDER, ARCANE THUNDER, DYNAMIC FRONT series, USAFE AIR DEFENDER, ASTRAL KNIGHT series, MING STATE AT, MING NORTHERN STRIKE, BALTIC VIKING, and other emerging initiatives as directed. 5.3.3 Track resource requirements by type and unit. Document and file applicable correspondence and facilitate resolution to resource gaps through the proper chain of command. This includes MOU",
+            "source": null
+          },
+          {
+            "text": "ity Levels (AQL) Surveillance Method / By Whom 5.1.1 Monthly report on unit participation status Provide a tracker that shows all planned training events, meetings/conferences, JELC milestones. Report will highlight and include recommendations for areas of concern. Submit monthly on the 1st of the month. Report is received no more than four times later than the 7th day of the month during the period of performance. Periodic Inspection / COR 5.2.2 Training objective Tracker Track training objectives by participating units. Translate and provide consolidated tracker prior to JELC events for senior leadership to reference. Tracker is received later than 24 hours prior to a planning meeting, or upon request no more than two times during the period of performance Periodic Inspection / COR 5.3.3 Track Resource Requirements Track resource requirements by type and unit. Document and file applicable correspondence and facilitate resolution to resource gaps through the proper chain of command. Submit Bi-Weekly or upon request. Can be combined with weekly status update. Trackers are received late no more than four times during the period of performance. Periodic Inspection / COR 16 Ver. AUG 2025 TECHNICAL EXHIBIT 2 Deliverables",
+            "source": null
+          },
+          {
+            "text": "ved later than 24 hours prior to a planning meeting, or upon request no more than two times during the period of performance Periodic Inspection / COR 5.3.3 Track Resource Requirements Track resource requirements by type and unit. Document and file applicable correspondence and facilitate resolution to resource gaps through the proper chain of command. Submit Bi-Weekly or upon request. Can be combined with weekly status update. Trackers are received late no more than four times during the period of performance. Periodic Inspection / COR 16 Ver. AUG 2025 TECHNICAL EXHIBIT 2 Deliverables Schedule PWS Reference / Deliverable Title Frequency Number of Copies Medium/Format Submit To 5.1.1 Monthly report on unit participation status Monthly 1 Excel Spreadsheet/Email SCD 5.2.2 Training objective Tracker Per JELC Timeline or upon request 1 Excel Spreadsheet/Email SCD 5.3.3 Track Resource Requirements Bi-Weekly or upon request 1 Excel Spreadsheet/Email SCD 1.4.1 QCP NLT 10 days Following Contract Award 1 Electronic Submission COR/KO 1.4.5.6 AT Level 1 Awareness Training Certificates Provide within 15 calendar days after employee completes training. 1 Electronic Submission COR/KO 1.4.5.10 OPSEC Training Cert",
+            "source": null
+          }
+        ],
+        "certifications_partner": [
+          {
+            "text": "ated in their respective areas in accordance with physical security and data protection requirements. 1.4.5.4.5 Practice safe network and Internet operating principles and take no actions that threaten the integrity of the system or network. 6 Ver. AUG 2025 1.4.5.5 RESERVED 1.4.5.6 AT Level 1 Awareness Training (AT): All contractor employees, including subcontractor employees, requiring access to Army installations, facilities, and controlled access areas shall complete Level 1 AT within 30 calendar days after contract start date and within 30 calendar days of new employees commencing performance. The contractor shall submit certificates of completion for each affected contractor and subcontractor employee to the KO within 15 calendar days after completion of training. Level 1 AT is available at https://jkodirect.jten.mil/, course title “Level I Antiterrorism Awareness Training”. 1.4.5.7 Information Assurance (IA)/Information Technology (IT) Training: All contractor employees and associated subcontractor employees shall complete the DoD IA Awareness Training before issuance of network access and annually thereafter. All contractor employees performing services involving IA/IT functions shall comply with DoD and Army workforce training requirements in DoDD 8140.01,",
+            "source": null
+          },
+          {
+            "text": "n Technology (IT) Training: All contractor employees and associated subcontractor employees shall complete the DoD IA Awareness Training before issuance of network access and annually thereafter. All contractor employees performing services involving IA/IT functions shall comply with DoD and Army workforce training requirements in DoDD 8140.01, DoD 8570.01-M and AR 25-2 within six months of the start of contract performance. In accordance with DoD 8570.01-M, DFARS 252.239.7001 and AR 25-2, contractor employees performing Information Assurance Technical (IAT) functions shall be appropriately certified upon contract award. The baseline certification as stipulated in DoD 8570.01-M shall be completed upon contract award. 1.4.5.8 Information Awareness: All contractor employees with access to a government information system shall be registered in the Army Training Certification Tracking System (ATCTS) (https://atcts.army.mil/iastar/index.php) at commencement of services, and shall successfully complete the DoD Cyber Awareness training prior to access to the IS and then annually thereafter at https://cs.signal.army.mil/. 1.4.5.9 RESERVED 1.4.5.10 OPSEC Training: In accordance with AR 530-1, Operations Security, new contractor employees shall complete OPSEC training within 3",
+            "source": null
+          },
+          {
+            "text": "services involving IA/IT functions shall comply with DoD and Army workforce training requirements in DoDD 8140.01, DoD 8570.01-M and AR 25-2 within six months of the start of contract performance. In accordance with DoD 8570.01-M, DFARS 252.239.7001 and AR 25-2, contractor employees performing Information Assurance Technical (IAT) functions shall be appropriately certified upon contract award. The baseline certification as stipulated in DoD 8570.01-M shall be completed upon contract award. 1.4.5.8 Information Awareness: All contractor employees with access to a government information system shall be registered in the Army Training Certification Tracking System (ATCTS) (https://atcts.army.mil/iastar/index.php) at commencement of services, and shall successfully complete the DoD Cyber Awareness training prior to access to the IS and then annually thereafter at https://cs.signal.army.mil/. 1.4.5.9 RESERVED 1.4.5.10 OPSEC Training: In accordance with AR 530-1, Operations Security, new contractor employees shall complete OPSEC training within 30 calendar days of their reporting for duty and annually thereafter. The contractor shall submit certificates of completion for each contractor employee to the KO within 15 calendar days after completion of training. OPSEC training",
+            "source": null
+          }
+        ],
+        "staffing_team": [
+          {
+            "text": "ry, except as specified in paragraph 3.0 as government furnished, to perform liaison, training development, administration, and consultation services, as defined in this PWS. 1.2 Background: The Michigan National Guard (MING) and the Republic of Latvia have worked closely through the State Partnership Program (SPP) since 1993. This partnership increases the capability, readiness and lethality of both formations through the joint understanding, familiarization, and standardization of each other’s process and procedures. The partnership benefits from an ongoing liaison relationship that maintains continuity of efforts during periods of staffing turnovers. 1.3 Period of Performance (PoP): The Period of Performance shall be 1 Base Year of 12 months and four 12-month option-years. 1.4 General Information: 1.4.1 Quality Control (QC): The contractor shall develop and keep an effective QC Plan (QCP) to ensure performance of services per this PWS. The contractor shall develop and implement procedures to identify, prevent, and ensure non-recurrence of defective services. The contractor’s QCP is how it assures itself that the work follows the requirements of the contract. At a minimum, the contractor shall develop QC procedures that address the areas outlined in Technical Exhibit 1",
+            "source": null
+          },
+          {
+            "text": "tment will be in writing and will state the scope of authority and limitations. This individual has authority to provide technical direction to the Contractor as long as that direction is within the scope of the contract, does not constitute a change, and has no funding implications. This individual does NOT have authority to change the terms and conditions of the contract. 2.1.4 Defective Service: A service output that does not meet the standard of performance associated with the PWS. 2.1.5 Deliverable: Anything that can be physically delivered and includes non- manufactured things such as meeting minutes or reports. 2.1.6 Key Personnel: Contractor personnel that are evaluated in a source selection process and that may be required to be used in the performance of a contract by the PWS. When key personnel are used as an evaluation factor in best value procurement, an offer can be rejected if it does not have a firm commitment from the persons that are listed in the proposal. 2.1.7 Physical Security: Actions that prevent the loss or damage of Government property. 2.1.8 Quality Assurance: The government procedures to verify that services being performed by the Contractor are performed according to acceptable standards. 2.1.9 Quality Assurance Surveillance Pla",
+            "source": null
+          },
+          {
+            "text": "hat direction is within the scope of the contract, does not constitute a change, and has no funding implications. This individual does NOT have authority to change the terms and conditions of the contract. 2.1.4 Defective Service: A service output that does not meet the standard of performance associated with the PWS. 2.1.5 Deliverable: Anything that can be physically delivered and includes non- manufactured things such as meeting minutes or reports. 2.1.6 Key Personnel: Contractor personnel that are evaluated in a source selection process and that may be required to be used in the performance of a contract by the PWS. When key personnel are used as an evaluation factor in best value procurement, an offer can be rejected if it does not have a firm commitment from the persons that are listed in the proposal. 2.1.7 Physical Security: Actions that prevent the loss or damage of Government property. 2.1.8 Quality Assurance: The government procedures to verify that services being performed by the Contractor are performed according to acceptable standards. 2.1.9 Quality Assurance Surveillance Plan (QASP): An organized written document specifying the surveillance methodology to be used for surveillance of contractor performance. 2.1.10 Quality Control: All nece",
+            "source": null
+          }
+        ],
+        "insurance_bonds": [
+          {
+            "text": "plement procedures to identify, prevent, and ensure non-recurrence of defective services. The contractor’s QCP is how it assures itself that the work follows the requirements of the contract. At a minimum, the contractor shall develop QC procedures that address the areas outlined in Technical Exhibit 1, Performance Requirements Summary (PRS). The contractor shall send a final QCP to the Contracting Officer Representative (COR) not later than 10 days after the contract award. After acceptance of the QCP, the contractor shall obtain the Contracting Officer’s (KO’s) acceptance in writing of any proposed changes to its QCP. 1.4.2 Quality Assurance (QA): The Government will evaluate the contractor’s performance under this contract via the Quality Assurance Surveillance Plan (QASP). This plan is primarily focused on what the Government will do to ensure that the contractor has performed in accordance with the performance standards. It defines the application of performance standards, the frequency of surveillance, and acceptable quality level(s) or defect rate(s). 1.4.3 Recognized Holidays: The United States (US) recognizes the following holidays. The contractor shall not perform services on these days: W91JB26QA006 ATTACHMENT A Total Pages: 16 2 Ver. AUG 2025 1.4.3.1 New Yea",
+            "source": null
+          },
+          {
+            "text": "is how it assures itself that the work follows the requirements of the contract. At a minimum, the contractor shall develop QC procedures that address the areas outlined in Technical Exhibit 1, Performance Requirements Summary (PRS). The contractor shall send a final QCP to the Contracting Officer Representative (COR) not later than 10 days after the contract award. After acceptance of the QCP, the contractor shall obtain the Contracting Officer’s (KO’s) acceptance in writing of any proposed changes to its QCP. 1.4.2 Quality Assurance (QA): The Government will evaluate the contractor’s performance under this contract via the Quality Assurance Surveillance Plan (QASP). This plan is primarily focused on what the Government will do to ensure that the contractor has performed in accordance with the performance standards. It defines the application of performance standards, the frequency of surveillance, and acceptable quality level(s) or defect rate(s). 1.4.3 Recognized Holidays: The United States (US) recognizes the following holidays. The contractor shall not perform services on these days: W91JB26QA006 ATTACHMENT A Total Pages: 16 2 Ver. AUG 2025 1.4.3.1 New Year’s Day: January 1st 1.4.3.2 Birthday of Martin Luther King, Jr 1.4.3.3 Washington’s Birthday 1.4.3.4 Memori",
+            "source": null
+          },
+          {
+            "text": "1.4.5.6 AT Level 1 Awareness Training (AT): All contractor employees, including subcontractor employees, requiring access to Army installations, facilities, and controlled access areas shall complete Level 1 AT within 30 calendar days after contract start date and within 30 calendar days of new employees commencing performance. The contractor shall submit certificates of completion for each affected contractor and subcontractor employee to the KO within 15 calendar days after completion of training. Level 1 AT is available at https://jkodirect.jten.mil/, course title “Level I Antiterrorism Awareness Training”. 1.4.5.7 Information Assurance (IA)/Information Technology (IT) Training: All contractor employees and associated subcontractor employees shall complete the DoD IA Awareness Training before issuance of network access and annually thereafter. All contractor employees performing services involving IA/IT functions shall comply with DoD and Army workforce training requirements in DoDD 8140.01, DoD 8570.01-M and AR 25-2 within six months of the start of contract performance. In accordance with DoD 8570.01-M, DFARS 252.239.7001 and AR 25-2, contractor employees performing Information Assurance Technical (IAT) functions shall be appropriately certified upon contract awar",
+            "source": null
+          }
+        ],
+        "subcontracting_consortium": [
+          {
+            "text": "on which may affect performance. The Government reserves the right to direct the removal of an employee for misconduct, security reasons, or any actions that can reasonably be seen as damaging to the relationship between MING and the Republic of Latvia. Removal of contractor employees for reasons stated above does not relieve the Contractor from responsibility for total performance of this contract. 1.4.5 Security Requirements: The contractor shall obey all applicable installation/facility access and local security policies and procedures. The COR can aid in obtaining these policies and procedures. The contractor and all associated subcontractor employees shall provide all information required for background checks to meet installation access requirements to be accomplished by installation Provost Marshal Office, Director of Emergency Services or Security Office. The contractor shall ensure compliance with all personal identity verification requirements as directed by Department of Defense (DoD), Headquarters Department of Army (HQDA) and/or local policy. Should the Force Protection Condition (FPCON) change, the Government may require changes in contractor security matters or processes. 1.4.5.1 Common Access Cards: For contractors requiring Common Access Card (CAC): The",
+            "source": null
+          },
+          {
+            "text": "lication 201-3, Personal Identity Verification (PIV) of Federal Employees and Contractors, January 2022, and DoD Manual 5200.02, Procedures for the DoD Personnel Security Program (PSP), April 3, 2017, and (d) verification of a claimed identity. Each applicant must register sponsorship and enrollment information in the Defense Enrollment Eligibility Reporting System (DEERS) through either the Real-Time Automated Personnel ID System (RAPIDS) using the DD Form 1172-2, or the Trusted Associate Sponsorship System (TASS). 1.4.5.1.1 Background Investigation Requirements for CAC Issuance: The contractor shall ensure that all contractor and subcontractor personnel whose duties require CAC issuance obtain them and shall process all CAC applications. The contractor bears the costs associated with Secret or higher security clearances. Applicants requiring Secret or higher-level clearances should refer to their contractor for completion of requisite documents and investigations. To receive a CAC the applicant shall provide a copy of this PWS, the applicant’s resume (required for Centralized Suitability Service Center (CSSC) to make interim determination), an OF 306 filled out in its entirety, and 4 Ver. AUG 2025 fingerprints (can be submitted digitally with a recruiter or in the Joint",
+            "source": null
+          },
+          {
+            "text": "turn issued CACs to the DEERS office upon departure or dismissal of each contractor employee, and shall obtain receipt for each card and provide it to the TA/COR. 1.4.5.1.5 New CAC or Renewal: The contractor shall manage requests for new or renewal of CACs in sufficient time to ensure that all contractor employees have them when needed to perform work under this contract. The contractor shall provide at least 5 Ver. AUG 2025 10 calendar days advance notice to the TA, unless there are extenuating circumstances approved by the COR or KO. 1.4.5.1.6 The contractor shall obtain a “.mil” email address for each applicant, including subcontractors, who may be deployed or require logical access to a government computer network. Include this request on a DD 2875, System Authorization Access Request when requesting access to other systems 1.4.5.2 RESERVED 1.4.5.3 Communications Security/Information Technology (COMSEC/IT) Security. All communications with DoD organizations are subject to COMSEC review. All telephone communications networks are continually subject to intercept by unfriendly intelligence organizations. DoD has authorized the military departments to conduct COMSEC monitoring and recording of telephone calls originating from, or terminating at, DoD organizati",
+            "source": null
+          }
+        ],
+        "deliverables_scope": [
+          {
+            "text": "nd procedures. The partnership benefits from an ongoing liaison relationship that maintains continuity of efforts during periods of staffing turnovers. 1.3 Period of Performance (PoP): The Period of Performance shall be 1 Base Year of 12 months and four 12-month option-years. 1.4 General Information: 1.4.1 Quality Control (QC): The contractor shall develop and keep an effective QC Plan (QCP) to ensure performance of services per this PWS. The contractor shall develop and implement procedures to identify, prevent, and ensure non-recurrence of defective services. The contractor’s QCP is how it assures itself that the work follows the requirements of the contract. At a minimum, the contractor shall develop QC procedures that address the areas outlined in Technical Exhibit 1, Performance Requirements Summary (PRS). The contractor shall send a final QCP to the Contracting Officer Representative (COR) not later than 10 days after the contract award. After acceptance of the QCP, the contractor shall obtain the Contracting Officer’s (KO’s) acceptance in writing of any proposed changes to its QCP. 1.4.2 Quality Assurance (QA): The Government will evaluate the contractor’s performance under this contract via the Quality Assurance Surveillance Plan (QASP). This plan is primarily focus",
+            "source": null
+          },
+          {
+            "text": ".3 Period of Performance (PoP): The Period of Performance shall be 1 Base Year of 12 months and four 12-month option-years. 1.4 General Information: 1.4.1 Quality Control (QC): The contractor shall develop and keep an effective QC Plan (QCP) to ensure performance of services per this PWS. The contractor shall develop and implement procedures to identify, prevent, and ensure non-recurrence of defective services. The contractor’s QCP is how it assures itself that the work follows the requirements of the contract. At a minimum, the contractor shall develop QC procedures that address the areas outlined in Technical Exhibit 1, Performance Requirements Summary (PRS). The contractor shall send a final QCP to the Contracting Officer Representative (COR) not later than 10 days after the contract award. After acceptance of the QCP, the contractor shall obtain the Contracting Officer’s (KO’s) acceptance in writing of any proposed changes to its QCP. 1.4.2 Quality Assurance (QA): The Government will evaluate the contractor’s performance under this contract via the Quality Assurance Surveillance Plan (QASP). This plan is primarily focused on what the Government will do to ensure that the contractor has performed in accordance with the performance standards. It defines the application of",
+            "source": null
+          },
+          {
+            "text": "Latvian National Armed Forces on behalf of the MING with a secondary duty to support the Bilateral Affairs Officer in the ODC. The contractor shall always maintain an adequate workforce for the uninterrupted performance of all tasks defined within this PWS when the Government facility/installation is not closed for the above reasons. When hiring personnel, the contractor must be mindful that the stability and continuity of the workforce are essential. Teleworking is authorized. 1.4.4.1 Telework: The Government may allow teleworking by contractor employees when determined to be in the best interest of the Government in meeting work requirements. In furtherance of Continuity of Operations Planning (COOP), a telework program may be enacted to ensure that the Government's mission-critical operations stay operational during times of national emergency or incidents of national significance. Telework shall be at no added cost to the Government. 1.4.4.2 Security Gates and Vehicle Operations: Unscheduled gate closures by the Security Police may occur at any time causing all personnel that are entering or exiting a closed installation to experience a delay. This cannot be predicted or prevented. Contractors are not compensated for unexpected closures or delays. Vehicles operated b",
+            "source": null
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "ayed in all correspondence types (to include signature blocks on e- mail) and dealings with Government or non-Government entities. Contractor personnel shall wear identification badges distinguishing themselves as such. The badges shall have the company name, employee name and the word “contractor” displayed. The contractor shall retrieve all identification media (including vehicle passes) from its employees who depart employment for any reason. The contractor shall return all 9 Ver. AUG 2025 identification media (i.e., badges and vehicles passes) to the KO within 14 days of an employee’s departure. 1.4.11. Combating Trafficking in Persons: The United States Government has adopted a zero-tolerance policy regarding trafficking in persons. Contractors and contractor employees shall not engage in trafficking of persons during the period of performance of the contract; procure commercial sex acts during the period of performance of the contract; or use forced labor in the performance of the contract. The Contractor shall notify its employees of the United States Government’s zero tolerance policy, the actions that will be taken against employees for violations of this policy. The contractor shall take appropriate action, up to and including termination, against employees o",
+            "source": null
+          },
+          {
+            "text": "nt or non-Government entities. Contractor personnel shall wear identification badges distinguishing themselves as such. The badges shall have the company name, employee name and the word “contractor” displayed. The contractor shall retrieve all identification media (including vehicle passes) from its employees who depart employment for any reason. The contractor shall return all 9 Ver. AUG 2025 identification media (i.e., badges and vehicles passes) to the KO within 14 days of an employee’s departure. 1.4.11. Combating Trafficking in Persons: The United States Government has adopted a zero-tolerance policy regarding trafficking in persons. Contractors and contractor employees shall not engage in trafficking of persons during the period of performance of the contract; procure commercial sex acts during the period of performance of the contract; or use forced labor in the performance of the contract. The Contractor shall notify its employees of the United States Government’s zero tolerance policy, the actions that will be taken against employees for violations of this policy. The contractor shall take appropriate action, up to and including termination, against employees or subcontractors that violate the US Government policy as described at FAR 22.17. 1.4.12 Travel:",
+            "source": null
+          },
+          {
+            "text": "persons. Contractors and contractor employees shall not engage in trafficking of persons during the period of performance of the contract; procure commercial sex acts during the period of performance of the contract; or use forced labor in the performance of the contract. The Contractor shall notify its employees of the United States Government’s zero tolerance policy, the actions that will be taken against employees for violations of this policy. The contractor shall take appropriate action, up to and including termination, against employees or subcontractors that violate the US Government policy as described at FAR 22.17. 1.4.12 Travel: Contractor Travel. A separate Not to Exceed (NTE) Contract Line-Item Number (CLIN) will be added to the contract to pay for travel expenses. The contractor shall travel to Lansing (MI), In/Around Latvia, and to USAREUR/EUCOM during the performance of this contract to attend meetings and planning sessions. 1.4.12.1 The contractor will be authorized travel expenses consistent with the substantive provisions of the Joint Travel Regulation (JTR) and the limitation of funds specified in this contract. All travel requires COR recommendation for approval and/or authorization by the KO prior to travel arrangements being made. 1.4.13",
+            "source": null
+          }
+        ],
+        "term_value": [
+          {
+            "text": "ssuance of an ID. The photo ID requirement cannot be waived, consistent with applicable statutory requirements. The Verification Officer will capture primary and alternate fingerprints, a picture, and updates to DEERS, and will then issue a CAC. Issued CACs will be valid for no longer than three years, or until the individual's contract ends (inclusive of any options), whichever is earlier. 1.4.5.1.4 Departure of Dismissal: The contractor shall return issued CACs to the DEERS office upon departure or dismissal of each contractor employee, and shall obtain receipt for each card and provide it to the TA/COR. 1.4.5.1.5 New CAC or Renewal: The contractor shall manage requests for new or renewal of CACs in sufficient time to ensure that all contractor employees have them when needed to perform work under this contract. The contractor shall provide at least 5 Ver. AUG 2025 10 calendar days advance notice to the TA, unless there are extenuating circumstances approved by the COR or KO. 1.4.5.1.6 The contractor shall obtain a “.mil” email address for each applicant, including subcontractors, who may be deployed or require logical access to a government computer network. Include this request on a DD 2875, System Authorization Access Request when requesting access to oth",
+            "source": null
+          },
+          {
+            "text": "d, consistent with applicable statutory requirements. The Verification Officer will capture primary and alternate fingerprints, a picture, and updates to DEERS, and will then issue a CAC. Issued CACs will be valid for no longer than three years, or until the individual's contract ends (inclusive of any options), whichever is earlier. 1.4.5.1.4 Departure of Dismissal: The contractor shall return issued CACs to the DEERS office upon departure or dismissal of each contractor employee, and shall obtain receipt for each card and provide it to the TA/COR. 1.4.5.1.5 New CAC or Renewal: The contractor shall manage requests for new or renewal of CACs in sufficient time to ensure that all contractor employees have them when needed to perform work under this contract. The contractor shall provide at least 5 Ver. AUG 2025 10 calendar days advance notice to the TA, unless there are extenuating circumstances approved by the COR or KO. 1.4.5.1.6 The contractor shall obtain a “.mil” email address for each applicant, including subcontractors, who may be deployed or require logical access to a government computer network. Include this request on a DD 2875, System Authorization Access Request when requesting access to other systems 1.4.5.2 RESERVED 1.4.5.3 Communications",
+            "source": null
+          },
+          {
+            "text": "wnership/copyright belonging exclusively to the Government. These documents and materials may not be used or sold by the contractor without written permission from the KO. All materials supplied to the Government shall be the sole property of the Government and may not be used for any other purpose. This right does not abrogate any other Government rights. 1.4.14 Organizational Conflicts of Interest (OCI): The contractor and subcontractor personnel performing services under this contract may receive, have access to or participate in the development of proprietary or source selection information (e.g., cost or pricing information, budget information or analyses, specifications or work statements, etc.) or perform evaluation services which may create a current or subsequent OCIs, as defined in FAR Subpart 9.5. The contractor shall notify the KO immediately whenever it becomes aware that such access or participation may result in any actual or potential OCI and shall promptly submit a plan to the KO to avoid or mitigate any such OCI. The contractor’s mitigation plan will be determined to be acceptable solely at the discretion of the KO. In the event the KO unilaterally determines that any such OCI cannot be satisfactorily avoided or mitigated, the KO may impose other r",
+            "source": null
+          }
+        ],
+        "award_criteria": [
+          {
+            "text": "===== FILE: files/Attachment_A_-_PWS.pdf ===== 1 Ver. AUG 2025 PERFORMANCE WORK STATEMENT (PWS) FOR Latvia Liaison to MIARNG (Overseas Deployment Training Coordination) Services 1.0 General: 1.1 Scope: The contractor shall provide all personnel, equipment, tools, materials, supervision, and quality control necessary, except as specified in paragraph 3.0 as government furnished, to perform liaison, training development, administration, and consultation services, as defined in this PWS. 1.2 Background: The Michigan National Guard (MING) and the Republic of Latvia have worked closely through the State Partnership Program (SPP) since 1993. This partnership increases the capability, readiness and lethality of both formations through the joint understanding, familiarization, and standardization of each other’s process and procedures. The partnership benefits from an ongoing liaison relationship that maintains continuity of efforts during periods of staffing turnovers. 1.3 Period of Performance (PoP): The Period of Performance shall be 1 Base Year of 12 months and four 12-month option-years. 1.4 General Information: 1.4.1 Quality Control (QC): The contractor shall develop and keep an effective QC Plan (QCP) to ensure performance of services per this PWS. The contractor shall develop and implement procedures to identify, prevent, and ensure non-recurrence of defective services. The con",
+            "source": null
+          },
+          {
+            "text": ") RECOMMENDED ): ALTERNATE E-MAIL: PRIMARY PHONE #: ALTERNATE PHONE#: ACTIO N REQ UESTED INVESTIGATION REQUIRED: PERIODIC REINVESTIGATION: YES □ NO □ INTERIM REQUIRED: YES □ NO □ FINGERPRINT INFORMATION FINGERPRINT APPOINTMENT (ONLY REQUIRED FOR INITIAL CLEARANCES): WITH: DATE: TIME:_______________________________ JUSTIFICATION/REASON FOR INVE STIGATION □ MOS CODE (MILITARY ONLY) (e.g., 96B): □ POSITION DESCRIPTION/DD2875(ATTACHED ) □ OTHER (PROVID E SPECI FIC DETAILS OF THE REQUI REMEN T): SUPERVISOR INFORMATION SUPERVISOR RANK: FIRST NAME: LAST NAME: TITLE: EMAIL ADDRESS: PHONE: REMARKS: I certify that this individual requires the background investigation for valid employment offer or mission requirements. SIGNATURE: ===== FILE: files/sam_http_resources.json ===== { \"notice_id\": \"1d438c4c08b0437596b5842dd0357b0a\", \"resources\": [ { \"resource_id\": \"896dabefc5084cc689023abc0f752c01\", \"name\": \"Attachment A - PWS.pdf\", \"access\": \"0\", \"deleted\": null, \"path\": \"root._embedded.opportunityAttachmentList[0].attachments[0]\" }, { \"resource_id\": \"57c82e5c197c44f0b9cc8047982485e5\", \"name\": \"Attachment B - Solicitation Provisions and Clauses.pdf\", \"access\": \"0\",",
+            "source": null
+          }
+        ],
+        "forms_signatures": [
+          {
+            "text": "contractor must be mindful that the stability and continuity of the workforce are essential. Teleworking is authorized. 1.4.4.1 Telework: The Government may allow teleworking by contractor employees when determined to be in the best interest of the Government in meeting work requirements. In furtherance of Continuity of Operations Planning (COOP), a telework program may be enacted to ensure that the Government's mission-critical operations stay operational during times of national emergency or incidents of national significance. Telework shall be at no added cost to the Government. 1.4.4.2 Security Gates and Vehicle Operations: Unscheduled gate closures by the Security Police may occur at any time causing all personnel that are entering or exiting a closed installation to experience a delay. This cannot be predicted or prevented. Contractors are not compensated for unexpected closures or delays. Vehicles operated by contractor personnel are subject to search pursuant to applicable regulations. Any moving violation of any applicable motor vehicle regulation may result in the termination of the contractor employee’s installation driving privileges. 1.4.4.3 Observing Installation Requirements: The contractor’s employees shall become familiar with and obey the regulations of the installation; including fire, traffic, safety, and security regulations while on the installation. Contr",
+            "source": null
+          },
+          {
+            "text": "INVESTIGATION: YES □ NO □ INTERIM REQUIRED: YES □ NO □ FINGERPRINT INFORMATION FINGERPRINT APPOINTMENT (ONLY REQUIRED FOR INITIAL CLEARANCES): WITH: DATE: TIME:_______________________________ JUSTIFICATION/REASON FOR INVE STIGATION □ MOS CODE (MILITARY ONLY) (e.g., 96B): □ POSITION DESCRIPTION/DD2875(ATTACHED ) □ OTHER (PROVID E SPECI FIC DETAILS OF THE REQUI REMEN T): SUPERVISOR INFORMATION SUPERVISOR RANK: FIRST NAME: LAST NAME: TITLE: EMAIL ADDRESS: PHONE: REMARKS: I certify that this individual requires the background investigation for valid employment offer or mission requirements. SIGNATURE: ===== FILE: files/sam_http_resources.json ===== { \"notice_id\": \"1d438c4c08b0437596b5842dd0357b0a\", \"resources\": [ { \"resource_id\": \"896dabefc5084cc689023abc0f752c01\", \"name\": \"Attachment A - PWS.pdf\", \"access\": \"0\", \"deleted\": null, \"path\": \"root._embedded.opportunityAttachmentList[0].attachments[0]\" }, { \"resource_id\": \"57c82e5c197c44f0b9cc8047982485e5\", \"name\": \"Attachment B - Solicitation Provisions and Clauses.pdf\", \"access\": \"0\", \"deleted\": null, \"path\": \"root._embedded.opportunityAttachmentList[0].attachments[1]\" }, { \"resource_id\": \"d222d7",
+            "source": null
+          }
+        ],
+        "submission": [
+          {
+            "text": "nd may be accepted. (3) Acceptable evidence to establish the time of receipt at the Government installation includes the time/date stamp of that installation on the offer wrapper, other documentary evidence of receipt maintained by the installation, or oral testimony or statements of Government personnel. (4) If an emergency or unanticipated event interrupts normal Government processes so that offers cannot be received at the Government office designated for receipt of offers by the exact time specified in the solicitation, and urgent Government requirements preclude amendment of the solicitation or other notice of an extension of the closing date, the time specified for receipt of offers will be deemed to be extended to the same time of day specified in the solicitation on the first work day on which normal Government processes resume. (5) Offers may be withdrawn by written notice received at any time before the exact time set for receipt of offers. Oral offers in response to oral solicitations may be withdrawn orally. If he solicitation authorizes facsimile offers, offers may be withdrawn via facsimile received at any time before the exact time set for receipt of offers, subject to the conditions specified in the solicitation concerning facsimile offers. An offer may be withd",
+            "source": null
+          },
+          {
+            "text": "the Acquisition of Covered Defense Telecommunications Equipment Services- Representation 252.204-7018 Prohibition on the Acquisition of Covered Defense Telecommunications Equipment Services 252.204-7019 Notice of NISTSP 900-171 DoD Assessment Requirements 252.204-7020 NIST SP 800-171DoD Assessment Requirements 252.204-7022 Expediting Contract Closeout 252.222-7999 Combating Race and Sex Stereotyping (Deviation 2021-O0001) (FT) 252.225-7048 Export-Controlled Items 252.225-7055 Representation Regarding Business Operations with the Maduro Regime 252.225-7056 Prohibition Regarding Business Operations with the Maduro Regime 252.232-7003 Electronic Submission of Payment Requests and Receiving Reports 252.232-7006 Wide Area Workflow Payment Instructions (fill in) 252.232-7010 Levies on Contract Payments 252.232-7017 Accelerating Payments to Small Business Subcontractors—Prohibition on Fees and Consideration 252.239-7001 Information Assurance Contractor Training and Certification 252.239-7098 Prohibition on Contracting to Maintain or Establish a Computer Network Unless Such Network is Designed to Block Access to Certain Websites—Representation (Deviation 2021-O0003)(April 2021) 252.247-7023 Transportation of Supplies by Sea Over $15,000 52.222-36 Equal Opportunity for Workers with Disa",
+            "source": null
+          }
+        ],
+        "ip_data_security": [
+          {
+            "text": "employees must always carry proper identification with them and shall be subject to 3 Ver. AUG 2025 such checks as may be deemed necessary. The contractor shall ensure compliance with all regulations and orders of the installation which may affect performance. The Government reserves the right to direct the removal of an employee for misconduct, security reasons, or any actions that can reasonably be seen as damaging to the relationship between MING and the Republic of Latvia. Removal of contractor employees for reasons stated above does not relieve the Contractor from responsibility for total performance of this contract. 1.4.5 Security Requirements: The contractor shall obey all applicable installation/facility access and local security policies and procedures. The COR can aid in obtaining these policies and procedures. The contractor and all associated subcontractor employees shall provide all information required for background checks to meet installation access requirements to be accomplished by installation Provost Marshal Office, Director of Emergency Services or Security Office. The contractor shall ensure compliance with all personal identity verification requirements as directed by Department of Defense (DoD), Headquarters Department of Army (HQDA) and/or local policy.",
+            "source": null
+          },
+          {
+            "text": "ernment networks is a revocable privilege, not a right. Users are the foundation of the DoD strategy, and their actions affect the most vulnerable portion of the Army Enterprise Infostructure (AEI). Contractor employees shall have a favorable background investigation or hold a security clearance and access approvals commensurate with the level of information processed or available on the system. Contractor employees shall: 1.4.5.4.1 Comply with the command's Acceptable Use Policy (AUP) for Government owned IS and sign an AUP prior to or upon account activation https://cs.signal.army.mil/. 1.4.5.4.2 Complete initial and/or annual Cyber Awareness training at https://cs.signal.army.mil/ 1.4.5.4.3 Mark and safeguard files, output products, and storage media per classification level and disseminate them only to individuals authorized to receive them with a valid need to know. 1.4.5.4.4 Protect IS and IS peripherals located in their respective areas in accordance with physical security and data protection requirements. 1.4.5.4.5 Practice safe network and Internet operating principles and take no actions that threaten the integrity of the system or network. 6 Ver. AUG 2025 1.4.5.5 RESERVED 1.4.5.6 AT Level 1 Awareness Training (AT): All contractor employee",
+            "source": null
+          },
+          {
+            "text": "ed or available on the system. Contractor employees shall: 1.4.5.4.1 Comply with the command's Acceptable Use Policy (AUP) for Government owned IS and sign an AUP prior to or upon account activation https://cs.signal.army.mil/. 1.4.5.4.2 Complete initial and/or annual Cyber Awareness training at https://cs.signal.army.mil/ 1.4.5.4.3 Mark and safeguard files, output products, and storage media per classification level and disseminate them only to individuals authorized to receive them with a valid need to know. 1.4.5.4.4 Protect IS and IS peripherals located in their respective areas in accordance with physical security and data protection requirements. 1.4.5.4.5 Practice safe network and Internet operating principles and take no actions that threaten the integrity of the system or network. 6 Ver. AUG 2025 1.4.5.5 RESERVED 1.4.5.6 AT Level 1 Awareness Training (AT): All contractor employees, including subcontractor employees, requiring access to Army installations, facilities, and controlled access areas shall complete Level 1 AT within 30 calendar days after contract start date and within 30 calendar days of new employees commencing performance. The contractor shall submit certificates of completion for each affected contractor and subcontractor employee to t",
+            "source": null
+          }
+        ]
+      },
+      "source_dce_run_id": 31916368034,
+      "source_shard": 18,
+      "hot_ready_at": "2026-08-16T00:06:42.167360+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": -27,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [
+        "security-clearance"
       ],
       "review_lane": "SPM_PRIORITY"
     },
