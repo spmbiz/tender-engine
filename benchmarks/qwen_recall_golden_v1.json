@@ -1,0 +1,51 @@
+{
+  "schema": "QWEN_RECALL_GOLDEN_SET_V1",
+  "purpose": "Block Qwen scale-out if known DCE-reviewed positives are rejected or if obvious non-digital modes pollute STRONG_FIT. High recall takes precedence over precision.",
+  "cases": [
+    {
+      "candidate_id": "IE:8670172",
+      "label": "DCE-reviewed strong digital positive: Animation and Software Development",
+      "expected": {"min_rank": "FIT", "allowed_modes": ["DIRECT_DIGITAL", "AI_ENABLED", "MIXED"], "must_not_reject": true}
+    },
+    {
+      "candidate_id": "PL-BZP:08def84e-fb8f-254e-962b-1200016e42b5",
+      "label": "DCE-reviewed digital positive: accessible web application",
+      "expected": {"min_rank": "FIT", "allowed_modes": ["DIRECT_DIGITAL", "AI_ENABLED", "MIXED", "SUBCONTRACTABLE"], "must_not_reject": true}
+    },
+    {
+      "candidate_id": "IE:8623183",
+      "label": "DCE-reviewed partnerable editorial/web-system positive",
+      "expected": {"min_rank": "MAYBE", "must_not_reject": true}
+    },
+    {
+      "candidate_id": "DE-DOE:224c8e0b-518e-4e73-9d21-9eda8db13c19:01",
+      "label": "Physical truck: retain for broker recall but never strong direct-digital",
+      "expected": {"max_rank": "FIT", "allowed_modes": ["BROKER_RESELL", "SUBCONTRACTABLE", "MIXED", "UNCLEAR"], "must_not_reject": true}
+    },
+    {
+      "candidate_id": "US-SAM:6c69d2cd760a40c08bfd29a4d4218b25",
+      "label": "Regulated methylphenidate: visible but never strong/easy from notice metadata",
+      "expected": {"exact_rank": "MAYBE", "allowed_modes": ["BROKER_RESELL", "UNCLEAR"], "must_not_reject": true}
+    },
+    {
+      "candidate_id": "TED:560598-2026",
+      "label": "Physical microscopes: retain for broker/resell but not strong direct-digital",
+      "expected": {"max_rank": "FIT", "allowed_modes": ["BROKER_RESELL", "SUBCONTRACTABLE", "MIXED", "UNCLEAR"], "must_not_reject": true}
+    },
+    {
+      "candidate_id": "US-SAM:d5c30c0b355d4a81ab4e4e2a16acbfc2",
+      "label": "Commercial parts: explicit broker/resell recall control",
+      "expected": {"max_rank": "FIT", "allowed_modes": ["BROKER_RESELL", "SUBCONTRACTABLE", "MIXED", "UNCLEAR"], "must_not_reject": true}
+    },
+    {
+      "candidate_id": "TED:564078-2026",
+      "label": "Heavy HVAC onsite: partnerable, not direct-digital strong",
+      "expected": {"max_rank": "FIT", "allowed_modes": ["SUBCONTRACTABLE", "MIXED", "UNCLEAR"], "must_not_reject": true}
+    },
+    {
+      "candidate_id": "US-SAM:3e996363f3f840c3b4bd786b9cdb985d",
+      "label": "Aviation Security Officer personal-services control",
+      "expected": {"allowed_ranks": ["REJECT_OBVIOUS", "MAYBE"]}
+    }
+  ]
+}
