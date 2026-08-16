@@ -48,9 +48,16 @@ jobs:
           set -euo pipefail
           rid="${INPUT_DCE_RUN_ID:-}"
           if ! [[ "$rid" =~ ^[0-9]+$ ]]; then
-            rid="$(gh run list --workflow dce-fanout-v2.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
+            rid=''
+            mapfile -t successful < <(gh run list --workflow dce-fanout-v2.yml --status success --limit 20 --json databaseId,createdAt --jq 'sort_by(.createdAt) | reverse | .[].databaseId')
+            for candidate in "${successful[@]}"; do
+              if gh release view "dce-harvest-$candidate" --json assets --jq '.assets[].name' 2>/dev/null | grep -Fxq "dce-candidate-queue-$candidate.jsonl"; then
+                rid="$candidate"
+                break
+              fi
+            done
           fi
-          [[ "$rid" =~ ^[0-9]+$ ]] || { echo 'No successful DCE run available for progress ledger.' >&2; exit 1; }
+          [[ "$rid" =~ ^[0-9]+$ ]] || { echo 'No successful durable DCE run available for progress ledger.' >&2; exit 1; }
           tag="dce-harvest-$rid"
           asset="dce-candidate-queue-$rid.jsonl"
           summary="${asset}.summary.json"
