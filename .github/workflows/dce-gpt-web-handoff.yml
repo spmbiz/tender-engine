@@ -1,0 +1,116 @@
+name: DCE GPT Web Handoff
+
+on:
+  workflow_run:
+    workflows: ["DCE Fanout V2"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      source_run:
+        description: DCE Fanout V2 run ID to recover into the persistent GPT Web review bank
+        required: false
+        default: '31941279207'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dce-gpt-web-handoff.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dce-gpt-web-handoff
+  cancel-in-progress: false
+
+jobs:
+  build-handoff:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Resolve source DCE run
+        id: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            run_id='${{ github.event.workflow_run.id }}'
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            run_id='${{ github.event.inputs.source_run }}'
+          else
+            run_id='31941279207'
+          fi
+          test -n "$run_id"
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "Recovering DCE run $run_id"
+      - name: Download existing deep-review pack only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ steps.source.outputs.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="dce-harvest-${SOURCE_RUN}"
+          asset="dce-deep-review-${SOURCE_RUN}.tar.gz"
+          mkdir -p recovered
+          gh release download "$tag" --pattern "$asset" --dir recovered
+          test -s "recovered/$asset"
+          mkdir -p recovered/extracted
+          tar -xzf "recovered/$asset" -C recovered/extracted
+          queue="$(find recovered/extracted -type f -name deep_review_queue.jsonl -print -quit)"
+          test -n "$queue"
+          echo "REVIEW_QUEUE=$queue" >> "$GITHUB_ENV"
+          echo "Found existing review queue: $queue"
+      - name: Build persistent GPT Web review bank without any model API
+        env:
+          SOURCE_RUN: ${{ steps.source.outputs.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/build_gpt_web_review_bank.py \
+            --queue "$REVIEW_QUEUE" \
+            --existing control/gpt_review_pending.json \
+            --out control/gpt_review_pending.json \
+            --run-id "$SOURCE_RUN" \
+            --max-items 240
+          python - <<'PY'
+          import json
+          p='control/gpt_review_pending.json'
+          x=json.load(open(p,encoding='utf-8'))
+          print(json.dumps({
+              'schema':x.get('schema'),
+              'latest_source_dce_run_id':x.get('latest_source_dce_run_id'),
+              'incoming_gate_ready':x.get('incoming_gate_ready'),
+              'pending_total':x.get('count'),
+          }, indent=2))
+          PY
+      - name: Persist handoff for GPT Web
+        env:
+          SOURCE_RUN: ${{ steps.source.outputs.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add control/gpt_review_pending.json
+          if git diff --cached --quiet; then
+            echo 'No handoff delta to persist.'
+            exit 0
+          fi
+          git commit -m "Persist GPT Web DCE review bank from ${SOURCE_RUN}"
+          for attempt in 1 2 3 4; do
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            git fetch origin main
+            git rebase origin/main
+            sleep "$((attempt * 2))"
+          done
+          echo 'Unable to persist GPT Web handoff after retries' >&2
+          exit 1
