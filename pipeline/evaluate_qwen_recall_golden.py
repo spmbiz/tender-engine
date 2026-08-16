@@ -17,15 +17,22 @@ def load_jsonl(path: Path) -> dict[str, dict[str, Any]]:
             if not line:
                 continue
             row = json.loads(line)
-            cid = str(row.get("canonical_notice_id") or "").strip()
+            cid = str(row.get("canonical_notice_id") or row.get("id") or "").strip()
             if cid:
                 out[cid] = row
     return out
 
 
+def normalized_fields(row: dict[str, Any]) -> tuple[str, str]:
+    classification = str(row.get("classification") or row.get("decision") or "").upper()
+    mode = str(row.get("delivery_mode") or row.get("possible_delivery_route") or "").upper()
+    return classification, mode
+
+
 def evaluate(golden: dict[str, Any], rows: dict[str, dict[str, Any]]) -> dict[str, Any]:
     cases_out: list[dict[str, Any]] = []
     failures: list[str] = []
+    warnings: list[str] = []
     positive_total = 0
     positive_retained = 0
 
@@ -34,14 +41,17 @@ def evaluate(golden: dict[str, Any], rows: dict[str, dict[str, Any]]) -> dict[st
         expected = case.get("expected") or {}
         row = rows.get(cid)
         checks: list[dict[str, Any]] = []
+        case_warnings: list[dict[str, Any]] = []
         passed = True
         if row is None:
             failures.append(f"missing_result:{cid}")
             cases_out.append({"candidate_id": cid, "label": case.get("label"), "passed": False, "checks": [{"check": "present", "passed": False}]})
             continue
 
-        classification = str(row.get("classification") or "").upper()
-        mode = str(row.get("delivery_mode") or "").upper()
+        classification, mode = normalized_fields(row)
+        lean = str(row.get("lean_attractiveness") or "UNKNOWN").upper()
+        friction = [str(x).upper() for x in (row.get("friction_flags") or [])]
+
         if expected.get("must_not_reject"):
             positive_total += 1
             ok = classification != "REJECT_OBVIOUS"
@@ -70,6 +80,24 @@ def evaluate(golden: dict[str, Any], rows: dict[str, dict[str, Any]]) -> dict[st
             ok = mode in allowed_modes
             checks.append({"check": "allowed_modes", "expected": allowed_modes, "actual": mode, "passed": ok})
             passed &= ok
+        if "preferred_modes" in expected:
+            preferred = [str(x) for x in expected["preferred_modes"]]
+            ok = mode in preferred
+            item = {"check": "preferred_modes", "expected": preferred, "actual": mode, "passed": ok, "severity": "warning"}
+            case_warnings.append(item)
+            if not ok:
+                warnings.append(f"preferred_mode_mismatch:{cid}:{mode}")
+        if "allowed_lean" in expected:
+            allowed_lean = [str(x) for x in expected["allowed_lean"]]
+            ok = lean in allowed_lean
+            checks.append({"check": "allowed_lean", "expected": allowed_lean, "actual": lean, "passed": ok})
+            passed &= ok
+        if "required_friction_any" in expected:
+            required = [str(x) for x in expected["required_friction_any"]]
+            hits = sorted(set(required) & set(friction))
+            ok = bool(hits)
+            checks.append({"check": "required_friction_any", "expected": required, "actual": friction, "hits": hits, "passed": ok})
+            passed &= ok
 
         if not passed:
             failures.append(f"policy_failure:{cid}")
@@ -78,15 +106,18 @@ def evaluate(golden: dict[str, Any], rows: dict[str, dict[str, Any]]) -> dict[st
             "label": case.get("label"),
             "classification": classification,
             "delivery_mode": mode,
+            "lean_attractiveness": lean,
+            "friction_flags": friction,
             "model_classification": row.get("model_classification"),
             "model_delivery_mode": row.get("model_delivery_mode"),
             "passed": bool(passed),
             "checks": checks,
+            "warnings": case_warnings,
         })
 
     recall = positive_retained / positive_total if positive_total else None
     return {
-        "schema": "QWEN_RECALL_GOLDEN_REPORT_V1",
+        "schema": "QWEN_RECALL_GOLDEN_REPORT_V3",
         "golden_schema": golden.get("schema"),
         "case_count": len(golden.get("cases", [])),
         "cases_passed": sum(1 for c in cases_out if c["passed"]),
@@ -94,6 +125,8 @@ def evaluate(golden: dict[str, Any], rows: dict[str, dict[str, Any]]) -> dict[st
         "known_positive_recall": recall,
         "known_positive_retained": positive_retained,
         "known_positive_total": positive_total,
+        "quality_warning_count": len(warnings),
+        "quality_warnings": warnings,
         "scale_out_gate": "PASS" if not failures and recall == 1.0 else "BLOCK",
         "failures": failures,
         "cases": cases_out,

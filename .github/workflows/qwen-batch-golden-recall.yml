@@ -1,0 +1,162 @@
+name: Qwen Batch Golden Recall
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'control/qwen_batch_golden_trigger.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qwen-batch-golden-recall
+  cancel-in-progress: false
+
+jobs:
+  golden:
+    strategy:
+      fail-fast: false
+      matrix:
+        batch_size: [8, 16]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download current durable classification queue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ledger
+          gh release download notice-intelligence-ledger-latest \
+            --pattern notice-classification-queue-latest.jsonl.gz \
+            --dir ledger
+          test -s ledger/notice-classification-queue-latest.jsonl.gz
+
+      - name: Materialize exact DCE-grounded golden rows
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import gzip,json,pathlib
+          golden=json.load(open('benchmarks/qwen_batch_recall_golden_v1.json',encoding='utf-8'))
+          wanted={x['candidate_id'] for x in golden['cases']}
+          found={}
+          with gzip.open('ledger/notice-classification-queue-latest.jsonl.gz','rt',encoding='utf-8') as fh:
+              for line in fh:
+                  row=json.loads(line)
+                  cid=str(row.get('canonical_notice_id') or (row.get('notice') or {}).get('candidate_id') or '')
+                  if cid in wanted: found[cid]=row
+          missing=sorted(wanted-set(found))
+          if missing: raise SystemExit(f'Golden candidates missing: {missing}')
+          with open('golden-queue.jsonl','w',encoding='utf-8') as out:
+              for cid in sorted(found): out.write(json.dumps(found[cid],ensure_ascii=False,separators=(',',':'))+'\n')
+          pathlib.Path('golden-input-manifest.json').write_text(json.dumps({'schema':'QWEN_BATCH_GOLDEN_INPUT_V1','count':len(found),'candidate_ids':sorted(found)},indent=2)+'\n')
+          PY
+
+      - name: Install llama.cpp CPU runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p llama-dist
+          gh api 'repos/ggml-org/llama.cpp/releases?per_page=20' > /tmp/releases.json
+          readarray -t picked < <(python - <<'PY'
+          import json,re
+          for rel in json.load(open('/tmp/releases.json')):
+              if rel.get('draft') or rel.get('prerelease'): continue
+              for a in rel.get('assets',[]):
+                  if re.fullmatch(r'llama-.*-bin-ubuntu-x64\.tar\.gz',a.get('name','')):
+                      print(rel['tag_name']); print(a['name']); raise SystemExit
+          raise SystemExit('no llama asset')
+          PY
+          )
+          gh release download "${picked[0]}" --repo ggml-org/llama.cpp --pattern "${picked[1]}" --dir llama-dist
+          tar -xzf "llama-dist/${picked[1]}" -C llama-dist
+          server="$(find llama-dist -type f -name llama-server -perm -u+x -print -quit)"
+          test -n "$server"
+          echo "LLAMA_SERVER=$server" >> "$GITHUB_ENV"
+
+      - name: Start Qwen3 4B once
+        shell: bash
+        run: |
+          set -euo pipefail
+          start="$(date +%s)"
+          "$LLAMA_SERVER" -hf Qwen/Qwen3-4B-GGUF:Q4_K_M \
+            --host 127.0.0.1 --port 8080 --jinja -c 8192 -t 4 > qwen-server.log 2>&1 &
+          echo $! > qwen-server.pid
+          for i in $(seq 1 180); do
+            curl -fsS http://127.0.0.1:8080/health >/dev/null 2>&1 && break
+            kill -0 "$(cat qwen-server.pid)" >/dev/null 2>&1 || { tail -200 qwen-server.log; exit 1; }
+            sleep 3
+          done
+          curl -fsS http://127.0.0.1:8080/health >/dev/null
+          echo "QWEN_STARTUP_SECONDS=$(($(date +%s)-start))" >> "$GITHUB_ENV"
+
+      - name: Run lean-axis batch classifier on golden set
+        shell: bash
+        run: |
+          set -euo pipefail
+          b='${{ matrix.batch_size }}'
+          n="$(wc -l < golden-queue.jsonl)"
+          python pipeline/qwen_notice_batch_benchmark.py \
+            --queue golden-queue.jsonl \
+            --out "golden-batch-${b}-results.jsonl" \
+            --summary "golden-batch-${b}-summary.json" \
+            --batch-size "$b" \
+            --sample-size "$n" \
+            --source-ledger-generation golden-live-ledger \
+            --description-chars 900 \
+            --max-tokens 1200 \
+            --timeout 300 \
+            --startup-seconds "$QWEN_STARTUP_SECONDS"
+
+      - name: Stop model
+        if: always()
+        shell: bash
+        run: |
+          [ -s qwen-server.pid ] && kill "$(cat qwen-server.pid)" >/dev/null 2>&1 || true
+
+      - name: Enforce recall plus lean-axis golden policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          b='${{ matrix.batch_size }}'
+          python pipeline/evaluate_qwen_recall_golden.py \
+            --golden benchmarks/qwen_batch_recall_golden_v1.json \
+            --results "golden-batch-${b}-results.jsonl" \
+            --report "golden-batch-${b}-report.json"
+
+      - name: Upload golden evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-batch-${{ matrix.batch_size }}-golden-${{ github.run_id }}
+          path: |
+            benchmarks/qwen_batch_recall_golden_v1.json
+            golden-input-manifest.json
+            golden-batch-${{ matrix.batch_size }}-results.jsonl
+            golden-batch-${{ matrix.batch_size }}-summary.json
+            golden-batch-${{ matrix.batch_size }}-report.json
+            qwen-server.log
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          f='golden-batch-${{ matrix.batch_size }}-report.json'
+          if [ -s "$f" ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat "$f" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
