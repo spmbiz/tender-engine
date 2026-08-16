@@ -1,0 +1,122 @@
+name: Focus DCE Review
+
+on:
+  workflow_dispatch:
+    inputs:
+      dce_run_id:
+        description: Durable DCE harvest run ID containing the candidate pack
+        required: true
+      candidate_id:
+        description: Exact canonical candidate ID, e.g. IE:8670172
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: '1'
+
+jobs:
+  focus:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Resolve exact canonical candidate pack
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DCE_RUN_ID: ${{ github.event.inputs.dce_run_id }}
+          CANDIDATE_ID: ${{ github.event.inputs.candidate_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$DCE_RUN_ID" =~ ^[0-9]+$ ]] || { echo "Invalid DCE run ID" >&2; exit 2; }
+          [ -n "$CANDIDATE_ID" ] || { echo "candidate_id required" >&2; exit 2; }
+          tag="dce-harvest-$DCE_RUN_ID"
+          mkdir -p focus-download focus-extracted focus-output
+          gh release download "$tag" --pattern 'dce-canonical-packs-manifest.json' --dir focus-download
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          from pathlib import Path
+          from pipeline.durable_dce_pack import slugify
+
+          cid = os.environ['CANDIDATE_ID']
+          manifest = json.loads(Path('focus-download/dce-canonical-packs-manifest.json').read_text(encoding='utf-8'))
+          target = f"candidate-{slugify(cid)}.tar.gz"
+          found = None
+          for bundle in manifest.get('bundles') or []:
+              names = {str(m.get('name') or '') for m in (bundle.get('members') or []) if isinstance(m, dict)}
+              if target in names:
+                  found = str(bundle.get('file') or '')
+                  break
+          if not found:
+              raise SystemExit(f"Candidate archive {target!r} not found in durable bundle manifest")
+          print(f"tag=dce-harvest-{os.environ['DCE_RUN_ID']}")
+          print(f"bundle={found}")
+          print(f"archive={target}")
+          print(f"slug={slugify(cid)}")
+          PY
+
+      - name: Download only the bundle containing the requested candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.resolve.outputs.tag }}
+          BUNDLE: ${{ steps.resolve.outputs.bundle }}
+          ARCHIVE: ${{ steps.resolve.outputs.archive }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release download "$TAG" --pattern "$BUNDLE" --dir focus-download
+          tar -xf "focus-download/$BUNDLE" -C focus-download "$ARCHIVE"
+          tar -xzf "focus-download/$ARCHIVE" -C focus-extracted
+          test -s focus-extracted/corpus.txt
+          test -s focus-extracted/manifest.json
+          test -s focus-extracted/evidence_quality.json
+
+      - name: Build full focused ChatGPT review packet
+        env:
+          DCE_RUN_ID: ${{ github.event.inputs.dce_run_id }}
+          CANDIDATE_ID: ${{ github.event.inputs.candidate_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/build_focus_dce_review.py \
+            --root focus-extracted \
+            --candidate-id "$CANDIDATE_ID" \
+            --source-run "$DCE_RUN_ID" \
+            --out focus-output/focus_dce_review.json \
+            | tee focus-output/build_summary.json
+          cp focus-extracted/corpus.txt focus-output/corpus.txt
+          for f in candidate.json manifest.json document_index.json evidence_quality.json gate_snippets.json authority_conflicts.json _canonical_pack_manifest.json ted_resolution.json portal_page.txt; do
+            [ -f "focus-extracted/$f" ] && cp "focus-extracted/$f" focus-output/ || true
+          done
+          if [ -d focus-extracted/originals ]; then
+            cp -a focus-extracted/originals focus-output/originals
+          fi
+
+      - name: Publish short-lived focused DCE packet for ChatGPT
+        uses: actions/upload-artifact@v4
+        with:
+          name: focus-dce-${{ github.event.inputs.dce_run_id }}-${{ steps.resolve.outputs.slug }}
+          path: focus-output/
+          retention-days: 3
+          if-no-files-found: error
+          compression-level: 1
+
+      - name: Focus review summary
+        shell: bash
+        run: |
+          echo "### Focus DCE ready" >> "$GITHUB_STEP_SUMMARY"
+          echo "- candidate: ${{ github.event.inputs.candidate_id }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- source DCE run: ${{ github.event.inputs.dce_run_id }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- artifact: focus-dce-${{ github.event.inputs.dce_run_id }}-${{ steps.resolve.outputs.slug }}" >> "$GITHUB_STEP_SUMMARY"
+          cat focus-output/build_summary.json >> "$GITHUB_STEP_SUMMARY"
