@@ -15,8 +15,6 @@ on:
 permissions:
   contents: read
 
-# v2 uses a separate group so an already-running v1 smoke is allowed to finish and
-# preserve its evidence instead of being cancelled destructively.
 concurrency:
   group: qwen-notice-shadow-smoke-v2
   cancel-in-progress: false
@@ -63,14 +61,19 @@ jobs:
             --dir ledger
           test -s ledger/notice-classification-queue-latest.jsonl.gz
           test -s ledger/notice-ledger-summary-latest.json
-          generation="$(python - <<'PY'
-          import json
-          x=json.load(open('ledger/notice-ledger-summary-latest.json'))
-          print(x.get('source_run') or x.get('snapshot_run_id') or x.get('run_id') or 'UNKNOWN')
-          PY
-          )"
+
+          # The stable release title/body is the authoritative generation pointer.
+          # The summary schema intentionally does not guarantee a source_run field.
+          release_name="$(gh release view notice-intelligence-ledger-latest --json name --jq '.name')"
+          generation="$(grep -oE '[0-9]{8,}' <<< "$release_name" | tail -n1)"
+          if [[ ! "$generation" =~ ^[0-9]+$ ]]; then
+            release_body="$(gh release view notice-intelligence-ledger-latest --json body --jq '.body')"
+            generation="$(grep -oE 'run=[0-9]+' <<< "$release_body" | head -n1 | cut -d= -f2)"
+          fi
+          [[ "$generation" =~ ^[0-9]+$ ]] || { echo "Could not resolve ledger generation" >&2; exit 1; }
           echo "SOURCE_LEDGER_GENERATION=$generation" >> "$GITHUB_ENV"
           sha256sum ledger/notice-classification-queue-latest.jsonl.gz > ledger/INPUT_SHA256.txt
+          printf '%s\n' "$generation" > ledger/SOURCE_LEDGER_GENERATION.txt
 
       - name: Install latest usable llama.cpp Ubuntu x64 CPU binary
         env:
@@ -164,7 +167,7 @@ jobs:
           python - <<'PY'
           import hashlib,json,pathlib,os
           files=[]
-          for name in ('qwen-shadow-results.jsonl','qwen-shadow-summary.json','qwen-server.log','ledger/INPUT_SHA256.txt'):
+          for name in ('qwen-shadow-results.jsonl','qwen-shadow-summary.json','qwen-server.log','ledger/INPUT_SHA256.txt','ledger/SOURCE_LEDGER_GENERATION.txt'):
               p=pathlib.Path(name)
               if not p.is_file(): continue
               h=hashlib.sha256(p.read_bytes()).hexdigest()
@@ -189,6 +192,7 @@ jobs:
             qwen-server.log
             qwen-shadow-evidence-manifest.json
             ledger/INPUT_SHA256.txt
+            ledger/SOURCE_LEDGER_GENERATION.txt
           if-no-files-found: warn
           retention-days: 7
 
