@@ -3,8 +3,11 @@ from __future__ import annotations
 from pipeline.build_gpt_review_backlog import compact_row, portfolio_select
 
 
-def _row(cid: str, portal: str, title: str, text: str = "", coverage: int = 10):
-    gates = {f"gate_{i}": [{"text": text or f"evidence {i}"}] for i in range(coverage)}
+def _row(cid: str, portal: str, title: str, text: str = "", coverage: int = 10, snippet_shape: bool = False):
+    if snippet_shape:
+        gates = {f"gate_{i}": [{"snippet": text or f"evidence {i}", "match": "signal"}] for i in range(coverage)}
+    else:
+        gates = {f"gate_{i}": [{"text": text or f"evidence {i}"}] for i in range(coverage)}
     return {
         "candidate_id": cid,
         "title": title,
@@ -27,6 +30,13 @@ def test_compact_row_keeps_authoritative_evidence_and_source_run():
     assert row["candidate_document_relevance"]["proven"] is True
     assert row["spm_fit_band"] in {"HOT", "GOOD"}
     assert row["evidence_gate_coverage"] == 10
+
+
+def test_compact_row_accepts_real_aggregate_snippet_shape():
+    row = compact_row(_row("FR:1", "FR_BOAMP", "Graphic design services", snippet_shape=True), "124")
+    assert row is not None
+    assert row["evidence_gate_coverage"] == 10
+    assert row["evidence_by_gate"]["gate_0"][0]["text"] == "evidence 0"
 
 
 def test_unproven_document_never_enters_backlog():
