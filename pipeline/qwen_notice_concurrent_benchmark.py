@@ -9,21 +9,40 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
-from pipeline.qwen_notice_shadow_classifier import (
-    CLASSIFIER_VERSION,
-    SYSTEM,
-    PROMPT_VERSION,
-    candidate_id,
-    classifier_input_hash,
-    compact_notice,
-    deterministic_sample,
-    extract_object,
-    iter_jsonl,
-    material_hash,
-    normalize,
-    post_json,
-    user_prompt,
-)
+try:
+    from pipeline.qwen_notice_shadow_classifier import (
+        CLASSIFIER_VERSION,
+        SYSTEM,
+        PROMPT_VERSION,
+        candidate_id,
+        classifier_input_hash,
+        compact_notice,
+        deterministic_sample,
+        extract_object,
+        iter_jsonl,
+        material_hash,
+        normalize,
+        post_json,
+        user_prompt,
+    )
+except ModuleNotFoundError:
+    # `python pipeline/qwen_notice_concurrent_benchmark.py` puts the pipeline
+    # directory on sys.path, so support direct execution as well as module import.
+    from qwen_notice_shadow_classifier import (
+        CLASSIFIER_VERSION,
+        SYSTEM,
+        PROMPT_VERSION,
+        candidate_id,
+        classifier_input_hash,
+        compact_notice,
+        deterministic_sample,
+        extract_object,
+        iter_jsonl,
+        material_hash,
+        normalize,
+        post_json,
+        user_prompt,
+    )
 
 SCHEMA = "QWEN_NOTICE_CONCURRENT_SHADOW_V2"
 
