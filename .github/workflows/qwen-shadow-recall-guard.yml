@@ -9,13 +9,17 @@ on:
       source_run_id:
         description: Qwen smoke run ID to guard
         required: true
+  push:
+    branches: [main]
+    paths:
+      - 'control/qwen_guard_trigger.json'
 
 permissions:
   actions: read
   contents: write
 
 concurrency:
-  group: qwen-shadow-recall-guard-${{ github.event.workflow_run.id || github.event.inputs.source_run_id }}
+  group: qwen-shadow-recall-guard-${{ github.event.workflow_run.id || github.event.inputs.source_run_id || github.run_id }}
   cancel-in-progress: false
 
 jobs:
@@ -35,8 +39,17 @@ jobs:
             run_id='${{ github.event.workflow_run.id }}'
             conclusion='${{ github.event.workflow_run.conclusion }}'
             head_sha='${{ github.event.workflow_run.head_sha }}'
-          else
+          elif [ '${{ github.event_name }}' = 'workflow_dispatch' ]; then
             run_id='${{ github.event.inputs.source_run_id }}'
+            conclusion="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}" --jq '.conclusion // "unknown"')"
+            head_sha="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}" --jq '.head_sha')"
+          else
+            run_id="$(python - <<'PY'
+          import json
+          x=json.load(open('control/qwen_guard_trigger.json'))
+          print(x['source_run_id'])
+          PY
+          )"
             conclusion="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}" --jq '.conclusion // "unknown"')"
             head_sha="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}" --jq '.head_sha')"
           fi
