@@ -1,0 +1,276 @@
+{
+  "schema_version": 1,
+  "purpose": "Machine-readable implementation state for skills/oss-provider-expansion/SKILL.md. Presence here never implies live validation.",
+  "status_semantics": {
+    "LIVE_EXISTING": "Implementation already exists in tender-engine; live validation remains a separate measured state.",
+    "SHADOW_ADDED": "Additive non-destructive integration added; not allowed to alter canonical truth automatically.",
+    "AUTHORIZED_IMPORT": "Usable only through an authorized/account-based official data export or credentialed API.",
+    "PENDING_IMPLEMENTATION": "High-value source/repo identified but no production adapter is claimed.",
+    "PENDING_AUTH": "Source exists but credentials/registration/access are required; no bypass is attempted.",
+    "REFERENCE_ONLY": "Architecture/QA/reference implementation; intentionally not a production dependency."
+  },
+  "entries": [
+    {
+      "key": "BE_BCE_KBO",
+      "country": "BE",
+      "priority": "P0_CROSS_CUTTING",
+      "role": "buyer_supplier_identity",
+      "status": "AUTHORIZED_IMPORT",
+      "official": "https://economie.fgov.be/fr/themes/entreprises/banque-carrefour-des/services-pour-tous/reutilisation-de-donnees/banque-carrefour-des-0",
+      "implementation": "pipeline/entity_resolution_shadow.py",
+      "notes": "Normalize exact 10-digit BCE/KBO enterprise IDs. Bulk enrichment must use official reusable Open Data / authorized access, never systematic Public Search scraping."
+    },
+    {
+      "key": "SPLINK_ENTITY_RESOLUTION",
+      "priority": "P0_CROSS_CUTTING",
+      "role": "probabilistic_entity_resolution",
+      "status": "SHADOW_ADDED",
+      "upstream": "https://github.com/moj-analytical-services/splink",
+      "implementation": "pipeline/entity_resolution_shadow.py",
+      "notes": "Exact legal IDs may auto-link; Splink suggestions never auto-merge procurement identities."
+    },
+    {
+      "key": "DOCLING_DCE",
+      "priority": "P0_CROSS_CUTTING",
+      "role": "deep_document_parsing",
+      "status": "SHADOW_ADDED",
+      "upstream": "https://github.com/docling-project/docling",
+      "implementation": "pipeline/docling_deep_parser.py",
+      "hook": "pipeline/extract_corpus.py",
+      "notes": "Native extraction remains fast path; Docling is a low-yield/error fallback and preserves source hashes."
+    },
+    {
+      "key": "MA_PMMP",
+      "country": "MA",
+      "priority": "P0",
+      "role": "notice_and_dce",
+      "status": "PENDING_IMPLEMENTATION",
+      "official": "https://www.marchespublics.gov.ma/",
+      "upstream": "https://github.com/automatebdarija/pmmp-scraper",
+      "notes": "Public consultation pages exist; DCE/account-only routes must remain explicit PENDING_AUTH/AUTH_REQUIRED and never be bypassed."
+    },
+    {
+      "key": "CH_SIMAP",
+      "country": "CH",
+      "priority": "P0",
+      "role": "notice",
+      "status": "LIVE_EXISTING",
+      "upstream": "https://github.com/Digilac/simap-mcp",
+      "implementation": "pipeline/discover_ch_simap.py"
+    },
+    {
+      "key": "CH_PUBLIC_DATA_ENRICHMENT",
+      "country": "CH",
+      "priority": "P2",
+      "role": "entity_enrichment_reference",
+      "status": "REFERENCE_ONLY",
+      "upstream": "https://github.com/malkreide/swiss-public-data-mcp"
+    },
+    {
+      "key": "NO_DOFFIN",
+      "country": "NO",
+      "priority": "P0",
+      "role": "notice",
+      "status": "LIVE_EXISTING",
+      "implementation": "pipeline/discover_no_doffin.py",
+      "references": [
+        "https://github.com/EnzoConsulting/doffin-dashboard",
+        "https://github.com/anskaffelser/eforms-sdk-nor",
+        "https://github.com/reidar80/DoffinMCP"
+      ]
+    },
+    {
+      "key": "DE_OEFFENTLICHEVERGABE",
+      "country": "DE",
+      "priority": "P0",
+      "role": "notice",
+      "status": "LIVE_EXISTING",
+      "implementation": "pipeline/discover_de_doe_csv.py",
+      "upstream": "https://github.com/leelesemann-sys/vergabe-radar"
+    },
+    {
+      "key": "FR_BOAMP",
+      "country": "FR",
+      "priority": "P0",
+      "role": "live_notice",
+      "status": "LIVE_EXISTING",
+      "implementation": "pipeline/discover_global_official.py",
+      "references": [
+        "https://github.com/stefw/boamp-server",
+        "https://github.com/OneNicolas/mcp-service-public"
+      ]
+    },
+    {
+      "key": "FR_DECP",
+      "country": "FR",
+      "priority": "P0",
+      "role": "historical_award_buyer_supplier_prior",
+      "status": "PENDING_IMPLEMENTATION",
+      "upstream": "https://github.com/mdaoudi-de/hackathon-an-2026-vigie-marches",
+      "notes": "Keep historical award intelligence separate from live eligibility facts; join by SIRET/procedure evidence when available."
+    },
+    {
+      "key": "PT_BASE",
+      "country": "PT",
+      "priority": "P0",
+      "role": "notice_and_history",
+      "status": "LIVE_EXISTING",
+      "implementation": "pipeline/discover_pt_base_open.py",
+      "upstream": "https://github.com/chicoferreira/contratopublico"
+    },
+    {
+      "key": "EE_RHR",
+      "country": "EE",
+      "priority": "P0",
+      "role": "notice_and_document_route",
+      "status": "PENDING_IMPLEMENTATION",
+      "official": "https://riigihanked.riik.ee/rhr/",
+      "upstream": "https://github.com/keeltekool/hanke-radar",
+      "notes": "Official public notice endpoints exist; implement cheap bulk/list discovery before expensive detail expansion."
+    },
+    {
+      "key": "AU_AUSTENDER",
+      "country": "AU",
+      "priority": "P0",
+      "role": "federal_notice",
+      "status": "LIVE_EXISTING",
+      "implementation": "pipeline/discover_global_official.py",
+      "upstream": "https://github.com/austender/austender-ocds-api"
+    },
+    {
+      "key": "AU_NSW_ETENDERING",
+      "country": "AU-NSW",
+      "priority": "P0",
+      "role": "notice_contract_planned_procurement",
+      "status": "PENDING_AUTH",
+      "official": "https://api.nsw.gov.au/",
+      "upstream": "https://github.com/NSW-eTendering/NSW-eTendering-API",
+      "notes": "Current API uses client-credential access. Planned procurement is strategically valuable as pre-tender radar; do not embed credentials in the public repo."
+    },
+    {
+      "key": "AT_OFFENEVERGABEN",
+      "country": "AT",
+      "priority": "P1",
+      "role": "notice",
+      "status": "LIVE_EXISTING",
+      "implementation": "pipeline/discover_at_datagv.py",
+      "upstream": "https://github.com/Forum-Informationsfreiheit/OffeneVergaben-Scraper"
+    },
+    {
+      "key": "PL_BZP",
+      "country": "PL",
+      "priority": "P1",
+      "role": "notice",
+      "status": "LIVE_EXISTING",
+      "implementation": "pipeline/discover_pl_bzp.py",
+      "references": [
+        "https://github.com/atlasprzetargow/mcp-server",
+        "https://github.com/atlasprzetargow/polish-tenders-dataset"
+      ]
+    },
+    {
+      "key": "BR_PNCP_PCA",
+      "country": "BR",
+      "priority": "P1",
+      "role": "notice_award_planned_procurement",
+      "status": "PENDING_IMPLEMENTATION",
+      "references": [
+        "https://github.com/Licinexus/licinexus-mcp",
+        "https://github.com/Mcp-Brasil/mcp-brasil"
+      ],
+      "notes": "PCA/planning records belong in a PRE_TENDER_RADAR grain, not mixed into live notice counts."
+    },
+    {
+      "key": "CL_MERCADOPUBLICO",
+      "country": "CL",
+      "priority": "P1",
+      "role": "notice_award_ocds",
+      "status": "PENDING_IMPLEMENTATION",
+      "references": [
+        "https://github.com/stgomoyaa/mercadopublico-parser",
+        "https://github.com/DCCP-Hugo/MercadoPublicoOCDS"
+      ],
+      "notes": "Any upstream with unclear license remains reference-only until license is verified."
+    },
+    {
+      "key": "SE_UPPHANDLING",
+      "country": "SE",
+      "priority": "P1",
+      "role": "notice",
+      "status": "PENDING_IMPLEMENTATION",
+      "upstream": "https://github.com/isakskogstad/Upphandlingsdata-MCP"
+    },
+    {
+      "key": "CZ_SMART_TENDER",
+      "country": "CZ",
+      "priority": "P1",
+      "role": "notice_search_reference",
+      "status": "LIVE_EXISTING",
+      "implementation": "pipeline/discover_cz_zakazky_public.py",
+      "upstream": "https://github.com/Boza-Analytics/Smart-Tender-Search"
+    },
+    {
+      "key": "IT_ANAC_NPA",
+      "country": "IT",
+      "priority": "P1",
+      "role": "notice_ocds_bulk",
+      "status": "LIVE_EXISTING",
+      "implementation": "pipeline/discover_it_anac_ocds_bulk.py",
+      "upstream": "https://github.com/anticorruzione/npa"
+    },
+    {
+      "key": "OPENRFPS_PROVIDER_PATTERN",
+      "priority": "P2_ARCHITECTURE",
+      "role": "provider_contract_reference",
+      "status": "REFERENCE_ONLY",
+      "upstream": "https://github.com/dobtco/openrfps-scrapers"
+    },
+    {
+      "key": "KINGFISHER_COLLECT_PROCESS",
+      "priority": "P2_ARCHITECTURE",
+      "role": "ocds_collection_processing_reference",
+      "status": "REFERENCE_ONLY",
+      "references": [
+        "https://github.com/open-contracting/kingfisher-collect",
+        "https://github.com/open-contracting/kingfisher-process"
+      ]
+    },
+    {
+      "key": "LIB_COVE_OCDS",
+      "priority": "P2_ARCHITECTURE",
+      "role": "ocds_quality_assurance_reference",
+      "status": "REFERENCE_ONLY",
+      "upstream": "https://github.com/open-contracting/lib-cove-ocds"
+    },
+    {
+      "key": "OPENPROCUREMENT_API",
+      "priority": "P2_ARCHITECTURE",
+      "role": "procurement_api_reference",
+      "status": "REFERENCE_ONLY",
+      "upstream": "https://github.com/openprocurement/openprocurement.api"
+    },
+    {
+      "key": "TAP_EU_TED",
+      "priority": "P2_ARCHITECTURE",
+      "role": "incremental_ted_reference",
+      "status": "REFERENCE_ONLY",
+      "upstream": "https://github.com/flexponsive/tap-eu-ted",
+      "notes": "Do not duplicate the existing TED rail; borrow state/bookmark patterns only."
+    },
+    {
+      "key": "TED_OPEN_DATA_EXPLORER",
+      "priority": "P2_ARCHITECTURE",
+      "role": "procedure_notice_graph_reference",
+      "status": "REFERENCE_ONLY",
+      "upstream": "https://github.com/OP-TED/ted-open-data-explorer"
+    },
+    {
+      "key": "TENDERX_DCE_PATTERN",
+      "priority": "P2_ARCHITECTURE",
+      "role": "document_hash_recursive_extraction_reference",
+      "status": "REFERENCE_ONLY",
+      "upstream": "https://github.com/akashbalyan/tenderX",
+      "notes": "Storage/hash/extraction patterns only. CAPTCHA or access-control bypass techniques are out of scope."
+    }
+  ]
+}

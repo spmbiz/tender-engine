@@ -134,6 +134,41 @@ def extract_text(path: Path) -> tuple[str, str]:
     return "unsupported", ""
 
 
+def _native_text_yield(text: str) -> int:
+    if not text or "_EXTRACTION_ERROR " in text[:80]:
+        return 0
+    return len(text.strip())
+
+
+def _try_docling(path: Path, root: Path, kind: str, text: str) -> tuple[str, dict | None]:
+    mode = os.getenv("DCE_DOCLING_MODE", "auto").strip().lower()
+    min_chars = max(0, int(os.getenv("DCE_DOCLING_MIN_CHARS", "800")))
+    try:
+        from pipeline.docling_deep_parser import parse_with_docling, should_deep_parse
+    except Exception as exc:
+        return text, {"status": "ADAPTER_IMPORT_ERROR", "error": repr(exc)}
+
+    if not should_deep_parse(kind, _native_text_yield(text), mode=mode, min_chars=min_chars):
+        return text, None
+
+    deep = parse_with_docling(path, root / "derived" / "docling")
+    if deep.get("status") != "DOWNLOADED_SOURCE_PARSED":
+        return text, deep
+
+    try:
+        deep_text = Path(str(deep["markdown_path"])).read_text(encoding="utf-8", errors="replace")
+    except Exception as exc:
+        deep["status"] = "SIDECAR_READ_ERROR"
+        deep["error"] = repr(exc)
+        return text, deep
+
+    # Deep extraction supplements/replaces only the derived corpus text for this
+    # file. The authoritative original stays untouched and hashed in the index.
+    if len(deep_text.strip()) > _native_text_yield(text):
+        return deep_text, deep
+    return text, deep
+
+
 def process_candidate(root: Path):
     files_root = root / "files"
     if not files_root.exists():
@@ -144,7 +179,8 @@ def process_candidate(root: Path):
     for path in sorted(files_root.rglob("*")):
         if not path.is_file():
             continue
-        kind, text = extract_text(path)
+        kind, native_text = extract_text(path)
+        text, deep = _try_docling(path, root, kind, native_text)
         rel = str(path.relative_to(root))
         rec = {
             "path": rel,
@@ -152,8 +188,11 @@ def process_candidate(root: Path):
             "size": path.stat().st_size,
             "sha256": sha256_file(path),
             "kind": kind,
+            "native_text_chars": _native_text_yield(native_text),
             "text_chars": len(text),
         }
+        if deep is not None:
+            rec["deep_parser"] = deep
         docs.append(rec)
         if text:
             if len(text) > 1_500_000:
