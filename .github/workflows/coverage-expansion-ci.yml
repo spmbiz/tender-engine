@@ -1,0 +1,125 @@
+name: Coverage Expansion CI
+
+on:
+  pull_request:
+    paths:
+      - 'pipeline/ocds_release_normalizer.py'
+      - 'pipeline/discover_worldbank_procurement.py'
+      - 'pipeline/discover_za_etenders_ocds.py'
+      - 'pipeline/discover_uk_proactis_ocds.py'
+      - 'tests/test_ocds_release_normalizer.py'
+      - 'tests/test_worldbank_procurement.py'
+      - '.github/workflows/coverage-expansion-ci.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: coverage-expansion-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests pytest
+      - name: Compile adapters
+        run: python -m py_compile pipeline/ocds_release_normalizer.py pipeline/discover_worldbank_procurement.py pipeline/discover_za_etenders_ocds.py pipeline/discover_uk_proactis_ocds.py
+      - name: Run focused unit contracts
+        run: python -m pytest -q tests/test_ocds_release_normalizer.py tests/test_worldbank_procurement.py
+
+  worldbank-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Live public World Bank API smoke
+        run: |
+          python pipeline/discover_worldbank_procurement.py --output /tmp/wb --max-pages 1 --page-size 25
+          python - <<'PY'
+          import json
+          s=json.load(open('/tmp/wb/stats.json'))
+          assert not s['errors'], s
+          assert s['api_records_seen'] > 0, s
+          for t in ('Invitation for Bids','Request for Expression of Interest','Invitation for Prequalification','General Procurement Notice','Contract Award'):
+              assert t in s['totals_by_type'], (t,s)
+          print(json.dumps(s,indent=2))
+          PY
+
+  south-africa-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Live National Treasury OCDS smoke
+        run: |
+          python pipeline/discover_za_etenders_ocds.py --output /tmp/za --lookback-days 90 --page-size 100 --max-pages 2
+          python - <<'PY'
+          import json
+          s=json.load(open('/tmp/za/stats.json'))
+          assert not s['errors'], s
+          assert s['raw_materialized'] + s['awards_materialized'] > 0, s
+          print(json.dumps(s,indent=2))
+          PY
+
+  pcs-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Live Public Contracts Scotland OCDS smoke
+        env:
+          PROACTIS_ALLOW_INCOMPLETE_TLS: '1'
+        run: |
+          python pipeline/discover_uk_proactis_ocds.py --source UK_PCS_OCDS --output /tmp/pcs --months 2
+          python - <<'PY'
+          import json
+          s=json.load(open('/tmp/pcs/stats.json'))
+          assert s['raw_materialized'] + s['awards_materialized'] + s['pre_tender_materialized'] > 0, s
+          if s['errors']:
+              raise AssertionError(s)
+          print(json.dumps(s,indent=2))
+          PY
+
+  sell2wales-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Probe Sell2Wales without treating upstream failure as coverage
+        env:
+          PROACTIS_ALLOW_INCOMPLETE_TLS: '1'
+        shell: bash
+        run: |
+          set +e
+          python pipeline/discover_uk_proactis_ocds.py --source UK_SELL2WALES_OCDS --output /tmp/s2w --months 2
+          rc=$?
+          python - <<'PY'
+          import json,os
+          p='/tmp/s2w/stats.json'
+          if os.path.exists(p):
+              s=json.load(open(p)); print(json.dumps(s,indent=2))
+              healthy=not s.get('errors') and (s.get('raw_materialized',0)+s.get('awards_materialized',0)+s.get('pre_tender_materialized',0)>0)
+              print('SELL2WALES_PROBE=' + ('LIVE_VALIDATED' if healthy else 'DEGRADED_UPSTREAM'))
+          else:
+              print('SELL2WALES_PROBE=DEGRADED_UPSTREAM_NO_STATS')
+          PY
+          exit "$rc"
