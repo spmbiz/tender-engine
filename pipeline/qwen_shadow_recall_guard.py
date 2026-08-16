@@ -29,7 +29,11 @@ DIRECT_DIGITAL = re.compile(
     r"\b(website|web ?app|web portal|software|saas|digital platform|application development|mobile app|animation|video production|graphic design|content creation|transcription|cms|workflow automation|e[- ]learning|online training|data processing)\b",
     re.I,
 )
-INDIRECT_PATH = re.compile(r"\b(subcontract|third[- ]party|consortium|resell|broker|supplier|vendor)\b", re.I)
+# Match subcontract, subcontractor(s), subcontracting, subcontracted, etc.
+INDIRECT_PATH = re.compile(
+    r"\b(subcontract(?:or(?:s)?|ing|ed|s)?|third[- ]party|consortium|resell|broker|supplier|vendor)\b",
+    re.I,
+)
 PERSONAL_SERVICE = re.compile(r"\bpersonal services? contract\b", re.I)
 
 
@@ -40,6 +44,11 @@ def text_of(row: dict[str, Any]) -> tuple[str, str]:
         str(notice.get(k) or "")
         for k in ("title", "description", "cpv_or_category", "procedure")
     )
+    # Model reason is not authoritative procurement evidence, but it may expose the model's own
+    # delivery-route rationale. It is used only as a recall-preserving hint, never as a final gate.
+    model_reason = str(row.get("reason") or "")
+    if model_reason:
+        scope = f"{scope} {model_reason}"
     return title, scope
 
 
