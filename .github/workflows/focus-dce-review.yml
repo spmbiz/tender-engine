@@ -4,8 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       dce_run_id:
-        description: Durable DCE harvest run ID containing the candidate pack
-        required: true
+        description: Durable DCE harvest run ID, or 'auto' to resolve from cumulative backlog
+        required: false
+        default: 'auto'
       candidate_id:
         description: Exact canonical candidate ID, e.g. IE:8670172
         required: true
@@ -43,11 +44,28 @@ jobs:
             rid='${{ github.event.inputs.dce_run_id }}'
             cid='${{ github.event.inputs.candidate_id }}'
           else
-            rid="$(sed -nE 's/^dce_run_id=([0-9]+).*$/\1/p' control/focus_dce_trigger.txt | tail -1)"
+            rid="$(sed -nE 's/^dce_run_id=(.*)$/\1/p' control/focus_dce_trigger.txt | tail -1)"
             cid="$(sed -nE 's/^candidate_id=(.*)$/\1/p' control/focus_dce_trigger.txt | tail -1)"
           fi
-          [[ "$rid" =~ ^[0-9]+$ ]] || { echo "Invalid DCE run ID: $rid" >&2; exit 2; }
           [ -n "$cid" ] || { echo "candidate_id required" >&2; exit 2; }
+          if [ -z "$rid" ] || [ "$rid" = 'auto' ]; then
+            rid="$(CANDIDATE_ID="$cid" python - <<'PY'
+          import json, os
+          from pathlib import Path
+          cid = os.environ['CANDIDATE_ID']
+          p = Path('control/gpt_review_backlog.json')
+          if not p.is_file():
+              raise SystemExit('Cumulative GPT review backlog not found')
+          obj = json.loads(p.read_text(encoding='utf-8'))
+          matches = [r for r in (obj.get('items') or []) if isinstance(r, dict) and str(r.get('candidate_id') or '') == cid]
+          if not matches:
+              raise SystemExit(f'Candidate {cid!r} not found in cumulative GPT review backlog')
+          matches.sort(key=lambda r: int(r.get('source_dce_run_id') or 0), reverse=True)
+          print(matches[0].get('source_dce_run_id') or '')
+          PY
+          )"
+          fi
+          [[ "$rid" =~ ^[0-9]+$ ]] || { echo "Invalid/unresolved DCE run ID: $rid" >&2; exit 2; }
           echo "dce_run_id=$rid" >> "$GITHUB_OUTPUT"
           echo "candidate_id=$cid" >> "$GITHUB_OUTPUT"
 
