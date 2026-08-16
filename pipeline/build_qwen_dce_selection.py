@@ -150,8 +150,10 @@ def main() -> None:
     state_rows = read_jsonl(Path(args.state))
     now = datetime.now(timezone.utc)
     blocked_controller = controller_blocked_ids(Path(args.blocked_state)) if args.blocked_state else set()
-    blocked_reviewed = reviewed_ids(Path(args.review_backlog)) if args.review_backlog else set()
-    blocked_dispatch = dispatch_cooldown_ids(Path(args.dispatch_state), now) if args.dispatch_state else set()
+    review_path = Path(args.review_backlog) if args.review_backlog else Path('control/gpt_review_backlog.json')
+    dispatch_path = Path(args.dispatch_state) if args.dispatch_state else Path('control/qwen_live/dispatch_state.json')
+    blocked_reviewed = reviewed_ids(review_path)
+    blocked_dispatch = dispatch_cooldown_ids(dispatch_path, now)
     blocked = blocked_controller | blocked_reviewed | blocked_dispatch
 
     valid = []
@@ -236,6 +238,7 @@ def main() -> None:
 
     summary = {
         'schema': 'QWEN_LIVE_DCE_SELECTION_SUMMARY_V1',
+        'generated_at_utc': now.replace(microsecond=0).isoformat(),
         'source_run': str(args.source_run),
         'state_rows': len(state_rows),
         'ledger_rows': len(ledger),
@@ -257,7 +260,7 @@ def main() -> None:
             'dce_is_authoritative': True,
             'rejects_are_not_deleted': True,
             'already_reviewed_dce_is_not_requeued': True,
-            'dispatch_cooldown_prevents_duplicate_inflight_work': True,
+            'dispatch_cooldown_prevents_duplicate_inflight_work_when_state_is_present': True,
             'deterministic_reject_audit_share': args.reject_audit_share,
             'open_world_explore_share': args.explore_share,
             'exact_material_hash_required': True,
