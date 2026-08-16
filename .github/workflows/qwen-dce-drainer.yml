@@ -25,29 +25,45 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - name: Dispatch newest durable DCE run not yet Qwen-pre-read
+      - name: Dispatch newest recent durable DCE run not yet Qwen-pre-read
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
+          MAX_FALLBACK_AGE_SECONDS: '7200'
         shell: bash
         run: |
           set -euo pipefail
 
-          # Never create duplicate queued triage work. The Qwen DCE workflow is
-          # globally serialized, so one active/queued instance is sufficient.
+          # Primary path is the direct dispatch at the end of DCE Fanout V2.
+          # This safety net only rescues recent live misses; it must never spend
+          # Qwen capacity draining old historical DCE backlog ahead of fresh work.
           active="$(gh run list --repo "$REPO" --workflow qwen-dce-triage.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
           if [ "$active" -gt 0 ]; then
             echo "Qwen DCE triage already has $active active/queued run(s); no duplicate dispatch."
             exit 0
           fi
 
-          mapfile -t completed < <(gh run list --repo "$REPO" --workflow dce-fanout-v2.yml --status success --limit 25 --json databaseId,createdAt --jq 'sort_by(.createdAt) | reverse | .[].databaseId')
+          mapfile -t completed < <(gh run list --repo "$REPO" --workflow dce-fanout-v2.yml --status success --limit 25 --json databaseId,createdAt --jq 'sort_by(.createdAt) | reverse | .[] | "\(.databaseId)|\(.createdAt)"')
           if [ "${#completed[@]}" -eq 0 ]; then
             echo 'No successful DCE run found.'
             exit 0
           fi
 
-          for rid in "${completed[@]}"; do
+          now_epoch="$(date -u +%s)"
+          for entry in "${completed[@]}"; do
+            rid="${entry%%|*}"
+            created_at="${entry#*|}"
+            created_epoch="$(date -u -d "$created_at" +%s 2>/dev/null || echo 0)"
+            if [ "$created_epoch" -le 0 ]; then
+              echo "Skipping DCE run $rid: cannot parse createdAt=$created_at"
+              continue
+            fi
+            age_seconds="$((now_epoch-created_epoch))"
+            if [ "$age_seconds" -gt "$MAX_FALLBACK_AGE_SECONDS" ]; then
+              echo "Reached DCE run $rid older than fallback horizon (${age_seconds}s); stopping old-backlog scan."
+              break
+            fi
+
             tag="dce-harvest-$rid"
             if ! gh release view "$tag" --repo "$REPO" >/dev/null 2>&1; then
               # A zero-shard/admission-deferred run has no durable DCE release.
@@ -58,12 +74,11 @@ jobs:
             if grep -Fxq "qwen-dce-triage-$rid.jsonl" <<< "$assets" || grep -Fxq "qwen-dce-triage-status-$rid.json" <<< "$assets"; then
               continue
             fi
-            echo "Dispatching missing Qwen DCE pre-read for durable DCE run $rid"
+            echo "Dispatching recent missing Qwen DCE pre-read for durable DCE run $rid age=${age_seconds}s"
             gh workflow run qwen-dce-triage.yml --repo "$REPO" --ref main -f dce_run_id="$rid" -f workers=4
             exit 0
           done
 
-          echo 'No untriaged durable DCE run found.'
+          echo 'No recent untriaged durable DCE run found.'
 
-# Direct DCE aggregate dispatch is primary; this 5-minute drainer is only the safety net.
-# Forced latest-backlog drain 2026-08-16T23:40+02:00
+# Direct DCE aggregate dispatch is primary; this 5-minute drainer is only the recent-live safety net.
