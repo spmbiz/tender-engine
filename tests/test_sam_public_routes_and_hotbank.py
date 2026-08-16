@@ -41,20 +41,20 @@ def review_item(cid, run_id, score=80):
 
 def test_newer_dce_generation_resets_review_bank():
     existing = {
-        "schema": "GPT_REVIEW_HOT_V1",
+        "schema": "GPT_REVIEW_HOT_V3",
         "latest_dce_run_id": 100,
         "items": [review_item("OLD", 100, 89)],
     }
     incoming = [review_item("NEW", 101, 70)]
     merged = hot.merge_review(existing, incoming, set(), "101", "0", 30)
-    assert merged["schema"] == "GPT_REVIEW_HOT_V2"
+    assert merged["schema"] == "GPT_REVIEW_HOT_V3"
     assert merged["generation_reset"] is True
     assert [x["candidate_id"] for x in merged["items"]] == ["NEW"]
 
 
 def test_late_old_shard_cannot_contaminate_newer_review_bank():
     existing = {
-        "schema": "GPT_REVIEW_HOT_V2",
+        "schema": "GPT_REVIEW_HOT_V3",
         "latest_dce_run_id": 101,
         "items": [review_item("NEW", 101, 70)],
     }
