@@ -1,0 +1,52 @@
+name: UK FTS OCDS CI
+
+on:
+  pull_request:
+    paths:
+      - 'pipeline/discover_uk_fts_ocds.py'
+      - 'pipeline/ocds_release_normalizer.py'
+      - 'tests/test_uk_fts_ocds.py'
+      - '.github/workflows/uk-fts-ocds-ci.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: uk-fts-ocds-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests pytest
+      - run: python -m py_compile pipeline/discover_uk_fts_ocds.py pipeline/ocds_release_normalizer.py
+      - run: python -m pytest -q tests/test_uk_fts_ocds.py
+
+  live-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Validate official FTS planning tender and award stages
+        run: |
+          python pipeline/discover_uk_fts_ocds.py --output /tmp/fts --lookback-days 3 --max-pages 3 --page-size 100
+          python - <<'PY'
+          import json
+          s=json.load(open('/tmp/fts/stats.json'))
+          assert not s['errors'], s
+          assert not s['truncated_by_page_cap'], s
+          assert set(s['releases_by_stage']) == {'tender','planning','award'}, s
+          assert s['releases_by_stage']['tender'] > 0, s
+          assert s['raw_materialized'] > 0, s
+          assert s['current_materialized'] > 0, s
+          print(json.dumps(s,indent=2))
+          PY
