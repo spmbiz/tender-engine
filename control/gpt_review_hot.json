@@ -1,10 +1,10 @@
 {
   "schema": "GPT_REVIEW_HOT_V3",
-  "updated_at": "2026-08-16T15:32:24.279950+00:00",
+  "updated_at": "2026-08-16T15:32:30.316749+00:00",
   "latest_dce_run_id": 31955900876,
-  "latest_shard": 3,
+  "latest_shard": 4,
   "generation_reset": false,
-  "count": 5,
+  "count": 6,
   "items": [
     {
       "candidate_id": "US-SAM:b14e80f09a1b4c3d97c60d8c01334f3e",
@@ -1246,6 +1246,91 @@
       "spm_friction_signals": [
         "cmmc"
       ],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
+      "candidate_id": "PL-BZP:08def37e-8d2a-82d2-962b-1200019cd25d",
+      "title": "Zakup i dostawa sprzętu i wyposażenia medycznego w ramach zadania pn. \"Wsparcie podstawowej opieki zdrowotnej (POZ)\".",
+      "buyer": "SAMODZIELNY PUBLICZNY ZAKŁAD OPIEKI ZDROWOTNEJ W NAWOJOWEJ",
+      "portal": "PL_EZAMOWIENIA",
+      "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08def37e-8d2a-82d2-962b-1200019cd25d",
+      "deadline": "2026-08-17T07:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 60,
+      "priority_score": 60,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "DEADLINE_CONFLICT_REVIEW_REQUIRED",
+        "conflict": true,
+        "notice_deadline_raw": "2026-08-17T07:00:00+00:00",
+        "notice_deadline_date": "2026-08-17",
+        "dce_deadline_candidates": [
+          "2026-09-16"
+        ],
+        "evidence": [
+          {
+            "date": "2026-09-16",
+            "match": "16 września 2026",
+            "context": "Nawojowej, ul. Parkowa 6, 33-335 Nawojowa, tel. 668 135 520,  \ne-mail: spzoznawojowa@poczta.onet.pl. \n \n11. Termin związania ofertą. \n11.1. Wykonawca jest związany ofertą od dnia upływu terminu składania ofert do dnia  \n16 września 2026 r., przy czym pierwszym dniem terminu związania ofertą jest dzień, w  \nktórym upływa termin składania ofert. \n11.2. W przypadku gdy wybór najkorzystniejszej oferty nie nastąpi przed upływem terminu  \nzwiązania ofertą ok"
+          }
+        ],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 3,
+          "unique_contexts": 3
+        },
+        "rule": "Never silently overwrite deadline metadata. Deadline candidates come only from authoritative gate-ready DCE text near deadline language; unresolved/multiple/conflicting dates require review before final 90+/FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "DEADLINE_CONFLICT_REVIEW_REQUIRED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 1,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [],
+        "term_value": [
+          {
+            "text": "gralną częścią niniejszej SWZ stanowią następujące załączniki: 1. Opis przedmiotu zamówienia (Formularz asortymentowy) - Załącznik nr 1. 2. Projektowane postanowienia umowy w sprawie zamówienia publicznego – Załącznik nr 2. 3. Formularz ofertowy - Załącznik nr 3. 4. Oświadczenie Wykonawcy - Załącznik nr 4. 5. Klauzula informacyjna dotycząca przetwarzania danych osobowych - Załącznik nr 5. ===== FILE: files/Za__cznik nr 2 do SWZ - Projektowane postanowienia umowy_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/theme/theme/themeManager.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.themeManager+xml\"/><Override PartName=\"/theme/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/></Types> ===== FILE: files/Za__cznik nr 2 do SWZ - Projektowane postanowienia umowy_unpacked/theme/theme/theme1.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <a:theme xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" name=\"Motyw pakie",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "mularz asortymentowy) - Załącznik nr 1. 2. Projektowane postanowienia umowy w sprawie zamówienia publicznego – Załącznik nr 2. 3. Formularz ofertowy - Załącznik nr 3. 4. Oświadczenie Wykonawcy - Załącznik nr 4. 5. Klauzula informacyjna dotycząca przetwarzania danych osobowych - Załącznik nr 5. ===== FILE: files/Za__cznik nr 2 do SWZ - Projektowane postanowienia umowy_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/theme/theme/themeManager.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.themeManager+xml\"/><Override PartName=\"/theme/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/></Types> ===== FILE: files/Za__cznik nr 2 do SWZ - Projektowane postanowienia umowy_unpacked/theme/theme/theme1.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <a:theme xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" name=\"Motyw pakietu Office\"><a:themeElements><a:clrScheme name=\"Pakiet Office\"><a:dk1><a:sysClr val=\"windowText\" la",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "/theme/themeManager.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <a:themeManager xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\"/> ===== FILE: files/Za__cznik nr 3 do SWZ - Formularz oferty_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Override PartName=\"/theme/theme/themeManager.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.themeManager+xml\"/><Override PartName=\"/theme/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/></Types> ===== FILE: files/Za__cznik nr 3 do SWZ - Formularz oferty_unpacked/theme/theme/theme1.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <a:theme xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" name=\"Motyw pakietu Office\"><a:themeElements><a:clrScheme name=\"Pakiet Office\"><a:dk1><a:sysClr val=\"windowText\" lastClr=\"000000\"/></a:dk1><a:lt1><a:sysClr val=\"window\" lastClr=\"FFFFFF\"/></a:lt1><a:dk2><a:srgbClr val=\"1F497D\"/></a:dk2><a:lt2><a:srgbClr val=\"EEECE1\"/></a:lt2><a",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "ger xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\"/> ===== FILE: files/Za__cznik nr 3 do SWZ - Formularz oferty_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Override PartName=\"/theme/theme/themeManager.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.themeManager+xml\"/><Override PartName=\"/theme/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/></Types> ===== FILE: files/Za__cznik nr 3 do SWZ - Formularz oferty_unpacked/theme/theme/theme1.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <a:theme xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" name=\"Motyw pakietu Office\"><a:themeElements><a:clrScheme name=\"Pakiet Office\"><a:dk1><a:sysClr val=\"windowText\" lastClr=\"000000\"/></a:dk1><a:lt1><a:sysClr val=\"window\" lastClr=\"FFFFFF\"/></a:lt1><a:dk2><a:srgbClr val=\"1F497D\"/></a:dk2><a:lt2><a:srgbClr val=\"EEECE1\"/></a:lt2><a:accent1><a:srgbClr val=\"4F81BD\"/></a:accent1><a:accent2><a:srgbClr val=\"C0504D\"/></a:accent2><a:a",
+            "source": null,
+            "match": "Extension"
+          }
+        ],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 31955900876,
+      "source_shard": 4,
+      "hot_ready_at": "2026-08-16T15:32:30.147266+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 8,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
       "review_lane": "SPM_PRIORITY"
     }
   ],
