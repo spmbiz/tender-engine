@@ -75,17 +75,18 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Download durable ledger queue and resolve exact generation
+      - name: Download residual queue plus canonical golden corpus
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p ledger
+          mkdir -p ledger canonical-release canonical
           gh release download notice-intelligence-ledger-latest \
             --pattern notice-classification-queue-latest.jsonl.gz \
             --dir ledger
           test -s ledger/notice-classification-queue-latest.jsonl.gz
+
           release_name="$(gh release view notice-intelligence-ledger-latest --json name --jq '.name')"
           generation="$(grep -oE '[0-9]{8,}' <<< "$release_name" | tail -n1)"
           if [[ ! "$generation" =~ ^[0-9]+$ ]]; then
@@ -94,9 +95,30 @@ jobs:
           fi
           [[ "$generation" =~ ^[0-9]+$ ]]
           echo "SOURCE_LEDGER_GENERATION=$generation" >> "$GITHUB_ENV"
-          sha256sum ledger/notice-classification-queue-latest.jsonl.gz > ledger/INPUT_SHA256.txt
 
-      - name: Materialize mixed DCE-golden plus deterministic live sample
+          # Goldens are stable benchmark cases and may already be classified, so
+          # they must come from the complete canonical generation — never from the
+          # shrinking residual classification queue.
+          source_tag="discovery-harvest-${generation}"
+          repaired="supergreen-wide-read-${generation}-repaired.tar.gz"
+          normal="supergreen-wide-read-${generation}.tar.gz"
+          assets="$(gh release view "$source_tag" --json assets --jq '.assets[].name')"
+          if grep -Fxq "$repaired" <<< "$assets"; then
+            source_asset="$repaired"
+          elif grep -Fxq "$normal" <<< "$assets"; then
+            source_asset="$normal"
+          else
+            echo "No canonical discovery asset for generation $generation" >&2
+            exit 1
+          fi
+          gh release download "$source_tag" --pattern "$source_asset" --dir canonical-release
+          tar -xzf "canonical-release/$source_asset" -C canonical
+          golden_source="$(find canonical -type f -name current_candidates.jsonl -print -quit)"
+          test -s "$golden_source"
+          cp "$golden_source" ledger/golden-current-candidates.jsonl
+          sha256sum ledger/notice-classification-queue-latest.jsonl.gz ledger/golden-current-candidates.jsonl > ledger/INPUT_SHA256.txt
+
+      - name: Materialize stable goldens plus deterministic residual live sample
         shell: bash
         env:
           SAMPLE_SIZE: ${{ needs.plan.outputs.sample_size }}
@@ -108,21 +130,30 @@ jobs:
           golden=json.load(open('benchmarks/qwen_batch_recall_golden_v1.json',encoding='utf-8'))
           wanted={str(x['candidate_id']) for x in golden.get('cases',[])}
           found={}
+
+          # Stable benchmark payloads from the full canonical generation.
+          with open('ledger/golden-current-candidates.jsonl','r',encoding='utf-8',errors='replace') as fh:
+              for line in fh:
+                  if not line.strip(): continue
+                  row=json.loads(line)
+                  n=row.get('notice') if isinstance(row.get('notice'),dict) else row
+                  cid=str(row.get('canonical_notice_id') or n.get('candidate_id') or n.get('notice_id') or n.get('id') or '').strip()
+                  if cid in wanted:
+                      found[cid]=row
+          missing=sorted(wanted-set(found))
+          if missing:
+              raise SystemExit(f'DCE golden candidates missing from canonical generation: {missing}')
+
+          # Fresh live sample comes from the residual/unclassified queue only.
           residual=[]
           with gzip.open('ledger/notice-classification-queue-latest.jsonl.gz','rt',encoding='utf-8') as fh:
               for line in fh:
                   row=json.loads(line)
                   n=row.get('notice') if isinstance(row.get('notice'),dict) else row
                   cid=str(row.get('canonical_notice_id') or n.get('candidate_id') or n.get('notice_id') or n.get('id') or '').strip()
-                  if not cid:
+                  if not cid or cid in wanted:
                       continue
-                  if cid in wanted:
-                      found[cid]=row
-                  else:
-                      residual.append((hashlib.sha256(cid.encode()).hexdigest(),cid,row))
-          missing=sorted(wanted-set(found))
-          if missing:
-              raise SystemExit(f'DCE golden candidates missing from current ledger: {missing}')
+                  residual.append((hashlib.sha256(cid.encode()).hexdigest(),cid,row))
           residual.sort(key=lambda x:(x[0],x[1]))
           need=max(0,target-len(found))
           selected=[found[cid] for cid in sorted(found)] + [x[2] for x in residual[:need]]
@@ -135,14 +166,17 @@ jobs:
                   out.write(json.dumps(row,ensure_ascii=False,separators=(',',':'))+'\n')
           if len(ids) != len(set(ids)):
               raise SystemExit('autotune sample duplicate IDs')
-          if len(ids) < min(target, len(wanted)):
-              raise SystemExit('autotune sample unexpectedly small')
+          if not wanted.issubset(set(ids)):
+              raise SystemExit('autotune sample lost one or more golden IDs')
           pathlib.Path('autotune-input-manifest.json').write_text(json.dumps({
-              'schema':'QWEN_BATCH_AUTOTUNE_INPUT_V1',
+              'schema':'QWEN_BATCH_AUTOTUNE_INPUT_V2',
               'ledger_generation':os.environ.get('SOURCE_LEDGER_GENERATION'),
               'requested':target,
               'actual':len(ids),
               'golden_count':len(wanted),
+              'live_residual_count':max(0,len(ids)-len(wanted)),
+              'golden_source':'canonical_discovery_generation',
+              'live_source':'residual_classification_queue',
               'ids':ids,
           },indent=2)+'\n',encoding='utf-8')
           PY
