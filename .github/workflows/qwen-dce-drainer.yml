@@ -3,7 +3,7 @@ name: Qwen DCE Triage Drainer
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '*/5 * * * *'
   push:
     branches: [main]
     paths:
@@ -65,5 +65,5 @@ jobs:
 
           echo 'No untriaged durable DCE run found.'
 
-# Manual handoff smoke trigger 2026-08-16T21:25+02:00
-# Forced live drain 2026-08-16T22:18+02:00
+# Direct DCE aggregate dispatch is primary; this 5-minute drainer is only the safety net.
+# Forced latest-backlog drain 2026-08-16T23:40+02:00
