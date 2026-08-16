@@ -1,0 +1,54 @@
+name: Generate LT SuperGreen Patch Blob
+
+on:
+  push:
+    branches: ['feat/activate-lt-cvp-next-run']
+    paths:
+      - 'pipeline/patch_supergreen_lt_cvp.py'
+      - '.github/workflows/lt-supergreen-patch-blob.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: lt-supergreen-patch-blob
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/activate-lt-cvp-next-run
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Patch and validate workflow
+        run: |
+          python pipeline/patch_supergreen_lt_cvp.py
+          python -m pip install --disable-pip-version-check -q pyyaml
+          python - <<'PY'
+          import yaml
+          from pathlib import Path
+          p=Path('.github/workflows/supergreen-discovery-v2.yml')
+          body=p.read_text()
+          parsed=yaml.safe_load(body)
+          assert isinstance(parsed,dict) and 'jobs' in parsed
+          assert 'LT_CVP_API' in body
+          assert 'discover_lt_cvp_api.py' in body
+          print('validated')
+          PY
+      - name: Store patched workflow as git blob only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          python - <<'PY' >/tmp/blob.json
+          import json
+          from pathlib import Path
+          print(json.dumps({'content':Path('.github/workflows/supergreen-discovery-v2.yml').read_text(),'encoding':'utf-8'}))
+          PY
+          sha="$(gh api --method POST "repos/$GITHUB_REPOSITORY/git/blobs" --input /tmp/blob.json --jq .sha)"
+          echo "PATCHED_WORKFLOW_BLOB_SHA=$sha"
