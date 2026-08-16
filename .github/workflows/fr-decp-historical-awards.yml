@@ -4,6 +4,10 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '41 4 * * 1,4'
+  push:
+    branches: [main]
+    paths:
+      - 'control/fr_decp_trigger.txt'
   pull_request:
     paths:
       - 'pipeline/materialize_fr_decp_awards.py'
