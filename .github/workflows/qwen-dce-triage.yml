@@ -213,12 +213,21 @@ jobs:
       - name: Merge pre-read and build persistent one-file GPT inbox
         env:
           SOURCE_RUN: ${{ needs.plan.outputs.source_run }}
+          GATE_READY: ${{ needs.plan.outputs.gate_ready }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p control results
-          : > control/qwen_dce_triage_latest.jsonl
-          while IFS= read -r f; do cat "$f" >> control/qwen_dce_triage_latest.jsonl; done < <(find results -type f -name 'qwen-dce-*.jsonl' -size +0c 2>/dev/null | sort || true)
+          touch control/qwen_dce_triage_latest.jsonl
+          current=/tmp/qwen-dce-current.jsonl
+          : > "$current"
+          while IFS= read -r f; do cat "$f" >> "$current"; done < <(find results -type f -name 'qwen-dce-*.jsonl' -size +0c 2>/dev/null | sort || true)
+          if [ "$GATE_READY" != '0' ]; then
+            test -s "$current" || { echo 'gate-ready DCE rows existed but no Qwen result rows were produced; preserving canonical triage' >&2; exit 1; }
+            cp "$current" control/qwen_dce_triage_latest.jsonl
+          else
+            echo 'No gate-ready DCE rows; preserving existing canonical Qwen triage.'
+          fi
           python pipeline/build_gpt_supergreen_inbox.py \
             --triage control/qwen_dce_triage_latest.jsonl \
             --existing control/gpt_supergreen_inbox.json \
@@ -232,18 +241,40 @@ jobs:
           x=json.load(open(p,encoding='utf-8'))
           print(json.dumps(x.get('counts') or {},indent=2))
           PY
-      - name: Persist Qwen DCE output in source DCE Release
-        if: needs.plan.outputs.gate_ready != '0'
+      - name: Persist Qwen DCE completion status in source DCE Release
+        if: needs.plan.outputs.gate_ready == '0' || needs.classify.result == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
           SOURCE_RUN: ${{ needs.plan.outputs.source_run }}
+          GATE_READY: ${{ needs.plan.outputs.gate_ready }}
+          CLASSIFY_RESULT: ${{ needs.classify.result }}
         shell: bash
         run: |
           set -euo pipefail
           tag="dce-harvest-${SOURCE_RUN}"
-          cp control/qwen_dce_triage_latest.jsonl "qwen-dce-triage-${SOURCE_RUN}.jsonl"
-          cp control/gpt_supergreen_inbox.json "gpt-supergreen-inbox-${SOURCE_RUN}.json"
-          gh release upload "$tag" "qwen-dce-triage-${SOURCE_RUN}.jsonl" "gpt-supergreen-inbox-${SOURCE_RUN}.json" --clobber
+          status="qwen-dce-triage-status-${SOURCE_RUN}.json"
+          python - <<'PY'
+          import json,os
+          from datetime import datetime,timezone
+          run=os.environ['SOURCE_RUN']; gate_ready=int(os.environ['GATE_READY'])
+          payload={
+              'schema':'QWEN_DCE_TRIAGE_STATUS_V1',
+              'source_dce_run_id':int(run) if run.isdigit() else run,
+              'gate_ready_rows':gate_ready,
+              'classification_result':os.environ.get('CLASSIFY_RESULT') or 'unknown',
+              'qwen_pre_read_ran':gate_ready>0,
+              'completed_at':datetime.now(timezone.utc).isoformat(),
+              'finality':'PRE_READ_ONLY_NOT_FINAL_VERDICT',
+          }
+          open(f'qwen-dce-triage-status-{run}.json','w',encoding='utf-8').write(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
+          PY
+          assets=("$status")
+          if [ "$GATE_READY" != '0' ]; then
+            cp control/qwen_dce_triage_latest.jsonl "qwen-dce-triage-${SOURCE_RUN}.jsonl"
+            cp control/gpt_supergreen_inbox.json "gpt-supergreen-inbox-${SOURCE_RUN}.json"
+            assets+=("qwen-dce-triage-${SOURCE_RUN}.jsonl" "gpt-supergreen-inbox-${SOURCE_RUN}.json")
+          fi
+          gh release upload "$tag" "${assets[@]}" --clobber
       - name: Persist canonical fast-answer surface to main
         shell: bash
         run: |
