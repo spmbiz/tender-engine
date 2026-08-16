@@ -1,0 +1,134 @@
+name: DCE V10 Resolver Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_dce_run:
+        description: Prior durable DCE run whose exact queue should be replayed for resolver validation
+        required: false
+        default: '31974706689'
+      lines:
+        description: Queue lines to smoke without touching the durable attempt ledger
+        required: false
+        default: '1,2,56,57'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dce-v10-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install live resolver dependencies
+        run: python -m pip install --disable-pip-version-check -q requests 'playwright>=1.46,<2' beautifulsoup4 pypdf python-docx openpyxl python-pptx
+      - name: Reuse runner Chrome
+        shell: bash
+        run: |
+          set -euo pipefail
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Recover exact prior live queue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_DCE_RUN: ${{ github.event.inputs.source_dce_run || '31974706689' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="dce-harvest-${SOURCE_DCE_RUN}"
+          mkdir -p smoke-input
+          gh release download "$tag" --pattern "dce-candidate-queue-${SOURCE_DCE_RUN}.jsonl" --dir smoke-input
+          mv "smoke-input/dce-candidate-queue-${SOURCE_DCE_RUN}.jsonl" smoke-input/queue.jsonl
+      - name: Resolve the exact four production routes with the new contract
+        id: routes
+        env:
+          SMOKE_LINES: ${{ github.event.inputs.lines || '1,2,56,57' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from pipeline.build_matrix import SUPPORTED, resolve_dce_portal
+
+          wanted=[int(x) for x in os.environ['SMOKE_LINES'].split(',') if x.strip()]
+          rows=Path('smoke-input/queue.jsonl').read_text(encoding='utf-8').splitlines()
+          report=[]
+          executable=[]
+          for line_no in wanted:
+              rec=json.loads(rows[line_no-1])
+              portal, raw=resolve_dce_portal(rec)
+              supported=portal in SUPPORTED
+              report.append({'line':line_no,'candidate_id':rec.get('candidate_id'),'raw_portal':raw,'resolver_portal':portal,'supported':supported,'route_mode':(rec.get('route') or {}).get('mode'),'route_state':(rec.get('route') or {}).get('route_state')})
+              if supported:
+                  executable.append(line_no)
+          Path('smoke-route-report.json').write_text(json.dumps(report,indent=2,ensure_ascii=False),encoding='utf-8')
+          Path('/tmp/smoke_lines').write_text(','.join(map(str,executable)),encoding='utf-8')
+          print(json.dumps(report,indent=2,ensure_ascii=False))
+          PY
+          echo "lines=$(cat /tmp/smoke_lines)" >> "$GITHUB_OUTPUT"
+      - name: Execute v10 resolvers on the supported production samples
+        if: steps.routes.outputs.lines != ''
+        env:
+          DCE_BROWSER_FAST_TIMEOUT_SECONDS: '150'
+          DCE_HTTP_FAST_TIMEOUT_SECONDS: '90'
+          DCE_BROWSER_INLINE_RETRIES: '0'
+          DCE_HTTP_INLINE_RETRIES: '0'
+        run: >-
+          python pipeline/dce_batch_worker.py
+          --queue smoke-input/queue.jsonl
+          --lines '${{ steps.routes.outputs.lines }}'
+          --out smoke-out
+          --concurrency 4
+          --retries 0
+          --timeout-seconds 150
+      - name: Extract and classify retrieved evidence
+        if: steps.routes.outputs.lines != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/extract_corpus.py --root smoke-out
+          python pipeline/dce_evidence_quality.py --root smoke-out
+      - name: Build smoke verdict
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+
+          route_report=json.loads(Path('smoke-route-report.json').read_text(encoding='utf-8'))
+          manifests=[]
+          if Path('smoke-out').exists():
+              for path in sorted(Path('smoke-out').glob('*/manifest.json')):
+                  m=json.loads(path.read_text(encoding='utf-8'))
+                  qpath=path.parent/'evidence_quality.json'
+                  q=json.loads(qpath.read_text(encoding='utf-8')) if qpath.exists() else {}
+                  manifests.append({'candidate_id':m.get('candidate_id'),'portal':m.get('portal'),'raw_portal':m.get('raw_portal'),'status':m.get('status'),'files':len(m.get('files') or []),'evidence_quality':q.get('classification') or q.get('evidence_quality') or q.get('status'),'gate_readiness':q.get('gate_readiness'),'error':m.get('error'),'method_attempts':m.get('dce_method_attempts') or []})
+          payload={'routes':route_report,'results':manifests}
+          Path('smoke-verdict.json').write_text(json.dumps(payload,indent=2,ensure_ascii=False),encoding='utf-8')
+          print(json.dumps(payload,indent=2,ensure_ascii=False))
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a',encoding='utf-8') as f:
+              f.write('```json\n'+json.dumps(payload,indent=2,ensure_ascii=False)+'\n```\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dce-v10-smoke-${{ github.run_id }}
+          path: |
+            smoke-route-report.json
+            smoke-verdict.json
+            smoke-out/
+          retention-days: 2
+          if-no-files-found: error
