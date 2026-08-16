@@ -171,7 +171,7 @@ jobs:
     if: needs.plan.result == 'success' && needs.plan.outputs.remaining != '0'
     strategy:
       fail-fast: false
-      max-parallel: 8
+      max-parallel: 6
       matrix:
         shard: [0,1,2,3,4,5,6,7]
     runs-on: ubuntu-latest
@@ -444,7 +444,7 @@ jobs:
             -f selection_path=queues/qwen_live_selection_latest.jsonl \
             -f source_discovery_run='${{ needs.plan.outputs.source_run }}' \
             -f max_jobs="$jobs" \
-            -f max_parallel=8 \
+            -f max_parallel=6 \
             -f jobs_per_shard=0
           echo "Dispatched Qwen semantic DCE lane: candidates=$jobs source=${{ needs.plan.outputs.source_run }}"
 
