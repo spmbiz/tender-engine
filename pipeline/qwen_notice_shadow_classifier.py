@@ -66,7 +66,7 @@ def deterministic_sample(rows: Iterable[dict[str, Any]], n: int) -> list[dict[st
     return [x[2] for x in ranked[: max(0, n)]]
 
 
-def compact_notice(envelope: dict[str, Any], description_chars: int) -> dict[str, Any]:
+def compact_notice(envelope: dict[str, Any], description_chars: int = 1800) -> dict[str, Any]:
     row = envelope.get("notice") if isinstance(envelope.get("notice"), dict) else envelope
     description = " ".join(str(row.get("description") or "").split())
     if len(description) > description_chars:
