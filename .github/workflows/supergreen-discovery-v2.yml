@@ -252,12 +252,16 @@ jobs:
       fail-fast: false
       max-parallel: 15
       matrix:
-        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP, NO_DOFFIN, FI_HILMA, PT_BASE_OPEN, DK_UDBUD_PUBLIC, CZ_ZAKAZKY_GOV, IT_ANAC_DELTA]
+        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP, NO_DOFFIN, FI_HILMA, PT_BASE_OPEN, DK_UDBUD_PUBLIC, CZ_ZAKAZKY_GOV, IT_ANAC_DELTA, SI_EJN, SK_UVO, EE_RHR]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4 playwright
+      - name: Reuse runner Chrome for browser-backed national lanes
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; fi
       - name: Syntax gate
         run: python -m py_compile pipeline/discover_*.py pipeline/dce_worker_v6.py
       - name: Harvest official national source with delta/reconcile window
@@ -286,6 +290,9 @@ jobs:
             DK_UDBUD_PUBLIC) python pipeline/discover_dk_udbud_public.py ;;
             CZ_ZAKAZKY_GOV) python pipeline/discover_cz_zakazky_public.py ;;
             IT_ANAC_DELTA) python pipeline/discover_it_anac_delta.py ;;
+            SI_EJN) python pipeline/discover_si_ejn_browser.py ;;
+            SK_UVO) python pipeline/discover_sk_uvo.py ;;
+            EE_RHR) if [ "$DISCOVERY_MODE" = reconcile ]; then months=3; else months=2; fi; python pipeline/discover_ee_rhr.py --output "$DISCOVERY_OUT" --months "$months" ;;
             *) python pipeline/discover_global_official.py ;;
           esac
           rc=$?;echo "source_exit_code=$rc"
