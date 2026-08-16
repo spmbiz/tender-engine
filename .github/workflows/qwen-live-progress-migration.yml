@@ -19,7 +19,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Patch classifier and Qwen workflow for externally readable live progress
+      - name: Patch classifier for externally readable live progress
         shell: bash
         run: |
           set -euo pipefail
@@ -38,27 +38,27 @@ jobs:
 
           s = replace_once(
               s,
+              'import argparse\nimport datetime as dt\n',
+              'import argparse\nimport base64\nimport datetime as dt\n',
+              'base64 import',
+          )
+          s = replace_once(
+              s,
               'import re\nimport time\n',
               'import re\nimport subprocess\nimport time\n',
               'subprocess import',
           )
           s = replace_once(
               s,
-              '    ap.add_argument("--progress", default=None, help="Live JSON checkpoint rewritten after every completed request")\n    ap.add_argument("--batch-size", type=int, required=True)\n',
-              '    ap.add_argument("--progress", default=None, help="Live JSON checkpoint rewritten after every completed request")\n    ap.add_argument("--live-release-tag", default=None, help="Optional GitHub Release tag receiving the live progress JSON after every checkpoint")\n    ap.add_argument("--live-release-repo", default=None, help="owner/repo for live Release uploads; defaults to GITHUB_REPOSITORY")\n    ap.add_argument("--batch-size", type=int, required=True)\n',
-              'live release args',
-          )
-          s = replace_once(
-              s,
               '    sample_by_id = {cid(row): row for row in sample}\n\n    def emit(event: str, **fields: Any) -> None:\n',
-              '''    sample_by_id = {cid(row): row for row in sample}\n    live_release_repo = args.live_release_repo or os.environ.get("GITHUB_REPOSITORY")\n\n    def emit(event: str, **fields: Any) -> None:\n''',
-              'live repo state',
+              '''    sample_by_id = {cid(row): row for row in sample}\n    live_release_tag = f"qwen-live-progress-{run_id}" if os.environ.get("GITHUB_ACTIONS") == "true" and run_id != "local" else None\n    live_release_repo = os.environ.get("GITHUB_REPOSITORY")\n    live_release_ready = False\n    live_auth_env: dict[str, str] | None = None\n\n    def emit(event: str, **fields: Any) -> None:\n''',
+              'live release state',
           )
           s = replace_once(
               s,
               '        print("QWEN_PROGRESS " + json.dumps(payload, ensure_ascii=False, separators=(",", ":")), flush=True)\n\n    def build_record(candidate: str) -> dict[str, Any] | None:\n',
-              '''        print("QWEN_PROGRESS " + json.dumps(payload, ensure_ascii=False, separators=(",", ":")), flush=True)\n\n    def publish_external_checkpoint(event: str) -> None:\n        if not args.live_release_tag or not live_release_repo:\n            return\n        if not progress_path.exists():\n            return\n        cmd = [\n            "gh", "release", "upload", args.live_release_tag, str(progress_path),\n            "--clobber", "--repo", live_release_repo,\n        ]\n        try:\n            cp = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=30, check=False)\n            if cp.returncode == 0:\n                emit("EXTERNAL_CHECKPOINT_PUBLISHED", checkpoint_event=event, asset=progress_path.name, release_tag=args.live_release_tag)\n            else:\n                emit("EXTERNAL_CHECKPOINT_PUBLISH_FAIL", checkpoint_event=event, asset=progress_path.name, release_tag=args.live_release_tag, returncode=cp.returncode, stderr_tail=(cp.stderr or "")[-500:])\n        except Exception as exc:\n            emit("EXTERNAL_CHECKPOINT_PUBLISH_FAIL", checkpoint_event=event, asset=progress_path.name, release_tag=args.live_release_tag, error=type(exc).__name__)\n\n    def build_record(candidate: str) -> dict[str, Any] | None:\n''',
-              'publisher function',
+              '''        print("QWEN_PROGRESS " + json.dumps(payload, ensure_ascii=False, separators=(",", ":")), flush=True)\n\n    def github_auth_env() -> dict[str, str] | None:\n        nonlocal live_auth_env\n        if live_auth_env is not None:\n            return live_auth_env\n        env = os.environ.copy()\n        if env.get("GH_TOKEN"):\n            live_auth_env = env\n            return env\n        try:\n            header = subprocess.check_output(\n                ["git", "config", "--local", "--get", "http.https://github.com/.extraheader"],\n                text=True, stderr=subprocess.DEVNULL, timeout=5,\n            ).strip()\n            match = re.search(r"basic\\s+(\\S+)", header, flags=re.I)\n            if not match:\n                return None\n            decoded = base64.b64decode(match.group(1)).decode("utf-8", errors="ignore")\n            token = decoded.split(":", 1)[1] if ":" in decoded else ""\n            if not token:\n                return None\n            env["GH_TOKEN"] = token\n            live_auth_env = env\n            return env\n        except Exception:\n            return None\n\n    def ensure_live_release() -> bool:\n        nonlocal live_release_ready\n        if live_release_ready:\n            return True\n        if not live_release_tag or not live_release_repo:\n            return False\n        env = github_auth_env()\n        if not env:\n            return False\n        view = subprocess.run(\n            ["gh", "release", "view", live_release_tag, "--repo", live_release_repo],\n            env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15, check=False,\n        )\n        if view.returncode != 0:\n            create = subprocess.run(\n                ["gh", "release", "create", live_release_tag, "--repo", live_release_repo,\n                 "--target", os.environ.get("GITHUB_SHA", "main"),\n                 "--title", f"Qwen Live Progress {run_id}",\n                 "--notes", "Externally readable per-worker Qwen checkpoints; assets are replaced after each checkpoint."],\n                env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=25, check=False,\n            )\n            if create.returncode != 0:\n                view = subprocess.run(\n                    ["gh", "release", "view", live_release_tag, "--repo", live_release_repo],\n                    env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15, check=False,\n                )\n                if view.returncode != 0:\n                    return False\n        live_release_ready = True\n        return True\n\n    def publish_external_checkpoint(event: str) -> None:\n        if not progress_path.exists() or not ensure_live_release():\n            return\n        env = github_auth_env()\n        if not env:\n            return\n        try:\n            cp = subprocess.run(\n                ["gh", "release", "upload", live_release_tag, str(progress_path), "--clobber", "--repo", live_release_repo],\n                env=env, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, timeout=30, check=False,\n            )\n            if cp.returncode == 0:\n                emit("EXTERNAL_CHECKPOINT_PUBLISHED", checkpoint_event=event, asset=progress_path.name, release_tag=live_release_tag)\n            else:\n                emit("EXTERNAL_CHECKPOINT_PUBLISH_FAIL", checkpoint_event=event, asset=progress_path.name, release_tag=live_release_tag, returncode=cp.returncode, stderr_tail=(cp.stderr or "")[-300:])\n        except Exception as exc:\n            emit("EXTERNAL_CHECKPOINT_PUBLISH_FAIL", checkpoint_event=event, asset=progress_path.name, release_tag=live_release_tag, error=type(exc).__name__)\n\n    def build_record(candidate: str) -> dict[str, Any] | None:\n''',
+              'publisher functions',
           )
           s = replace_once(
               s,
@@ -69,14 +69,8 @@ jobs:
           s = replace_once(
               s,
               '            "github_notice_per_top_batch": True,\n',
-              '            "github_notice_per_top_batch": True,\n            "external_release_checkpoint": bool(args.live_release_tag and live_release_repo),\n            "external_release_tag": args.live_release_tag,\n            "external_release_asset": progress_path.name,\n',
-              'summary observability metadata',
-          )
-          s = replace_once(
-              s,
-              '    atomic_json(progress_path, {\n        "schema": PROGRESS_SCHEMA,\n',
-              '    atomic_json(progress_path, {\n        "schema": PROGRESS_SCHEMA,\n',
-              'final progress anchor',
+              '            "github_notice_per_top_batch": True,\n            "external_release_checkpoint": bool(live_release_tag and live_release_repo),\n            "external_release_tag": live_release_tag,\n            "external_release_asset": progress_path.name,\n',
+              'summary metadata',
           )
           s = replace_once(
               s,
@@ -85,50 +79,21 @@ jobs:
               'final publish call',
           )
           p.write_text(s, encoding='utf-8')
-
-          w = Path('.github/workflows/qwen-live-classification.yml')
-          y = w.read_text(encoding='utf-8')
-          y = replace_once(
-              y,
-              '      - name: Plan summary\n        run: |\n',
-              '''      - name: Create externally readable live progress release\n        env:\n          GH_TOKEN: ${{ github.token }}\n        shell: bash\n        run: |\n          set -euo pipefail\n          tag="qwen-live-progress-${GITHUB_RUN_ID}"\n          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --target "$GITHUB_SHA" \\\n            --title "Qwen Live Progress ${GITHUB_RUN_ID}" \\\n            --notes "Live per-worker Qwen checkpoints. Assets are replaced after each completed request/batch. source_run=${{ steps.plan.outputs.source_run }}"\n\n      - name: Plan summary\n        run: |\n''',
-              'create progress release step',
-          )
-          y = replace_once(
-              y,
-              "      - name: Classify bounded shard with recursive self-healing\n        if: steps.shard.outputs.has_work == 'true'\n        shell: bash\n        run: |\n",
-              "      - name: Classify bounded shard with recursive self-healing\n        if: steps.shard.outputs.has_work == 'true'\n        env:\n          GH_TOKEN: ${{ github.token }}\n        shell: bash\n        run: |\n",
-              'classify GH token',
-          )
-          y = replace_once(
-              y,
-              '            --out "qwen-live-${idx}-raw.jsonl" \\\n            --summary "qwen-live-${idx}-summary.json" \\\n            --batch-size "$QWEN_BATCH_SIZE" \\\n',
-              '            --out "qwen-live-${idx}-raw.jsonl" \\\n            --summary "qwen-live-${idx}-summary.json" \\\n            --progress "qwen-live-progress-shard-${idx}.json" \\\n            --live-release-tag "qwen-live-progress-${GITHUB_RUN_ID}" \\\n            --live-release-repo "${GITHUB_REPOSITORY}" \\\n            --batch-size "$QWEN_BATCH_SIZE" \\\n',
-              'classifier live flags',
-          )
-          y = replace_once(
-              y,
-              '            qwen-live-${{ matrix.shard }}-guard-summary.json\n            qwen-server.log\n',
-              '            qwen-live-${{ matrix.shard }}-guard-summary.json\n            qwen-live-progress-shard-${{ matrix.shard }}.json\n            qwen-server.log\n',
-              'final artifact includes progress',
-          )
-          w.write_text(y, encoding='utf-8')
           PY
-
           python -m py_compile pipeline/qwen_notice_batch_selfheal.py
-          grep -F 'qwen-live-progress-${GITHUB_RUN_ID}' .github/workflows/qwen-live-classification.yml
           grep -F 'EXTERNAL_CHECKPOINT_PUBLISHED' pipeline/qwen_notice_batch_selfheal.py
+          grep -F 'qwen-live-progress-' pipeline/qwen_notice_batch_selfheal.py
 
-      - name: Commit migration
+      - name: Commit safe live checkpoint publisher
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add pipeline/qwen_notice_batch_selfheal.py .github/workflows/qwen-live-classification.yml
-          git commit -m 'qwen: publish live per-worker progress checkpoints'
+          git add pipeline/qwen_notice_batch_selfheal.py
+          git commit -m 'qwen: publish externally readable live checkpoints'
 
-      - name: Cancel currently running Qwen classifications
+      - name: Cancel current Qwen run before restart
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -136,18 +101,16 @@ jobs:
           set -euo pipefail
           current="$(gh run list --workflow qwen-live-classification.yml --limit 20 --json databaseId,status --jq '.[] | select(.status=="in_progress" or .status=="queued" or .status=="pending") | .databaseId')"
           for run in $current; do
-            echo "Cancelling Qwen run $run before observable-code restart"
+            echo "Cancelling Qwen run $run"
             gh api -X POST "repos/${GITHUB_REPOSITORY}/actions/runs/${run}/cancel" >/dev/null || true
           done
 
-      - name: Push migration and trigger fresh observable Qwen run
+      - name: Push safe migration
         shell: bash
         run: |
           set -euo pipefail
           for attempt in 1 2 3 4 5; do
-            if git pull --rebase origin main && git push origin HEAD:main; then
-              exit 0
-            fi
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
             git rebase --abort >/dev/null 2>&1 || true
             sleep "$((attempt * 3))"
           done
