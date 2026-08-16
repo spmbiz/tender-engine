@@ -1,7 +1,7 @@
 {
   "schema": "GPT_INSTANT_SUPERGREEN_INBOX_V3",
-  "updated_at": "2026-08-16T22:03:34.865588+00:00",
-  "latest_source_dce_run_id": 31974706689,
+  "updated_at": "2026-08-16T22:13:23.827598+00:00",
+  "latest_source_dce_run_id": 31975449482,
   "confirmed_supergreens": [
     {
       "candidate_id": "IE:8670172",
@@ -120,14 +120,78 @@
       "notice_url": "https://ted.europa.eu/en/notice/-/detail/564841-2026"
     }
   ],
-  "pending_final_review": [],
+  "pending_final_review": [
+    {
+      "candidate_id": "IE:8841473",
+      "title": "Preliminary Market Consultation - Digital Marketing Expertise to Support Delivery of Stop Food Waste",
+      "buyer": "Environmental Protection Agency",
+      "portal": "IRELAND_ETENDERS",
+      "notice_url": "https://www.etenders.gov.ie/epps/pmc/viewPmc.do?resourceId=8841473",
+      "deadline": "2026-09-08T14:00:00+01:00",
+      "estimated_value": null,
+      "currency": "EUR",
+      "gate_readiness": true,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "deadline_authority_status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+      "evidence_gate_coverage": 9,
+      "native_spm_core": true,
+      "obvious_noncore_scope": false,
+      "qwen_dce_classification": "QWEN_DCE_INSUFFICIENT",
+      "qwen_dce_lean": "UNKNOWN",
+      "qwen_dce_route": "UNCLEAR",
+      "explicit_blockers": [],
+      "critical_unknowns": [],
+      "qwen_reason": "",
+      "recommended_gpt_action": "REVIEW_IF_CAPACITY",
+      "gpt_priority_score": 50,
+      "evidence_by_gate": {
+        "entity_geography": [
+          "AAD//wMAUEsDBBQABgAIAAAA IQDPhQFseQMAAHwKAAAOAAAAZHJzL2Uyb0RvYy54bWzUlm2P1DYQx99X6new/J7Lw5J9iC6Hrgsc lWhB4uC9N3Ee2sQOtveS49MzYzvJ7nG0EohWaKWV49jjmf/Mb5zLZ2PXkjuudCNFRqOLkBIuclk0 osro+9uXT7aUaMNEwVopeEbvuabPrn795XLoUx7LWrYFVwSMCJ0OfUZrY/o0CHRe847pC9lzAS9L qTpm4FFVQaHYANa7NojDcB0MUhW9kjnXGmafu5f0ytovS56bN2WpuSFtRsE3Y/+V/T/gf3B1ydJK sb5ucu8G+wYvOtYIO"
+        ],
+        "turnover_financial": [],
+        "references_experience": [
+          "digital content and resources that can be adapted and reused for future food waste prevention communications and campaigns in conjunction with the creation of some new assets to attract and engage new audiences. Regular performance and engagement monitoring and evaluation is required to review effectiveness and suitability of the approach, based on"
+        ],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [
+          "ation in this Preliminary Market Consultation exercise does not bias any future competitions Note Please note that information relating to this Preliminary Market Consultation, including clarifications and changes, will be published on the Irish Government Procurement Opportunities Portal www.etenders.gov.ie. Registration is free of charge and ther"
+        ],
+        "sla_onsite": [
+          "wPNG/> ===== FILE: files/portal_page.txt ===== Advanced search Latest CfTs Latest Notices EN Log in Notice & Tender Documents CFT: PRELIMINARY MARKET CONSULTATION - DIGITAL MARKETING EXPERTISE TO SUPPORT DELIVERY OF STOP FOOD WASTE Show CfT Menu Notices Tender Documents 10 20 50 100 Results Per page | Displaying the 1 match. Columns Addendum ID Tit"
+        ],
+        "term_value": [
+          "increase the engagement with content and motivate audiences to change their behaviours in line with the objective for Stop Food Waste. Therefore Stop Food Waste communications consist of focussed campaigns on targeted topics and distinct audience cohorts informed by behavioural research. Communications are delivered mainly using digital channels su"
+        ],
+        "award_criteria": [
+          "eader\" <"
+        ],
+        "forms_signatures": [
+          "Food Waste has developed a valuable bank of digital content and resources that can be adapted and reused for future food waste prevention communications and campaigns in conjunction with the creation of some new assets to attract and engage new audiences. Regular performance and engagement monitoring and evaluation is required to review effectivene"
+        ],
+        "submission": [
+          "tion with the creation of some new assets to attract and engage new audiences. Regular performance and engagement monitoring and evaluation is required to review effectiveness and suitability of the approach, based on campaign goals and objectives. Insights gained in post-campaign analysis and optimisation recommendations will inform future campaig"
+        ],
+        "ip_data_security": [
+          "e objective for Stop Food Waste. Therefore Stop Food Waste communications consist of focussed campaigns on targeted topics and distinct audience cohorts informed by behavioural research. Communications are delivered mainly using digital channels such as stopfoodwaste.ie; social media (Facebook, Instagram) and online engagement activities (stakehold"
+        ],
+        "payment_tax": []
+      },
+      "source_dce_run_id": 31975449482,
+      "qwen_dce_version": "qwen3-4b-dce-gate-triage-v3",
+      "finality": "PRE_READ_ONLY_NOT_FINAL_VERDICT",
+      "inbox_recall_override": "NATIVE_SPM_GATE_READY_QWEN_INCONCLUSIVE"
+    }
+  ],
   "counts": {
     "confirmed_supergreens": 0,
     "confirmed_green_total": 1,
     "resolved_total": 3,
-    "pending_final_review": 0,
+    "pending_final_review": 1,
     "review_now": 0,
-    "recall_overrides": 0
+    "recall_overrides": 1
   },
   "answer_contract": "When the user asks what supergreens exist, read this file first. Report live FINAL_SUPER_GREEN/GREEN verdicts immediately. Then adjudicate FINAL_REVIEW_NOW. If capacity allows, review SPM-core gate-ready rows retained by the recall override when Qwen was inconclusive. This user-facing inbox excludes obvious non-core and evidence-empty rows. Qwen is pre-read only; missing evidence is UNKNOWN.",
   "finality_rule": "Only GPT Web final adjudication from authoritative DCE evidence may create FINAL_SUPER_GREEN. Qwen and recall overrides never do."
