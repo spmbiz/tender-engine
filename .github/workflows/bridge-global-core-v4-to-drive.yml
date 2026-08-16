@@ -10,30 +10,21 @@ permissions:
   contents: read
 
 jobs:
-  bridge-assets:
+  missing-assets:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
-      max-parallel: 16
+      max-parallel: 8
       matrix:
         asset:
-          - historical_tenders.parquet
-          - historical_tenders.jsonl.gz
-          - awards.parquet
-          - awards.jsonl.gz
-          - award_suppliers.parquet
-          - award_suppliers.jsonl.gz
-          - buyers.parquet
-          - buyers.csv.gz
-          - suppliers.parquet
-          - suppliers.csv.gz
-          - source_country_summary.csv
-          - dedupe_overlap_summary.csv
-          - schema_report.json
-          - data_quality_report.json
-          - run_manifest.json
-          - SHA256SUMS
+          - awards.csv.gz
+          - award_suppliers.csv.gz
+          - country_summary.csv
+          - data_quality.json
+          - evidence_lanes.json
+          - market_cohorts.csv
+          - source_priority.json
     steps:
       - name: Download canonical release asset
         env:
@@ -44,18 +35,48 @@ jobs:
           mkdir -p bundle
           gh release download tender-normalized-global-core-v4 \
             --repo walidgdg1-ai/coldemailtool \
-            --pattern "$ASSET" \
-            --dir bundle
+            --pattern "$ASSET" --dir bundle
           test -s "bundle/$ASSET"
-          ls -lah "bundle/$ASSET"
-
       - name: Upload connector-safe artifact
         uses: actions/upload-artifact@v4
         with:
-          name: core-v4-${{ strategy.job-index }}-${{ matrix.asset }}
+          name: core-v4-${{ matrix.asset }}
           path: bundle/${{ matrix.asset }}
           compression-level: 0
-          if-no-files-found: error
+          retention-days: 1
+
+  split-oversized:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        asset:
+          - historical_tenders.parquet
+          - historical_tenders.csv.gz
+    steps:
+      - name: Download and split canonical oversized asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ASSET: ${{ matrix.asset }}
+        run: |
+          set -euo pipefail
+          mkdir -p original parts manifests
+          gh release download tender-normalized-global-core-v4 \
+            --repo walidgdg1-ai/coldemailtool \
+            --pattern "$ASSET" --dir original
+          sha256sum "original/$ASSET" | tee "manifests/$ASSET.sha256"
+          split -b 240M -d -a 3 "original/$ASSET" "parts/$ASSET.part-"
+          (cd parts && sha256sum "$ASSET".part-*) > "manifests/$ASSET.parts.sha256"
+          ls -lh parts/
+      - name: Upload multipart payload
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-v4-multipart-${{ matrix.asset }}
+          path: |
+            parts/*
+            manifests/*
+          compression-level: 0
           retention-days: 1
 
   provenance:
@@ -67,12 +88,13 @@ jobs:
           Source repository: walidgdg1-ai/coldemailtool
           Source release: tender-normalized-global-core-v4
           Destination: Google Drive / Public Tender Intelligence — Archive / Releases / tender-normalized-global-core-v4
-          Transfer semantics: byte-preserving GitHub Release asset -> GitHub Actions Artifact -> Google Drive
-          Integrity authority: SHA256SUMS from the canonical GitHub Release
+          Normal assets are mirrored from canonical release bytes.
+          Oversized assets historical_tenders.parquet and historical_tenders.csv.gz are stored as byte-exact multipart chunks with SHA256 reconstruction manifests because the ChatGPT connector transport caps a single artifact at 512 MB.
+          GitHub Release remains the canonical source and is not deleted.
           EOF
       - uses: actions/upload-artifact@v4
         with:
-          name: core-v4-provenance
+          name: core-v4-provenance-v2
           path: DRIVE_BRIDGE_PROVENANCE.txt
           compression-level: 0
           retention-days: 1
