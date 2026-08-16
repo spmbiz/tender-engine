@@ -12,7 +12,9 @@ on:
       - 'pipeline/authority_conflicts.py'
       - 'pipeline/auto_adjudicate_dce.py'
       - 'pipeline/materialize_dce_selection.py'
+      - 'pipeline/dce_attempt_ledger.py'
       - '.github/workflows/dce-queue-drainer.yml'
+      - '.github/workflows/dce-progress-ledger.yml'
 
 permissions:
   contents: read
@@ -28,7 +30,7 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-      - name: Dispatch freshest high-value persisted DCE queue when fleet is free
+      - name: Dispatch freshest unseen DCE work when fleet is free
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -36,7 +38,7 @@ jobs:
           set -euo pipefail
           active="$(gh run list --workflow dce-fanout-v2.yml --limit 40 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
           if [ "$active" -gt 0 ]; then
-            echo "DCE fleet busy: $active active/queued. Persisted queues remain untouched."
+            echo "DCE fleet busy: $active active/queued. Durable progress will retrigger the drainer after completion."
             exit 0
           fi
 
@@ -56,47 +58,66 @@ jobs:
           PY
           }
 
+          unseen_for() {
+            python pipeline/dce_attempt_ledger.py count \
+              --queue "$1" \
+              --ledger control/dce_attempt_ledger.jsonl
+          }
+
           rescue='queues/spm_rescue_selection_latest.jsonl'
           qwen='queues/qwen_live_selection_latest.jsonl'
           rescue_run=''
           qwen_run=''
-          if [ -s "$rescue" ]; then rescue_run="$(source_run_for "$rescue")"; fi
-          if [ -s "$qwen" ]; then qwen_run="$(source_run_for "$qwen")"; fi
+          rescue_unseen=0
+          qwen_unseen=0
+          if [ -s "$rescue" ]; then
+            rescue_run="$(source_run_for "$rescue")"
+            rescue_unseen="$(unseen_for "$rescue")"
+          fi
+          if [ -s "$qwen" ]; then
+            qwen_run="$(source_run_for "$qwen")"
+            qwen_unseen="$(unseen_for "$qwen")"
+          fi
+
+          echo "Unseen queue state: qwen=$qwen_unseen rescue=$rescue_unseen"
 
           path=''
+          unseen=0
           max_jobs=0
           reason=''
 
-          # Fresh machine-ranked live work must not be starved forever by a
-          # persistent manually curated rescue manifest. Prefer Qwen when it is
-          # available and at least as fresh as the rescue queue; rescue remains
-          # the fallback for urgent/newer curated work or when Qwen is empty.
-          if [ -s "$qwen" ] && [[ "$qwen_run" =~ ^[0-9]+$ ]]; then
-            if [ ! -s "$rescue" ] || ! [[ "$rescue_run" =~ ^[0-9]+$ ]] || [ "$qwen_run" -ge "$rescue_run" ]; then
+          # Qwen live selection is already bounded (currently 160 rows) and is the
+          # high-recall admission set. Drain every unseen selected version rather
+          # than recycling a tiny prefix. Rescue remains the urgent/newer fallback.
+          if [ "$qwen_unseen" -gt 0 ] && [[ "$qwen_run" =~ ^[0-9]+$ ]]; then
+            if [ "$rescue_unseen" -eq 0 ] || ! [[ "$rescue_run" =~ ^[0-9]+$ ]] || [ "$qwen_run" -ge "$rescue_run" ]; then
               path="$qwen"
-              max_jobs=60
-              reason="fresh-qwen-live-first"
+              unseen="$qwen_unseen"
+              max_jobs=160
+              reason="fresh-qwen-unseen-first"
             fi
           fi
-          if [ -z "$path" ] && [ -s "$rescue" ]; then
+          if [ -z "$path" ] && [ "$rescue_unseen" -gt 0 ]; then
             path="$rescue"
-            max_jobs=30
-            reason="curated-rescue-fallback"
-          fi
-          if [ -z "$path" ] && [ -s "$qwen" ]; then
-            path="$qwen"
+            unseen="$rescue_unseen"
             max_jobs=60
-            reason="qwen-live-fallback"
+            reason="curated-rescue-unseen-fallback"
+          fi
+          if [ -z "$path" ] && [ "$qwen_unseen" -gt 0 ]; then
+            path="$qwen"
+            unseen="$qwen_unseen"
+            max_jobs=160
+            reason="qwen-unseen-fallback"
           fi
           if [ -z "$path" ]; then
-            echo 'No persisted DCE queue to drain.'
+            echo 'No unseen persisted DCE work. Waiting for the next Qwen/live selection refresh.'
             exit 0
           fi
 
           source_run="$(source_run_for "$path")"
           [[ "$source_run" =~ ^[0-9]+$ ]] || { echo "Cannot resolve source run from $path" >&2; exit 1; }
           rows="$(grep -cve '^\s*$' "$path" || true)"
-          jobs="$rows"
+          jobs="$unseen"
           if [ "$jobs" -gt "$max_jobs" ]; then jobs="$max_jobs"; fi
           if [ "$jobs" -lt 1 ]; then exit 0; fi
 
@@ -104,9 +125,7 @@ jobs:
             -f selection_path="$path" \
             -f source_discovery_run="$source_run" \
             -f max_jobs="$jobs" \
-            -f max_parallel=8 \
+            -f max_parallel=10 \
             -f max_shards=80 \
             -f jobs_per_shard=0
-          echo "Dispatched persisted queue $path rows=$rows jobs=$jobs source=$source_run policy=$reason. Fresh Qwen live work can no longer be permanently starved by a persistent rescue manifest."
-
-# Fresh-Qwen-first starvation + cross-snapshot retry trigger 2026-08-16T22:05+02:00
+          echo "Dispatched $jobs unseen candidate versions from $path (rows=$rows unseen=$unseen source=$source_run policy=$reason)."
