@@ -10,7 +10,10 @@ from typing import Any
 
 import requests
 
-from pipeline.ocds_release_normalizer import release_awards, release_to_candidate
+try:
+    from pipeline.ocds_release_normalizer import release_awards, release_to_candidate
+except ModuleNotFoundError:  # direct `python pipeline/foo.py` execution
+    from ocds_release_normalizer import release_awards, release_to_candidate
 
 SOURCES = {
     "UK_PCS_OCDS": {
@@ -25,9 +28,6 @@ SOURCES = {
         "portal": "SELL2WALES",
         "base": "https://api.sell2wales.gov.wales/v1",
         "locale": 2057,
-        # Sell2Wales has its own site notice taxonomy (51-55) in addition to
-        # the OJEU/FTS-style types. 51 is a live website invitation to tender,
-        # 52 a website PIN, 53 a website award, 54/55 subcontract pre/post award.
         "contract_types": [2, 5, 12, 21, 22, 23, 24, 51],
         "award_types": [3, 6, 13, 25, 53, 55],
         "pre_types": [1, 4, 52, 54],
@@ -68,9 +68,6 @@ def fetch_pkg(
         except requests.exceptions.SSLError as exc:
             last = exc
             if allow_incomplete_tls:
-                # Some Proactis deployments have historically served an incomplete
-                # certificate chain. This fallback is explicit, off by default and
-                # recorded in stats; it never bypasses authentication/access controls.
                 r = session.get(url, params=params, timeout=60, verify=False)
                 r.raise_for_status()
                 data = r.json()
@@ -110,9 +107,7 @@ def main() -> None:
             if cfg.get("locale"):
                 params["locale"] = cfg["locale"]
             try:
-                pkg, tls_fallback = fetch_pkg(
-                    session, cfg["base"] + "/Notices", params, allow_incomplete_tls
-                )
+                pkg, tls_fallback = fetch_pkg(session, cfg["base"] + "/Notices", params, allow_incomplete_tls)
                 tls_fallbacks += int(tls_fallback)
             except Exception as exc:
                 errors.append({"month": date_from, "notice_type": notice_type, "error": repr(exc)})
@@ -120,45 +115,33 @@ def main() -> None:
             releases = pkg.get("releases") or []
             if not isinstance(releases, list):
                 releases = []
-            telemetry.append(
-                {"month": date_from, "notice_type": notice_type, "releases": len(releases), "tls_fallback": tls_fallback}
-            )
+            telemetry.append({"month": date_from, "notice_type": notice_type, "releases": len(releases), "tls_fallback": tls_fallback})
             for release in releases:
                 if not isinstance(release, dict):
                     continue
                 ocid = str(release.get("ocid") or "").strip()
-                # Both official APIs document /Notice?id=<OCID> as the canonical
-                # notice-family endpoint. Do not guess the website's internal ID.
                 public_url = f"{cfg['base']}/Notice?id={ocid}"
                 if cfg.get("locale"):
                     public_url += f"&locale={cfg['locale']}"
                 if notice_type in cfg["contract_types"]:
-                    cand = release_to_candidate(
-                        release, source=args.source, portal=cfg["portal"], notice_url=public_url, now=now
-                    )
+                    cand = release_to_candidate(release, source=args.source, portal=cfg["portal"], notice_url=public_url, now=now)
                     if cand:
                         candidates[cand["candidate_id"]] = cand
                 elif notice_type in cfg["award_types"]:
-                    found = release_awards(
-                        release, source=args.source, portal=cfg["portal"], notice_url=public_url
-                    )
+                    found = release_awards(release, source=args.source, portal=cfg["portal"], notice_url=public_url)
                     if found:
                         awards.extend(found)
                     else:
-                        awards.append(
-                            {
-                                "grain": "AWARD_NOTICE",
-                                "source": args.source,
-                                "portal": cfg["portal"],
-                                "ocid": ocid or None,
-                                "notice_url": public_url,
-                                "supplier_resolution_status": "PENDING_RELEASE_DETAIL",
-                            }
-                        )
+                        awards.append({
+                            "grain": "AWARD_NOTICE",
+                            "source": args.source,
+                            "portal": cfg["portal"],
+                            "ocid": ocid or None,
+                            "notice_url": public_url,
+                            "supplier_resolution_status": "PENDING_RELEASE_DETAIL",
+                        })
                 else:
-                    cand = release_to_candidate(
-                        release, source=args.source, portal=cfg["portal"], notice_url=public_url, now=now
-                    )
+                    cand = release_to_candidate(release, source=args.source, portal=cfg["portal"], notice_url=public_url, now=now)
                     if cand:
                         cand["grain"] = "PRE_TENDER_RADAR"
                         cand["current"] = True
