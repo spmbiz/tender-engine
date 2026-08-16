@@ -1,0 +1,150 @@
+name: GPT Review Backlog
+
+on:
+  workflow_run:
+    workflows: ["DCE Fanout V2"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      dce_run_id:
+        description: Optional exact DCE run ID
+        required: false
+        default: ""
+      recent_successful_runs:
+        description: Backfill newest successful DCE runs when no exact run is supplied
+        required: false
+        default: "1"
+  push:
+    branches: [main]
+    paths:
+      - 'control/gpt_review_backlog_trigger.txt'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: tender-gpt-review-backlog
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Resolve DCE runs to ingest
+        id: runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p backlog-inputs
+          : > backlog-inputs/run_ids.txt
+
+          if [ '${{ github.event_name }}' = 'workflow_run' ]; then
+            echo '${{ github.event.workflow_run.id }}' > backlog-inputs/run_ids.txt
+          elif [ '${{ github.event_name }}' = 'workflow_dispatch' ]; then
+            exact='${{ github.event.inputs.dce_run_id }}'
+            recent='${{ github.event.inputs.recent_successful_runs }}'
+            if [[ "$exact" =~ ^[0-9]+$ ]]; then
+              echo "$exact" > backlog-inputs/run_ids.txt
+            else
+              [[ "$recent" =~ ^[0-9]+$ ]] || recent=1
+              recent=$(( recent > 50 ? 50 : recent ))
+              gh api "repos/$GITHUB_REPOSITORY/actions/workflows/dce-fanout-v2.yml/runs?status=completed&per_page=100" \
+                --jq '.workflow_runs[] | select(.conclusion=="success") | .id' \
+                | head -n "$recent" > backlog-inputs/run_ids.txt
+            fi
+          else
+            recent="$(sed -nE 's/^recent_successful_runs=([0-9]+).*$/\1/p' control/gpt_review_backlog_trigger.txt | tail -1)"
+            exact="$(sed -nE 's/^dce_run_id=([0-9]+).*$/\1/p' control/gpt_review_backlog_trigger.txt | tail -1)"
+            if [[ "$exact" =~ ^[0-9]+$ ]]; then
+              echo "$exact" > backlog-inputs/run_ids.txt
+            else
+              [[ "$recent" =~ ^[0-9]+$ ]] || recent=20
+              recent=$(( recent > 50 ? 50 : recent ))
+              gh api "repos/$GITHUB_REPOSITORY/actions/workflows/dce-fanout-v2.yml/runs?status=completed&per_page=100" \
+                --jq '.workflow_runs[] | select(.conclusion=="success") | .id' \
+                | head -n "$recent" > backlog-inputs/run_ids.txt
+            fi
+          fi
+
+          sort -u backlog-inputs/run_ids.txt -o backlog-inputs/run_ids.txt
+          echo "runs=$(paste -sd, backlog-inputs/run_ids.txt)" >> "$GITHUB_OUTPUT"
+          echo "Backlog ingest runs: $(paste -sd, backlog-inputs/run_ids.txt)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Download durable deep-review packs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          : > backlog-inputs/specs.txt
+          while read -r rid; do
+            [[ "$rid" =~ ^[0-9]+$ ]] || continue
+            tag="dce-harvest-$rid"
+            mkdir -p "backlog-inputs/$rid"
+            if gh release download "$tag" --pattern "dce-deep-review-$rid.tar.gz" --dir "backlog-inputs/$rid" >/dev/null 2>&1; then
+              tar -xzf "backlog-inputs/$rid/dce-deep-review-$rid.tar.gz" -C "backlog-inputs/$rid"
+              queue="backlog-inputs/$rid/deep_review_queue.jsonl"
+              if [ -s "$queue" ]; then
+                printf '%s:%s\n' "$rid" "$queue" >> backlog-inputs/specs.txt
+              fi
+            else
+              echo "No durable deep-review pack for $rid" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done < backlog-inputs/run_ids.txt
+          test -s backlog-inputs/specs.txt || { echo 'No readable deep-review packs found'; exit 0; }
+
+      - name: Build cumulative compact review reservoir
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=()
+          while read -r spec; do
+            [ -n "$spec" ] && args+=(--input "$spec")
+          done < backlog-inputs/specs.txt
+          python pipeline/build_gpt_review_backlog.py \
+            "${args[@]}" \
+            --existing control/gpt_review_backlog.json \
+            --out control/gpt_review_backlog.json \
+            --max-items 120 \
+            --max-portal-share 0.40 \
+            | tee backlog-inputs/build-summary.json
+          test -s control/gpt_review_backlog.json
+          cat backlog-inputs/build-summary.json >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Persist reservoir with concurrent-writer retry
+        shell: bash
+        run: |
+          set -euo pipefail
+          file='control/gpt_review_backlog.json'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$file"
+          if git diff --cached --quiet; then
+            echo 'Cumulative GPT review reservoir unchanged' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git commit -m "tender: refresh cumulative GPT review backlog"
+          for attempt in 1 2 3 4 5 6; do
+            if git pull --rebase origin main && git push origin HEAD:main; then
+              echo 'Cumulative GPT review reservoir persisted' >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((attempt * 4))"
+          done
+          echo 'Failed to persist GPT review backlog after bounded retries' >&2
+          exit 1
