@@ -8,6 +8,9 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/qwen-dce-drainer.yml'
+      - '.github/workflows/qwen-dce-triage.yml'
+      - 'pipeline/qwen_dce_gate_triage.py'
+      - 'pipeline/build_gpt_supergreen_inbox.py'
 
 permissions:
   contents: read
