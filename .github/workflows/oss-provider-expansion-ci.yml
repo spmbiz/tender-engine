@@ -21,6 +21,10 @@ on:
       - 'tests/test_discover_ee_rhr.py'
   workflow_dispatch:
 
+concurrency:
+  group: oss-provider-expansion-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
