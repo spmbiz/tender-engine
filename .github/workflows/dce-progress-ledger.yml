@@ -1,12 +1,14 @@
 name: DCE Progress Ledger
 
 on:
-  workflow_run:
-    workflows: ['DCE Fanout V2']
-    types: [completed]
-  # Bootstrap only when this workflow itself is changed. This lets a newly-added
-  # progress ledger catch the latest successful DCE run once; normal operation is
-  # workflow_run-driven and ledger commits do not retrigger this path.
+  workflow_dispatch:
+    inputs:
+      dce_run_id:
+        description: Successful DCE Fanout V2 run to persist and continue
+        required: false
+        default: ''
+  # Bootstrap only when this workflow itself changes. Future normal operation is
+  # dispatched explicitly by DCE Fanout V2, avoiding unreliable workflow_run gaps.
   push:
     branches: [main]
     paths:
@@ -22,7 +24,6 @@ concurrency:
 
 jobs:
   persist-and-continue:
-    if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -38,16 +39,15 @@ jobs:
         id: recover
         env:
           GH_TOKEN: ${{ github.token }}
-          EVENT_NAME: ${{ github.event_name }}
-          EVENT_DCE_RUN_ID: ${{ github.event.workflow_run.id }}
+          INPUT_DCE_RUN_ID: ${{ github.event.inputs.dce_run_id }}
         shell: bash
         run: |
           set -euo pipefail
-          rid="${EVENT_DCE_RUN_ID:-}"
-          if [ "$EVENT_NAME" = 'push' ] || ! [[ "$rid" =~ ^[0-9]+$ ]]; then
+          rid="${INPUT_DCE_RUN_ID:-}"
+          if ! [[ "$rid" =~ ^[0-9]+$ ]]; then
             rid="$(gh run list --workflow dce-fanout-v2.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
           fi
-          [[ "$rid" =~ ^[0-9]+$ ]] || { echo 'No successful DCE run available for progress bootstrap.' >&2; exit 1; }
+          [[ "$rid" =~ ^[0-9]+$ ]] || { echo 'No successful DCE run available for progress ledger.' >&2; exit 1; }
           tag="dce-harvest-$rid"
           asset="dce-candidate-queue-$rid.jsonl"
           mkdir -p recovered
@@ -83,7 +83,7 @@ jobs:
 
           # One-time migration wave: materializer produced 152 rows while this run
           # was already carrying the old max_jobs=60 dispatch input. Do not mark
-          # the unprocessed tail as consumed. The next wave uses max_jobs=160.
+          # the unprocessed tail as consumed. The next full wave uses max_jobs=160.
           if [ "$DCE_RUN_ID" = '31970904558' ]; then
             echo 'Migration wave detected; deliberately not ledgering its oversized pre-truncation queue.'
             echo 'added=0' >> "$GITHUB_OUTPUT"
