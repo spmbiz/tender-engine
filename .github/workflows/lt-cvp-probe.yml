@@ -1,0 +1,28 @@
+name: Lithuania CVP IS Probe
+
+on:
+  pull_request:
+    paths:
+      - 'pipeline/probe_lt_cvp_api.py'
+      - '.github/workflows/lt-cvp-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lt-cvp-probe-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  live-schema:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests brotli
+      - run: python -m py_compile pipeline/probe_lt_cvp_api.py
+      - name: Probe VPT public procurement export API
+        run: python pipeline/probe_lt_cvp_api.py
