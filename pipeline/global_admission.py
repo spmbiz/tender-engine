@@ -18,7 +18,7 @@ DEFAULT_POLICY = {
 
 
 def _request(url: str):
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.3"})
+    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.4"})
     tok = os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")
     if tok:
         req.add_header("Authorization", f"Bearer {tok}")
@@ -153,7 +153,18 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     state = _global_state()
     last = state.get("last_decision") if isinstance(state, dict) else {}
     demand = (last or {}).get("demand") or {}
-    hospitality_demand = int(demand.get("hospitality") or 1)
+
+    # Never interpret a missing/stale remote Hospitality demand value as
+    # permission to steal the entire Hospitality base share. The Evergreen broker
+    # now publishes the real V1 multi-lane backlog; until that fresh decision is
+    # visible, reserve the configured demanding floor rather than the old bogus
+    # fallback of 1 slot.
+    hospitality_cfg = workloads.get("hospitality") or {}
+    hospitality_floor = max(1, int(hospitality_cfg.get("min_slots_when_demanding") or 5))
+    hospitality_demand = int(demand.get("hospitality") or 0)
+    if hospitality_demand <= 0:
+        hospitality_demand = hospitality_floor
+
     gws_demand = int(demand.get("gws") or 0)
     tender_demand = int(demand.get("tenders") or max(requested, 1))
 
@@ -166,7 +177,7 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
         queued.update(repo_queued)
 
     sibling_targets = {
-        "hospitality": _fair_target(total, hospitality_demand, workloads.get("hospitality") or {}),
+        "hospitality": _fair_target(total, hospitality_demand, hospitality_cfg),
         "gws": _fair_target(total, gws_demand, workloads.get("gws") or {}),
     }
     sibling_missing = sum(max(0, sibling_targets[w] - int(active.get(w, 0))) for w in sibling_targets)
