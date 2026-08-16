@@ -1,167 +1,100 @@
-# AGENTS.md — Local LLM Cascade Direction
+# AGENTS.md — Tender Harvester Agent Contract
 
-## Strategic direction
+## Read first
 
-This repository should add a **hybrid deterministic + local small-LLM qualification layer** so that broad tender discovery can be filtered semantically at very high volume before expensive GPT/DCE reasoning.
+Before modifying discovery, semantic classification, DCE routing, or fleet architecture, read:
 
-The intended role of local models is triage, extraction and confidence routing — **not final legal/commercial judgment** and not a replacement for authoritative DCE verification.
+1. `skills/tender-engine/SKILL.md` for canonical procurement evidence and final bid/no-bid rules;
+2. `skills/live-semantic-fleet/SKILL.md` for the **current V2 backfill-once + live-delta + Qwen architecture**;
+3. `docs/HARVESTER_SCALE_BLUEPRINT.md` plus the existing Super Green/autonomous-fleet docs for broader scaling and durability rules.
 
-Target architecture:
+Where older local-LLM ideas conflict with `skills/live-semantic-fleet/SKILL.md`, the newer skill wins. In particular, the current first implementation target is **Qwen ~4B on parallel GitHub-hosted runners after a persistent Notice Intelligence Ledger**, with no mandatory sub-1B prefilter or multi-model ensemble unless measurement later proves it necessary.
+
+## Real operating environment
+
+This project does **not** assume OpenAI API agents. The high-level controller is ChatGPT Web (currently GPT-5.6 Sol in the user's workflow) using native GitHub and Google Drive connectivity to launch, inspect, edit, debug and steer work. GitHub Actions / scripts provide bulk execution.
+
+Do not introduce an OpenAI API dependency unless the user explicitly requests one.
+
+## Current target architecture
 
 ```text
 broad official discovery
-  -> normalize / dedupe / hard rules / CPV filters
-  -> ultra-cheap semantic prefilter (optional sub-1B model)
-  -> small local 3B–4B instruct classifier
-  -> confidence router
-      -> obvious reject / plausible keep
-      -> ambiguous cases -> stronger GPT semantic read
-      -> shortlisted candidates -> DCE retrieval
-      -> authoritative mandatory-gate deep read
-      -> final GREEN / SUPER GREEN decision
+  -> normalize / exact dedupe
+  -> Notice Intelligence Ledger
+  -> new or materially changed only
+  -> cheap deterministic hard filters
+  -> parallel Qwen ~4B GitHub workers
+  -> persist classification + model/prompt provenance
+  -> GPT Web for retained / unusual / uncertain / high-value cases
+  -> DCE retrieval / authoritative gate extraction
+  -> final GREEN / SUPER GREEN
 ```
 
-This must preserve the repository's existing law that no FINAL SUPER GREEN score is granted without mandatory-gate evidence from authoritative procurement material.
+The key scaling rule is **BACKFILL ONCE; PROCESS DELTAS FOREVER**. An active notice that is already known, unchanged, and classified should cost zero repeated LLM inference.
 
-## Primary tender use case
+## Qwen role
 
-Use a small local model to decide whether a notice plausibly fits the capabilities we can actually deliver or broker, from compact inputs such as:
+Use a Qwen 3/3.5-class ~4B instruct GGUF as the first benchmark target on standard GitHub-hosted runners. A 10–20 job matrix can provide 10–20 independent model instances in parallel, subject to real account/global fleet capacity.
 
-- title;
-- short description;
-- CPV/category codes;
-- buyer;
-- country;
-- estimated value if present;
-- lot descriptions;
-- short extracted snippets.
+Do not commit weights to Git. Cache pinned model/runtime artifacts, load once per worker, process substantial shards, persist isolated outputs, and aggregate transaction-safely.
 
-Example capability families currently relevant include:
+Support compact batching where benchmarked safe. Do not assume one prompt per tender.
 
-- website / CMS / web redesign / digital platform work;
-- software / lightweight automation / AI-enabled implementation;
-- transcription / language-processing work;
-- graphic design / creative production;
-- video / AI-assisted media production;
-- printing / print brokerage / fulfillment where subcontracting is viable.
+## Recall doctrine
 
-Desired strict output shape:
+The local classifier is a high-recall semantic router, not the final commercial/legal authority.
 
-```json
-{
-  "decision": "STRONG_FIT|FIT|MAYBE|REJECT",
-  "confidence": 0.0,
-  "matched_capabilities": [],
-  "possible_blockers": [],
-  "needs_dce": true,
-  "reason": "short explanation"
-}
-```
+Reject only clearly irrelevant opportunities. Novel, unusual, potentially brokerable, subcontractable, AI-assisted, software-enabled, resale, creative, digital or otherwise plausibly lean-deliverable opportunities should survive for review. Insufficient evidence remains `MAYBE` / `UNKNOWN` rather than becoming rejection.
 
-The classifier must never invent eligibility, budget, certifications, submission rules or buyer requirements. UNKNOWN is valid.
+Never invent eligibility, value, certifications, buyer requirements, deadlines, subcontract permissions or DCE facts.
 
-## What local models should do
+## No over-engineering by default
 
-Good tasks for 3B–4B local models:
+Do not add a 0.5–0.8B prefilter, Qwen9B, GLM, MiniCPM, Mistral, voting ensembles, or other model tiers before the Qwen4B benchmark demonstrates a real throughput/recall problem.
 
-- semantic niche classification beyond simple keywords;
-- detect that procurement language is conceptually equivalent to one of our niches;
-- rank notices for GPT attention;
-- identify obvious unrelated tenders;
-- extract structured fields from already-retrieved text;
-- tag likely subcontractable components;
-- identify which notices merit DCE download first;
-- summarize small chunks into compact handoff JSON.
+Keep interfaces model-agnostic so alternatives can be tested later.
 
-## What local models should NOT own
+## SERP / Search Fabric
 
-Do not trust a lightweight model alone for:
+Official procurement sources remain primary for completeness and source truth.
 
-- final legal eligibility;
-- mandatory certifications;
-- bid/no-bid on ambiguous contractual obligations;
-- interpreting contradictory DCE clauses;
-- final pricing feasibility;
-- final GREEN/SUPER GREEN scoring;
-- assertions not present in source material.
+OpenSERP, DDGS and optional SearXNG are secondary resolution/gap-filling tools for:
 
-Those remain for deterministic verification, authoritative document evidence and stronger-model review.
+- exact title/reference search;
+- buyer + reference resolution;
+- public PDF/DOCX/XLS discovery;
+- mirrored official notice pages;
+- award/related page discovery;
+- unresolved DCE/document routes.
 
-## Model/runtime preference
+SERP absence never proves a tender/document does not exist. CAPTCHA, throttle and errors must remain explicit.
 
-Optimize first for CPU-friendly GGUF inference under `llama.cpp` on free/ephemeral GitHub-hosted runners.
+## GPT Web boundary
 
-Candidate families to benchmark rather than permanently hard-code:
+GPT Web should focus on commercially plausible, unusual, uncertain, contradictory or high-value candidates and on creative delivery/broker/subcontract reasoning. Persist those decisions as reusable labels.
 
-- Qwen 3/3.5 class ~3B–4B instruct models;
-- Phi-4-mini class ~3.8B;
-- SmolLM3 ~3B;
-- sub-1B Qwen-class model only as a garbage pre-filter.
+GPT Web is not the daemon that reclassifies the entire world every live pass.
 
-Prefer 4-bit quantization when workload accuracy remains acceptable. Keep prequalification prompts compact; do not feed whole DCEs into a small model merely because a large context window is advertised.
+## DCE boundary
 
-## Suggested multi-stage funnel
+No local model and no SERP output may bypass authoritative mandatory-gate verification. No FINAL SUPER GREEN / 90+ without the evidence required by `skills/tender-engine/SKILL.md`.
 
-A practical target is:
+## Security
 
-```text
-100,000 raw notices
-  -> deterministic source/category/CPV/rule filters
-  -> 10,000–30,000 plausible textual candidates
-  -> local small-LLM semantic classification
-  -> 1,000–5,000 high-value candidates
-  -> stronger GPT wide-read
-  -> narrow DCE queue
-  -> DCE retrieval + authoritative gate extraction
-  -> final deep review
-```
+This repository is public. Do not route arbitrary public-repo workflow execution to the user's personal self-hosted PC. If the PC is used for OpenSERP, a stronger model, browser work or warm caches, it should be behind a **private control repository**. Public PR/fork code must never have arbitrary execution access to the machine.
 
-Exact volumes must be measured; do not fake throughput targets by silently lowering quality.
+The live system must continue when the PC is offline.
 
-## GitHub Actions / fleet integration
+## Core philosophy
 
-When implementing:
-
-- use independent shards compatible with the existing autonomous fleet;
-- avoid every short-lived runner re-downloading multi-GB weights when possible;
-- use GitHub cache, durable cached artifacts where appropriate, or a shared inference endpoint if that is cheaper/faster;
-- preserve fail-safe durable outputs before worker exit;
-- local-model failure should return an explicit state and must not consume/lose the candidate;
-- do not introduce concurrent writes to shared canonical files;
-- preserve current Release-based durability and lease semantics;
-- benchmark CPU inference under actual `ubuntu-latest` constraints before increasing fanout.
-
-CircleCI workers may use the same classifier contract if model/runtime caching makes sense there.
-
-## Required benchmark before production routing
-
-Build a labeled **AI PROD tender benchmark** from real previously reviewed notices.
-
-Suggested first set: 300–1,000 notices covering obvious rejects, semantic fits, misleading keyword matches, borderline cases and genuine high-value opportunities.
-
-Compare candidate local models against trusted GPT/human labels and track:
-
-- precision on FIT/STRONG_FIT;
-- recall on known good tenders;
-- false-negative rate on GREEN/SUPER-GREEN-like opportunities (critical);
-- false-positive reduction versus keyword/CPV rules;
-- ambiguity rate;
-- latency per notice;
-- peak RAM;
-- notices/minute per runner;
-- model download/cache overhead.
-
-Optimize for **cost and compute per retained true opportunity**, not generic benchmark scores.
-
-## Implementation philosophy
-
-1. **Deterministic first.** Source metadata, CPVs, deadlines, hashes and exact gates belong in code.
-2. **Small LLM second.** Use it for semantic ambiguity and language mapping.
-3. **Stronger GPT only where valuable.** Do not spend frontier-model reasoning on obvious garbage.
-4. **Confidence router.** Never make a single small-model score an unreviewable truth.
-5. **Strict structured output.** Machine decisions should be JSON-schema validated.
-6. **Source-grounded only.** No fabricated tender facts.
-7. **Preserve the DCE final gate.** Lightweight preclassification can prioritize retrieval, never bypass authoritative verification.
-8. **Incremental rollout.** Shadow-score first, benchmark, then enable automatic rejection only at empirically safe thresholds.
-
-When agents modify the discovery, wide-read handoff, queueing or autonomous-fleet paths, they should actively consider whether this local-LLM cascade can remove unnecessary GPT workload while preserving or improving recall of genuine high-value tenders.
+1. Official sources for coverage.
+2. Deterministic facts in code.
+3. Persistent ledger before LLM scale.
+4. Qwen ~4B on parallel GitHub workers for semantic triage.
+5. High recall: weird/novel/unknown survives.
+6. GPT Web for high-value hard cases.
+7. DCE for final mandatory gates.
+8. OpenSERP/DDGS/SearXNG as resolver tools, not source-of-truth replacements.
+9. Measure NEW+UPDATED/hour versus classifier capacity/hour.
+10. Do not add architectural complexity without a measured bottleneck.
