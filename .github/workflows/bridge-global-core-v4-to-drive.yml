@@ -10,21 +10,24 @@ permissions:
   contents: read
 
 jobs:
-  missing-assets:
+  small-assets:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     strategy:
       fail-fast: false
-      max-parallel: 8
+      max-parallel: 10
       matrix:
         asset:
-          - awards.csv.gz
-          - award_suppliers.csv.gz
+          - buyers.csv.gz
+          - buyers.parquet
           - country_summary.csv
           - data_quality.json
           - evidence_lanes.json
           - market_cohorts.csv
+          - run_manifest.json
           - source_priority.json
+          - suppliers.csv.gz
+          - suppliers.parquet
     steps:
       - name: Download canonical release asset
         env:
@@ -33,68 +36,98 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p bundle
-          gh release download tender-normalized-global-core-v4 \
-            --repo walidgdg1-ai/coldemailtool \
-            --pattern "$ASSET" --dir bundle
+          gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern "$ASSET" --dir bundle
           test -s "bundle/$ASSET"
-      - name: Upload connector-safe artifact
-        uses: actions/upload-artifact@v4
+          sha256sum "bundle/$ASSET" > "bundle/$ASSET.sha256"
+      - uses: actions/upload-artifact@v4
         with:
-          name: core-v4-${{ matrix.asset }}
-          path: bundle/${{ matrix.asset }}
+          name: core-v4-small-${{ matrix.asset }}
+          path: bundle/*
           compression-level: 0
           retention-days: 1
 
-  split-oversized:
+  large-assets:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     strategy:
       fail-fast: false
+      max-parallel: 6
       matrix:
         asset:
-          - historical_tenders.parquet
           - historical_tenders.csv.gz
+          - historical_tenders.parquet
+          - awards.csv.gz
+          - awards.parquet
+          - award_suppliers.csv.gz
+          - award_suppliers.parquet
     steps:
-      - name: Download and split canonical oversized asset
+      - name: Download split and hash
         env:
           GH_TOKEN: ${{ github.token }}
           ASSET: ${{ matrix.asset }}
         run: |
           set -euo pipefail
           mkdir -p original parts manifests
-          gh release download tender-normalized-global-core-v4 \
-            --repo walidgdg1-ai/coldemailtool \
-            --pattern "$ASSET" --dir original
-          sha256sum "original/$ASSET" | tee "manifests/$ASSET.sha256"
-          split -b 240M -d -a 3 "original/$ASSET" "parts/$ASSET.part-"
-          (cd parts && sha256sum "$ASSET".part-*) > "manifests/$ASSET.parts.sha256"
+          gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern "$ASSET" --dir original
+          sha256sum "original/$ASSET" > "manifests/$ASSET.sha256"
+          split -b 80M -d -a 3 "original/$ASSET" "parts/$ASSET.part-"
+          (cd parts && sha256sum "$ASSET".part-*) > "../manifests/$ASSET.parts.sha256"
           ls -lh parts/
-      - name: Upload multipart payload
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
+        if: ${{ hashFiles(format('parts/{0}.part-000', matrix.asset)) != '' }}
+        with: {name: "core-v4-${{ matrix.asset }}-part-000", path: "parts/${{ matrix.asset }}.part-000", compression-level: 0, retention-days: 1}
+      - uses: actions/upload-artifact@v4
+        if: ${{ hashFiles(format('parts/{0}.part-001', matrix.asset)) != '' }}
+        with: {name: "core-v4-${{ matrix.asset }}-part-001", path: "parts/${{ matrix.asset }}.part-001", compression-level: 0, retention-days: 1}
+      - uses: actions/upload-artifact@v4
+        if: ${{ hashFiles(format('parts/{0}.part-002', matrix.asset)) != '' }}
+        with: {name: "core-v4-${{ matrix.asset }}-part-002", path: "parts/${{ matrix.asset }}.part-002", compression-level: 0, retention-days: 1}
+      - uses: actions/upload-artifact@v4
+        if: ${{ hashFiles(format('parts/{0}.part-003', matrix.asset)) != '' }}
+        with: {name: "core-v4-${{ matrix.asset }}-part-003", path: "parts/${{ matrix.asset }}.part-003", compression-level: 0, retention-days: 1}
+      - uses: actions/upload-artifact@v4
+        if: ${{ hashFiles(format('parts/{0}.part-004', matrix.asset)) != '' }}
+        with: {name: "core-v4-${{ matrix.asset }}-part-004", path: "parts/${{ matrix.asset }}.part-004", compression-level: 0, retention-days: 1}
+      - uses: actions/upload-artifact@v4
+        if: ${{ hashFiles(format('parts/{0}.part-005', matrix.asset)) != '' }}
+        with: {name: "core-v4-${{ matrix.asset }}-part-005", path: "parts/${{ matrix.asset }}.part-005", compression-level: 0, retention-days: 1}
+      - uses: actions/upload-artifact@v4
+        if: ${{ hashFiles(format('parts/{0}.part-006', matrix.asset)) != '' }}
+        with: {name: "core-v4-${{ matrix.asset }}-part-006", path: "parts/${{ matrix.asset }}.part-006", compression-level: 0, retention-days: 1}
+      - uses: actions/upload-artifact@v4
+        if: ${{ hashFiles(format('parts/{0}.part-007', matrix.asset)) != '' }}
+        with: {name: "core-v4-${{ matrix.asset }}-part-007", path: "parts/${{ matrix.asset }}.part-007", compression-level: 0, retention-days: 1}
+      - uses: actions/upload-artifact@v4
+        if: ${{ hashFiles(format('parts/{0}.part-008', matrix.asset)) != '' }}
+        with: {name: "core-v4-${{ matrix.asset }}-part-008", path: "parts/${{ matrix.asset }}.part-008", compression-level: 0, retention-days: 1}
+      - uses: actions/upload-artifact@v4
+        if: ${{ hashFiles(format('parts/{0}.part-009', matrix.asset)) != '' }}
+        with: {name: "core-v4-${{ matrix.asset }}-part-009", path: "parts/${{ matrix.asset }}.part-009", compression-level: 0, retention-days: 1}
+      - uses: actions/upload-artifact@v4
         with:
-          name: core-v4-multipart-${{ matrix.asset }}
-          path: |
-            parts/*
-            manifests/*
+          name: core-v4-${{ matrix.asset }}-hashes
+          path: manifests/*
           compression-level: 0
           retention-days: 1
 
   provenance:
     runs-on: ubuntu-latest
     steps:
-      - name: Write transfer provenance
+      - name: Write provenance and reconstruction instructions
         run: |
           cat > DRIVE_BRIDGE_PROVENANCE.txt <<'EOF'
-          Source repository: walidgdg1-ai/coldemailtool
-          Source release: tender-normalized-global-core-v4
-          Destination: Google Drive / Public Tender Intelligence — Archive / Releases / tender-normalized-global-core-v4
-          Normal assets are mirrored from canonical release bytes.
-          Oversized assets historical_tenders.parquet and historical_tenders.csv.gz are stored as byte-exact multipart chunks with SHA256 reconstruction manifests because the ChatGPT connector transport caps a single artifact at 512 MB.
-          GitHub Release remains the canonical source and is not deleted.
+          Canonical source: walidgdg1-ai/coldemailtool release tender-normalized-global-core-v4
+          Drive mirror: Public Tender Intelligence — Archive / Releases / tender-normalized-global-core-v4
+          Files <=100 MB are mirrored natively.
+          Files >100 MB are split into byte-exact 80 MiB parts because the Drive connector transport caps uploads at 100 MB.
+          Reconstruct on Linux/macOS: cat FILE.part-* > FILE
+          Reconstruct on PowerShell: cmd /c copy /b FILE.part-000+FILE.part-001+... FILE
+          Verify the reconstructed file against FILE.sha256.
+          The GitHub Release remains untouched as canonical backup.
           EOF
       - uses: actions/upload-artifact@v4
         with:
-          name: core-v4-provenance-v2
+          name: core-v4-drive-provenance
           path: DRIVE_BRIDGE_PROVENANCE.txt
           compression-level: 0
           retention-days: 1
