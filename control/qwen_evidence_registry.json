@@ -1,0 +1,51 @@
+{
+  "schema": "QWEN_EVIDENCE_REGISTRY_V1",
+  "storage_policy": {
+    "preferred_primary": "immutable_github_release",
+    "current_release_write_status": "BLOCKED_BY_GITHUB_APP_403_FOR_QWEN_PERSIST_WORKFLOWS",
+    "durable_fallback": "google_drive",
+    "actions_artifacts_are_temporary_only": true,
+    "delete_unique_data": false,
+    "automatic_rejection_enabled": false
+  },
+  "runs": [
+    {
+      "workflow_run_id": 31919548717,
+      "status": "DURABLY_MIRRORED_TO_DRIVE",
+      "model": "Qwen/Qwen3-4B-GGUF:Q4_K_M",
+      "quant": "Q4_K_M",
+      "prompt_version": "qwen-notice-high-recall-v1",
+      "classifier_version": "qwen3-4b-q4km-shadow-v1",
+      "sample_size": 12,
+      "sample_completed": 12,
+      "startup_seconds": 24.0,
+      "inference_seconds": 325.534,
+      "notices_per_second": 0.0369,
+      "seconds_per_notice": 27.128,
+      "parse_errors": 0,
+      "classification_counts": {
+        "FIT": 2,
+        "MAYBE": 6,
+        "REJECT_OBVIOUS": 4
+      },
+      "actions_artifact": {
+        "artifact_id": 9255984457,
+        "name": "qwen3-4b-shadow-smoke-31919548717",
+        "zip_digest_sha256": "1877c10e914475962552cff192335562630221592d5f629b967f8e0d8fac0e05",
+        "temporary_transport_only": true
+      },
+      "drive_mirror": {
+        "file_id": "1T_pJlb-cUvawKA10_x0KWgBF6N009i4T",
+        "file_name": "qwen3-4b-shadow-smoke-31919548717-durable.zip",
+        "url": "https://drive.google.com/file/d/1T_pJlb-cUvawKA10_x0KWgBF6N009i4T/view?usp=drivesdk",
+        "parent_folder_id": "1onZQsFiNrn-xRPhG0RnkncoV_SGNlWNk"
+      },
+      "safety": {
+        "shadow_only": true,
+        "destructive_reject": false,
+        "dce_truth": false,
+        "eligibility_truth": false
+      }
+    }
+  ]
+}
