@@ -52,7 +52,7 @@ jobs:
             fi
             assets="$(gh release view "$tag" --repo "$REPO" --json assets --jq '.assets[].name')"
             grep -Fxq "dce-deep-review-$rid.tar.gz" <<< "$assets" || continue
-            if grep -Fxq "qwen-dce-triage-$rid.jsonl" <<< "$assets"; then
+            if grep -Fxq "qwen-dce-triage-$rid.jsonl" <<< "$assets" || grep -Fxq "qwen-dce-triage-status-$rid.json" <<< "$assets"; then
               continue
             fi
             echo "Dispatching missing Qwen DCE pre-read for durable DCE run $rid"
