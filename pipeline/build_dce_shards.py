@@ -141,10 +141,10 @@ def main():
 
     for line_no, rec in load_lines(Path(args.queue)):
         status = str(rec.get("status") or "QUEUED").upper()
-        if status not in {"QUEUED", "READY", "DCE_PENDING", "AUTO_DCE_PREFETCH"}:
+        if status not in {"QUEUED", "READY", "DCE_PENDING", "AUTO_DCE_PREFETCH", "AUTO_DCE_PREFETCH_QWEN"}:
             skipped.append({"line": line_no, "candidate_id": rec.get("candidate_id"), "reason": f"status:{status}"})
             continue
-        portal = str(rec.get("portal") or rec.get("portal_key") or rec.get("source") or "").upper()
+        portal = str(rec.get("portal") or rec.get("portal_key") or rec.get("selection_portal") or rec.get("source") or "").upper()
         if portal not in SUPPORTED:
             skipped.append({"line": line_no, "candidate_id": rec.get("candidate_id"), "reason": f"unsupported:{portal}"})
             continue
