@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import datetime as dt
 import gzip
 import hashlib
 import json
 import os
 import re
+import subprocess
 import time
 import urllib.request
 from collections import Counter
@@ -319,6 +321,10 @@ def main() -> None:
     final: dict[str, dict[str, Any]] = {}
     row_meta: dict[str, dict[str, Any]] = {}
     sample_by_id = {cid(row): row for row in sample}
+    live_release_tag = f"qwen-live-progress-{run_id}" if os.environ.get("GITHUB_ACTIONS") == "true" and run_id != "local" else None
+    live_release_repo = os.environ.get("GITHUB_REPOSITORY")
+    live_release_ready = False
+    live_auth_env: dict[str, str] | None = None
 
     def emit(event: str, **fields: Any) -> None:
         payload = {
@@ -329,6 +335,81 @@ def main() -> None:
             **fields,
         }
         print("QWEN_PROGRESS " + json.dumps(payload, ensure_ascii=False, separators=(",", ":")), flush=True)
+
+    def github_auth_env() -> dict[str, str] | None:
+        nonlocal live_auth_env
+        if live_auth_env is not None:
+            return live_auth_env
+        env = os.environ.copy()
+        if env.get("GH_TOKEN"):
+            live_auth_env = env
+            return env
+        try:
+            header = subprocess.check_output(
+                ["git", "config", "--local", "--get", "http.https://github.com/.extraheader"],
+                text=True, stderr=subprocess.DEVNULL, timeout=5,
+            ).strip()
+            match = re.search(r"basic\s+(\S+)", header, flags=re.I)
+            if not match:
+                return None
+            decoded = base64.b64decode(match.group(1)).decode("utf-8", errors="ignore")
+            token = decoded.split(":", 1)[1] if ":" in decoded else ""
+            if not token:
+                return None
+            env["GH_TOKEN"] = token
+            live_auth_env = env
+            return env
+        except Exception:
+            return None
+
+    def ensure_live_release() -> bool:
+        nonlocal live_release_ready
+        if live_release_ready:
+            return True
+        if not live_release_tag or not live_release_repo:
+            return False
+        env = github_auth_env()
+        if not env:
+            return False
+        view = subprocess.run(
+            ["gh", "release", "view", live_release_tag, "--repo", live_release_repo],
+            env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15, check=False,
+        )
+        if view.returncode != 0:
+            create = subprocess.run(
+                ["gh", "release", "create", live_release_tag, "--repo", live_release_repo,
+                 "--target", os.environ.get("GITHUB_SHA", "main"),
+                 "--title", f"Qwen Live Progress {run_id}",
+                 "--notes", "Externally readable per-worker Qwen checkpoints; assets are replaced after each checkpoint."],
+                env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=25, check=False,
+            )
+            if create.returncode != 0:
+                view = subprocess.run(
+                    ["gh", "release", "view", live_release_tag, "--repo", live_release_repo],
+                    env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15, check=False,
+                )
+                if view.returncode != 0:
+                    return False
+        live_release_ready = True
+        return True
+
+    def publish_external_checkpoint(event: str) -> None:
+        if not progress_path.exists() or not ensure_live_release():
+            return
+        env = github_auth_env()
+        if not env:
+            return
+        try:
+            cp = subprocess.run(
+                ["gh", "release", "upload", live_release_tag, str(progress_path), "--clobber", "--repo", live_release_repo],
+                env=env, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, timeout=30, check=False,
+            )
+            if cp.returncode == 0:
+                emit("EXTERNAL_CHECKPOINT_PUBLISHED", checkpoint_event=event, asset=progress_path.name, release_tag=live_release_tag)
+            else:
+                emit("EXTERNAL_CHECKPOINT_PUBLISH_FAIL", checkpoint_event=event, asset=progress_path.name, release_tag=live_release_tag, returncode=cp.returncode, stderr_tail=(cp.stderr or "")[-300:])
+        except Exception as exc:
+            emit("EXTERNAL_CHECKPOINT_PUBLISH_FAIL", checkpoint_event=event, asset=progress_path.name, release_tag=live_release_tag, error=type(exc).__name__)
 
     def build_record(candidate: str) -> dict[str, Any] | None:
         row = sample_by_id.get(candidate)
@@ -388,6 +469,7 @@ def main() -> None:
             "updated_at_utc": now_utc(),
         }
         atomic_json(progress_path, live)
+        publish_external_checkpoint(event)
         emit("CHECKPOINT", resolved=live["resolved"], remaining=live["remaining"], attempts=live["request_attempts"], failures=live["failed_attempts"], splits=split_events, decisions=live["decision_counts"])
 
     emit("START", sample_total=len(sample), batch_size=args.batch_size, timeout_seconds=args.timeout, max_runtime_seconds=args.max_runtime_seconds, startup_seconds=args.startup_seconds)
@@ -581,6 +663,9 @@ def main() -> None:
             "incremental_progress_json": str(progress_path),
             "atomic_checkpoint_rewrites": True,
             "github_notice_per_top_batch": True,
+            "external_release_checkpoint": bool(live_release_tag and live_release_repo),
+            "external_release_tag": live_release_tag,
+            "external_release_asset": progress_path.name,
         },
         "data_safety": {
             "shadow_only": True,
@@ -609,6 +694,7 @@ def main() -> None:
         "elapsed_seconds": round(elapsed, 3),
         "updated_at_utc": now_utc(),
     })
+    publish_external_checkpoint("COMPLETE")
     emit("COMPLETE", resolved=len(records), total=len(sample), elapsed_seconds=round(elapsed, 3), seconds_per_notice=summary["seconds_per_notice"], failures=summary["failed_attempts"], splits=split_events, singleton_fallbacks=singleton_fallbacks, decisions=summary["decision_counts"])
     if not summary["row_conservation_pass"]:
         raise SystemExit("row conservation failed")
