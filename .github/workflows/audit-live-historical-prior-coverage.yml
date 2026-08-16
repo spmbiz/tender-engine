@@ -1,0 +1,60 @@
+name: Audit Live Historical Prior Coverage
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/audit_live_historical_prior_coverage.py'
+      - '.github/workflows/audit-live-historical-prior-coverage.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: audit-live-historical-prior-coverage
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download durable classification queue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p input out
+          gh release download notice-intelligence-ledger-latest --pattern 'notice-classification-queue-latest.jsonl.gz' --dir input
+          release_name="$(gh release view notice-intelligence-ledger-latest --json name --jq '.name')"
+          source_run="$(grep -oE '[0-9]{8,}' <<< "$release_name" | tail -n1)"
+          [[ "$source_run" =~ ^[0-9]+$ ]]
+          echo "SOURCE_RUN=$source_run" >> "$GITHUB_ENV"
+      - name: Audit rule coverage
+        run: |
+          python pipeline/audit_live_historical_prior_coverage.py \
+            --input input/notice-classification-queue-latest.jsonl.gz \
+            --priors control/historical_market_priors.json \
+            --out "out/live-historical-prior-coverage-${SOURCE_RUN}.json"
+          sha256sum "out/live-historical-prior-coverage-${SOURCE_RUN}.json" > "out/live-historical-prior-coverage-${SOURCE_RUN}.sha256"
+      - name: Publish durable diagnostic
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="live-historical-prior-coverage-${SOURCE_RUN}-${GITHUB_RUN_ID}"
+          gh release create "$tag" --target "$GITHUB_SHA" --title "Live Historical Prior Coverage ${SOURCE_RUN}" --notes "Non-destructive diagnostic of historical prior rule coverage on the durable live classification queue. No notice is filtered or deleted."
+          gh release upload "$tag" out/*
+          cp "out/live-historical-prior-coverage-${SOURCE_RUN}.json" out/live-historical-prior-coverage-latest.json
+          cp "out/live-historical-prior-coverage-${SOURCE_RUN}.sha256" out/live-historical-prior-coverage-latest.sha256
+          latest=live-historical-prior-coverage-latest
+          gh release view "$latest" >/dev/null 2>&1 || gh release create "$latest" --target "$GITHUB_SHA" --title 'Live Historical Prior Coverage — LATEST' --notes 'Stable diagnostic pointer.'
+          gh release edit "$latest" --title "Live Historical Prior Coverage — LATEST (${SOURCE_RUN})" --notes "source_run=${SOURCE_RUN}; diagnostic only; no destructive filtering."
+          gh release upload "$latest" out/live-historical-prior-coverage-latest.* --clobber
