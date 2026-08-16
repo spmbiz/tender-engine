@@ -1,0 +1,131 @@
+name: Live Historical Prior Shadow
+
+on:
+  workflow_run:
+    workflows: ["Notice Intelligence Ledger"]
+    types: [completed]
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/build_live_historical_prior_shadow.py'
+      - 'pipeline/historical_market_priors.py'
+      - 'control/historical_market_priors.json'
+      - '.github/workflows/live-historical-prior-shadow.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: live-historical-prior-shadow
+  cancel-in-progress: false
+
+jobs:
+  enrich:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download durable live classification queue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p input out latest
+          gh release download notice-intelligence-ledger-latest \
+            --pattern 'notice-classification-queue-latest.jsonl.gz' \
+            --pattern 'notice-ledger-summary-latest.json' \
+            --dir input
+          test -s input/notice-classification-queue-latest.jsonl.gz
+          test -s input/notice-ledger-summary-latest.json
+
+          release_name="$(gh release view notice-intelligence-ledger-latest --json name --jq '.name')"
+          source_run="$(grep -oE '[0-9]{8,}' <<< "$release_name" | tail -n1)"
+          [[ "$source_run" =~ ^[0-9]+$ ]] || { echo "Could not resolve source run from: $release_name" >&2; exit 1; }
+          echo "SOURCE_RUN=$source_run" >> "$GITHUB_ENV"
+          prior_sha="$(sha256sum control/historical_market_priors.json | awk '{print substr($1,1,12)}')"
+          echo "PRIOR_SHA=$prior_sha" >> "$GITHUB_ENV"
+
+      - name: Apply historical priors without dropping any notice
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/build_live_historical_prior_shadow.py \
+            --input input/notice-classification-queue-latest.jsonl.gz \
+            --priors control/historical_market_priors.json \
+            --source-run "$SOURCE_RUN" \
+            --all-out "out/live-historical-prior-all-${SOURCE_RUN}.jsonl.gz" \
+            --promoted-out "out/live-historical-prior-promoted-${SOURCE_RUN}.jsonl.gz" \
+            --residual-out "out/live-historical-prior-residual-${SOURCE_RUN}.jsonl.gz" \
+            --summary-out "out/live-historical-prior-summary-${SOURCE_RUN}.json"
+
+      - name: Enforce row conservation and identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          run=os.environ['SOURCE_RUN']
+          ledger=json.load(open('input/notice-ledger-summary-latest.json',encoding='utf-8'))
+          shadow=json.load(open(f'out/live-historical-prior-summary-{run}.json',encoding='utf-8'))
+          expected=int(ledger.get('classification_queue') or 0)
+          assert shadow['input_rows']==expected,(shadow['input_rows'],expected)
+          assert shadow['all_enriched_rows']==shadow['input_rows']
+          assert shadow['promoted_rows']+shadow['residual_rows']==shadow['input_rows']
+          assert shadow['malformed_identity_rows']==0,shadow['malformed_identity_rows']
+          assert shadow['safety']['drops_or_deletes_notices'] is False
+          assert shadow['safety']['residual_is_reject'] is False
+          print('ROW_CONSERVATION_PASS', expected, 'promoted', shadow['promoted_rows'], 'residual', shadow['residual_rows'])
+          PY
+          (cd out && sha256sum * > "SHA256SUMS-${SOURCE_RUN}.txt")
+
+      - name: Publish immutable durable generation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="live-historical-prior-shadow-${SOURCE_RUN}-${PRIOR_SHA}-${GITHUB_RUN_ID}"
+          gh release create "$tag" \
+            --target "$GITHUB_SHA" \
+            --title "Live Historical Prior Shadow ${SOURCE_RUN}" \
+            --notes "Data-preserving pre-DCE enrichment. Every classification-queue row is retained in the all output; promoted/residual are derived views only. Residual is never a reject set. source_run=${SOURCE_RUN} prior_sha=${PRIOR_SHA} workflow_run=${GITHUB_RUN_ID}."
+          gh release upload "$tag" out/*
+          echo "IMMUTABLE_TAG=$tag" >> "$GITHUB_ENV"
+
+      - name: Refresh stable latest pointer
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp "out/live-historical-prior-all-${SOURCE_RUN}.jsonl.gz" latest/live-historical-prior-all-latest.jsonl.gz
+          cp "out/live-historical-prior-promoted-${SOURCE_RUN}.jsonl.gz" latest/live-historical-prior-promoted-latest.jsonl.gz
+          cp "out/live-historical-prior-residual-${SOURCE_RUN}.jsonl.gz" latest/live-historical-prior-residual-latest.jsonl.gz
+          cp "out/live-historical-prior-summary-${SOURCE_RUN}.json" latest/live-historical-prior-summary-latest.json
+          cp "out/SHA256SUMS-${SOURCE_RUN}.txt" latest/SHA256SUMS-latest.txt
+          tag=live-historical-prior-shadow-latest
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" \
+            --target "$GITHUB_SHA" \
+            --title 'Live Historical Prior Shadow — LATEST' \
+            --notes 'Stable pointer; authoritative historical-prior output remains pre-DCE only.'
+          gh release edit "$tag" \
+            --title "Live Historical Prior Shadow — LATEST (${SOURCE_RUN})" \
+            --notes "source_run=${SOURCE_RUN} prior_sha=${PRIOR_SHA} immutable=${IMMUTABLE_TAG}. Full enriched queue is row-conserving; promoted/residual are derived and non-destructive."
+          gh release upload "$tag" latest/* --clobber
+
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -s "out/live-historical-prior-summary-${SOURCE_RUN:-unknown}.json" ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat "out/live-historical-prior-summary-${SOURCE_RUN}.json" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
