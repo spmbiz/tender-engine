@@ -14,6 +14,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/dce-gpt-web-handoff.yml'
+      - 'pipeline/build_gpt_web_review_bank.py'
 
 permissions:
   contents: write
@@ -77,6 +78,8 @@ jobs:
             --queue "$REVIEW_QUEUE" \
             --existing control/gpt_review_pending.json \
             --out control/gpt_review_pending.json \
+            --top-out control/gpt_review_pending_top.json \
+            --top-items 30 \
             --run-id "$SOURCE_RUN" \
             --max-items 240
           python - <<'PY'
@@ -87,8 +90,11 @@ jobs:
               'schema':x.get('schema'),
               'latest_source_dce_run_id':x.get('latest_source_dce_run_id'),
               'incoming_gate_ready':x.get('incoming_gate_ready'),
+              'incoming_with_gate_evidence':x.get('incoming_with_gate_evidence'),
               'pending_total':x.get('count'),
           }, indent=2))
+          if x.get('incoming_gate_ready') and not x.get('incoming_with_gate_evidence'):
+              raise SystemExit('Gate-ready rows exist but zero gate evidence was packed; refusing silent empty handoff')
           PY
       - name: Persist handoff for GPT Web
         env:
@@ -98,7 +104,7 @@ jobs:
           set -euo pipefail
           git config user.name 'tender-engine-bot'
           git config user.email 'tender-engine-bot@users.noreply.github.com'
-          git add control/gpt_review_pending.json
+          git add control/gpt_review_pending.json control/gpt_review_pending_top.json
           if git diff --cached --quiet; then
             echo 'No handoff delta to persist.'
             exit 0
