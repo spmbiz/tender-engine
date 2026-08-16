@@ -1,0 +1,6 @@
+# Optional OSS expansion dependencies.
+# Not installed by default: the core Tender Engine must keep working without them.
+# Splink 4.x is the stable line used by entity_resolution_shadow.py; 5.x is still prerelease as of 2026-08.
+splink>=4.0.16,<5
+# Docling stays on the current v2 API used by docling_deep_parser.py.
+docling>=2.115,<3
