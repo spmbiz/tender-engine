@@ -1,0 +1,136 @@
+name: Qwen Concurrent Slots Benchmark
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'control/qwen_concurrent_trigger.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qwen-concurrent-slots-benchmark
+  cancel-in-progress: false
+
+jobs:
+  benchmark:
+    strategy:
+      fail-fast: false
+      matrix:
+        concurrency: [2, 4]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download durable ledger queue and resolve generation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ledger
+          gh release download notice-intelligence-ledger-latest \
+            --pattern notice-classification-queue-latest.jsonl.gz \
+            --pattern notice-ledger-summary-latest.json \
+            --dir ledger
+          test -s ledger/notice-classification-queue-latest.jsonl.gz
+          generation="$(python - <<'PY'
+          import json
+          s=json.load(open('ledger/notice-ledger-summary-latest.json'))
+          print(s.get('source_discovery_run') or s.get('generated_at') or 'UNKNOWN')
+          PY
+          )"
+          echo "LEDGER_GENERATION=$generation" >> "$GITHUB_ENV"
+
+      - name: Install llama.cpp CPU runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p llama-dist
+          gh api 'repos/ggml-org/llama.cpp/releases?per_page=20' > /tmp/releases.json
+          readarray -t picked < <(python - <<'PY'
+          import json,re
+          for rel in json.load(open('/tmp/releases.json')):
+              if rel.get('draft') or rel.get('prerelease'): continue
+              for a in rel.get('assets',[]):
+                  if re.fullmatch(r'llama-.*-bin-ubuntu-x64\.tar\.gz',a.get('name','')):
+                      print(rel['tag_name']); print(a['name']); raise SystemExit
+          raise SystemExit('no llama asset')
+          PY
+          )
+          gh release download "${picked[0]}" --repo ggml-org/llama.cpp --pattern "${picked[1]}" --dir llama-dist
+          tar -xzf "llama-dist/${picked[1]}" -C llama-dist
+          server="$(find llama-dist -type f -name llama-server -perm -u+x -print -quit)"
+          test -n "$server"
+          echo "LLAMA_SERVER=$server" >> "$GITHUB_ENV"
+          echo "LLAMA_CPP_TAG=${picked[0]}" >> "$GITHUB_ENV"
+
+      - name: Start Qwen3 4B once
+        shell: bash
+        run: |
+          set -euo pipefail
+          start="$(date +%s)"
+          "$LLAMA_SERVER" -hf Qwen/Qwen3-4B-GGUF:Q4_K_M \
+            --host 127.0.0.1 --port 8080 --jinja -c 4096 -t 4 > qwen-server.log 2>&1 &
+          echo $! > qwen-server.pid
+          for i in $(seq 1 180); do
+            curl -fsS http://127.0.0.1:8080/health >/dev/null 2>&1 && break
+            kill -0 "$(cat qwen-server.pid)" >/dev/null 2>&1 || { tail -200 qwen-server.log; exit 1; }
+            sleep 3
+          done
+          curl -fsS http://127.0.0.1:8080/health >/dev/null
+          echo "QWEN_STARTUP_SECONDS=$(($(date +%s)-start))" >> "$GITHUB_ENV"
+
+      - name: Run independent per-notice requests concurrently
+        shell: bash
+        run: |
+          set -euo pipefail
+          c='${{ matrix.concurrency }}'
+          python pipeline/qwen_notice_concurrent_benchmark.py \
+            --queue ledger/notice-classification-queue-latest.jsonl.gz \
+            --out "qwen-concurrent-${c}-results.jsonl" \
+            --summary "qwen-concurrent-${c}-summary.json" \
+            --concurrency "$c" \
+            --sample-size 12 \
+            --description-chars 1800 \
+            --max-tokens 100 \
+            --timeout 120 \
+            --startup-seconds "$QWEN_STARTUP_SECONDS" \
+            --source-ledger-generation "$LEDGER_GENERATION"
+
+      - name: Stop model
+        if: always()
+        shell: bash
+        run: |
+          [ -s qwen-server.pid ] && kill "$(cat qwen-server.pid)" >/dev/null 2>&1 || true
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-concurrent-${{ matrix.concurrency }}-${{ github.run_id }}
+          path: |
+            qwen-concurrent-${{ matrix.concurrency }}-results.jsonl
+            qwen-concurrent-${{ matrix.concurrency }}-summary.json
+            qwen-server.log
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          f='qwen-concurrent-${{ matrix.concurrency }}-summary.json'
+          if [ -s "$f" ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat "$f" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
