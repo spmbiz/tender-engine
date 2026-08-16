@@ -150,6 +150,11 @@ def main() -> None:
         seen.add(cid)
         base = by_id.get(cid)
         if not base:
+            # Qwen's live queue is persisted independently from any one discovery
+            # snapshot. A few rows can therefore refer to a notice discovered in a
+            # different/newer canonical harvest. Do not let those stale cross-snapshot
+            # references abort an otherwise valid DCE batch; retain them in the
+            # persisted Qwen queue and report them explicitly for a later matching run.
             missing.append(cid)
             continue
         cid_key, tb_key = identity(base)
@@ -176,14 +181,17 @@ def main() -> None:
         rec['selection_manifest_candidate_id'] = cid
         selected.append(rec)
 
-    if missing:
-        raise SystemExit('Selection candidates missing from canonical discovery pool: ' + ', '.join(missing))
-
-    accounted = len(selected) + len(excluded_existing) + len(duplicate_selection) + len(excluded_qwen_pre_admission)
+    accounted = len(selected) + len(missing) + len(excluded_existing) + len(duplicate_selection) + len(excluded_qwen_pre_admission)
     if accounted != len(selection):
         raise SystemExit(
-            f'Coverage mismatch: selected={len(selected)} existing={len(excluded_existing)} '
+            f'Coverage mismatch: selected={len(selected)} missing_snapshot={len(missing)} existing={len(excluded_existing)} '
             f'duplicates={len(duplicate_selection)} qwen_deferred={len(excluded_qwen_pre_admission)} selection={len(selection)}'
+        )
+    if selection and not selected:
+        raise SystemExit(
+            'Selection produced zero materializable DCE candidates; refusing to publish an empty batch. '
+            f'missing_snapshot={len(missing)} existing={len(excluded_existing)} duplicates={len(duplicate_selection)} '
+            f'qwen_deferred={len(excluded_qwen_pre_admission)}'
         )
 
     out = Path(args.out)
@@ -195,6 +203,8 @@ def main() -> None:
     summary = {
         'canonical_candidate_pool': len(candidates),
         'selection_manifest_records': len(selection),
+        'missing_from_source_snapshot_count': len(missing),
+        'missing_from_source_snapshot_candidate_ids': missing,
         'excluded_as_existing_exact_identity': len(excluded_existing),
         'excluded_existing_candidate_ids': excluded_existing,
         'deduplicated_exact_identity_count': len(duplicate_selection),
