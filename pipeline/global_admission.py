@@ -18,7 +18,7 @@ DEFAULT_POLICY = {
 
 
 def _request(url: str):
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.4"})
+    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.5"})
     tok = os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")
     if tok:
         req.add_header("Authorization", f"Bearer {tok}")
@@ -96,18 +96,7 @@ def _fair_target(total: int, demand: int, cfg: dict) -> int:
 
 
 def _controller_preauthorized() -> bool:
-    """True when the live controller already admitted this DCE wave.
-
-    Autonomous DCE dispatches are pinned to the dedicated ``fleet-dce`` branch
-    only after fleet_controller has measured account capacity, protected sibling
-    headroom, and supplied a bounded max_parallel value. Re-running the same
-    fair-share calculation several seconds later inside the prepare job creates a
-    race: auxiliary Tender jobs can appear in between and make the second vote
-    return zero, even though the controller already leased the queue.
-
-    Explicit env opt-in is supported for tests/future controllers. Manual runs on
-    main remain broker-controlled.
-    """
+    """True when the live controller already admitted this DCE wave."""
     flag = str(os.getenv("DCE_ADMISSION_PREAUTHORIZED") or "").strip().lower()
     if flag in {"1", "true", "yes"}:
         return True
@@ -119,18 +108,49 @@ def _controller_preauthorized() -> bool:
     return ref_name == "fleet-dce"
 
 
+def _workflow_selection_path() -> str:
+    """Best-effort workflow_dispatch selection path without requiring YAML plumbing."""
+    explicit = str(os.getenv("DCE_SELECTION_PATH") or "").strip()
+    if explicit:
+        return explicit
+    event_path = str(os.getenv("GITHUB_EVENT_PATH") or "").strip()
+    if not event_path:
+        return ""
+    try:
+        event = json.load(open(event_path, encoding="utf-8"))
+    except Exception:
+        return ""
+    inputs = event.get("inputs") if isinstance(event, dict) else {}
+    if not isinstance(inputs, dict):
+        return ""
+    return str(inputs.get("selection_path") or "").strip()
+
+
+def _spm_curated_fast_lane() -> bool:
+    """Only the tiny GPT-curated rescue manifest gets bounded free-slot priority.
+
+    This does not preempt siblings and does not bypass the account's physical
+    capacity. It merely allows an already curated, high-value DCE queue to use
+    currently idle slots instead of leaving them reserved for a sibling workload
+    that is not using them at that instant.
+    """
+    flag = str(os.getenv("DCE_SPM_CURATED_FAST_LANE") or "").strip().lower()
+    if flag in {"1", "true", "yes"}:
+        return True
+    return "spm_rescue_selection" in _workflow_selection_path().lower()
+
+
 def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     """Admission-control new Tender runners without preempting running jobs.
 
     Actual in-progress jobs consume capacity. Queued jobs are demand/backlog and
     never consume a slot in this local admission calculation. Sibling workloads
-    with durable demand still receive fair-target headroom before Tender borrows
-    idle capacity.
+    with durable demand normally receive fair-target headroom before Tender
+    borrows idle capacity.
 
-    Autonomous DCE waves dispatched on ``fleet-dce`` are an exception: their
-    ``requested`` value is already the controller-approved capacity budget, so the
-    sharder consumes that budget rather than performing a contradictory second
-    admission vote.
+    GPT-curated SPM rescue queues are a deliberately tiny exception: they may use
+    up to three *currently free* physical runner slots even when those idle slots
+    were being held as sibling headroom. Nothing running is killed or displaced.
     """
     requested = max(0, int(requested))
     if _controller_preauthorized():
@@ -154,11 +174,6 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     last = state.get("last_decision") if isinstance(state, dict) else {}
     demand = (last or {}).get("demand") or {}
 
-    # Never interpret a missing/stale remote Hospitality demand value as
-    # permission to steal the entire Hospitality base share. The Evergreen broker
-    # now publishes the real V1 multi-lane backlog; until that fresh decision is
-    # visible, reserve the configured demanding floor rather than the old bogus
-    # fallback of 1 slot.
     hospitality_cfg = workloads.get("hospitality") or {}
     hospitality_floor = max(1, int(hospitality_cfg.get("min_slots_when_demanding") or 5))
     hospitality_demand = int(demand.get("hospitality") or 0)
@@ -176,18 +191,38 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
         active.update(repo_active)
         queued.update(repo_queued)
 
+    active_total = sum(int(v) for v in active.values())
+    tender_cfg = workloads.get("tenders") or {}
+    tender_max = int(tender_cfg.get("max_slots") or total)
+    existing_tender_active = int(active.get("tenders", 0))
+    tender_room = max(0, tender_max - existing_tender_active)
+
+    if _spm_curated_fast_lane():
+        physical_free = max(0, total - active_total)
+        allowed = min(requested, 3, physical_free, tender_room)
+        return allowed, {
+            "mode": "spm-curated-free-slot-fast-lane",
+            "capacity": total,
+            "requested": requested,
+            "allowed": allowed,
+            "fast_lane_cap": 3,
+            "active_commitments": dict(active),
+            "queued_backlog": dict(queued),
+            "active_total": active_total,
+            "physical_free": physical_free,
+            "existing_tender_active": existing_tender_active,
+            "tender_room": tender_room,
+            "selection_path": _workflow_selection_path(),
+            "preemption": "none; only currently free physical slots are consumed",
+            "reason": "GPT-curated SPM DCE shortlist receives bounded latency priority so high-value resolved candidates are not stranded behind sibling headroom reservations",
+        }
+
     sibling_targets = {
         "hospitality": _fair_target(total, hospitality_demand, hospitality_cfg),
         "gws": _fair_target(total, gws_demand, workloads.get("gws") or {}),
     }
     sibling_missing = sum(max(0, sibling_targets[w] - int(active.get(w, 0))) for w in sibling_targets)
-    active_total = sum(int(v) for v in active.values())
     global_room_after_protection = max(0, total - active_total - sibling_missing)
-
-    tender_cfg = workloads.get("tenders") or {}
-    tender_max = int(tender_cfg.get("max_slots") or total)
-    existing_tender_active = int(active.get("tenders", 0))
-    tender_room = max(0, tender_max - existing_tender_active)
 
     effective_tender_demand = max(tender_demand, requested + existing_tender_active)
     unmet_tender_demand = max(0, effective_tender_demand - existing_tender_active)
