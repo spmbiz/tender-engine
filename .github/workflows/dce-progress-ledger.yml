@@ -1,0 +1,111 @@
+name: DCE Progress Ledger
+
+on:
+  workflow_run:
+    workflows: ['DCE Fanout V2']
+    types: [completed]
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: dce-progress-ledger
+  cancel-in-progress: false
+
+jobs:
+  persist-and-continue:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Recover exact successful DCE queue
+        id: recover
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DCE_RUN_ID: ${{ github.event.workflow_run.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rid="$DCE_RUN_ID"
+          tag="dce-harvest-$rid"
+          asset="dce-candidate-queue-$rid.jsonl"
+          mkdir -p recovered
+          gh release view "$tag" >/dev/null
+          gh release download "$tag" --pattern "$asset" --dir recovered
+          test -f "recovered/$asset"
+          source_run="$(QUEUE="recovered/$asset" python - <<'PY'
+          import json,os
+          p=os.environ['QUEUE']
+          out=''
+          for line in open(p,encoding='utf-8',errors='replace'):
+              if not line.strip(): continue
+              r=json.loads(line)
+              out=r.get('wide_read_run_id') or r.get('source_discovery_run') or r.get('source_run_id') or ''
+              if out: break
+          print(out)
+          PY
+          )"
+          echo "queue=recovered/$asset" >> "$GITHUB_OUTPUT"
+          echo "source_run=$source_run" >> "$GITHUB_OUTPUT"
+          echo "Recovered durable queue for successful DCE run $rid"
+
+      - name: Persist exact-version attempts to main
+        id: ledger
+        env:
+          DCE_RUN_ID: ${{ github.event.workflow_run.id }}
+          QUEUE: ${{ steps.recover.outputs.queue }}
+          SOURCE_RUN: ${{ steps.recover.outputs.source_run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase origin main
+
+          python pipeline/dce_attempt_ledger.py update \
+            --queue "$QUEUE" \
+            --ledger control/dce_attempt_ledger.jsonl \
+            --dce-run-id "$DCE_RUN_ID" \
+            --source-run-id "$SOURCE_RUN" | tee ledger-update.json
+
+          added="$(python - <<'PY'
+          import json
+          print(json.load(open('ledger-update.json'))['added'])
+          PY
+          )"
+          echo "added=$added" >> "$GITHUB_OUTPUT"
+
+          if [ "$added" -gt 0 ]; then
+            git add control/dce_attempt_ledger.jsonl
+            git commit -m "tender: persist DCE progress for run $DCE_RUN_ID"
+            # Main can move because Qwen also persists canonical surfaces. Rebase
+            # once more before push; ledger updates are serialized by concurrency.
+            git pull --rebase origin main
+            git push origin HEAD:main
+          else
+            echo 'No new candidate versions to persist.'
+          fi
+
+      - name: Continue Qwen pre-read and next unseen DCE wave immediately
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ADDED: ${{ steps.ledger.outputs.added }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run qwen-dce-drainer.yml --ref main
+          if [ "${ADDED:-0}" -gt 0 ]; then
+            gh workflow run dce-queue-drainer.yml --ref main
+            echo "Persisted $ADDED candidate versions; dispatched Qwen DCE drainer and next unseen DCE wave."
+          else
+            echo 'No progress delta; Qwen drainer dispatched but DCE self-loop intentionally stopped.'
+          fi
