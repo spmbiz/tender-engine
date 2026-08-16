@@ -1,0 +1,15 @@
+{
+  "schema": "QWEN_BATCH_AUTOTUNE_TRIGGER_V1",
+  "enabled": true,
+  "candidate_batch_sizes": [1, 2, 4, 6, 8, 12, 16, 20, 24, 32],
+  "sample_size": 48,
+  "full_sweep_every_hours": 6,
+  "scheduled_health_check": "champion plus immediate neighbors",
+  "policy": {
+    "row_conservation_required": true,
+    "dce_golden_gate_required": true,
+    "singleton_fallbacks_allowed_for_champion": 0,
+    "automatic_rejection_enabled": false,
+    "failed_batches_recursively_split": true
+  }
+}
