@@ -1,0 +1,92 @@
+name: Build Qwen Shadow Shards
+
+on:
+  workflow_run:
+    workflows: ["Live Historical Prior Shadow"]
+    types: [completed]
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/build_qwen_shadow_shards.py'
+      - '.github/workflows/build-qwen-shadow-shards.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-qwen-shadow-shards
+  cancel-in-progress: false
+
+jobs:
+  shard:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download durable residual view
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p input out/shards
+          gh release download live-historical-prior-shadow-latest \
+            --pattern 'live-historical-prior-residual-latest.jsonl.gz' \
+            --pattern 'live-historical-prior-summary-latest.json' \
+            --dir input
+          release_name="$(gh release view live-historical-prior-shadow-latest --json name --jq '.name')"
+          source_run="$(grep -oE '[0-9]{8,}' <<< "$release_name" | tail -n1)"
+          [[ "$source_run" =~ ^[0-9]+$ ]]
+          echo "SOURCE_RUN=$source_run" >> "$GITHUB_ENV"
+      - name: Build 32 deterministic lossless shards
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/build_qwen_shadow_shards.py \
+            --input input/live-historical-prior-residual-latest.jsonl.gz \
+            --source-run "$SOURCE_RUN" \
+            --shards 32 \
+            --out-dir out/shards \
+            --manifest-out "out/qwen-shadow-manifest-${SOURCE_RUN}.json"
+          python - <<'PY'
+          import json,os
+          run=os.environ['SOURCE_RUN']
+          prior=json.load(open('input/live-historical-prior-summary-latest.json',encoding='utf-8'))
+          m=json.load(open(f'out/qwen-shadow-manifest-{run}.json',encoding='utf-8'))
+          expected=int(prior['residual_rows'])
+          assert m['input_rows']==expected,(m['input_rows'],expected)
+          assert m['unique_ids']==expected
+          assert m['sharded_rows']==expected
+          assert m['missing_ids']==0 and m['duplicate_ids']==0
+          print('QWEN_SHARD_ROW_CONSERVATION_PASS',expected)
+          PY
+          (cd out && find shards -type f -print0 | sort -z | xargs -0 sha256sum > "SHA256SUMS-${SOURCE_RUN}.txt")
+      - name: Publish immutable shard generation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="qwen-shadow-input-${SOURCE_RUN}-${GITHUB_RUN_ID}"
+          gh release create "$tag" --target "$GITHUB_SHA" \
+            --title "Qwen Shadow Input ${SOURCE_RUN}" \
+            --notes "Lossless deterministic shards of the historical-prior residual. Residual is not reject; automatic rejection remains disabled. source_run=${SOURCE_RUN} workflow_run=${GITHUB_RUN_ID}."
+          gh release upload "$tag" out/shards/* "out/qwen-shadow-manifest-${SOURCE_RUN}.json" "out/SHA256SUMS-${SOURCE_RUN}.txt"
+          echo "IMMUTABLE_TAG=$tag" >> "$GITHUB_ENV"
+      - name: Refresh stable pointer manifest only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          latest=qwen-shadow-input-latest
+          cp "out/qwen-shadow-manifest-${SOURCE_RUN}.json" out/qwen-shadow-manifest-latest.json
+          cp "out/SHA256SUMS-${SOURCE_RUN}.txt" out/SHA256SUMS-latest.txt
+          gh release view "$latest" >/dev/null 2>&1 || gh release create "$latest" --target "$GITHUB_SHA" --title 'Qwen Shadow Input — LATEST' --notes 'Stable pointer to latest immutable shard generation.'
+          gh release edit "$latest" --title "Qwen Shadow Input — LATEST (${SOURCE_RUN})" --notes "source_run=${SOURCE_RUN} immutable=${IMMUTABLE_TAG}. Shards live in immutable release; manifest and hashes here are stable pointers."
+          gh release upload "$latest" out/qwen-shadow-manifest-latest.json out/SHA256SUMS-latest.txt --clobber
