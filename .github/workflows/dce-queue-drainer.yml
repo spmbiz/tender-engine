@@ -11,6 +11,7 @@ on:
       - 'queues/qwen_live_selection_latest.jsonl'
       - 'pipeline/authority_conflicts.py'
       - 'pipeline/auto_adjudicate_dce.py'
+      - 'pipeline/materialize_dce_selection.py'
       - '.github/workflows/dce-queue-drainer.yml'
 
 permissions:
@@ -108,4 +109,4 @@ jobs:
             -f jobs_per_shard=0
           echo "Dispatched persisted queue $path rows=$rows jobs=$jobs source=$source_run policy=$reason. Fresh Qwen live work can no longer be permanently starved by a persistent rescue manifest."
 
-# Fresh-Qwen-first starvation fix 2026-08-16T22:03+02:00
+# Fresh-Qwen-first starvation + cross-snapshot retry trigger 2026-08-16T22:05+02:00
