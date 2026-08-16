@@ -27,7 +27,7 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-      - name: Dispatch highest-value persisted DCE queue when fleet is free
+      - name: Dispatch freshest high-value persisted DCE queue when fleet is free
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -38,34 +38,67 @@ jobs:
             echo "DCE fleet busy: $active active/queued. Persisted queues remain untouched."
             exit 0
           fi
-          path=''
-          max_jobs=0
-          if [ -s queues/spm_rescue_selection_latest.jsonl ]; then
-            path='queues/spm_rescue_selection_latest.jsonl'
-            max_jobs=30
-          elif [ -s queues/qwen_live_selection_latest.jsonl ]; then
-            path='queues/qwen_live_selection_latest.jsonl'
-            max_jobs=60
-          else
-            echo 'No persisted DCE queue to drain.'
-            exit 0
-          fi
-          source_run="$(PATH_IN="$path" python - <<'PY'
+
+          source_run_for() {
+            local p="$1"
+            PATH_IN="$p" python - <<'PY'
           import json,os
           p=os.environ['PATH_IN']
           for line in open(p,encoding='utf-8',errors='replace'):
-              if not line.strip(): continue
+              if not line.strip():
+                  continue
               r=json.loads(line)
               v=r.get('wide_read_run_id') or r.get('source_discovery_run') or r.get('source_run')
               if v is not None:
-                  print(v); break
+                  print(v)
+                  break
           PY
-          )"
+          }
+
+          rescue='queues/spm_rescue_selection_latest.jsonl'
+          qwen='queues/qwen_live_selection_latest.jsonl'
+          rescue_run=''
+          qwen_run=''
+          if [ -s "$rescue" ]; then rescue_run="$(source_run_for "$rescue")"; fi
+          if [ -s "$qwen" ]; then qwen_run="$(source_run_for "$qwen")"; fi
+
+          path=''
+          max_jobs=0
+          reason=''
+
+          # Fresh machine-ranked live work must not be starved forever by a
+          # persistent manually curated rescue manifest. Prefer Qwen when it is
+          # available and at least as fresh as the rescue queue; rescue remains
+          # the fallback for urgent/newer curated work or when Qwen is empty.
+          if [ -s "$qwen" ] && [[ "$qwen_run" =~ ^[0-9]+$ ]]; then
+            if [ ! -s "$rescue" ] || ! [[ "$rescue_run" =~ ^[0-9]+$ ]] || [ "$qwen_run" -ge "$rescue_run" ]; then
+              path="$qwen"
+              max_jobs=60
+              reason="fresh-qwen-live-first"
+            fi
+          fi
+          if [ -z "$path" ] && [ -s "$rescue" ]; then
+            path="$rescue"
+            max_jobs=30
+            reason="curated-rescue-fallback"
+          fi
+          if [ -z "$path" ] && [ -s "$qwen" ]; then
+            path="$qwen"
+            max_jobs=60
+            reason="qwen-live-fallback"
+          fi
+          if [ -z "$path" ]; then
+            echo 'No persisted DCE queue to drain.'
+            exit 0
+          fi
+
+          source_run="$(source_run_for "$path")"
           [[ "$source_run" =~ ^[0-9]+$ ]] || { echo "Cannot resolve source run from $path" >&2; exit 1; }
           rows="$(grep -cve '^\s*$' "$path" || true)"
           jobs="$rows"
           if [ "$jobs" -gt "$max_jobs" ]; then jobs="$max_jobs"; fi
           if [ "$jobs" -lt 1 ]; then exit 0; fi
+
           gh workflow run dce-fanout-v2.yml --ref main \
             -f selection_path="$path" \
             -f source_discovery_run="$source_run" \
@@ -73,6 +106,6 @@ jobs:
             -f max_parallel=8 \
             -f max_shards=80 \
             -f jobs_per_shard=0
-          echo "Dispatched persisted queue $path rows=$rows jobs=$jobs source=$source_run. GPT-curated SPM rescue manifests may now consume up to three currently free physical slots without preempting any running sibling workload; all other queues keep normal fair-share admission."
+          echo "Dispatched persisted queue $path rows=$rows jobs=$jobs source=$source_run policy=$reason. Fresh Qwen live work can no longer be permanently starved by a persistent rescue manifest."
 
-# Manual smoke trigger 2026-08-16T21:21+02:00
+# Fresh-Qwen-first starvation fix 2026-08-16T22:03+02:00
