@@ -14,8 +14,12 @@ GLOBAL_PACKS = [
     "discovery-global-pt-base-open","discovery-global-dk-udbud-public","discovery-global-cz-zakazky-gov",
     "discovery-global-it-anac-delta","discovery-global-cyprus-epps","discovery-global-malta-epps",
     "discovery-global-lux-pmp","discovery-global-si-ejn","discovery-global-sk-uvo","discovery-global-ee-rhr",
+    "discovery-global-world-bank-procurement","discovery-global-za-etenders-ocds","discovery-global-uk-pcs-ocds",
 ]
-STRICT_NONZERO_SOURCES={"CYPRUS_EPPS","MALTA_EPPS","LUX_PMP","SI_EJN","SK_UVO","EE_RHR"}
+STRICT_NONZERO_SOURCES={
+    "CYPRUS_EPPS","MALTA_EPPS","LUX_PMP","SI_EJN","SK_UVO","EE_RHR",
+    "WORLD_BANK_PROCUREMENT","ZA_ETENDERS_OCDS","UK_PCS_OCDS",
+}
 EXTERNAL_REQUIRED_LANES=["UNGM_PUBLIC"]
 
 def required_sharded(mode):
