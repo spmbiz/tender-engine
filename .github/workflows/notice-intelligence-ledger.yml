@@ -5,6 +5,12 @@ on:
     workflows: ["Live World Snapshot for GPT"]
     types: [completed]
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/apply_qwen_state_to_ledger.py'
+      - 'pipeline/build_notice_intelligence_ledger.py'
+      - '.github/workflows/notice-intelligence-ledger.yml'
 
 permissions:
   contents: write
@@ -13,10 +19,14 @@ concurrency:
   group: notice-intelligence-ledger
   cancel-in-progress: true
 
+env:
+  QWEN_CLASSIFIER_VERSION: 'qwen3-4b-q4km-batch-selfheal-v1'
+
 jobs:
   ledger:
     # Shadow control-plane stage. It never deletes/rejects a tender and never
     # establishes DCE or eligibility truth.
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -31,11 +41,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p snapshot previous
+          mkdir -p snapshot previous qwen-state
           gh release download live-world-snapshot-latest \
             --pattern 'live-open-tenders-latest.jsonl.gz' \
             --pattern 'snapshot-manifest-latest.json' \
-            --dir snapshot
+            --dir snapshot --clobber
           test -s snapshot/live-open-tenders-latest.jsonl.gz
           test -s snapshot/snapshot-manifest-latest.json
           source_run="$(python - <<'PY'
@@ -58,15 +68,35 @@ jobs:
             if grep -Fxq 'notice-intelligence-ledger-latest.jsonl.gz' <<< "$assets"; then
               gh release download notice-intelligence-ledger-latest \
                 --pattern 'notice-intelligence-ledger-latest.jsonl.gz' \
-                --dir previous
+                --dir previous --clobber
               echo 'PREVIOUS_LEDGER=previous/notice-intelligence-ledger-latest.jsonl.gz' >> "$GITHUB_ENV"
+            else
+              echo 'PREVIOUS_LEDGER=' >> "$GITHUB_ENV"
+            fi
+          else
+            echo 'PREVIOUS_LEDGER=' >> "$GITHUB_ENV"
+            echo 'No prior ledger found: this run is the one-time backfill.'
+          fi
+
+      - name: Recover exact-hash Qwen classification state when available
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view qwen-classification-state-latest >/dev/null 2>&1; then
+            assets="$(gh release view qwen-classification-state-latest --json assets --jq '.assets[].name')"
+            if grep -Fxq 'qwen-classification-state-latest.jsonl.gz' <<< "$assets"; then
+              gh release download qwen-classification-state-latest \
+                --pattern 'qwen-classification-state-latest.jsonl.gz' \
+                --dir qwen-state --clobber
+              echo 'QWEN_STATE=qwen-state/qwen-classification-state-latest.jsonl.gz' >> "$GITHUB_ENV"
               exit 0
             fi
           fi
-          echo 'PREVIOUS_LEDGER=' >> "$GITHUB_ENV"
-          echo 'No prior ledger found: this run is the one-time backfill.'
+          echo 'QWEN_STATE=' >> "$GITHUB_ENV"
 
-      - name: Build NEW/UPDATED ledger and shadow classifier queues
+      - name: Build NEW/UPDATED ledger and classifier queue using the real classifier version
         shell: bash
         run: |
           set -euo pipefail
@@ -79,7 +109,41 @@ jobs:
             --change-queue-out "notice-change-queue-${SOURCE_RUN}.jsonl.gz" \
             --classification-queue-out "notice-classification-queue-${SOURCE_RUN}.jsonl.gz" \
             --summary-out "notice-ledger-summary-${SOURCE_RUN}.json" \
-            --classifier-version qwen-shadow-v1
+            --classifier-version "$QWEN_CLASSIFIER_VERSION"
+
+      - name: Apply current exact-hash Qwen state to ledger and remove already-classified rows from queue
+        if: env.QWEN_STATE != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/apply_qwen_state_to_ledger.py \
+            --ledger "notice-intelligence-ledger-${SOURCE_RUN}.jsonl.gz" \
+            --classification-queue "notice-classification-queue-${SOURCE_RUN}.jsonl.gz" \
+            --state "$QWEN_STATE" \
+            --summary "notice-ledger-summary-${SOURCE_RUN}.json" \
+            --classifier-version "$QWEN_CLASSIFIER_VERSION"
+
+      - name: Validate lossless ledger identity and classification queue invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import gzip,json,os
+          run=os.environ['SOURCE_RUN']
+          def rows(path):
+              with gzip.open(path,'rt',encoding='utf-8') as f:
+                  return [json.loads(x) for x in f if x.strip()]
+          ledger=rows(f'notice-intelligence-ledger-{run}.jsonl.gz')
+          queue=rows(f'notice-classification-queue-{run}.jsonl.gz')
+          summary=json.load(open(f'notice-ledger-summary-{run}.json',encoding='utf-8'))
+          ids=[x['canonical_notice_id'] for x in ledger]
+          qids=[x['canonical_notice_id'] for x in queue]
+          assert len(ids)==len(set(ids))==summary['current_unique'], (len(ids),summary)
+          assert len(qids)==len(set(qids))==summary['classification_queue'], (len(qids),summary)
+          assert set(qids).issubset(set(ids))
+          assert summary['target_classifier_version']==os.environ['QWEN_CLASSIFIER_VERSION']
+          print(json.dumps({'ledger':len(ids),'classification_queue':len(qids),'classifier_version':summary['target_classifier_version']},indent=2))
+          PY
 
       - name: Publish immutable ledger generation
         env:
@@ -91,7 +155,7 @@ jobs:
           gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" \
             --target main \
             --title "Notice Intelligence Ledger ${SOURCE_RUN}" \
-            --notes "Shadow high-recall ledger for normalized live notices. NEW/UPDATED controls semantic reclassification; no ledger event establishes DCE/eligibility truth or deletes a tender."
+            --notes "Shadow high-recall ledger for normalized live notices. NEW/UPDATED controls semantic reclassification; exact-hash Qwen state is reused; no ledger event establishes DCE/eligibility truth or deletes a tender."
           gh release upload "$tag" \
             "notice-intelligence-ledger-${SOURCE_RUN}.jsonl.gz" \
             "notice-change-queue-${SOURCE_RUN}.jsonl.gz" \
@@ -115,7 +179,7 @@ jobs:
           summary="$(python - <<'PY'
           import json,os
           s=json.load(open('notice-ledger-summary-latest.json'))
-          print(f"run={os.environ['SOURCE_RUN']} current={s['current_unique']} new={s['new']} updated={s['updated']} unchanged={s['unchanged']} change_queue={s['change_queue']} classification_queue={s['classification_queue']}")
+          print(f"run={os.environ['SOURCE_RUN']} current={s['current_unique']} new={s['new']} updated={s['updated']} unchanged={s['unchanged']} change_queue={s['change_queue']} classification_queue={s['classification_queue']} classifier={s['target_classifier_version']}")
           PY
           )"
           gh release edit "$tag" --title "Notice Intelligence Ledger — LATEST (${SOURCE_RUN})" --notes "$summary"

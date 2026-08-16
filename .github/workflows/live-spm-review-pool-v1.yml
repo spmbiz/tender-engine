@@ -48,18 +48,21 @@ jobs:
             --coverage snapshot/discovery-coverage-latest.json \
             --priors control/historical_market_priors.json \
             --out review --packet-size 400
-      - name: Validate preservation contract
+      - name: Validate preservation contract against the current snapshot, never a hardcoded universe size
         run: |
           python - <<'PY'
-          import json,os
+          import gzip,json,os
           s=json.load(open('review/summary.json',encoding='utf-8'))
+          with gzip.open('snapshot/live-open-tenders-latest.jsonl.gz','rt',encoding='utf-8') as fh:
+              actual=sum(1 for line in fh if line.strip())
           assert s['contract']=='LIVE_SPM_REVIEW_POOL_V1',s
+          assert s['snapshot_rows']==actual,(s['snapshot_rows'],actual)
           assert s['snapshot_rows']==s['playbook_or_lean_hits']+s['residual_open_world'],s
-          assert s['snapshot_rows']==43191,s
+          assert s['snapshot_rows']>0,s
           assert s['final_verdict_allowed'] is False
           assert s['compiled_historical_rules']>0,s
           assert os.path.getsize('review/playbook_lean_hits.jsonl')>0
-          print(json.dumps(s,indent=2,ensure_ascii=False))
+          print(json.dumps({'snapshot_rows':actual,'preserved':True,'summary':s},indent=2,ensure_ascii=False))
           PY
       - name: Persist compact review authority
         run: |
