@@ -1,0 +1,15 @@
+{
+  "schema": "GPT_INSTANT_SUPERGREEN_INBOX_V1",
+  "updated_at": null,
+  "latest_source_dce_run_id": null,
+  "confirmed_supergreens": [],
+  "pending_final_review": [],
+  "counts": {
+    "confirmed_supergreens": 0,
+    "confirmed_green_total": 0,
+    "pending_final_review": 0,
+    "review_now": 0
+  },
+  "answer_contract": "When the user asks what supergreens exist, read this file first. Report confirmed_supergreens immediately. Then adjudicate pending_final_review rows marked FINAL_REVIEW_NOW from evidence_by_gate. Qwen is pre-read only; missing evidence is UNKNOWN. Persist a GPT final verdict only after mandatory gates and deadline authority are resolved.",
+  "finality_rule": "Only GPT Web final adjudication from authoritative DCE evidence may create FINAL_SUPER_GREEN. Qwen never does."
+}
