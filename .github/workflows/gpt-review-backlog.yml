@@ -63,8 +63,8 @@ jobs:
               [[ "$recent" =~ ^[0-9]+$ ]] || recent=1
               recent=$(( recent > 50 ? 50 : recent ))
               gh api "repos/$GITHUB_REPOSITORY/actions/workflows/dce-fanout-v2.yml/runs?status=completed&per_page=100" \
-                --jq '.workflow_runs[] | select(.conclusion=="success") | .id' \
-                | head -n "$recent" > backlog-inputs/run_ids.txt
+                --jq ".workflow_runs | map(select(.conclusion==\"success\")) | .[:$recent][] | .id" \
+                > backlog-inputs/run_ids.txt
             fi
           else
             recent="$(sed -nE 's/^recent_successful_runs=([0-9]+).*$/\1/p' control/gpt_review_backlog_trigger.txt | tail -1)"
@@ -75,8 +75,8 @@ jobs:
               [[ "$recent" =~ ^[0-9]+$ ]] || recent=20
               recent=$(( recent > 50 ? 50 : recent ))
               gh api "repos/$GITHUB_REPOSITORY/actions/workflows/dce-fanout-v2.yml/runs?status=completed&per_page=100" \
-                --jq '.workflow_runs[] | select(.conclusion=="success") | .id' \
-                | head -n "$recent" > backlog-inputs/run_ids.txt
+                --jq ".workflow_runs | map(select(.conclusion==\"success\")) | .[:$recent][] | .id" \
+                > backlog-inputs/run_ids.txt
             fi
           fi
 
