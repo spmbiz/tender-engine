@@ -1,14 +1,14 @@
 {
   "schema": "QWEN_BATCH_AUTOTUNE_TRIGGER_V1",
   "enabled": true,
-  "candidate_batch_sizes": [1, 2, 4, 6, 8, 12, 16, 20, 24, 32],
+  "candidate_batch_sizes": [8],
   "sample_size": 24,
   "full_sweep_every_hours": 6,
-  "scheduled_health_check": "champion plus immediate neighbors; rotating 3-size repair wave when degraded",
+  "scheduled_health_check": "single champion-sized health check; production Hospitality/Tender/GWS throughput has priority over experimental tuning",
   "capacity_policy": {
     "priority": "live discovery and DCE/SUPERGREEN throughput before experimental autotuning",
-    "max_configured_parallel_candidates": 3,
-    "reason": "Explore the full batch-size space without consuming the DCE fleet: workflow matrix is capped at three simultaneous Qwen tuning runners."
+    "max_configured_parallel_candidates": 1,
+    "reason": "Serialize experimental Qwen autotuning to one runner so it cannot consume multiple physical slots while production discovery/classification backlogs are active."
   },
   "policy": {
     "row_conservation_required": true,
