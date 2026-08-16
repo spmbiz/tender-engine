@@ -1,0 +1,183 @@
+name: Qwen Batch Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      sample_size:
+        description: Deterministic sample size shared by both batch sizes
+        required: false
+        default: '32'
+  push:
+    branches: [main]
+    paths:
+      - 'control/qwen_batch_benchmark_trigger.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qwen-batch-benchmark
+  cancel-in-progress: false
+
+jobs:
+  benchmark:
+    strategy:
+      fail-fast: false
+      matrix:
+        batch_size: [8, 16]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Resolve shared sample size
+        id: cfg
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = 'workflow_dispatch' ]; then
+            n='${{ github.event.inputs.sample_size }}'
+          else
+            n="$(python - <<'PY'
+          import json
+          x=json.load(open('control/qwen_batch_benchmark_trigger.json'))
+          print(int(x.get('sample_size',32)))
+          PY
+          )"
+          fi
+          [[ "$n" =~ ^[0-9]+$ ]] && [ "$n" -ge 16 ] && [ "$n" -le 128 ]
+          echo "sample_size=$n" >> "$GITHUB_OUTPUT"
+
+      - name: Download durable ledger queue and resolve generation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ledger
+          gh release download notice-intelligence-ledger-latest \
+            --pattern notice-classification-queue-latest.jsonl.gz \
+            --dir ledger
+          test -s ledger/notice-classification-queue-latest.jsonl.gz
+          release_name="$(gh release view notice-intelligence-ledger-latest --json name --jq '.name')"
+          generation="$(grep -oE '[0-9]{8,}' <<< "$release_name" | tail -n1)"
+          if [[ ! "$generation" =~ ^[0-9]+$ ]]; then
+            body="$(gh release view notice-intelligence-ledger-latest --json body --jq '.body')"
+            generation="$(grep -oE 'run=[0-9]+' <<< "$body" | head -n1 | cut -d= -f2)"
+          fi
+          [[ "$generation" =~ ^[0-9]+$ ]]
+          echo "SOURCE_LEDGER_GENERATION=$generation" >> "$GITHUB_ENV"
+          sha256sum ledger/notice-classification-queue-latest.jsonl.gz > ledger/INPUT_SHA256.txt
+
+      - name: Install llama.cpp CPU runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p llama-dist
+          gh api 'repos/ggml-org/llama.cpp/releases?per_page=20' > /tmp/releases.json
+          readarray -t picked < <(python - <<'PY'
+          import json,re
+          for rel in json.load(open('/tmp/releases.json')):
+              if rel.get('draft') or rel.get('prerelease'): continue
+              for a in rel.get('assets',[]):
+                  if re.fullmatch(r'llama-.*-bin-ubuntu-x64\.tar\.gz',a.get('name','')):
+                      print(rel['tag_name']); print(a['name']); raise SystemExit
+          raise SystemExit('no llama asset')
+          PY
+          )
+          gh release download "${picked[0]}" --repo ggml-org/llama.cpp --pattern "${picked[1]}" --dir llama-dist
+          tar -xzf "llama-dist/${picked[1]}" -C llama-dist
+          server="$(find llama-dist -type f -name llama-server -perm -u+x -print -quit)"
+          test -n "$server"
+          echo "LLAMA_SERVER=$server" >> "$GITHUB_ENV"
+          echo "LLAMA_CPP_TAG=${picked[0]}" >> "$GITHUB_ENV"
+
+      - name: Start Qwen3 4B once
+        shell: bash
+        run: |
+          set -euo pipefail
+          start="$(date +%s)"
+          "$LLAMA_SERVER" -hf Qwen/Qwen3-4B-GGUF:Q4_K_M \
+            --host 127.0.0.1 --port 8080 --jinja -c 8192 -t 4 > qwen-server.log 2>&1 &
+          echo $! > qwen-server.pid
+          for i in $(seq 1 180); do
+            curl -fsS http://127.0.0.1:8080/health >/dev/null 2>&1 && break
+            kill -0 "$(cat qwen-server.pid)" >/dev/null 2>&1 || { cat qwen-server.log; exit 1; }
+            sleep 3
+          done
+          curl -fsS http://127.0.0.1:8080/health >/dev/null
+          echo "QWEN_STARTUP_SECONDS=$(($(date +%s)-start))" >> "$GITHUB_ENV"
+
+      - name: Run lossless batch benchmark
+        shell: bash
+        run: |
+          set -euo pipefail
+          b='${{ matrix.batch_size }}'
+          python pipeline/qwen_notice_batch_benchmark.py \
+            --queue ledger/notice-classification-queue-latest.jsonl.gz \
+            --out "qwen-batch-${b}-results.jsonl" \
+            --summary "qwen-batch-${b}-summary.json" \
+            --batch-size "$b" \
+            --sample-size '${{ steps.cfg.outputs.sample_size }}' \
+            --source-ledger-generation "$SOURCE_LEDGER_GENERATION" \
+            --description-chars 900 \
+            --max-tokens 1200 \
+            --timeout 300 \
+            --startup-seconds "$QWEN_STARTUP_SECONDS"
+
+      - name: Stop model
+        if: always()
+        shell: bash
+        run: |
+          [ -s qwen-server.pid ] && kill "$(cat qwen-server.pid)" >/dev/null 2>&1 || true
+
+      - name: Build evidence manifest
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          b='${{ matrix.batch_size }}'
+          python - <<PY
+          import hashlib,json,pathlib,os
+          b='${{ matrix.batch_size }}'
+          names=[f'qwen-batch-{b}-results.jsonl',f'qwen-batch-{b}-summary.json','qwen-server.log','ledger/INPUT_SHA256.txt']
+          files=[]
+          for name in names:
+              p=pathlib.Path(name)
+              if p.is_file(): files.append({'path':name,'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+          pathlib.Path(f'qwen-batch-{b}-manifest.json').write_text(json.dumps({
+              'schema':'QWEN_BATCH_BENCHMARK_EVIDENCE_V1','workflow_run_id':os.environ.get('GITHUB_RUN_ID'),
+              'batch_size':int(b),'source_ledger_generation':os.environ.get('SOURCE_LEDGER_GENERATION'),
+              'files':files,'data_safety':{'shadow_only':True,'destructive_rejection_enabled':False}
+          },indent=2)+'\n')
+          PY
+
+      - name: Upload temporary transport artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-batch-${{ matrix.batch_size }}-benchmark-${{ github.run_id }}
+          path: |
+            qwen-batch-${{ matrix.batch_size }}-results.jsonl
+            qwen-batch-${{ matrix.batch_size }}-summary.json
+            qwen-batch-${{ matrix.batch_size }}-manifest.json
+            qwen-server.log
+            ledger/INPUT_SHA256.txt
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          f='qwen-batch-${{ matrix.batch_size }}-summary.json'
+          if [ -s "$f" ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat "$f" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
