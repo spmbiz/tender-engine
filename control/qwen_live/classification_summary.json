@@ -1,20 +1,23 @@
 {
   "schema": "NOTICE_CLASSIFICATION_STATE_MERGE_SUMMARY_V1",
-  "generated_at": "2026-08-16T10:23:54+00:00",
+  "generated_at": "2026-08-16T15:31:02+00:00",
   "target_classifier_version": "qwen3-4b-q4km-batch-selfheal-v1",
   "ledger_notices": 60015,
-  "previous_state_rows": 1643,
-  "result_rows_seen": 0,
-  "state_rows_after_merge": 1643,
+  "previous_state_rows": 3252,
+  "result_rows_seen": 1920,
+  "state_rows_after_merge": 4838,
   "input_queue_rows": 60015,
-  "remaining_classification_queue": 58372,
-  "classified_fraction_of_ledger": 0.02737649,
+  "remaining_classification_queue": 55177,
+  "classified_fraction_of_ledger": 0.08061318,
   "stats": {
-    "previous_carried": 1643,
-    "queue_already_classified": 1643,
-    "queue_remaining": 58372
+    "previous_carried": 3252,
+    "queue_already_classified": 4838,
+    "queue_remaining": 55177,
+    "results_accepted": 1586
   },
-  "rejected_result_reasons": {},
+  "rejected_result_reasons": {
+    "wrong_business_calibration_version": 334
+  },
   "safety": {
     "exact_material_hash_required": true,
     "parse_or_fallback_result_marks_classified": false,
