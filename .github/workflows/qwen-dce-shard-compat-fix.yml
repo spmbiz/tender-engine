@@ -1,0 +1,102 @@
+name: Fix Qwen DCE Shard Compatibility
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qwen-dce-shard-compat-fix.yml'
+
+permissions:
+  actions: write
+  contents: write
+
+jobs:
+  patch-test-push-rerun:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Patch Qwen status and portal compatibility
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('pipeline/build_dce_shards.py')
+          s=p.read_text(encoding='utf-8')
+          old='if status not in {"QUEUED", "READY", "DCE_PENDING", "AUTO_DCE_PREFETCH"}:'
+          new='if status not in {"QUEUED", "READY", "DCE_PENDING", "AUTO_DCE_PREFETCH", "AUTO_DCE_PREFETCH_QWEN"}:'
+          if old not in s and new not in s:
+              raise SystemExit('status patch anchor missing')
+          s=s.replace(old,new)
+          old2='portal = str(rec.get("portal") or rec.get("portal_key") or rec.get("source") or "").upper()'
+          new2='portal = str(rec.get("portal") or rec.get("portal_key") or rec.get("selection_portal") or rec.get("source") or "").upper()'
+          if old2 not in s and new2 not in s:
+              raise SystemExit('portal patch anchor missing')
+          s=s.replace(old2,new2)
+          p.write_text(s,encoding='utf-8')
+          PY
+          python -m py_compile pipeline/build_dce_shards.py
+      - name: Regression smoke Qwen candidate reaches shard matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, sys, tempfile
+          from pathlib import Path
+          import pipeline.build_dce_shards as m
+          m.dynamic_tender_parallel=lambda requested:(1,{'mode':'test'})
+          with tempfile.TemporaryDirectory() as td:
+              td=Path(td)
+              q=td/'q.jsonl'; out=td/'matrix.json'
+              q.write_text(json.dumps({
+                  'candidate_id':'TEST:QWEN',
+                  'status':'AUTO_DCE_PREFETCH_QWEN',
+                  'selection_portal':'TED',
+                  'title':'Synthetic digital tender',
+                  'buyer':'Synthetic buyer'
+              })+'\n',encoding='utf-8')
+              old=list(sys.argv)
+              try:
+                  sys.argv=['build_dce_shards.py','--queue',str(q),'--out',str(out),'--max-parallel','1','--max-jobs','1']
+                  m.main()
+              finally:
+                  sys.argv=old
+              plan=json.loads(Path('dce_plan.json').read_text())
+              assert plan['candidate_count']==1, plan
+              assert plan['shard_count']==1, plan
+              assert plan['portal_counts'].get('TED')==1, plan
+              print('QWEN_DCE_COMPAT_SMOKE_PASS', json.dumps(plan))
+          PY
+      - name: Push pipeline compatibility fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add pipeline/build_dce_shards.py
+          git commit -m 'dce: accept calibrated Qwen semantic queue'
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((attempt*2))"
+          done
+          exit 1
+      - name: Re-dispatch Qwen semantic DCE lane
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run dce-fanout-v2.yml --repo "$GITHUB_REPOSITORY" --ref main \
+            -f selection_path=queues/qwen_live_selection_latest.jsonl \
+            -f source_discovery_run=31923649637 \
+            -f max_jobs=120 \
+            -f max_parallel=6 \
+            -f jobs_per_shard=0
+          echo 'REDISPATCHED_QWEN_DCE_AFTER_COMPAT_FIX'
