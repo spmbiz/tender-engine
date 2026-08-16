@@ -1,0 +1,164 @@
+name: Qwen Notice Shadow Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      sample_size:
+        description: Deterministic notice sample size
+        required: false
+        default: '12'
+  push:
+    branches: [main]
+    paths:
+      - 'control/qwen_shadow_trigger.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qwen-notice-shadow-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Resolve smoke size
+        id: cfg
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = 'workflow_dispatch' ]; then
+            n='${{ github.event.inputs.sample_size }}'
+          else
+            n="$(python - <<'PY'
+          import json
+          x=json.load(open('control/qwen_shadow_trigger.json'))
+          print(int(x.get('sample_size',12)))
+          PY
+          )"
+          fi
+          [[ "$n" =~ ^[0-9]+$ ]] || exit 1
+          [ "$n" -ge 1 ] && [ "$n" -le 64 ] || { echo 'sample_size must be 1..64' >&2; exit 1; }
+          echo "sample_size=$n" >> "$GITHUB_OUTPUT"
+
+      - name: Download current ledger classification queue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ledger
+          gh release download notice-intelligence-ledger-latest \
+            --pattern notice-classification-queue-latest.jsonl.gz \
+            --dir ledger
+          test -s ledger/notice-classification-queue-latest.jsonl.gz
+
+      - name: Install latest usable llama.cpp Ubuntu x64 CPU binary
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p llama-dist
+          gh api 'repos/ggml-org/llama.cpp/releases?per_page=20' > /tmp/llama-releases.json
+          readarray -t picked < <(python - <<'PY'
+          import json,re
+          releases=json.load(open('/tmp/llama-releases.json'))
+          for rel in releases:
+              if rel.get('draft') or rel.get('prerelease'):
+                  continue
+              for asset in rel.get('assets',[]):
+                  name=asset.get('name','')
+                  if re.fullmatch(r'llama-.*-bin-ubuntu-x64\.tar\.gz',name):
+                      print(rel['tag_name'])
+                      print(name)
+                      raise SystemExit
+          raise SystemExit('No usable llama.cpp Ubuntu x64 CPU asset found in recent releases')
+          PY
+          )
+          tag="${picked[0]}"
+          asset="${picked[1]}"
+          echo "LLAMA_CPP_TAG=$tag" >> "$GITHUB_ENV"
+          gh release download "$tag" --repo ggml-org/llama.cpp --pattern "$asset" --dir llama-dist
+          tar -xzf "llama-dist/$asset" -C llama-dist
+          server="$(find llama-dist -type f -name llama-server -perm -u+x -print -quit)"
+          [ -n "$server" ] || { echo 'llama-server missing from release asset' >&2; exit 1; }
+          echo "LLAMA_SERVER=$server" >> "$GITHUB_ENV"
+          "$server" --version || true
+
+      - name: Start official Qwen3 4B Q4_K_M once and wait for health
+        shell: bash
+        run: |
+          set -euo pipefail
+          start="$(date +%s)"
+          "$LLAMA_SERVER" \
+            -hf Qwen/Qwen3-4B-GGUF:Q4_K_M \
+            --host 127.0.0.1 --port 8080 \
+            --jinja -c 8192 -t 4 > qwen-server.log 2>&1 &
+          pid=$!
+          echo "$pid" > qwen-server.pid
+          ready=0
+          for i in $(seq 1 180); do
+            if curl -fsS http://127.0.0.1:8080/health >/dev/null 2>&1; then
+              ready=1
+              break
+            fi
+            if ! kill -0 "$pid" >/dev/null 2>&1; then
+              echo 'llama-server exited before ready' >&2
+              cat qwen-server.log >&2
+              exit 1
+            fi
+            sleep 3
+          done
+          [ "$ready" = 1 ] || { echo 'Qwen server readiness timeout' >&2; tail -200 qwen-server.log >&2; exit 1; }
+          now="$(date +%s)"
+          echo "QWEN_STARTUP_SECONDS=$((now-start))" >> "$GITHUB_ENV"
+          echo "Qwen ready in $((now-start))s using $LLAMA_CPP_TAG"
+
+      - name: Classify deterministic sample in shadow mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/qwen_notice_shadow_classifier.py \
+            --queue ledger/notice-classification-queue-latest.jsonl.gz \
+            --out qwen-shadow-results.jsonl \
+            --summary qwen-shadow-summary.json \
+            --sample-size '${{ steps.cfg.outputs.sample_size }}' \
+            --startup-seconds "$QWEN_STARTUP_SECONDS"
+
+      - name: Stop local model server
+        if: always()
+        shell: bash
+        run: |
+          [ -s qwen-server.pid ] && kill "$(cat qwen-server.pid)" >/dev/null 2>&1 || true
+
+      - name: Upload smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen3-4b-shadow-smoke-${{ github.run_id }}
+          path: |
+            qwen-shadow-results.jsonl
+            qwen-shadow-summary.json
+            qwen-server.log
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -s qwen-shadow-summary.json ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat qwen-shadow-summary.json >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          else
+            tail -100 qwen-server.log 2>/dev/null >> "$GITHUB_STEP_SUMMARY" || true
+          fi
