@@ -74,3 +74,5 @@ jobs:
             -f max_shards=80 \
             -f jobs_per_shard=0
           echo "Dispatched persisted queue $path rows=$rows jobs=$jobs source=$source_run. GPT-curated SPM rescue manifests may now consume up to three currently free physical slots without preempting any running sibling workload; all other queues keep normal fair-share admission."
+
+# Manual smoke trigger 2026-08-16T21:21+02:00
