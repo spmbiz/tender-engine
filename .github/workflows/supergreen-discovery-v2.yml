@@ -252,7 +252,7 @@ jobs:
       fail-fast: false
       max-parallel: 15
       matrix:
-        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP, NO_DOFFIN, FI_HILMA, PT_BASE_OPEN, DK_UDBUD_PUBLIC, CZ_ZAKAZKY_GOV, IT_ANAC_DELTA, SI_EJN, SK_UVO, EE_RHR, WORLD_BANK_PROCUREMENT, ZA_ETENDERS_OCDS, UK_PCS_OCDS, UK_FTS_OCDS]
+        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP, NO_DOFFIN, FI_HILMA, PT_BASE_OPEN, DK_UDBUD_PUBLIC, CZ_ZAKAZKY_GOV, IT_ANAC_DELTA, SI_EJN, SK_UVO, EE_RHR, WORLD_BANK_PROCUREMENT, ZA_ETENDERS_OCDS, UK_PCS_OCDS, UK_FTS_OCDS, LT_CVP_API]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -297,6 +297,7 @@ jobs:
             ZA_ETENDERS_OCDS) if [ "$DISCOVERY_MODE" = reconcile ]; then days=365; pages=80; else days=90; pages=20; fi; python pipeline/discover_za_etenders_ocds.py --output "$DISCOVERY_OUT" --lookback-days "$days" --page-size 100 --max-pages "$pages" ;;
             UK_PCS_OCDS) export PROACTIS_ALLOW_INCOMPLETE_TLS=1 PROACTIS_WORKERS=8; if [ "$DISCOVERY_MODE" = reconcile ]; then months=6; else months=2; fi; python pipeline/discover_uk_proactis_ocds.py --source UK_PCS_OCDS --output "$DISCOVERY_OUT" --months "$months" --workers 8 ;;
             UK_FTS_OCDS) if [ "$DISCOVERY_MODE" = reconcile ]; then days=30; pages=150; else days=5; pages=80; fi; python pipeline/discover_uk_fts_ocds.py --output "$DISCOVERY_OUT" --lookback-days "$days" --max-pages "$pages" --page-size 100 ;;
+            LT_CVP_API) python -m pip install --disable-pip-version-check -q brotli; if [ "$DISCOVERY_MODE" = reconcile ]; then pages=200; else pages=40; fi; python pipeline/discover_lt_cvp_api.py --output "$DISCOVERY_OUT" --page-size 250 --max-pages "$pages" ;;
             *) python pipeline/discover_global_official.py ;;
           esac
           rc=$?;echo "source_exit_code=$rc"

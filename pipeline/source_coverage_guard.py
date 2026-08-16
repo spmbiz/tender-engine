@@ -15,11 +15,11 @@ GLOBAL_PACKS = [
     "discovery-global-it-anac-delta","discovery-global-cyprus-epps","discovery-global-malta-epps",
     "discovery-global-lux-pmp","discovery-global-si-ejn","discovery-global-sk-uvo","discovery-global-ee-rhr",
     "discovery-global-world-bank-procurement","discovery-global-za-etenders-ocds","discovery-global-uk-pcs-ocds",
-    "discovery-global-uk-fts-ocds",
+    "discovery-global-uk-fts-ocds","discovery-global-lt-cvp-api",
 ]
 STRICT_NONZERO_SOURCES={
     "CYPRUS_EPPS","MALTA_EPPS","LUX_PMP","SI_EJN","SK_UVO","EE_RHR",
-    "WORLD_BANK_PROCUREMENT","ZA_ETENDERS_OCDS","UK_PCS_OCDS","UK_FTS_OCDS",
+    "WORLD_BANK_PROCUREMENT","ZA_ETENDERS_OCDS","UK_PCS_OCDS","UK_FTS_OCDS","LT_CVP_API",
 }
 EXTERNAL_REQUIRED_LANES=["UNGM_PUBLIC"]
 
@@ -61,7 +61,7 @@ def main():
         if h["status"]!="OK":degraded.append(name)
     external_present={x.strip().upper() for x in args.external_present.split(",") if x.strip()};external_missing=[x for x in EXTERNAL_REQUIRED_LANES if x.upper() not in external_present]
     clean=not missing and not degraded and not external_missing;status="WORLD_COMPLETE" if clean else "PARTIAL_WORLD_COVERAGE"
-    payload={"contract":"SOURCE_COVERAGE_GUARD_V3_NONZERO","discovery_mode":args.mode,"coverage_status":status,"worldwide_claim_allowed":clean,"expected_materialized_packs":len(expected_packs),"present_materialized_packs":len(expected_packs)-len(missing),"missing_packs":missing,"degraded_packs":degraded,"external_required_lanes":EXTERNAL_REQUIRED_LANES,"external_present_lanes":sorted(external_present),"external_missing_lanes":external_missing,"pack_health":health,"semantics":"WORLD_COMPLETE means every configured discovery lane materialized cleanly; strict live registries must also be nonzero. It does not mean every procurement authority on Earth was exhaustively enumerated. PARTIAL_WORLD_COVERAGE remains usable, but reports and prompts must disclose missing/degraded lanes."}
+    payload={"contract":"SOURCE_COVERAGE_GUARD_V3_NONZERO","discovery_mode":args.mode,"coverage_status":status,"worldwide_claim_allowed":clean,"expected_materialized_packs":len(expected_packs),"present_materialized_packs":len(expected_packs)-len(missing),"missing_packs":missing,"degraded_packs":degraded,"external_required_lanes":EXTERNAL_REQUIRED_LANES,"external_present_lanes":sorted(external_present),"external_missing_lanes":external_missing,"pack_health":health,"semantics":"WORLD_COMPLETE means every configured discovery lane materialized cleanly; strict live registries must also be nonzero. It does not mean every procurement authority on Earth was exhaustively enumerated. PARTIAL_WORLD_COVERAGE remains usable, but reports and prompts must disclose missing/degraded lanes. A source that hits an explicit page cap is DEGRADED rather than silently represented as complete."}
     out=Path(args.out);out.parent.mkdir(parents=True,exist_ok=True);out.write_text(json.dumps(payload,indent=2,ensure_ascii=False),encoding="utf-8");print(json.dumps(payload,indent=2,ensure_ascii=False))
     if args.strict and not clean:raise SystemExit(3)
 if __name__=="__main__":main()
