@@ -1,0 +1,85 @@
+name: SWM MARS Exact DCE Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'control/swm_mars_probe_trigger.json'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch exact SWM block and public files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p swm-mars
+          python - <<'PY'
+          import html, json, pathlib, re, urllib.parse, urllib.request
+
+          page='https://www.swm.de/unternehmen/einkauf/bekanntmachungen'
+          ref='SV-FFI-260810-001'
+          req=urllib.request.Request(page,headers={'User-Agent':'Mozilla/5.0'})
+          with urllib.request.urlopen(req,timeout=30) as r:
+              raw=r.read().decode('utf-8','replace')
+          pathlib.Path('swm-mars/page.html').write_text(raw,encoding='utf-8')
+          pos=raw.find(ref)
+          if pos < 0:
+              raise SystemExit(f'{ref} not found in live SWM page')
+          # Start at the enclosing area shortly before the reference and stop before next procedure reference.
+          start=max(0,pos-3000)
+          next_ref=raw.find('Referenznummer',pos+len(ref))
+          if next_ref < 0:
+              next_ref=min(len(raw),pos+20000)
+          block=raw[start:next_ref]
+          pathlib.Path('swm-mars/block.html').write_text(block,encoding='utf-8')
+          text=re.sub(r'<[^>]+>',' ',block)
+          text=html.unescape(re.sub(r'\s+',' ',text)).strip()
+          pathlib.Path('swm-mars/block.txt').write_text(text+'\n',encoding='utf-8')
+          hrefs=[]
+          for href in re.findall(r'href=["\']([^"\']+)["\']',block,flags=re.I):
+              u=urllib.parse.urljoin(page,html.unescape(href))
+              if u.startswith('http') and u not in hrefs:
+                  hrefs.append(u)
+          # Candidate documents are public linked files inside the exact procedure block.
+          files=[]
+          for i,u in enumerate(hrefs):
+              if not re.search(r'\.(pdf|zip|xlsx?|docx?)(?:\?|$)',u,re.I):
+                  continue
+              out_name=pathlib.Path(urllib.parse.urlparse(u).path).name or f'file-{i}'
+              out=pathlib.Path('swm-mars')/out_name
+              status=None; ctype=None; size=None; error=None
+              try:
+                  req=urllib.request.Request(u,headers={'User-Agent':'Mozilla/5.0'})
+                  with urllib.request.urlopen(req,timeout=45) as r:
+                      status=getattr(r,'status',200); ctype=r.headers.get('Content-Type'); data=r.read()
+                  out.write_bytes(data); size=len(data)
+              except Exception as e:
+                  error=f'{type(e).__name__}: {e}'
+              files.append({'url':u,'filename':out_name,'status':status,'content_type':ctype,'bytes':size,'error':error})
+          summary={'schema':'SWM_EXACT_PROCEDURE_PROBE_V1','reference':ref,'page':page,'block_text':text,'hrefs':hrefs,'files':files}
+          pathlib.Path('swm-mars/summary.json').write_text(json.dumps(summary,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print(json.dumps(summary,indent=2,ensure_ascii=False))
+          if not files:
+              raise SystemExit('No public document links found in exact procedure block')
+          if not any(f.get('status')==200 and f.get('bytes') for f in files):
+              raise SystemExit('Public links found but none downloaded successfully')
+          PY
+      - name: Upload probe evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: swm-mars-exact-dce-${{ github.run_id }}
+          path: swm-mars/
+          if-no-files-found: error
+          retention-days: 3
