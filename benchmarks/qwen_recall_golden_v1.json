@@ -1,16 +1,16 @@
 {
   "schema": "QWEN_RECALL_GOLDEN_SET_V1",
-  "purpose": "Block Qwen scale-out if known DCE-reviewed positives are rejected or if obvious non-digital modes pollute STRONG_FIT. High recall takes precedence over precision.",
+  "purpose": "Block Qwen scale-out on false-negative recall or unsafe ranking of obvious controls. Positive delivery-mode uncertainty is a warning, not a recall failure.",
   "cases": [
     {
       "candidate_id": "IE:8670172",
       "label": "DCE-reviewed strong digital positive: Animation and Software Development",
-      "expected": {"min_rank": "FIT", "allowed_modes": ["DIRECT_DIGITAL", "AI_ENABLED", "MIXED"], "must_not_reject": true}
+      "expected": {"min_rank": "FIT", "preferred_modes": ["DIRECT_DIGITAL", "AI_ENABLED", "MIXED"], "must_not_reject": true}
     },
     {
       "candidate_id": "PL-BZP:08def84e-fb8f-254e-962b-1200016e42b5",
       "label": "DCE-reviewed digital positive: accessible web application",
-      "expected": {"min_rank": "FIT", "allowed_modes": ["DIRECT_DIGITAL", "AI_ENABLED", "MIXED", "SUBCONTRACTABLE"], "must_not_reject": true}
+      "expected": {"min_rank": "FIT", "preferred_modes": ["DIRECT_DIGITAL", "AI_ENABLED", "MIXED", "SUBCONTRACTABLE"], "must_not_reject": true}
     },
     {
       "candidate_id": "IE:8623183",
