@@ -1,0 +1,217 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import datetime as dt
+import gzip
+import json
+from collections import Counter
+from pathlib import Path
+from typing import Any, Iterable
+
+STATE_SCHEMA = "NOTICE_CLASSIFICATION_STATE_V1"
+SUMMARY_SCHEMA = "NOTICE_CLASSIFICATION_STATE_MERGE_SUMMARY_V1"
+
+
+def now_utc() -> str:
+    return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
+
+
+def opener(path: Path, mode: str):
+    return gzip.open(path, mode + "t", encoding="utf-8") if path.suffix == ".gz" else path.open(mode, encoding="utf-8")
+
+
+def read_jsonl(path: Path | None) -> list[dict[str, Any]]:
+    if not path or not path.exists() or path.stat().st_size == 0:
+        return []
+    out: list[dict[str, Any]] = []
+    with opener(path, "r") as fh:
+        for raw in fh:
+            raw = raw.strip()
+            if not raw:
+                continue
+            try:
+                row = json.loads(raw)
+            except Exception:
+                continue
+            if isinstance(row, dict):
+                out.append(row)
+    return out
+
+
+def write_jsonl(path: Path, rows: Iterable[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with opener(path, "w") as fh:
+        for row in rows:
+            fh.write(json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n")
+
+
+def cid(row: dict[str, Any]) -> str:
+    n = row.get("notice") if isinstance(row.get("notice"), dict) else {}
+    return str(row.get("canonical_notice_id") or row.get("candidate_id") or row.get("id") or n.get("candidate_id") or "").strip()
+
+
+def material_hash(row: dict[str, Any]) -> str:
+    return str(row.get("input_material_fields_hash") or row.get("material_fields_hash") or "").strip()
+
+
+def is_valid_result(row: dict[str, Any], expected_hash: str, target_version: str) -> tuple[bool, str]:
+    if not cid(row):
+        return False, "missing_id"
+    h = material_hash(row)
+    if not h:
+        return False, "missing_input_hash"
+    if h != expected_hash:
+        return False, "stale_material_hash"
+    version = str(row.get("classifier_version") or "").strip()
+    if not version:
+        return False, "missing_classifier_version"
+    if target_version and version != target_version:
+        return False, "wrong_classifier_version"
+    if row.get("parse_error"):
+        return False, "parse_or_fallback_error"
+    classification = str(row.get("classification") or row.get("decision") or "").upper()
+    if classification not in {"STRONG_FIT", "FIT", "MAYBE", "REJECT_OBVIOUS"}:
+        return False, "invalid_classification"
+    return True, "accepted"
+
+
+def state_record(row: dict[str, Any], accepted_at: str) -> dict[str, Any]:
+    return {
+        "schema": STATE_SCHEMA,
+        "canonical_notice_id": cid(row),
+        "material_fields_hash": material_hash(row),
+        "classifier_model": row.get("classifier_model"),
+        "classifier_quant": row.get("classifier_quant"),
+        "classifier_prompt_version": row.get("classifier_prompt_version"),
+        "classifier_version": row.get("classifier_version"),
+        "classification": str(row.get("classification") or row.get("decision") or "").upper(),
+        "confidence": row.get("confidence"),
+        "lean_attractiveness": row.get("lean_attractiveness"),
+        "delivery_mode": row.get("delivery_mode") or row.get("possible_delivery_route"),
+        "friction_flags": row.get("friction_flags") if isinstance(row.get("friction_flags"), list) else [],
+        "novelty_or_unusual_flag": row.get("novelty_or_unusual_flag", row.get("unusual_or_novel")),
+        "needs_gpt_review": row.get("needs_gpt_review"),
+        "classified_at_utc": row.get("classified_at_utc") or row.get("classified_at") or accepted_at,
+        "source_ledger_generation": row.get("source_ledger_generation"),
+        "source_result_schema": row.get("schema"),
+        "accepted_into_state_at": accepted_at,
+    }
+
+
+def merge(
+    ledger_rows: list[dict[str, Any]],
+    queue_rows: list[dict[str, Any]],
+    previous_state_rows: list[dict[str, Any]],
+    result_groups: list[list[dict[str, Any]]],
+    *,
+    target_version: str,
+    accepted_at: str,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
+    current_hash: dict[str, str] = {}
+    for row in ledger_rows:
+        candidate = cid(row)
+        h = str(row.get("material_fields_hash") or "").strip()
+        if candidate and h:
+            current_hash[candidate] = h
+
+    state: dict[str, dict[str, Any]] = {}
+    stats = Counter()
+    # Carry forward only state that is still exact for current material + target classifier.
+    for row in previous_state_rows:
+        candidate = cid(row)
+        if not candidate or candidate not in current_hash:
+            stats["previous_orphan_dropped"] += 1
+            continue
+        if material_hash(row) != current_hash[candidate]:
+            stats["previous_stale_dropped"] += 1
+            continue
+        if target_version and str(row.get("classifier_version") or "") != target_version:
+            stats["previous_wrong_version_dropped"] += 1
+            continue
+        state[candidate] = row
+        stats["previous_carried"] += 1
+
+    reject_reasons = Counter()
+    for group in result_groups:
+        for row in group:
+            candidate = cid(row)
+            if not candidate or candidate not in current_hash:
+                reject_reasons["unknown_or_missing_id"] += 1
+                continue
+            ok, reason = is_valid_result(row, current_hash[candidate], target_version)
+            if not ok:
+                reject_reasons[reason] += 1
+                continue
+            state[candidate] = state_record(row, accepted_at)
+            stats["results_accepted"] += 1
+
+    filtered_queue: list[dict[str, Any]] = []
+    queue_seen: set[str] = set()
+    for envelope in queue_rows:
+        candidate = cid(envelope)
+        if not candidate or candidate in queue_seen:
+            continue
+        queue_seen.add(candidate)
+        h = str(envelope.get("material_fields_hash") or material_hash(envelope) or "").strip()
+        state_row = state.get(candidate)
+        if state_row and h and material_hash(state_row) == h and str(state_row.get("classifier_version") or "") == target_version:
+            stats["queue_already_classified"] += 1
+            continue
+        filtered_queue.append(envelope)
+        stats["queue_remaining"] += 1
+
+    state_rows = [state[k] for k in sorted(state)]
+    summary = {
+        "schema": SUMMARY_SCHEMA,
+        "generated_at": accepted_at,
+        "target_classifier_version": target_version,
+        "ledger_notices": len(current_hash),
+        "previous_state_rows": len(previous_state_rows),
+        "result_rows_seen": sum(len(x) for x in result_groups),
+        "state_rows_after_merge": len(state_rows),
+        "input_queue_rows": len(queue_rows),
+        "remaining_classification_queue": len(filtered_queue),
+        "classified_fraction_of_ledger": round(len(state_rows) / len(current_hash), 8) if current_hash else 0.0,
+        "stats": dict(sorted(stats.items())),
+        "rejected_result_reasons": dict(sorted(reject_reasons.items())),
+        "safety": {
+            "exact_material_hash_required": True,
+            "parse_or_fallback_result_marks_classified": False,
+            "wrong_classifier_version_marks_classified": False,
+            "stale_result_can_overwrite_updated_notice": False,
+            "classification_is_not_dce_or_eligibility_truth": True,
+        },
+    }
+    return state_rows, filtered_queue, summary
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description="Merge Qwen semantic results into durable hash-safe classification state.")
+    ap.add_argument("--ledger", required=True)
+    ap.add_argument("--classification-queue", required=True)
+    ap.add_argument("--previous-state")
+    ap.add_argument("--results", action="append", default=[])
+    ap.add_argument("--target-classifier-version", required=True)
+    ap.add_argument("--state-out", required=True)
+    ap.add_argument("--queue-out", required=True)
+    ap.add_argument("--summary-out", required=True)
+    args = ap.parse_args()
+
+    accepted_at = now_utc()
+    state, queue, summary = merge(
+        read_jsonl(Path(args.ledger)),
+        read_jsonl(Path(args.classification_queue)),
+        read_jsonl(Path(args.previous_state)) if args.previous_state else [],
+        [read_jsonl(Path(p)) for p in args.results],
+        target_version=args.target_classifier_version,
+        accepted_at=accepted_at,
+    )
+    write_jsonl(Path(args.state_out), state)
+    write_jsonl(Path(args.queue_out), queue)
+    Path(args.summary_out).write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    main()
