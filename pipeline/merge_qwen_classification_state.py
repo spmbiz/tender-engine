@@ -11,6 +11,7 @@ from typing import Any, Iterable
 
 STATE_SCHEMA = "NOTICE_CLASSIFICATION_STATE_V1"
 SUMMARY_SCHEMA = "NOTICE_CLASSIFICATION_STATE_MERGE_SUMMARY_V1"
+BUSINESS_CALIBRATION_VERSION = "spm-business-fit-v2"
 
 
 def now_utc() -> str:
@@ -68,6 +69,8 @@ def is_valid_result(row: dict[str, Any], expected_hash: str, target_version: str
         return False, "missing_classifier_version"
     if target_version and version != target_version:
         return False, "wrong_classifier_version"
+    if str(row.get("business_calibration_version") or "") != BUSINESS_CALIBRATION_VERSION:
+        return False, "wrong_business_calibration_version"
     if row.get("parse_error"):
         return False, "parse_or_fallback_error"
     classification = str(row.get("classification") or row.get("decision") or "").upper()
@@ -92,6 +95,9 @@ def state_record(row: dict[str, Any], accepted_at: str) -> dict[str, Any]:
         "friction_flags": row.get("friction_flags") if isinstance(row.get("friction_flags"), list) else [],
         "novelty_or_unusual_flag": row.get("novelty_or_unusual_flag", row.get("unusual_or_novel")),
         "needs_gpt_review": row.get("needs_gpt_review"),
+        "survival_decision": row.get("survival_decision") or "KEEP",
+        "dce_eligible": bool(row.get("dce_eligible", True)),
+        "business_calibration_version": row.get("business_calibration_version"),
         "classified_at_utc": row.get("classified_at_utc") or row.get("classified_at") or accepted_at,
         "source_ledger_generation": row.get("source_ledger_generation"),
         "source_result_schema": row.get("schema"),
@@ -129,6 +135,9 @@ def merge(
         if target_version and str(row.get("classifier_version") or "") != target_version:
             stats["previous_wrong_version_dropped"] += 1
             continue
+        if str(row.get("business_calibration_version") or "") != BUSINESS_CALIBRATION_VERSION:
+            stats["previous_wrong_business_calibration_dropped"] += 1
+            continue
         state[candidate] = row
         stats["previous_carried"] += 1
 
@@ -155,7 +164,7 @@ def merge(
         queue_seen.add(candidate)
         h = str(envelope.get("material_fields_hash") or material_hash(envelope) or "").strip()
         state_row = state.get(candidate)
-        if state_row and h and material_hash(state_row) == h and str(state_row.get("classifier_version") or "") == target_version:
+        if state_row and h and material_hash(state_row) == h and str(state_row.get("classifier_version") or "") == target_version and str(state_row.get("business_calibration_version") or "") == BUSINESS_CALIBRATION_VERSION:
             stats["queue_already_classified"] += 1
             continue
         filtered_queue.append(envelope)

@@ -89,8 +89,11 @@ def main() -> None:
         row['lean_attractiveness'] = s.get('lean_attractiveness')
         row['delivery_mode'] = s.get('delivery_mode')
         row['friction_flags'] = s.get('friction_flags') if isinstance(s.get('friction_flags'), list) else []
-        row['novelty_or_unusual_flag'] = s.get('novelty_or_unusual_flag')
+        row['novelty_or_unusual_flag'] = s.get('novelty_or_unusual_flag', s.get('unusual_or_novel'))
         row['needs_gpt_review'] = s.get('needs_gpt_review')
+        row['survival_decision'] = s.get('survival_decision') or 'KEEP'
+        row['dce_eligible'] = bool(s.get('dce_eligible', True))
+        row['business_calibration_version'] = s.get('business_calibration_version')
         row['classified_at'] = s.get('classified_at_utc') or s.get('classified_at')
         row['needs_reclassification'] = False
         row['classification_stale'] = False

@@ -35,7 +35,7 @@ F_CODE = {
     "SC": "SECURITY_CLEARANCE", "O": "OTHER",
 }
 
-PROMPT_VERSION = "qwen-batch-high-recall-compact-selfheal-v1"
+PROMPT_VERSION = "qwen-batch-high-recall-business-fit-v2"
 CLASSIFIER_VERSION = "qwen3-4b-q4km-batch-selfheal-v1"
 SCHEMA = "QWEN_NOTICE_BATCH_SELFHEAL_V1"
 SUMMARY_SCHEMA = "QWEN_NOTICE_BATCH_SELFHEAL_SUMMARY_V1"
@@ -63,8 +63,13 @@ PERSONAL_SERVICE = re.compile(r"\bpersonal services? contract\b", re.I)
 
 SYSTEM = """High-recall public-tender router for a lean Belgian SME.
 This is routing only, never eligibility or final bid approval.
-Keep unusual, ambiguous, subcontractable, consortium, broker/resell, AI or digital opportunities.
-Reject only clearly unsuitable work. Separate survivability from lean attractiveness.
+CRITICAL: KEEP is not FIT. Use MAYBE liberally for anything worth preserving but not yet commercially attractive.
+STRONG_FIT = clear SPM leverage, lean/core delivery, low obvious friction, worth immediate DCE review.
+FIT = practical plausible opportunity with reasonably direct delivery or a straightforward broker route.
+MAYBE = preserve for recall: ambiguous, partner-heavy, physical commodity, generic service, on-site work, unclear economics or unclear gates.
+REJECT_OBVIOUS = clearly non-opportunity/informational or clearly unsuitable active pursuit.
+Physical goods, heavy/on-site work and personal-service contracts must NOT be FIT merely because subcontracting exists.
+Keep unusual, ambiguous, subcontractable, consortium, broker/resell, AI or digital opportunities by using MAYBE when uncertain.
 Return ONLY one compact JSON object {"x":[...]} in the same order as input.
 For every item use:
 i=id
@@ -143,6 +148,7 @@ def compact(row: dict[str, Any], description_chars: int) -> dict[str, Any]:
         "v": n.get("estimated_value"),
         "y": n.get("currency"),
         "p": n.get("procedure"),
+        "e": n.get("deadline") or n.get("deadline_utc"),
     }
 
 
@@ -227,54 +233,69 @@ def deterministic_guard(decoded: dict[str, Any], row: dict[str, Any]) -> tuple[d
     text = " ".join(str(n.get(k) or "") for k in ("title", "description", "cpv_or_category", "procedure"))
     title = str(n.get("title") or "")
     actions: list[str] = []
-    physical = bool(PHYSICAL_GOODS.search(title)) or bool(PHYSICAL_GOODS.search(text[:1200]))
-    regulated = bool(REGULATED.search(title)) or bool(REGULATED.search(text[:1600]))
-    heavy = bool(HEAVY_ONSITE.search(title)) or bool(HEAVY_ONSITE.search(text[:1400]))
-    digital = bool(DIRECT_DIGITAL.search(title)) or bool(DIRECT_DIGITAL.search(text[:1600]))
-    personal = bool(PERSONAL_SERVICE.search(title))
-
-    if digital and not personal and out["classification"] in {"REJECT_OBVIOUS", "MAYBE"}:
-        out["classification"] = "FIT"
-        actions.append("clear_digital_floor_fit")
-    if regulated:
-        out["classification"] = "MAYBE"
+    out["survival_decision"] = "KEEP"
+    out["dce_eligible"] = True
+    physical = bool(PHYSICAL_GOODS.search(title)) or bool(PHYSICAL_GOODS.search(text[:1600]))
+    regulated = bool(REGULATED.search(title)) or bool(REGULATED.search(text[:1800]))
+    heavy = bool(HEAVY_ONSITE.search(title)) or bool(HEAVY_ONSITE.search(text[:1800]))
+    personal = bool(PERSONAL_SERVICE.search(title)) or bool(PERSONAL_SERVICE.search(text[:1000]))
+    info_only = bool(re.search(r"(industry day|sources sought|request for information|special notice|award notice|contract award notice)", title, re.I))
+    hard_personnel = bool(re.search(r"(aviation security officer|armed security|security guard|guard services?|physician|nurse|medical staffing)", text, re.I))
+    patient_transport = bool(re.search(r"(non[- ]?emergent patient transportation|patient transport|ambulance services?)", text, re.I))
+    core = bool(re.search(r"(website|web ?app|web portal|application development|mobile app|animation|video production|graphic design|content creation|copywriting|editorial|proofreading|translation|transcription|printing?|brochures?|leaflets?|signage|promotional goods?|digitization|digitisation|scanning|document management|e[- ]learning|training content|training materials?|media monitoring|social media|communications strategy|digital marketing|market research|research services?|surveys?|data processing|data entry|workflow automation|cms|hosting|web maintenance)", text, re.I))
+    strong_core = bool(re.search(r"(website|web ?app|web portal|application development|mobile app|animation|video production|graphic design|content creation|translation|transcription|printing?|digitization|digitisation|scanning|e[- ]learning|media monitoring|social media|market research|surveys?)", text, re.I))
+    deadline_raw = n.get("deadline") or n.get("deadline_utc")
+    deadline = None
+    if deadline_raw:
+        try:
+            deadline = dt.datetime.fromisoformat(str(deadline_raw).replace("Z", "+00:00"))
+            if deadline.tzinfo is None: deadline = deadline.replace(tzinfo=dt.timezone.utc)
+        except Exception: deadline = None
+    if deadline is not None and deadline < dt.datetime.now(dt.timezone.utc):
+        out.update(classification="REJECT_OBVIOUS", lean_attractiveness="LOW", delivery_mode="UNCLEAR", survival_decision="DROP", dce_eligible=False)
+        actions.append("expired_deadline_drop")
+    if info_only:
+        out.update(classification="REJECT_OBVIOUS", lean_attractiveness="LOW", delivery_mode="UNCLEAR", survival_decision="DROP", dce_eligible=False)
+        actions.append("information_only_not_dce")
+    if (personal and hard_personnel) or patient_transport or (personal and not core):
+        out.update(classification="REJECT_OBVIOUS", lean_attractiveness="LOW", delivery_mode="UNCLEAR", survival_decision="DROP", dce_eligible=False)
+        if (personal or hard_personnel) and "LICENSED_PERSONNEL" not in out["friction_flags"]: out["friction_flags"].append("LICENSED_PERSONNEL")
+        actions.append("personal_or_hard_service_drop")
+    if regulated and out["survival_decision"] != "DROP":
+        out.update(classification="MAYBE", lean_attractiveness="LOW", delivery_mode="BROKER_RESELL", dce_eligible=False)
+        if "REGULATED_GOODS" not in out["friction_flags"]: out["friction_flags"].append("REGULATED_GOODS")
+        out["needs_gpt_review"] = True
+        actions.append("regulated_keep_no_dce")
+    if physical and not core and out["survival_decision"] != "DROP":
+        if out["classification"] in {"STRONG_FIT", "FIT"}: out["classification"] = "MAYBE"; actions.append("physical_fit_to_maybe")
         out["delivery_mode"] = "BROKER_RESELL"
+        if out["lean_attractiveness"] == "HIGH": out["lean_attractiveness"] = "MEDIUM"
+    if heavy and not core and out["survival_decision"] != "DROP":
+        if out["classification"] in {"STRONG_FIT", "FIT"}: out["classification"] = "MAYBE"; actions.append("heavy_fit_to_maybe")
+        out["delivery_mode"] = "SUBCONTRACTABLE"
         out["lean_attractiveness"] = "LOW"
-        if "REGULATED_GOODS" not in out["friction_flags"]:
-            out["friction_flags"].append("REGULATED_GOODS")
+        if "ON_SITE_SPECIALIST" not in out["friction_flags"]: out["friction_flags"].append("ON_SITE_SPECIALIST")
         out["needs_gpt_review"] = True
-        actions.append("regulated_cap_and_flag")
-    elif physical and not digital:
-        if out["classification"] == "STRONG_FIT":
+    hard_friction = bool({"LICENSED_PERSONNEL", "SECURITY_CLEARANCE", "REGULATED_GOODS"} & set(out["friction_flags"]))
+    if out["classification"] == "STRONG_FIT":
+        if not strong_core or hard_friction:
+            out["classification"] = "FIT" if core and not hard_friction else "MAYBE"
+            actions.append("strong_requires_core_low_friction")
+        elif deadline is None:
             out["classification"] = "FIT"
-            actions.append("physical_cap_fit")
-        if out["classification"] == "REJECT_OBVIOUS":
+            out["needs_gpt_review"] = True
+            actions.append("strong_deadline_unverified_to_fit")
+    if out["classification"] == "FIT" and out["survival_decision"] != "DROP":
+        if not core and (out["delivery_mode"] in {"SUBCONTRACTABLE", "BROKER_RESELL", "UNCLEAR"} or out["lean_attractiveness"] in {"LOW", "UNKNOWN"}):
             out["classification"] = "MAYBE"
-            actions.append("physical_recall_rescue")
-        if out["delivery_mode"] in {"DIRECT_DIGITAL", "AI_ENABLED", "UNCLEAR"}:
-            out["delivery_mode"] = "BROKER_RESELL"
-            actions.append("physical_route_broker")
-        if out["lean_attractiveness"] == "HIGH":
-            out["lean_attractiveness"] = "MEDIUM"
-            actions.append("physical_lean_cap_medium")
-    if heavy and not personal:
-        if out["classification"] == "STRONG_FIT":
-            out["classification"] = "FIT"
-            actions.append("heavy_cap_fit")
-        if out["delivery_mode"] in {"DIRECT_DIGITAL", "AI_ENABLED", "UNCLEAR"}:
-            out["delivery_mode"] = "SUBCONTRACTABLE"
-            actions.append("heavy_route_subcontract")
-        if out["lean_attractiveness"] == "HIGH":
-            out["lean_attractiveness"] = "MEDIUM"
-            actions.append("heavy_lean_cap_medium")
-        if "ON_SITE_SPECIALIST" not in out["friction_flags"]:
-            out["friction_flags"].append("ON_SITE_SPECIALIST")
-        out["needs_gpt_review"] = True
-    if out["classification"] == "STRONG_FIT" and not digital:
-        out["classification"] = "FIT"
-        actions.append("strong_requires_clear_digital")
+            actions.append("noncore_partner_fit_to_maybe")
+        elif hard_friction:
+            out["classification"] = "MAYBE"
+            actions.append("hard_friction_fit_to_maybe")
+    if out["classification"] == "REJECT_OBVIOUS" and out["survival_decision"] == "KEEP": out["dce_eligible"] = False
+    out["business_calibration_version"] = "spm-business-fit-v2"
+    out["novelty_or_unusual_flag"] = bool(out.get("unusual_or_novel", out.get("novelty_or_unusual_flag", False)))
     return out, actions
-
 
 def atomic_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
