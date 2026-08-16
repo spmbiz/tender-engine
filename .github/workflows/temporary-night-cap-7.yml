@@ -1,0 +1,66 @@
+name: Temporary Tender Night Cap 7
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/temporary-night-cap-7.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: temporary-tender-night-cap
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply overnight worker caps
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          live = Path('.github/workflows/qwen-live-classification.yml')
+          s = live.read_text(encoding='utf-8')
+          replacements = [
+              ("QWEN_WORKERS: '8'", "QWEN_WORKERS: '6'"),
+              ("max-parallel: 8", "max-parallel: 6"),
+              ("shard: [0,1,2,3,4,5,6,7]", "shard: [0,1,2,3,4,5]"),
+              ("of-008", "of-006"),
+              ("-f max_parallel=8", "-f max_parallel=6"),
+          ]
+          for old, new in replacements:
+              if old not in s:
+                  raise SystemExit(f'missing expected qwen-live token: {old}')
+              s = s.replace(old, new)
+          live.write_text(s, encoding='utf-8')
+
+          tune = Path('.github/workflows/qwen-batch-autotune-selfheal.yml')
+          t = tune.read_text(encoding='utf-8')
+          if 'max-parallel: 3' not in t:
+              raise SystemExit('missing expected autotune max-parallel: 3')
+          t = t.replace('max-parallel: 3', 'max-parallel: 1', 1)
+          tune.write_text(t, encoding='utf-8')
+          PY
+      - name: Commit caps
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/qwen-live-classification.yml .github/workflows/qwen-batch-autotune-selfheal.yml
+          git commit -m 'fleet: overnight tender worker cap 7 [skip ci]'
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((attempt * 3))
+          done
+          exit 1
