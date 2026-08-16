@@ -9,6 +9,7 @@ on:
     paths:
       - 'control/qwen_batch_autotune_trigger.json'
       - 'pipeline/qwen_notice_batch_selfheal.py'
+      - 'pipeline/qwen_notice_post_guard.py'
       - 'pipeline/select_qwen_batch_champion.py'
       - '.github/workflows/qwen-batch-autotune-selfheal.yml'
 
@@ -46,8 +47,6 @@ jobs:
               except Exception:
                   state={}
               hour=datetime.datetime.now(datetime.timezone.utc).hour
-              # Every six hours, re-open the full search space, still under the
-              # matrix max-parallel cap below. Other hours are cheap health/repair waves.
               if hour % 6 != 0:
                   champion=int((state.get('champion') or {}).get('initial_batch_size') or 0)
                   if state.get('status') == 'PASS' and champion in sizes:
@@ -223,17 +222,30 @@ jobs:
         run: |
           [ -s qwen-server.pid ] && kill "$(cat qwen-server.pid)" >/dev/null 2>&1 || true
 
-      - name: Evaluate DCE-grounded golden gates without hiding candidate evidence
+      - name: Apply conserved generic routing and friction post guard
         if: always()
         shell: bash
         run: |
           set -euo pipefail
           b='${{ matrix.batch_size }}'
           if [ -s "qwen-selfheal-${b}-results.jsonl" ]; then
+            python pipeline/qwen_notice_post_guard.py \
+              --input "qwen-selfheal-${b}-results.jsonl" \
+              --output "qwen-selfheal-${b}-guarded.jsonl" \
+              --summary "qwen-selfheal-${b}-post-guard-summary.json"
+          fi
+
+      - name: Evaluate DCE-grounded golden gates without hiding candidate evidence
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          b='${{ matrix.batch_size }}'
+          if [ -s "qwen-selfheal-${b}-guarded.jsonl" ]; then
             set +e
             python pipeline/evaluate_qwen_recall_golden.py \
               --golden benchmarks/qwen_batch_recall_golden_v1.json \
-              --results "qwen-selfheal-${b}-results.jsonl" \
+              --results "qwen-selfheal-${b}-guarded.jsonl" \
               --report "qwen-selfheal-${b}-golden.json"
             code=$?
             set -e
@@ -257,7 +269,7 @@ jobs:
           summary=read(f'qwen-selfheal-{b}-summary.json',{})
           golden=read(f'qwen-selfheal-{b}-golden.json',{'scale_out_gate':'BLOCK','failures':['missing_golden_report']})
           files=[]
-          for name in [f'qwen-selfheal-{b}-results.jsonl',f'qwen-selfheal-{b}-summary.json',f'qwen-selfheal-{b}-golden.json','autotune-input-manifest.json','ledger/INPUT_SHA256.txt','qwen-server.log']:
+          for name in [f'qwen-selfheal-{b}-results.jsonl',f'qwen-selfheal-{b}-guarded.jsonl',f'qwen-selfheal-{b}-summary.json',f'qwen-selfheal-{b}-post-guard-summary.json',f'qwen-selfheal-{b}-golden.json','autotune-input-manifest.json','ledger/INPUT_SHA256.txt','qwen-server.log']:
               p=pathlib.Path(name)
               if p.is_file():
                   files.append({'path':name,'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
@@ -282,7 +294,9 @@ jobs:
             candidate.json
             autotune-input-manifest.json
             qwen-selfheal-${{ matrix.batch_size }}-results.jsonl
+            qwen-selfheal-${{ matrix.batch_size }}-guarded.jsonl
             qwen-selfheal-${{ matrix.batch_size }}-summary.json
+            qwen-selfheal-${{ matrix.batch_size }}-post-guard-summary.json
             qwen-selfheal-${{ matrix.batch_size }}-golden.json
             ledger/INPUT_SHA256.txt
             qwen-server.log
