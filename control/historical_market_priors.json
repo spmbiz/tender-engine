@@ -1,9 +1,9 @@
 {
   "contract": "TENDER_MARKET_BRAIN_PRIORS_V1",
   "status": "READY",
-  "generated_at": "2026-08-15T19:02:26.452087+00:00",
-  "source_release": "walidgdg1-ai/tender-engine:market-intelligence-v9-final-qa + market-intelligence-micro-niche-v2-precision + market-intelligence-hunt-subniches-v2-precision",
-  "source_scope": "Global Core v4 notice-first. Route-aware and title-led historical priors; staffing-dependent language services are explicitly held from live promotion.",
+  "generated_at": "2026-08-16T01:27:02.457578+00:00",
+  "source_release": "walidgdg1-ai/tender-engine:market-intelligence-v9-final-qa + market-intelligence-micro-niche-v2-precision",
+  "source_scope": "Global Core v4 notice-first. v9 cleaned lanes plus title-led Micro-Niche v2 Precision lanes admitted only after persisted manual QA. Direct/noncompetitive evidence remains buyer-demand intelligence only.",
   "safety": {
     "affects_final_verdict": false,
     "satisfies_dce_gates": false,
@@ -149,8 +149,8 @@
     {
       "lane": "Website support / accessibility / hosting",
       "country": "FRANCE",
-      "sample_size": 111,
-      "historical_score": 78.32,
+      "sample_size": 121,
+      "historical_score": 81.97,
       "priority_bonus": 5,
       "decision": "PROMOTE_CORE",
       "match_field": "title",
@@ -159,8 +159,8 @@
         "(?:maintenance|support|h[eé]bergement|entretien|mise [àa] jour).{0,90}(?:site web|site internet|website|portail web)"
       ],
       "negative_patterns": [
+        "construction",
         "hardware",
-        "mat[eé]riel informatique",
         "security portal",
         "x-ray"
       ]
@@ -202,18 +202,16 @@
         "security portal",
         "x-ray",
         "medical",
-        "hardware",
-        "assistance [àa] ma[iî]trise d.?ouvrage",
-        "\\bamo\\b.{0,50}(?:site|web|refonte)",
-        "mission.{0,30}ma[iî]trise d.?ouvrage"
+        "construction",
+        "hardware"
       ]
     },
     {
       "lane": "Website support / accessibility / hosting",
       "country": "GERMANY",
-      "sample_size": 123,
-      "historical_score": 81.91,
-      "priority_bonus": 6,
+      "sample_size": 90,
+      "historical_score": 86.29,
+      "priority_bonus": 5,
       "decision": "PROMOTE_CORE",
       "match_field": "title",
       "patterns": [
@@ -221,6 +219,7 @@
         "(?:pflege|wartung|betreuung|support|hosting|betrieb).{0,90}(?:webseite|website|internetauftritt|webauftritt)"
       ],
       "negative_patterns": [
+        "construction",
         "hardware",
         "security portal",
         "portal crane"
@@ -359,22 +358,20 @@
     {
       "lane": "Transcription / speech-to-text",
       "country": "FRANCE",
-      "sample_size": 45,
-      "historical_score": 76.21,
+      "sample_size": 58,
+      "historical_score": 82.42,
       "priority_bonus": 4,
       "decision": "PROMOTE_CORE",
       "match_field": "title",
       "patterns": [
         "\\btranscription\\b",
         "\\bretranscription\\b",
+        "st[eé]notyp",
         "speech[- ]to[- ]text"
       ],
       "negative_patterns": [
-        "st[eé]notyp",
-        "st[eé]nograph",
         "dna transcription",
         "gene transcription",
-        "g[eè]ne",
         "transcription factor"
       ]
     },
@@ -487,6 +484,50 @@
         "equipment",
         "hardware",
         "audiovisual equipment"
+      ]
+    },
+    {
+      "lane": "Translation",
+      "country": "FRANCE",
+      "sample_size": 139,
+      "historical_score": 84.28,
+      "priority_bonus": 5,
+      "decision": "PROMOTE_CORE",
+      "match_field": "title",
+      "patterns": [
+        "\\btraduction\\b",
+        "\\binterpr[eé]tariat\\b",
+        "translation services?",
+        "linguistic translation"
+      ],
+      "negative_patterns": [
+        "translational",
+        "translationnelle",
+        "m[eé]decine",
+        "mat[eé]riel.{0,40}traduction",
+        "audiovisuel.{0,50}traduction",
+        "translation.{0,40}equipment"
+      ]
+    },
+    {
+      "lane": "Translation",
+      "country": "CANADA",
+      "sample_size": 35,
+      "historical_score": 81.5,
+      "priority_bonus": 3,
+      "decision": "PROMOTE_CORE",
+      "match_field": "title",
+      "patterns": [
+        "translation services?",
+        "professional translation",
+        "technical translation",
+        "sign language translation",
+        "interpretation services?"
+      ],
+      "negative_patterns": [
+        "translational",
+        "translation.{0,40}equipment",
+        "simultaneous interpretation equipment"
       ]
     }
   ],
