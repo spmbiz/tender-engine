@@ -1,0 +1,53 @@
+name: Qwen Live Probe 31927134312
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qwen-live-probe-31927134312.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read live Qwen checkpoints
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/qwen-live
+          gh release download qwen-live-progress-31927134312 --repo "$GITHUB_REPOSITORY" --pattern 'qwen-live-*-raw-progress.json' --dir /tmp/qwen-live --clobber
+          python - <<'PY'
+          import json,glob,os
+          from collections import Counter
+          files=sorted(glob.glob('/tmp/qwen-live/*.json'))
+          agg=Counter(); total_resolved=0; total_remaining=0
+          print('QWEN_LIVE_PROBE_V2')
+          for f in files:
+              d=json.load(open(f,encoding='utf-8'))
+              wid=d.get('worker_id') or d.get('shard') or os.path.basename(f)
+              resolved=d.get('resolved',d.get('completed',d.get('processed',0))) or 0
+              remaining=d.get('remaining',d.get('remaining_notices',0)) or 0
+              counts=d.get('decision_counts') or d.get('classification_counts') or d.get('counts') or {}
+              if not isinstance(counts,dict): counts={}
+              total_resolved += int(resolved or 0)
+              total_remaining += int(remaining or 0)
+              for k,v in counts.items():
+                  try: agg[str(k)] += int(v)
+                  except Exception: pass
+              print(json.dumps({
+                  'worker':wid,'resolved':resolved,'remaining':remaining,
+                  'decision_counts':counts,
+                  'request_attempts':d.get('request_attempts'),
+                  'failed_attempts':d.get('failed_attempts'),
+                  'split_events':d.get('split_events',d.get('splits')),
+                  'elapsed_seconds':d.get('elapsed_seconds',d.get('elapsed')),
+                  'seconds_per_notice':d.get('seconds_per_notice'),
+                  'last_attempt':d.get('last_attempt'),
+                  'updated_at':d.get('updated_at',d.get('updated_at_utc')),
+              },ensure_ascii=False))
+          print('AGGREGATE '+json.dumps({'workers':len(files),'resolved':total_resolved,'remaining':total_remaining,'decision_counts':dict(agg)},ensure_ascii=False))
+          PY
