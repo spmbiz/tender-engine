@@ -147,7 +147,7 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **DK-UDBUD:9f77d7a2-ded8-4142-8a3f-b6cfff72ab6d:01** · DENMARK · p=46 · deadline=2026-08-30T21:59:59+00:00 · blockers=none · Media Monitoring System
 
 ## web_cms
-- **DE-DOE:4adfbe6f-ebf9-403e-953b-bb7b90ed901f:01** · GERMANY · p=62 · deadline=UNKNOWN · blockers=none · Betreuung und Weiterentwicklung Websites
+- **DE-DOE:4adfbe6f-ebf9-403e-953b-bb7b90ed901f:01** · GERMANY · p=57 · deadline=UNKNOWN · blockers=none · Betreuung und Weiterentwicklung Websites
 - **IE:8763289** · IRELAND · p=55 · deadline=2026-08-24T16:30:00+00:00 · blockers=none · Provision of Website Design, Development, Hosting, Maintenance and Digital Resource Portal Services – Primary Mathematics Hub
 - **FR-BOAMP:26-80319** · FRANCE · p=54 · deadline=2026-09-04T11:00:00+00:00 · blockers=none · Création du nouveau site web de NEOMA BUSINESS SCHOOL avec accompagnement technique
 - **FR-BOAMP:26-80308** · FRANCE · p=54 · deadline=2026-10-12T12:00:00+00:00 · blockers=none · Refonte complète du site internet et intranet du Centre Hospitalier d'Erstein
