@@ -12,6 +12,7 @@ from urllib.parse import urljoin, urlparse
 import requests
 
 import dce_worker as base
+from build_matrix import resolve_dce_portal
 from ted_resolver import resolve_ted_candidate
 
 
@@ -223,7 +224,7 @@ def main():
 
     candidate = base.load_candidate(Path(args.queue), args.line)
     cid = str(candidate.get("candidate_id") or f"line-{args.line}")
-    portal = str(candidate.get("portal") or candidate.get("portal_key") or candidate.get("source") or "").upper()
+    portal, raw_portal = resolve_dce_portal(candidate)
     root = Path(args.out) / base.slugify(cid)
     files_dir = root / "files"
     files_dir.mkdir(parents=True, exist_ok=True)
@@ -231,6 +232,7 @@ def main():
         "candidate": candidate,
         "candidate_id": cid,
         "portal": portal,
+        "raw_portal": raw_portal,
         "queue_line": args.line,
         "status": "STARTED",
         "started_at": datetime.now(timezone.utc).isoformat(),
@@ -254,7 +256,7 @@ def main():
         manifest["error"] = repr(exc)
     manifest["finished_at"] = datetime.now(timezone.utc).isoformat()
     (root / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(json.dumps({"candidate_id": cid, "portal": portal, "status": manifest["status"], "files": len(manifest["files"]), "root": str(root)}, indent=2))
+    print(json.dumps({"candidate_id": cid, "portal": portal, "raw_portal": raw_portal, "status": manifest["status"], "files": len(manifest["files"]), "root": str(root)}, indent=2))
 
 
 if __name__ == "__main__":
