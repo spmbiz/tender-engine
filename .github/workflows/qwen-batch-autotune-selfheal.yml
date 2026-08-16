@@ -1,0 +1,433 @@
+name: Qwen Batch Autotune Self-Heal
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'control/qwen_batch_autotune_trigger.json'
+      - 'pipeline/qwen_notice_batch_selfheal.py'
+      - 'pipeline/select_qwen_batch_champion.py'
+      - '.github/workflows/qwen-batch-autotune-selfheal.yml'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: qwen-batch-autotune-selfheal
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      batch_sizes: ${{ steps.plan.outputs.batch_sizes }}
+      sample_size: ${{ steps.plan.outputs.sample_size }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: plan
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import datetime,json,os,pathlib
+          cfg=json.load(open('control/qwen_batch_autotune_trigger.json',encoding='utf-8'))
+          sizes=[int(x) for x in cfg.get('candidate_batch_sizes',[1,2,4,6,8,12,16,20,24,32])]
+          sizes=sorted(set(x for x in sizes if 1 <= x <= 64))
+          sample=int(cfg.get('sample_size',48))
+          event=os.environ.get('GITHUB_EVENT_NAME','')
+          runtime=pathlib.Path('control/qwen_batch_runtime_config.json')
+          chosen=sizes
+          if event == 'schedule' and runtime.exists():
+              try:
+                  state=json.loads(runtime.read_text(encoding='utf-8'))
+              except Exception:
+                  state={}
+              hour=datetime.datetime.now(datetime.timezone.utc).hour
+              if state.get('status') == 'PASS' and hour % 6 != 0:
+                  champion=int((state.get('champion') or {}).get('initial_batch_size') or 0)
+                  if champion in sizes:
+                      idx=sizes.index(champion)
+                      chosen=sizes[max(0,idx-1):min(len(sizes),idx+2)]
+          print('batch_sizes='+json.dumps(chosen,separators=(',',':')))
+          print('sample_size='+str(sample))
+          PY
+
+  tune:
+    needs: plan
+    strategy:
+      fail-fast: false
+      matrix:
+        batch_size: ${{ fromJSON(needs.plan.outputs.batch_sizes) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download durable ledger queue and resolve exact generation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ledger
+          gh release download notice-intelligence-ledger-latest \
+            --pattern notice-classification-queue-latest.jsonl.gz \
+            --dir ledger
+          test -s ledger/notice-classification-queue-latest.jsonl.gz
+          release_name="$(gh release view notice-intelligence-ledger-latest --json name --jq '.name')"
+          generation="$(grep -oE '[0-9]{8,}' <<< "$release_name" | tail -n1)"
+          if [[ ! "$generation" =~ ^[0-9]+$ ]]; then
+            body="$(gh release view notice-intelligence-ledger-latest --json body --jq '.body')"
+            generation="$(grep -oE 'run=[0-9]+' <<< "$body" | head -n1 | cut -d= -f2)"
+          fi
+          [[ "$generation" =~ ^[0-9]+$ ]]
+          echo "SOURCE_LEDGER_GENERATION=$generation" >> "$GITHUB_ENV"
+          sha256sum ledger/notice-classification-queue-latest.jsonl.gz > ledger/INPUT_SHA256.txt
+
+      - name: Materialize mixed DCE-golden plus deterministic live sample
+        shell: bash
+        env:
+          SAMPLE_SIZE: ${{ needs.plan.outputs.sample_size }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import gzip,hashlib,json,os,pathlib
+          target=int(os.environ['SAMPLE_SIZE'])
+          golden=json.load(open('benchmarks/qwen_batch_recall_golden_v1.json',encoding='utf-8'))
+          wanted={str(x['candidate_id']) for x in golden.get('cases',[])}
+          found={}
+          residual=[]
+          with gzip.open('ledger/notice-classification-queue-latest.jsonl.gz','rt',encoding='utf-8') as fh:
+              for line in fh:
+                  row=json.loads(line)
+                  n=row.get('notice') if isinstance(row.get('notice'),dict) else row
+                  cid=str(row.get('canonical_notice_id') or n.get('candidate_id') or n.get('notice_id') or n.get('id') or '').strip()
+                  if not cid:
+                      continue
+                  if cid in wanted:
+                      found[cid]=row
+                  else:
+                      residual.append((hashlib.sha256(cid.encode()).hexdigest(),cid,row))
+          missing=sorted(wanted-set(found))
+          if missing:
+              raise SystemExit(f'DCE golden candidates missing from current ledger: {missing}')
+          residual.sort(key=lambda x:(x[0],x[1]))
+          need=max(0,target-len(found))
+          selected=[found[cid] for cid in sorted(found)] + [x[2] for x in residual[:need]]
+          ids=[]
+          with open('autotune-queue.jsonl','w',encoding='utf-8') as out:
+              for row in selected:
+                  n=row.get('notice') if isinstance(row.get('notice'),dict) else row
+                  cid=str(row.get('canonical_notice_id') or n.get('candidate_id') or n.get('notice_id') or n.get('id') or '').strip()
+                  ids.append(cid)
+                  out.write(json.dumps(row,ensure_ascii=False,separators=(',',':'))+'\n')
+          if len(ids) != len(set(ids)):
+              raise SystemExit('autotune sample duplicate IDs')
+          if len(ids) < min(target, len(wanted)):
+              raise SystemExit('autotune sample unexpectedly small')
+          pathlib.Path('autotune-input-manifest.json').write_text(json.dumps({
+              'schema':'QWEN_BATCH_AUTOTUNE_INPUT_V1',
+              'ledger_generation':os.environ.get('SOURCE_LEDGER_GENERATION'),
+              'requested':target,
+              'actual':len(ids),
+              'golden_count':len(wanted),
+              'ids':ids,
+          },indent=2)+'\n',encoding='utf-8')
+          PY
+
+      - name: Cache Qwen GGUF download
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: qwen3-4b-q4-k-m-hf-v1
+
+      - name: Install llama.cpp CPU runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p llama-dist
+          gh api 'repos/ggml-org/llama.cpp/releases?per_page=20' > /tmp/releases.json
+          readarray -t picked < <(python - <<'PY'
+          import json,re
+          for rel in json.load(open('/tmp/releases.json')):
+              if rel.get('draft') or rel.get('prerelease'):
+                  continue
+              for a in rel.get('assets',[]):
+                  if re.fullmatch(r'llama-.*-bin-ubuntu-x64\.tar\.gz',a.get('name','')):
+                      print(rel['tag_name']); print(a['name']); raise SystemExit
+          raise SystemExit('no llama.cpp Ubuntu x64 asset found')
+          PY
+          )
+          gh release download "${picked[0]}" --repo ggml-org/llama.cpp --pattern "${picked[1]}" --dir llama-dist
+          tar -xzf "llama-dist/${picked[1]}" -C llama-dist
+          server="$(find llama-dist -type f -name llama-server -perm -u+x -print -quit)"
+          test -n "$server"
+          echo "LLAMA_SERVER=$server" >> "$GITHUB_ENV"
+          echo "LLAMA_CPP_TAG=${picked[0]}" >> "$GITHUB_ENV"
+
+      - name: Start Qwen3 4B once
+        shell: bash
+        run: |
+          set -euo pipefail
+          start="$(date +%s)"
+          "$LLAMA_SERVER" -hf Qwen/Qwen3-4B-GGUF:Q4_K_M \
+            --host 127.0.0.1 --port 8080 --jinja -c 8192 -t 4 > qwen-server.log 2>&1 &
+          echo $! > qwen-server.pid
+          ready=0
+          for i in $(seq 1 180); do
+            if curl -fsS http://127.0.0.1:8080/health >/dev/null 2>&1; then ready=1; break; fi
+            kill -0 "$(cat qwen-server.pid)" >/dev/null 2>&1 || { tail -200 qwen-server.log; exit 1; }
+            sleep 3
+          done
+          [ "$ready" = 1 ] || { tail -200 qwen-server.log; exit 1; }
+          echo "QWEN_STARTUP_SECONDS=$(($(date +%s)-start))" >> "$GITHUB_ENV"
+
+      - name: Run recursive self-healing batch router
+        shell: bash
+        env:
+          SAMPLE_SIZE: ${{ needs.plan.outputs.sample_size }}
+        run: |
+          set -euo pipefail
+          b='${{ matrix.batch_size }}'
+          python pipeline/qwen_notice_batch_selfheal.py \
+            --queue autotune-queue.jsonl \
+            --out "qwen-selfheal-${b}-results.jsonl" \
+            --summary "qwen-selfheal-${b}-summary.json" \
+            --batch-size "$b" \
+            --sample-size "$SAMPLE_SIZE" \
+            --source-ledger-generation "$SOURCE_LEDGER_GENERATION" \
+            --description-chars 500 \
+            --timeout 75 \
+            --max-tokens 1100 \
+            --max-runtime-seconds 1200 \
+            --startup-seconds "$QWEN_STARTUP_SECONDS"
+
+      - name: Stop model
+        if: always()
+        shell: bash
+        run: |
+          [ -s qwen-server.pid ] && kill "$(cat qwen-server.pid)" >/dev/null 2>&1 || true
+
+      - name: Evaluate DCE-grounded golden gates without hiding candidate evidence
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          b='${{ matrix.batch_size }}'
+          if [ -s "qwen-selfheal-${b}-results.jsonl" ]; then
+            set +e
+            python pipeline/evaluate_qwen_recall_golden.py \
+              --golden benchmarks/qwen_batch_recall_golden_v1.json \
+              --results "qwen-selfheal-${b}-results.jsonl" \
+              --report "qwen-selfheal-${b}-golden.json"
+            code=$?
+            set -e
+            echo "$code" > "qwen-selfheal-${b}-golden.exitcode"
+          fi
+
+      - name: Build candidate evidence
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          b='${{ matrix.batch_size }}'
+          python - <<PY
+          import hashlib,json,pathlib,os
+          b='${{ matrix.batch_size }}'
+          def read(name,default):
+              p=pathlib.Path(name)
+              if not p.is_file():
+                  return default
+              return json.loads(p.read_text(encoding='utf-8'))
+          summary=read(f'qwen-selfheal-{b}-summary.json',{})
+          golden=read(f'qwen-selfheal-{b}-golden.json',{'scale_out_gate':'BLOCK','failures':['missing_golden_report']})
+          files=[]
+          for name in [f'qwen-selfheal-{b}-results.jsonl',f'qwen-selfheal-{b}-summary.json',f'qwen-selfheal-{b}-golden.json','autotune-input-manifest.json','ledger/INPUT_SHA256.txt','qwen-server.log']:
+              p=pathlib.Path(name)
+              if p.is_file():
+                  files.append({'path':name,'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+          pathlib.Path('candidate.json').write_text(json.dumps({
+              'schema':'QWEN_BATCH_AUTOTUNE_CANDIDATE_V1',
+              'workflow_run_id':os.environ.get('GITHUB_RUN_ID'),
+              'batch_size':int(b),
+              'ledger_generation':os.environ.get('SOURCE_LEDGER_GENERATION'),
+              'summary':summary,
+              'golden':golden,
+              'files':files,
+              'data_safety':{'shadow_only':True,'drops_or_deletes_notices':False,'automatic_rejection_enabled':False},
+          },indent=2)+'\n',encoding='utf-8')
+          PY
+
+      - name: Upload candidate transport artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-autotune-${{ matrix.batch_size }}-${{ github.run_id }}
+          path: |
+            candidate.json
+            autotune-input-manifest.json
+            qwen-selfheal-${{ matrix.batch_size }}-results.jsonl
+            qwen-selfheal-${{ matrix.batch_size }}-summary.json
+            qwen-selfheal-${{ matrix.batch_size }}-golden.json
+            ledger/INPUT_SHA256.txt
+            qwen-server.log
+          if-no-files-found: warn
+          retention-days: 90
+
+  select:
+    needs: [plan, tune]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: qwen-autotune-*-${{ github.run_id }}
+          path: candidates
+
+      - name: Select fastest safe champion
+        id: select
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          python pipeline/select_qwen_batch_champion.py \
+            --root candidates \
+            --out qwen-batch-autotune-champion.json \
+            --run-id "$GITHUB_RUN_ID"
+          code=$?
+          set -e
+          echo "selector_exit=$code" >> "$GITHUB_OUTPUT"
+          test -s qwen-batch-autotune-champion.json
+
+      - name: Build stable runtime config
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,pathlib
+          x=json.load(open('qwen-batch-autotune-champion.json',encoding='utf-8'))
+          champ=x.get('champion')
+          payload={
+              'schema':'QWEN_BATCH_RUNTIME_CONFIG_V1',
+              'status':x.get('status'),
+              'champion':None,
+              'safety':{
+                  'shadow_only':True,
+                  'automatic_rejection_enabled':False,
+                  'failed_batch_recursively_splits':True,
+                  'dce_required_for_final_supergreen':True,
+              },
+          }
+          if champ:
+              payload['champion']={
+                  'initial_batch_size':champ.get('initial_batch_size'),
+                  'classifier_version':champ.get('classifier_version'),
+                  'classifier_prompt_version':champ.get('classifier_prompt_version'),
+                  'safe_for_shadow_scale_out':bool(champ.get('safe_for_shadow_scale_out')),
+              }
+          pathlib.Path('qwen_batch_runtime_config.json').write_text(json.dumps(payload,indent=2)+'\n',encoding='utf-8')
+          PY
+
+      - name: Package immutable evidence
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,pathlib,zipfile
+          root=pathlib.Path('candidates')
+          manifest=[]
+          for p in sorted(root.rglob('*')):
+              if p.is_file():
+                  manifest.append({'path':str(p),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+          pathlib.Path('qwen-batch-autotune-evidence-manifest.json').write_text(json.dumps({
+              'schema':'QWEN_BATCH_AUTOTUNE_EVIDENCE_MANIFEST_V1',
+              'files':manifest,
+              'data_safety':{'derived_evidence':True,'source_tender_rows_not_deleted':True},
+          },indent=2)+'\n')
+          with zipfile.ZipFile('qwen-batch-autotune-evidence.zip','w',compression=zipfile.ZIP_DEFLATED) as z:
+              for p in sorted(root.rglob('*')):
+                  if p.is_file():
+                      z.write(p,p)
+          PY
+
+      - name: Publish immutable plus latest Release evidence
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          immutable="qwen-batch-autotune-${GITHUB_RUN_ID}"
+          files=(qwen-batch-autotune-champion.json qwen_batch_runtime_config.json qwen-batch-autotune-evidence-manifest.json qwen-batch-autotune-evidence.zip)
+          gh release create "$immutable" "${files[@]}" \
+            --title "Qwen Batch Autotune ${GITHUB_RUN_ID}" \
+            --notes "Lossless self-heal benchmark. DCE golden gate + row conservation. Actions artifacts are transport only."
+          if gh release view qwen-batch-autotune-latest >/dev/null 2>&1; then
+            gh release upload qwen-batch-autotune-latest "${files[@]}" --clobber
+            gh release edit qwen-batch-autotune-latest --title "Qwen Batch Autotune — LATEST (${GITHUB_RUN_ID})" \
+              --notes "Pointer copy; immutable evidence is in $immutable."
+          else
+            gh release create qwen-batch-autotune-latest "${files[@]}" \
+              --title "Qwen Batch Autotune — LATEST (${GITHUB_RUN_ID})" \
+              --notes "Pointer copy; immutable evidence is in $immutable."
+          fi
+
+      - name: Persist stable runtime config transactionally
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp qwen_batch_runtime_config.json control/qwen_batch_runtime_config.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/qwen_batch_runtime_config.json
+          if git diff --cached --quiet; then
+            echo 'Runtime config unchanged'
+            exit 0
+          fi
+          git commit -m "tenders: autotune Qwen batch runtime ${GITHUB_RUN_ID}"
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then
+              echo 'Runtime config persisted'
+              exit 0
+            fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((attempt * 4))"
+          done
+          echo 'Failed to persist runtime config after bounded retries' >&2
+          exit 1
+
+      - name: Upload controller transport artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-autotune-controller-${{ github.run_id }}
+          path: |
+            qwen-batch-autotune-champion.json
+            qwen_batch_runtime_config.json
+            qwen-batch-autotune-evidence-manifest.json
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -s qwen-batch-autotune-champion.json ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat qwen-batch-autotune-champion.json >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
