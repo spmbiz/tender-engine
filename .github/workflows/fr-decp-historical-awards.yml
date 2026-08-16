@@ -1,0 +1,91 @@
+name: France DECP Historical Awards
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '41 4 * * 1,4'
+  pull_request:
+    paths:
+      - 'pipeline/materialize_fr_decp_awards.py'
+      - 'tests/test_fr_decp_materializer.py'
+      - '.github/workflows/fr-decp-historical-awards.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fr-decp-historical-awards-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  unit-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q duckdb requests pytest
+      - run: python -m py_compile pipeline/materialize_fr_decp_awards.py
+      - run: python -m pytest -q tests/test_fr_decp_materializer.py
+
+  materialize:
+    if: github.event_name != 'pull_request'
+    needs: unit-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install bounded dependencies
+        run: python -m pip install --disable-pip-version-check -q 'duckdb>=1.2,<2' 'requests>=2.32,<3'
+      - name: Materialize award facts and historical priors
+        run: python pipeline/materialize_fr_decp_awards.py --output historical/fr_decp
+      - name: Validate grains and non-empty output before persistence
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import duckdb
+          root=Path('historical/fr_decp')
+          stats=json.loads((root/'stats.json').read_text())
+          assert stats['status']=='OK', stats
+          assert stats['counts']['awards']>0, stats
+          assert stats['counts']['award_supplier_links']>0, stats
+          assert (root/'source/fr_decp_source.parquet').stat().st_size > 1_000_000
+          assert duckdb.sql(f"select count(*) from read_parquet('{root/'awards.parquet'}')").fetchone()[0] == stats['counts']['awards']
+          print(json.dumps(stats,indent=2))
+          PY
+      - name: Create durable release and preserve source snapshot plus derived facts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="fr-decp-awards-${GITHUB_RUN_ID}"
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "France DECP awards ${GITHUB_RUN_ID}" \
+            --notes "Canonical historical AWARD/AWARD_SUPPLIER_LINK snapshot. Historical priors are not live eligibility or competition proof."
+          cp historical/fr_decp/source/fr_decp_source.parquet fr-decp-source.parquet
+          cp historical/fr_decp/awards.parquet fr-decp-awards.parquet
+          cp historical/fr_decp/award_supplier_links.parquet fr-decp-award-supplier-links.parquet
+          cp historical/fr_decp/buyer_supplier_priors.parquet fr-decp-buyer-supplier-priors.parquet
+          cp historical/fr_decp/stats.json fr-decp-stats.json
+          cp historical/fr_decp/source_schema.json fr-decp-source-schema.json
+          gh release upload "$tag" \
+            fr-decp-source.parquet \
+            fr-decp-awards.parquet \
+            fr-decp-award-supplier-links.parquet \
+            fr-decp-buyer-supplier-priors.parquet \
+            fr-decp-stats.json \
+            fr-decp-source-schema.json --clobber
+          for asset in fr-decp-source.parquet fr-decp-awards.parquet fr-decp-award-supplier-links.parquet fr-decp-buyer-supplier-priors.parquet fr-decp-stats.json fr-decp-source-schema.json; do
+            gh release view "$tag" --json assets --jq '.assets[].name' | grep -Fxq "$asset"
+          done
+      - name: Publish concise run summary
+        run: |
+          echo '### France DECP historical awards' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat historical/fr_decp/stats.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
