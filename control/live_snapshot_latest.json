@@ -1,13 +1,13 @@
 {
   "schema": "LIVE_WORLD_SNAPSHOT_POINTER_V2",
-  "source_discovery_run": 31902477505,
-  "generated_at": "2026-08-16T01:20:50.666189+00:00",
-  "snapshot_rows": 43102,
+  "source_discovery_run": 31923649637,
+  "generated_at": "2026-08-16T03:24:39.903472+00:00",
+  "snapshot_rows": 60015,
   "open_state_counts": {
-    "OPEN_CONFIRMED_BY_DEADLINE": 40053,
-    "OPEN_UNVERIFIED_NO_PARSEABLE_DEADLINE": 3049
+    "OPEN_CONFIRMED_BY_DEADLINE": 52030,
+    "OPEN_UNVERIFIED_NO_PARSEABLE_DEADLINE": 7985
   },
-  "packet_count": 87,
+  "packet_count": 121,
   "coverage_status": "PARTIAL_WORLD_COVERAGE",
   "failed_sources": [],
   "world_exhaustive_claim_allowed": false,
@@ -15,7 +15,7 @@
   "packet_path_template": "gpt-packets/packet-XXXX.jsonl",
   "coverage_path": "discovery_coverage.json",
   "stable_release_tag": "live-world-snapshot-latest",
-  "immutable_release_tag": "live-world-snapshot-31902477505",
+  "immutable_release_tag": "live-world-snapshot-31923649637",
   "dce_request_path": "control/gpt_dce_request.json",
   "rule": "GPT selects candidate IDs semantically; GitHub retrieves DCE only after selection. Failed source lanes remain missing/UNKNOWN. No notice-only FINAL_SUPER_GREEN."
 }
