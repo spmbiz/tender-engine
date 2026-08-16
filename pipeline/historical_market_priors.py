@@ -58,20 +58,42 @@ def _country(rec: dict) -> str:
             return country
 
     source = _norm(rec.get("source") or rec.get("source_name") or rec.get("portal"))
+    # Exact canonical live-source identifiers are authoritative enough to recover
+    # jurisdiction when the normalized notice omitted its country. TED is
+    # intentionally absent because it is multi-country and must remain fail-closed.
     exact_source_map = {
         "sam.gov": "USA",
         "sam": "USA",
+        "us_sam_bulk": "USA",
         "contracts finder": "UNITED KINGDOM",
+        "uk_contracts_finder": "UNITED KINGDOM",
         "boamp": "FRANCE",
+        "fr_boamp": "FRANCE",
+        "de_doe": "GERMANY",
         "canadabuys": "CANADA",
+        "ca_canadabuys": "CANADA",
         "seao": "CANADA - QUEBEC",
+        "qc_seao": "CANADA - QUEBEC",
+        "ireland_etenders": "IRELAND",
         "austender": "AUSTRALIA",
+        "nz_gets": "NEW ZEALAND",
+        "lux_pmp": "LUXEMBOURG",
+        "ch_simap": "SWITZERLAND",
+        "cz_zakazky_gov": "CZECHIA",
+        "dk_udbud_public": "DENMARK",
+        "es_placsp": "SPAIN",
+        "fi_hilma": "FINLAND",
+        "gr_khmdhs": "GREECE",
+        "lv_iub": "LATVIA",
+        "nl_tenderned_rss": "NETHERLANDS",
+        "no_doffin": "NORWAY",
+        "pl_bzp": "POLAND",
     }
     return exact_source_map.get(source, "")
 
 
 def _cpv(rec: dict) -> str:
-    raw = rec.get("cpv") or rec.get("cpv_code") or rec.get("main_cpv") or ""
+    raw = rec.get("cpv") or rec.get("cpv_code") or rec.get("main_cpv") or rec.get("cpv_or_category") or ""
     if isinstance(raw, list):
         raw = raw[0] if raw else ""
     digits = re.sub(r"\D", "", str(raw))
@@ -96,7 +118,7 @@ def _search_text(rec: dict) -> str:
     vals = []
     for key in (
         "title", "name", "description", "scope", "scope_summary", "summary",
-        "cpv_description", "category", "subcategory",
+        "cpv_description", "cpv_or_category", "category", "subcategory",
     ):
         value = rec.get(key)
         if isinstance(value, list):
@@ -166,7 +188,6 @@ def _lane_adjustment(rec: dict, priors: dict) -> tuple[int, list[str]]:
         elif match_field in {"search_text", "broad", "all"}:
             text = broad_text
         else:
-            # Unknown match modes fail closed instead of silently broadening.
             continue
         if not text:
             continue
@@ -183,7 +204,6 @@ def _lane_adjustment(rec: dict, priors: dict) -> tuple[int, list[str]]:
             continue
         raw = int(round(float(rule.get("priority_bonus") or 0)))
         bonus = max(-MAX_LANE_BONUS, min(MAX_LANE_BONUS, raw))
-        # Never stack multiple overlapping lane rules on one notice; use the strongest.
         if abs(bonus) > abs(best):
             best = bonus
             reason = f"{bonus:+d}:historical-lane:{rule.get('lane','UNKNOWN')}(n={n})"
