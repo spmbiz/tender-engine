@@ -1,0 +1,82 @@
+name: OSS Provider Expansion CI
+
+on:
+  pull_request:
+    paths:
+      - 'pipeline/entity_resolution_shadow.py'
+      - 'pipeline/docling_deep_parser.py'
+      - 'pipeline/extract_corpus.py'
+      - 'pipeline/provider_contract.py'
+      - 'pipeline/audit_oss_provider_registry.py'
+      - 'control/oss_provider_registry.json'
+      - 'requirements-oss-expansion.txt'
+      - 'tests/test_entity_resolution_shadow.py'
+      - 'tests/test_docling_deep_parser.py'
+      - 'tests/test_oss_provider_registry.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  core-fail-closed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Compile additive adapters
+        run: |
+          python -m py_compile \
+            pipeline/entity_resolution_shadow.py \
+            pipeline/docling_deep_parser.py \
+            pipeline/extract_corpus.py \
+            pipeline/provider_contract.py \
+            pipeline/audit_oss_provider_registry.py
+      - name: Run focused tests without optional heavy dependencies
+        run: |
+          python -m pip install --disable-pip-version-check -q pytest
+          pytest -q \
+            tests/test_entity_resolution_shadow.py \
+            tests/test_docling_deep_parser.py \
+            tests/test_oss_provider_registry.py
+      - name: Audit machine-readable provider coverage
+        run: python pipeline/audit_oss_provider_registry.py --output oss-provider-audit.json
+
+  splink-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install stable Splink line only
+        run: python -m pip install --disable-pip-version-check -q 'splink>=4.0.16,<5' pandas duckdb
+      - name: Exercise shadow adapter import and strict BCE path
+        run: |
+          python - <<'PY'
+          from pipeline.entity_resolution_shadow import normalize_be_enterprise_number
+          assert normalize_be_enterprise_number('BE 1001.050.094') == '1001050094'
+          import splink
+          print('splink', getattr(splink, '__version__', 'unknown'))
+          PY
+
+  docling-api-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install current Docling v2 line
+        run: python -m pip install --disable-pip-version-check -q 'docling>=2.115,<3'
+      - name: Verify DocumentConverter API used by fallback
+        run: |
+          python - <<'PY'
+          from docling.document_converter import DocumentConverter
+          from pipeline.docling_deep_parser import should_deep_parse
+          assert DocumentConverter is not None
+          assert should_deep_parse('pdf', 0, mode='auto')
+          print('docling API smoke OK')
+          PY
