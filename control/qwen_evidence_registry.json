@@ -46,6 +46,63 @@
         "dce_truth": false,
         "eligibility_truth": false
       }
+    },
+    {
+      "workflow_run_id": 31919855831,
+      "status": "DURABLY_MIRRORED_TO_DRIVE",
+      "model": "Qwen/Qwen3-4B-GGUF:Q4_K_M",
+      "quant": "Q4_K_M",
+      "prompt_version": "qwen-notice-high-recall-v2-fast",
+      "classifier_version": "qwen3-4b-q4km-shadow-v2-fast-checkpointed",
+      "source_ledger_generation_recorded_by_artifact": "UNKNOWN",
+      "source_ledger_generation_resolved_from_stable_release": 31902477505,
+      "provenance_note": "Workflow provenance extraction was fixed after this run; the source queue was downloaded from notice-intelligence-ledger-latest whose stable release title/body identifies run 31902477505.",
+      "sample_size": 12,
+      "sample_completed": 12,
+      "startup_seconds": 24.0,
+      "inference_seconds": 260.075,
+      "notices_per_second": 0.0461,
+      "seconds_per_notice": 21.673,
+      "parse_errors": 0,
+      "classification_counts": {
+        "STRONG_FIT": 4,
+        "FIT": 5,
+        "MAYBE": 2,
+        "REJECT_OBVIOUS": 1
+      },
+      "actions_artifact": {
+        "artifact_id": 9256076895,
+        "name": "qwen3-4b-shadow-smoke-31919855831",
+        "zip_digest_sha256": "e2270d290d756a457b6e1f1f05f1a82308fa1f8b966fab57113d44e1e44eda05",
+        "temporary_transport_only": true
+      },
+      "evidence_files": {
+        "qwen-shadow-results.jsonl": "3af0296d3ab32afa0012be676e6d2936b57bdcd4b8d92f575b6c012fed3e37ce",
+        "qwen-shadow-summary.json": "ef58131aca3dced5d80184df14ab9af1012098b5338803af4875dc4eee899868",
+        "qwen-server.log": "21e95399113e55a5812216263a2a8c45626bbfd2b1824a4186aef07a568986cd",
+        "ledger/INPUT_SHA256.txt": "1fa9ae247403373f43be2f314d649e18c09124473c8e54b453c421ac1d09dceb"
+      },
+      "drive_mirror": {
+        "file_id": "1aIZGFMVreo9RZJ5MfFYSh5E7dOWZs4OL",
+        "file_name": "qwen3-4b-shadow-smoke-31919855831-v2-durable.zip",
+        "url": "https://drive.google.com/file/d/1aIZGFMVreo9RZJ5MfFYSh5E7dOWZs4OL/view?usp=drivesdk",
+        "parent_folder_id": "1onZQsFiNrn-xRPhG0RnkncoV_SGNlWNk"
+      },
+      "observed_behavior": {
+        "high_recall_uplift_vs_v1": true,
+        "reject_obvious_count_v1": 4,
+        "reject_obvious_count_v2": 1,
+        "over_permissive_examples_present": true,
+        "note": "Some heavy, regulated or specialist supply/work notices were promoted because broker/subcontract/resell possibility was interpreted as fit. Keep as discovery signal, not SPM attractiveness truth."
+      },
+      "safety": {
+        "shadow_only": true,
+        "checkpointed_after_each_notice": true,
+        "parse_failure_becomes_maybe": true,
+        "destructive_reject": false,
+        "dce_truth": false,
+        "eligibility_truth": false
+      }
     }
   ]
 }
