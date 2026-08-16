@@ -29,8 +29,7 @@ def load_json(path: Path, default: Any):
     if not path.exists():
         return default
     try:
-        obj = json.loads(path.read_text(encoding="utf-8", errors="replace"))
-        return obj
+        return json.loads(path.read_text(encoding="utf-8", errors="replace"))
     except Exception:
         return default
 
@@ -70,6 +69,12 @@ def deadline_open(row: dict[str, Any]) -> bool:
 
 
 def compact_evidence(raw: Any) -> dict[str, list[dict[str, Any]]]:
+    """Normalize all evidence shapes emitted by current and legacy DCE stages.
+
+    aggregate_dce.py stores extracted gate candidates as {snippet, match, ...};
+    the ChatGPT hot publisher uses {text, source}. Accept both without weakening
+    authority/relevance gates.
+    """
     if not isinstance(raw, dict):
         return {}
     out: dict[str, list[dict[str, Any]]] = {}
@@ -79,12 +84,17 @@ def compact_evidence(raw: Any) -> dict[str, list[dict[str, Any]]]:
         kept: list[dict[str, Any]] = []
         for value in values[:EVIDENCE_PER_GATE]:
             if isinstance(value, dict):
-                text = str(value.get("text") or "").strip()
+                text = str(
+                    value.get("text")
+                    or value.get("snippet")
+                    or value.get("context")
+                    or ""
+                ).strip()
                 if not text:
                     continue
                 kept.append({
                     "text": text[:EVIDENCE_CHARS],
-                    "source": value.get("source"),
+                    "source": value.get("source") or value.get("file") or value.get("path"),
                 })
             elif isinstance(value, str) and value.strip():
                 kept.append({"text": value.strip()[:EVIDENCE_CHARS], "source": None})
@@ -172,12 +182,6 @@ def evidence_key(row: dict[str, Any]) -> tuple:
 
 
 def portfolio_select(rows: list[dict[str, Any]], limit: int, portal_share: float) -> list[dict[str, Any]]:
-    """High SPM fit first, with bounded portal concentration and exploration.
-
-    This is attention allocation only. Rows excluded from this compact index remain
-    preserved in immutable DCE Releases and may re-enter when higher-ranked rows
-    expire or are reviewed.
-    """
     if limit <= 0:
         return []
     rows = [dict(r) for r in rows if deadline_open(r)]
@@ -239,7 +243,6 @@ def portfolio_select(rows: list[dict[str, Any]], limit: int, portal_share: float
             break
         emit(row, "EVIDENCE_EXPLORATION")
 
-    # Elastic fill: never waste index capacity if only one portal/category remains.
     for row in ranked:
         if len(selected) >= limit:
             break
