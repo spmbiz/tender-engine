@@ -37,6 +37,22 @@ HARD_TEXT = (
     (re.compile(r"\b(?:100% total small business set[- ]aside|small business set[- ]aside)\b", re.I), "GEO"),
     (re.compile(r"\b(?:manufacturer authori[sz]ation|required authorised reseller|required authorized reseller|sole authorised reseller|sole authorized reseller)\b", re.I), "RESELLER"),
 )
+SPM_CORE = re.compile(
+    r"\b(?:website|web ?app|web portal|site web|web development|web design|application development|mobile app|cms\b|hosting|web maintenance|"
+    r"software development|saas\b|digital platform|workflow automation|robotic process automation|rpa\b|animation|video production|film production|"
+    r"video editing|graphic design|visual identity|brand identity|content creation|copywriting|editorial|translation|transcription|proofreading|"
+    r"printing services?|brochures?|leaflets?|signage|promotional goods?|digitization|digitisation|scanning|document management|e[- ]learning|"
+    r"digital learning|training content|media monitoring|social listening|social media|digital marketing|market research|survey services?|"
+    r"data processing|data entry|api integration|publication design|typesetting)\b", re.I
+)
+HARD_NONCORE = re.compile(
+    r"\b(?:construction|civil works?|road works?|renovation works?|roofing|masonry|excavation|demolition|security guard|security officer|"
+    r"patient transport|ambulance|medical staffing|physician services?|nursing services?|generator maintenance|chiller maintenance|vehicle maintenance|"
+    r"aircraft maintenance|ship repair|firefighting vehicle|fire truck|fuel delivery|diesel delivery|ammunition|weapon|herbicide|pest control|"
+    r"laundry services?|food services?|catering services?|electrical works?|plumbing works?|hvac works?|painting works?|insulation works?|snow clearing|"
+    r"waste collection|janitorial|cleaning services?|laboratory equipment|scientific equipment|valves?|spare parts?|machinery|furniture|uniforms?|"
+    r"umundurowania|koszule|spodnie|softshell|concrete materials?|sump pump|halal menu)\b", re.I
+)
 GATES = (
     "entity_geography","turnover_financial","references_experience","certifications_partner","staffing_team",
     "insurance_bonds","subcontracting_consortium","deliverables_scope","sla_onsite","term_value","award_criteria",
@@ -76,6 +92,9 @@ def evidence_map(row: dict[str,Any]) -> dict[str,Any]:
         for key in ("gate_evidence","evidence_by_gate","categories"):
             v=gs.get(key)
             if isinstance(v,dict): return v
+        # Current deep_review_queue format stores the canonical gate arrays
+        # directly under gate_snippets. Never silently collapse this to {}.
+        return gs
     return {}
 
 
@@ -153,23 +172,40 @@ def result_for(row: dict[str,Any], packed_evidence: dict[str,list[str]], model_i
     for x in ((model_item or {}).get("u") or []):
         x=str(x).upper()
         if x in ALLOWED_BLOCKERS and x not in unknowns: unknowns.append(x)
+    evidence_coverage=sum(1 for arr in packed_evidence.values() if arr)
     all_text=" ".join(t for arr in packed_evidence.values() for t in arr)
     for rx,code in HARD_TEXT:
         if rx.search(all_text) and code not in blockers: blockers.append(code)
+    title=str(first(row,"title") or "")
+    scope_text=f"{title} {all_text[:6000]}"
+    native_core=bool(SPM_CORE.search(scope_text))
+    obvious_noncore=bool(HARD_NONCORE.search(scope_text)) and not native_core
     deadline=first(row,"deadline")
     parsed=parse_deadline(deadline)
     expired=bool(parsed and parsed < datetime.now(timezone.utc))
+    gate_ready=bool(row.get("gate_readiness"))
+
+    # Non-negotiable deterministic safety guards around the small local model.
+    # A model-only HOT/GOOD can never survive without actual gate evidence.
+    if evidence_coverage == 0:
+        cls="QWEN_DCE_INSUFFICIENT"
+        lcode="U"; rcode="U"
+    if obvious_noncore and cls in {"QWEN_DCE_HOT","QWEN_DCE_GOOD"}:
+        cls="QWEN_DCE_MAYBE"
+        lcode="L"
+        if rcode in {"D","A"}: rcode="B"
     if expired:
         cls="QWEN_DCE_BLOCKED"
         if "DEADLINE" not in blockers: blockers.append("DEADLINE")
-    gate_ready=bool(row.get("gate_readiness"))
     if not gate_ready:
         cls="QWEN_DCE_INSUFFICIENT"
+
     hard=bool(set(blockers)&{"GEO","SECURITY","RESELLER","DEADLINE"})
     wants=bool((model_item or {}).get("g"))
     if expired: action="DROP_EXPIRED"
-    elif not gate_ready: action="NEED_MORE_DCE"
-    elif cls in {"QWEN_DCE_HOT","QWEN_DCE_GOOD"} and not hard and wants: action="FINAL_REVIEW_NOW"
+    elif not gate_ready or evidence_coverage == 0: action="NEED_MORE_DCE"
+    elif obvious_noncore: action="REVIEW_IF_CAPACITY"
+    elif cls in {"QWEN_DCE_HOT","QWEN_DCE_GOOD"} and native_core and not hard and wants: action="FINAL_REVIEW_NOW"
     elif cls in {"QWEN_DCE_HOT","QWEN_DCE_GOOD","QWEN_DCE_MAYBE"} and not hard: action="REVIEW_IF_CAPACITY"
     elif hard or cls=="QWEN_DCE_BLOCKED": action="DROP_OR_PARTNER"
     else: action="NEED_MORE_DCE"
@@ -178,6 +214,8 @@ def result_for(row: dict[str,Any], packed_evidence: dict[str,list[str]], model_i
     if action=="FINAL_REVIEW_NOW": base+=2
     if unknowns: base-=min(12,2*len(unknowns))
     if blockers: base-=min(20,4*len(blockers))
+    if obvious_noncore: base=min(base,49)
+    if evidence_coverage == 0: base=min(base,25)
     priority=max(0,min(89,base))
     return {
         "candidate_id":cid,"title":first(row,"title"),"buyer":first(row,"buyer","contracting_authority"),
@@ -185,11 +223,12 @@ def result_for(row: dict[str,Any], packed_evidence: dict[str,list[str]], model_i
         "estimated_value":first(row,"estimated_value","value"),"currency":first(row,"currency"),
         "gate_readiness":gate_ready,"content_quality":first(row,"content_quality"),
         "deadline_authority_status":first(row,"deadline_authority_status"),
+        "evidence_gate_coverage":evidence_coverage,"native_spm_core":native_core,"obvious_noncore_scope":obvious_noncore,
         "qwen_dce_classification":cls,"qwen_dce_lean":L_MAP.get(lcode,"UNKNOWN"),"qwen_dce_route":R_MAP.get(rcode,"UNCLEAR"),
         "explicit_blockers":blockers,"critical_unknowns":unknowns,"qwen_reason":str((model_item or {}).get("p") or "")[:220],
         "recommended_gpt_action":action,"gpt_priority_score":priority,"evidence_by_gate":packed_evidence,
         "source_dce_run_id":int(source_run) if str(source_run).isdigit() else source_run,
-        "qwen_dce_version":"qwen3-4b-dce-gate-triage-v1",
+        "qwen_dce_version":"qwen3-4b-dce-gate-triage-v2",
         "finality":"PRE_READ_ONLY_NOT_FINAL_VERDICT",
     }
 
@@ -223,6 +262,10 @@ def main():
     p=Path(args.out); p.parent.mkdir(parents=True,exist_ok=True)
     with p.open("w",encoding="utf-8") as f:
         for r in out: f.write(json.dumps(r,ensure_ascii=False,separators=(",",":"))+"\n")
-    print(json.dumps({"source_run":args.source_run,"shard":args.shard_index,"shards":args.shard_count,"gate_ready_rows":len(rows),"written":len(out),"final_review_now":sum(r['recommended_gpt_action']=='FINAL_REVIEW_NOW' for r in out)},indent=2))
+    print(json.dumps({
+        "source_run":args.source_run,"shard":args.shard_index,"shards":args.shard_count,"gate_ready_rows":len(rows),"written":len(out),
+        "with_evidence":sum((r.get('evidence_gate_coverage') or 0)>0 for r in out),
+        "final_review_now":sum(r['recommended_gpt_action']=='FINAL_REVIEW_NOW' for r in out)
+    },indent=2))
 
 if __name__=="__main__": main()
