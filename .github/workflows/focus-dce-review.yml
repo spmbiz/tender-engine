@@ -64,9 +64,12 @@ jobs:
           mkdir -p focus-download focus-extracted focus-output
           gh release download "$tag" --pattern 'dce-canonical-packs-manifest.json' --dir focus-download
           python - <<'PY' >> "$GITHUB_OUTPUT"
-          import json, os
+          import json, os, re
           from pathlib import Path
-          from pipeline.durable_dce_pack import slugify
+
+          def slugify(value: str) -> str:
+              s = re.sub(r"[^A-Za-z0-9._-]+", "-", value or "candidate").strip("-")
+              return (s or "candidate")[:120]
 
           cid = os.environ['CANDIDATE_ID']
           manifest = json.loads(Path('focus-download/dce-canonical-packs-manifest.json').read_text(encoding='utf-8'))
