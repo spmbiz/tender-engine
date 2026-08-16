@@ -8,7 +8,10 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Iterable
 
-from pipeline import historical_market_priors as historical
+try:
+    from pipeline import historical_market_priors as historical
+except ModuleNotFoundError:  # direct execution via python pipeline/<script>.py
+    import historical_market_priors as historical
 
 SCHEMA = "LIVE_HISTORICAL_PRIOR_SHADOW_V1"
 SUMMARY_SCHEMA = "LIVE_HISTORICAL_PRIOR_SHADOW_SUMMARY_V1"
