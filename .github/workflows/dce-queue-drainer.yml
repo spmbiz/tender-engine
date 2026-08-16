@@ -3,12 +3,13 @@ name: DCE Queue Drainer
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '*/5 * * * *'
   push:
     branches: [main]
     paths:
       - 'queues/spm_rescue_selection_latest.jsonl'
       - 'queues/qwen_live_selection_latest.jsonl'
+      - 'control/dce_attempt_ledger.jsonl'
       - 'pipeline/authority_conflicts.py'
       - 'pipeline/auto_adjudicate_dce.py'
       - 'pipeline/materialize_dce_selection.py'
@@ -38,7 +39,41 @@ jobs:
           set -euo pipefail
           active="$(gh run list --workflow dce-fanout-v2.yml --limit 40 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
           if [ "$active" -gt 0 ]; then
-            echo "DCE fleet busy: $active active/queued. Durable progress will retrigger the drainer after completion."
+            echo "DCE fleet busy: $active active/queued. No duplicate dispatch."
+            exit 0
+          fi
+
+          # Hard anti-repeat barrier: if a successful durable DCE run is newer than
+          # the progress ledger, persist it FIRST. Never launch another wave from a
+          # stale ledger, even if GitHub scheduling/repo pushes race by a few seconds.
+          latest_durable=''
+          mapfile -t successful < <(gh run list --workflow dce-fanout-v2.yml --status success --limit 20 --json databaseId,createdAt --jq 'sort_by(.createdAt) | reverse | .[].databaseId')
+          for rid in "${successful[@]}"; do
+            tag="dce-harvest-$rid"
+            if gh release view "$tag" --json assets --jq '.assets[].name' 2>/dev/null | grep -Fxq "dce-candidate-queue-$rid.jsonl"; then
+              latest_durable="$rid"
+              break
+            fi
+          done
+          ledger_run="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('control/dce_attempt_ledger.jsonl')
+          mx=0
+          if p.exists():
+              for line in p.open(encoding='utf-8',errors='replace'):
+                  if not line.strip(): continue
+                  try:r=json.loads(line)
+                  except Exception: continue
+                  try:v=int(r.get('dce_run_id') or 0)
+                  except Exception:v=0
+                  mx=max(mx,v)
+          print(mx)
+          PY
+          )"
+          if [[ "$latest_durable" =~ ^[0-9]+$ ]] && [ "$latest_durable" -gt "$ledger_run" ]; then
+            echo "Unledgered successful DCE run detected: $latest_durable > ledger $ledger_run. Persisting progress before any new dispatch."
+            gh workflow run dce-progress-ledger.yml --ref main -f dce_run_id="$latest_durable"
             exit 0
           fi
 
@@ -86,9 +121,6 @@ jobs:
           max_jobs=0
           reason=''
 
-          # Qwen live selection is already bounded (currently 160 rows) and is the
-          # high-recall admission set. Drain every unseen selected version rather
-          # than recycling a tiny prefix. Rescue remains the urgent/newer fallback.
           if [ "$qwen_unseen" -gt 0 ] && [[ "$qwen_run" =~ ^[0-9]+$ ]]; then
             if [ "$rescue_unseen" -eq 0 ] || ! [[ "$rescue_run" =~ ^[0-9]+$ ]] || [ "$qwen_run" -ge "$rescue_run" ]; then
               path="$qwen"
