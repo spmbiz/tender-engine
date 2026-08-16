@@ -9,6 +9,10 @@ on:
       candidate_id:
         description: Exact canonical candidate ID, e.g. IE:8670172
         required: true
+  push:
+    branches: [main]
+    paths:
+      - 'control/focus_dce_trigger.txt'
 
 permissions:
   contents: read
@@ -30,17 +34,32 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Resolve requested focus target
+        id: target
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = 'workflow_dispatch' ]; then
+            rid='${{ github.event.inputs.dce_run_id }}'
+            cid='${{ github.event.inputs.candidate_id }}'
+          else
+            rid="$(sed -nE 's/^dce_run_id=([0-9]+).*$/\1/p' control/focus_dce_trigger.txt | tail -1)"
+            cid="$(sed -nE 's/^candidate_id=(.*)$/\1/p' control/focus_dce_trigger.txt | tail -1)"
+          fi
+          [[ "$rid" =~ ^[0-9]+$ ]] || { echo "Invalid DCE run ID: $rid" >&2; exit 2; }
+          [ -n "$cid" ] || { echo "candidate_id required" >&2; exit 2; }
+          echo "dce_run_id=$rid" >> "$GITHUB_OUTPUT"
+          echo "candidate_id=$cid" >> "$GITHUB_OUTPUT"
+
       - name: Resolve exact canonical candidate pack
         id: resolve
         env:
           GH_TOKEN: ${{ github.token }}
-          DCE_RUN_ID: ${{ github.event.inputs.dce_run_id }}
-          CANDIDATE_ID: ${{ github.event.inputs.candidate_id }}
+          DCE_RUN_ID: ${{ steps.target.outputs.dce_run_id }}
+          CANDIDATE_ID: ${{ steps.target.outputs.candidate_id }}
         shell: bash
         run: |
           set -euo pipefail
-          [[ "$DCE_RUN_ID" =~ ^[0-9]+$ ]] || { echo "Invalid DCE run ID" >&2; exit 2; }
-          [ -n "$CANDIDATE_ID" ] || { echo "candidate_id required" >&2; exit 2; }
           tag="dce-harvest-$DCE_RUN_ID"
           mkdir -p focus-download focus-extracted focus-output
           gh release download "$tag" --pattern 'dce-canonical-packs-manifest.json' --dir focus-download
@@ -84,8 +103,8 @@ jobs:
 
       - name: Build full focused ChatGPT review packet
         env:
-          DCE_RUN_ID: ${{ github.event.inputs.dce_run_id }}
-          CANDIDATE_ID: ${{ github.event.inputs.candidate_id }}
+          DCE_RUN_ID: ${{ steps.target.outputs.dce_run_id }}
+          CANDIDATE_ID: ${{ steps.target.outputs.candidate_id }}
         shell: bash
         run: |
           set -euo pipefail
@@ -106,7 +125,7 @@ jobs:
       - name: Publish short-lived focused DCE packet for ChatGPT
         uses: actions/upload-artifact@v4
         with:
-          name: focus-dce-${{ github.event.inputs.dce_run_id }}-${{ steps.resolve.outputs.slug }}
+          name: focus-dce-${{ steps.target.outputs.dce_run_id }}-${{ steps.resolve.outputs.slug }}
           path: focus-output/
           retention-days: 3
           if-no-files-found: error
@@ -116,7 +135,7 @@ jobs:
         shell: bash
         run: |
           echo "### Focus DCE ready" >> "$GITHUB_STEP_SUMMARY"
-          echo "- candidate: ${{ github.event.inputs.candidate_id }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- source DCE run: ${{ github.event.inputs.dce_run_id }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- artifact: focus-dce-${{ github.event.inputs.dce_run_id }}-${{ steps.resolve.outputs.slug }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- candidate: ${{ steps.target.outputs.candidate_id }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- source DCE run: ${{ steps.target.outputs.dce_run_id }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- artifact: focus-dce-${{ steps.target.outputs.dce_run_id }}-${{ steps.resolve.outputs.slug }}" >> "$GITHUB_STEP_SUMMARY"
           cat focus-output/build_summary.json >> "$GITHUB_STEP_SUMMARY"
