@@ -1,0 +1,89 @@
+name: Qwen Progress Mirror
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qwen-progress-mirror.yml'
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Qwen workflow run ID to mirror
+        required: false
+        default: '31925520702'
+
+permissions:
+  contents: write
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download and aggregate live Qwen progress
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.inputs.run_id || '31925520702' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="qwen-live-progress-${RUN_ID}"
+          rm -rf /tmp/qwen-progress && mkdir -p /tmp/qwen-progress control/qwen_live
+          ok=0
+          for attempt in 1 2 3 4 5; do
+            rm -f /tmp/qwen-progress/*
+            if gh release download "$tag" --pattern 'qwen-live-*-raw-progress.json' --dir /tmp/qwen-progress --clobber; then
+              ok=1
+              break
+            fi
+            sleep "$((attempt * 2))"
+          done
+          [ "$ok" = 1 ] || { echo "Unable to download live progress release $tag" >&2; exit 1; }
+          python - "$RUN_ID" <<'PY'
+          import json, glob, sys, datetime
+          run_id=sys.argv[1]
+          rows=[]
+          for path in sorted(glob.glob('/tmp/qwen-progress/qwen-live-*-raw-progress.json')):
+              try:
+                  with open(path,encoding='utf-8') as f: d=json.load(f)
+              except Exception as exc:
+                  rows.append({'file':path.rsplit('/',1)[-1],'read_error':type(exc).__name__})
+                  continue
+              rows.append(d)
+          total_resolved=sum(int(x.get('resolved') or 0) for x in rows if isinstance(x,dict))
+          total_sample=sum(int(x.get('sample_total') or 0) for x in rows if isinstance(x,dict))
+          decisions={}
+          for x in rows:
+              for k,v in (x.get('decision_counts') or {}).items():
+                  decisions[k]=decisions.get(k,0)+int(v or 0)
+          payload={
+              'schema':'QWEN_LIVE_PROGRESS_MIRROR_V1',
+              'run_id':run_id,
+              'mirrored_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+              'workers_seen':len(rows),
+              'total_resolved':total_resolved,
+              'total_sample':total_sample,
+              'aggregate_decision_counts':dict(sorted(decisions.items())),
+              'workers':rows,
+          }
+          out=f'control/qwen_live/progress_snapshot_{run_id}.json'
+          with open(out,'w',encoding='utf-8') as f: json.dump(payload,f,ensure_ascii=False,indent=2); f.write('\n')
+          print(json.dumps(payload,ensure_ascii=False,indent=2))
+          PY
+      - name: Publish readable progress snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add control/qwen_live/progress_snapshot_*.json
+          git commit -m "qwen: mirror live progress snapshot ${GITHUB_RUN_ID}" || exit 0
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((attempt * 2))"
+          done
+          exit 1
