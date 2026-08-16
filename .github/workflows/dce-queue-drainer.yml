@@ -43,9 +43,17 @@ jobs:
             exit 0
           fi
 
-          # Hard anti-repeat barrier: if a successful durable DCE run is newer than
-          # the progress ledger, persist it FIRST. Never launch another wave from a
-          # stale ledger, even if GitHub scheduling/repo pushes race by a few seconds.
+          unseen_for() {
+            python pipeline/dce_attempt_ledger.py count \
+              --queue "$1" \
+              --ledger control/dce_attempt_ledger.jsonl
+          }
+
+          # Hard anti-repeat barrier based on exact candidate version identity, not
+          # monotonically increasing workflow IDs. A later successful run can be a
+          # duplicate transition wave and must not block the pipeline forever merely
+          # because its run number is newer than the run that first ledgered those
+          # exact candidate versions.
           latest_durable=''
           mapfile -t successful < <(gh run list --workflow dce-fanout-v2.yml --status success --limit 20 --json databaseId,createdAt --jq 'sort_by(.createdAt) | reverse | .[].databaseId')
           for rid in "${successful[@]}"; do
@@ -55,26 +63,21 @@ jobs:
               break
             fi
           done
-          ledger_run="$(python - <<'PY'
-          import json
-          from pathlib import Path
-          p=Path('control/dce_attempt_ledger.jsonl')
-          mx=0
-          if p.exists():
-              for line in p.open(encoding='utf-8',errors='replace'):
-                  if not line.strip(): continue
-                  try:r=json.loads(line)
-                  except Exception: continue
-                  try:v=int(r.get('dce_run_id') or 0)
-                  except Exception:v=0
-                  mx=max(mx,v)
-          print(mx)
-          PY
-          )"
-          if [[ "$latest_durable" =~ ^[0-9]+$ ]] && [ "$latest_durable" -gt "$ledger_run" ]; then
-            echo "Unledgered successful DCE run detected: $latest_durable > ledger $ledger_run. Persisting progress before any new dispatch."
-            gh workflow run dce-progress-ledger.yml --ref main -f dce_run_id="$latest_durable"
-            exit 0
+          if [[ "$latest_durable" =~ ^[0-9]+$ ]]; then
+            mkdir -p /tmp/dce-latest
+            latest_queue="/tmp/dce-latest/dce-candidate-queue-${latest_durable}.jsonl"
+            gh release download "dce-harvest-${latest_durable}" \
+              --pattern "dce-candidate-queue-${latest_durable}.jsonl" \
+              --dir /tmp/dce-latest --clobber
+            test -s "$latest_queue"
+            latest_unseen="$(unseen_for "$latest_queue")"
+            echo "Latest durable DCE run $latest_durable has exact-version unseen=$latest_unseen"
+            if [ "$latest_unseen" -gt 0 ]; then
+              echo "Successful durable DCE work is not yet fully ledgered. Persisting it before any new dispatch."
+              gh workflow run dce-progress-ledger.yml --ref main -f dce_run_id="$latest_durable"
+              exit 0
+            fi
+            echo "Latest durable DCE run is fully represented in the exact-version ledger. Anti-repeat barrier passed."
           fi
 
           source_run_for() {
@@ -91,12 +94,6 @@ jobs:
                   print(v)
                   break
           PY
-          }
-
-          unseen_for() {
-            python pipeline/dce_attempt_ledger.py count \
-              --queue "$1" \
-              --ledger control/dce_attempt_ledger.jsonl
           }
 
           rescue='queues/spm_rescue_selection_latest.jsonl'
