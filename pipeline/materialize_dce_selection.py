@@ -143,6 +143,7 @@ def main() -> None:
             "business_fit_score",
             "wide_read_run_id",
             "status",
+            "selection_portal",
             "selection_reason",
             "selection_bucket",
             "selection_fit_class",
