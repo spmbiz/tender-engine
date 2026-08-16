@@ -1,0 +1,64 @@
+name: Sync GPT Supergreen Inbox
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'control/final_supergreen_bank.json'
+      - 'pipeline/build_gpt_supergreen_inbox.py'
+      - '.github/workflows/sync-supergreen-inbox.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-gpt-supergreen-inbox
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild canonical fast-answer surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          : > /tmp/empty-triage.jsonl
+          source_run="$(python - <<'PY'
+          import json
+          final=json.load(open('control/final_supergreen_bank.json',encoding='utf-8'))
+          runs=[x.get('source_dce_run_id') for x in final.get('items',[]) if isinstance(x,dict) and x.get('source_dce_run_id')]
+          print(max(runs) if runs else 0)
+          PY
+          )"
+          python pipeline/build_gpt_supergreen_inbox.py --triage /tmp/empty-triage.jsonl --existing control/gpt_supergreen_inbox.json --final-bank control/final_supergreen_bank.json --out control/gpt_supergreen_inbox.json --max-items 40 --source-run "$source_run"
+          python - <<'PY'
+          import json
+          x=json.load(open('control/gpt_supergreen_inbox.json',encoding='utf-8'))
+          bad=[r.get('candidate_id') for r in x.get('pending_final_review',[]) if not r.get('native_spm_core') or r.get('obvious_noncore_scope')]
+          if bad: raise SystemExit('Refusing polluted user inbox: '+', '.join(map(str,bad)))
+          print(json.dumps(x.get('counts') or {},indent=2))
+          PY
+      - name: Persist clean inbox
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add control/gpt_supergreen_inbox.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'sync: canonical GPT supergreen inbox from final bank'
+          for n in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((n*2))"
+          done
+          exit 1
