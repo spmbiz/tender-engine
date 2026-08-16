@@ -89,7 +89,10 @@ def main() -> None:
     ap.add_argument("--candidates", required=True)
     ap.add_argument("--selection", required=True)
     ap.add_argument("--out", required=True)
-    ap.add_argument("--exclude-queue", default="queues/dce_candidates.jsonl")
+    # Historical queues are not durable attempt state. Passing --exclude-queue is
+    # still supported for one-off compatibility jobs, but autonomous DCE must rely
+    # on the exact-version attempt ledger so valid cooldown retries can re-enter.
+    ap.add_argument("--exclude-queue", default="")
     ap.add_argument("--attempt-ledger", default="control/dce_attempt_ledger.jsonl")
     args = ap.parse_args()
 
@@ -97,8 +100,6 @@ def main() -> None:
     selection = load_selection(Path(args.selection))
     by_id = {str(r.get("candidate_id")): r for r in candidates if r.get("candidate_id")}
 
-    # Preserve the old exact queue dedupe as an additive backwards-compatibility
-    # guard; durable progress now comes from the exact-version attempt ledger.
     exclude_rows = load_jsonl(Path(args.exclude_queue)) if args.exclude_queue else []
     excluded_ids: set[str] = set()
     excluded_tb: set[tuple[str, str]] = set()
