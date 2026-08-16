@@ -1,0 +1,270 @@
+name: Qwen DCE Gate Triage
+
+on:
+  workflow_run:
+    workflows: ["DCE Fanout V2"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      dce_run_id:
+        description: Successful DCE Fanout V2 run ID to pre-read
+        required: true
+      workers:
+        description: Qwen DCE workers (1-6)
+        required: false
+        default: '4'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: qwen-dce-gate-triage
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    outputs:
+      source_run: ${{ steps.plan.outputs.source_run }}
+      gate_ready: ${{ steps.plan.outputs.gate_ready }}
+      workers: ${{ steps.plan.outputs.workers }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_RUN: ${{ github.event.inputs.dce_run_id }}
+          REQUESTED_WORKERS: ${{ github.event.inputs.workers || '4' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = 'workflow_run' ]; then
+            rid='${{ github.event.workflow_run.id }}'
+          else
+            rid="$INPUT_RUN"
+          fi
+          [[ "$rid" =~ ^[0-9]+$ ]] || { echo "invalid DCE run id: $rid" >&2; exit 1; }
+          tag="dce-harvest-$rid"
+          asset="dce-deep-review-$rid.tar.gz"
+          mkdir -p recovered/extracted transport
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            echo "DCE release $tag does not exist" >&2
+            exit 1
+          fi
+          gh release download "$tag" --pattern "$asset" --dir recovered
+          test -s "recovered/$asset"
+          tar -xzf "recovered/$asset" -C recovered/extracted
+          queue="$(find recovered/extracted -type f -name deep_review_queue.jsonl -print -quit)"
+          test -n "$queue"
+          cp "$queue" transport/deep_review_queue.jsonl
+          gate_ready="$(python - <<'PY'
+          import json
+          n=0
+          for line in open('transport/deep_review_queue.jsonl',encoding='utf-8',errors='replace'):
+              if not line.strip(): continue
+              try:r=json.loads(line)
+              except Exception:continue
+              if isinstance(r,dict) and r.get('gate_readiness'): n+=1
+          print(n)
+          PY
+          )"
+          workers="$(GATE_READY="$gate_ready" python - <<'PY'
+          import os
+          g=int(os.environ['GATE_READY'])
+          try:w=int(os.environ.get('REQUESTED_WORKERS') or 4)
+          except Exception:w=4
+          w=max(1,min(6,w))
+          print(0 if g==0 else min(w,g))
+          PY
+          )"
+          matrix="$(WORKERS="$workers" python - <<'PY'
+          import json,os
+          n=int(os.environ['WORKERS'])
+          print(json.dumps({'include':[{'shard':i,'shard_count':n} for i in range(n)]},separators=(',',':')))
+          PY
+          )"
+          echo "source_run=$rid" >> "$GITHUB_OUTPUT"
+          echo "gate_ready=$gate_ready" >> "$GITHUB_OUTPUT"
+          echo "workers=$workers" >> "$GITHUB_OUTPUT"
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "DCE run=$rid gate_ready=$gate_ready qwen_workers=$workers"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qwen-dce-input-${{ github.run_id }}
+          path: transport/deep_review_queue.jsonl
+          retention-days: 2
+          if-no-files-found: error
+          compression-level: 0
+
+  classify:
+    needs: plan
+    if: needs.plan.outputs.gate_ready != '0' && needs.plan.outputs.workers != '0'
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ fromJSON(needs.plan.outputs.workers) }}
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: qwen-dce-input-${{ github.run_id }}
+          path: input
+      - name: Cache Qwen GGUF
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: qwen3-4b-q4-k-m-hf-v1
+      - name: Install llama.cpp CPU runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p llama-dist
+          gh api 'repos/ggml-org/llama.cpp/releases?per_page=20' > /tmp/releases.json
+          readarray -t picked < <(python - <<'PY'
+          import json,re
+          for rel in json.load(open('/tmp/releases.json')):
+              if rel.get('draft') or rel.get('prerelease'): continue
+              for a in rel.get('assets',[]):
+                  if re.fullmatch(r'llama-.*-bin-ubuntu-x64\.tar\.gz',a.get('name','')):
+                      print(rel['tag_name']); print(a['name']); raise SystemExit
+          raise SystemExit('no llama.cpp Ubuntu x64 asset found')
+          PY
+          )
+          gh release download "${picked[0]}" --repo ggml-org/llama.cpp --pattern "${picked[1]}" --dir llama-dist
+          tar -xzf "llama-dist/${picked[1]}" -C llama-dist
+          server="$(find llama-dist -type f -name llama-server -perm -u+x -print -quit)"
+          test -n "$server"
+          echo "LLAMA_SERVER=$server" >> "$GITHUB_ENV"
+      - name: Start Qwen3 4B DCE reader
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$LLAMA_SERVER" -hf Qwen/Qwen3-4B-GGUF:Q4_K_M --host 127.0.0.1 --port 8080 --jinja -c 12288 -t 4 > qwen-dce-server.log 2>&1 &
+          echo $! > qwen-dce-server.pid
+          for i in $(seq 1 180); do
+            if curl -fsS http://127.0.0.1:8080/health >/dev/null 2>&1; then exit 0; fi
+            kill -0 "$(cat qwen-dce-server.pid)" >/dev/null 2>&1 || { tail -200 qwen-dce-server.log; exit 1; }
+            sleep 3
+          done
+          tail -200 qwen-dce-server.log
+          exit 1
+      - name: Pre-read authoritative DCE gate evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/qwen_dce_gate_triage.py \
+            --queue input/deep_review_queue.jsonl \
+            --out "qwen-dce-${{ matrix.shard }}.jsonl" \
+            --source-run '${{ needs.plan.outputs.source_run }}' \
+            --shard-index '${{ matrix.shard }}' \
+            --shard-count '${{ matrix.shard_count }}' \
+            --batch-size 4 \
+            --per-gate 3 \
+            --evidence-chars 700 \
+            --timeout 90 \
+            --max-tokens 1200
+      - name: Stop model
+        if: always()
+        shell: bash
+        run: '[ -s qwen-dce-server.pid ] && kill "$(cat qwen-dce-server.pid)" >/dev/null 2>&1 || true'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qwen-dce-result-${{ matrix.shard }}-${{ github.run_id }}
+          path: |
+            qwen-dce-${{ matrix.shard }}.jsonl
+            qwen-dce-server.log
+          retention-days: 3
+          if-no-files-found: warn
+
+  aggregate:
+    needs: [plan, classify]
+    if: always() && needs.plan.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download Qwen DCE outputs
+        if: needs.plan.outputs.gate_ready != '0' && needs.plan.outputs.workers != '0'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: qwen-dce-result-*-${{ github.run_id }}
+          path: results
+          merge-multiple: true
+      - name: Merge pre-read and build persistent one-file GPT inbox
+        env:
+          SOURCE_RUN: ${{ needs.plan.outputs.source_run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p control results
+          : > control/qwen_dce_triage_latest.jsonl
+          while IFS= read -r f; do cat "$f" >> control/qwen_dce_triage_latest.jsonl; done < <(find results -type f -name 'qwen-dce-*.jsonl' -size +0c 2>/dev/null | sort || true)
+          python pipeline/build_gpt_supergreen_inbox.py \
+            --triage control/qwen_dce_triage_latest.jsonl \
+            --existing control/gpt_supergreen_inbox.json \
+            --final-bank control/final_supergreen_bank.json \
+            --out control/gpt_supergreen_inbox.json \
+            --max-items 40 \
+            --source-run "$SOURCE_RUN"
+          python - <<'PY'
+          import json
+          p='control/gpt_supergreen_inbox.json'
+          x=json.load(open(p,encoding='utf-8'))
+          print(json.dumps(x.get('counts') or {},indent=2))
+          PY
+      - name: Persist Qwen DCE output in source DCE Release
+        if: needs.plan.outputs.gate_ready != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ needs.plan.outputs.source_run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="dce-harvest-${SOURCE_RUN}"
+          cp control/qwen_dce_triage_latest.jsonl "qwen-dce-triage-${SOURCE_RUN}.jsonl"
+          cp control/gpt_supergreen_inbox.json "gpt-supergreen-inbox-${SOURCE_RUN}.json"
+          gh release upload "$tag" "qwen-dce-triage-${SOURCE_RUN}.jsonl" "gpt-supergreen-inbox-${SOURCE_RUN}.json" --clobber
+      - name: Persist canonical fast-answer surface to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add control/qwen_dce_triage_latest.jsonl control/gpt_supergreen_inbox.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "qwen: persist DCE pre-read and GPT instant inbox ${{ needs.plan.outputs.source_run }}"
+          for n in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((n*3))"
+          done
+          exit 1
+      - name: Summary
+        shell: bash
+        run: |
+          echo "### Qwen DCE gate triage" >> "$GITHUB_STEP_SUMMARY"
+          echo "- source DCE run: ${{ needs.plan.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- gate-ready DCE rows: ${{ needs.plan.outputs.gate_ready }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Qwen workers: ${{ needs.plan.outputs.workers }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- canonical GPT fast-answer file: control/gpt_supergreen_inbox.json" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Qwen pre-read is never a final eligibility verdict." >> "$GITHUB_STEP_SUMMARY"
