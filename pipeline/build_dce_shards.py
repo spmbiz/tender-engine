@@ -9,7 +9,7 @@ import unicodedata
 from collections import Counter
 from pathlib import Path
 
-from build_matrix import BROWSER_PORTALS, SUPPORTED, load_lines
+from build_matrix import BROWSER_PORTALS, SUPPORTED, load_lines, resolve_dce_portal
 from global_admission import dynamic_tender_parallel
 
 MATRIX_JOB_LIMIT = 256
@@ -138,28 +138,42 @@ def main():
     seen_candidates: set[str] = set()
     seen_title_buyers: set[tuple[str, str]] = set()
     portal_counts: Counter[str] = Counter()
+    raw_portal_counts: Counter[str] = Counter()
+    skip_reason_counts: Counter[str] = Counter()
+
+    def skip(line_no: int, rec: dict, reason: str) -> None:
+        skipped.append({"line": line_no, "candidate_id": rec.get("candidate_id"), "reason": reason})
+        category = reason.split(":", 1)[0]
+        skip_reason_counts[category] += 1
 
     for line_no, rec in load_lines(Path(args.queue)):
         status = str(rec.get("status") or "QUEUED").upper()
         if status not in {"QUEUED", "READY", "DCE_PENDING", "AUTO_DCE_PREFETCH", "AUTO_DCE_PREFETCH_QWEN"}:
-            skipped.append({"line": line_no, "candidate_id": rec.get("candidate_id"), "reason": f"status:{status}"})
+            skip(line_no, rec, f"status:{status}")
             continue
-        portal = str(rec.get("portal") or rec.get("portal_key") or rec.get("selection_portal") or rec.get("source") or "").upper()
+        portal, raw_portal = resolve_dce_portal(rec)
+        raw_portal_counts[raw_portal or "UNKNOWN"] += 1
         if portal not in SUPPORTED:
-            skipped.append({"line": line_no, "candidate_id": rec.get("candidate_id"), "reason": f"unsupported:{portal}"})
+            skip(line_no, rec, f"unsupported:{raw_portal}")
             continue
         candidate_id = str(rec.get("candidate_id") or f"line-{line_no}").strip()
         cid_key, tb_key = _identity_keys(rec)
         if cid_key in excluded_ids or (tb_key and tb_key in excluded_title_buyers):
-            skipped.append({"line": line_no, "candidate_id": candidate_id, "reason": "already_in_exclude_queue_exact_identity"})
+            skip(line_no, rec, "already_in_exclude_queue_exact_identity")
             continue
         if cid_key in seen_candidates or (tb_key and tb_key in seen_title_buyers):
-            skipped.append({"line": line_no, "candidate_id": candidate_id, "reason": "duplicate_exact_identity_in_queue"})
+            skip(line_no, rec, "duplicate_exact_identity_in_queue")
             continue
         seen_candidates.add(cid_key)
         if tb_key:
             seen_title_buyers.add(tb_key)
-        jobs.append({"line": line_no, "candidate_id": candidate_id, "portal": portal, "needs_browser": portal in BROWSER_PORTALS})
+        jobs.append({
+            "line": line_no,
+            "candidate_id": candidate_id,
+            "portal": portal,
+            "raw_portal": raw_portal,
+            "needs_browser": portal in BROWSER_PORTALS,
+        })
         portal_counts[portal] += 1
         if len(jobs) >= max_jobs:
             break
@@ -176,6 +190,10 @@ def main():
             "requested_parallel": requested_parallel,
             "admission": admission,
             "sizing_mode": "deferred_global_admission",
+            "portal_counts": dict(sorted(portal_counts.items())),
+            "raw_portal_counts": dict(sorted(raw_portal_counts.items())),
+            "skipped_count": len(skipped),
+            "skip_reason_counts": dict(sorted(skip_reason_counts.items())),
             "matrix": payload,
         }
         Path("dce_plan.json").write_text(json.dumps(plan, indent=2), encoding="utf-8")
@@ -267,7 +285,9 @@ def main():
         "browser_candidates": len(browser_jobs),
         "http_candidates": len(http_jobs),
         "portal_counts": dict(sorted(portal_counts.items())),
+        "raw_portal_counts": dict(sorted(raw_portal_counts.items())),
         "skipped_count": len(skipped),
+        "skip_reason_counts": dict(sorted(skip_reason_counts.items())),
         "exclude_queue": str(exclude_path) if exclude_path else None,
         "matrix": payload,
     }
