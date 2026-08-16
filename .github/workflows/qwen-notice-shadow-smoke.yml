@@ -15,14 +15,16 @@ on:
 permissions:
   contents: read
 
+# v2 uses a separate group so an already-running v1 smoke is allowed to finish and
+# preserve its evidence instead of being cancelled destructively.
 concurrency:
-  group: qwen-notice-shadow-smoke
-  cancel-in-progress: true
+  group: qwen-notice-shadow-smoke-v2
+  cancel-in-progress: false
 
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -57,8 +59,18 @@ jobs:
           mkdir -p ledger
           gh release download notice-intelligence-ledger-latest \
             --pattern notice-classification-queue-latest.jsonl.gz \
+            --pattern notice-ledger-summary-latest.json \
             --dir ledger
           test -s ledger/notice-classification-queue-latest.jsonl.gz
+          test -s ledger/notice-ledger-summary-latest.json
+          generation="$(python - <<'PY'
+          import json
+          x=json.load(open('ledger/notice-ledger-summary-latest.json'))
+          print(x.get('source_run') or x.get('snapshot_run_id') or x.get('run_id') or 'UNKNOWN')
+          PY
+          )"
+          echo "SOURCE_LEDGER_GENERATION=$generation" >> "$GITHUB_ENV"
+          sha256sum ledger/notice-classification-queue-latest.jsonl.gz > ledger/INPUT_SHA256.txt
 
       - name: Install latest usable llama.cpp Ubuntu x64 CPU binary
         env:
@@ -101,7 +113,7 @@ jobs:
           "$LLAMA_SERVER" \
             -hf Qwen/Qwen3-4B-GGUF:Q4_K_M \
             --host 127.0.0.1 --port 8080 \
-            --jinja -c 8192 -t 4 > qwen-server.log 2>&1 &
+            --jinja -c 4096 -t 4 > qwen-server.log 2>&1 &
           pid=$!
           echo "$pid" > qwen-server.pid
           ready=0
@@ -122,7 +134,7 @@ jobs:
           echo "QWEN_STARTUP_SECONDS=$((now-start))" >> "$GITHUB_ENV"
           echo "Qwen ready in $((now-start))s using $LLAMA_CPP_TAG"
 
-      - name: Classify deterministic sample in shadow mode
+      - name: Classify deterministic sample in checkpoint-safe shadow mode
         shell: bash
         run: |
           set -euo pipefail
@@ -131,13 +143,40 @@ jobs:
             --out qwen-shadow-results.jsonl \
             --summary qwen-shadow-summary.json \
             --sample-size '${{ steps.cfg.outputs.sample_size }}' \
-            --startup-seconds "$QWEN_STARTUP_SECONDS"
+            --startup-seconds "$QWEN_STARTUP_SECONDS" \
+            --source-ledger-generation "$SOURCE_LEDGER_GENERATION" \
+            --description-chars 1800 \
+            --max-tokens 100 \
+            --timeout 75 \
+            --max-runtime-seconds 900
 
       - name: Stop local model server
         if: always()
         shell: bash
         run: |
           [ -s qwen-server.pid ] && kill "$(cat qwen-server.pid)" >/dev/null 2>&1 || true
+
+      - name: Build smoke evidence manifest
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,pathlib,os
+          files=[]
+          for name in ('qwen-shadow-results.jsonl','qwen-shadow-summary.json','qwen-server.log','ledger/INPUT_SHA256.txt'):
+              p=pathlib.Path(name)
+              if not p.is_file(): continue
+              h=hashlib.sha256(p.read_bytes()).hexdigest()
+              files.append({'path':name,'bytes':p.stat().st_size,'sha256':h})
+          pathlib.Path('qwen-shadow-evidence-manifest.json').write_text(json.dumps({
+              'schema':'QWEN_SHADOW_EVIDENCE_MANIFEST_V1',
+              'workflow_run_id':os.environ.get('GITHUB_RUN_ID'),
+              'source_ledger_generation':os.environ.get('SOURCE_LEDGER_GENERATION','UNKNOWN'),
+              'files':files,
+              'data_safety':{'shadow_only':True,'destructive_rejection_enabled':False}
+          },indent=2)+'\n')
+          PY
 
       - name: Upload smoke evidence
         if: always()
@@ -148,6 +187,8 @@ jobs:
             qwen-shadow-results.jsonl
             qwen-shadow-summary.json
             qwen-server.log
+            qwen-shadow-evidence-manifest.json
+            ledger/INPUT_SHA256.txt
           if-no-files-found: warn
           retention-days: 7
 
