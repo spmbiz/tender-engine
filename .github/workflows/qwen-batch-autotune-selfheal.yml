@@ -36,21 +36,27 @@ jobs:
           cfg=json.load(open('control/qwen_batch_autotune_trigger.json',encoding='utf-8'))
           sizes=[int(x) for x in cfg.get('candidate_batch_sizes',[1,2,4,6,8,12,16,20,24,32])]
           sizes=sorted(set(x for x in sizes if 1 <= x <= 64))
-          sample=int(cfg.get('sample_size',48))
+          sample=int(cfg.get('sample_size',24))
           event=os.environ.get('GITHUB_EVENT_NAME','')
           runtime=pathlib.Path('control/qwen_batch_runtime_config.json')
           chosen=sizes
-          if event == 'schedule' and runtime.exists():
+          if event == 'schedule':
               try:
-                  state=json.loads(runtime.read_text(encoding='utf-8'))
+                  state=json.loads(runtime.read_text(encoding='utf-8')) if runtime.exists() else {}
               except Exception:
                   state={}
               hour=datetime.datetime.now(datetime.timezone.utc).hour
-              if state.get('status') == 'PASS' and hour % 6 != 0:
+              # Every six hours, re-open the full search space, still under the
+              # matrix max-parallel cap below. Other hours are cheap health/repair waves.
+              if hour % 6 != 0:
                   champion=int((state.get('champion') or {}).get('initial_batch_size') or 0)
-                  if champion in sizes:
+                  if state.get('status') == 'PASS' and champion in sizes:
                       idx=sizes.index(champion)
                       chosen=sizes[max(0,idx-1):min(len(sizes),idx+2)]
+                  elif sizes:
+                      width=min(3,len(sizes))
+                      start=((hour * width) % len(sizes))
+                      chosen=[sizes[(start+i) % len(sizes)] for i in range(width)]
           print('batch_sizes='+json.dumps(chosen,separators=(',',':')))
           print('sample_size='+str(sample))
           PY
@@ -59,6 +65,7 @@ jobs:
     needs: plan
     strategy:
       fail-fast: false
+      max-parallel: 3
       matrix:
         batch_size: ${{ fromJSON(needs.plan.outputs.batch_sizes) }}
     runs-on: ubuntu-latest
