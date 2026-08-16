@@ -1,0 +1,74 @@
+name: DCE Queue Drainer
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/10 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'queues/spm_rescue_selection_latest.jsonl'
+      - 'queues/qwen_live_selection_latest.jsonl'
+      - '.github/workflows/dce-queue-drainer.yml'
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: dce-queue-drainer
+  cancel-in-progress: true
+
+jobs:
+  drain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dispatch highest-value persisted DCE queue when fleet is free
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          active="$(gh run list --workflow dce-fanout-v2.yml --limit 40 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
+          if [ "$active" -gt 0 ]; then
+            echo "DCE fleet busy: $active active/queued. Persisted queues remain untouched."
+            exit 0
+          fi
+          path=''
+          max_jobs=0
+          if [ -s queues/spm_rescue_selection_latest.jsonl ]; then
+            path='queues/spm_rescue_selection_latest.jsonl'
+            max_jobs=30
+          elif [ -s queues/qwen_live_selection_latest.jsonl ]; then
+            path='queues/qwen_live_selection_latest.jsonl'
+            max_jobs=60
+          else
+            echo 'No persisted DCE queue to drain.'
+            exit 0
+          fi
+          source_run="$(PATH_IN="$path" python - <<'PY'
+          import json,os
+          p=os.environ['PATH_IN']
+          for line in open(p,encoding='utf-8',errors='replace'):
+              if not line.strip(): continue
+              r=json.loads(line)
+              v=r.get('wide_read_run_id') or r.get('source_discovery_run') or r.get('source_run')
+              if v is not None:
+                  print(v); break
+          PY
+          )"
+          [[ "$source_run" =~ ^[0-9]+$ ]] || { echo "Cannot resolve source run from $path" >&2; exit 1; }
+          rows="$(grep -cve '^\s*$' "$path" || true)"
+          jobs="$rows"
+          if [ "$jobs" -gt "$max_jobs" ]; then jobs="$max_jobs"; fi
+          if [ "$jobs" -lt 1 ]; then exit 0; fi
+          gh workflow run dce-fanout-v2.yml --ref main \
+            -f selection_path="$path" \
+            -f source_discovery_run="$source_run" \
+            -f max_jobs="$jobs" \
+            -f max_parallel=8 \
+            -f max_shards=80 \
+            -f jobs_per_shard=0
+          echo "Dispatched persisted queue $path rows=$rows jobs=$jobs source=$source_run. If global admission defers it, the next scheduled drain retries without losing the manifest."
