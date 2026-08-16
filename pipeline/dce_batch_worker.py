@@ -11,7 +11,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-from build_matrix import BROWSER_PORTALS
+from build_matrix import BROWSER_PORTALS, resolve_dce_portal
 
 RETRYABLE_STATUSES = {"ERROR_RETRYABLE"}
 RATE_LIMIT_RE = re.compile(r"(?:\b429\b|too many requests|rate.?limit|retry-after)", re.I)
@@ -41,7 +41,7 @@ def load_manifest(out: str, candidate_id: str) -> dict:
 
 
 def _fast_lane_policy(candidate: dict, requested_retries: int, requested_timeout: int) -> tuple[int, int, str]:
-    portal = str(candidate.get("portal") or candidate.get("portal_key") or candidate.get("source") or "").upper()
+    portal, _ = resolve_dce_portal(candidate)
     if portal in BROWSER_PORTALS:
         retries = min(max(0, requested_retries), max(0, int(os.getenv("DCE_BROWSER_INLINE_RETRIES", "0"))))
         timeout_seconds = min(max(30, requested_timeout), max(30, int(os.getenv("DCE_BROWSER_FAST_TIMEOUT_SECONDS", "150"))))
@@ -55,7 +55,7 @@ def _fast_lane_policy(candidate: dict, requested_retries: int, requested_timeout
 def run_one(queue: str, line_no: int, out: str, retries: int, timeout_seconds: int):
     candidate = load_candidate(queue, line_no)
     candidate_id = str(candidate.get("candidate_id") or f"line-{line_no}")
-    portal = str(candidate.get("portal") or candidate.get("portal_key") or candidate.get("source") or "").upper()
+    portal, raw_portal = resolve_dce_portal(candidate)
     effective_retries, effective_timeout, lane = _fast_lane_policy(candidate, retries, timeout_seconds)
     attempts = []
     started = time.monotonic()
@@ -108,6 +108,7 @@ def run_one(queue: str, line_no: int, out: str, retries: int, timeout_seconds: i
         "line": line_no,
         "candidate_id": candidate_id,
         "portal": portal,
+        "raw_portal": raw_portal,
         "lane": lane,
         "returncode": final["returncode"],
         "status": final["status"],
@@ -150,6 +151,7 @@ def main():
                     "line": futs[fut],
                     "candidate_id": None,
                     "portal": None,
+                    "raw_portal": None,
                     "lane": None,
                     "returncode": 99,
                     "status": "BATCH_EXCEPTION",
