@@ -233,7 +233,19 @@ def process(root: Path) -> dict:
 
 
 def main():
-    ap=argparse.ArgumentParser(); ap.add_argument('--root',default='out'); args=ap.parse_args(); roots=sorted(set(p.parent for p in Path(args.root).rglob('manifest.json'))); rows=[process(r) for r in roots]; statuses=sorted({r['deadline']['status'] for r in rows]); print(json.dumps({'candidates':len(rows),'deadline_conflicts':sum(1 for r in rows if r['deadline']['conflict']),'authoritative_submission_dates':sum(1 for r in rows if r['deadline'].get('authoritative_submission_date')),'statuses':{s:sum(1 for r in rows if r['deadline']['status']==s) for s in statuses}},indent=2,ensure_ascii=False))
+    ap=argparse.ArgumentParser()
+    ap.add_argument('--root',default='out')
+    args=ap.parse_args()
+    roots=sorted(set(p.parent for p in Path(args.root).rglob('manifest.json')))
+    rows=[process(r) for r in roots]
+    statuses=sorted({r['deadline']['status'] for r in rows})
+    summary={
+        'candidates':len(rows),
+        'deadline_conflicts':sum(1 for r in rows if r['deadline']['conflict']),
+        'authoritative_submission_dates':sum(1 for r in rows if r['deadline'].get('authoritative_submission_date')),
+        'statuses':{s:sum(1 for r in rows if r['deadline']['status']==s) for s in statuses},
+    }
+    print(json.dumps(summary,indent=2,ensure_ascii=False))
 
 
 if __name__=='__main__': main()
