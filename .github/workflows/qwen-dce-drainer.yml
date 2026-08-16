@@ -1,0 +1,63 @@
+name: Qwen DCE Triage Drainer
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/10 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qwen-dce-drainer.yml'
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: qwen-dce-triage-drainer
+  cancel-in-progress: true
+
+jobs:
+  drain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Dispatch newest durable DCE run not yet Qwen-pre-read
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Never create duplicate queued triage work. The Qwen DCE workflow is
+          # globally serialized, so one active/queued instance is sufficient.
+          active="$(gh run list --repo "$REPO" --workflow qwen-dce-triage.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
+          if [ "$active" -gt 0 ]; then
+            echo "Qwen DCE triage already has $active active/queued run(s); no duplicate dispatch."
+            exit 0
+          fi
+
+          mapfile -t completed < <(gh run list --repo "$REPO" --workflow dce-fanout-v2.yml --status success --limit 25 --json databaseId,createdAt --jq 'sort_by(.createdAt) | reverse | .[].databaseId')
+          if [ "${#completed[@]}" -eq 0 ]; then
+            echo 'No successful DCE run found.'
+            exit 0
+          fi
+
+          for rid in "${completed[@]}"; do
+            tag="dce-harvest-$rid"
+            if ! gh release view "$tag" --repo "$REPO" >/dev/null 2>&1; then
+              # A zero-shard/admission-deferred run has no durable DCE release.
+              continue
+            fi
+            assets="$(gh release view "$tag" --repo "$REPO" --json assets --jq '.assets[].name')"
+            grep -Fxq "dce-deep-review-$rid.tar.gz" <<< "$assets" || continue
+            if grep -Fxq "qwen-dce-triage-$rid.jsonl" <<< "$assets"; then
+              continue
+            fi
+            echo "Dispatching missing Qwen DCE pre-read for durable DCE run $rid"
+            gh workflow run qwen-dce-triage.yml --repo "$REPO" --ref main -f dce_run_id="$rid" -f workers=4
+            exit 0
+          done
+
+          echo 'No untriaged durable DCE run found.'
