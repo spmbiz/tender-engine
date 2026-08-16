@@ -36,7 +36,6 @@ jobs:
           pos=raw.find(ref)
           if pos < 0:
               raise SystemExit(f'{ref} not found in live SWM page')
-          # Start at the enclosing area shortly before the reference and stop before next procedure reference.
           start=max(0,pos-3000)
           next_ref=raw.find('Referenznummer',pos+len(ref))
           if next_ref < 0:
@@ -51,7 +50,6 @@ jobs:
               u=urllib.parse.urljoin(page,html.unescape(href))
               if u.startswith('http') and u not in hrefs:
                   hrefs.append(u)
-          # Candidate documents are public linked files inside the exact procedure block.
           files=[]
           for i,u in enumerate(hrefs):
               if not re.search(r'\.(pdf|zip|xlsx?|docx?)(?:\?|$)',u,re.I):
@@ -66,14 +64,42 @@ jobs:
                   out.write_bytes(data); size=len(data)
               except Exception as e:
                   error=f'{type(e).__name__}: {e}'
-              files.append({'url':u,'filename':out_name,'status':status,'content_type':ctype,'bytes':size,'error':error})
-          summary={'schema':'SWM_EXACT_PROCEDURE_PROBE_V1','reference':ref,'page':page,'block_text':text,'hrefs':hrefs,'files':files}
+              files.append({'url':u,'filename':out_name,'status':status,'content_type':ctype,'bytes':size,'error':error,'linked':True})
+
+          base='https://www.swm.de/dam/doc/einkauf-logistik/bekanntmachungen/ausschreibungen/it-leistungen/'
+          guesses=[
+              'SV-FFI-260810-001_Bewertung_Teilnahmewettbewerb_PIONEER.pdf',
+              'Bewertung_Teilnahmewettbewerb_PIONEER.pdf',
+              'SV-FFI-260810-001_Bewertung_Teilnahmewettbewerb.pdf',
+              'SV-FFI-260810-001_Ausschreibungsunterlagen_INFORMATIV.pdf',
+              'SV-FFI-260810-001_Antrag-zum-Teilnahmewettbewerb.pdf',
+              'SV-FFI-260810-001_Bedingungen-zum-Teilnahmewettbewerb.pdf',
+              'SV-FFI-260810-001_Eigenerklaerung-Russlandbezug.pdf',
+              'SV-FFI-260810-001_Verpflichtungserklaerung-Eignungsleihe.pdf'
+          ]
+          linked_urls={f['url'] for f in files}
+          guessed=[]
+          for name in guesses:
+              u=base+urllib.parse.quote(name,safe='._-/')
+              if u in linked_urls:
+                  continue
+              rec={'url':u,'filename':name,'status':None,'content_type':None,'bytes':None,'error':None,'linked':False}
+              try:
+                  req=urllib.request.Request(u,headers={'User-Agent':'Mozilla/5.0'})
+                  with urllib.request.urlopen(req,timeout=20) as r:
+                      rec['status']=getattr(r,'status',200); rec['content_type']=r.headers.get('Content-Type'); data=r.read()
+                  rec['bytes']=len(data)
+                  if rec['status']==200 and data:
+                      pathlib.Path('swm-mars',name).write_bytes(data)
+              except Exception as e:
+                  rec['error']=f'{type(e).__name__}: {e}'
+              guessed.append(rec)
+
+          summary={'schema':'SWM_EXACT_PROCEDURE_PROBE_V2','reference':ref,'page':page,'block_text':text,'hrefs':hrefs,'files':files,'unlinked_guesses':guessed}
           pathlib.Path('swm-mars/summary.json').write_text(json.dumps(summary,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
           print(json.dumps(summary,indent=2,ensure_ascii=False))
-          if not files:
-              raise SystemExit('No public document links found in exact procedure block')
-          if not any(f.get('status')==200 and f.get('bytes') for f in files):
-              raise SystemExit('Public links found but none downloaded successfully')
+          if not files or not any(f.get('status')==200 and f.get('bytes') for f in files):
+              raise SystemExit('No exact linked public documents downloaded')
           PY
       - name: Upload probe evidence
         if: always()
