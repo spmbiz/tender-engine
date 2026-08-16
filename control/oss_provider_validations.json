@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-16T14:38:58Z",
+  "validations": {
+    "EE_RHR": {
+      "status": "LIVE_VALIDATED",
+      "evidence": "GitHub Actions OSS Provider Expansion CI / estonia-rhr-live-smoke",
+      "validation_scope": "official previous-month bulk XML endpoint reachable, payload nontrivial, active/biddable eForms notices parsed with authoritative IDs",
+      "implementation": "pipeline/discover_ee_rhr.py",
+      "promotion_effect": "Treat as implemented for backlog/P0-open accounting; production fleet wiring is validated separately by patch dry-run and post-merge lane activation."
+    },
+    "SPLINK_ENTITY_RESOLUTION": {
+      "status": "DEPENDENCY_VALIDATED",
+      "evidence": "GitHub Actions OSS Provider Expansion CI / splink-smoke",
+      "validation_scope": "stable Splink v4 dependency installs and shadow resolver imports; probabilistic output remains non-destructive"
+    },
+    "DOCLING_DCE": {
+      "status": "DEPENDENCY_VALIDATED",
+      "evidence": "GitHub Actions OSS Provider Expansion CI / docling-api-smoke",
+      "validation_scope": "Docling v2 installs and DocumentConverter API used by deep fallback imports successfully"
+    }
+  }
+}
