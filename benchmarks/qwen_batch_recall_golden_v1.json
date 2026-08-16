@@ -1,0 +1,51 @@
+{
+  "schema": "QWEN_BATCH_RECALL_GOLDEN_SET_V1",
+  "purpose": "Validate high-recall survival separately from lean attractiveness before batch Qwen scale-out.",
+  "cases": [
+    {
+      "candidate_id": "IE:8670172",
+      "label": "DCE-reviewed strong digital positive: Animation and Software Development",
+      "expected": {"min_rank": "FIT", "preferred_modes": ["DIRECT_DIGITAL", "AI_ENABLED", "MIXED"], "must_not_reject": true}
+    },
+    {
+      "candidate_id": "PL-BZP:08def84e-fb8f-254e-962b-1200016e42b5",
+      "label": "DCE-reviewed accessible web application",
+      "expected": {"min_rank": "FIT", "preferred_modes": ["DIRECT_DIGITAL", "AI_ENABLED", "MIXED", "SUBCONTRACTABLE"], "must_not_reject": true}
+    },
+    {
+      "candidate_id": "IE:8623183",
+      "label": "DCE-reviewed partnerable editorial/web-system positive",
+      "expected": {"min_rank": "MAYBE", "must_not_reject": true}
+    },
+    {
+      "candidate_id": "DE-DOE:224c8e0b-518e-4e73-9d21-9eda8db13c19:01",
+      "label": "Physical truck: retain for broker recall, but not lean/direct-digital",
+      "expected": {"max_rank": "FIT", "allowed_modes": ["BROKER_RESELL", "SUBCONTRACTABLE", "MIXED", "UNCLEAR"], "allowed_lean": ["LOW", "MEDIUM", "UNKNOWN"], "must_not_reject": true}
+    },
+    {
+      "candidate_id": "US-SAM:6c69d2cd760a40c08bfd29a4d4218b25",
+      "label": "Regulated methylphenidate: retain but flag regulated and low-lean",
+      "expected": {"max_rank": "FIT", "allowed_modes": ["BROKER_RESELL", "SUBCONTRACTABLE", "MIXED", "UNCLEAR"], "allowed_lean": ["LOW", "UNKNOWN"], "required_friction_any": ["REGULATED_GOODS"], "must_not_reject": true}
+    },
+    {
+      "candidate_id": "TED:560598-2026",
+      "label": "Physical microscopes: retain as sourcing/subcontract route, not strong direct digital",
+      "expected": {"max_rank": "FIT", "allowed_modes": ["BROKER_RESELL", "SUBCONTRACTABLE", "MIXED", "UNCLEAR"], "allowed_lean": ["LOW", "MEDIUM", "UNKNOWN"], "must_not_reject": true}
+    },
+    {
+      "candidate_id": "US-SAM:d5c30c0b355d4a81ab4e4e2a16acbfc2",
+      "label": "Commercial parts: broker/resell recall control",
+      "expected": {"max_rank": "FIT", "allowed_modes": ["BROKER_RESELL", "SUBCONTRACTABLE", "MIXED", "UNCLEAR"], "allowed_lean": ["LOW", "MEDIUM", "UNKNOWN"], "must_not_reject": true}
+    },
+    {
+      "candidate_id": "TED:564078-2026",
+      "label": "HVAC installation: retain as partnerable but low/medium lean with onsite friction",
+      "expected": {"max_rank": "FIT", "allowed_modes": ["SUBCONTRACTABLE", "MIXED", "UNCLEAR"], "allowed_lean": ["LOW", "MEDIUM", "UNKNOWN"], "required_friction_any": ["ON_SITE_SPECIALIST", "LICENSED_PERSONNEL", "LOCAL_PRESENCE", "HEAVY_EQUIPMENT"], "must_not_reject": true}
+    },
+    {
+      "candidate_id": "US-SAM:3e996363f3f840c3b4bd786b9cdb985d",
+      "label": "Aviation Security Officer personal-services control",
+      "expected": {"allowed_ranks": ["REJECT_OBVIOUS", "MAYBE"], "allowed_lean": ["LOW", "UNKNOWN"]}
+    }
+  ]
+}
