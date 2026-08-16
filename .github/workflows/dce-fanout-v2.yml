@@ -234,17 +234,14 @@ jobs:
         run: python pipeline/extract_gates.py --root out
       - name: Build immediate per-shard review queue
         run: python pipeline/aggregate_dce.py --root out --out fast-aggregate
-      - name: Adjudicate gate-ready DCE rows immediately
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_ADJUDICATION_MODEL: gpt-5-mini
+      - name: Prepare gate-ready DCE rows for GPT Web adjudication (API-free)
         shell: bash
         run: |
           set -euo pipefail
           python pipeline/auto_adjudicate_dce.py \
             --queue fast-aggregate/deep_review_queue.jsonl \
             --out fast-adjudication \
-            --max-model-reviews 16
+            --max-model-reviews 0
       - name: Enforce deterministic final-verdict guard on hot verdicts
         run: python pipeline/final_verdict_guard.py --review fast-adjudication/adjudication.jsonl
       - name: Publish guarded shard verdict and refresh ChatGPT hot feed
