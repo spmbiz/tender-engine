@@ -19,7 +19,6 @@ jobs:
       matrix:
         asset:
           - buyers.csv.gz
-          - buyers.parquet
           - country_summary.csv
           - data_quality.json
           - evidence_lanes.json
@@ -51,7 +50,7 @@ jobs:
     timeout-minutes: 35
     strategy:
       fail-fast: false
-      max-parallel: 6
+      max-parallel: 7
       matrix:
         asset:
           - historical_tenders.csv.gz
@@ -60,6 +59,7 @@ jobs:
           - awards.parquet
           - award_suppliers.csv.gz
           - award_suppliers.parquet
+          - buyers.parquet
     steps:
       - name: Download split and hash
         env:
@@ -71,7 +71,7 @@ jobs:
           gh release download tender-normalized-global-core-v4 --repo walidgdg1-ai/coldemailtool --pattern "$ASSET" --dir original
           sha256sum "original/$ASSET" > "manifests/$ASSET.sha256"
           split -b 80M -d -a 3 "original/$ASSET" "parts/$ASSET.part-"
-          (cd parts && sha256sum "$ASSET".part-*) > "../manifests/$ASSET.parts.sha256"
+          (cd parts && sha256sum "$ASSET".part-*) > "manifests/$ASSET.parts.sha256"
           ls -lh parts/
       - uses: actions/upload-artifact@v4
         if: ${{ hashFiles(format('parts/{0}.part-000', matrix.asset)) != '' }}
