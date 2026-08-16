@@ -74,11 +74,9 @@ def main() -> None:
         if not isinstance(releases, list):
             errors.append({"page": page, "error": "RELEASES_NOT_LIST"})
             break
-        telemetry.append({
-            "page": page,
-            "releases": len(releases),
-            "next": (pkg.get("links") or {}).get("next") if isinstance(pkg.get("links"), dict) else None,
-        })
+        links = pkg.get("links") or {}
+        next_url = links.get("next") if isinstance(links, dict) else None
+        telemetry.append({"page": page, "releases": len(releases), "next": next_url})
         if not releases:
             break
         for release in releases:
@@ -103,8 +101,10 @@ def main() -> None:
                     notice_url=notice_url,
                 )
             )
-        links = pkg.get("links") or {}
-        if len(releases) < args.page_size or (isinstance(links, dict) and not links.get("next")):
+        # The API can return fewer rows than requested *and still advertise a
+        # valid next page*. The authoritative pagination link wins over page
+        # fullness, otherwise valid releases are silently lost.
+        if not next_url:
             break
 
     raw = sorted(candidates.values(), key=lambda x: (x.get("deadline") or "9999", x["candidate_id"]))
@@ -123,11 +123,12 @@ def main() -> None:
         "document_routes": sum(bool((x.get("route") or {}).get("document_urls")) for x in raw),
         "competition_signal_rows": sum(x.get("tenderers_received_observed") is not None for x in raw)
         + sum(x.get("tenderers_received_observed") is not None for x in awards),
+        "pages_fetched": len(telemetry),
         "generated_at": now.isoformat(),
         "errors": errors,
         "telemetry": telemetry,
         "source_url": BASE,
-        "semantics": "OCDS tenderers list count is preserved as an observed competition signal when published; it is never invented when absent.",
+        "semantics": "OCDS tenderers list count is preserved as an observed competition signal when published; it is never invented when absent. Pagination follows authoritative links even when pages are underfilled.",
     }
     (out / "stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(stats, ensure_ascii=False, indent=2))
