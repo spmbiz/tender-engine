@@ -68,11 +68,9 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Run 31970904558 was the one-time migration wave: the new materializer
-          # produced 152 rows but it had been dispatched just before the drainer
-          # limit was raised, so build_dce_shards intentionally processed only 60.
-          # Never mark its unprocessed tail as consumed. The immediate next wave
-          # runs with max_jobs=160 and can be ledgered safely in full.
+          # One-time migration wave: materializer produced 152 rows while this run
+          # was already carrying the old max_jobs=60 dispatch input. Do not mark
+          # the unprocessed tail as consumed. The next wave uses max_jobs=160.
           if [ "$DCE_RUN_ID" = '31970904558' ]; then
             echo 'Migration wave detected; deliberately not ledgering its oversized pre-truncation queue.'
             echo 'added=0' >> "$GITHUB_OUTPUT"
@@ -116,5 +114,9 @@ jobs:
         run: |
           set -euo pipefail
           gh workflow run qwen-dce-drainer.yml --ref main
-          gh workflow run dce-queue-drainer.yml --ref main
-          echo "DCE success chained immediately: qwen-pre-read + next unseen drain (added=${ADDED:-0} transition_skip=${TRANSITION_SKIP:-false})."
+          if [ "${ADDED:-0}" -gt 0 ] || [ "${TRANSITION_SKIP:-false}" = 'true' ]; then
+            gh workflow run dce-queue-drainer.yml --ref main
+            echo "Progress advanced; next unseen DCE wave dispatched (added=${ADDED:-0} transition_skip=${TRANSITION_SKIP:-false})."
+          else
+            echo 'No progress delta; DCE self-loop stopped cleanly until the persisted selection changes.'
+          fi
