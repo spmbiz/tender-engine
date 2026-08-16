@@ -1,0 +1,83 @@
+name: SPM Rescue Pool
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_discovery_run:
+        description: Canonical discovery run ID
+        required: false
+        default: '31923649637'
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/build_spm_rescue_pool.py'
+      - '.github/workflows/spm-rescue-pool.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: spm-rescue-pool
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recover canonical candidate universe
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ github.event.inputs.source_discovery_run || '31923649637' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="discovery-harvest-${SOURCE_RUN}"
+          normal="supergreen-wide-read-${SOURCE_RUN}.tar.gz"
+          repaired="supergreen-wide-read-${SOURCE_RUN}-repaired.tar.gz"
+          assets="$(gh release view "$tag" --json assets --jq '.assets[].name')"
+          if grep -Fxq "$repaired" <<< "$assets"; then asset="$repaired"; else asset="$normal"; fi
+          mkdir -p source extracted
+          gh release download "$tag" --pattern "$asset" --dir source
+          tar -xzf "source/$asset" -C extracted
+          candidates="$(find extracted -type f -name current_candidates.jsonl -print -quit)"
+          test -n "$candidates"
+          echo "CANDIDATES=$candidates" >> "$GITHUB_ENV"
+          echo "SOURCE_RUN=$SOURCE_RUN" >> "$GITHUB_ENV"
+      - name: Build broad SPM-native pool only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/build_spm_rescue_pool.py \
+            --input "$CANDIDATES" \
+            --out control/spm_rescue_pool.json \
+            --max-items 400 \
+            --min-score 20
+          python - <<'PY'
+          import json
+          p='control/spm_rescue_pool.json'
+          x=json.load(open(p,encoding='utf-8'))
+          x['source_discovery_run_id']=int(__import__('os').environ['SOURCE_RUN'])
+          open(p,'w',encoding='utf-8').write(json.dumps(x,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps({k:x.get(k) for k in ['source_total','source_open_or_unknown_deadline','matched_before_cap','count','source_discovery_run_id']},indent=2))
+          PY
+      - name: Persist pool for GPT semantic review
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add control/spm_rescue_pool.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Persist SPM rescue pool from ${SOURCE_RUN}"
+          for n in 1 2 3 4; do
+            if git push origin HEAD:main; then exit 0; fi
+            git fetch origin main
+            git rebase origin/main
+            sleep "$((n*2))"
+          done
+          exit 1
