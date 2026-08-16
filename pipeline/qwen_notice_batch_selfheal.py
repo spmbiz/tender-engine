@@ -6,6 +6,7 @@ import datetime as dt
 import gzip
 import hashlib
 import json
+import os
 import re
 import time
 import urllib.request
@@ -36,6 +37,7 @@ PROMPT_VERSION = "qwen-batch-high-recall-compact-selfheal-v1"
 CLASSIFIER_VERSION = "qwen3-4b-q4km-batch-selfheal-v1"
 SCHEMA = "QWEN_NOTICE_BATCH_SELFHEAL_V1"
 SUMMARY_SCHEMA = "QWEN_NOTICE_BATCH_SELFHEAL_SUMMARY_V1"
+PROGRESS_SCHEMA = "QWEN_NOTICE_BATCH_LIVE_PROGRESS_V1"
 
 PHYSICAL_GOODS = re.compile(
     r"\b(parts?|spares?|equipment|supplies?|vehicle|truck|lorry|lkw|microscopes?|filters?|"
@@ -272,11 +274,19 @@ def deterministic_guard(decoded: dict[str, Any], row: dict[str, Any]) -> tuple[d
     return out, actions
 
 
+def atomic_json(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    tmp.replace(path)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--queue", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--summary", required=True)
+    ap.add_argument("--progress", default=None, help="Live JSON checkpoint rewritten after every completed request")
     ap.add_argument("--batch-size", type=int, required=True)
     ap.add_argument("--sample-size", type=int, default=48)
     ap.add_argument("--server", default="http://127.0.0.1:8080/v1/chat/completions")
@@ -294,8 +304,13 @@ def main() -> None:
     sample = deterministic_sample(iter_jsonl(Path(args.queue)), args.sample_size)
     out_path = Path(args.out)
     summary_path = Path(args.summary)
+    progress_path = Path(args.progress) if args.progress else out_path.with_name(out_path.stem + "-progress.json")
     out_path.parent.mkdir(parents=True, exist_ok=True)
     summary_path.parent.mkdir(parents=True, exist_ok=True)
+
+    worker_match = re.search(r"qwen-live-(\d+)", out_path.name)
+    worker_id = os.environ.get("QWEN_WORKER_ID") or (worker_match.group(1) if worker_match else "unknown")
+    run_id = os.environ.get("GITHUB_RUN_ID") or "local"
     started = time.monotonic()
     attempts: list[dict[str, Any]] = []
     split_events = 0
@@ -303,13 +318,88 @@ def main() -> None:
     recovered_rows = 0
     final: dict[str, dict[str, Any]] = {}
     row_meta: dict[str, dict[str, Any]] = {}
+    sample_by_id = {cid(row): row for row in sample}
+
+    def emit(event: str, **fields: Any) -> None:
+        payload = {
+            "event": event,
+            "worker": worker_id,
+            "run_id": run_id,
+            "at_utc": now_utc(),
+            **fields,
+        }
+        print("QWEN_PROGRESS " + json.dumps(payload, ensure_ascii=False, separators=(",", ":")), flush=True)
+
+    def build_record(candidate: str) -> dict[str, Any] | None:
+        row = sample_by_id.get(candidate)
+        if row is None or candidate not in final:
+            return None
+        decoded = final[candidate]
+        meta = row_meta.get(candidate) or {
+            "parse_error": "missing_after_selfheal",
+            "effective_batch_size": 1,
+            "self_heal_depth": 0,
+            "recovered_after_split": False,
+        }
+        return {
+            "schema": SCHEMA,
+            "canonical_notice_id": candidate,
+            "input_material_fields_hash": material_hash(row),
+            "source_ledger_generation": args.source_ledger_generation,
+            "classifier_model": args.model,
+            "classifier_quant": "Q4_K_M",
+            "classifier_prompt_version": PROMPT_VERSION,
+            "classifier_version": CLASSIFIER_VERSION,
+            "initial_batch_size": args.batch_size,
+            "classified_at_utc": now_utc(),
+            **decoded,
+            **meta,
+            "notice": compact(row, args.description_chars),
+        }
+
+    def persist_progress(event: str, last_ids: list[str] | None = None) -> None:
+        resolved = [cid(row) for row in sample if cid(row) in final]
+        records = [r for candidate in resolved if (r := build_record(candidate)) is not None]
+        tmp = out_path.with_suffix(out_path.suffix + ".tmp")
+        with tmp.open("w", encoding="utf-8") as fh:
+            for record in records:
+                fh.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n")
+            fh.flush()
+            os.fsync(fh.fileno())
+        tmp.replace(out_path)
+        decisions = Counter(r["classification"] for r in records)
+        live = {
+            "schema": PROGRESS_SCHEMA,
+            "run_id": run_id,
+            "worker": worker_id,
+            "source_ledger_generation": args.source_ledger_generation,
+            "event": event,
+            "sample_total": len(sample),
+            "resolved": len(records),
+            "remaining": len(sample) - len(records),
+            "request_attempts": len(attempts),
+            "failed_attempts": sum(1 for x in attempts if x["status"] == "FAIL"),
+            "split_events": split_events,
+            "singleton_fallbacks": singleton_fallbacks,
+            "decision_counts": dict(sorted(decisions.items())),
+            "elapsed_seconds": round(time.monotonic() - started, 3),
+            "last_ids": list(last_ids or []),
+            "last_attempt": attempts[-1] if attempts else None,
+            "updated_at_utc": now_utc(),
+        }
+        atomic_json(progress_path, live)
+        emit("CHECKPOINT", resolved=live["resolved"], remaining=live["remaining"], attempts=live["request_attempts"], failures=live["failed_attempts"], splits=split_events, decisions=live["decision_counts"])
+
+    emit("START", sample_total=len(sample), batch_size=args.batch_size, timeout_seconds=args.timeout, max_runtime_seconds=args.max_runtime_seconds, startup_seconds=args.startup_seconds)
+    persist_progress("START")
 
     def run_batch(batch: list[dict[str, Any]], depth: int, initial_size: int) -> None:
         nonlocal split_events, singleton_fallbacks, recovered_rows
         expected = [cid(x) for x in batch]
         if not expected:
             return
-        if time.monotonic() - started >= args.max_runtime_seconds:
+        elapsed = time.monotonic() - started
+        if elapsed >= args.max_runtime_seconds:
             for row in batch:
                 candidate = cid(row)
                 final[candidate] = decode_item(None)
@@ -320,8 +410,12 @@ def main() -> None:
                     "recovered_after_split": depth > 0,
                 }
                 singleton_fallbacks += 1
+            emit("RUNTIME_FALLBACK", depth=depth, batch_size=len(batch), ids=expected, elapsed_seconds=round(elapsed, 3))
+            persist_progress("RUNTIME_FALLBACK", expected)
             return
 
+        attempt_no = len(attempts) + 1
+        emit("REQUEST", attempt=attempt_no, depth=depth, batch_size=len(batch), ids=expected)
         t0 = time.monotonic()
         err = None
         items = None
@@ -357,7 +451,7 @@ def main() -> None:
             err = f"request_error:{type(exc).__name__}"
 
         latency = round(time.monotonic() - t0, 3)
-        attempts.append({
+        attempt = {
             "requested_batch_size": len(batch),
             "depth": depth,
             "status": "PASS" if not err else "FAIL",
@@ -365,12 +459,16 @@ def main() -> None:
             "latency_seconds": latency,
             "usage": usage,
             "raw_chars": len(raw_text),
-        })
+        }
+        attempts.append(attempt)
+        emit("RESPONSE", attempt=len(attempts), depth=depth, batch_size=len(batch), status=attempt["status"], error=err, latency_seconds=latency, raw_chars=len(raw_text), usage=usage)
 
         if err:
             if len(batch) > 1:
                 split_events += 1
                 mid = len(batch) // 2
+                emit("SPLIT", attempt=len(attempts), depth=depth, batch_size=len(batch), left=mid, right=len(batch) - mid, reason=err, split_events=split_events)
+                persist_progress("SPLIT", expected)
                 run_batch(batch[:mid], depth + 1, initial_size)
                 run_batch(batch[mid:], depth + 1, initial_size)
                 return
@@ -383,9 +481,12 @@ def main() -> None:
                 "recovered_after_split": False,
             }
             singleton_fallbacks += 1
+            emit("SINGLETON_FALLBACK", candidate=candidate, depth=depth, error=err, singleton_fallbacks=singleton_fallbacks)
+            persist_progress("SINGLETON_FALLBACK", expected)
             return
 
         by_id = {str(x.get("i") or x.get("id") or "").strip(): x for x in items or []}
+        batch_decisions = []
         for row in batch:
             candidate = cid(row)
             decoded = decode_item(by_id[candidate])
@@ -400,38 +501,45 @@ def main() -> None:
                 "recovered_after_split": recovered,
                 "deterministic_guard_actions": guard_actions,
             }
+            batch_decisions.append({
+                "id": candidate,
+                "classification": decoded["classification"],
+                "lean": decoded["lean_attractiveness"],
+                "route": decoded["delivery_mode"],
+                "review": decoded["needs_gpt_review"],
+            })
+        emit("BATCH_OUTPUT", attempt=len(attempts), depth=depth, batch_size=len(batch), decisions=batch_decisions)
+        persist_progress("BATCH_OUTPUT", expected)
 
-    for start in range(0, len(sample), args.batch_size):
-        run_batch(sample[start:start + args.batch_size], 0, args.batch_size)
+    top_batches = (len(sample) + args.batch_size - 1) // args.batch_size
+    for batch_index, start in enumerate(range(0, len(sample), args.batch_size), start=1):
+        batch = sample[start:start + args.batch_size]
+        emit("TOP_BATCH_START", batch_index=batch_index, top_batches=top_batches, batch_size=len(batch), resolved=len(final))
+        run_batch(batch, 0, args.batch_size)
+        resolved = len(final)
+        notice_text = f"worker={worker_id} batch={batch_index}/{top_batches} resolved={resolved}/{len(sample)} attempts={len(attempts)} failures={sum(1 for x in attempts if x['status']=='FAIL')} splits={split_events}"
+        print(f"::notice title=Qwen live progress::{notice_text}", flush=True)
+        emit("TOP_BATCH_DONE", batch_index=batch_index, top_batches=top_batches, resolved=resolved, total=len(sample))
 
     records: list[dict[str, Any]] = []
     with out_path.open("w", encoding="utf-8") as fh:
         for row in sample:
             candidate = cid(row)
-            decoded = final.get(candidate) or decode_item(None)
-            meta = row_meta.get(candidate) or {
-                "parse_error": "missing_after_selfheal",
-                "effective_batch_size": 1,
-                "self_heal_depth": 0,
-                "recovered_after_split": False,
-            }
-            record = {
-                "schema": SCHEMA,
-                "canonical_notice_id": candidate,
-                "input_material_fields_hash": material_hash(row),
-                "source_ledger_generation": args.source_ledger_generation,
-                "classifier_model": args.model,
-                "classifier_quant": "Q4_K_M",
-                "classifier_prompt_version": PROMPT_VERSION,
-                "classifier_version": CLASSIFIER_VERSION,
-                "initial_batch_size": args.batch_size,
-                "classified_at_utc": now_utc(),
-                **decoded,
-                **meta,
-                "notice": compact(row, args.description_chars),
-            }
+            if candidate not in final:
+                final[candidate] = decode_item(None)
+                row_meta[candidate] = {
+                    "parse_error": "missing_after_selfheal",
+                    "effective_batch_size": 1,
+                    "self_heal_depth": 0,
+                    "recovered_after_split": False,
+                }
+            record = build_record(candidate)
+            if record is None:
+                continue
             records.append(record)
             fh.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n")
+        fh.flush()
+        os.fsync(fh.fileno())
 
     elapsed = time.monotonic() - started
     ids = [x["canonical_notice_id"] for x in records]
@@ -445,6 +553,8 @@ def main() -> None:
         "classifier_prompt_version": PROMPT_VERSION,
         "classifier_version": CLASSIFIER_VERSION,
         "source_ledger_generation": args.source_ledger_generation,
+        "worker": worker_id,
+        "run_id": run_id,
         "sample_requested": args.sample_size,
         "sample_completed": len(records),
         "unique_ids": len(set(ids)),
@@ -464,6 +574,14 @@ def main() -> None:
         "lean_attractiveness_counts": dict(sorted(lean_counts.items())),
         "row_conservation_pass": len(records) == len(sample) == len(set(ids)),
         "attempts": attempts,
+        "live_observability": {
+            "structured_stdout_per_request": True,
+            "batch_decisions_logged": True,
+            "incremental_raw_jsonl_checkpoint": str(out_path),
+            "incremental_progress_json": str(progress_path),
+            "atomic_checkpoint_rewrites": True,
+            "github_notice_per_top_batch": True,
+        },
         "data_safety": {
             "shadow_only": True,
             "drops_or_deletes_notices": False,
@@ -474,9 +592,27 @@ def main() -> None:
         "updated_at_utc": now_utc(),
     }
     summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    atomic_json(progress_path, {
+        "schema": PROGRESS_SCHEMA,
+        "run_id": run_id,
+        "worker": worker_id,
+        "source_ledger_generation": args.source_ledger_generation,
+        "event": "COMPLETE",
+        "sample_total": len(sample),
+        "resolved": len(records),
+        "remaining": 0,
+        "request_attempts": len(attempts),
+        "failed_attempts": summary["failed_attempts"],
+        "split_events": split_events,
+        "singleton_fallbacks": singleton_fallbacks,
+        "decision_counts": dict(sorted(decision_counts.items())),
+        "elapsed_seconds": round(elapsed, 3),
+        "updated_at_utc": now_utc(),
+    })
+    emit("COMPLETE", resolved=len(records), total=len(sample), elapsed_seconds=round(elapsed, 3), seconds_per_notice=summary["seconds_per_notice"], failures=summary["failed_attempts"], splits=split_events, singleton_fallbacks=singleton_fallbacks, decisions=summary["decision_counts"])
     if not summary["row_conservation_pass"]:
         raise SystemExit("row conservation failed")
-    print(json.dumps(summary, ensure_ascii=False, indent=2))
+    print(json.dumps(summary, ensure_ascii=False, indent=2), flush=True)
 
 
 if __name__ == "__main__":
