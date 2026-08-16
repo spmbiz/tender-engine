@@ -1,0 +1,33 @@
+name: Qwen Emergency Cancel Migration
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qwen-emergency-cancel-migration.yml'
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cancel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Cancel unsafe migration run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: '31925387845'
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api -X POST "repos/${REPO}/actions/runs/${RUN_ID}/cancel" >/dev/null || true
+          for i in $(seq 1 30); do
+            state="$(gh api "repos/${REPO}/actions/runs/${RUN_ID}" --jq '.status + "|" + (.conclusion // "")')"
+            echo "$state"
+            [[ "$state" == completed* ]] && exit 0
+            sleep 2
+          done
+          gh api -X POST "repos/${REPO}/actions/runs/${RUN_ID}/force-cancel" >/dev/null || true
