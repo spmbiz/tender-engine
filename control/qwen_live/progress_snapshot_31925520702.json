@@ -1,0 +1,327 @@
+{
+  "schema": "QWEN_LIVE_PROGRESS_MIRROR_V1",
+  "run_id": "31925520702",
+  "mirrored_at_utc": "2026-08-16T04:05:07.454520+00:00",
+  "workers_seen": 8,
+  "total_resolved": 61,
+  "total_sample": 1920,
+  "aggregate_decision_counts": {
+    "FIT": 54,
+    "MAYBE": 5,
+    "STRONG_FIT": 2
+  },
+  "workers": [
+    {
+      "schema": "QWEN_NOTICE_BATCH_LIVE_PROGRESS_V1",
+      "run_id": "31925520702",
+      "worker": "0",
+      "source_ledger_generation": "31923649637",
+      "event": "BATCH_OUTPUT",
+      "sample_total": 240,
+      "resolved": 8,
+      "remaining": 232,
+      "request_attempts": 11,
+      "failed_attempts": 5,
+      "split_events": 5,
+      "singleton_fallbacks": 0,
+      "decision_counts": {
+        "FIT": 7,
+        "STRONG_FIT": 1
+      },
+      "elapsed_seconds": 271.208,
+      "last_ids": [
+        "US-SAM:bf7388e9b0634caea04da53b0609e387"
+      ],
+      "last_attempt": {
+        "requested_batch_size": 1,
+        "depth": 3,
+        "status": "PASS",
+        "error": null,
+        "latency_seconds": 15.406,
+        "usage": {
+          "completion_tokens": 67,
+          "prompt_tokens": 462,
+          "total_tokens": 529,
+          "prompt_tokens_details": {
+            "cached_tokens": 253
+          }
+        },
+        "raw_chars": 98
+      },
+      "updated_at_utc": "2026-08-16T04:04:27+00:00"
+    },
+    {
+      "schema": "QWEN_NOTICE_BATCH_LIVE_PROGRESS_V1",
+      "run_id": "31925520702",
+      "worker": "1",
+      "source_ledger_generation": "31923649637",
+      "event": "BATCH_OUTPUT",
+      "sample_total": 240,
+      "resolved": 8,
+      "remaining": 232,
+      "request_attempts": 11,
+      "failed_attempts": 6,
+      "split_events": 5,
+      "singleton_fallbacks": 1,
+      "decision_counts": {
+        "FIT": 7,
+        "MAYBE": 1
+      },
+      "elapsed_seconds": 250.179,
+      "last_ids": [
+        "DE-DOE:25702966:1"
+      ],
+      "last_attempt": {
+        "requested_batch_size": 1,
+        "depth": 3,
+        "status": "PASS",
+        "error": null,
+        "latency_seconds": 8.7,
+        "usage": {
+          "completion_tokens": 50,
+          "prompt_tokens": 350,
+          "total_tokens": 400,
+          "prompt_tokens_details": {
+            "cached_tokens": 249
+          }
+        },
+        "raw_chars": 76
+      },
+      "updated_at_utc": "2026-08-16T04:04:17+00:00"
+    },
+    {
+      "schema": "QWEN_NOTICE_BATCH_LIVE_PROGRESS_V1",
+      "run_id": "31925520702",
+      "worker": "2",
+      "source_ledger_generation": "31923649637",
+      "event": "BATCH_OUTPUT",
+      "sample_total": 240,
+      "resolved": 7,
+      "remaining": 233,
+      "request_attempts": 10,
+      "failed_attempts": 5,
+      "split_events": 5,
+      "singleton_fallbacks": 0,
+      "decision_counts": {
+        "FIT": 6,
+        "MAYBE": 1
+      },
+      "elapsed_seconds": 283.074,
+      "last_ids": [
+        "US-SAM:accc2a3e392f4959858c85827c3d98ae"
+      ],
+      "last_attempt": {
+        "requested_batch_size": 1,
+        "depth": 3,
+        "status": "PASS",
+        "error": null,
+        "latency_seconds": 6.454,
+        "usage": {
+          "completion_tokens": 68,
+          "prompt_tokens": 397,
+          "total_tokens": 465,
+          "prompt_tokens_details": {
+            "cached_tokens": 391
+          }
+        },
+        "raw_chars": 98
+      },
+      "updated_at_utc": "2026-08-16T04:04:56+00:00"
+    },
+    {
+      "schema": "QWEN_NOTICE_BATCH_LIVE_PROGRESS_V1",
+      "run_id": "31925520702",
+      "worker": "3",
+      "source_ledger_generation": "31923649637",
+      "event": "BATCH_OUTPUT",
+      "sample_total": 240,
+      "resolved": 8,
+      "remaining": 232,
+      "request_attempts": 9,
+      "failed_attempts": 5,
+      "split_events": 4,
+      "singleton_fallbacks": 1,
+      "decision_counts": {
+        "FIT": 7,
+        "MAYBE": 1
+      },
+      "elapsed_seconds": 247.24,
+      "last_ids": [
+        "TED:552688-2026",
+        "DE-DOE:43530e77-ca7c-4c7c-bf32-4ac0b58586dd:01"
+      ],
+      "last_attempt": {
+        "requested_batch_size": 2,
+        "depth": 2,
+        "status": "PASS",
+        "error": null,
+        "latency_seconds": 29.517,
+        "usage": {
+          "completion_tokens": 112,
+          "prompt_tokens": 678,
+          "total_tokens": 790,
+          "prompt_tokens_details": {
+            "cached_tokens": 249
+          }
+        },
+        "raw_chars": 172
+      },
+      "updated_at_utc": "2026-08-16T04:04:15+00:00"
+    },
+    {
+      "schema": "QWEN_NOTICE_BATCH_LIVE_PROGRESS_V1",
+      "run_id": "31925520702",
+      "worker": "4",
+      "source_ledger_generation": "31923649637",
+      "event": "BATCH_OUTPUT",
+      "sample_total": 240,
+      "resolved": 8,
+      "remaining": 232,
+      "request_attempts": 11,
+      "failed_attempts": 5,
+      "split_events": 5,
+      "singleton_fallbacks": 0,
+      "decision_counts": {
+        "FIT": 8
+      },
+      "elapsed_seconds": 274.091,
+      "last_ids": [
+        "DK-UDBUD:c18c7772-28df-4487-84d7-a635c706924d:01"
+      ],
+      "last_attempt": {
+        "requested_batch_size": 1,
+        "depth": 3,
+        "status": "PASS",
+        "error": null,
+        "latency_seconds": 15.193,
+        "usage": {
+          "completion_tokens": 76,
+          "prompt_tokens": 445,
+          "total_tokens": 521,
+          "prompt_tokens_details": {
+            "cached_tokens": 249
+          }
+        },
+        "raw_chars": 107
+      },
+      "updated_at_utc": "2026-08-16T04:04:28+00:00"
+    },
+    {
+      "schema": "QWEN_NOTICE_BATCH_LIVE_PROGRESS_V1",
+      "run_id": "31925520702",
+      "worker": "5",
+      "source_ledger_generation": "31923649637",
+      "event": "BATCH_OUTPUT",
+      "sample_total": 240,
+      "resolved": 6,
+      "remaining": 234,
+      "request_attempts": 12,
+      "failed_attempts": 6,
+      "split_events": 6,
+      "singleton_fallbacks": 0,
+      "decision_counts": {
+        "FIT": 6
+      },
+      "elapsed_seconds": 279.867,
+      "last_ids": [
+        "US-SAM:b371b17c9d6644a597496039f3b3f081"
+      ],
+      "last_attempt": {
+        "requested_batch_size": 1,
+        "depth": 3,
+        "status": "PASS",
+        "error": null,
+        "latency_seconds": 15.331,
+        "usage": {
+          "completion_tokens": 70,
+          "prompt_tokens": 464,
+          "total_tokens": 534,
+          "prompt_tokens_details": {
+            "cached_tokens": 252
+          }
+        },
+        "raw_chars": 98
+      },
+      "updated_at_utc": "2026-08-16T04:04:46+00:00"
+    },
+    {
+      "schema": "QWEN_NOTICE_BATCH_LIVE_PROGRESS_V1",
+      "run_id": "31925520702",
+      "worker": "6",
+      "source_ledger_generation": "31923649637",
+      "event": "BATCH_OUTPUT",
+      "sample_total": 240,
+      "resolved": 8,
+      "remaining": 232,
+      "request_attempts": 13,
+      "failed_attempts": 6,
+      "split_events": 6,
+      "singleton_fallbacks": 0,
+      "decision_counts": {
+        "FIT": 7,
+        "MAYBE": 1
+      },
+      "elapsed_seconds": 286.63,
+      "last_ids": [
+        "US-SAM:57b24d739f7345468e942308036320d5"
+      ],
+      "last_attempt": {
+        "requested_batch_size": 1,
+        "depth": 3,
+        "status": "PASS",
+        "error": null,
+        "latency_seconds": 17.427,
+        "usage": {
+          "completion_tokens": 71,
+          "prompt_tokens": 506,
+          "total_tokens": 577,
+          "prompt_tokens_details": {
+            "cached_tokens": 253
+          }
+        },
+        "raw_chars": 98
+      },
+      "updated_at_utc": "2026-08-16T04:04:54+00:00"
+    },
+    {
+      "schema": "QWEN_NOTICE_BATCH_LIVE_PROGRESS_V1",
+      "run_id": "31925520702",
+      "worker": "7",
+      "source_ledger_generation": "31923649637",
+      "event": "BATCH_OUTPUT",
+      "sample_total": 240,
+      "resolved": 8,
+      "remaining": 232,
+      "request_attempts": 11,
+      "failed_attempts": 6,
+      "split_events": 5,
+      "singleton_fallbacks": 1,
+      "decision_counts": {
+        "FIT": 6,
+        "MAYBE": 1,
+        "STRONG_FIT": 1
+      },
+      "elapsed_seconds": 247.174,
+      "last_ids": [
+        "US-SAM:cd84c5c8e6ce48008adc1f8fddacb384"
+      ],
+      "last_attempt": {
+        "requested_batch_size": 1,
+        "depth": 3,
+        "status": "PASS",
+        "error": null,
+        "latency_seconds": 10.258,
+        "usage": {
+          "completion_tokens": 64,
+          "prompt_tokens": 368,
+          "total_tokens": 432,
+          "prompt_tokens_details": {
+            "cached_tokens": 253
+          }
+        },
+        "raw_chars": 98
+      },
+      "updated_at_utc": "2026-08-16T04:04:17+00:00"
+    }
+  ]
+}
