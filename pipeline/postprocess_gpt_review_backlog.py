@@ -23,7 +23,8 @@ FRICTION_RULES: tuple[tuple[re.Pattern[str], int, str], ...] = (
     (re.compile(r"\b(?:wosb|women[- ]owned small business)\b", re.I), -55, "us-wosb-set-aside"),
     (re.compile(r"\b(?:edwosb|economically disadvantaged women[- ]owned small business)\b", re.I), -55, "us-edwosb-set-aside"),
     (re.compile(r"\bhubzone\b", re.I), -55, "us-hubzone-set-aside"),
-    (re.compile(r"\b8\s*\(a\)\b", re.I), -55, "us-8a-set-aside"),
+    (re.compile(r"\b8\s*\(a\)(?:\s|$)", re.I), -65, "us-8a-set-aside"),
+    (re.compile(r"\b(?:direct|sole[- ]source)[^.]{0,140}\b8\s*\(a\)", re.I), -85, "us-direct-8a-award"),
     (re.compile(r"\b(?:100\s*%\s*)?(?:total\s+)?small business set[- ]aside\b", re.I), -45, "us-small-business-set-aside"),
     (re.compile(r"\b(?:all\s+)?(?:contractor\s+)?(?:personnel|employees|staff)(?:[^.]{0,100})?(?:shall|must|required to)\s+be\s+u\.?s\.?\s+citizens?\b", re.I), -90, "us-citizens-only"),
     (re.compile(r"\b(?:shall|must|required to)\s+be\s+u\.?s\.?\s+citizens?\b", re.I), -80, "us-citizens-only"),
@@ -33,6 +34,7 @@ FRICTION_RULES: tuple[tuple[re.Pattern[str], int, str], ...] = (
     (re.compile(r"\bsecurity clearance\b", re.I), -45, "security-clearance"),
     (re.compile(r"\bno award will be made\b", re.I), -70, "rfi-no-award"),
     (re.compile(r"\bnot (?:a|an) (?:request for proposal|solicitation)\b", re.I), -55, "not-an-award-solicitation"),
+    (re.compile(r"\bdoes not constitute (?:a|an) (?:request for proposals?|request for quotations?|invitation for bids?|solicitation)\b", re.I), -70, "market-research-not-solicitation"),
     (re.compile(r"\bsources sought\b", re.I), -45, "sources-sought"),
     (re.compile(r"\bmarket research(?: purposes)? only\b", re.I), -45, "market-research-only"),
     (re.compile(r"\blive,?\s+open\s+surgery\b", re.I), -55, "specialist-live-surgery-production"),
@@ -95,6 +97,26 @@ def band(score: int) -> str:
     return "LOW"
 
 
+def apply_deadline_attention(row: dict[str, Any], score: int, blockers: list[str], applied: set[str]) -> int:
+    """Unresolved dates stay reviewable, but cannot outrank a current, reconciled DCE."""
+    if bool(row.get("deadline_resolved")):
+        return score
+    status = str(row.get("deadline_authority_status") or "").upper()
+    if "CONFLICT" in status:
+        if "deadline-conflict" not in applied:
+            score -= 25
+            blockers.append("deadline-conflict")
+            applied.add("deadline-conflict")
+        return min(score, 39)  # MAYBE until authority is reconciled.
+    if "UNKNOWN" in status or not status:
+        if "deadline-unresolved" not in applied:
+            score -= 10
+            blockers.append("deadline-unresolved")
+            applied.add("deadline-unresolved")
+        return min(score, 59)  # Can remain GOOD, never HOT.
+    return min(score, 59)
+
+
 def harden_row(row: dict[str, Any]) -> dict[str, Any] | None:
     row = dict(row)
     relevance = row.get("candidate_document_relevance")
@@ -115,10 +137,11 @@ def harden_row(row: dict[str, Any]) -> dict[str, Any] | None:
             score += penalty
             blockers.append(label)
             applied.add(label)
+    score = apply_deadline_attention(row, score, blockers, applied)
     score = max(-100, min(100, score))
     row["spm_post_dce_score"] = score
     row["spm_fit_band"] = band(score)
-    row["spm_friction_signals"] = blockers[:16]
+    row["spm_friction_signals"] = blockers[:20]
     return row
 
 
@@ -142,7 +165,7 @@ def main() -> None:
             hardened.append(cooked)
 
     items = portfolio_select(hardened, args.max_items, args.max_portal_share)
-    payload["schema"] = "GPT_REVIEW_BACKLOG_V2"
+    payload["schema"] = "GPT_REVIEW_BACKLOG_V3"
     payload["count"] = len(items)
     payload["items"] = items
     payload["portal_counts"] = dict(Counter(str(x.get("portal") or "UNKNOWN") for x in items))
@@ -151,7 +174,7 @@ def main() -> None:
     payload["backfill_relevance_unproven_removed"] = dropped_unproven
     payload["attention_policy"] = (
         "Recall-first discovery is unchanged. This compact review index only reorders authoritative DCEs; "
-        "explicit prime-ineligibility/security/onsite frictions are down-ranked, not deleted from durable storage."
+        "explicit prime-ineligibility/security/onsite/non-solicitation frictions and unresolved deadline authority are down-ranked, not deleted from durable storage."
     )
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({
