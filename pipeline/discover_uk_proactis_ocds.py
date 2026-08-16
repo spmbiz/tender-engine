@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -55,23 +56,24 @@ def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
             fh.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
-def fetch_pkg(
-    session: requests.Session, url: str, params: dict[str, Any], allow_incomplete_tls: bool
-) -> tuple[dict[str, Any], bool]:
+def fetch_pkg(url: str, params: dict[str, Any], allow_incomplete_tls: bool) -> tuple[dict[str, Any], bool, float]:
+    session = requests.Session()
+    session.headers.update({"User-Agent": UA, "Accept": "application/json"})
     last = None
+    started = time.monotonic()
     for attempt in range(4):
         try:
             r = session.get(url, params=params, timeout=60, verify=True)
             r.raise_for_status()
             data = r.json()
-            return data if isinstance(data, dict) else {}, False
+            return (data if isinstance(data, dict) else {}), False, time.monotonic() - started
         except requests.exceptions.SSLError as exc:
             last = exc
             if allow_incomplete_tls:
                 r = session.get(url, params=params, timeout=60, verify=False)
                 r.raise_for_status()
                 data = r.json()
-                return data if isinstance(data, dict) else {}, True
+                return (data if isinstance(data, dict) else {}), True, time.monotonic() - started
         except Exception as exc:
             last = exc
         if attempt < 3:
@@ -84,68 +86,87 @@ def main() -> None:
     ap.add_argument("--source", choices=sorted(SOURCES), default=os.getenv("PROACTIS_SOURCE", "UK_PCS_OCDS"))
     ap.add_argument("--output", type=Path)
     ap.add_argument("--months", type=int, default=int(os.getenv("PROACTIS_MONTHS", "2")))
+    ap.add_argument("--workers", type=int, default=int(os.getenv("PROACTIS_WORKERS", "8")))
     args = ap.parse_args()
     cfg = SOURCES[args.source]
     out = args.output or Path(os.getenv("DISCOVERY_OUT", f"discovery/global/{args.source}"))
     out.mkdir(parents=True, exist_ok=True)
     now = datetime.now(timezone.utc)
-    session = requests.Session()
-    session.headers.update({"User-Agent": UA, "Accept": "application/json"})
     allow_incomplete_tls = os.getenv("PROACTIS_ALLOW_INCOMPLETE_TLS", "0") == "1"
     candidates: dict[str, dict[str, Any]] = {}
     awards: list[dict[str, Any]] = []
     pre: list[dict[str, Any]] = []
-    telemetry = []
-    errors = []
+    telemetry: list[dict[str, Any]] = []
+    errors: list[dict[str, Any]] = []
     tls_fallbacks = 0
 
     notice_types = cfg["contract_types"] + cfg["award_types"] + cfg["pre_types"]
+    tasks: list[tuple[str, int, dict[str, Any]]] = []
     for year, month in month_pairs(args.months, now):
         date_from = f"{month:02d}-{year}"
         for notice_type in notice_types:
             params: dict[str, Any] = {"dateFrom": date_from, "noticeType": notice_type, "outputType": 0}
             if cfg.get("locale"):
                 params["locale"] = cfg["locale"]
+            tasks.append((date_from, notice_type, params))
+
+    fetched: list[tuple[str, int, dict[str, Any], bool, float]] = []
+    workers = max(1, min(args.workers, len(tasks) or 1, 12))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = {
+            pool.submit(fetch_pkg, cfg["base"] + "/Notices", params, allow_incomplete_tls): (date_from, notice_type)
+            for date_from, notice_type, params in tasks
+        }
+        for future in as_completed(futures):
+            date_from, notice_type = futures[future]
             try:
-                pkg, tls_fallback = fetch_pkg(session, cfg["base"] + "/Notices", params, allow_incomplete_tls)
-                tls_fallbacks += int(tls_fallback)
+                pkg, tls_fallback, elapsed = future.result()
+                fetched.append((date_from, notice_type, pkg, tls_fallback, elapsed))
             except Exception as exc:
                 errors.append({"month": date_from, "notice_type": notice_type, "error": repr(exc)})
+
+    for date_from, notice_type, pkg, tls_fallback, elapsed in sorted(fetched, key=lambda x: (x[0], x[1])):
+        tls_fallbacks += int(tls_fallback)
+        releases = pkg.get("releases") or []
+        if not isinstance(releases, list):
+            releases = []
+        telemetry.append({
+            "month": date_from,
+            "notice_type": notice_type,
+            "releases": len(releases),
+            "tls_fallback": tls_fallback,
+            "elapsed_seconds": round(elapsed, 3),
+        })
+        for release in releases:
+            if not isinstance(release, dict):
                 continue
-            releases = pkg.get("releases") or []
-            if not isinstance(releases, list):
-                releases = []
-            telemetry.append({"month": date_from, "notice_type": notice_type, "releases": len(releases), "tls_fallback": tls_fallback})
-            for release in releases:
-                if not isinstance(release, dict):
-                    continue
-                ocid = str(release.get("ocid") or "").strip()
-                public_url = f"{cfg['base']}/Notice?id={ocid}"
-                if cfg.get("locale"):
-                    public_url += f"&locale={cfg['locale']}"
-                if notice_type in cfg["contract_types"]:
-                    cand = release_to_candidate(release, source=args.source, portal=cfg["portal"], notice_url=public_url, now=now)
-                    if cand:
-                        candidates[cand["candidate_id"]] = cand
-                elif notice_type in cfg["award_types"]:
-                    found = release_awards(release, source=args.source, portal=cfg["portal"], notice_url=public_url)
-                    if found:
-                        awards.extend(found)
-                    else:
-                        awards.append({
-                            "grain": "AWARD_NOTICE",
-                            "source": args.source,
-                            "portal": cfg["portal"],
-                            "ocid": ocid or None,
-                            "notice_url": public_url,
-                            "supplier_resolution_status": "PENDING_RELEASE_DETAIL",
-                        })
+            ocid = str(release.get("ocid") or "").strip()
+            public_url = f"{cfg['base']}/Notice?id={ocid}"
+            if cfg.get("locale"):
+                public_url += f"&locale={cfg['locale']}"
+            if notice_type in cfg["contract_types"]:
+                cand = release_to_candidate(release, source=args.source, portal=cfg["portal"], notice_url=public_url, now=now)
+                if cand:
+                    candidates[cand["candidate_id"]] = cand
+            elif notice_type in cfg["award_types"]:
+                found = release_awards(release, source=args.source, portal=cfg["portal"], notice_url=public_url)
+                if found:
+                    awards.extend(found)
                 else:
-                    cand = release_to_candidate(release, source=args.source, portal=cfg["portal"], notice_url=public_url, now=now)
-                    if cand:
-                        cand["grain"] = "PRE_TENDER_RADAR"
-                        cand["current"] = True
-                        pre.append(cand)
+                    awards.append({
+                        "grain": "AWARD_NOTICE",
+                        "source": args.source,
+                        "portal": cfg["portal"],
+                        "ocid": ocid or None,
+                        "notice_url": public_url,
+                        "supplier_resolution_status": "PENDING_RELEASE_DETAIL",
+                    })
+            else:
+                cand = release_to_candidate(release, source=args.source, portal=cfg["portal"], notice_url=public_url, now=now)
+                if cand:
+                    cand["grain"] = "PRE_TENDER_RADAR"
+                    cand["current"] = True
+                    pre.append(cand)
 
     raw = sorted(candidates.values(), key=lambda x: (x.get("deadline") or "9999", x["candidate_id"]))
     current = [x for x in raw if x.get("current")]
@@ -163,8 +184,11 @@ def main() -> None:
         "pre_tender_materialized": len(pre),
         "document_routes": sum(bool((x.get("route") or {}).get("document_urls")) for x in raw),
         "months": args.months,
+        "workers": workers,
+        "requests_planned": len(tasks),
+        "requests_succeeded": len(fetched),
         "generated_at": now.isoformat(),
-        "errors": errors,
+        "errors": sorted(errors, key=lambda x: (x.get("month", ""), x.get("notice_type", 0))),
         "telemetry": telemetry,
         "tls_fallbacks": tls_fallbacks,
         "incomplete_tls_fallback_allowed": allow_incomplete_tls,
