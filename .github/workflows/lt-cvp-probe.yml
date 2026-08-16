@@ -1,9 +1,11 @@
-name: Lithuania CVP IS Probe
+name: Lithuania CVP IS CI
 
 on:
   pull_request:
     paths:
       - 'pipeline/probe_lt_cvp_api.py'
+      - 'pipeline/discover_lt_cvp_api.py'
+      - 'tests/test_lt_cvp_api.py'
       - '.github/workflows/lt-cvp-probe.yml'
   workflow_dispatch:
 
@@ -11,18 +13,39 @@ permissions:
   contents: read
 
 concurrency:
-  group: lt-cvp-probe-${{ github.event.pull_request.number || github.ref }}
+  group: lt-cvp-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  live-schema:
+  contract:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests brotli pytest
+      - run: python -m py_compile pipeline/probe_lt_cvp_api.py pipeline/discover_lt_cvp_api.py
+      - run: python -m pytest -q tests/test_lt_cvp_api.py
+
+  live-discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests brotli
-      - run: python -m py_compile pipeline/probe_lt_cvp_api.py
-      - name: Probe VPT public procurement export API
-        run: python pipeline/probe_lt_cvp_api.py
+      - name: Validate VPT public API and conservative currentness
+        run: |
+          python pipeline/discover_lt_cvp_api.py --output /tmp/lt --page-size 250 --max-pages 8
+          python - <<'PY'
+          import json
+          s=json.load(open('/tmp/lt/stats.json'))
+          assert not s['errors'], s
+          assert s['raw_materialized'] > 0, s
+          # Promotion into the live fleet requires actual future-deadline records,
+          # not merely a reachable archive/API.
+          assert s['current_materialized'] > 0, s
+          print(json.dumps(s,indent=2))
+          PY
