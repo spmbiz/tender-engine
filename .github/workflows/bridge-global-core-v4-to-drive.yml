@@ -1,0 +1,44 @@
+name: Bridge Global Core v4 to Drive
+
+on:
+  push:
+    paths:
+      - '.github/workflows/bridge-global-core-v4-to-drive.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bridge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Download canonical historical release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p bundle
+          gh release download tender-normalized-global-core-v4 \
+            --repo walidgdg1-ai/coldemailtool \
+            --dir bundle
+          ls -lah bundle
+
+      - name: Add bridge provenance
+        run: |
+          cat > bundle/DRIVE_BRIDGE_PROVENANCE.txt <<'EOF'
+          Source repository: walidgdg1-ai/coldemailtool
+          Source release: tender-normalized-global-core-v4
+          Destination purpose: Google Drive mirror of canonical historical tender warehouse
+          Transfer semantics: byte-preserving GitHub Release -> GitHub Actions Artifact -> Google Drive
+          EOF
+
+      - name: Upload byte-preserving bridge artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tender-normalized-global-core-v4-drive-bridge
+          path: bundle/*
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
