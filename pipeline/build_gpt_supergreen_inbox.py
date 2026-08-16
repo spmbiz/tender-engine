@@ -29,6 +29,26 @@ def open_deadline(r):
     try:return date.fromisoformat(v[:10])>=datetime.now(timezone.utc).date()
     except Exception:return True
 
+def normalize_for_inbox(r):
+    if not isinstance(r,dict): return r
+    x=dict(r)
+    # High recall after DCE: an authoritative, gate-ready, native SPM scope must
+    # not disappear merely because the small local model answered INSUFFICIENT.
+    # Route it to secondary GPT review, never to FINAL_REVIEW_NOW, and never
+    # promote its final eligibility automatically.
+    if (
+        str(x.get('qwen_dce_classification') or '')=='QWEN_DCE_INSUFFICIENT'
+        and bool(x.get('native_spm_core'))
+        and not bool(x.get('obvious_noncore_scope'))
+        and bool(x.get('gate_readiness'))
+        and int(x.get('evidence_gate_coverage') or 0)>=5
+        and str(x.get('recommended_gpt_action') or '') not in {'DROP_EXPIRED','DROP_OR_PARTNER'}
+    ):
+        x['recommended_gpt_action']='REVIEW_IF_CAPACITY'
+        x['gpt_priority_score']=max(50,int(x.get('gpt_priority_score') or 0))
+        x['inbox_recall_override']='NATIVE_SPM_GATE_READY_QWEN_INCONCLUSIVE'
+    return x
+
 def rank(r):
     action={'FINAL_REVIEW_NOW':4,'REVIEW_IF_CAPACITY':3,'NEED_MORE_DCE':2,'DROP_OR_PARTNER':1,'DROP_EXPIRED':0}.get(str(r.get('recommended_gpt_action')),0)
     return (action,int(r.get('gpt_priority_score') or 0),int(bool(r.get('gate_readiness'))),int(r.get('evidence_gate_coverage') or 0),str(r.get('candidate_id') or ''))
@@ -47,9 +67,11 @@ def main():
     final=load_json(Path(args.final_bank)) if args.final_bank else {}
     resolved={key(x) for x in final.get('items',[]) if isinstance(x,dict) and key(x)}
     merged={}
-    for r in existing.get('pending_final_review',[]) or []:
+    for raw in existing.get('pending_final_review',[]) or []:
+        r=normalize_for_inbox(raw)
         if user_inbox_eligible(r) and key(r) not in resolved: merged[key(r)]=r
-    for r in load_jsonl(args.triage):
+    for raw in load_jsonl(args.triage):
+        r=normalize_for_inbox(raw)
         if key(r) in resolved or not user_inbox_eligible(r): continue
         cur=merged.get(key(r))
         if cur is None or rank(r)>=rank(cur): merged[key(r)]=r
@@ -57,11 +79,11 @@ def main():
     confirmed=[x for x in (final.get('items') or []) if isinstance(x,dict) and open_deadline(x) and str(x.get('classification') or '') in {'FINAL_SUPER_GREEN','GREEN','YELLOW','RED'}]
     confirmed.sort(key=lambda r:(str(r.get('classification') or '')=='FINAL_SUPER_GREEN',int(r.get('final_score') or 0)),reverse=True)
     payload={
-      'schema':'GPT_INSTANT_SUPERGREEN_INBOX_V2','updated_at':datetime.now(timezone.utc).isoformat(),'latest_source_dce_run_id':int(args.source_run) if str(args.source_run).isdigit() else args.source_run,
+      'schema':'GPT_INSTANT_SUPERGREEN_INBOX_V3','updated_at':datetime.now(timezone.utc).isoformat(),'latest_source_dce_run_id':int(args.source_run) if str(args.source_run).isdigit() else args.source_run,
       'confirmed_supergreens':confirmed,'pending_final_review':pending,
-      'counts':{'confirmed_supergreens':sum(str(x.get('classification'))=='FINAL_SUPER_GREEN' for x in confirmed),'confirmed_green_total':sum(str(x.get('classification')) in {'FINAL_SUPER_GREEN','GREEN'} for x in confirmed),'resolved_total':len(confirmed),'pending_final_review':len(pending),'review_now':sum(x.get('recommended_gpt_action')=='FINAL_REVIEW_NOW' for x in pending)},
-      'answer_contract':'When the user asks what supergreens exist, read this file first. Report live FINAL_SUPER_GREEN/GREEN verdicts immediately. Then adjudicate pending_final_review rows marked FINAL_REVIEW_NOW from evidence_by_gate. This user-facing inbox intentionally excludes non-core and insufficient Qwen rows. Qwen is pre-read only; missing evidence is UNKNOWN.',
-      'finality_rule':'Only GPT Web final adjudication from authoritative DCE evidence may create FINAL_SUPER_GREEN. Qwen never does.',
+      'counts':{'confirmed_supergreens':sum(str(x.get('classification'))=='FINAL_SUPER_GREEN' for x in confirmed),'confirmed_green_total':sum(str(x.get('classification')) in {'FINAL_SUPER_GREEN','GREEN'} for x in confirmed),'resolved_total':len(confirmed),'pending_final_review':len(pending),'review_now':sum(x.get('recommended_gpt_action')=='FINAL_REVIEW_NOW' for x in pending),'recall_overrides':sum(bool(x.get('inbox_recall_override')) for x in pending)},
+      'answer_contract':'When the user asks what supergreens exist, read this file first. Report live FINAL_SUPER_GREEN/GREEN verdicts immediately. Then adjudicate FINAL_REVIEW_NOW. If capacity allows, review SPM-core gate-ready rows retained by the recall override when Qwen was inconclusive. This user-facing inbox excludes obvious non-core and evidence-empty rows. Qwen is pre-read only; missing evidence is UNKNOWN.',
+      'finality_rule':'Only GPT Web final adjudication from authoritative DCE evidence may create FINAL_SUPER_GREEN. Qwen and recall overrides never do.',
     }
     Path(args.out).parent.mkdir(parents=True,exist_ok=True);Path(args.out).write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(payload['counts'],indent=2))
