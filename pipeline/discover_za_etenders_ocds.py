@@ -10,7 +10,10 @@ from typing import Any
 
 import requests
 
-from pipeline.ocds_release_normalizer import release_awards, release_to_candidate
+try:
+    from pipeline.ocds_release_normalizer import release_awards, release_to_candidate
+except ModuleNotFoundError:  # direct `python pipeline/foo.py` execution
+    from ocds_release_normalizer import release_awards, release_to_candidate
 
 BASE = "https://ocds-api.etenders.gov.za/api/OCDSReleases"
 UA = "Tender-Engine/5.5 (+public procurement research; South Africa National Treasury OCDS)"
@@ -82,8 +85,6 @@ def main() -> None:
             if not isinstance(release, dict):
                 continue
             ocid = str(release.get("ocid") or "").strip()
-            # Official Swagger documents this route. Keep the authoritative API
-            # release URL rather than guessing a website/UI route from the OCID.
             notice_url = f"{BASE}/release/{ocid}" if ocid else None
             cand = release_to_candidate(
                 release,
