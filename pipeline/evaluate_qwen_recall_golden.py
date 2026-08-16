@@ -24,7 +24,6 @@ def load_jsonl(path: Path) -> dict[str, dict[str, Any]]:
 
 
 def normalized_fields(row: dict[str, Any]) -> tuple[str, str]:
-    # Supports both per-notice guarded schema and the newer batch lean-axis schema.
     classification = str(row.get("classification") or row.get("decision") or "").upper()
     mode = str(row.get("delivery_mode") or row.get("possible_delivery_route") or "").upper()
     return classification, mode
@@ -50,6 +49,9 @@ def evaluate(golden: dict[str, Any], rows: dict[str, dict[str, Any]]) -> dict[st
             continue
 
         classification, mode = normalized_fields(row)
+        lean = str(row.get("lean_attractiveness") or "UNKNOWN").upper()
+        friction = [str(x).upper() for x in (row.get("friction_flags") or [])]
+
         if expected.get("must_not_reject"):
             positive_total += 1
             ok = classification != "REJECT_OBVIOUS"
@@ -85,6 +87,17 @@ def evaluate(golden: dict[str, Any], rows: dict[str, dict[str, Any]]) -> dict[st
             case_warnings.append(item)
             if not ok:
                 warnings.append(f"preferred_mode_mismatch:{cid}:{mode}")
+        if "allowed_lean" in expected:
+            allowed_lean = [str(x) for x in expected["allowed_lean"]]
+            ok = lean in allowed_lean
+            checks.append({"check": "allowed_lean", "expected": allowed_lean, "actual": lean, "passed": ok})
+            passed &= ok
+        if "required_friction_any" in expected:
+            required = [str(x) for x in expected["required_friction_any"]]
+            hits = sorted(set(required) & set(friction))
+            ok = bool(hits)
+            checks.append({"check": "required_friction_any", "expected": required, "actual": friction, "hits": hits, "passed": ok})
+            passed &= ok
 
         if not passed:
             failures.append(f"policy_failure:{cid}")
@@ -93,8 +106,8 @@ def evaluate(golden: dict[str, Any], rows: dict[str, dict[str, Any]]) -> dict[st
             "label": case.get("label"),
             "classification": classification,
             "delivery_mode": mode,
-            "lean_attractiveness": row.get("lean_attractiveness"),
-            "friction_flags": row.get("friction_flags"),
+            "lean_attractiveness": lean,
+            "friction_flags": friction,
             "model_classification": row.get("model_classification"),
             "model_delivery_mode": row.get("model_delivery_mode"),
             "passed": bool(passed),
@@ -104,7 +117,7 @@ def evaluate(golden: dict[str, Any], rows: dict[str, dict[str, Any]]) -> dict[st
 
     recall = positive_retained / positive_total if positive_total else None
     return {
-        "schema": "QWEN_RECALL_GOLDEN_REPORT_V2",
+        "schema": "QWEN_RECALL_GOLDEN_REPORT_V3",
         "golden_schema": golden.get("schema"),
         "case_count": len(golden.get("cases", [])),
         "cases_passed": sum(1 for c in cases_out if c["passed"]),
