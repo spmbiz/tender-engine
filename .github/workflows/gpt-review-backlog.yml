@@ -129,6 +129,17 @@ jobs:
           test -s control/gpt_review_backlog.json
           cat backlog-inputs/build-summary.json >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Re-prove legacy DCE relevance and down-rank explicit prime blockers
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/postprocess_gpt_review_backlog.py \
+            --path control/gpt_review_backlog.json \
+            --max-items 120 \
+            --max-portal-share 0.40 \
+            | tee backlog-inputs/postprocess-summary.json
+          cat backlog-inputs/postprocess-summary.json >> "$GITHUB_STEP_SUMMARY"
+
       - name: Persist reservoir with concurrent-writer retry
         shell: bash
         run: |
