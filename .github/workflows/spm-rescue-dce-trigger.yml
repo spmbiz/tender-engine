@@ -1,0 +1,36 @@
+name: SPM Rescue DCE Trigger
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'queues/spm_rescue_selection_latest.jsonl'
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: spm-rescue-dce-trigger
+  cancel-in-progress: true
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch focused API-free DCE fanout
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run 'DCE Fanout V2' \
+            --repo '${{ github.repository }}' \
+            -f selection_path='queues/spm_rescue_selection_latest.jsonl' \
+            -f source_discovery_run='31923649637' \
+            -f max_jobs='20' \
+            -f max_parallel='8' \
+            -f max_shards='40' \
+            -f jobs_per_shard='0'
+          echo 'Focused SPM DCE run dispatched; GitHub adjudication remains API-free and GPT Web handoff will consume gate-ready evidence.'
