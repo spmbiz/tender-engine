@@ -1,6 +1,6 @@
 {
-  "schema": "GPT_INSTANT_SUPERGREEN_INBOX_V2",
-  "updated_at": "2026-08-16T15:40:45.820040+00:00",
+  "schema": "GPT_INSTANT_SUPERGREEN_INBOX_V3",
+  "updated_at": "2026-08-16T15:42:07.741426+00:00",
   "latest_source_dce_run_id": 31955485422,
   "confirmed_supergreens": [
     {
@@ -126,8 +126,9 @@
     "confirmed_green_total": 1,
     "resolved_total": 3,
     "pending_final_review": 0,
-    "review_now": 0
+    "review_now": 0,
+    "recall_overrides": 0
   },
-  "answer_contract": "When the user asks what supergreens exist, read this file first. Report live FINAL_SUPER_GREEN/GREEN verdicts immediately. Then adjudicate pending_final_review rows marked FINAL_REVIEW_NOW from evidence_by_gate. This user-facing inbox intentionally excludes non-core and insufficient Qwen rows. Qwen is pre-read only; missing evidence is UNKNOWN.",
-  "finality_rule": "Only GPT Web final adjudication from authoritative DCE evidence may create FINAL_SUPER_GREEN. Qwen never does."
+  "answer_contract": "When the user asks what supergreens exist, read this file first. Report live FINAL_SUPER_GREEN/GREEN verdicts immediately. Then adjudicate FINAL_REVIEW_NOW. If capacity allows, review SPM-core gate-ready rows retained by the recall override when Qwen was inconclusive. This user-facing inbox excludes obvious non-core and evidence-empty rows. Qwen is pre-read only; missing evidence is UNKNOWN.",
+  "finality_rule": "Only GPT Web final adjudication from authoritative DCE evidence may create FINAL_SUPER_GREEN. Qwen and recall overrides never do."
 }
