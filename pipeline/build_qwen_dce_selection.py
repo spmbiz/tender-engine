@@ -49,6 +49,16 @@ def read_jsonl(path: Path | None) -> list[dict[str, Any]]:
     return out
 
 
+def read_json(path: Path | None) -> dict[str, Any]:
+    if not path or not path.exists() or path.stat().st_size == 0:
+        return {}
+    try:
+        obj = json.loads(path.read_text(encoding='utf-8'))
+        return obj if isinstance(obj, dict) else {}
+    except Exception:
+        return {}
+
+
 def cid(row: dict[str, Any]) -> str:
     n = row.get('notice') if isinstance(row.get('notice'), dict) else {}
     return str(row.get('canonical_notice_id') or row.get('candidate_id') or n.get('candidate_id') or '').strip()
@@ -64,13 +74,8 @@ def parse_deadline(v: Any):
         return None
 
 
-def blocked_ids(path: Path | None) -> set[str]:
-    if not path or not path.exists():
-        return set()
-    try:
-        state = json.loads(path.read_text(encoding='utf-8'))
-    except Exception:
-        return set()
+def controller_blocked_ids(path: Path | None) -> set[str]:
+    state = read_json(path)
     out = {str(x).strip() for x in state.get('processed_candidate_ids', []) if str(x).strip()}
     pending = state.get('pending_dce_batch')
     if isinstance(pending, dict):
@@ -79,6 +84,25 @@ def blocked_ids(path: Path | None) -> set[str]:
     if isinstance(cooldown, dict):
         out.update(str(x).strip() for x in cooldown if str(x).strip())
     return out
+
+
+def reviewed_ids(path: Path | None) -> set[str]:
+    data = read_json(path)
+    items = data.get('items') if isinstance(data.get('items'), list) else []
+    return {cid(x) for x in items if isinstance(x, dict) and cid(x)}
+
+
+def dispatch_cooldown_ids(path: Path | None, now: datetime) -> set[str]:
+    data = read_json(path)
+    records = data.get('records') if isinstance(data.get('records'), dict) else {}
+    blocked: set[str] = set()
+    for candidate, rec in records.items():
+        if not isinstance(rec, dict):
+            continue
+        retry_after = parse_deadline(rec.get('retry_after_utc'))
+        if retry_after is not None and retry_after > now:
+            blocked.add(str(candidate).strip())
+    return blocked
 
 
 def semantic_score(row: dict[str, Any]) -> tuple[int, list[str]]:
@@ -111,6 +135,8 @@ def main() -> None:
     ap.add_argument('--ledger', required=True)
     ap.add_argument('--snapshot', required=True)
     ap.add_argument('--blocked-state')
+    ap.add_argument('--review-backlog')
+    ap.add_argument('--dispatch-state')
     ap.add_argument('--out', required=True)
     ap.add_argument('--summary', required=True)
     ap.add_argument('--source-run', required=True)
@@ -122,8 +148,11 @@ def main() -> None:
     ledger = {cid(x): x for x in read_jsonl(Path(args.ledger)) if cid(x)}
     snapshot = {cid(x): x for x in read_jsonl(Path(args.snapshot)) if cid(x)}
     state_rows = read_jsonl(Path(args.state))
-    blocked = blocked_ids(Path(args.blocked_state)) if args.blocked_state else set()
     now = datetime.now(timezone.utc)
+    blocked_controller = controller_blocked_ids(Path(args.blocked_state)) if args.blocked_state else set()
+    blocked_reviewed = reviewed_ids(Path(args.review_backlog)) if args.review_backlog else set()
+    blocked_dispatch = dispatch_cooldown_ids(Path(args.dispatch_state), now) if args.dispatch_state else set()
+    blocked = blocked_controller | blocked_reviewed | blocked_dispatch
 
     valid = []
     stale = 0
@@ -212,6 +241,9 @@ def main() -> None:
         'ledger_rows': len(ledger),
         'snapshot_rows': len(snapshot),
         'blocked_ids': len(blocked),
+        'blocked_controller_ids': len(blocked_controller),
+        'blocked_already_reviewed_ids': len(blocked_reviewed),
+        'blocked_qwen_dispatch_cooldown_ids': len(blocked_dispatch),
         'valid_exact_hash_current': len(valid),
         'stale_hash_ignored': stale,
         'missing_snapshot': missing_snapshot,
@@ -224,6 +256,8 @@ def main() -> None:
             'qwen_is_notice_ranking_only': True,
             'dce_is_authoritative': True,
             'rejects_are_not_deleted': True,
+            'already_reviewed_dce_is_not_requeued': True,
+            'dispatch_cooldown_prevents_duplicate_inflight_work': True,
             'deterministic_reject_audit_share': args.reject_audit_share,
             'open_world_explore_share': args.explore_share,
             'exact_material_hash_required': True,
