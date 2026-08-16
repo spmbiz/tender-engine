@@ -4,6 +4,13 @@ on:
   workflow_run:
     workflows: ['DCE Fanout V2']
     types: [completed]
+  # Bootstrap only when this workflow itself is changed. This lets a newly-added
+  # progress ledger catch the latest successful DCE run once; normal operation is
+  # workflow_run-driven and ledger commits do not retrigger this path.
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dce-progress-ledger.yml'
 
 permissions:
   contents: write
@@ -15,7 +22,7 @@ concurrency:
 
 jobs:
   persist-and-continue:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -31,11 +38,16 @@ jobs:
         id: recover
         env:
           GH_TOKEN: ${{ github.token }}
-          DCE_RUN_ID: ${{ github.event.workflow_run.id }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_DCE_RUN_ID: ${{ github.event.workflow_run.id }}
         shell: bash
         run: |
           set -euo pipefail
-          rid="$DCE_RUN_ID"
+          rid="${EVENT_DCE_RUN_ID:-}"
+          if [ "$EVENT_NAME" = 'push' ] || ! [[ "$rid" =~ ^[0-9]+$ ]]; then
+            rid="$(gh run list --workflow dce-fanout-v2.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
+          fi
+          [[ "$rid" =~ ^[0-9]+$ ]] || { echo 'No successful DCE run available for progress bootstrap.' >&2; exit 1; }
           tag="dce-harvest-$rid"
           asset="dce-candidate-queue-$rid.jsonl"
           mkdir -p recovered
@@ -54,6 +66,7 @@ jobs:
           print(out)
           PY
           )"
+          echo "dce_run_id=$rid" >> "$GITHUB_OUTPUT"
           echo "queue=recovered/$asset" >> "$GITHUB_OUTPUT"
           echo "source_run=$source_run" >> "$GITHUB_OUTPUT"
           echo "Recovered durable queue for successful DCE run $rid"
@@ -61,7 +74,7 @@ jobs:
       - name: Persist exact-version attempts to main
         id: ledger
         env:
-          DCE_RUN_ID: ${{ github.event.workflow_run.id }}
+          DCE_RUN_ID: ${{ steps.recover.outputs.dce_run_id }}
           QUEUE: ${{ steps.recover.outputs.queue }}
           SOURCE_RUN: ${{ steps.recover.outputs.source_run }}
         shell: bash
