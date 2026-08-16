@@ -38,7 +38,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Recover exact successful DCE queue
+      - name: Recover exact successful DCE queue and selection accounting
         id: recover
         env:
           GH_TOKEN: ${{ github.token }}
@@ -53,32 +53,43 @@ jobs:
           [[ "$rid" =~ ^[0-9]+$ ]] || { echo 'No successful DCE run available for progress ledger.' >&2; exit 1; }
           tag="dce-harvest-$rid"
           asset="dce-candidate-queue-$rid.jsonl"
+          summary="${asset}.summary.json"
+          selection="dce-selection-$rid.jsonl"
           mkdir -p recovered
           gh release view "$tag" >/dev/null
           gh release download "$tag" --pattern "$asset" --dir recovered
+          gh release download "$tag" --pattern "$summary" --dir recovered
+          gh release download "$tag" --pattern "$selection" --dir recovered
           test -f "recovered/$asset"
-          source_run="$(QUEUE="recovered/$asset" python - <<'PY'
+          test -f "recovered/$summary"
+          test -f "recovered/$selection"
+          source_run="$(QUEUE="recovered/$asset" SELECTION="recovered/$selection" python - <<'PY'
           import json,os
-          p=os.environ['QUEUE']
-          out=''
-          for line in open(p,encoding='utf-8',errors='replace'):
-              if not line.strip(): continue
-              r=json.loads(line)
-              out=r.get('wide_read_run_id') or r.get('source_discovery_run') or r.get('source_run_id') or ''
-              if out: break
-          print(out)
+          for p in (os.environ['QUEUE'],os.environ['SELECTION']):
+              for line in open(p,encoding='utf-8',errors='replace'):
+                  if not line.strip(): continue
+                  r=json.loads(line)
+                  out=r.get('wide_read_run_id') or r.get('source_discovery_run') or r.get('source_run_id') or r.get('source_run') or ''
+                  if out:
+                      print(out)
+                      raise SystemExit
+          print('')
           PY
           )"
           echo "dce_run_id=$rid" >> "$GITHUB_OUTPUT"
           echo "queue=recovered/$asset" >> "$GITHUB_OUTPUT"
+          echo "summary=recovered/$summary" >> "$GITHUB_OUTPUT"
+          echo "selection=recovered/$selection" >> "$GITHUB_OUTPUT"
           echo "source_run=$source_run" >> "$GITHUB_OUTPUT"
-          echo "Recovered durable queue for successful DCE run $rid"
+          echo "Recovered durable queue, materializer summary and original selection for successful DCE run $rid"
 
-      - name: Persist exact-version attempts to main
+      - name: Persist exact-version attempts and source-scoped terminal skips to main
         id: ledger
         env:
           DCE_RUN_ID: ${{ steps.recover.outputs.dce_run_id }}
           QUEUE: ${{ steps.recover.outputs.queue }}
+          SUMMARY: ${{ steps.recover.outputs.summary }}
+          SELECTION: ${{ steps.recover.outputs.selection }}
           SOURCE_RUN: ${{ steps.recover.outputs.source_run }}
         shell: bash
         run: |
@@ -104,9 +115,18 @@ jobs:
             --dce-run-id "$DCE_RUN_ID" \
             --source-run-id "$SOURCE_RUN" | tee ledger-update.json
 
+          python pipeline/dce_attempt_ledger.py update-terminal-skips \
+            --selection "$SELECTION" \
+            --summary "$SUMMARY" \
+            --ledger control/dce_attempt_ledger.jsonl \
+            --dce-run-id "$DCE_RUN_ID" \
+            --source-run-id "$SOURCE_RUN" | tee ledger-skips.json
+
           added="$(python - <<'PY'
           import json
-          print(json.load(open('ledger-update.json'))['added'])
+          a=json.load(open('ledger-update.json'))['added']
+          b=json.load(open('ledger-skips.json'))['added']
+          print(int(a)+int(b))
           PY
           )"
           echo "added=$added" >> "$GITHUB_OUTPUT"
@@ -118,7 +138,7 @@ jobs:
             git pull --rebase origin main
             git push origin HEAD:main
           else
-            echo 'No new candidate versions to persist.'
+            echo 'No new candidate versions or source-scoped terminal skips to persist.'
           fi
 
       - name: Continue Qwen pre-read and next unseen DCE wave immediately
