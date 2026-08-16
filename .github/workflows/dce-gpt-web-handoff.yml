@@ -15,6 +15,7 @@ on:
     paths:
       - '.github/workflows/dce-gpt-web-handoff.yml'
       - 'pipeline/build_gpt_web_review_bank.py'
+      - 'pipeline/rebuild_gpt_web_review_bank_v4.py'
 
 permissions:
   contents: write
@@ -68,13 +69,13 @@ jobs:
           test -n "$queue"
           echo "REVIEW_QUEUE=$queue" >> "$GITHUB_ENV"
           echo "Found existing review queue: $queue"
-      - name: Build persistent GPT Web review bank without any model API
+      - name: Rebuild persistent GPT Web review bank without any model API
         env:
           SOURCE_RUN: ${{ steps.source.outputs.run_id }}
         shell: bash
         run: |
           set -euo pipefail
-          python pipeline/build_gpt_web_review_bank.py \
+          python pipeline/rebuild_gpt_web_review_bank_v4.py \
             --queue "$REVIEW_QUEUE" \
             --existing control/gpt_review_pending.json \
             --out control/gpt_review_pending.json \
