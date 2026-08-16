@@ -29,21 +29,21 @@ BROWSER_PORTALS = {
 SUPPORTED = BROWSER_PORTALS | {
     "US_SAM", "US_SAM_BULK",
     "UNGM", "DIRECT_HTTP", "UK_CONTRACTS_FINDER", "TED_PUBLIC_PAGE_FAST",
+    "WORLD_BANK",
 }
 
 # Discovery/provider identifiers are provenance, not necessarily DCE adapter
-# identifiers.  This map translates only the resolver view; the original portal,
+# identifiers. This map translates only the resolver view; the original portal,
 # source and selection_portal fields remain untouched in the candidate record.
 PORTAL_ALIASES = {
-    # Public Contracts Scotland OCDS/open-data lane -> proven PCS resolver.
+    # Public Contracts Scotland OCDS/open-data lane -> dedicated PCS resolver.
     "PUBLIC_CONTRACTS_SCOTLAND": "SCOTLAND_PCS",
     "UK_PCS_OCDS": "SCOTLAND_PCS",
     "PCS_OCDS": "SCOTLAND_PCS",
-    # New open-data lanes currently use the guarded generic public-page cascade.
-    # This is preferable to silently dropping them, and remains fail-closed for
-    # evidence: a page hit is not DCE evidence unless an actual file is retrieved.
-    "WORLD_BANK": "GENERIC_PUBLIC_PAGE",
-    "WORLD_BANK_PROCUREMENT": "GENERIC_PUBLIC_PAGE",
+    # World Bank has an official unauthenticated procurement-notice API and does
+    # not need the fragile projects.worldbank.org browser page.
+    "WORLD_BANK_PROCUREMENT": "WORLD_BANK",
+    # These public web lanes still use the guarded generic public-page cascade.
     "UK_FIND_A_TENDER": "GENERIC_PUBLIC_PAGE",
     "UK_FTS_OCDS": "GENERIC_PUBLIC_PAGE",
     "LT_CVP_IS": "GENERIC_PUBLIC_PAGE",
@@ -60,16 +60,23 @@ def _portal_token(value: object) -> str:
 
 
 def candidate_has_public_route(candidate: dict) -> bool:
+    """Whether the record contains an actual public notice/document route.
+
+    Provider API bookkeeping endpoints are intentionally not enough. A record-only
+    API row with no public document/notice landing page must not consume a browser
+    shard just because `route.api_endpoint` starts with https://.
+    """
     if str(candidate.get("notice_url") or "").startswith(("http://", "https://")):
         return True
     route = candidate.get("route") or {}
     if isinstance(route, dict):
-        for key, value in route.items():
-            if key == "document_urls" and isinstance(value, list):
-                if any(isinstance(u, str) and u.startswith(("http://", "https://")) for u in value):
-                    return True
+        for key in ("detail_url", "document_landing_url", "documents_url", "notice_url", "public_url"):
+            value = route.get(key)
             if isinstance(value, str) and value.startswith(("http://", "https://")):
                 return True
+        value = route.get("document_urls")
+        if isinstance(value, list) and any(isinstance(u, str) and u.startswith(("http://", "https://")) for u in value):
+            return True
     for doc in candidate.get("documents") or []:
         if isinstance(doc, str) and doc.startswith(("http://", "https://")):
             return True
@@ -78,14 +85,27 @@ def candidate_has_public_route(candidate: dict) -> bool:
     return False
 
 
+def _explicit_record_only_without_dce(candidate: dict) -> bool:
+    route = candidate.get("route") or {}
+    if not isinstance(route, dict):
+        return False
+    mode = str(route.get("mode") or "").upper()
+    state = str(route.get("route_state") or "").upper()
+    if state in {"NO_PUBLIC_DOCUMENT_ROUTE_IN_API_RECORD", "NO_PUBLIC_DCE_ROUTE"}:
+        return not candidate_has_public_route(candidate)
+    if mode.endswith("_RECORD_ONLY"):
+        return not candidate_has_public_route(candidate)
+    return False
+
+
 def resolve_dce_portal(candidate: dict) -> tuple[str, str]:
     """Return (resolver_portal, raw_portal) for a live candidate.
 
     We inspect every provenance field instead of trusting the first non-empty one:
     wide-read records can carry a human/display portal while the selection manifest
-    carries the stable provider key.  Known aliases win.  If no adapter name is
-    recognized but a public URL exists, use the guarded generic public-page resolver
-    rather than dropping the candidate before DCE.  No URL => remain unsupported.
+    carries the stable provider key. Known aliases win. If no adapter name is
+    recognized but a real public notice/document URL exists, use the guarded generic
+    public-page resolver. Explicit API-record-only rows are not fabricated into DCE.
     """
     raw_values = [
         candidate.get("resolver_portal"),
@@ -100,6 +120,9 @@ def resolve_dce_portal(candidate: dict) -> tuple[str, str]:
         if token and token not in tokens:
             tokens.append(token)
     raw = tokens[0] if tokens else ""
+
+    if _explicit_record_only_without_dce(candidate):
+        return raw, raw
 
     for token in tokens:
         if token in SUPPORTED:
