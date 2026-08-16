@@ -2,12 +2,12 @@
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import gzip
 import hashlib
 import json
 import re
 import time
-import urllib.error
 import urllib.request
 from collections import Counter
 from pathlib import Path
@@ -15,15 +15,22 @@ from typing import Any, Iterable
 
 ALLOWED = {"STRONG_FIT", "FIT", "MAYBE", "REJECT_OBVIOUS"}
 DELIVERY_MODES = {"DIRECT_DIGITAL", "AI_ENABLED", "SUBCONTRACTABLE", "BROKER_RESELL", "MIXED", "UNCLEAR"}
-PROMPT_VERSION = "qwen-notice-high-recall-v1"
+PROMPT_VERSION = "qwen-notice-high-recall-v2-fast"
+CLASSIFIER_VERSION = "qwen3-4b-q4km-shadow-v2-fast-checkpointed"
+SCHEMA = "QWEN_NOTICE_SHADOW_CLASSIFICATION_V2"
+SUMMARY_SCHEMA = "QWEN_NOTICE_SHADOW_SMOKE_SUMMARY_V2"
 
 SYSTEM = """You are a HIGH-RECALL public-tender opportunity classifier for a lean Belgian SME.
 The business may deliver directly, use AI/software automation, subcontract specialists, form a consortium, broker/resell goods or services, or combine these modes.
-Your job is triage, NOT eligibility adjudication. Notice metadata cannot prove DCE gates.
-Prefer false positives over false negatives. If scope is ambiguous, unusual, niche, potentially subcontractable/brokerable/resellable, or information is insufficient, choose MAYBE rather than REJECT_OBVIOUS.
-REJECT_OBVIOUS is reserved for clearly unsuitable work with no plausible lean direct, AI-enabled, subcontracted, consortium, broker/resell or operational path.
+This is TRIAGE, not eligibility adjudication. Notice metadata cannot prove DCE gates.
+Prefer false positives over false negatives. Ambiguous, unusual, niche, novel, subcontractable, brokerable, resellable, or information-poor notices must be MAYBE rather than REJECT_OBVIOUS.
+REJECT_OBVIOUS is reserved for clearly unsuitable work with no plausible lean direct, AI-enabled, subcontracted, consortium, broker/resell, or operational path.
 Never call anything GREEN or SUPERGREEN.
-Return one JSON object only. /no_think"""
+Return one compact JSON object only. /no_think"""
+
+
+def now_utc() -> str:
+    return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
 
 
 def iter_jsonl(path: Path) -> Iterable[dict[str, Any]]:
@@ -39,7 +46,12 @@ def iter_jsonl(path: Path) -> Iterable[dict[str, Any]]:
 
 
 def candidate_id(row: dict[str, Any]) -> str:
-    return str(row.get("canonical_notice_id") or (row.get("notice") or {}).get("candidate_id") or "").strip()
+    notice = row.get("notice") if isinstance(row.get("notice"), dict) else row
+    return str(row.get("canonical_notice_id") or notice.get("candidate_id") or notice.get("notice_id") or notice.get("id") or "").strip()
+
+
+def material_hash(row: dict[str, Any]) -> str:
+    return str(row.get("material_fields_hash") or row.get("input_material_fields_hash") or "").strip()
 
 
 def deterministic_sample(rows: Iterable[dict[str, Any]], n: int) -> list[dict[str, Any]]:
@@ -54,13 +66,13 @@ def deterministic_sample(rows: Iterable[dict[str, Any]], n: int) -> list[dict[st
     return [x[2] for x in ranked[: max(0, n)]]
 
 
-def compact_notice(envelope: dict[str, Any]) -> dict[str, Any]:
+def compact_notice(envelope: dict[str, Any], description_chars: int) -> dict[str, Any]:
     row = envelope.get("notice") if isinstance(envelope.get("notice"), dict) else envelope
-    description = str(row.get("description") or "")
-    if len(description) > 5000:
-        description = description[:5000] + " …[truncated]"
+    description = " ".join(str(row.get("description") or "").split())
+    if len(description) > description_chars:
+        description = description[:description_chars] + " …[truncated]"
     return {
-        "candidate_id": str(row.get("candidate_id") or envelope.get("canonical_notice_id") or ""),
+        "candidate_id": candidate_id(envelope),
         "source": row.get("source"),
         "country": row.get("country"),
         "buyer": row.get("buyer"),
@@ -69,7 +81,7 @@ def compact_notice(envelope: dict[str, Any]) -> dict[str, Any]:
         "cpv_or_category": row.get("cpv_or_category"),
         "estimated_value": row.get("estimated_value"),
         "currency": row.get("currency"),
-        "deadline": row.get("deadline"),
+        "deadline": row.get("deadline") or row.get("deadline_utc"),
         "procedure": row.get("procedure"),
         "lots": row.get("lots"),
         "notice_eligibility": row.get("notice_eligibility"),
@@ -77,15 +89,24 @@ def compact_notice(envelope: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def user_prompt(row: dict[str, Any]) -> str:
-    return """Classify this notice into exactly one of STRONG_FIT, FIT, MAYBE, REJECT_OBVIOUS.
-Use high recall. Digital training, web portals, IT/ICT, software, data, design, video, content, printing, consulting, operational services, and plausible broker/resell/subcontract opportunities must not be rejected merely because delivery details are uncertain.
-Output JSON only with keys:
-classification, confidence (0..1), novelty_or_unusual_flag (boolean), delivery_mode (DIRECT_DIGITAL|AI_ENABLED|SUBCONTRACTABLE|BROKER_RESELL|MIXED|UNCLEAR), reason (max 30 words).
+def user_prompt(row: dict[str, Any], description_chars: int) -> str:
+    return """Classify exactly one: STRONG_FIT, FIT, MAYBE, REJECT_OBVIOUS.
+High recall is mandatory. Digital/IT/software/data/design/video/content/printing/consulting/operational work and plausible broker/resell/subcontract paths must not be rejected just because delivery details are unknown.
+JSON keys only: classification, confidence (0..1), novelty_or_unusual_flag (boolean), delivery_mode (DIRECT_DIGITAL|AI_ENABLED|SUBCONTRACTABLE|BROKER_RESELL|MIXED|UNCLEAR), reason (max 18 words).
 /no_think
-
 NOTICE:
-""" + json.dumps(compact_notice(row), ensure_ascii=False)
+""" + json.dumps(compact_notice(row, description_chars), ensure_ascii=False, separators=(",", ":"))
+
+
+def classifier_input_hash(envelope: dict[str, Any], description_chars: int) -> str:
+    payload = {
+        "system": SYSTEM,
+        "user": user_prompt(envelope, description_chars),
+        "material_fields_hash": material_hash(envelope),
+        "prompt_version": PROMPT_VERSION,
+    }
+    raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()
 
 
 def post_json(url: str, payload: dict[str, Any], timeout: int) -> dict[str, Any]:
@@ -123,7 +144,7 @@ def normalize(raw: dict[str, Any] | None, parse_error: str | None = None) -> dic
             "confidence": 0.0,
             "novelty_or_unusual_flag": True,
             "delivery_mode": "UNCLEAR",
-            "reason": "Model output was unavailable or invalid; high-recall fallback keeps notice for review.",
+            "reason": "Model unavailable or invalid; high-recall fallback retains notice.",
             "parse_error": parse_error or "invalid_json",
         }
     classification = str(raw.get("classification") or "MAYBE").upper()
@@ -137,7 +158,7 @@ def normalize(raw: dict[str, Any] | None, parse_error: str | None = None) -> dic
         confidence = min(1.0, max(0.0, float(raw.get("confidence", 0.0))))
     except Exception:
         confidence = 0.0
-    reason = " ".join(str(raw.get("reason") or "").split())[:500]
+    reason = " ".join(str(raw.get("reason") or "").split())[:350]
     return {
         "classification": classification,
         "confidence": confidence,
@@ -148,6 +169,48 @@ def normalize(raw: dict[str, Any] | None, parse_error: str | None = None) -> dic
     }
 
 
+def summary_payload(
+    output: list[dict[str, Any]],
+    sample_requested: int,
+    startup_seconds: float,
+    started: float,
+    source_ledger_generation: str,
+    stopped_early: bool,
+) -> dict[str, Any]:
+    elapsed = time.monotonic() - started
+    counts = Counter(x["classification"] for x in output)
+    parse_errors = sum(1 for x in output if x.get("parse_error"))
+    return {
+        "schema": SUMMARY_SCHEMA,
+        "classifier_model": "Qwen/Qwen3-4B-GGUF:Q4_K_M",
+        "classifier_quant": "Q4_K_M",
+        "classifier_prompt_version": PROMPT_VERSION,
+        "classifier_version": CLASSIFIER_VERSION,
+        "source_ledger_generation": source_ledger_generation,
+        "sample_requested": sample_requested,
+        "sample_completed": len(output),
+        "startup_seconds": round(startup_seconds, 3),
+        "inference_seconds": round(elapsed, 3),
+        "notices_per_second": round(len(output) / elapsed, 4) if elapsed and output else None,
+        "seconds_per_notice": round(elapsed / len(output), 3) if output else None,
+        "parse_errors": parse_errors,
+        "classification_counts": dict(sorted(counts.items())),
+        "stopped_early_for_runtime_budget": stopped_early,
+        "data_safety": {
+            "shadow_only": True,
+            "drops_or_deletes_notices": False,
+            "automatic_rejection_enabled": False,
+            "checkpointed_after_each_notice": True,
+            "unknown_or_parse_failure_becomes": "MAYBE",
+        },
+        "updated_at_utc": now_utc(),
+    }
+
+
+def write_summary(path: Path, payload: dict[str, Any]) -> None:
+    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--queue", required=True)
@@ -156,78 +219,104 @@ def main() -> None:
     ap.add_argument("--server", default="http://127.0.0.1:8080/v1/chat/completions")
     ap.add_argument("--model", default="Qwen/Qwen3-4B-GGUF:Q4_K_M")
     ap.add_argument("--sample-size", type=int, default=12)
-    ap.add_argument("--timeout", type=int, default=120)
+    ap.add_argument("--timeout", type=int, default=75)
     ap.add_argument("--startup-seconds", type=float, default=0.0)
+    ap.add_argument("--description-chars", type=int, default=1800)
+    ap.add_argument("--max-tokens", type=int, default=100)
+    ap.add_argument("--max-runtime-seconds", type=int, default=900)
+    ap.add_argument("--source-ledger-generation", default="UNKNOWN")
     args = ap.parse_args()
 
     sample = deterministic_sample(iter_jsonl(Path(args.queue)), args.sample_size)
     output: list[dict[str, Any]] = []
     started = time.monotonic()
-    for envelope in sample:
-        cid = candidate_id(envelope)
-        t0 = time.monotonic()
-        parse_error = None
-        raw_obj = None
-        raw_text = ""
-        try:
-            response = post_json(
-                args.server,
-                {
-                    "model": args.model,
-                    "messages": [
-                        {"role": "system", "content": SYSTEM},
-                        {"role": "user", "content": user_prompt(envelope)},
-                    ],
-                    "temperature": 0.7,
-                    "top_p": 0.8,
-                    "max_tokens": 220,
-                    "stream": False,
-                },
-                args.timeout,
-            )
-            raw_text = str(response["choices"][0]["message"]["content"])
-            raw_obj = extract_object(raw_text)
-            if raw_obj is None:
-                parse_error = "invalid_json"
-        except Exception as exc:
-            parse_error = f"request_error:{type(exc).__name__}"
-        result = normalize(raw_obj, parse_error)
-        result.update(
-            {
-                "schema": "QWEN_NOTICE_SHADOW_CLASSIFICATION_V1",
-                "canonical_notice_id": cid,
-                "classifier_model": args.model,
-                "classifier_quant": "Q4_K_M",
-                "classifier_prompt_version": PROMPT_VERSION,
-                "classifier_version": "qwen3-4b-q4km-shadow-v1",
-                "classified_at_epoch": int(time.time()),
-                "latency_seconds": round(time.monotonic() - t0, 3),
-                "notice": compact_notice(envelope),
-                "raw_output": raw_text[:2000],
-            }
-        )
-        output.append(result)
+    out_path = Path(args.out)
+    summary_path = Path(args.summary)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text("", encoding="utf-8")
 
-    elapsed = time.monotonic() - started
-    counts = Counter(x["classification"] for x in output)
-    parse_errors = sum(1 for x in output if x.get("parse_error"))
-    summary = {
-        "schema": "QWEN_NOTICE_SHADOW_SMOKE_SUMMARY_V1",
-        "classifier_model": args.model,
-        "classifier_quant": "Q4_K_M",
-        "classifier_prompt_version": PROMPT_VERSION,
-        "classifier_version": "qwen3-4b-q4km-shadow-v1",
-        "sample_size": len(output),
-        "startup_seconds": round(args.startup_seconds, 3),
-        "inference_seconds": round(elapsed, 3),
-        "notices_per_second": round(len(output) / elapsed, 4) if elapsed else None,
-        "seconds_per_notice": round(elapsed / len(output), 3) if output else None,
-        "parse_errors": parse_errors,
-        "classification_counts": dict(sorted(counts.items())),
-        "safety": "SHADOW_ONLY: outputs do not delete notices, decide eligibility, or establish DCE truth.",
-    }
-    Path(args.out).write_text("".join(json.dumps(x, ensure_ascii=False) + "\n" for x in output), encoding="utf-8")
-    Path(args.summary).write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    stopped_early = False
+    with out_path.open("a", encoding="utf-8") as out_fh:
+        for envelope in sample:
+            # Exit cleanly before the Actions job timeout. Completed rows already exist on disk.
+            if output and (time.monotonic() - started) >= args.max_runtime_seconds:
+                stopped_early = True
+                break
+
+            cid = candidate_id(envelope)
+            t0 = time.monotonic()
+            parse_error = None
+            raw_obj = None
+            raw_text = ""
+            usage: dict[str, Any] = {}
+            try:
+                response = post_json(
+                    args.server,
+                    {
+                        "model": args.model,
+                        "messages": [
+                            {"role": "system", "content": SYSTEM},
+                            {"role": "user", "content": user_prompt(envelope, args.description_chars)},
+                        ],
+                        "temperature": 0.1,
+                        "top_p": 0.8,
+                        "max_tokens": args.max_tokens,
+                        "stream": False,
+                    },
+                    args.timeout,
+                )
+                raw_text = str(response["choices"][0]["message"]["content"])
+                raw_obj = extract_object(raw_text)
+                usage = response.get("usage") if isinstance(response.get("usage"), dict) else {}
+                if raw_obj is None:
+                    parse_error = "invalid_json"
+            except Exception as exc:
+                parse_error = f"request_error:{type(exc).__name__}"
+
+            result = normalize(raw_obj, parse_error)
+            result.update(
+                {
+                    "schema": SCHEMA,
+                    "canonical_notice_id": cid,
+                    "input_material_fields_hash": material_hash(envelope),
+                    "classifier_input_hash": classifier_input_hash(envelope, args.description_chars),
+                    "source_ledger_generation": args.source_ledger_generation,
+                    "classifier_model": args.model,
+                    "classifier_quant": "Q4_K_M",
+                    "classifier_prompt_version": PROMPT_VERSION,
+                    "classifier_version": CLASSIFIER_VERSION,
+                    "classified_at_utc": now_utc(),
+                    "latency_seconds": round(time.monotonic() - t0, 3),
+                    "usage": usage,
+                    "notice": compact_notice(envelope, args.description_chars),
+                    "raw_output": raw_text[:1200],
+                }
+            )
+            output.append(result)
+            out_fh.write(json.dumps(result, ensure_ascii=False, separators=(",", ":")) + "\n")
+            out_fh.flush()
+            write_summary(
+                summary_path,
+                summary_payload(
+                    output,
+                    args.sample_size,
+                    args.startup_seconds,
+                    started,
+                    args.source_ledger_generation,
+                    stopped_early=False,
+                ),
+            )
+
+    summary = summary_payload(
+        output,
+        args.sample_size,
+        args.startup_seconds,
+        started,
+        args.source_ledger_generation,
+        stopped_early=stopped_early,
+    )
+    write_summary(summary_path, summary)
     print(json.dumps(summary, indent=2, ensure_ascii=False))
 
 
