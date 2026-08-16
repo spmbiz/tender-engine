@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import html
 import json
 import re
 import urllib.request
@@ -51,7 +52,7 @@ HARD_NONCORE = re.compile(
     r"aircraft maintenance|ship repair|firefighting vehicle|fire truck|fuel delivery|diesel delivery|ammunition|weapon|herbicide|pest control|"
     r"laundry services?|food services?|catering services?|electrical works?|plumbing works?|hvac works?|painting works?|insulation works?|snow clearing|"
     r"waste collection|janitorial|cleaning services?|laboratory equipment|scientific equipment|valves?|spare parts?|machinery|furniture|uniforms?|"
-    r"umundurowania|koszule|spodnie|softshell|concrete materials?|sump pump|halal menu)\b", re.I
+    r"umundurowania|koszule|spodnie|softshell|concrete materials?|sump pump|halal menu|wire coil)\b", re.I
 )
 GATES = (
     "entity_geography","turnover_financial","references_experience","certifications_partner","staffing_team",
@@ -92,20 +93,36 @@ def evidence_map(row: dict[str,Any]) -> dict[str,Any]:
         for key in ("gate_evidence","evidence_by_gate","categories"):
             v=gs.get(key)
             if isinstance(v,dict): return v
-        # Current deep_review_queue format stores the canonical gate arrays
-        # directly under gate_snippets. Never silently collapse this to {}.
         return gs
     return {}
 
 
+def clean_snippet(raw: str, chars: int) -> str:
+    raw=html.unescape(str(raw or ""))
+    # OOXML/HTML tags are common in extracted office documents. Keep the text,
+    # not the markup, so Qwen spends context on procurement meaning.
+    text=re.sub(r"<[^>]{0,500}>", " ", raw)
+    text=re.sub(r"\b(?:w:|xs:|pc:|r:id|xmlns:)\S*", " ", text)
+    text=" ".join(text.split())
+    return text[:chars]
+
+
 def normalize_items(items: Any, per_gate: int, chars: int) -> list[str]:
+    candidates=[]
+    if not isinstance(items,list): return []
+    for item in items:
+        if isinstance(item,dict): raw=str(item.get("text") or item.get("snippet") or item.get("evidence") or "")
+        else: raw=str(item or "")
+        cleaned=clean_snippet(raw,chars)
+        if not cleaned: continue
+        markup_ratio=(raw.count('<')+raw.count('>'))/max(1,len(raw))
+        alpha=sum(ch.isalpha() for ch in cleaned)/max(1,len(cleaned))
+        candidates.append((markup_ratio,-alpha,-len(cleaned),cleaned))
+    candidates.sort()
     out=[]
-    if not isinstance(items,list): return out
-    for item in items[:per_gate]:
-        if isinstance(item,dict): text=str(item.get("text") or item.get("snippet") or item.get("evidence") or "")
-        else: text=str(item or "")
-        text=" ".join(text.split())[:chars]
-        if text: out.append(text)
+    for _,_,_,text in candidates:
+        if text not in out: out.append(text)
+        if len(out)>=per_gate: break
     return out
 
 
@@ -177,7 +194,8 @@ def result_for(row: dict[str,Any], packed_evidence: dict[str,list[str]], model_i
     for rx,code in HARD_TEXT:
         if rx.search(all_text) and code not in blockers: blockers.append(code)
     title=str(first(row,"title") or "")
-    scope_text=f"{title} {all_text[:6000]}"
+    deliverables=" ".join(packed_evidence.get("deliverables_scope") or [])
+    scope_text=f"{title} {deliverables}"
     native_core=bool(SPM_CORE.search(scope_text))
     obvious_noncore=bool(HARD_NONCORE.search(scope_text)) and not native_core
     deadline=first(row,"deadline")
@@ -185,14 +203,10 @@ def result_for(row: dict[str,Any], packed_evidence: dict[str,list[str]], model_i
     expired=bool(parsed and parsed < datetime.now(timezone.utc))
     gate_ready=bool(row.get("gate_readiness"))
 
-    # Non-negotiable deterministic safety guards around the small local model.
-    # A model-only HOT/GOOD can never survive without actual gate evidence.
     if evidence_coverage == 0:
-        cls="QWEN_DCE_INSUFFICIENT"
-        lcode="U"; rcode="U"
+        cls="QWEN_DCE_INSUFFICIENT"; lcode="U"; rcode="U"
     if obvious_noncore and cls in {"QWEN_DCE_HOT","QWEN_DCE_GOOD"}:
-        cls="QWEN_DCE_MAYBE"
-        lcode="L"
+        cls="QWEN_DCE_MAYBE"; lcode="L"
         if rcode in {"D","A"}: rcode="B"
     if expired:
         cls="QWEN_DCE_BLOCKED"
@@ -206,7 +220,7 @@ def result_for(row: dict[str,Any], packed_evidence: dict[str,list[str]], model_i
     elif not gate_ready or evidence_coverage == 0: action="NEED_MORE_DCE"
     elif obvious_noncore: action="REVIEW_IF_CAPACITY"
     elif cls in {"QWEN_DCE_HOT","QWEN_DCE_GOOD"} and native_core and not hard and wants: action="FINAL_REVIEW_NOW"
-    elif cls in {"QWEN_DCE_HOT","QWEN_DCE_GOOD","QWEN_DCE_MAYBE"} and not hard: action="REVIEW_IF_CAPACITY"
+    elif cls in {"QWEN_DCE_HOT","QWEN_DCE_GOOD","QWEN_DCE_MAYBE"} and native_core and not hard: action="REVIEW_IF_CAPACITY"
     elif hard or cls=="QWEN_DCE_BLOCKED": action="DROP_OR_PARTNER"
     else: action="NEED_MORE_DCE"
     base={"QWEN_DCE_HOT":86,"QWEN_DCE_GOOD":74,"QWEN_DCE_MAYBE":52,"QWEN_DCE_BLOCKED":12,"QWEN_DCE_INSUFFICIENT":28}[cls]
@@ -228,7 +242,7 @@ def result_for(row: dict[str,Any], packed_evidence: dict[str,list[str]], model_i
         "explicit_blockers":blockers,"critical_unknowns":unknowns,"qwen_reason":str((model_item or {}).get("p") or "")[:220],
         "recommended_gpt_action":action,"gpt_priority_score":priority,"evidence_by_gate":packed_evidence,
         "source_dce_run_id":int(source_run) if str(source_run).isdigit() else source_run,
-        "qwen_dce_version":"qwen3-4b-dce-gate-triage-v2",
+        "qwen_dce_version":"qwen3-4b-dce-gate-triage-v3",
         "finality":"PRE_READ_ONLY_NOT_FINAL_VERDICT",
     }
 
@@ -241,6 +255,11 @@ def main():
     ap.add_argument("--batch-size",type=int,default=4); ap.add_argument("--timeout",type=int,default=90); ap.add_argument("--max-tokens",type=int,default=1200)
     ap.add_argument("--per-gate",type=int,default=3); ap.add_argument("--evidence-chars",type=int,default=700)
     args=ap.parse_args()
+    # Hard internal bounds keep the prompt inside a useful 12k-token CPU context
+    # even if workflow inputs are accidentally made too large later.
+    batch_size=max(1,min(2,args.batch_size))
+    per_gate=max(1,min(1,args.per_gate))
+    evidence_chars=max(120,min(350,args.evidence_chars))
     rows=[]
     for row in iter_jsonl(Path(args.queue)):
         if not row.get("gate_readiness"): continue
@@ -249,14 +268,18 @@ def main():
         bucket=int(hashlib.sha256(cid.encode()).hexdigest()[:8],16)%max(1,args.shard_count)
         if bucket==args.shard_index: rows.append(row)
     out=[]
-    for start in range(0,len(rows),max(1,args.batch_size)):
-        chunk=rows[start:start+max(1,args.batch_size)]
+    model_batches_ok=0
+    for start in range(0,len(rows),batch_size):
+        chunk=rows[start:start+batch_size]
         prompts=[]; packed=[]
         for row in chunk:
-            p,e=pack_row(row,args.per_gate,args.evidence_chars); prompts.append(p); packed.append(e)
+            p,e=pack_row(row,per_gate,evidence_chars); prompts.append(p); packed.append(e)
         model_items=[]
-        try: model_items=extract(post(args.server,args.model,prompts,args.timeout,args.max_tokens))
-        except Exception: model_items=[]
+        try:
+            model_items=extract(post(args.server,args.model,prompts,args.timeout,args.max_tokens))
+            if model_items: model_batches_ok+=1
+        except Exception:
+            model_items=[]
         by_id={str(x.get("i") or ""):x for x in model_items}
         for row,e in zip(chunk,packed): out.append(result_for(row,e,by_id.get(str(first(row,"candidate_id") or "")),args.source_run))
     p=Path(args.out); p.parent.mkdir(parents=True,exist_ok=True)
@@ -264,6 +287,7 @@ def main():
         for r in out: f.write(json.dumps(r,ensure_ascii=False,separators=(",",":"))+"\n")
     print(json.dumps({
         "source_run":args.source_run,"shard":args.shard_index,"shards":args.shard_count,"gate_ready_rows":len(rows),"written":len(out),
+        "batch_size":batch_size,"per_gate":per_gate,"evidence_chars":evidence_chars,"model_batches_ok":model_batches_ok,
         "with_evidence":sum((r.get('evidence_gate_coverage') or 0)>0 for r in out),
         "final_review_now":sum(r['recommended_gpt_action']=='FINAL_REVIEW_NOW' for r in out)
     },indent=2))
