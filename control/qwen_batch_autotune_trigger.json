@@ -1,14 +1,14 @@
 {
   "schema": "QWEN_BATCH_AUTOTUNE_TRIGGER_V1",
   "enabled": true,
-  "candidate_batch_sizes": [1, 2, 4],
+  "candidate_batch_sizes": [1, 2, 4, 6, 8, 12, 16, 20, 24, 32],
   "sample_size": 24,
   "full_sweep_every_hours": 6,
-  "scheduled_health_check": "champion plus immediate neighbors",
+  "scheduled_health_check": "champion plus immediate neighbors; rotating 3-size repair wave when degraded",
   "capacity_policy": {
     "priority": "live discovery and DCE/SUPERGREEN throughput before experimental autotuning",
     "max_configured_parallel_candidates": 3,
-    "reason": "Avoid consuming ~10 of ~20 GitHub slots with Qwen tuning while live DCE work is pending. Expand only during an intentional benchmark window."
+    "reason": "Explore the full batch-size space without consuming the DCE fleet: workflow matrix is capped at three simultaneous Qwen tuning runners."
   },
   "policy": {
     "row_conservation_required": true,
