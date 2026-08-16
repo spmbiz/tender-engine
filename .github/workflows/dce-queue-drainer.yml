@@ -9,6 +9,8 @@ on:
     paths:
       - 'queues/spm_rescue_selection_latest.jsonl'
       - 'queues/qwen_live_selection_latest.jsonl'
+      - 'pipeline/authority_conflicts.py'
+      - 'pipeline/auto_adjudicate_dce.py'
       - '.github/workflows/dce-queue-drainer.yml'
 
 permissions:
