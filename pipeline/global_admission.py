@@ -10,15 +10,15 @@ GLOBAL_REPO = "walidgdg1-ai/evergreenleadminer"
 DEFAULT_POLICY = {
     "github": {"capacity": 20},
     "workloads": {
-        "hospitality": {"enabled": True, "weight": 0.50, "min_slots_when_demanding": 6, "max_slots": 20},
-        "tenders": {"enabled": True, "weight": 0.25, "min_slots_when_demanding": 4, "max_slots": 20},
-        "gws": {"enabled": True, "weight": 0.25, "min_slots_when_demanding": 4, "max_slots": 10},
+        "hospitality": {"enabled": True, "weight": 0.25, "min_slots_when_demanding": 5, "max_slots": 20},
+        "tenders": {"enabled": True, "weight": 0.25, "min_slots_when_demanding": 5, "max_slots": 20},
+        "gws": {"enabled": True, "weight": 0.25, "min_slots_when_demanding": 5, "max_slots": 20},
     },
 }
 
 
 def _request(url: str):
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.2"})
+    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.3"})
     tok = os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")
     if tok:
         req.add_header("Authorization", f"Bearer {tok}")
@@ -120,16 +120,16 @@ def _controller_preauthorized() -> bool:
 
 
 def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
-    """Admission-control new DCE runners without preempting any running job.
+    """Admission-control new Tender runners without preempting running jobs.
 
     Actual in-progress jobs consume capacity. Queued jobs are demand/backlog and
     never consume a slot in this local admission calculation. Sibling workloads
     with durable demand still receive fair-target headroom before Tender borrows
     idle capacity.
 
-    Autonomous waves dispatched on ``fleet-dce`` are an exception: their
+    Autonomous DCE waves dispatched on ``fleet-dce`` are an exception: their
     ``requested`` value is already the controller-approved capacity budget, so the
-    sharder must consume that budget rather than performing a contradictory second
+    sharder consumes that budget rather than performing a contradictory second
     admission vote.
     """
     requested = max(0, int(requested))
@@ -178,9 +178,6 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     existing_tender_active = int(active.get("tenders", 0))
     tender_room = max(0, tender_max - existing_tender_active)
 
-    # Remote demand snapshots can lag behind the durable DCE selection. The
-    # explicit requested parallelism is therefore a lower bound on effective DCE
-    # demand, while active jobs still count against the account capacity.
     effective_tender_demand = max(tender_demand, requested + existing_tender_active)
     unmet_tender_demand = max(0, effective_tender_demand - existing_tender_active)
     allowed = min(requested, global_room_after_protection, tender_room, unmet_tender_demand)
@@ -207,5 +204,6 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
         "tender_max": tender_max,
         "preemption": "none; admission control only",
         "queue_rule": "queued jobs are backlog/demand, not occupied runner slots",
+        "policy_fallback": "25% hospitality + 25% tenders + 25% gws + 25% elastic/borrowable",
     }
     return allowed, report
