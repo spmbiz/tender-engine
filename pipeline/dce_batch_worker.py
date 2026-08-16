@@ -8,6 +8,7 @@ import re
 import subprocess
 import sys
 import time
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -63,7 +64,7 @@ def run_one(queue: str, line_no: int, out: str, retries: int, timeout_seconds: i
     for attempt in range(1, effective_retries + 2):
         cmd = [
             sys.executable,
-            "pipeline/dce_worker_v9.py",
+            "pipeline/dce_worker_v10.py",
             "--queue",
             queue,
             "--line",
@@ -182,5 +183,4 @@ def main():
 
 
 if __name__ == "__main__":
-    from collections import Counter
     main()
