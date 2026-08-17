@@ -1,29 +1,31 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_V3",
-  "generated_at_utc": "2026-08-17T01:23:41+00:00",
+  "generated_at_utc": "2026-08-17T01:34:37+00:00",
   "source_run": "31959798665",
-  "state_rows": 7746,
+  "state_rows": 7766,
   "ledger_rows": 46023,
   "snapshot_rows": 46023,
   "blocked_ids": 14901,
   "durable_attempted_exact_versions_ignored": 634,
-  "valid_exact_hash_current_unattempted": 5391,
-  "eligible_keep_for_dce": 4881,
+  "valid_exact_hash_current_unattempted": 5404,
+  "eligible_keep_for_dce": 4893,
   "stale_hash_ignored": 0,
   "missing_snapshot": 0,
-  "expired_ignored": 79,
+  "expired_ignored": 81,
   "selected": 160,
   "selection_decisions": {
-    "MAYBE": 152,
+    "FIT": 1,
+    "MAYBE": 151,
     "REJECT_OBVIOUS": 8
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
+    "qwen-primary": 1,
     "qwen-open-world-explore": 32,
     "qwen-reject-audit": 8,
-    "qwen-elastic": 120
+    "qwen-elastic": 119
   },
   "policy": {
     "keep_is_not_fit": true,
