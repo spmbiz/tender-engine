@@ -10,6 +10,8 @@ on:
   workflow_run:
     workflows: ["DCE Fanout V2"]
     types: [completed]
+  schedule:
+    - cron: '*/5 * * * *'
   # Bootstrap the latest successful durable run when this workflow changes.
   push:
     branches: [main]
@@ -148,7 +150,7 @@ jobs:
             echo 'No new candidate versions or source-scoped terminal skips to persist.'
           fi
 
-      - name: Continue Qwen pre-read and next unseen DCE wave immediately
+      - name: Continue Qwen pre-read and refresh unseen selection before the next DCE wave
         env:
           GH_TOKEN: ${{ github.token }}
           ADDED: ${{ steps.ledger.outputs.added }}
@@ -158,8 +160,12 @@ jobs:
           set -euo pipefail
           gh workflow run qwen-dce-drainer.yml --ref main
           if [ "${ADDED:-0}" -gt 0 ] || [ "${TRANSITION_SKIP:-false}" = 'true' ]; then
-            gh workflow run dce-queue-drainer.yml --ref main
-            echo "Progress advanced; next unseen DCE wave dispatched (added=${ADDED:-0} transition_skip=${TRANSITION_SKIP:-false})."
+            # Do NOT wake DCE against the stale selection. First force the rolling
+            # conveyor to rebuild the queue from the newly persisted attempt ledger;
+            # the conveyor itself dispatches DCE only after already-attempted exact
+            # notice versions have disappeared.
+            gh workflow run qwen-live-conveyor.yml --ref main
+            echo "Progress advanced; unseen-selection conveyor dispatched first (added=${ADDED:-0} transition_skip=${TRANSITION_SKIP:-false})."
           else
             echo 'No progress delta; DCE self-loop stopped cleanly until the persisted selection changes.'
           fi
