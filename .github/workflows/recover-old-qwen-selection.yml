@@ -1,0 +1,57 @@
+name: Recover Historical Qwen Selection Outcomes
+
+on:
+  workflow_dispatch:
+    inputs:
+      selection_ref:
+        description: Commit containing historical qwen_live_selection_latest.jsonl
+        required: false
+        default: '11fbf3d061234ca44a519ab31027ba25a68e22d4'
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/recover_selection_outcomes.py'
+      - '.github/workflows/recover-old-qwen-selection.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: recover-old-qwen-selection
+  cancel-in-progress: true
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recover old selection against durable attempts and historical DCE pre-reads
+        env:
+          SELECTION_REF: ${{ github.event.inputs.selection_ref || '11fbf3d061234ca44a519ab31027ba25a68e22d4' }}
+        run: |
+          python pipeline/recover_selection_outcomes.py \
+            --selection-ref "$SELECTION_REF" \
+            --out control/recovered_qwen_selection_11fbf3d.json
+      - name: Persist audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git pull --rebase origin main
+          git add control/recovered_qwen_selection_11fbf3d.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "recovery: persist old Qwen 160 outcome audit"
+          for n in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((n*2))"
+          done
+          exit 1
