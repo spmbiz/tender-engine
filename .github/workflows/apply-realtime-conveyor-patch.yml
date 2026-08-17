@@ -1,72 +1,19 @@
-name: Apply Realtime Conveyor Patch
+name: Apply Realtime Conveyor Patch (Legacy Disabled)
 
+# Retired patch-and-restart workflow. The realtime conveyor is now canonical in
+# main. Keeping this manual no-op prevents an old patch from cancelling active
+# Qwen passes or restoring obsolete 48-row settings.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'pipeline/apply_realtime_conveyor_patch.py'
-      - '.github/workflows/apply-realtime-conveyor-patch.yml'
 
 permissions:
-  contents: write
-  actions: write
-
-concurrency:
-  group: apply-realtime-conveyor-patch
-  cancel-in-progress: true
+  contents: read
 
 jobs:
-  patch-and-restart:
+  retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Patch shard-hot inbox dispatch and short Qwen artifacts
-        shell: bash
-        run: |
-          set -euo pipefail
-          git pull --rebase origin main
-          python pipeline/apply_realtime_conveyor_patch.py
-          git config user.name 'tender-engine-bot'
-          git config user.email 'tender-engine-bot@users.noreply.github.com'
-          git add .github/workflows/dce-fanout-v2.yml .github/workflows/qwen-live-classification.yml
-          if ! git diff --cached --quiet; then
-            git commit -m 'runtime: realtime shard conveyor and inbox dispatch'
-            for n in 1 2 3 4 5; do
-              if git pull --rebase origin main && git push origin HEAD:main; then break; fi
-              git rebase --abort >/dev/null 2>&1 || true
-              [ "$n" -lt 5 ] || exit 1
-              sleep "$((n*2))"
-            done
-          fi
-
-      - name: Replace stale long Qwen pass with short-artifact pass and refresh current hot inbox
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          # The long 240-row pass has not published result artifacts yet. Cancelling
-          # it loses no durable classification state and immediately frees the lane
-          # for 48-row workers that can feed the incremental conveyor much sooner.
-          for rid in $(gh run list --workflow qwen-live-classification.yml --limit 10 --json databaseId,status --jq '.[] | select(.status=="in_progress" or .status=="queued") | .databaseId'); do
-            gh run cancel "$rid" || true
-          done
-          sleep 3
-          gh workflow run qwen-live-classification.yml --ref main \
-            -f per_shard=48 \
-            -f auto_continue=true \
-            -f dce_limit=160
-          # Hot DCE shards from the already-running wave may have updated their
-          # banks before the explicit-dispatch patch existed. Bring the final inbox
-          # current once now; future shards dispatch this themselves automatically.
-          gh workflow run gpt-inbox-live-refresh.yml --ref main
-          echo 'Realtime Qwen + inbox refresh dispatched.'
+      - run: |
+          echo 'REALTIME_CONVEYOR_PATCH_RETIRED'
+          echo 'No Qwen run is cancelled and no workflow is rewritten.'
