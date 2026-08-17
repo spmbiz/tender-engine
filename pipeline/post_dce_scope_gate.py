@@ -99,10 +99,15 @@ def _first(row: Mapping[str, Any], *names: str) -> Any:
 
 
 def _evidence_map(row: Mapping[str, Any]) -> Mapping[str, Any]:
-    snippets = row.get("gate_snippets") or row.get("evidence_by_gate") or {}
+    snippets = (
+        row.get("gate_snippets")
+        or row.get("evidence_by_gate")
+        or row.get("gate_evidence_candidates")
+        or {}
+    )
     if not isinstance(snippets, Mapping):
         return {}
-    for nested_key in ("categories", "gate_evidence", "evidence_by_gate"):
+    for nested_key in ("categories", "gate_evidence", "evidence_by_gate", "gate_evidence_candidates"):
         nested = snippets.get(nested_key)
         if isinstance(nested, Mapping):
             return nested
