@@ -23,6 +23,11 @@ concurrency:
 
 jobs:
   refresh:
+    # DCE shards now publish control/gpt_supergreen_inbox.json directly in their
+    # already-running worker. Legacy `gh workflow run` calls are deliberately a
+    # zero-runner no-op until the DCE workflow itself rolls forward; the 5-minute
+    # schedule remains an independent repair/fallback path.
+    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
