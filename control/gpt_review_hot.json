@@ -1,10 +1,10 @@
 {
   "schema": "GPT_REVIEW_HOT_V3",
-  "updated_at": "2026-08-17T08:27:12.411205+00:00",
+  "updated_at": "2026-08-17T08:28:04.854236+00:00",
   "latest_dce_run_id": 32010043125,
-  "latest_shard": 3,
+  "latest_shard": 4,
   "generation_reset": false,
-  "count": 9,
+  "count": 10,
   "items": [
     {
       "candidate_id": "US-SAM:3e48bc2c1e7e4b24b2089dac9f1f106a",
@@ -1492,6 +1492,251 @@
       "hot_ready_at": "2026-08-17T08:24:56.916903+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 22,
+      "spm_fit_band": "MAYBE",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
+      "candidate_id": "TED:564513-2026",
+      "title": "France – Motor vehicles – Acquisition de véhicules d'occasions de types fourgons",
+      "buyer": "MAIRIE DE MACON",
+      "portal": "TED",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/564513-2026",
+      "deadline": "2026-09-23T18:00:00+02:00",
+      "estimated_value": 0.0,
+      "currency": "EUR",
+      "preliminary_score": 80,
+      "priority_score": 80,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+        "conflict": false,
+        "notice_deadline_raw": "2026-09-23T18:00:00+02:00",
+        "notice_deadline_date": "2026-09-23",
+        "authoritative_submission_date": "2026-09-23",
+        "submission_deadline_candidates": [
+          "2026-09-23"
+        ],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [
+          "2026-09-23"
+        ],
+        "labelled_evidence": [
+          {
+            "date": "2026-09-23",
+            "match": "23 septembre 2026",
+            "label": "SUBMISSION",
+            "keyword": "réception des offres",
+            "distance": 13,
+            "context": " LA CONSULTATION \n  \n \nACCORD-CADRE DE FOURNITURES COURANTES ET DE SERVICES \n \n \n \n \n \n \n \n \nAcquisition de véhicules d'occasions de types \nfourgons \n  \n \nDate et heure limites de réception des offres : \nMercredi 23 septembre 2026 à 18:00 \n \n  \nPensez à anticiper votre dépôt plusieurs heures avant l'heure limite \n \n \n  \n \n \n \n \n \n \n \n \nVILLE DE MACON  \nQuai Lamartine \n71018 MACON \n\n \nL'ESSENTIEL DE LA PROCÉDURE \n \n \nObjet Acquisition de véhicules d'occasions de types fourgons \n \n \nMode de passation Appel d'offres ouvert \n \n "
+          }
+        ],
+        "evidence": [
+          {
+            "date": "2026-09-23",
+            "match": "23 septembre 2026",
+            "context": "MENT DE LA CONSULTATION \n  \n \nACCORD-CADRE DE FOURNITURES COURANTES ET DE SERVICES \n \n \n \n \n \n \n \n \nAcquisition de véhicules d'occasions de types \nfourgons \n  \n \nDate et heure limites de réception des offres : \nMercredi 23 septembre 2026 à 18:00 \n \n  \nPensez à anticiper votre dépôt plusieurs heures avant l'heure limite \n \n \n  \n \n \n \n \n \n \n \n \nVILLE DE MACON  \nQuai Lamartine \n71018 MACON \n\n \nL'ESSENTIEL DE LA PROCÉDURE \n \n \nObjet Acquisition de véhicules"
+          }
+        ],
+        "context_stats": {
+          "gate_contexts": 13,
+          "corpus_contexts": 10,
+          "unique_contexts": 18
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 11,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "ate et le destinataire. Elles sont prouvées par des attestations du destinataire ou, à défaut, par une déclaration du candidat Pour présenter leur candidature, les candidats peuvent utiliser les formulaires DC1 (lettre de candidature) et DC2 (déclaration du candidat). Ces documents sont disponibles gratuitement sur le site www.economie.gouv.fr. Ils peuvent aussi utiliser le Document Unique de Marché Européen (DUME). Pour justifier des capacités professionnelles, techniques et financières d'autres opérateurs économiques sur lesquels il s'appuie pour présenter sa candidature, le candidat produit les mêmes documents concernant cet opérateur économique que ceux qui lui so nt exigés par le pouvoir adjudicateur. En outre, pour justifier qu'il dispose des capacités de cet opérateur économique pour l'exécution des prestations, le candidat produit un engagement écrit de l'opérateur économique. Pièces de l'offre : Libellés L'acte d'engagement (AE) et ses annexes Le mémoire justificatif des dispositions que l'entreprise se propose d'adopter pour l'exécution du contrat Les fiches techniques correspondant aux produits et prestations proposés par le candidat 6 - Conditions d'envoi ou de remise des plis Les plis devront parvenir à destination avant la date et l'heure limites de réce",
+            "source": null,
+            "match": "opérateur économique"
+          },
+          {
+            "text": "enter leur candidature, les candidats peuvent utiliser les formulaires DC1 (lettre de candidature) et DC2 (déclaration du candidat). Ces documents sont disponibles gratuitement sur le site www.economie.gouv.fr. Ils peuvent aussi utiliser le Document Unique de Marché Européen (DUME). Pour justifier des capacités professionnelles, techniques et financières d'autres opérateurs économiques sur lesquels il s'appuie pour présenter sa candidature, le candidat produit les mêmes documents concernant cet opérateur économique que ceux qui lui so nt exigés par le pouvoir adjudicateur. En outre, pour justifier qu'il dispose des capacités de cet opérateur économique pour l'exécution des prestations, le candidat produit un engagement écrit de l'opérateur économique. Pièces de l'offre : Libellés L'acte d'engagement (AE) et ses annexes Le mémoire justificatif des dispositions que l'entreprise se propose d'adopter pour l'exécution du contrat Les fiches techniques correspondant aux produits et prestations proposés par le candidat 6 - Conditions d'envoi ou de remise des plis Les plis devront parvenir à destination avant la date et l'heure limites de réception des offres indiquées sur la page de garde du présent document. 6.1 - Transmission électronique La transmission des documents par voi",
+            "source": null,
+            "match": "opérateur économique"
+          },
+          {
+            "text": "DC2 (déclaration du candidat). Ces documents sont disponibles gratuitement sur le site www.economie.gouv.fr. Ils peuvent aussi utiliser le Document Unique de Marché Européen (DUME). Pour justifier des capacités professionnelles, techniques et financières d'autres opérateurs économiques sur lesquels il s'appuie pour présenter sa candidature, le candidat produit les mêmes documents concernant cet opérateur économique que ceux qui lui so nt exigés par le pouvoir adjudicateur. En outre, pour justifier qu'il dispose des capacités de cet opérateur économique pour l'exécution des prestations, le candidat produit un engagement écrit de l'opérateur économique. Pièces de l'offre : Libellés L'acte d'engagement (AE) et ses annexes Le mémoire justificatif des dispositions que l'entreprise se propose d'adopter pour l'exécution du contrat Les fiches techniques correspondant aux produits et prestations proposés par le candidat 6 - Conditions d'envoi ou de remise des plis Les plis devront parvenir à destination avant la date et l'heure limites de réception des offres indiquées sur la page de garde du présent document. 6.1 - Transmission électronique La transmission des documents par voie électronique est effectuée sur le profil d'acheteur du pouvoir adjudicateur, à l'adresse URL suiva",
+            "source": null,
+            "match": "opérateur économique"
+          }
+        ],
+        "turnover_financial": [
+          {
+            "text": "5.1 - Documents à produire Chaque candidat aura à produire un dossier complet comprenant les pièces suivantes : Consultation n°: 2026_MACON-fourgon Page 6 sur 10 Pièces de la candidature telles que prévues aux articles L. 2142 -1, R. 2142 -3, R. 2142 -4, R. 2143 -3 et R. 2143-4 du Code de la commande publique : Renseignements concernant la situation juridique de l'entreprise : Libellés Déclaration sur l'honneur pour justifier que le candidat n'entre dans aucun des cas d'interdiction de soumissionner Renseignements concernant la capacité économique et financière de l'entreprise : Libellés Déclaration concernant le chiffre d'affaires global et le chiffre d'affaires concernant les prestations objet du contrat, réalisées au cours des trois derniers exercices disponibles Renseignements concernant les références professionnelles et la capacité technique de l'entreprise : Libellés Liste des principales prestations effectuées au cours des trois dernières années, indiquant le montant, la date et le destinataire. Elles sont prouvées par des attestations du destinataire ou, à défaut, par une déclaration du candidat Pour présenter leur candidature, les candidats peuvent utiliser les formulaires DC1 (lettre de candidature) et DC2 (déclaration du candidat). Ces docu",
+            "source": null,
+            "match": "chiffre d'affaires"
+          },
+          {
+            "text": "haque candidat aura à produire un dossier complet comprenant les pièces suivantes : Consultation n°: 2026_MACON-fourgon Page 6 sur 10 Pièces de la candidature telles que prévues aux articles L. 2142 -1, R. 2142 -3, R. 2142 -4, R. 2143 -3 et R. 2143-4 du Code de la commande publique : Renseignements concernant la situation juridique de l'entreprise : Libellés Déclaration sur l'honneur pour justifier que le candidat n'entre dans aucun des cas d'interdiction de soumissionner Renseignements concernant la capacité économique et financière de l'entreprise : Libellés Déclaration concernant le chiffre d'affaires global et le chiffre d'affaires concernant les prestations objet du contrat, réalisées au cours des trois derniers exercices disponibles Renseignements concernant les références professionnelles et la capacité technique de l'entreprise : Libellés Liste des principales prestations effectuées au cours des trois dernières années, indiquant le montant, la date et le destinataire. Elles sont prouvées par des attestations du destinataire ou, à défaut, par une déclaration du candidat Pour présenter leur candidature, les candidats peuvent utiliser les formulaires DC1 (lettre de candidature) et DC2 (déclaration du candidat). Ces documents sont disponibles gratuitem",
+            "source": null,
+            "match": "chiffre d'affaires"
+          }
+        ],
+        "references_experience": [
+          {
+            "text": "dature telles que prévues aux articles L. 2142 -1, R. 2142 -3, R. 2142 -4, R. 2143 -3 et R. 2143-4 du Code de la commande publique : Renseignements concernant la situation juridique de l'entreprise : Libellés Déclaration sur l'honneur pour justifier que le candidat n'entre dans aucun des cas d'interdiction de soumissionner Renseignements concernant la capacité économique et financière de l'entreprise : Libellés Déclaration concernant le chiffre d'affaires global et le chiffre d'affaires concernant les prestations objet du contrat, réalisées au cours des trois derniers exercices disponibles Renseignements concernant les références professionnelles et la capacité technique de l'entreprise : Libellés Liste des principales prestations effectuées au cours des trois dernières années, indiquant le montant, la date et le destinataire. Elles sont prouvées par des attestations du destinataire ou, à défaut, par une déclaration du candidat Pour présenter leur candidature, les candidats peuvent utiliser les formulaires DC1 (lettre de candidature) et DC2 (déclaration du candidat). Ces documents sont disponibles gratuitement sur le site www.economie.gouv.fr. Ils peuvent aussi utiliser le Document Unique de Marché Européen (DUME). Pour justifier des capacités profe",
+            "source": null,
+            "match": "références"
+          },
+          {
+            "text": "destination avant la date et l'heure limites de réception des offres indiquées sur la page de garde du présent document. 6.1 - Transmission électronique La transmission des documents par voie électronique est effectuée sur le profil d'acheteur du pouvoir adjudicateur, à l'adresse URL suivante : https://achatpublic.com. Le pli doit contenir les pièces de la candidature et les pièces de l'offre définies au présent règlement de la consultation. Consultation n°: 2026_MACON-fourgon Page 7 sur 10 Chaque transmission fera l'objet d'une date certaine de réception et d'un accusé de réception électronique. A ce titre, le fuseau horaire de référence est celui de (GMT+01: 00) Paris, Bruxelles, Copenhague, Madrid. Le pli sera considéré « hors délai » si le téléchargement se termine après la date et l'heure limites de réception des offres. Si plusieurs plis sont transmis successivement par le même candidat, seul le dernier pli transmis dans le délai imparti est pris en compte par l'acheteur. Il doit par conséquent contenir l'ensemble des pièces exigées au titre de la présente consultation. Le pli peut être doublé d'une copie de sauvegarde transmise dans les délais impartis, sur support physique électronique (CD-ROM, DVD-ROM, clé USB) ou sur support papier. Cette copie doit être p",
+            "source": null,
+            "match": "référence"
+          }
+        ],
+        "certifications_partner": [
+          {
+            "text": "ales des véhicules disponibles) 40.0 1.2-Moyens humains et techniques pour la préparation, l’entretien, la réparation, le suivi des véhicules (jugé au regard des réponses apportées dans le cadre de mémoire technique et financier) 5.0 1.3-Délai de garantie maximum proposé 15.0 2-Prix des prestations (jugé au regard des prix proposés dans le cadre de mémoire technique et financier pour les 3 véhicules) 30.0 3-Performances en matière de protection de l’environnement 10.0 7.3 - Suite à donner à la consultation Le ou les candidats attributaires d'un accord -cadre seront donc retenus à titre provisoire en attendant la production des certificats et attestations des articles R. 2143 -6 à R. 2143 -10 du Code de la commande publique, qui seront à nouveau demandés lors de l'attribution d'un marché subséquent. Le délai imparti par le pouvoir adjudicateur pour remettre ces documents ne pourra être supérieur à 15 jours. 8 - Renseignements complémentaires 8.1 - Adresses supplémentaires et points de contact Pour tout renseignement complémentaire concernant cette consultation, les candidats transmettent impérativement leur demande par l'intermédiaire du profil d'acheteur du pouvoir adjudicateur, dont l'adresse URL est la suivante : https://achatpublic.com Cette demande doit i",
+            "source": null,
+            "match": "certificat"
+          },
+          {
+            "text": "istratif.fr/ Pour obtenir des renseignements relatifs à l'introduction des recours, les candidats devront s'adresser à : Tribunal Administratif de Dijon 22 rue d'Assas - BP 61616 21000 DIJON Tél : 03 80 73 91 00 Télécopie : 03 80 73 39 89 Courriel : greffe.ta-dijon@juradm.fr Adresse internet (U.R.L) : http://dijon.tribunal-administratif.fr/ Consultation n°: 2026_MACON-fourgon Page 9 sur 10 9 - Clauses complémentaires Signature électronique des documents Les documents devant être signés électroniquement par le titulaire peuvent l'être soit à la remise de l'offre, soit à l’issue de la procédure de passation, en présentant un certificat de signature électronique qualifié. Un certificat de signature qualifié doit être délivré, soit par un prestataire de service de confiance qualifié répondant aux exigences du règlement eIDAS , soit par une autorité de certification, française ou étrangère, qui répond aux exigences équivalentes à l’annexe I du règlement (UE) n° 910/2014 du Parlement européen et du Conseil du 23 juillet 2014 sur l’identification électronique et les services de c onfiance pour les transactions électroniques au sein du marché intérieur. Un prestataire de service de confiance qualifié est un prestataire de services qui fournit un ou plusieurs services",
+            "source": null,
+            "match": "certificat"
+          },
+          {
+            "text": "à l'introduction des recours, les candidats devront s'adresser à : Tribunal Administratif de Dijon 22 rue d'Assas - BP 61616 21000 DIJON Tél : 03 80 73 91 00 Télécopie : 03 80 73 39 89 Courriel : greffe.ta-dijon@juradm.fr Adresse internet (U.R.L) : http://dijon.tribunal-administratif.fr/ Consultation n°: 2026_MACON-fourgon Page 9 sur 10 9 - Clauses complémentaires Signature électronique des documents Les documents devant être signés électroniquement par le titulaire peuvent l'être soit à la remise de l'offre, soit à l’issue de la procédure de passation, en présentant un certificat de signature électronique qualifié. Un certificat de signature qualifié doit être délivré, soit par un prestataire de service de confiance qualifié répondant aux exigences du règlement eIDAS , soit par une autorité de certification, française ou étrangère, qui répond aux exigences équivalentes à l’annexe I du règlement (UE) n° 910/2014 du Parlement européen et du Conseil du 23 juillet 2014 sur l’identification électronique et les services de c onfiance pour les transactions électroniques au sein du marché intérieur. Un prestataire de service de confiance qualifié est un prestataire de services qui fournit un ou plusieurs services de confiance qualifiés et a obtenu de l’organe de con",
+            "source": null,
+            "match": "certificat"
+          },
+          {
+            "text": "80 73 39 89 Courriel : greffe.ta-dijon@juradm.fr Adresse internet (U.R.L) : http://dijon.tribunal-administratif.fr/ Consultation n°: 2026_MACON-fourgon Page 9 sur 10 9 - Clauses complémentaires Signature électronique des documents Les documents devant être signés électroniquement par le titulaire peuvent l'être soit à la remise de l'offre, soit à l’issue de la procédure de passation, en présentant un certificat de signature électronique qualifié. Un certificat de signature qualifié doit être délivré, soit par un prestataire de service de confiance qualifié répondant aux exigences du règlement eIDAS , soit par une autorité de certification, française ou étrangère, qui répond aux exigences équivalentes à l’annexe I du règlement (UE) n° 910/2014 du Parlement européen et du Conseil du 23 juillet 2014 sur l’identification électronique et les services de c onfiance pour les transactions électroniques au sein du marché intérieur. Un prestataire de service de confiance qualifié est un prestataire de services qui fournit un ou plusieurs services de confiance qualifiés et a obtenu de l’organe de contrôle le statut qualifié (article 3.20 du règlement eIDAS). La liste est disponible avec ce lien : https://esignature.ec.europa.eu/efda/tl-browser/#/screen/tl/FR Les frais d’ac",
+            "source": null,
+            "match": "certification"
+          }
+        ],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [
+          {
+            "text": "/RC/RC.pdf ===== RÈGLEMENT DE LA CONSULTATION ACCORD-CADRE DE FOURNITURES COURANTES ET DE SERVICES Acquisition de véhicules d'occasions de types fourgons Date et heure limites de réception des offres : Mercredi 23 septembre 2026 à 18:00 Pensez à anticiper votre dépôt plusieurs heures avant l'heure limite VILLE DE MACON Quai Lamartine 71018 MACON L'ESSENTIEL DE LA PROCÉDURE Objet Acquisition de véhicules d'occasions de types fourgons Mode de passation Appel d'offres ouvert Type de contrat Accord-cadre Délai de validité des offres 6 mois Forme de groupement Aucune forme de groupement imposée à l'attributaire Variantes Sans PSE Sans Clauses sociales Avec Clauses environnementales Avec Durée / Délai 12 mois Visite sur site Sans  Signature électronique Obligatoire du contrat par l’attributaire (articles 6.1 et 9 du présent règlement) SOMMAIRE 1 - Objet et étendue de la consultation ................................................................................................. 4 1.1 - Objet ........................................................................................................................................ 4 1.2 - Mode de passation",
+            "source": null,
+            "match": "groupement"
+          },
+          {
+            "text": "ENT DE LA CONSULTATION ACCORD-CADRE DE FOURNITURES COURANTES ET DE SERVICES Acquisition de véhicules d'occasions de types fourgons Date et heure limites de réception des offres : Mercredi 23 septembre 2026 à 18:00 Pensez à anticiper votre dépôt plusieurs heures avant l'heure limite VILLE DE MACON Quai Lamartine 71018 MACON L'ESSENTIEL DE LA PROCÉDURE Objet Acquisition de véhicules d'occasions de types fourgons Mode de passation Appel d'offres ouvert Type de contrat Accord-cadre Délai de validité des offres 6 mois Forme de groupement Aucune forme de groupement imposée à l'attributaire Variantes Sans PSE Sans Clauses sociales Avec Clauses environnementales Avec Durée / Délai 12 mois Visite sur site Sans  Signature électronique Obligatoire du contrat par l’attributaire (articles 6.1 et 9 du présent règlement) SOMMAIRE 1 - Objet et étendue de la consultation ................................................................................................. 4 1.1 - Objet ........................................................................................................................................ 4 1.2 - Mode de passation ...........................",
+            "source": null,
+            "match": "groupement"
+          },
+          {
+            "text": ".......................................................... 4 1.4 - Décomposition de la consultation............................................................................................ 4 1.5 - Nomenclature........................................................................................................................... 4 2 - Conditions de la consultation ......................................................................................................... 4 2.1 - Délai de validité des offres ...................................................................................................... 4 2.2 - Forme juridique du groupement .............................................................................................. 4 2.3 - Variantes .................................................................................................................................. 4 2.4 - Développement durable ........................................................................................................... 5 3 - Conditions relatives au contrat ....................................................................................................... 5 3.1 - Durée du contrat ou délai d'exécution ...........................................................................",
+            "source": null,
+            "match": "groupement"
+          },
+          {
+            "text": "pplication des articles L. 2125 -1 1°, R. 2162-1 à R. 2162-12 du Code de la commande publique Il sera attribué à 3 opérateurs économiques (sous réserve d'un nombre suffisant d'offres). 1.4 - Décomposition de la consultation Il n'est pas prévu de décomposition en lots. 1.5 - Nomenclature La classification conforme au vocabulaire commun des marchés européens (CPV) est : Code principal Description 34100000-8 Véhicules à moteur 2 - Conditions de la consultation 2.1 - Délai de validité des offres Le délai de validité des offres est fixé à 6 mois à compter de la date limite de réception des offres. 2.2 - Forme juridique du groupement Le pouvoir adjudicateur ne souhaite imposer aucune forme de groupement à l'attributaire de l'accord -cadre. 2.3 - Variantes Aucune variante n'est autorisée. Consultation n°: 2026_MACON-fourgon Page 5 sur 10 2.4 - Développement durable Cette consultation comporte des conditions d'exécution à caractère social et environnemental dont le détail est indiqué dans le CCAP. Le respect de ces dispositions est une condition de la conformité de l'offre. Une offre comportant des réserves ou ne resp ectant pas ces conditions d'exécution particulières sera déclarée irrégulière au motif du non-respect du cahier des charges. Chaque titulaire c",
+            "source": null,
+            "match": "groupement"
+          }
+        ],
+        "deliverables_scope": [
+          {
+            "text": ". 2.2 - Forme juridique du groupement Le pouvoir adjudicateur ne souhaite imposer aucune forme de groupement à l'attributaire de l'accord -cadre. 2.3 - Variantes Aucune variante n'est autorisée. Consultation n°: 2026_MACON-fourgon Page 5 sur 10 2.4 - Développement durable Cette consultation comporte des conditions d'exécution à caractère social et environnemental dont le détail est indiqué dans le CCAP. Le respect de ces dispositions est une condition de la conformité de l'offre. Une offre comportant des réserves ou ne resp ectant pas ces conditions d'exécution particulières sera déclarée irrégulière au motif du non-respect du cahier des charges. Chaque titulaire concerné devra mettre en œuvre tous les moyens dont il dispose pour respecter ces objectifs de développement durable dans le cadre de l'exécution des prestations. 3 - Conditions relatives au contrat 3.1 - Durée du contrat ou délai d'exécution La durée de la période initiale est fixée au CCAP. 3.2 - Modalités essentielles de financement et de paiement Les sommes dues au(x) titulaire(s) de l'accord-cadre seront payées dans un délai global de 30 jours à compter de la date de réception des factures ou des demandes de paiement équivalentes. 4 - Contenu du dossier de consultation Le dossier de consultation des",
+            "source": null,
+            "match": "cahier des charges"
+          },
+          {
+            "text": "autorisée. Consultation n°: 2026_MACON-fourgon Page 5 sur 10 2.4 - Développement durable Cette consultation comporte des conditions d'exécution à caractère social et environnemental dont le détail est indiqué dans le CCAP. Le respect de ces dispositions est une condition de la conformité de l'offre. Une offre comportant des réserves ou ne resp ectant pas ces conditions d'exécution particulières sera déclarée irrégulière au motif du non-respect du cahier des charges. Chaque titulaire concerné devra mettre en œuvre tous les moyens dont il dispose pour respecter ces objectifs de développement durable dans le cadre de l'exécution des prestations. 3 - Conditions relatives au contrat 3.1 - Durée du contrat ou délai d'exécution La durée de la période initiale est fixée au CCAP. 3.2 - Modalités essentielles de financement et de paiement Les sommes dues au(x) titulaire(s) de l'accord-cadre seront payées dans un délai global de 30 jours à compter de la date de réception des factures ou des demandes de paiement équivalentes. 4 - Contenu du dossier de consultation Le dossier de consultation des entreprises (DCE) contient les pièces suivantes : - Le règlement de la consultation (RC) - L'acte d'engagement (AE) et ses annexes - Le cahier des clauses administratives partic",
+            "source": null,
+            "match": "prestations"
+          },
+          {
+            "text": "dossier complet comprenant les pièces suivantes : Consultation n°: 2026_MACON-fourgon Page 6 sur 10 Pièces de la candidature telles que prévues aux articles L. 2142 -1, R. 2142 -3, R. 2142 -4, R. 2143 -3 et R. 2143-4 du Code de la commande publique : Renseignements concernant la situation juridique de l'entreprise : Libellés Déclaration sur l'honneur pour justifier que le candidat n'entre dans aucun des cas d'interdiction de soumissionner Renseignements concernant la capacité économique et financière de l'entreprise : Libellés Déclaration concernant le chiffre d'affaires global et le chiffre d'affaires concernant les prestations objet du contrat, réalisées au cours des trois derniers exercices disponibles Renseignements concernant les références professionnelles et la capacité technique de l'entreprise : Libellés Liste des principales prestations effectuées au cours des trois dernières années, indiquant le montant, la date et le destinataire. Elles sont prouvées par des attestations du destinataire ou, à défaut, par une déclaration du candidat Pour présenter leur candidature, les candidats peuvent utiliser les formulaires DC1 (lettre de candidature) et DC2 (déclaration du candidat). Ces documents sont disponibles gratuitement sur le site www.econom",
+            "source": null,
+            "match": "prestations"
+          },
+          {
+            "text": "de la commande publique : Renseignements concernant la situation juridique de l'entreprise : Libellés Déclaration sur l'honneur pour justifier que le candidat n'entre dans aucun des cas d'interdiction de soumissionner Renseignements concernant la capacité économique et financière de l'entreprise : Libellés Déclaration concernant le chiffre d'affaires global et le chiffre d'affaires concernant les prestations objet du contrat, réalisées au cours des trois derniers exercices disponibles Renseignements concernant les références professionnelles et la capacité technique de l'entreprise : Libellés Liste des principales prestations effectuées au cours des trois dernières années, indiquant le montant, la date et le destinataire. Elles sont prouvées par des attestations du destinataire ou, à défaut, par une déclaration du candidat Pour présenter leur candidature, les candidats peuvent utiliser les formulaires DC1 (lettre de candidature) et DC2 (déclaration du candidat). Ces documents sont disponibles gratuitement sur le site www.economie.gouv.fr. Ils peuvent aussi utiliser le Document Unique de Marché Européen (DUME). Pour justifier des capacités professionnelles, techniques et financières d'autres opérateurs économiques sur lesquels il s'appuie pour présen",
+            "source": null,
+            "match": "prestations"
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "e limites de réception des offres : Mercredi 23 septembre 2026 à 18:00 Pensez à anticiper votre dépôt plusieurs heures avant l'heure limite VILLE DE MACON Quai Lamartine 71018 MACON L'ESSENTIEL DE LA PROCÉDURE Objet Acquisition de véhicules d'occasions de types fourgons Mode de passation Appel d'offres ouvert Type de contrat Accord-cadre Délai de validité des offres 6 mois Forme de groupement Aucune forme de groupement imposée à l'attributaire Variantes Sans PSE Sans Clauses sociales Avec Clauses environnementales Avec Durée / Délai 12 mois Visite sur site Sans  Signature électronique Obligatoire du contrat par l’attributaire (articles 6.1 et 9 du présent règlement) SOMMAIRE 1 - Objet et étendue de la consultation ................................................................................................. 4 1.1 - Objet ........................................................................................................................................ 4 1.2 - Mode de passation ................................................................................................................... 4 1.3 - Type et forme de contrat ................................................",
+            "source": null,
+            "match": "sur site"
+          },
+          {
+            "text": "ps://www.achatpublic.com Cela concerne les questions/réponses sur le DCE, les demandes de compléments de dossier, de précisions, de négociation, de mise au point du marché, les notifications ou les documents et attestations exigées ci - dessus. Tout échange ou information du pouvoir adjudicateur émis à l’attention d’un ou plusieurs candidats génère automatiquement un message du site du profil d’acheteur, qui parvient au candidat sur le courriel du compte utilisateur créé sur cette plate-forme. Consultation n°: 2026_MACON-fourgon Page 10 sur 10 Ce message automatique est à conserver : il précise au candidat un identifiant / login personnel, lui permettant d’aller télécharger l’information sur le site. A ce titre, et pendant toute la durée de la consultation, les candidats sont invités à relever régulièrement leurs adresses de courriels (y compris dans les courriels classés « indésirables » ou « spam »). En effet, ces informations peuvent être assorties par le pouvoir adjudicateur d’un délai de réponse obligatoire, sous peine d’élimination de l’offre.",
+            "source": null,
+            "match": "in person"
+          }
+        ],
+        "term_value": [
+          {
+            "text": "de contact ........................................................................ 8 8.2 - Procédures de recours .............................................................................................................. 8 9 - Clauses complémentaires ............................................................................................................... 9 Consultation n°: 2026_MACON-fourgon Page 4 sur 10 1 - Objet et étendue de la consultation 1.1 - Objet La présente consultation concerne : L’Acquisition de véhicules d'occasions de types fourgons Cette consultation est relancée car le précédent contrat a atteint son montant maximum alors que la fin d’échéance de la seconde période était fixée au 26/02/20270. En application de l’arrêt Simonsen et Weel, l’accord-cadre a donc pris fin. Le présent accord-cadre a pour objet de définir les termes régissant les marchés à passer sur son fondement (appelés « marchés subséquents ») au cours de la période fixée à l’Article 3.1. L'objet de cet accord-cadre concerne la sélection de titulaires qui auront la capacité de répondre aux marchés subséquents d'achat de véhicules d'occasion de types \"fourgons\" L1H2 et L2 H2 par la Ville de Mâcon. Le présent accord -cadre est multi -attributaire. Les marchés subséquents fondés s",
+            "source": null,
+            "match": "montant maximum"
+          }
+        ],
+        "award_criteria": [
+          {
+            "text": "2 - Attribution des accords-cadres Le jugement des offres sera effectué dans les conditions prévues aux articles L.2152 -1 à L.2152-4, R. 2152- 1 et R. 2152-2 du Code de la commande publique et donnera lieu à un classement des offres. Consultation n°: 2026_MACON-fourgon Page 8 sur 10 L'attention des candidats est attirée sur le fait que toute offre irrégulière pourra faire l'objet d'une demande de régularisation, à condition qu'elle ne soit pas anormalement basse. En revanche, toute offre inacceptable ou inappropriée sera éliminée. Les critères retenus pour le jugement des offres sont pondérés de la manière suivante : Critères Pondération 1-Valeur technique 60.0 1.1-Etendue du parc disponible sur le type \"fourgon\" ( Fournir toutes les fiches commerciales des véhicules disponibles) 40.0 1.2-Moyens humains et techniques pour la préparation, l’entretien, la réparation, le suivi des véhicules (jugé au regard des réponses apportées dans le cadre de mémoire technique et financier) 5.0 1.3-Délai de garantie maximum proposé 15.0 2-Prix des prestations (jugé au regard des prix proposés dans le cadre de mémoire technique et financier pour les 3 véhicules) 30.0 3-Performances en matière de protection de l’environnement 10.0 7.3 - Suite à donner à la consultation Le ou l",
+            "source": null,
+            "match": "Pondération"
+          }
+        ],
+        "forms_signatures": [
+          {
+            "text": "on des offres : Mercredi 23 septembre 2026 à 18:00 Pensez à anticiper votre dépôt plusieurs heures avant l'heure limite VILLE DE MACON Quai Lamartine 71018 MACON L'ESSENTIEL DE LA PROCÉDURE Objet Acquisition de véhicules d'occasions de types fourgons Mode de passation Appel d'offres ouvert Type de contrat Accord-cadre Délai de validité des offres 6 mois Forme de groupement Aucune forme de groupement imposée à l'attributaire Variantes Sans PSE Sans Clauses sociales Avec Clauses environnementales Avec Durée / Délai 12 mois Visite sur site Sans  Signature électronique Obligatoire du contrat par l’attributaire (articles 6.1 et 9 du présent règlement) SOMMAIRE 1 - Objet et étendue de la consultation ................................................................................................. 4 1.1 - Objet ........................................................................................................................................ 4 1.2 - Mode de passation ................................................................................................................... 4 1.3 - Type et forme de contrat .....................................................................",
+            "source": null,
+            "match": "Signature"
+          },
+          {
+            "text": "ces objectifs de développement durable dans le cadre de l'exécution des prestations. 3 - Conditions relatives au contrat 3.1 - Durée du contrat ou délai d'exécution La durée de la période initiale est fixée au CCAP. 3.2 - Modalités essentielles de financement et de paiement Les sommes dues au(x) titulaire(s) de l'accord-cadre seront payées dans un délai global de 30 jours à compter de la date de réception des factures ou des demandes de paiement équivalentes. 4 - Contenu du dossier de consultation Le dossier de consultation des entreprises (DCE) contient les pièces suivantes : - Le règlement de la consultation (RC) - L'acte d'engagement (AE) et ses annexes - Le cahier des clauses administratives particulières (CCAP) - Le cadre de mémoire technique et financier Il est disponible à l’adresse électronique suivante : https://www.achatpublic.com En cas de difficultés pour télécharger le dossier, communiquer avec le pouvoir adjudicateur via le profil d’acheteur ou déposer son offre, le candidat est invité à se rapprocher du support technique en contactant le numéro suivant : 08 92 23 21 20 (hotline du site internet achat public) ou support@achatpublic.com. Il est remis gratuitement à chaque candidat. Aucune demande d'envoi du DCE sur support physique électronique n'est",
+            "source": null,
+            "match": "acte d'engagement"
+          },
+          {
+            "text": "nt durable dans le cadre de l'exécution des prestations. 3 - Conditions relatives au contrat 3.1 - Durée du contrat ou délai d'exécution La durée de la période initiale est fixée au CCAP. 3.2 - Modalités essentielles de financement et de paiement Les sommes dues au(x) titulaire(s) de l'accord-cadre seront payées dans un délai global de 30 jours à compter de la date de réception des factures ou des demandes de paiement équivalentes. 4 - Contenu du dossier de consultation Le dossier de consultation des entreprises (DCE) contient les pièces suivantes : - Le règlement de la consultation (RC) - L'acte d'engagement (AE) et ses annexes - Le cahier des clauses administratives particulières (CCAP) - Le cadre de mémoire technique et financier Il est disponible à l’adresse électronique suivante : https://www.achatpublic.com En cas de difficultés pour télécharger le dossier, communiquer avec le pouvoir adjudicateur via le profil d’acheteur ou déposer son offre, le candidat est invité à se rapprocher du support technique en contactant le numéro suivant : 08 92 23 21 20 (hotline du site internet achat public) ou support@achatpublic.com. Il est remis gratuitement à chaque candidat. Aucune demande d'envoi du DCE sur support physique électronique n'est autorisée. Le pouvoir adjudicateur se réserve le droit d'apporter des modifications de détail au dossier de consultation au plus tard 10 jours avant la date limite de réception des offres. Ce délai est décompté à partir de la date d'envoi par le pouvoir adjudicateur des modifications aux candidats ayant retiré le dossier initial. Les candidats devront alors répondre sur la base du dossier modifié sans pouvoir n'élever aucune réclamation à ce sujet. Si, pendant l'étude du dossier par les candidats, la date limite de réception des offres es",
+            "source": null,
+            "match": "annexes \n- Le cahier des clauses administratives particulières (CCAP) \n- Le cadre de mémoire technique et financier \n \nI"
+          },
+          {
+            "text": "nal Administratif de Dijon 22 rue d'Assas - BP 61616 21000 DIJON Tél : 03 80 73 91 00 Télécopie : 03 80 73 39 89 Courriel : greffe.ta-dijon@juradm.fr Adresse internet (U.R.L) : http://dijon.tribunal-administratif.fr/ Pour obtenir des renseignements relatifs à l'introduction des recours, les candidats devront s'adresser à : Tribunal Administratif de Dijon 22 rue d'Assas - BP 61616 21000 DIJON Tél : 03 80 73 91 00 Télécopie : 03 80 73 39 89 Courriel : greffe.ta-dijon@juradm.fr Adresse internet (U.R.L) : http://dijon.tribunal-administratif.fr/ Consultation n°: 2026_MACON-fourgon Page 9 sur 10 9 - Clauses complémentaires Signature électronique des documents Les documents devant être signés électroniquement par le titulaire peuvent l'être soit à la remise de l'offre, soit à l’issue de la procédure de passation, en présentant un certificat de signature électronique qualifié. Un certificat de signature qualifié doit être délivré, soit par un prestataire de service de confiance qualifié répondant aux exigences du règlement eIDAS , soit par une autorité de certification, française ou étrangère, qui répond aux exigences équivalentes à l’annexe I du règlement (UE) n° 910/2014 du Parlement européen et du Conseil du 23 juillet 2014 sur l’identification électronique et",
+            "source": null,
+            "match": "Signature"
+          }
+        ],
+        "submission": [
+          {
+            "text": "pe et forme de contrat L'accord-cadre avec maximum est passé en application des articles L. 2125 -1 1°, R. 2162-1 à R. 2162-12 du Code de la commande publique Il sera attribué à 3 opérateurs économiques (sous réserve d'un nombre suffisant d'offres). 1.4 - Décomposition de la consultation Il n'est pas prévu de décomposition en lots. 1.5 - Nomenclature La classification conforme au vocabulaire commun des marchés européens (CPV) est : Code principal Description 34100000-8 Véhicules à moteur 2 - Conditions de la consultation 2.1 - Délai de validité des offres Le délai de validité des offres est fixé à 6 mois à compter de la date limite de réception des offres. 2.2 - Forme juridique du groupement Le pouvoir adjudicateur ne souhaite imposer aucune forme de groupement à l'attributaire de l'accord -cadre. 2.3 - Variantes Aucune variante n'est autorisée. Consultation n°: 2026_MACON-fourgon Page 5 sur 10 2.4 - Développement durable Cette consultation comporte des conditions d'exécution à caractère social et environnemental dont le détail est indiqué dans le CCAP. Le respect de ces dispositions est une condition de la conformité de l'offre. Une offre comportant des réserves ou ne resp ectant pas ces conditions d'exécution particulières sera déclarée irrégulière au",
+            "source": null,
+            "match": "date limite"
+          },
+          {
+            "text": "dresse électronique suivante : https://www.achatpublic.com En cas de difficultés pour télécharger le dossier, communiquer avec le pouvoir adjudicateur via le profil d’acheteur ou déposer son offre, le candidat est invité à se rapprocher du support technique en contactant le numéro suivant : 08 92 23 21 20 (hotline du site internet achat public) ou support@achatpublic.com. Il est remis gratuitement à chaque candidat. Aucune demande d'envoi du DCE sur support physique électronique n'est autorisée. Le pouvoir adjudicateur se réserve le droit d'apporter des modifications de détail au dossier de consultation au plus tard 10 jours avant la date limite de réception des offres. Ce délai est décompté à partir de la date d'envoi par le pouvoir adjudicateur des modifications aux candidats ayant retiré le dossier initial. Les candidats devront alors répondre sur la base du dossier modifié sans pouvoir n'élever aucune réclamation à ce sujet. Si, pendant l'étude du dossier par les candidats, la date limite de réception des offres est reportée, la disposition précédente est applicable en fonction de cette nouvelle date. 5 - Présentation des candidatures et des offres Le pouvoir adjudicateur applique le principe \"Dites -le nous une fois\". Par conséquent, les candidats ne sont pas tenus",
+            "source": null,
+            "match": "date limite"
+          },
+          {
+            "text": "@achatpublic.com. Il est remis gratuitement à chaque candidat. Aucune demande d'envoi du DCE sur support physique électronique n'est autorisée. Le pouvoir adjudicateur se réserve le droit d'apporter des modifications de détail au dossier de consultation au plus tard 10 jours avant la date limite de réception des offres. Ce délai est décompté à partir de la date d'envoi par le pouvoir adjudicateur des modifications aux candidats ayant retiré le dossier initial. Les candidats devront alors répondre sur la base du dossier modifié sans pouvoir n'élever aucune réclamation à ce sujet. Si, pendant l'étude du dossier par les candidats, la date limite de réception des offres est reportée, la disposition précédente est applicable en fonction de cette nouvelle date. 5 - Présentation des candidatures et des offres Le pouvoir adjudicateur applique le principe \"Dites -le nous une fois\". Par conséquent, les candidats ne sont pas tenus de fournir les documents et renseignements qui ont déjà été transmis dans le cadre d'une précédente consultation et qui demeurent valables. Les offres des candidats seront entièrement rédigées en langue française et exprimées en EURO. Si les offres des candidats sont rédigées dans une autre langue, elles doivent être accompagnées d'une traduction en fr",
+            "source": null,
+            "match": "date limite"
+          },
+          {
+            "text": "à R. 2143 -10 du Code de la commande publique, qui seront à nouveau demandés lors de l'attribution d'un marché subséquent. Le délai imparti par le pouvoir adjudicateur pour remettre ces documents ne pourra être supérieur à 15 jours. 8 - Renseignements complémentaires 8.1 - Adresses supplémentaires et points de contact Pour tout renseignement complémentaire concernant cette consultation, les candidats transmettent impérativement leur demande par l'intermédiaire du profil d'acheteur du pouvoir adjudicateur, dont l'adresse URL est la suivante : https://achatpublic.com Cette demande doit intervenir au plus tard 10 jours avant la date limite de remise des plis. Une réponse sera alors adressée, à toutes les entreprises ayant retiré le dossier ou l'ayant téléchargé après identification, 6 jours au plus tard avant la date limite de remise des plis. 8.2 - Procédures de recours Le tribunal territorialement compétent est : Tribunal Administratif de Dijon 22 rue d'Assas - BP 61616 21000 DIJON Tél : 03 80 73 91 00 Télécopie : 03 80 73 39 89 Courriel : greffe.ta-dijon@juradm.fr Adresse internet (U.R.L) : http://dijon.tribunal-administratif.fr/ Pour obtenir des renseignements relatifs à l'introduction des recours, les candidats devront s'adresser à : Tribunal Administrati",
+            "source": null,
+            "match": "date limite"
+          }
+        ],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32010043125,
+      "source_shard": 4,
+      "hot_ready_at": "2026-08-17T08:28:04.471068+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 21,
       "spm_fit_band": "MAYBE",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
