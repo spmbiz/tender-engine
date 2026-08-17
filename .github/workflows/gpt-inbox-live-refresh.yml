@@ -22,16 +22,11 @@ permissions:
   contents: write
 
 concurrency:
-  # Bot shard dispatches are isolated so they can never cancel a real push/tick or
-  # post-DCE recovery. Only sampled bot dispatches allocate a runner below.
   group: ${{ github.event_name == 'workflow_dispatch' && github.actor == 'github-actions[bot]' && format('gpt-inbox-bot-{0}', github.run_id) || 'gpt-inbox-live-refresh' }}
   cancel-in-progress: true
 
 jobs:
   refresh:
-    # DCE shards dispatch this after every hot publish. Run only ~20% of those bot
-    # dispatches; push/tick/post-DCE/human runs always execute. This avoids both the
-    # old zero-runner starvation and a runner storm.
     if: >-
       github.event_name != 'workflow_dispatch' ||
       github.actor != 'github-actions[bot]' ||
@@ -104,7 +99,28 @@ jobs:
               --out control/gpt_supergreen_inbox.json \
               --max-items 100
 
-            git add control/gpt_review_hot.json control/gpt_supergreen_inbox.json
+            python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          inbox=json.load(open('control/gpt_supergreen_inbox.json',encoding='utf-8'))
+          review=json.load(open('control/gpt_review_hot.json',encoding='utf-8'))
+          payload={
+            'schema':'GPT_INBOX_HEALTH_V1',
+            'updated_at':datetime.now(timezone.utc).isoformat(),
+            'inbox_schema':inbox.get('schema'),
+            'latest_source_dce_run_id':inbox.get('latest_source_dce_run_id'),
+            'counts':inbox.get('counts') or {},
+            'review_bank_count':review.get('count'),
+            'review_bank_schema':review.get('schema'),
+            'recovery_metrics':review.get('recovery_metrics') or {},
+            'healthy':inbox.get('schema')=='GPT_WEB_REVIEW_INBOX_V2' and int((inbox.get('counts') or {}).get('pending_gpt_web_review') or 0)>0,
+            'contract':'Small health sidecar only; canonical work remains control/gpt_supergreen_inbox.json.',
+          }
+          open('control/gpt_inbox_metrics.json','w',encoding='utf-8').write(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(payload,indent=2))
+          PY
+
+            git add control/gpt_review_hot.json control/gpt_supergreen_inbox.json control/gpt_inbox_metrics.json
             if git diff --cached --quiet; then
               echo 'Persistent review bank and inbox already current.'
               exit 0
@@ -118,5 +134,3 @@ jobs:
           done
           echo 'Failed to persist recovered GPT inbox after retries.' >&2
           exit 1
-
-# Post-legacy-run recovery checkpoint: DCE #173 completed after the V2 inbox landed.
