@@ -1,0 +1,27 @@
+{
+  "schema": "GPT_INBOX_HEALTH_V1",
+  "updated_at": "2026-08-17T11:16:53.310120+00:00",
+  "inbox_schema": "GPT_WEB_REVIEW_INBOX_V2",
+  "latest_source_dce_run_id": 32023052121,
+  "counts": {
+    "pending_gpt_web_review": 142,
+    "reviewed_ticks_total": 11,
+    "excluded_already_reviewed": 0,
+    "excluded_already_in_final_bank": 0,
+    "pending_by_stage": {
+      "BUSINESS_GATES": 124,
+      "DCE_AUTHENTICITY": 18
+    }
+  },
+  "review_bank_count": 160,
+  "review_bank_schema": "GPT_REVIEW_HOT_V4",
+  "recovery_metrics": {
+    "shard_files_scanned": 148,
+    "adjudication_rows_scanned": 607,
+    "model_review_rows_seen": 205,
+    "dce_authenticity_rows_seen": 39,
+    "persistent_unique_pending_surface": 160
+  },
+  "healthy": true,
+  "contract": "Small health sidecar only; canonical work remains control/gpt_supergreen_inbox.json."
+}
