@@ -276,6 +276,9 @@ jobs:
             --run-id "$RUN_ID" \
             --shard "$SHARD_ID" \
             --repo "$REPO"
+          # Commits made by GITHUB_TOKEN do not create downstream push runs. The
+          # hot shard therefore dispatches the user-facing inbox refresh explicitly.
+          gh workflow run gpt-inbox-live-refresh.yml --ref main
       - name: Build canonical immutable packs and compact handoff
         shell: bash
         run: |
