@@ -61,19 +61,19 @@ jobs:
 
           live = Path('.github/workflows/qwen-live-classification.yml')
           text = live.read_text(encoding='utf-8')
-          old = '''      allowed_workers: ${{ steps.plan.outputs.allowed_workers }}
-      matrix: ${{ steps.plan.outputs.matrix }}
-'''
-          new = '''      allowed_workers: ${{ steps.plan.outputs.allowed_workers }}
-      matrix: ${{ steps.plan.outputs.matrix }}
-      batch_size: ${{ steps.plan.outputs.batch_size }}
-'''
+          E='$'+'{{'
+          Z='}}'
+          allowed=E+' steps.plan.outputs.allowed_workers '+Z
+          matrix=E+' steps.plan.outputs.matrix '+Z
+          batch_step=E+' steps.plan.outputs.batch_size '+Z
+          batch_need=E+' needs.plan.outputs.batch_size '+Z
+          old = '      allowed_workers: '+allowed+'\n      matrix: '+matrix+'\n'
+          new = old + '      batch_size: '+batch_step+'\n'
           if old not in text:
               raise SystemExit('live plan outputs block not found; refusing unsafe mutation')
           text = text.replace(old, new, 1)
 
-          marker = '''          echo "source_run=$source_run" >> "$GITHUB_OUTPUT"
-'''
+          marker = '          echo "source_run=$source_run" >> "$GITHUB_OUTPUT"\n'
           insert = '''          batch_size="$(python - <<'PYBATCH'
           import json
           from pathlib import Path
@@ -99,32 +99,34 @@ jobs:
               raise SystemExit('live output marker not found; refusing unsafe mutation')
           text = text.replace(marker, insert, 1)
           old_batch = '            --batch-size "$QWEN_BATCH_SIZE" \\\n'
-          new_batch = "            --batch-size '${{ needs.plan.outputs.batch_size }}' \\\n"
+          new_batch = "            --batch-size '"+batch_need+"' \\\n"
           if old_batch not in text:
               raise SystemExit('live fixed batch invocation not found; refusing unsafe mutation')
           text = text.replace(old_batch, new_batch, 1)
-          text = text.replace('batch size: $QWEN_BATCH_SIZE', 'batch size: ${{ steps.plan.outputs.batch_size }}', 1)
+          text = text.replace('batch size: $QWEN_BATCH_SIZE', 'batch size: '+batch_step, 1)
           trigger = "      - 'pipeline/qwen_notice_post_guard.py'\n"
-          if "      - 'control/qwen_batch_runtime_config.json'\n" not in text:
+          runtime_trigger = "      - 'control/qwen_batch_runtime_config.json'\n"
+          if runtime_trigger not in text:
               if trigger not in text:
                   raise SystemExit('live trigger insertion point not found')
-              text = text.replace(trigger, trigger + "      - 'control/qwen_batch_runtime_config.json'\n", 1)
+              text = text.replace(trigger, trigger + runtime_trigger, 1)
           live.write_text(text, encoding='utf-8')
           PY
 
-      - name: Validate YAML and exact intended diffs
+      - name: Validate exact intended diffs
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           import pathlib
+          E='$'+'{{'; Z='}}'
           a=pathlib.Path('.github/workflows/qwen-batch-autotune-selfheal.yml').read_text()
           l=pathlib.Path('.github/workflows/qwen-live-classification.yml').read_text()
           assert 'GOLDEN_SOURCE_GENERATION' in a
           assert 'benchmark_canonical_discovery_generation' in a
-          assert 'batch_size: ${{ steps.plan.outputs.batch_size }}' in l
-          assert "--batch-size '${{ needs.plan.outputs.batch_size }}'" in l
-          assert "control/qwen_batch_runtime_config.json" in l
+          assert 'batch_size: '+E+' steps.plan.outputs.batch_size '+Z in l
+          assert "--batch-size '"+E+' needs.plan.outputs.batch_size '+Z+"'" in l
+          assert 'control/qwen_batch_runtime_config.json' in l
           print('control-plane repair assertions passed')
           PY
           git diff --check
