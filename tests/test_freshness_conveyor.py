@@ -8,6 +8,7 @@ sys.path.insert(0, str(ROOT / "pipeline"))
 from freshness_conveyor_watchdog import StageState, decide
 from build_qwen_shadow_shards import freshness_rank
 from build_qwen_dce_selection import freshness_rank as dce_freshness_rank
+from materialize_dce_selection import build_candidate_index, canonical_candidate_id
 
 
 def test_watchdog_repairs_stages_in_dependency_order():
@@ -48,3 +49,11 @@ def test_dce_shortlist_preserves_same_freshness_order():
     assert dce_freshness_rank({"ledger_event": "UPDATED"}, now=now) == 0
     assert dce_freshness_rank({"ledger_event": "UNCHANGED", "first_seen_at": (now - timedelta(hours=3)).isoformat()}, now=now) == 1
     assert dce_freshness_rank({"ledger_event": "UNCHANGED", "first_seen_at": (now - timedelta(days=2)).isoformat()}, now=now) == 2
+
+
+def test_qwen_to_dce_candidate_identity_is_case_insensitive():
+    candidates = [{"candidate_id": "UK_PCS_OCDS:ocds-r6ebe6-0000839484", "title": "Example"}]
+    indexed = build_candidate_index(candidates)
+    qwen_id = "uk_pcs_ocds:ocds-r6ebe6-0000839484"
+    assert canonical_candidate_id(qwen_id) in indexed
+    assert indexed[canonical_candidate_id(qwen_id)]["candidate_id"] == candidates[0]["candidate_id"]
