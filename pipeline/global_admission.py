@@ -9,11 +9,11 @@ API = "https://api.github.com"
 GLOBAL_REPO = "spmbiz/evergreenleadminer"
 TENDER_REPO = "spmbiz/tender-engine"
 DEFAULT_POLICY = {
-    "github": {"capacity": 20},
+    "github": {"capacity": 60},
     "workloads": {
-        "hospitality": {"enabled": True, "weight": 0.25, "min_slots_when_demanding": 5, "max_slots": 20},
-        "tenders": {"enabled": True, "weight": 0.25, "min_slots_when_demanding": 5, "max_slots": 20},
-        "gws": {"enabled": True, "weight": 0.25, "min_slots_when_demanding": 5, "max_slots": 20},
+        "hospitality": {"enabled": True, "weight": 1.0 / 3.0, "min_slots_when_demanding": 20, "max_slots": 60},
+        "tenders": {"enabled": True, "weight": 1.0 / 3.0, "min_slots_when_demanding": 20, "max_slots": 60},
+        "gws": {"enabled": True, "weight": 1.0 / 3.0, "min_slots_when_demanding": 20, "max_slots": 60},
     },
 }
 
@@ -59,8 +59,8 @@ def _repo_capacity_state(repo: str, ignore_run_id: str = "") -> tuple[Counter, C
     """Return (active slots, queued jobs) by workload.
 
     Queued jobs are backlog/demand signals, not physical occupancy. Active jobs
-    consume the 20 hosted-runner slots. This lets every top-level workload keep a
-    bounded fair-share target while idle shares are immediately borrowable by siblings.
+    consume the 60 hosted-runner slots. This lets every top-level workload keep a
+    20-slot target while idle shares are immediately borrowable by siblings.
     """
     active: Counter[str] = Counter()
     queued: Counter[str] = Counter()
@@ -148,12 +148,12 @@ def _qwen_live_streaming_lane() -> bool:
 def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     requested = max(0, int(requested))
     if _controller_preauthorized():
-        allowed = min(requested, 20)
+        allowed = min(requested, 60)
         return allowed, {
             "mode": "controller-preauthorized-budget",
             "requested": requested,
             "allowed": allowed,
-            "hard_cap": 20,
+            "hard_cap": 60,
             "authority": "fleet_controller",
             "reason": "controller already performed global capacity and sibling-headroom admission before dispatch; skip duplicate in-workflow fair-share vote",
             "preemption": "none; consume only the controller-approved budget",
@@ -162,7 +162,7 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
         return requested, {"mode": "disabled", "requested": requested, "allowed": requested}
 
     policy = _policy()
-    total = int((policy.get("github") or {}).get("capacity") or 20)
+    total = int((policy.get("github") or {}).get("capacity") or 60)
     workloads = policy.get("workloads") or DEFAULT_POLICY["workloads"]
     state = _global_state()
     last = state.get("last_decision") if isinstance(state, dict) else {}
@@ -170,8 +170,8 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
 
     hospitality_cfg = workloads.get("hospitality") or {}
     gws_cfg = workloads.get("gws") or {}
-    hospitality_floor = max(1, int(hospitality_cfg.get("min_slots_when_demanding") or 5))
-    gws_floor = max(1, int(gws_cfg.get("min_slots_when_demanding") or 5))
+    hospitality_floor = max(1, int(hospitality_cfg.get("min_slots_when_demanding") or 20))
+    gws_floor = max(1, int(gws_cfg.get("min_slots_when_demanding") or 20))
     hospitality_demand = int(demand.get("hospitality") or 0)
     gws_demand = int(demand.get("gws") or 0)
     tender_demand = int(demand.get("tenders") or max(requested, 1))
@@ -237,7 +237,7 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     allowed = min(requested, global_room_after_protection, tender_room, unmet_tender_demand)
 
     report = {
-        "mode": "elastic-20-total-tender-admission",
+        "mode": "elastic-20-20-20-tender-admission",
         "capacity": total,
         "requested": requested,
         "allowed": allowed,
@@ -259,6 +259,6 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
         "tender_max": tender_max,
         "preemption": "none; admission control only",
         "queue_rule": "queued jobs signal demand; only active jobs consume physical runner capacity",
-        "policy_fallback": "20 total concurrent jobs; 5-slot demanding floors for hospitality/tenders/gws and immediate idle-share borrowing",
+        "policy_fallback": "20 hospitality + 20 tenders + 20 gws when all demand; idle shares are immediately borrowable",
     }
     return allowed, report
