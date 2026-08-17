@@ -1,0 +1,25 @@
+name: Qwen Cutover Once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qwen-cutover-once.yml'
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cutover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Cancel pre-patch Qwen pass only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run cancel 32069021831 --repo "$GITHUB_REPOSITORY" || true
+          echo 'Requested cancellation of pre-patch Qwen run 32069021831; durable exact-hash queue remains authoritative.'
