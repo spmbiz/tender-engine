@@ -129,25 +129,43 @@ jobs:
           persist_file control/qwen_live/selection_summary.json recover/selection_summary.json
           persist_file control/qwen_live/classification_summary.json recover/classification_summary.json
 
-      - name: Dispatch recovered Qwen-ranked DCE queue without monopolizing Tender capacity
+      - name: Dispatch recovered Qwen-ranked DCE queue into free Tender slots
         if: steps.rebuild.outputs.selected != '0'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          active="$(gh run list --workflow dce-fanout-v2.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
-          if [ "$active" -eq 0 ]; then
-            gh workflow run dce-fanout-v2.yml --ref main \
-              -f selection_path=queues/qwen_live_selection_latest.jsonl \
-              -f source_discovery_run='${{ steps.rebuild.outputs.source_run }}' \
-              -f max_jobs='${{ steps.rebuild.outputs.selected }}' \
-              -f max_parallel=5 \
-              -f jobs_per_shard=0
-            echo "Dispatched ${{ steps.rebuild.outputs.selected }} Qwen-ranked DCE candidates at max_parallel=5."
-          else
-            echo "DCE fleet already busy ($active active/queued); recovered queue is persisted for the next drain."
+
+          # Prevent duplicate Qwen-DCE runs on main, while allowing the separate
+          # autonomous fleet-dce batch to keep working in parallel.
+          active_main="$(gh run list --workflow dce-fanout-v2.yml --branch main --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
+          if [ "$active_main" -gt 0 ]; then
+            echo "A Qwen/main DCE run is already active/queued ($active_main); no duplicate dispatch."
+            exit 0
           fi
+
+          # Ask the shared Tender admission controller for only the currently free
+          # room. We request at most four slots so Qwen classification and existing
+          # DCE work can continue sharing the 10-slot Tender budget.
+          dce_parallel="$(python - <<'PY'
+          from pipeline.global_admission import dynamic_tender_parallel
+          allowed,_=dynamic_tender_parallel(4)
+          print(max(0,min(4,int(allowed))))
+          PY
+          )"
+          if [ "${dce_parallel:-0}" -le 0 ]; then
+            echo "No free Tender room yet; queue is durable and the scheduled drainer will retry."
+            exit 0
+          fi
+
+          gh workflow run dce-fanout-v2.yml --ref main \
+            -f selection_path=queues/qwen_live_selection_latest.jsonl \
+            -f source_discovery_run='${{ steps.rebuild.outputs.source_run }}' \
+            -f max_jobs='${{ steps.rebuild.outputs.selected }}' \
+            -f max_parallel="$dce_parallel" \
+            -f jobs_per_shard=0
+          echo "Dispatched ${{ steps.rebuild.outputs.selected }} Qwen-ranked DCE candidates at max_parallel=$dce_parallel."
 
       - name: Continue Qwen backfill when no Qwen pass is already active
         if: steps.rebuild.outputs.remaining != '0'
