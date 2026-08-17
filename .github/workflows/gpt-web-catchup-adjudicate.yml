@@ -1,0 +1,67 @@
+name: GPT Web Catchup Adjudicate
+on:
+  push:
+    paths:
+      - '.github/workflows/gpt-web-catchup-adjudicate.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  adjudicate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Review residual snapshot
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          from collections import Counter
+          from datetime import datetime,timezone
+          lines=[json.loads(x) for x in pathlib.Path('control/gpt_web_catchup_index.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          meta=lines[0]['_meta']; rows=lines[1:]
+          assert len(rows)==meta['count']==6
+          decisions={
+            'US-SAM:9b9959d0803844929cb1ac2cae4ed175':('NO_DEFENSE_HARDWARE','Electronic components with DoD-specific compliance/export-control burden; not a lean digital/creative/software opportunity.'),
+            'US-SAM:8056794d402c44c794d40f28d3dee5ea':('NO_SCOPE_PHYSICAL','Vehicle lift procurement plus installation/maintenance is physical equipment work.'),
+            'US-SAM:a382a18c11d94568b367235fd967fc98':('NO_SCOPE_FIELD_ENGINEERING','Independent condition assessment of solar PV systems requires on-site technical/engineering work, outside SPM.'),
+            'US-SAM:b3c68ae9b6604bbbaa785bc714bcdad5':('NO_SCOPE_CONSTRUCTION','Waterproofing/exterior restoration of an ATC tower/base building is construction work.'),
+            'US-SAM:ce256f16e5d84743b6ad313644b00b5c':('BROKER_ONLY_UNSPECIFIED','Various-items procurement is not a native service; could only be reconsidered if the exact item list reveals a simple supplier route.'),
+            'US-SAM:e20074c07a984e76b324868007dfd43b':('NO_DEFENSE_HARDWARE','Actuating cylinder assembly is specialist defense hardware and carries CMMC friction.'),
+          }
+          now=datetime.now(timezone.utc).isoformat(); pass_id='gpt-web-pass-32026769574-catchup6-001'
+          items=[]
+          for r in rows:
+            v,reason=decisions[r['candidate_id']]
+            items.append({**r,'verdict':v,'reason':reason})
+          audit={'schema':'GPT_WEB_CATCHUP_REVIEW_V1','review_pass_id':pass_id,'reviewed_at':now,'decision_source':'GPT_WEB_THIS_CONVERSATION','source_snapshot':meta,'reviewed_count':len(items),'strict_green_count':0,'counts':dict(Counter(x['verdict'] for x in items)),'items':items}
+          pathlib.Path('control/gpt_web_catchup_review_32026769574.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2),encoding='utf-8')
+          lp=pathlib.Path('control/gpt_web_review_ledger.json'); ledger=json.loads(lp.read_text(encoding='utf-8'))
+          ticks=ledger.setdefault('ticks',{}); new=[]
+          for x in items:
+            key=x['candidate_id'].lower(); prior=ticks.get(key) or {}
+            if prior.get('reviewed') and prior.get('review_key')==x.get('review_key'): continue
+            ticks[key]={'candidate_id':x['candidate_id'],'reviewed':True,'reviewed_at':now,'review_pass_id':pass_id,'source_dce_run_id':x.get('source_dce_run_id'),'review_key':x.get('review_key'),'verdict':x['verdict']}
+            new.append(x['candidate_id'])
+          ledger['updated_at']=now
+          ledger.setdefault('passes',[]).append({'review_pass_id':pass_id,'reviewed_at':now,'source_dce_run_id':meta.get('latest_source_dce_run_id'),'reviewed_count':len(items),'new_ticks_written':len(new),'candidate_ids':[x['candidate_id'] for x in items]})
+          lp.write_text(json.dumps(ledger,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps({'reviewed':len(items),'new_ticks':len(new),'strict_green':0,'counts':audit['counts']},indent=2))
+          PY
+      - name: Persist
+        shell: bash
+        run: |
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add control/gpt_web_catchup_review_32026769574.json control/gpt_web_review_ledger.json
+          git commit -m 'gpt-web: review residual 6-candidate snapshot [skip ci]'
+          for i in 1 2 3 4 5; do
+            git push origin HEAD:main && exit 0
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort || true; exit 1; }
+            sleep $((i*2))
+          done
+          exit 1
