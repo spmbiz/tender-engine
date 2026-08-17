@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
+
+import requests
 
 import dce_worker as base
 import dce_worker_v2 as v2
@@ -159,6 +161,8 @@ def _second_stage_public_documents(candidate: dict, out: Path, manifest: dict) -
 
         downloaded = 0
         seen = set()
+        session = requests.Session()
+        session.headers.update({"User-Agent": "Tender-Engine/13.0 public procurement research"})
         # Direct anchors first.
         anchors = page.locator("a[href]").evaluate_all("els => els.map(a => ({href:a.href||'', text:(a.innerText||a.textContent||'').trim()}))")
         for item in anchors or []:
@@ -173,7 +177,7 @@ def _second_stage_public_documents(candidate: dict, out: Path, manifest: dict) -
             if href in seen:
                 continue
             seen.add(href)
-            rec = base.direct_download(href, out)
+            rec = base.direct_download(href, out, session)
             if rec:
                 manifest.setdefault("files", []).append(rec)
                 downloaded += 1
@@ -232,6 +236,14 @@ def adapter_public_spa_v13(candidate: dict, out: Path, manifest: dict):
     v12.adapter_public_spa_v12(candidate, out, manifest)
     if manifest.get("files"):
         return
+    # Some otherwise public listing pages redirect the document area to a real SSO
+    # boundary. Record that barrier instead of repeatedly treating it as unresolved.
+    for attempt in manifest.get("dce_method_attempts") or []:
+        resolved = str((attempt or {}).get("resolved_url") or "")
+        host = (urlparse(resolved).hostname or "").casefold() if resolved else ""
+        if host in {"accounts.opennexus.com"} or "/oauth/authorize" in resolved.casefold():
+            manifest["status"] = "AUTH_REQUIRED"
+            return
     if _second_stage_public_documents(candidate, out, manifest):
         manifest["status"] = "DOWNLOADED_PUBLIC"
 
