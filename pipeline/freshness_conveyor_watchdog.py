@@ -23,6 +23,7 @@ DISCOVERY_WORKFLOW = "supergreen-discovery-v2.yml"
 SNAPSHOT_WORKFLOW = "live-world-snapshot.yml"
 LEDGER_WORKFLOW = "notice-intelligence-ledger.yml"
 QWEN_WORKFLOW = "qwen-live-classification.yml"
+ACTIVE_RUN_STATES = {"in_progress", "queued", "waiting", "pending", "requested"}
 
 
 @dataclass(frozen=True)
@@ -131,16 +132,11 @@ def qwen_source_run() -> str | None:
 
 
 def workflow_active(workflow: str) -> bool:
-    for status in ("in_progress", "queued", "waiting", "pending", "requested"):
-        try:
-            data = api_json(f"/repos/{REPO}/actions/workflows/{workflow}/runs?status={status}&per_page=10")
-        except RuntimeError:
-            if status in {"waiting", "pending", "requested"}:
-                continue
-            raise
-        if data.get("workflow_runs"):
-            return True
-    return False
+    # Query once and inspect the returned run states ourselves. Some GitHub API
+    # status filters are permissive/quirky for waiting/requested states and can
+    # return completed historical runs, which previously caused false ACTIVE_WAIT.
+    data = api_json(f"/repos/{REPO}/actions/workflows/{workflow}/runs?per_page=30")
+    return any(str(run.get("status") or "") in ACTIVE_RUN_STATES for run in data.get("workflow_runs") or [])
 
 
 def dispatch(workflow: str, inputs: dict[str, str] | None = None) -> None:
