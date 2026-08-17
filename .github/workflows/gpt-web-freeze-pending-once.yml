@@ -1,0 +1,86 @@
+name: GPT Web Freeze Pending Once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/gpt-web-freeze-pending-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Freeze current GPT Web inbox snapshot
+        id: freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          src=Path('control/gpt_supergreen_inbox.json')
+          obj=json.loads(src.read_text(encoding='utf-8'))
+          rows=[x for x in obj.get('review_queue',[]) if isinstance(x,dict)]
+          run=os.environ['GITHUB_RUN_ID']
+          out=Path(f'/tmp/gpt_web_pending_snapshot_{run}.jsonl')
+          meta={
+            'schema':'GPT_WEB_PENDING_SNAPSHOT_V1',
+            'snapshot_run_id':int(run),
+            'source_commit':os.environ.get('GITHUB_SHA'),
+            'source_inbox_updated_at':obj.get('updated_at'),
+            'latest_source_dce_run_id':obj.get('latest_source_dce_run_id'),
+            'count':len(rows),
+          }
+          lines=[json.dumps({'_meta':meta},ensure_ascii=False)]
+          core=['candidate_id','title','buyer','portal','deadline','notice_url','review_stage','source_dce_run_id','source_shard','review_key','content_quality','gate_readiness','deadline_authority_status','evidence_gate_coverage','preliminary_score','estimated_value','currency']
+          for r in rows:
+            item={k:r.get(k) for k in core if k in r}
+            # Keep the business/gate evidence needed for GPT Web while bounding each row.
+            extra={}
+            for k,v in r.items():
+              if k in core or k in {'raw_text','raw_dce','documents','attachments','full_text'}:
+                continue
+              if v in (None,'',[],{}):
+                continue
+              extra[k]=v
+            raw=json.dumps(extra,ensure_ascii=False,default=str)
+            if len(raw)>12000:
+              raw=raw[:12000]+'…'
+            item['evidence_brief']=raw
+            lines.append(json.dumps(item,ensure_ascii=False,default=str))
+          out.write_text('\n'.join(lines)+'\n',encoding='utf-8')
+          Path('/tmp/snapshot_meta.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(meta,indent=2))
+          PY
+          echo "snapshot_path=control/gpt_web_pending_snapshot_${GITHUB_RUN_ID}.jsonl" >> "$GITHUB_OUTPUT"
+          echo "meta_path=control/gpt_web_pending_snapshot_${GITHUB_RUN_ID}.meta.json" >> "$GITHUB_OUTPUT"
+      - name: Persist immutable snapshot transactionally
+        shell: bash
+        run: |
+          set -euo pipefail
+          SNAP="${{ steps.freeze.outputs.snapshot_path }}"
+          META="${{ steps.freeze.outputs.meta_path }}"
+          cp "/tmp/gpt_web_pending_snapshot_${GITHUB_RUN_ID}.jsonl" /tmp/snapshot.jsonl
+          cp /tmp/snapshot_meta.json /tmp/meta.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/snapshot.jsonl "$SNAP"
+            cp /tmp/meta.json "$META"
+            git add "$SNAP" "$META"
+            git commit -m "gpt-web: freeze pending snapshot ${GITHUB_RUN_ID} [skip ci]"
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            sleep $((attempt*2))
+          done
+          exit 1
