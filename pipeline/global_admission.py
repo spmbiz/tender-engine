@@ -205,14 +205,14 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
             workflow = str(os.getenv("GITHUB_WORKFLOW") or "").strip().lower()
             if "qwen live notice classification" in workflow:
                 lane = "qwen-live-classifier"
-                cap_default = 3
+                cap_default = 8
                 reason = "Qwen notice classification continuously feeds the exact-unseen DCE conveyor and may use a bounded slice of currently idle physical slots"
             else:
                 lane = "qwen-live-unseen"
-                cap_default = 5
+                cap_default = 8
                 reason = "rolling Qwen exact-unseen DCE conveyor may borrow idle physical slots so the live inbox never waits behind unoccupied sibling reservations"
             try:
-                cap = max(1, min(8, int(os.getenv("DCE_QWEN_LIVE_FAST_LANE_CAP") or cap_default)))
+                cap = max(1, min(16, int(os.getenv("DCE_QWEN_LIVE_FAST_LANE_CAP") or cap_default)))
             except Exception:
                 cap = cap_default
         allowed = min(requested, cap, physical_free, tender_room)
