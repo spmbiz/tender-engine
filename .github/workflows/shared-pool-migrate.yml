@@ -1,0 +1,91 @@
+name: Tender Shared Pool Migration
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/shared-pool-migrate.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Make Qwen a normal Tender consumer of the shared worker pool
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          p=Path('pipeline/global_admission.py')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('"weight": 0.25, "min_slots_when_demanding": 5, "max_slots": 60',
+                      '"weight": 1.0 / 3.0, "min_slots_when_demanding": 20, "max_slots": 60')
+          # Qwen is not a fourth fleet. It is a Tender subtask and therefore uses
+          # normal Tender fair-share + borrowing. Keep only the tiny curated SPM
+          # latency lane special-cased.
+          s=s.replace('if _spm_curated_fast_lane() or _qwen_live_streaming_lane():',
+                      'if _spm_curated_fast_lane():')
+          p.write_text(s,encoding='utf-8')
+
+          q=Path('.github/workflows/qwen-live-classification.yml')
+          s=q.read_text(encoding='utf-8')
+          s=s.replace("QWEN_WORKERS_REQUESTED: '16'","QWEN_WORKERS_REQUESTED: '60'")
+          s=s.replace("int(os.environ.get('QWEN_WORKERS_REQUESTED') or 16)",
+                      "int(os.environ.get('QWEN_WORKERS_REQUESTED') or 60)")
+          # Direct Qwen->DCE handoff also asks the same Tender admission logic
+          # instead of owning a separate fixed 8-worker lane.
+          old="""          jobs='${{ steps.selection.outputs.count }}'\n          if [ \"$jobs\" -gt 120 ]; then jobs=120; fi\n          gh workflow run dce-fanout-v2.yml --ref main \\\n            -f selection_path=queues/qwen_live_selection_latest.jsonl \\\n            -f source_discovery_run='${{ needs.plan.outputs.source_run }}' \\\n            -f max_jobs=\"$jobs\" \\\n            -f max_parallel=8 \\\n            -f jobs_per_shard=0\n          echo \"Dispatched Qwen semantic DCE lane: candidates=$jobs source=${{ needs.plan.outputs.source_run }}; DCE fanout performs its own global admission.\"\n"""
+          new="""          jobs='${{ steps.selection.outputs.count }}'\n          if [ \"$jobs\" -gt 120 ]; then jobs=120; fi\n          dce_parallel=\"$(DCE_SELECTION_PATH=queues/qwen_live_selection_latest.jsonl python - <<'PYADMIT'\n          from pipeline.global_admission import dynamic_tender_parallel\n          allowed,_=dynamic_tender_parallel(60)\n          print(allowed)\n          PYADMIT\n          )\"\n          if [ \"${dce_parallel:-0}\" -le 0 ]; then\n            echo \"No shared Tender capacity available for DCE; persisted queue will be picked up by the drainer.\"\n            exit 0\n          fi\n          gh workflow run dce-fanout-v2.yml --ref main \\\n            -f selection_path=queues/qwen_live_selection_latest.jsonl \\\n            -f source_discovery_run='${{ needs.plan.outputs.source_run }}' \\\n            -f max_jobs=\"$jobs\" \\\n            -f max_parallel=\"$dce_parallel\" \\\n            -f jobs_per_shard=0\n          echo \"Dispatched Qwen semantic DCE lane: candidates=$jobs source=${{ needs.plan.outputs.source_run }} shared_tender_parallel=$dce_parallel.\"\n"""
+          if old not in s:
+              raise SystemExit('expected Qwen direct DCE dispatch block not found')
+          s=s.replace(old,new)
+          q.write_text(s,encoding='utf-8')
+
+          d=Path('.github/workflows/dce-queue-drainer.yml')
+          s=d.read_text(encoding='utf-8')
+          old="""          gh workflow run dce-fanout-v2.yml --ref main \\\n            -f selection_path=\"$path\" \\\n            -f source_discovery_run=\"$source_run\" \\\n            -f max_jobs=\"$jobs\" \\\n            -f max_parallel=24 \\\n            -f max_shards=80 \\\n            -f jobs_per_shard=0\n          echo \"Dispatched $jobs unseen candidate versions from $path (rows=$rows unseen=$unseen source=$source_run policy=$reason max_parallel=24).\"\n"""
+          new="""          dce_parallel=\"$(DCE_SELECTION_PATH=\"$path\" python - <<'PYADMIT'\n          from pipeline.global_admission import dynamic_tender_parallel\n          allowed,_=dynamic_tender_parallel(60)\n          print(allowed)\n          PYADMIT\n          )\"\n          if [ \"${dce_parallel:-0}\" -le 0 ]; then\n            echo \"No shared Tender capacity available; persisted unseen DCE work remains queued for the next drainer tick.\"\n            exit 0\n          fi\n          gh workflow run dce-fanout-v2.yml --ref main \\\n            -f selection_path=\"$path\" \\\n            -f source_discovery_run=\"$source_run\" \\\n            -f max_jobs=\"$jobs\" \\\n            -f max_parallel=\"$dce_parallel\" \\\n            -f max_shards=80 \\\n            -f jobs_per_shard=0\n          echo \"Dispatched $jobs unseen candidate versions from $path (rows=$rows unseen=$unseen source=$source_run policy=$reason shared_tender_parallel=$dce_parallel).\"\n"""
+          if old not in s:
+              raise SystemExit('expected DCE drainer dispatch block not found')
+          s=s.replace(old,new)
+          d.write_text(s,encoding='utf-8')
+          PY
+      - name: Validate shared Tender semantics
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile pipeline/global_admission.py
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('pipeline/global_admission.py').read_text(encoding='utf-8')
+          assert 'if _spm_curated_fast_lane() or _qwen_live_streaming_lane():' not in s
+          assert s.count('"min_slots_when_demanding": 20') >= 3
+          q=Path('.github/workflows/qwen-live-classification.yml').read_text(encoding='utf-8')
+          assert "QWEN_WORKERS_REQUESTED: '60'" in q
+          assert 'max_parallel="$dce_parallel"' in q
+          d=Path('.github/workflows/dce-queue-drainer.yml').read_text(encoding='utf-8')
+          assert 'max_parallel="$dce_parallel"' in d
+          assert 'max_parallel=24' not in d
+          print('SHARED_POOL_TENDER_VALIDATION=PASS')
+          PY
+          git diff --check
+      - name: Persist migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'spmbiz-shared-pool'
+          git config user.email 'actions@users.noreply.github.com'
+          git add pipeline/global_admission.py .github/workflows/qwen-live-classification.yml .github/workflows/dce-queue-drainer.yml
+          if git diff --cached --quiet; then echo 'NO_DELTA=1'; exit 0; fi
+          git commit -m '[fleet] fold Qwen and DCE into elastic Tender worker share [skip ci]'
+          git pull --rebase origin main
+          git push origin HEAD:main
