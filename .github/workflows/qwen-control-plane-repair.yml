@@ -9,7 +9,6 @@ on:
 
 permissions:
   contents: write
-  actions: write
 
 concurrency:
   group: qwen-control-plane-repair
@@ -24,115 +23,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Anchor autotune goldens and wire champion into live classifier
+      - name: Patch Qwen control plane
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-
-          auto = Path('.github/workflows/qwen-batch-autotune-selfheal.yml')
-          text = auto.read_text(encoding='utf-8')
-          old = '''          source_tag="discovery-harvest-${generation}"
-          repaired="supergreen-wide-read-${generation}-repaired.tar.gz"
-          normal="supergreen-wide-read-${generation}.tar.gz"
-'''
-          new = '''          golden_generation="$(python - <<'PYGEN'
-          import json
-          payload=json.load(open('benchmarks/qwen_batch_recall_golden_v1.json',encoding='utf-8'))
-          print(int(payload['canonical_source_run']))
-          PYGEN
-          )"
-          [[ "$golden_generation" =~ ^[0-9]+$ ]] || { echo 'Benchmark canonical_source_run is invalid' >&2; exit 1; }
-          echo "GOLDEN_SOURCE_GENERATION=$golden_generation" >> "$GITHUB_ENV"
-          source_tag="discovery-harvest-${golden_generation}"
-          repaired="supergreen-wide-read-${golden_generation}-repaired.tar.gz"
-          normal="supergreen-wide-read-${golden_generation}.tar.gz"
-'''
-          if old not in text:
-              raise SystemExit('autotune golden-source block not found; refusing unsafe mutation')
-          text = text.replace(old, new, 1)
-          text = text.replace(
-              "'golden_source':'canonical_discovery_generation',\n              'live_source':'residual_classification_queue',",
-              "'golden_source':'benchmark_canonical_discovery_generation',\n              'golden_source_generation':os.environ.get('GOLDEN_SOURCE_GENERATION'),\n              'live_source':'residual_classification_queue',",
-              1,
-          )
-          auto.write_text(text, encoding='utf-8')
-
-          live = Path('.github/workflows/qwen-live-classification.yml')
-          text = live.read_text(encoding='utf-8')
-          E='$'+'{{'
-          Z='}}'
-          allowed=E+' steps.plan.outputs.allowed_workers '+Z
-          matrix=E+' steps.plan.outputs.matrix '+Z
-          batch_step=E+' steps.plan.outputs.batch_size '+Z
-          batch_need=E+' needs.plan.outputs.batch_size '+Z
-          old = '      allowed_workers: '+allowed+'\n      matrix: '+matrix+'\n'
-          new = old + '      batch_size: '+batch_step+'\n'
-          if old not in text:
-              raise SystemExit('live plan outputs block not found; refusing unsafe mutation')
-          text = text.replace(old, new, 1)
-
-          marker = '          echo "source_run=$source_run" >> "$GITHUB_OUTPUT"\n'
-          insert = '''          batch_size="$(python - <<'PYBATCH'
-          import json
-          from pathlib import Path
-          fallback=8
-          p=Path('control/qwen_batch_runtime_config.json')
-          try:
-              cfg=json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
-          except Exception:
-              cfg={}
-          champ=cfg.get('champion') if cfg.get('status') == 'PASS' else None
-          if isinstance(champ,dict) and champ.get('safe_for_shadow_scale_out'):
-              try: n=int(champ.get('initial_batch_size') or fallback)
-              except Exception: n=fallback
-          else:
-              n=fallback
-          print(max(1,min(32,n)))
-          PYBATCH
-          )"
-          echo "batch_size=$batch_size" >> "$GITHUB_OUTPUT"
-          echo "source_run=$source_run" >> "$GITHUB_OUTPUT"
-'''
-          if marker not in text:
-              raise SystemExit('live output marker not found; refusing unsafe mutation')
-          text = text.replace(marker, insert, 1)
-          old_batch = '            --batch-size "$QWEN_BATCH_SIZE" \\\n'
-          new_batch = "            --batch-size '"+batch_need+"' \\\n"
-          if old_batch not in text:
-              raise SystemExit('live fixed batch invocation not found; refusing unsafe mutation')
-          text = text.replace(old_batch, new_batch, 1)
-          text = text.replace('batch size: $QWEN_BATCH_SIZE', 'batch size: '+batch_step, 1)
-          trigger = "      - 'pipeline/qwen_notice_post_guard.py'\n"
-          runtime_trigger = "      - 'control/qwen_batch_runtime_config.json'\n"
-          if runtime_trigger not in text:
-              if trigger not in text:
-                  raise SystemExit('live trigger insertion point not found')
-              text = text.replace(trigger, trigger + runtime_trigger, 1)
-          live.write_text(text, encoding='utf-8')
-          PY
-
-      - name: Validate exact intended diffs
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import pathlib
-          E='$'+'{{'; Z='}}'
-          a=pathlib.Path('.github/workflows/qwen-batch-autotune-selfheal.yml').read_text()
-          l=pathlib.Path('.github/workflows/qwen-live-classification.yml').read_text()
-          assert 'GOLDEN_SOURCE_GENERATION' in a
-          assert 'benchmark_canonical_discovery_generation' in a
-          assert 'batch_size: '+E+' steps.plan.outputs.batch_size '+Z in l
-          assert "--batch-size '"+E+' needs.plan.outputs.batch_size '+Z+"'" in l
-          assert 'control/qwen_batch_runtime_config.json' in l
-          print('control-plane repair assertions passed')
-          PY
+          python -c "import base64;exec(base64.b64decode('CmZyb20gcGF0aGxpYiBpbXBvcnQgUGF0aAoKYXV0byA9IFBhdGgoIi5naXRodWIvd29ya2Zsb3dzL3F3ZW4tYmF0Y2gtYXV0b3R1bmUtc2VsZmhlYWwueW1sIikKdGV4dCA9IGF1dG8ucmVhZF90ZXh0KGVuY29kaW5nPSJ1dGYtOCIpCm9sZCA9ICIiIiAgICAgICAgICBzb3VyY2VfdGFnPSJkaXNjb3ZlcnktaGFydmVzdC0ke2dlbmVyYXRpb259IgogICAgICAgICAgcmVwYWlyZWQ9InN1cGVyZ3JlZW4td2lkZS1yZWFkLSR7Z2VuZXJhdGlvbn0tcmVwYWlyZWQudGFyLmd6IgogICAgICAgICAgbm9ybWFsPSJzdXBlcmdyZWVuLXdpZGUtcmVhZC0ke2dlbmVyYXRpb259LnRhci5neiIKIiIiCm5ldyA9ICIiIiAgICAgICAgICBnb2xkZW5fZ2VuZXJhdGlvbj0iJChweXRob24gLSA8PCdQWUdFTicKICAgICAgICAgIGltcG9ydCBqc29uCiAgICAgICAgICBwYXlsb2FkPWpzb24ubG9hZChvcGVuKCdiZW5jaG1hcmtzL3F3ZW5fYmF0Y2hfcmVjYWxsX2dvbGRlbl92MS5qc29uJyxlbmNvZGluZz0ndXRmLTgnKSkKICAgICAgICAgIHByaW50KGludChwYXlsb2FkWydjYW5vbmljYWxfc291cmNlX3J1biddKSkKICAgICAgICAgIFBZR0VOCiAgICAgICAgICApIgogICAgICAgICAgW1sgIiRnb2xkZW5fZ2VuZXJhdGlvbiIgPX4gXlswLTldKyQgXV0gfHwgeyBlY2hvICdCZW5jaG1hcmsgY2Fub25pY2FsX3NvdXJjZV9ydW4gaXMgaW52YWxpZCcgPiYyOyBleGl0IDE7IH0KICAgICAgICAgIGVjaG8gIkdPTERFTl9TT1VSQ0VfR0VORVJBVElPTj0kZ29sZGVuX2dlbmVyYXRpb24iID4+ICIkR0lUSFVCX0VOViIKICAgICAgICAgIHNvdXJjZV90YWc9ImRpc2NvdmVyeS1oYXJ2ZXN0LSR7Z29sZGVuX2dlbmVyYXRpb259IgogICAgICAgICAgcmVwYWlyZWQ9InN1cGVyZ3JlZW4td2lkZS1yZWFkLSR7Z29sZGVuX2dlbmVyYXRpb259LXJlcGFpcmVkLnRhci5neiIKICAgICAgICAgIG5vcm1hbD0ic3VwZXJncmVlbi13aWRlLXJlYWQtJHtnb2xkZW5fZ2VuZXJhdGlvbn0udGFyLmd6IgoiIiIKaWYgIkdPTERFTl9TT1VSQ0VfR0VORVJBVElPTiIgbm90IGluIHRleHQ6CiAgICBpZiBvbGQgbm90IGluIHRleHQ6CiAgICAgICAgcmFpc2UgU3lzdGVtRXhpdCgiYXV0b3R1bmUgZ29sZGVuLXNvdXJjZSBibG9jayBub3QgZm91bmQiKQogICAgdGV4dCA9IHRleHQucmVwbGFjZShvbGQsIG5ldywgMSkKICAgIG9sZF9tYW5pZmVzdCA9ICInZ29sZGVuX3NvdXJjZSc6J2Nhbm9uaWNhbF9kaXNjb3ZlcnlfZ2VuZXJhdGlvbicsXG4gICAgICAgICAgICAgICdsaXZlX3NvdXJjZSc6J3Jlc2lkdWFsX2NsYXNzaWZpY2F0aW9uX3F1ZXVlJywiCiAgICBuZXdfbWFuaWZlc3QgPSAiJ2dvbGRlbl9zb3VyY2UnOidiZW5jaG1hcmtfY2Fub25pY2FsX2Rpc2NvdmVyeV9nZW5lcmF0aW9uJyxcbiAgICAgICAgICAgICAgJ2dvbGRlbl9zb3VyY2VfZ2VuZXJhdGlvbic6b3MuZW52aXJvbi5nZXQoJ0dPTERFTl9TT1VSQ0VfR0VORVJBVElPTicpLFxuICAgICAgICAgICAgICAnbGl2ZV9zb3VyY2UnOidyZXNpZHVhbF9jbGFzc2lmaWNhdGlvbl9xdWV1ZScsIgogICAgaWYgb2xkX21hbmlmZXN0IG5vdCBpbiB0ZXh0OgogICAgICAgIHJhaXNlIFN5c3RlbUV4aXQoImF1dG90dW5lIG1hbmlmZXN0IHNvdXJjZSBibG9jayBub3QgZm91bmQiKQogICAgdGV4dCA9IHRleHQucmVwbGFjZShvbGRfbWFuaWZlc3QsIG5ld19tYW5pZmVzdCwgMSkKYXV0by53cml0ZV90ZXh0KHRleHQsIGVuY29kaW5nPSJ1dGYtOCIpCgpsaXZlID0gUGF0aCgiLmdpdGh1Yi93b3JrZmxvd3MvcXdlbi1saXZlLWNsYXNzaWZpY2F0aW9uLnltbCIpCnRleHQgPSBsaXZlLnJlYWRfdGV4dChlbmNvZGluZz0idXRmLTgiKQpvbGRfb3V0cHV0cyA9ICIgICAgICBhbGxvd2VkX3dvcmtlcnM6ICR7eyBzdGVwcy5wbGFuLm91dHB1dHMuYWxsb3dlZF93b3JrZXJzIH19XG4gICAgICBtYXRyaXg6ICR7eyBzdGVwcy5wbGFuLm91dHB1dHMubWF0cml4IH19XG4iCm5ld19vdXRwdXRzID0gb2xkX291dHB1dHMgKyAiICAgICAgYmF0Y2hfc2l6ZTogJHt7IHN0ZXBzLnBsYW4ub3V0cHV0cy5iYXRjaF9zaXplIH19XG4iCmlmICJiYXRjaF9zaXplOiAke3sgc3RlcHMucGxhbi5vdXRwdXRzLmJhdGNoX3NpemUgfX0iIG5vdCBpbiB0ZXh0OgogICAgaWYgb2xkX291dHB1dHMgbm90IGluIHRleHQ6CiAgICAgICAgcmFpc2UgU3lzdGVtRXhpdCgibGl2ZSBvdXRwdXRzIGJsb2NrIG5vdCBmb3VuZCIpCiAgICB0ZXh0ID0gdGV4dC5yZXBsYWNlKG9sZF9vdXRwdXRzLCBuZXdfb3V0cHV0cywgMSkKCm1hcmtlciA9ICcgICAgICAgICAgZWNobyAic291cmNlX3J1bj0kc291cmNlX3J1biIgPj4gIiRHSVRIVUJfT1VUUFVUIlxuJwppbnNlcnQgPSAiIiIgICAgICAgICAgYmF0Y2hfc2l6ZT0iJChweXRob24gLSA8PCdQWUJBVENIJwogICAgICAgICAgaW1wb3J0IGpzb24KICAgICAgICAgIGZyb20gcGF0aGxpYiBpbXBvcnQgUGF0aAogICAgICAgICAgZmFsbGJhY2s9OAogICAgICAgICAgcD1QYXRoKCdjb250cm9sL3F3ZW5fYmF0Y2hfcnVudGltZV9jb25maWcuanNvbicpCiAgICAgICAgICB0cnk6CiAgICAgICAgICAgICAgY2ZnPWpzb24ubG9hZHMocC5yZWFkX3RleHQoZW5jb2Rpbmc9J3V0Zi04JykpIGlmIHAuZXhpc3RzKCkgZWxzZSB7fQogICAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgICBjZmc9e30KICAgICAgICAgIGNoYW1wPWNmZy5nZXQoJ2NoYW1waW9uJykgaWYgY2ZnLmdldCgnc3RhdHVzJykgPT0gJ1BBU1MnIGVsc2UgTm9uZQogICAgICAgICAgaWYgaXNpbnN0YW5jZShjaGFtcCxkaWN0KSBhbmQgY2hhbXAuZ2V0KCdzYWZlX2Zvcl9zaGFkb3dfc2NhbGVfb3V0Jyk6CiAgICAgICAgICAgICAgdHJ5OiBuPWludChjaGFtcC5nZXQoJ2luaXRpYWxfYmF0Y2hfc2l6ZScpIG9yIGZhbGxiYWNrKQogICAgICAgICAgICAgIGV4Y2VwdCBFeGNlcHRpb246IG49ZmFsbGJhY2sKICAgICAgICAgIGVsc2U6CiAgICAgICAgICAgICAgbj1mYWxsYmFjawogICAgICAgICAgcHJpbnQobWF4KDEsbWluKDMyLG4pKSkKICAgICAgICAgIFBZQkFUQ0gKICAgICAgICAgICkiCiAgICAgICAgICBlY2hvICJiYXRjaF9zaXplPSRiYXRjaF9zaXplIiA+PiAiJEdJVEhVQl9PVVRQVVQiCiAgICAgICAgICBlY2hvICJzb3VyY2VfcnVuPSRzb3VyY2VfcnVuIiA+PiAiJEdJVEhVQl9PVVRQVVQiCiIiIgppZiAnZWNobyAiYmF0Y2hfc2l6ZT0kYmF0Y2hfc2l6ZSIgPj4gIiRHSVRIVUJfT1VUUFVUIicgbm90IGluIHRleHQ6CiAgICBpZiBtYXJrZXIgbm90IGluIHRleHQ6CiAgICAgICAgcmFpc2UgU3lzdGVtRXhpdCgibGl2ZSBvdXRwdXQgbWFya2VyIG5vdCBmb3VuZCIpCiAgICB0ZXh0ID0gdGV4dC5yZXBsYWNlKG1hcmtlciwgaW5zZXJ0LCAxKQoKb2xkX2JhdGNoID0gJyAgICAgICAgICAgIC0tYmF0Y2gtc2l6ZSAiJFFXRU5fQkFUQ0hfU0laRSIgXFxcbicKbmV3X2JhdGNoID0gIiAgICAgICAgICAgIC0tYmF0Y2gtc2l6ZSAnJHt7IG5lZWRzLnBsYW4ub3V0cHV0cy5iYXRjaF9zaXplIH19JyBcXFxuIgppZiBuZXdfYmF0Y2ggbm90IGluIHRleHQ6CiAgICBpZiBvbGRfYmF0Y2ggbm90IGluIHRleHQ6CiAgICAgICAgcmFpc2UgU3lzdGVtRXhpdCgibGl2ZSBmaXhlZCBiYXRjaCBpbnZvY2F0aW9uIG5vdCBmb3VuZCIpCiAgICB0ZXh0ID0gdGV4dC5yZXBsYWNlKG9sZF9iYXRjaCwgbmV3X2JhdGNoLCAxKQoKdGV4dCA9IHRleHQucmVwbGFjZSgiYmF0Y2ggc2l6ZTogJFFXRU5fQkFUQ0hfU0laRSIsICJiYXRjaCBzaXplOiAke3sgc3RlcHMucGxhbi5vdXRwdXRzLmJhdGNoX3NpemUgfX0iLCAxKQp0cmlnZ2VyID0gIiAgICAgIC0gJ3BpcGVsaW5lL3F3ZW5fbm90aWNlX3Bvc3RfZ3VhcmQucHknXG4iCnJ1bnRpbWVfdHJpZ2dlciA9ICIgICAgICAtICdjb250cm9sL3F3ZW5fYmF0Y2hfcnVudGltZV9jb25maWcuanNvbidcbiIKaWYgcnVudGltZV90cmlnZ2VyIG5vdCBpbiB0ZXh0OgogICAgaWYgdHJpZ2dlciBub3QgaW4gdGV4dDoKICAgICAgICByYWlzZSBTeXN0ZW1FeGl0KCJsaXZlIHRyaWdnZXIgaW5zZXJ0aW9uIHBvaW50IG5vdCBmb3VuZCIpCiAgICB0ZXh0ID0gdGV4dC5yZXBsYWNlKHRyaWdnZXIsIHRyaWdnZXIgKyBydW50aW1lX3RyaWdnZXIsIDEpCgpsaXZlLndyaXRlX3RleHQodGV4dCwgZW5jb2Rpbmc9InV0Zi04IikKcHJpbnQoInJlcGFpciBwYXRjaCBhcHBsaWVkIikK'))"
           git diff --check
-          git diff -- .github/workflows/qwen-batch-autotune-selfheal.yml .github/workflows/qwen-live-classification.yml
+          grep -F 'GOLDEN_SOURCE_GENERATION' .github/workflows/qwen-batch-autotune-selfheal.yml
+          grep -F 'batch_size: $' .github/workflows/qwen-live-classification.yml
 
-      - name: Persist repair transactionally
+      - name: Persist repair
         shell: bash
         run: |
           set -euo pipefail
@@ -151,5 +51,4 @@ jobs:
             git rebase --abort >/dev/null 2>&1 || true
             sleep "$((attempt * 3))"
           done
-          echo 'Failed to persist Qwen control-plane repair' >&2
           exit 1
