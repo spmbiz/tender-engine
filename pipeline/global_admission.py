@@ -12,14 +12,14 @@ DEFAULT_POLICY = {
     "github": {"capacity": 20},
     "workloads": {
         "hospitality": {"enabled": False, "weight": 0.0, "min_slots_when_demanding": 0, "max_slots": 0},
-        "tenders": {"enabled": True, "weight": 0.5, "min_slots_when_demanding": 10, "max_slots": 10},
+        "tenders": {"enabled": True, "weight": 0.5, "min_slots_when_demanding": 10, "max_slots": 20},
         "gws": {"enabled": True, "weight": 0.5, "min_slots_when_demanding": 10, "max_slots": 10},
     },
 }
 
 
 def _request(url: str):
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.9"})
+    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/2.0"})
     tok = os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")
     if tok:
         req.add_header("Authorization", f"Bearer {tok}")
@@ -58,9 +58,9 @@ def _classify(repo: str, name: str, path: str) -> str:
 def _repo_capacity_state(repo: str, ignore_run_id: str = "") -> tuple[Counter, Counter]:
     """Return (active slots, queued jobs) by workload.
 
-    Queued jobs are backlog/demand signals, not physical occupancy. Active jobs
-    consume the 20 hosted-runner slots. Tender (including Qwen) and GWS each have
-    a hard 10-slot cap in the personal-account fallback mode.
+    Queued jobs are demand signals, not physical occupancy. Active jobs consume
+    hosted-runner slots. Tender work may borrow sibling capacity only when the
+    fair-share reservation is not currently demanded; no active job is preempted.
     """
     active: Counter[str] = Counter()
     queued: Counter[str] = Counter()
@@ -133,8 +133,8 @@ def _spm_curated_fast_lane() -> bool:
 def _qwen_live_streaming_lane() -> bool:
     """Identify Qwen work for observability only.
 
-    Qwen is deliberately NOT a separate capacity pool. The classifier and its DCE
-    handoff are normal Tender work and consume the same 10-slot Tender share.
+    Qwen remains normal Tender work. It can use idle Tender burst capacity but
+    never bypasses sibling reservations or physical hosted-runner capacity.
     """
     flag = str(os.getenv("DCE_QWEN_LIVE_STREAMING_LANE") or "").strip().lower()
     if flag in {"1", "true", "yes"}:
@@ -147,23 +147,35 @@ def _qwen_live_streaming_lane() -> bool:
 
 def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     requested = max(0, int(requested))
+
+    # The fleet controller has already made the global capacity decision on this
+    # path, so do not make a second remote broker vote. It may preauthorize up to
+    # the full hosted-runner capacity; the controller itself remains the authority.
     if _controller_preauthorized():
-        allowed = min(requested, 10)
+        hard_cap = 20
+        allowed = min(requested, hard_cap)
         return allowed, {
             "mode": "controller-preauthorized-budget",
             "requested": requested,
             "allowed": allowed,
-            "hard_cap": 10,
+            "hard_cap": hard_cap,
             "authority": "fleet_controller",
-            "reason": "controller already performed capacity admission; personal-account Tender hard cap remains 10",
+            "reason": "controller already performed capacity admission; consume only the preapproved budget",
             "preemption": "none; consume only the controller-approved budget",
         }
+
     if os.getenv("DCE_DISABLE_GLOBAL_ADMISSION", "").lower() in {"1", "true", "yes"}:
-        allowed = min(requested, 10)
-        return allowed, {"mode": "disabled-but-personal-hard-cap", "requested": requested, "allowed": allowed, "hard_cap": 10}
+        hard_cap = 20
+        allowed = min(requested, hard_cap)
+        return allowed, {
+            "mode": "disabled-but-physical-hard-cap",
+            "requested": requested,
+            "allowed": allowed,
+            "hard_cap": hard_cap,
+        }
 
     policy = _policy()
-    total = int((policy.get("github") or {}).get("capacity") or 20)
+    total = max(1, int((policy.get("github") or {}).get("capacity") or 20))
     workloads = policy.get("workloads") or DEFAULT_POLICY["workloads"]
     state = _global_state()
     last = state.get("last_decision") if isinstance(state, dict) else {}
@@ -194,7 +206,8 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
 
     active_total = sum(int(v) for v in active.values())
     tender_cfg = workloads.get("tenders") or {}
-    tender_max = min(10, int(tender_cfg.get("max_slots") or 10))
+    tender_floor = min(total, max(0, int(tender_cfg.get("min_slots_when_demanding") or 10)))
+    tender_max = min(total, max(tender_floor, int(tender_cfg.get("max_slots") or tender_floor or total)))
     existing_tender_active = int(active.get("tenders", 0))
     tender_room = max(0, tender_max - existing_tender_active)
 
@@ -225,14 +238,16 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
         "gws": _fair_target(total, gws_demand, gws_cfg),
     }
     sibling_missing = sum(max(0, sibling_targets[w] - int(active.get(w, 0))) for w in sibling_targets)
-    global_room_after_protection = max(0, total - active_total - sibling_missing)
+    physical_free = max(0, total - active_total)
+    global_room_after_protection = max(0, physical_free - sibling_missing)
 
     effective_tender_demand = max(tender_demand, requested + existing_tender_active)
     unmet_tender_demand = max(0, effective_tender_demand - existing_tender_active)
-    allowed = min(requested, global_room_after_protection, tender_room, unmet_tender_demand, 10)
+    allowed = min(requested, global_room_after_protection, tender_room, unmet_tender_demand, tender_max)
 
+    borrowed_slots = max(0, existing_tender_active + allowed - tender_floor)
     report = {
-        "mode": "personal-10-10-tender-admission",
+        "mode": "active-slot-fair-share-admission",
         "capacity": total,
         "requested": requested,
         "allowed": allowed,
@@ -240,6 +255,7 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
         "active_commitments": dict(active),
         "queued_backlog": dict(queued),
         "active_total": active_total,
+        "physical_free": physical_free,
         "demand": {
             "hospitality": hospitality_demand,
             "gws": gws_demand,
@@ -251,9 +267,11 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
         "global_room_after_protection": global_room_after_protection,
         "existing_tender_active": existing_tender_active,
         "queued_tender_backlog": int(queued.get("tenders", 0)),
+        "tender_floor": tender_floor,
         "tender_max": tender_max,
-        "preemption": "none; admission control only",
-        "queue_rule": "queued jobs signal demand; only active jobs consume physical runner capacity",
-        "policy_fallback": "10 tenders (Qwen included) + 10 GWS; Hospitality fanout paused while on personal 20-slot capacity",
+        "borrowed_idle_slots_after_admission": borrowed_slots,
+        "preemption": "none; idle borrowing ends naturally as current jobs complete",
+        "queue_rule": "queued sibling jobs reserve fair-share capacity; only active jobs consume physical slots",
+        "policy_fallback": "Tender floor remains protected while idle capacity may burst up to the configured max; GWS demand keeps its reservation.",
     }
     return allowed, report
