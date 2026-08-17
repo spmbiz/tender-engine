@@ -41,7 +41,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  QWEN_WORKERS_REQUESTED: '16'
+  QWEN_WORKERS_REQUESTED: '60'
   QWEN_BATCH_SIZE: '8'
   QWEN_CLASSIFIER_VERSION: 'qwen3-4b-q4km-batch-selfheal-v1'
 
@@ -149,7 +149,7 @@ jobs:
           python - <<'PY' > input/qwen-capacity-admission.json
           import json, os
           from pipeline.global_admission import dynamic_tender_parallel
-          requested=max(1,min(60,int(os.environ.get('QWEN_WORKERS_REQUESTED') or 16)))
+          requested=max(1,min(60,int(os.environ.get('QWEN_WORKERS_REQUESTED') or 60)))
           allowed, report=dynamic_tender_parallel(requested)
           report['lane']='qwen-live-classification'
           report['requested_workers']=requested
@@ -217,7 +217,7 @@ jobs:
         run: |
           echo "Source discovery: ${{ steps.plan.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Exact-hash queue remaining before this pass: ${{ steps.plan.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Workers requested: $QWEN_WORKERS_REQUESTED; workers admitted: ${{ steps.plan.outputs.allowed_workers }}; max notices/worker: ${{ steps.plan.outputs.per_shard }}; batch size: ${{ steps.plan.outputs.batch_size }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Workers requested from shared Tender pool: $QWEN_WORKERS_REQUESTED; workers admitted: ${{ steps.plan.outputs.allowed_workers }}; max notices/worker: ${{ steps.plan.outputs.per_shard }}; batch size: ${{ steps.plan.outputs.batch_size }}" >> "$GITHUB_STEP_SUMMARY"
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
           cat input/qwen-capacity-admission.json >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
@@ -495,13 +495,23 @@ jobs:
           fi
           jobs='${{ steps.selection.outputs.count }}'
           if [ "$jobs" -gt 120 ]; then jobs=120; fi
+          dce_parallel="$(DCE_SELECTION_PATH=queues/qwen_live_selection_latest.jsonl python - <<'PYADMIT'
+          from pipeline.global_admission import dynamic_tender_parallel
+          allowed,_=dynamic_tender_parallel(60)
+          print(allowed)
+          PYADMIT
+          )"
+          if [ "${dce_parallel:-0}" -le 0 ]; then
+            echo "No shared Tender capacity available for DCE; persisted queue will be picked up by the drainer."
+            exit 0
+          fi
           gh workflow run dce-fanout-v2.yml --ref main \
             -f selection_path=queues/qwen_live_selection_latest.jsonl \
             -f source_discovery_run='${{ needs.plan.outputs.source_run }}' \
             -f max_jobs="$jobs" \
-            -f max_parallel=24 \
+            -f max_parallel="$dce_parallel" \
             -f jobs_per_shard=0
-          echo "Dispatched Qwen semantic DCE lane: candidates=$jobs source=${{ needs.plan.outputs.source_run }}; DCE fanout performs its own global admission."
+          echo "Dispatched Qwen semantic DCE lane: candidates=$jobs source=${{ needs.plan.outputs.source_run }} shared_tender_parallel=$dce_parallel."
 
       - name: Continue bounded backfill only after real accepted progress
         if: steps.merge.outputs.remaining != '0' && steps.merge.outputs.accepted != '0' && (github.event.inputs.auto_continue || 'true') == 'true'
@@ -521,7 +531,7 @@ jobs:
           echo "### Qwen live mainline" >> "$GITHUB_STEP_SUMMARY"
           echo "- source discovery: ${{ needs.plan.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- queue before pass: ${{ needs.plan.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- workers requested/admitted: $QWEN_WORKERS_REQUESTED/${{ needs.plan.outputs.allowed_workers }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- workers requested/admitted from shared Tender pool: $QWEN_WORKERS_REQUESTED/${{ needs.plan.outputs.allowed_workers }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- accepted this pass: ${{ steps.merge.outputs.accepted }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- remaining exact-hash classification queue: ${{ steps.merge.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- cumulative classified state rows: ${{ steps.merge.outputs.state_rows }}" >> "$GITHUB_STEP_SUMMARY"
