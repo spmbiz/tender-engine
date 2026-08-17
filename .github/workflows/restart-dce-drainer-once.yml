@@ -18,4 +18,4 @@ jobs:
       - name: Dispatch fresh DCE queue drainer
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run dce-queue-drainer.yml --ref main
+        run: gh workflow run dce-queue-drainer.yml --repo spmbiz/tender-engine --ref main
