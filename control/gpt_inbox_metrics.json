@@ -1,38 +1,39 @@
 {
   "schema": "GPT_INBOX_HEALTH_V1",
-  "updated_at": "2026-08-17T18:54:30.799204+00:00",
+  "updated_at": "2026-08-17T18:57:36.761299+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V2",
   "latest_source_dce_run_id": 32056472546,
   "counts": {
-    "pending_gpt_web_review": 104,
+    "pending_gpt_web_review": 101,
     "reviewed_ticks_total": 171,
     "excluded_already_reviewed": 0,
     "excluded_already_in_final_bank": 0,
     "pending_by_stage": {
-      "BUSINESS_GATES": 91,
+      "BUSINESS_GATES": 88,
       "DCE_AUTHENTICITY": 13
     }
   },
-  "review_bank_count": 112,
+  "review_bank_count": 109,
   "review_bank_schema": "GPT_REVIEW_HOT_V4",
   "recovery_metrics": {
     "shard_files_scanned": 66,
     "adjudication_rows_scanned": 602,
-    "model_review_rows_seen": 183,
+    "model_review_rows_seen": 178,
     "dce_authenticity_rows_seen": 20,
-    "scope_auto_rejected": 39,
+    "scope_auto_rejected": 47,
     "scope_auto_reject_reason_counts": {
+      "NO_SCOPE_DOMINANT_PHYSICAL_PRIME_CONSTRUCTION": 14,
       "NO_SCOPE_PHYSICAL_CONSTRUCTION_WORKS": 10,
       "NO_SCOPE_PHYSICAL_DREDGING": 3,
       "NO_SCOPE_PHYSICAL_ROAD_BRIDGE_WORKS": 7,
-      "NO_SCOPE_PHYSICAL_HVAC_WORKS": 10,
-      "NO_SCOPE_PHYSICAL_DESIGN_BUILD_INFRASTRUCTURE": 6,
+      "NO_SCOPE_PHYSICAL_DESIGN_BUILD_INFRASTRUCTURE": 4,
       "NO_SCOPE_DOMINANT_PHYSICAL_STRAIGHT_TO_CONSTRUCTION": 3,
       "NO_SCOPE_DOMINANT_PHYSICAL_TURNKEY_INSTALLATION": 3,
       "NO_SCOPE_DOMINANT_PHYSICAL_FACILITY_CONSTRUCTION": 4,
+      "NO_SCOPE_PHYSICAL_HVAC_WORKS": 6,
       "NO_SCOPE_PHYSICAL_WASTE_SERVICE": 2
     },
-    "persistent_unique_pending_surface": 112
+    "persistent_unique_pending_surface": 109
   },
   "healthy": true,
   "contract": "Small health sidecar only; canonical work remains control/gpt_supergreen_inbox.json."
