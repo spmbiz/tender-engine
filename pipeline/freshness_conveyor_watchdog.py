@@ -25,9 +25,6 @@ SNAPSHOT_WORKFLOW = "live-world-snapshot.yml"
 LEDGER_WORKFLOW = "notice-intelligence-ledger.yml"
 QWEN_WORKFLOW = "qwen-live-classification.yml"
 ACTIVE_RUN_STATES = {"in_progress", "queued", "waiting", "pending", "requested"}
-# Stage-aware zombie limits. Snapshot/Ledger are short control-plane jobs; Qwen
-# workers legitimately run much longer and must never be killed by the watchdog
-# merely because a bounded semantic pass exceeds the short control-plane budget.
 MAX_ACTIVE_AGE_BY_WORKFLOW = {
     SNAPSHOT_WORKFLOW: 60,
     LEDGER_WORKFLOW: 45,
@@ -42,6 +39,7 @@ class StageState:
     snapshot: str | None
     ledger: str | None
     qwen: str | None
+    qwen_remaining: int | None = None
 
 
 def request(method: str, path: str, **kwargs) -> requests.Response:
@@ -108,6 +106,16 @@ def parse_run_id(text: str | None, *patterns: str) -> str | None:
     return None
 
 
+def parse_int(text: str | None, pattern: str) -> int | None:
+    m = re.search(pattern, str(text or ""), flags=re.I)
+    if not m:
+        return None
+    try:
+        return int(m.group(1))
+    except Exception:
+        return None
+
+
 def _parse_ts(value: object):
     if not value:
         return None
@@ -142,13 +150,16 @@ def ledger_source_run() -> str | None:
     )
 
 
-def qwen_source_run() -> str | None:
+def qwen_release_state() -> tuple[str | None, int | None]:
     rel = release("qwen-classification-state-latest") or {}
-    return parse_run_id(
-        f"{rel.get('name', '')} {rel.get('body', '')}",
+    raw = f"{rel.get('name', '')} {rel.get('body', '')}"
+    source = parse_run_id(
+        raw,
         r"source[_ -]?run\s*=\s*(\d+)",
         r"LATEST\s*\((\d+)(?:/|\))",
     )
+    remaining = parse_int(raw, r"\bremaining\s*=\s*(\d+)")
+    return source, remaining
 
 
 def cancel_run(run_id: object) -> bool:
@@ -160,9 +171,6 @@ def cancel_run(run_id: object) -> bool:
 
 
 def workflow_active(workflow: str) -> bool:
-    # Stale queued runs can survive for many hours and permanently block a
-    # freshness lane. Treat only recent active work as an ownership signal;
-    # cancel ancient zombies before allowing the newest generation through.
     data = api_json(f"/repos/{REPO}/actions/workflows/{workflow}/runs?per_page=30")
     now = datetime.now(timezone.utc)
     max_age = int(MAX_ACTIVE_AGE_BY_WORKFLOW.get(workflow, DEFAULT_MAX_ACTIVE_AGE_MINUTES))
@@ -195,16 +203,18 @@ def dispatch(workflow: str, inputs: dict[str, str] | None = None) -> None:
 
 
 def current_state() -> StageState:
+    qwen_source, qwen_remaining = qwen_release_state()
     return StageState(
         discovery=latest_usable_discovery(),
         snapshot=snapshot_source_run(),
         ledger=ledger_source_run(),
-        qwen=qwen_source_run(),
+        qwen=qwen_source,
+        qwen_remaining=qwen_remaining,
     )
 
 
 def decide(state: StageState) -> tuple[str, str | None]:
-    """Return the first stale stage that must be repaired, newest generation first."""
+    """Return the first stale or incomplete stage that must be repaired."""
     if not state.discovery:
         return "WAIT_NO_USABLE_DISCOVERY", None
     if state.snapshot != state.discovery:
@@ -213,6 +223,11 @@ def decide(state: StageState) -> tuple[str, str | None]:
         return "LEDGER", state.discovery
     if state.qwen != state.discovery:
         return "QWEN", state.discovery
+    # Publishing the current source generation is not enough: an interrupted pass
+    # can publish a zero-progress state pointer. Keep Qwen hot until the durable
+    # residual queue is empty; workflow_active() prevents duplicate workers.
+    if state.qwen_remaining is not None and state.qwen_remaining > 0:
+        return "QWEN", state.discovery
     return "HEALTHY", state.discovery
 
 
@@ -220,7 +235,7 @@ def main() -> None:
     state = current_state()
     action, target = decide(state)
     report: dict[str, Any] = {
-        "schema": "FRESHNESS_CONVEYOR_WATCHDOG_V1",
+        "schema": "FRESHNESS_CONVEYOR_WATCHDOG_V2",
         "state": state.__dict__,
         "decision": action,
         "target_generation": target,
