@@ -145,13 +145,12 @@ jobs:
             exit 0
           fi
 
-          # Ask the shared Tender admission controller for only the currently free
-          # room. We request at most four slots so Qwen classification and existing
-          # DCE work can continue sharing the 10-slot Tender budget.
+          # Ask the shared admission controller for a larger bounded DCE slice.
+          # Sibling reservations and physical capacity still win; no preemption.
           dce_parallel="$(python - <<'PY'
           from pipeline.global_admission import dynamic_tender_parallel
-          allowed,_=dynamic_tender_parallel(4)
-          print(max(0,min(4,int(allowed))))
+          allowed,_=dynamic_tender_parallel(10)
+          print(max(0,min(10,int(allowed))))
           PY
           )"
           if [ "${dce_parallel:-0}" -le 0 ]; then
@@ -177,10 +176,10 @@ jobs:
           active="$(gh run list --workflow qwen-live-classification.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
           if [ "$active" -eq 0 ]; then
             gh workflow run qwen-live-classification.yml --ref main \
-              -f per_shard=80 \
+              -f per_shard=192 \
               -f auto_continue=true \
               -f dce_limit=160
-            echo "Queued next short Qwen pass; remaining=${{ steps.rebuild.outputs.remaining }}."
+            echo "Queued next high-throughput Qwen pass; remaining=${{ steps.rebuild.outputs.remaining }}."
           else
             echo "Qwen already active/queued ($active); no duplicate dispatch."
           fi
