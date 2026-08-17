@@ -37,8 +37,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: qwen-live-notice-classification
-  # A code push supersedes stale architecture runs; scheduled/self-continued passes stay serialized.
+  group: qwen-live-notice-classification-${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success' && format('noop-{0}', github.run_id) || 'active' }}
+  # Only real active passes share the live group. Non-success workflow_run no-ops get a unique group and cannot replace a pending real pass.
   cancel-in-progress: ${{ github.event_name == 'push' }}
 
 env:
