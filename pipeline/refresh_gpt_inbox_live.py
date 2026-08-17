@@ -1,18 +1,18 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
+import urllib.request
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
-VISIBLE_FINAL_CLASSES = {'FINAL_SUPER_GREEN', 'GREEN', 'GREEN_PARTNERABLE'}
-
-# Deterministic pre-GPT blockers. These do not require an LLM to recognize and
-# should never consume scarce GPT Web final-review attention. Ambiguous business
-# gates remain UNKNOWN and stay eligible for GPT only when the candidate is a
-# strong SPM-fit HOT/GOOD row.
+# The inbox is now a work queue for GPT Web, not a verdict store.
+# Final/decided opportunities live in control/final_supergreen_bank.json.
+VISIBLE_REVIEW_SIGNALS = {'FINAL_SUPER_GREEN', 'GREEN', 'GREEN_PARTNERABLE'}
 HARD_GPT_INBOX_BLOCKERS = {
     'rfi-no-award',
     'not-a-solicitation',
@@ -34,6 +34,37 @@ def load_json(path: Path | None) -> dict[str, Any]:
         return obj if isinstance(obj, dict) else {}
     except Exception:
         return {}
+
+
+def load_live_review_ledger(path: Path) -> dict[str, Any]:
+    """Prefer the current main-branch ledger when running inside Actions.
+
+    DCE shards may have checked out before GPT Web added a tick. Reading the live
+    Contents API prevents a late shard from resurrecting already-reviewed rows.
+    Local/scheduled runs safely fall back to the checked-out file.
+    """
+    repo = str(os.getenv('GITHUB_REPOSITORY') or '').strip()
+    token = str(os.getenv('GH_TOKEN') or os.getenv('GITHUB_TOKEN') or '').strip()
+    if repo and token:
+        url = f'https://api.github.com/repos/{repo}/contents/control/gpt_web_review_ledger.json?ref=main'
+        req = urllib.request.Request(
+            url,
+            headers={
+                'Authorization': f'Bearer {token}',
+                'Accept': 'application/vnd.github.raw+json',
+                'X-GitHub-Api-Version': '2022-11-28',
+                'User-Agent': 'tender-gpt-inbox/1.0',
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                raw = resp.read().decode('utf-8', errors='replace').strip()
+            obj = json.loads(raw) if raw else {}
+            if isinstance(obj, dict):
+                return obj
+        except Exception:
+            pass
+    return load_json(path)
 
 
 def key(row: dict[str, Any]) -> str:
@@ -63,31 +94,57 @@ def source_run(row: dict[str, Any]) -> int | None:
     return None
 
 
-def confirmed_rank(row: dict[str, Any]):
-    cls = str(row.get('classification') or '').upper()
-    cls_rank = {'FINAL_SUPER_GREEN': 4, 'GREEN': 3, 'GREEN_PARTNERABLE': 2}.get(cls, -1)
-    return (cls_rank, int(row.get('final_score') or 0), source_run(row) or 0)
+def review_key(row: dict[str, Any]) -> str:
+    stable = {
+        'candidate_id': str(row.get('candidate_id') or ''),
+        'source_dce_run_id': source_run(row),
+        'title': str(row.get('title') or ''),
+        'deadline': str(row.get('deadline') or ''),
+    }
+    return hashlib.sha256(json.dumps(stable, sort_keys=True, ensure_ascii=False).encode('utf-8')).hexdigest()
+
+
+def ledger_ticks(ledger: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    raw = ledger.get('ticks')
+    if isinstance(raw, dict):
+        return {str(k).casefold(): v for k, v in raw.items() if isinstance(v, dict)}
+    if isinstance(raw, list):
+        out: dict[str, dict[str, Any]] = {}
+        for row in raw:
+            if isinstance(row, dict) and key(row):
+                out[key(row)] = row
+        return out
+    return {}
+
+
+def is_reviewed(row: dict[str, Any], ticks: dict[str, dict[str, Any]]) -> bool:
+    tick = ticks.get(key(row))
+    if not tick or not bool(tick.get('reviewed', True)):
+        return False
+    exact = str(tick.get('review_key') or '').strip()
+    if exact and exact == review_key(row):
+        return True
+    current_run = source_run(row)
+    reviewed_run = run_id(tick.get('source_dce_run_id'))
+    # A later DCE generation is allowed to re-enter GPT Web review.
+    if current_run is not None and reviewed_run is not None:
+        return current_run <= reviewed_run
+    return True
 
 
 def pending_rank(row: dict[str, Any]):
-    action = {'FINAL_REVIEW_NOW': 4}.get(str(row.get('recommended_gpt_action') or ''), 1)
+    signal = str(row.get('upstream_signal') or row.get('classification') or '').upper()
+    signal_rank = 2 if signal in VISIBLE_REVIEW_SIGNALS else 1
     return (
-        action,
-        int(row.get('gpt_priority_score') or row.get('spm_post_dce_score') or 0),
+        signal_rank,
+        int(row.get('gpt_priority_score') or row.get('spm_post_dce_score') or row.get('priority_score') or 0),
         int(bool(row.get('deadline_resolved'))),
         int(row.get('evidence_gate_coverage') or 0),
         source_run(row) or 0,
     )
 
 
-def normalize_hot_review(row: dict[str, Any]) -> dict[str, Any] | None:
-    """Convert an internal recall-first DCE row into a precision-first GPT inbox row.
-
-    GPT Web is the final adjudicator, not a discovery/filtering worker. Only
-    authoritative, gate-ready, strongly SPM-relevant HOT/GOOD rows survive here.
-    Obvious deterministic blockers are filtered before GPT. UNKNOWN business gates
-    are never promoted to PASS by this function.
-    """
+def normalize_hot_review(row: dict[str, Any], source_name: str = 'control/gpt_review_hot.json') -> dict[str, Any] | None:
     if not isinstance(row, dict) or not key(row) or not open_deadline(row):
         return None
     if not bool(row.get('gate_readiness')):
@@ -103,34 +160,60 @@ def normalize_hot_review(row: dict[str, Any]) -> dict[str, Any] | None:
         for x in (row.get('spm_friction_signals') or [])
         if str(x).strip()
     }
-
-    # Final inbox is intentionally precision-first. MAYBE/LOW/EXPLORATION stays in
-    # gpt_review_hot for recall/audit, but never consumes GPT Web final review.
     if score < 40 or (band and band not in {'HOT', 'GOOD'}):
         return None
     if friction & HARD_GPT_INBOX_BLOCKERS:
         return None
 
     out = dict(row)
-    out['native_spm_core'] = True
-    out['obvious_noncore_scope'] = False
-    out['qwen_dce_classification'] = out.get('qwen_dce_classification') or 'HOT_DCE_NOT_YET_QWEN_READ'
-    out['qwen_dce_lean'] = out.get('qwen_dce_lean') or 'UNKNOWN'
-    out['qwen_dce_route'] = out.get('qwen_dce_route') or 'UNCLEAR'
-    out['recommended_gpt_action'] = 'FINAL_REVIEW_NOW'
+    out['review_state'] = 'PENDING_GPT_WEB'
+    out['review_tick'] = False
+    out['review_key'] = review_key(out)
+    out['recommended_gpt_action'] = 'GPT_WEB_REVIEW_NOW'
     out['gpt_priority_score'] = max(50, min(100, score if score > 0 else int(out.get('priority_score') or 0)))
-    out['finality'] = 'AUTHORITATIVE_DCE_GPT_READY_NOT_FINAL_VERDICT'
-    out['inbox_live_source'] = 'control/gpt_review_hot.json'
-    out['gpt_stage_contract'] = 'GPT Web is final-stage adjudication only. Discovery, DCE retrieval, deterministic rejection and SPM-fit filtering already completed upstream.'
+    out['upstream_signal'] = str(out.get('upstream_signal') or out.get('classification') or 'DCE_REVIEW_READY').upper()
+    out['finality'] = 'NOT_A_VERDICT_GPT_WEB_MUST_REVIEW'
+    out['inbox_live_source'] = source_name
+    out['evidence_locator'] = {
+        'dce_run_id': source_run(out),
+        'shard': out.get('source_shard'),
+        'candidate_id': out.get('candidate_id'),
+    }
+    return out
+
+
+def normalize_hot_green(row: dict[str, Any]) -> dict[str, Any] | None:
+    """Auto/guarded GREEN is only a high-priority GPT Web input.
+
+    supergreen_hot is retained for compatibility, but it no longer means that the
+    user-facing inbox has accepted the verdict. GPT Web still owns the final call.
+    """
+    if not isinstance(row, dict) or not key(row) or not open_deadline(row):
+        return None
+    out = dict(row)
+    out['review_state'] = 'PENDING_GPT_WEB'
+    out['review_tick'] = False
+    out['review_key'] = review_key(out)
+    out['upstream_signal'] = str(out.get('classification') or 'AUTO_GREEN').upper()
+    out['recommended_gpt_action'] = 'GPT_WEB_REVIEW_NOW'
+    out['gpt_priority_score'] = max(70, min(100, int(out.get('final_score') or 0)))
+    out['finality'] = 'UPSTREAM_GUARDED_SIGNAL_NOT_A_GPT_WEB_VERDICT'
+    out['inbox_live_source'] = 'control/supergreen_hot.json'
+    out['evidence_locator'] = {
+        'dce_run_id': source_run(out),
+        'shard': out.get('source_shard'),
+        'candidate_id': out.get('candidate_id'),
+    }
     return out
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description='Rebuild the final-stage GPT Web inbox from durable green verdicts and precision-filtered shard-hot DCE evidence.')
+    ap = argparse.ArgumentParser(description='Build the queue of DCE-ready candidates GPT Web should review now.')
     ap.add_argument('--existing', default='control/gpt_supergreen_inbox.json')
     ap.add_argument('--final-bank', default='control/final_supergreen_bank.json')
     ap.add_argument('--hot-green', default='control/supergreen_hot.json')
     ap.add_argument('--hot-review', default='control/gpt_review_hot.json')
+    ap.add_argument('--review-ledger', default='control/gpt_web_review_ledger.json')
     ap.add_argument('--out', default='control/gpt_supergreen_inbox.json')
     ap.add_argument('--max-items', type=int, default=60)
     args = ap.parse_args()
@@ -139,101 +222,80 @@ def main() -> None:
     final_bank = load_json(Path(args.final_bank))
     hot_green = load_json(Path(args.hot_green))
     hot_review = load_json(Path(args.hot_review))
+    ledger = load_live_review_ledger(Path(args.review_ledger))
+    ticks = ledger_ticks(ledger)
 
-    # All durable final-bank rows are resolved and therefore suppress duplicate
-    # pending review. Only actual green classes are surfaced in the GPT inbox;
-    # durable RED/YELLOW remain in the final bank/audit trail, not this surface.
-    final_items = [x for x in final_bank.get('items', []) if isinstance(x, dict) and key(x) and open_deadline(x)]
+    # Anything already in the final bank is decided and never belongs in the work inbox.
+    final_items = [x for x in final_bank.get('items', []) if isinstance(x, dict) and key(x)]
     resolved = {key(x) for x in final_items}
-    visible_final_items = [
-        x for x in final_items
-        if str(x.get('classification') or '').upper() in VISIBLE_FINAL_CLASSES
-    ]
-
-    confirmed: dict[str, dict[str, Any]] = {key(x): x for x in visible_final_items}
-    # A shard-hot FINAL_SUPER_GREEN is never trusted as final. Only GREEN-class
-    # guarded DCE output may augment the live cache before GPT Web persistence.
-    for row in (hot_green.get('greens') or []):
-        if not isinstance(row, dict) or not key(row) or not open_deadline(row):
-            continue
-        cls = str(row.get('classification') or '').upper()
-        if cls not in {'GREEN', 'GREEN_PARTNERABLE'}:
-            continue
-        cur = confirmed.get(key(row))
-        live = dict(row)
-        live['finality'] = 'GUARDED_DCE_HOT_GREEN_NOT_FINAL_SUPERGREEN'
-        live['inbox_live_source'] = 'control/supergreen_hot.json'
-        if cur is None or confirmed_rank(live) > confirmed_rank(cur):
-            confirmed[key(row)] = live
 
     pending: dict[str, dict[str, Any]] = {}
-    existing_pending_total = 0
-    existing_pending_kept = 0
-    for raw in existing.get('pending_final_review', []) or []:
-        if not isinstance(raw, dict):
-            continue
-        existing_pending_total += 1
-        row = normalize_hot_review(raw)
-        if row is None or key(row) in resolved:
-            continue
-        pending[key(row)] = row
-        existing_pending_kept += 1
+    filtered_reviewed = 0
+    filtered_resolved = 0
 
-    hot_review_total = 0
-    hot_review_kept = 0
-    for raw in hot_review.get('items', []) or []:
-        if not isinstance(raw, dict):
-            continue
-        hot_review_total += 1
-        row = normalize_hot_review(raw)
-        if row is None or key(row) in resolved:
-            continue
-        cur = pending.get(key(row))
+    def consider(row: dict[str, Any] | None) -> None:
+        nonlocal filtered_reviewed, filtered_resolved
+        if row is None:
+            return
+        k = key(row)
+        if k in resolved:
+            filtered_resolved += 1
+            return
+        if is_reviewed(row, ticks):
+            filtered_reviewed += 1
+            return
+        cur = pending.get(k)
         if cur is None or pending_rank(row) >= pending_rank(cur):
-            pending[key(row)] = row
-        hot_review_kept += 1
+            pending[k] = row
 
-    pending_rows = sorted(pending.values(), key=pending_rank, reverse=True)[:max(0, args.max_items)]
-    confirmed_rows = sorted(confirmed.values(), key=confirmed_rank, reverse=True)
+    # Carry forward still-unreviewed items from the prior inbox.
+    existing_rows = existing.get('review_queue')
+    if not isinstance(existing_rows, list):
+        existing_rows = existing.get('pending_final_review') or []
+    for raw in existing_rows:
+        if isinstance(raw, dict):
+            consider(normalize_hot_review(raw, 'existing_inbox'))
+
+    # Precision-filtered DCE rows.
+    for raw in hot_review.get('items', []) or []:
+        if isinstance(raw, dict):
+            consider(normalize_hot_review(raw))
+
+    # Guarded/automatic GREEN is a priority signal only; GPT Web still reviews it.
+    for bucket in ('final_supergreens', 'greens'):
+        for raw in hot_green.get(bucket, []) or []:
+            if isinstance(raw, dict):
+                consider(normalize_hot_green(raw))
+
+    rows = sorted(pending.values(), key=pending_rank, reverse=True)[:max(0, args.max_items)]
 
     runs: list[int] = []
-    for v in (
-        existing.get('latest_source_dce_run_id'),
-        hot_green.get('latest_dce_run_id'),
-        hot_review.get('latest_dce_run_id'),
-    ):
-        n = run_id(v)
+    for value in (hot_review.get('latest_dce_run_id'), hot_green.get('latest_dce_run_id')):
+        n = run_id(value)
         if n is not None:
             runs.append(n)
-    for row in confirmed_rows + pending_rows:
+    for row in rows:
         n = source_run(row)
         if n is not None:
             runs.append(n)
-    latest = max(runs) if runs else existing.get('latest_source_dce_run_id')
 
     payload = {
-        'schema': 'GPT_INSTANT_SUPERGREEN_INBOX_V5_FINAL_STAGE',
+        'schema': 'GPT_WEB_REVIEW_INBOX_V1',
         'updated_at': datetime.now(timezone.utc).isoformat(),
-        'latest_source_dce_run_id': latest,
-        'confirmed_supergreens': confirmed_rows,
-        'pending_final_review': pending_rows,
+        'latest_source_dce_run_id': max(runs) if runs else existing.get('latest_source_dce_run_id'),
+        'review_queue': rows,
+        # Transitional alias so old readers do not break while the repo rolls forward.
+        'pending_final_review': rows,
         'counts': {
-            'confirmed_supergreens': sum(str(x.get('classification') or '').upper() == 'FINAL_SUPER_GREEN' for x in confirmed_rows),
-            'confirmed_green_total': sum(str(x.get('classification') or '').upper() in {'FINAL_SUPER_GREEN', 'GREEN'} for x in confirmed_rows),
-            'confirmed_or_partnerable_green_total': len(confirmed_rows),
-            'resolved_total': len(final_items),
-            'resolved_non_green_hidden_from_inbox': len(final_items) - len(visible_final_items),
-            'pending_final_review': len(pending_rows),
-            'review_now': len(pending_rows),
-            'existing_pending_filtered': max(0, existing_pending_total - existing_pending_kept),
-            'hot_review_filtered': max(0, hot_review_total - hot_review_kept),
-            'live_hot_review_items': sum(x.get('inbox_live_source') == 'control/gpt_review_hot.json' for x in pending_rows),
-            'live_hot_green_items': sum(x.get('inbox_live_source') == 'control/supergreen_hot.json' for x in confirmed_rows),
+            'pending_gpt_web_review': len(rows),
+            'reviewed_ticks_total': len(ticks),
+            'excluded_already_reviewed': filtered_reviewed,
+            'excluded_already_in_final_bank': filtered_resolved,
         },
-        'answer_contract': 'Read this file only for end-of-pipeline opportunities. Durable RED/YELLOW and internal MAYBE/LOW/exploration rows are deliberately excluded. Pending rows are authoritative-DCE, gate-ready, HOT/GOOD SPM-fit candidates awaiting only GPT Web final adjudication. Unknown is never PASS.',
-        'finality_rule': 'Only GPT Web final adjudication from authoritative DCE evidence may create or persist FINAL_SUPER_GREEN in the final bank. GitHub Actions never calls OpenAI and never waits for GPT Web.',
-        'pipeline_contract': 'harvest -> Qwen/local triage -> DCE -> deterministic evidence/gates/SPM-fit rejection -> this GPT-ready inbox -> GPT Web final adjudication -> final bank. GPT Web is not a pipeline dependency and cannot block upstream processing.',
-        'live_contract': 'DCE shards rebuild this file directly. The scheduled inbox refresh is only a repair/fallback path; no OpenAI API key or remote LLM call is required to reach the inbox.',
+        'review_contract': 'This file is only GPT Web work. Every row is DCE-ready or an upstream guarded GREEN signal that still requires GPT Web review. Nothing in this inbox is a final verdict.',
+        'tick_contract': 'After GPT Web reviews a pass, add one durable reviewed tick per candidate to control/gpt_web_review_ledger.json. The next rebuild removes ticked rows automatically. A later DCE run may re-enter review.',
+        'final_bank_contract': 'Decided GREEN/YELLOW/RED/FINAL_SUPER_GREEN results belong in control/final_supergreen_bank.json, never mixed into this inbox.',
+        'pipeline_contract': 'harvest -> Qwen/local triage -> DCE/evidence -> this GPT Web review inbox -> GPT Web review + tick -> final bank.',
     }
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
