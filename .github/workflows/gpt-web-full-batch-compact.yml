@@ -85,24 +85,35 @@ jobs:
                   'evidence': gate_digest,
               })
 
-          out={
+          meta={
               'schema':'GPT_WEB_FULL_BATCH_COMPACT_V1',
               'generated_at':datetime.now(timezone.utc).isoformat(),
               'source_inbox_updated_at':data.get('updated_at'),
               'latest_source_dce_run_id':data.get('latest_source_dce_run_id'),
               'count':len(rows),
-              'items':rows,
           }
           p=pathlib.Path('control/gpt_web_full_batch_compact.json')
-          p.write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding='utf-8')
-          print(json.dumps({'count':len(rows),'output':str(p)},indent=2))
+          p.write_text(json.dumps({**meta,'items':rows},ensure_ascii=False,indent=2),encoding='utf-8')
+
+          idx=pathlib.Path('control/gpt_web_full_batch_index.jsonl')
+          with idx.open('w',encoding='utf-8') as f:
+              f.write(json.dumps({'_meta':meta},ensure_ascii=False,separators=(',',':'))+'\n')
+              for r in rows:
+                  small={k:r.get(k) for k in [
+                      'candidate_id','title','buyer','portal','notice_url','deadline','estimated_value','currency',
+                      'gpt_priority_score','review_stage','spm_post_dce_score','spm_fit_band','spm_fit_reasons',
+                      'spm_friction_signals','content_quality','gate_readiness','evidence_gate_coverage',
+                      'deadline_authority_status','deadline_conflict','source_dce_run_id','source_shard','review_key'
+                  ]}
+                  f.write(json.dumps(small,ensure_ascii=False,separators=(',',':'))+'\n')
+          print(json.dumps({'count':len(rows),'output':str(p),'index':str(idx)},indent=2))
           PY
       - name: Persist compact batch
         shell: bash
         run: |
           git config user.name 'tender-engine-bot'
           git config user.email 'tender-engine-bot@users.noreply.github.com'
-          git add control/gpt_web_full_batch_compact.json
+          git add control/gpt_web_full_batch_compact.json control/gpt_web_full_batch_index.jsonl
           if git diff --cached --quiet; then
             echo 'No compact batch change.'
             exit 0
