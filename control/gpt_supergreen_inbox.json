@@ -1,6 +1,6 @@
 {
   "schema": "GPT_INSTANT_SUPERGREEN_INBOX_V3",
-  "updated_at": "2026-08-17T11:12:33.631503+00:00",
+  "updated_at": "2026-08-17T11:14:16.174213+00:00",
   "latest_source_dce_run_id": 32023052121,
   "confirmed_supergreens": [
     {
@@ -466,6 +466,6 @@
     "review_now": 0,
     "recall_overrides": 2
   },
-  "answer_contract": "When the user asks what supergreens exist, read this file first. Report live FINAL_SUPER_GREEN/GREEN verdicts immediately. Then adjudicate FINAL_REVIEW_NOW. If capacity allows, review SPM-core gate-ready rows retained by the recall override when Qwen was inconclusive. This user-facing inbox excludes obvious non-core and evidence-empty rows. Qwen is pre-read only; missing evidence is UNKNOWN.",
+  "answer_contract": "Legacy compatibility only. Current main must use GPT_WEB_REVIEW_INBOX_V2.",
   "finality_rule": "Only GPT Web final adjudication from authoritative DCE evidence may create FINAL_SUPER_GREEN. Qwen and recall overrides never do."
 }
