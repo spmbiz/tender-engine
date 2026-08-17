@@ -1,112 +1,18 @@
-name: Qwen Business Fit V2 Pipeline Migration
+name: Qwen Business Fit V2 Pipeline Migration — Retired
 
+# Historical one-shot migration retained as documentation only.
+# Production already carries the calibrated business-fit pipeline.
+# Never rewrite main or restart/cancel Qwen from this retired workflow.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/qwen-business-fit-v2-pipeline-migration.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
-  actions: write
+  contents: read
 
 jobs:
-  migrate:
+  retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Patch pipeline only
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          import re
-
-          # 1) Live classifier semantics + calibrated live labels. Keep classifier_version v1
-          # for workflow compatibility; business_calibration_version v2 is the invalidation key.
-          p=Path('pipeline/qwen_notice_batch_selfheal.py')
-          s=p.read_text(encoding='utf-8')
-          s=s.replace('PROMPT_VERSION = "qwen-batch-high-recall-compact-selfheal-v1"','PROMPT_VERSION = "qwen-batch-high-recall-business-fit-v2"')
-          new_system='''SYSTEM = """High-recall public-tender router for a lean Belgian SME.\nThis is routing only, never eligibility or final bid approval.\nCRITICAL: KEEP is not FIT. Use MAYBE liberally for anything worth preserving but not yet commercially attractive.\nSTRONG_FIT = clear SPM leverage, lean/core delivery, low obvious friction, worth immediate DCE review.\nFIT = practical plausible opportunity with reasonably direct delivery or a straightforward broker route.\nMAYBE = preserve for recall: ambiguous, partner-heavy, physical commodity, generic service, on-site work, unclear economics or unclear gates.\nREJECT_OBVIOUS = clearly non-opportunity/informational or clearly unsuitable active pursuit.\nPhysical goods, heavy/on-site work and personal-service contracts must NOT be FIT merely because subcontracting exists.\nKeep unusual, ambiguous, subcontractable, consortium, broker/resell, AI or digital opportunities by using MAYBE when uncertain.\nReturn ONLY one compact JSON object {\"x\":[...]} in the same order as input.\nFor every item use:\ni=id\nd=S|F|M|R for STRONG_FIT|FIT|MAYBE|REJECT_OBVIOUS\nl=H|M|L|U for HIGH|MEDIUM|LOW|UNKNOWN lean attractiveness\nr=D|A|S|B|X|U for DIRECT_DIGITAL|AI_ENABLED|SUBCONTRACTABLE|BROKER_RESELL|MIXED|UNCLEAR\nf=array of friction codes RG,LP,HE,CI,OS,LO,MA,FR,SC,O\nn=0|1 unusual/novel\ng=0|1 needs GPT review\nNever invent DCE facts. /no_think"""'''
-          s,n=re.subn(r'SYSTEM = """.*?"""',new_system,s,count=1,flags=re.S)
-          if n!=1: raise SystemExit('SYSTEM anchor failed')
-          if '"e": n.get("deadline") or n.get("deadline_utc")' not in s:
-              s=s.replace('        "p": n.get("procedure"),\n','        "p": n.get("procedure"),\n        "e": n.get("deadline") or n.get("deadline_utc"),\n')
-          guard='''def deterministic_guard(decoded: dict[str, Any], row: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:\n    out = dict(decoded)\n    n = notice(row)\n    text = " ".join(str(n.get(k) or "") for k in ("title", "description", "cpv_or_category", "procedure"))\n    title = str(n.get("title") or "")\n    actions: list[str] = []\n    out["survival_decision"] = "KEEP"\n    out["dce_eligible"] = True\n    physical = bool(PHYSICAL_GOODS.search(title)) or bool(PHYSICAL_GOODS.search(text[:1600]))\n    regulated = bool(REGULATED.search(title)) or bool(REGULATED.search(text[:1800]))\n    heavy = bool(HEAVY_ONSITE.search(title)) or bool(HEAVY_ONSITE.search(text[:1800]))\n    personal = bool(PERSONAL_SERVICE.search(title)) or bool(PERSONAL_SERVICE.search(text[:1000]))\n    info_only = bool(re.search(r"\\b(industry day|sources sought|request for information|special notice|award notice|contract award notice)\\b", title, re.I))\n    hard_personnel = bool(re.search(r"\\b(aviation security officer|armed security|security guard|guard services?|physician|nurse|medical staffing)\\b", text, re.I))\n    patient_transport = bool(re.search(r"\\b(non[- ]?emergent patient transportation|patient transport|ambulance services?)\\b", text, re.I))\n    core = bool(re.search(r"\\b(website|web ?app|web portal|application development|mobile app|animation|video production|graphic design|content creation|copywriting|editorial|proofreading|translation|transcription|printing?|brochures?|leaflets?|signage|promotional goods?|digitization|digitisation|scanning|document management|e[- ]learning|training content|training materials?|media monitoring|social media|communications strategy|digital marketing|market research|research services?|surveys?|data processing|data entry|workflow automation|cms|hosting|web maintenance)\\b", text, re.I))\n    strong_core = bool(re.search(r"\\b(website|web ?app|web portal|application development|mobile app|animation|video production|graphic design|content creation|translation|transcription|printing?|digitization|digitisation|scanning|e[- ]learning|media monitoring|social media|market research|surveys?)\\b", text, re.I))\n    deadline_raw = n.get("deadline") or n.get("deadline_utc")\n    deadline = None\n    if deadline_raw:\n        try:\n            deadline = dt.datetime.fromisoformat(str(deadline_raw).replace("Z", "+00:00"))\n            if deadline.tzinfo is None: deadline = deadline.replace(tzinfo=dt.timezone.utc)\n        except Exception: deadline = None\n    if deadline is not None and deadline < dt.datetime.now(dt.timezone.utc):\n        out.update(classification="REJECT_OBVIOUS", lean_attractiveness="LOW", delivery_mode="UNCLEAR", survival_decision="DROP", dce_eligible=False)\n        actions.append("expired_deadline_drop")\n    if info_only:\n        out.update(classification="REJECT_OBVIOUS", lean_attractiveness="LOW", delivery_mode="UNCLEAR", survival_decision="DROP", dce_eligible=False)\n        actions.append("information_only_not_dce")\n    if (personal and hard_personnel) or patient_transport or (personal and not core):\n        out.update(classification="REJECT_OBVIOUS", lean_attractiveness="LOW", delivery_mode="UNCLEAR", survival_decision="DROP", dce_eligible=False)\n        if (personal or hard_personnel) and "LICENSED_PERSONNEL" not in out["friction_flags"]: out["friction_flags"].append("LICENSED_PERSONNEL")\n        actions.append("personal_or_hard_service_drop")\n    if regulated and out["survival_decision"] != "DROP":\n        out.update(classification="MAYBE", lean_attractiveness="LOW", delivery_mode="BROKER_RESELL", dce_eligible=False)\n        if "REGULATED_GOODS" not in out["friction_flags"]: out["friction_flags"].append("REGULATED_GOODS")\n        out["needs_gpt_review"] = True\n        actions.append("regulated_keep_no_dce")\n    if physical and not core and out["survival_decision"] != "DROP":\n        if out["classification"] in {"STRONG_FIT", "FIT"}: out["classification"] = "MAYBE"; actions.append("physical_fit_to_maybe")\n        out["delivery_mode"] = "BROKER_RESELL"\n        if out["lean_attractiveness"] == "HIGH": out["lean_attractiveness"] = "MEDIUM"\n    if heavy and not core and out["survival_decision"] != "DROP":\n        if out["classification"] in {"STRONG_FIT", "FIT"}: out["classification"] = "MAYBE"; actions.append("heavy_fit_to_maybe")\n        out["delivery_mode"] = "SUBCONTRACTABLE"\n        out["lean_attractiveness"] = "LOW"\n        if "ON_SITE_SPECIALIST" not in out["friction_flags"]: out["friction_flags"].append("ON_SITE_SPECIALIST")\n        out["needs_gpt_review"] = True\n    hard_friction = bool({"LICENSED_PERSONNEL", "SECURITY_CLEARANCE", "REGULATED_GOODS"} & set(out["friction_flags"]))\n    if out["classification"] == "STRONG_FIT":\n        if not strong_core or hard_friction:\n            out["classification"] = "FIT" if core and not hard_friction else "MAYBE"\n            actions.append("strong_requires_core_low_friction")\n        elif deadline is None:\n            out["classification"] = "FIT"\n            out["needs_gpt_review"] = True\n            actions.append("strong_deadline_unverified_to_fit")\n    if out["classification"] == "FIT" and out["survival_decision"] != "DROP":\n        if not core and (out["delivery_mode"] in {"SUBCONTRACTABLE", "BROKER_RESELL", "UNCLEAR"} or out["lean_attractiveness"] in {"LOW", "UNKNOWN"}):\n            out["classification"] = "MAYBE"\n            actions.append("noncore_partner_fit_to_maybe")\n        elif hard_friction:\n            out["classification"] = "MAYBE"\n            actions.append("hard_friction_fit_to_maybe")\n    if out["classification"] == "REJECT_OBVIOUS" and out["survival_decision"] == "KEEP": out["dce_eligible"] = False\n    out["business_calibration_version"] = "spm-business-fit-v2"\n    out["novelty_or_unusual_flag"] = bool(out.get("unusual_or_novel", out.get("novelty_or_unusual_flag", False)))\n    return out, actions\n\n'''
-          s,n=re.subn(r'def deterministic_guard\(.*?\n\ndef atomic_json',guard+'def atomic_json',s,count=1,flags=re.S)
-          if n!=1: raise SystemExit('guard anchor failed')
-          p.write_text(s,encoding='utf-8')
-
-          # 2) Replace the old DCE selector implementation with the calibrated v2 implementation.
-          Path('pipeline/build_qwen_dce_selection.py').write_text(Path('pipeline/build_qwen_dce_selection_v2.py').read_text(encoding='utf-8'),encoding='utf-8')
-
-          # 3) Preserve calibration fields when applying state to the ledger.
-          p=Path('pipeline/apply_qwen_state_to_ledger.py')
-          s=p.read_text(encoding='utf-8')
-          anchor="        row['needs_gpt_review'] = s.get('needs_gpt_review')\n"
-          if "row['survival_decision']" not in s:
-              if anchor not in s: raise SystemExit('ledger overlay anchor failed')
-              s=s.replace(anchor,anchor+"        row['survival_decision'] = s.get('survival_decision') or 'KEEP'\n        row['dce_eligible'] = bool(s.get('dce_eligible', True))\n        row['business_calibration_version'] = s.get('business_calibration_version')\n")
-          s=s.replace("row['novelty_or_unusual_flag'] = s.get('novelty_or_unusual_flag')","row['novelty_or_unusual_flag'] = s.get('novelty_or_unusual_flag', s.get('unusual_or_novel'))")
-          p.write_text(s,encoding='utf-8')
-
-          # 4) Exact-hash merge also requires the v2 business calibration marker.
-          p=Path('pipeline/merge_qwen_classification_state.py')
-          s=p.read_text(encoding='utf-8')
-          marker='BUSINESS_CALIBRATION_VERSION = "spm-business-fit-v2"\n'
-          if marker not in s:
-              s=s.replace('SUMMARY_SCHEMA = "NOTICE_CLASSIFICATION_STATE_MERGE_SUMMARY_V1"\n','SUMMARY_SCHEMA = "NOTICE_CLASSIFICATION_STATE_MERGE_SUMMARY_V1"\n'+marker)
-          old='''    if target_version and version != target_version:\n        return False, "wrong_classifier_version"\n    if row.get("parse_error"):\n'''
-          new='''    if target_version and version != target_version:\n        return False, "wrong_classifier_version"\n    if str(row.get("business_calibration_version") or "") != BUSINESS_CALIBRATION_VERSION:\n        return False, "wrong_business_calibration_version"\n    if row.get("parse_error"):\n'''
-          if old not in s and 'wrong_business_calibration_version' not in s: raise SystemExit('merge valid-result anchor failed')
-          s=s.replace(old,new)
-          s=s.replace('''        "needs_gpt_review": row.get("needs_gpt_review"),\n        "classified_at_utc":''','''        "needs_gpt_review": row.get("needs_gpt_review"),\n        "survival_decision": row.get("survival_decision") or "KEEP",\n        "dce_eligible": bool(row.get("dce_eligible", True)),\n        "business_calibration_version": row.get("business_calibration_version"),\n        "classified_at_utc":''')
-          old_prev='''        if target_version and str(row.get("classifier_version") or "") != target_version:\n            stats["previous_wrong_version_dropped"] += 1\n            continue\n        state[candidate] = row\n'''
-          new_prev='''        if target_version and str(row.get("classifier_version") or "") != target_version:\n            stats["previous_wrong_version_dropped"] += 1\n            continue\n        if str(row.get("business_calibration_version") or "") != BUSINESS_CALIBRATION_VERSION:\n            stats["previous_wrong_business_calibration_dropped"] += 1\n            continue\n        state[candidate] = row\n'''
-          if old_prev not in s and 'previous_wrong_business_calibration_dropped' not in s: raise SystemExit('merge previous-state anchor failed')
-          s=s.replace(old_prev,new_prev)
-          old_q='''        if state_row and h and material_hash(state_row) == h and str(state_row.get("classifier_version") or "") == target_version:\n            stats["queue_already_classified"] += 1\n'''
-          new_q='''        if state_row and h and material_hash(state_row) == h and str(state_row.get("classifier_version") or "") == target_version and str(state_row.get("business_calibration_version") or "") == BUSINESS_CALIBRATION_VERSION:\n            stats["queue_already_classified"] += 1\n'''
-          if old_q not in s and 'business_calibration_version") or "") == BUSINESS_CALIBRATION_VERSION' not in s: raise SystemExit('merge queue anchor failed')
-          s=s.replace(old_q,new_q)
-          p.write_text(s,encoding='utf-8')
-          PY
-
-      - name: Validate v2 pipeline
-        shell: bash
-        run: |
-          set -euo pipefail
-          python -m py_compile pipeline/qwen_notice_batch_selfheal.py pipeline/build_qwen_dce_selection.py pipeline/apply_qwen_state_to_ledger.py pipeline/merge_qwen_classification_state.py
-          grep -q 'spm-business-fit-v2' pipeline/qwen_notice_batch_selfheal.py
-          grep -q 'survival_decision' pipeline/build_qwen_dce_selection.py
-          grep -q 'wrong_business_calibration_version' pipeline/merge_qwen_classification_state.py
-
-      - name: Push pipeline-only v2
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add pipeline/qwen_notice_batch_selfheal.py pipeline/build_qwen_dce_selection.py pipeline/apply_qwen_state_to_ledger.py pipeline/merge_qwen_classification_state.py
-          git commit -m 'qwen: calibrate keep vs fit and DCE eligibility v2'
-          git pull --rebase origin main
-          git push origin HEAD:main
-
-      - name: Restart Qwen on calibrated pipeline
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          for rid in 31927036081 31925520702; do gh run cancel "$rid" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || true; done
-          sleep 2
-          gh workflow run qwen-live-classification.yml --repo "$GITHUB_REPOSITORY" -f per_shard=240 -f auto_continue=true -f dce_limit=160
+      - run: |
+          echo 'Retired migration: no-op.'
+          echo 'Use the production Qwen workflow and A/B regression harness instead.'
