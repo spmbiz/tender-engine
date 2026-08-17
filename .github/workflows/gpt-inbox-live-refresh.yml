@@ -11,7 +11,9 @@ on:
       - 'control/supergreen_hot.json'
       - 'control/qwen_dce_triage_latest.jsonl'
       - 'control/final_supergreen_bank.json'
+      - 'control/gpt_web_review_ledger.json'
       - 'pipeline/refresh_gpt_inbox_live.py'
+      - 'pipeline/gpt_web_tick.py'
       - '.github/workflows/gpt-inbox-live-refresh.yml'
 
 permissions:
@@ -23,10 +25,8 @@ concurrency:
 
 jobs:
   refresh:
-    # DCE shards now publish control/gpt_supergreen_inbox.json directly in their
-    # already-running worker. Legacy `gh workflow run` calls are deliberately a
-    # zero-runner no-op until the DCE workflow itself rolls forward; the 5-minute
-    # schedule remains an independent repair/fallback path.
+    # DCE shards publish the inbox directly while this scheduled/push path repairs
+    # races and immediately applies GPT Web review ticks.
     if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -39,7 +39,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Rebuild live final inbox from durable verdicts and shard-hot DCE evidence
+      - name: Rebuild GPT Web work inbox from DCE evidence and durable ticks
         shell: bash
         run: |
           set -euo pipefail
@@ -49,10 +49,11 @@ jobs:
             --final-bank control/final_supergreen_bank.json \
             --hot-green control/supergreen_hot.json \
             --hot-review control/gpt_review_hot.json \
+            --review-ledger control/gpt_web_review_ledger.json \
             --out control/gpt_supergreen_inbox.json \
             --max-items 60
 
-      - name: Persist only when the user-facing surface changed
+      - name: Persist only when the GPT Web work surface changed
         shell: bash
         run: |
           set -euo pipefail
@@ -63,7 +64,7 @@ jobs:
             echo 'Inbox already current.'
             exit 0
           fi
-          git commit -m "inbox: live refresh from hot DCE evidence ${GITHUB_RUN_ID}"
+          git commit -m "inbox: GPT Web queue refresh ${GITHUB_RUN_ID}"
           for n in 1 2 3 4 5; do
             if git pull --rebase origin main && git push origin HEAD:main; then
               exit 0
