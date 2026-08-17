@@ -12,6 +12,11 @@ from typing import Any
 
 SCHEMA='QWEN_SHADOW_INPUT_V1'
 MANIFEST_SCHEMA='QWEN_SHADOW_SHARD_MANIFEST_V2'
+# Keep live passes short enough to persist useful classifications regularly.
+# The workflow may request a larger shard for throughput, but repeated bounded
+# passes are safer operationally than holding hundreds of classifications in a
+# single runner until the very end of a long job.
+DEFAULT_OPERATIONAL_MAX_ROWS_PER_SHARD=80
 
 
 def open_text(path:Path,mode:str):
@@ -97,13 +102,29 @@ def main():
     if a.shards<1 or a.shards>256: raise SystemExit('shards must be 1..256')
 
     env_cap=os.environ.get('REQUESTED_PER_SHARD','').strip()
+    operational_env=os.environ.get('QWEN_OPERATIONAL_ROWS_PER_SHARD','').strip()
+    try:
+        operational_cap=int(operational_env) if operational_env else DEFAULT_OPERATIONAL_MAX_ROWS_PER_SHARD
+    except ValueError:
+        raise SystemExit(f'invalid QWEN_OPERATIONAL_ROWS_PER_SHARD={operational_env!r}')
+    if operational_cap<1 or operational_cap>10000:
+        raise SystemExit('QWEN operational rows per shard must be 1..10000')
+
+    # An explicit CLI cap is authoritative for standalone tooling/tests. Live
+    # workflow requests come through REQUESTED_PER_SHARD and are additionally
+    # clamped to the operational cap so a single long runner cannot hold an
+    # entire large pass hostage before persistence.
     if a.max_rows_per_shard is not None:
-        cap=int(a.max_rows_per_shard)
+        requested_cap=int(a.max_rows_per_shard)
+        cap=requested_cap
     elif env_cap:
-        try: cap=int(env_cap)
+        try: requested_cap=int(env_cap)
         except ValueError: raise SystemExit(f'invalid REQUESTED_PER_SHARD={env_cap!r}')
+        cap=min(requested_cap,operational_cap) if requested_cap>0 else requested_cap
     else:
+        requested_cap=0
         cap=0
+    if requested_cap<0 or requested_cap>10000: raise SystemExit('requested max rows per shard must be 0..10000')
     if cap<0 or cap>10000: raise SystemExit('max rows per shard must be 0..10000')
 
     out=Path(a.out_dir); out.mkdir(parents=True,exist_ok=True)
@@ -154,6 +175,8 @@ def main():
         'input_rows':total,
         'unique_ids':len(seen),
         'shard_count':a.shards,
+        'requested_max_rows_per_shard':requested_cap or None,
+        'operational_cap_rows_per_shard':operational_cap,
         'max_rows_per_shard':cap or None,
         'selected_rows':selected,
         'sharded_rows':selected,
@@ -168,9 +191,10 @@ def main():
             'drops_or_deletes_notices':False,
             'shards_are_derived':True,
             'automatic_rejection_enabled':False,
+            'live_requests_clamped_for_low_latency_persistence':True,
         }
     }
     Path(a.manifest_out).write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-    print(json.dumps({k:manifest[k] for k in ('source_run','input_rows','unique_ids','shard_count','max_rows_per_shard','selected_rows','deferred_rows','missing_ids','duplicate_ids')},indent=2))
+    print(json.dumps({k:manifest[k] for k in ('source_run','input_rows','unique_ids','shard_count','requested_max_rows_per_shard','operational_cap_rows_per_shard','max_rows_per_shard','selected_rows','deferred_rows','missing_ids','duplicate_ids')},indent=2))
 
 if __name__=='__main__':main()
