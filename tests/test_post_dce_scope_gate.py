@@ -74,7 +74,7 @@ def test_barnagh_like_webar_scope_survives():
     assert apply_post_dce_scope_guard(rec) is False
 
 
-def test_digital_building_automation_scope_survives():
+def test_pure_digital_building_automation_scope_survives():
     rec = gate_ready_review(
         "Modernize Building Automated Systems",
         [{"text": "Provide building automation software, BAS analytics and controls analytics."}],
@@ -82,6 +82,36 @@ def test_digital_building_automation_scope_survives():
     result = evaluate_post_dce_scope(rec)
     assert result["auto_reject"] is False
     assert result["digital_override"] is True
+
+
+def test_straight_to_construction_bas_is_rejected_even_with_software():
+    rec = gate_ready_review(
+        "Modernization of Outlying CBOC Building Automation Systems",
+        [{"text": (
+            "The Contractor shall provide all labor, materials, equipment, supervision, and incidentals "
+            "necessary to furnish and install a Building Automation System (BAS). This project is a "
+            "straight-to-construction NRM project. Provide BAS controllers, gateways, software "
+            "configuration and integration services."
+        )}],
+    )
+    result = evaluate_post_dce_scope(rec)
+    assert result["auto_reject"] is True
+    assert result["digital_override"] is False
+    assert "NO_SCOPE_DOMINANT_PHYSICAL_STRAIGHT_TO_CONSTRUCTION" in result["reason_codes"]
+
+
+def test_major_facility_build_is_rejected_even_with_av_and_cybersecurity():
+    rec = gate_ready_review(
+        "Construct New Training Facility",
+        [{"text": (
+            "New construction of a training facility including structural, mechanical and electrical work, "
+            "audiovisual equipment and cybersecurity requirements. The contractor executes the construction project."
+        )}],
+    )
+    result = evaluate_post_dce_scope(rec)
+    assert result["auto_reject"] is True
+    assert result["digital_override"] is False
+    assert "NO_SCOPE_DOMINANT_PHYSICAL_FACILITY_CONSTRUCTION" in result["reason_codes"]
 
 
 def test_general_commodity_supply_remains_brokerable():
