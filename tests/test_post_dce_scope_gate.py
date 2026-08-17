@@ -7,7 +7,9 @@ from final_verdict_guard import apply_post_dce_scope_guard
 from post_dce_scope_gate import evaluate_post_dce_scope
 
 
-def gate_ready_review(title: str, deliverables=None):
+def gate_ready_review(title: str, deliverables=None, extra_gates=None):
+    gates = {"deliverables_scope": deliverables or []}
+    gates.update(extra_gates or {})
     return {
         "candidate_id": "TEST:X",
         "title": title,
@@ -16,9 +18,7 @@ def gate_ready_review(title: str, deliverables=None):
             "content_quality": "SUBSTANTIVE_DCE_PRESENT",
             "gate_readiness": True,
         },
-        "gate_evidence_candidates": {
-            "deliverables_scope": deliverables or [],
-        },
+        "gate_evidence_candidates": gates,
     }
 
 
@@ -112,6 +112,41 @@ def test_major_facility_build_is_rejected_even_with_av_and_cybersecurity():
     assert result["auto_reject"] is True
     assert result["digital_override"] is False
     assert "NO_SCOPE_DOMINANT_PHYSICAL_FACILITY_CONSTRUCTION" in result["reason_codes"]
+
+
+def test_cnatt_like_prime_construction_rejected_despite_av_cyber():
+    rec = gate_ready_review(
+        "P-200 CNATT Facility",
+        [{"text": "Design, procurement and installation of audiovisual equipment plus cybersecurity requirements."}],
+        {
+            "staffing_team": [{"text": (
+                "Contractor attendees must include the Project Manager, Superintendent, Site Safety and Health Officer "
+                "(SSHO), Quality Control Manager and major subcontractors. Provide project superintendent with a minimum "
+                "of 10 years experience in construction."
+            )}],
+            "insurance_bonds": [{"text": (
+                "FAR 52.232-5 Payments Under Fixed-Price Construction Contracts. Provide Builder's Risk Insurance. "
+                "The Performance Bond must reflect 100 percent of the aggregate amount."
+            )}],
+            "subcontracting_consortium": [{"text": "The Construction Contractor may engage A/V subcontractors."}],
+        },
+    )
+    result = evaluate_post_dce_scope(rec)
+    assert result["auto_reject"] is True
+    assert result["digital_override"] is False
+    assert result["reason_codes"] == ["NO_SCOPE_DOMINANT_PHYSICAL_PRIME_CONSTRUCTION"]
+    assert len(result["matched_patterns"]) >= 2
+
+
+def test_one_incidental_construction_reference_does_not_kill_digital_scope():
+    rec = gate_ready_review(
+        "Visitor WebAR and Content Platform",
+        [{"text": "Build the WebAR experience, CMS and QR-code visitor journey."}],
+        {"subcontracting_consortium": [{"text": "Coordinate branding placement with the Construction Contractor."}]},
+    )
+    result = evaluate_post_dce_scope(rec)
+    assert result["auto_reject"] is False
+    assert result["digital_override"] is True
 
 
 def test_general_commodity_supply_remains_brokerable():
