@@ -1,0 +1,129 @@
+name: Pipeline A/B Regression
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pipeline-ab-regression.yml'
+      - 'pipeline/pipeline_ab_regression.py'
+      - 'pipeline/global_admission.py'
+      - 'pipeline/build_qwen_shadow_shards.py'
+      - 'pipeline/materialize_dce_selection.py'
+      - 'pipeline/dce_batch_worker.py'
+      - 'pipeline/dce_worker_v14.py'
+      - 'tests/test_freshness_conveyor.py'
+      - 'tests/test_global_admission_preauthorized.py'
+      - 'control/pipeline_ab_trigger.json'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: pipeline-ab-regression
+  cancel-in-progress: false
+
+jobs:
+  test-a-frozen-baseline-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout current pipeline
+        uses: actions/checkout@v4
+        with:
+          path: current
+          fetch-depth: 1
+
+      - name: Checkout frozen pre-speedup baseline
+        uses: actions/checkout@v4
+        with:
+          ref: 98a992d57fbea7f3f23ac68173bca8778a6f8880
+          path: baseline
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install narrow regression dependencies
+        run: python -m pip install --disable-pip-version-check -q pytest requests
+
+      - name: Download one identical live residual queue for both refs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p live
+          gh release download notice-intelligence-ledger-latest \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern notice-classification-queue-latest.jsonl.gz \
+            --dir live --clobber
+          test -s live/notice-classification-queue-latest.jsonl.gz
+          sha256sum live/notice-classification-queue-latest.jsonl.gz > live/INPUT_SHA256.txt
+
+      - id: ab
+        name: Test A — current vs frozen baseline on identical synthetic + live replay
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python current/pipeline/pipeline_ab_regression.py \
+            --current current \
+            --baseline baseline \
+            --live-queue live/notice-classification-queue-latest.jsonl.gz \
+            --out pipeline-ab-report.json
+
+      - name: Publish A/B report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-ab-${{ github.run_id }}
+          path: |
+            pipeline-ab-report.json
+            live/INPUT_SHA256.txt
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Persist latest A/B report transactionally
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -s pipeline-ab-report.json ]; then
+            printf '{"schema":"TENDER_PIPELINE_AB_REGRESSION_V1","status":"HARNESS_CRASH","head_sha":"%s","run_id":"%s"}\n' "$HEAD_SHA" "$RUN_ID" > pipeline-ab-report.json
+          fi
+          python - <<'PY'
+          import json,os
+          p='pipeline-ab-report.json'
+          d=json.load(open(p,encoding='utf-8'))
+          d['head_sha']=os.environ['HEAD_SHA']
+          d['workflow_run_id']=os.environ['RUN_ID']
+          open(p,'w',encoding='utf-8').write(json.dumps(d,indent=2,ensure_ascii=False)+'\n')
+          PY
+          path='control/pipeline_ab_latest.json'
+          content="$(base64 -w0 pipeline-ab-report.json)"
+          for attempt in 1 2 3 4 5 6; do
+            sha="$(gh api "repos/$REPO/contents/$path" --jq '.sha' 2>/dev/null || true)"
+            args=(--method PUT "repos/$REPO/contents/$path" -f message="ci: persist pipeline A/B result $RUN_ID" -f content="$content" -f branch=main)
+            if [ -n "$sha" ]; then args+=(-f sha="$sha"); fi
+            if gh api "${args[@]}" >/dev/null; then
+              echo "persisted $path"
+              exit 0
+            fi
+            sleep "$((attempt * 2))"
+          done
+          echo 'failed to persist A/B report after retries' >&2
+          exit 1
+
+      - name: Fail workflow if A/B regression failed
+        if: steps.ab.outcome != 'success'
+        run: |
+          cat pipeline-ab-report.json || true
+          exit 1
