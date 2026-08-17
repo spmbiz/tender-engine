@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from post_dce_scope_gate import evaluate_post_dce_scope
 from publish_supergreen_hot import (
     compact_review,
     deadline_open,
@@ -107,6 +108,20 @@ def source_version(row: dict[str, Any]) -> tuple[int, int, int, int, str]:
     )
 
 
+def _business_gate_scope_reject(row: dict[str, Any]) -> dict[str, Any] | None:
+    stage = str(row.get("review_stage") or "BUSINESS_GATES").upper()
+    if stage == "DCE_AUTHENTICITY" or not bool(row.get("gate_readiness")):
+        return None
+    result = evaluate_post_dce_scope(row)
+    return result if result.get("auto_reject") else None
+
+
+def _count_scope_reject(result: dict[str, Any], reason_counts: dict[str, int]) -> None:
+    for reason in result.get("reason_codes") or []:
+        key = str(reason)
+        reason_counts[key] = reason_counts.get(key, 0) + 1
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--release-root", required=True)
@@ -117,10 +132,17 @@ def main() -> None:
 
     now = datetime.now(timezone.utc).isoformat()
     merged: dict[str, dict[str, Any]] = {}
+    scope_auto_rejected = 0
+    scope_reason_counts: dict[str, int] = {}
     existing = load_json(Path(args.existing), {})
     if isinstance(existing, dict):
         for row in existing.get("items") or []:
             if not isinstance(row, dict) or not deadline_open(row):
+                continue
+            scope_result = _business_gate_scope_reject(row)
+            if scope_result:
+                scope_auto_rejected += 1
+                _count_scope_reject(scope_result, scope_reason_counts)
                 continue
             ranked = ensure_review_rank(row)
             merged[item_key(ranked)] = ranked
@@ -142,6 +164,13 @@ def main() -> None:
             is_auth_review = classification == "YELLOW" and reviewable_authenticity(raw)
             if not (is_gate_review or is_auth_review):
                 continue
+
+            if is_gate_review:
+                scope_result = evaluate_post_dce_scope(raw)
+                if bool(raw.get("gate_readiness")) and scope_result.get("auto_reject"):
+                    scope_auto_rejected += 1
+                    _count_scope_reject(scope_result, scope_reason_counts)
+                    continue
 
             compact = compact_review(raw, str(run_id or 0), str(shard), now)
             compact["upstream_classification"] = classification
@@ -184,9 +213,11 @@ def main() -> None:
             "adjudication_rows_scanned": scanned_rows,
             "model_review_rows_seen": model_review_rows,
             "dce_authenticity_rows_seen": authenticity_rows,
+            "scope_auto_rejected": scope_auto_rejected,
+            "scope_auto_reject_reason_counts": scope_reason_counts,
             "persistent_unique_pending_surface": len(items),
         },
-        "ranking_contract": "Persistent GPT Web review bank. DCE generations never clear unreviewed candidates. BUSINESS_GATES rows have gate-ready DCE; DCE_AUTHENTICITY rows are inspectable retrieved documents that still require GPT Web to verify DCE relevance. Neither lane is a final verdict.",
+        "ranking_contract": "Persistent GPT Web review bank. DCE generations never clear unreviewed candidates. BUSINESS_GATES rows have gate-ready DCE; DCE_AUTHENTICITY rows are inspectable retrieved documents that still require GPT Web to verify DCE relevance. Deterministic post-DCE scope rejects remove only unambiguous non-broker physical works/services; digital, mixed, ambiguous and supply/brokerable rows survive. Neither lane is a final verdict.",
         "instruction": "Review HOT/GOOD business-fit rows first. DCE_AUTHENTICITY must first verify that retrieved documents are candidate-specific authoritative procurement material. Unknown is never PASS and finalization remains forbidden until mandatory gates and deadline authority are resolved.",
     }
     Path(args.out).write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
