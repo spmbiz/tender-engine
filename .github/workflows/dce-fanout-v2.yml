@@ -16,9 +16,9 @@ on:
         required: false
         default: '500'
       max_parallel:
-        description: Maximum GitHub shard runners in parallel; hard-capped at 20 and normally supplied by the live fleet controller
+        description: Maximum GitHub shard runners in parallel; Team hard-cap 60 and normally supplied by the live fleet controller
         required: false
-        default: '20'
+        default: '24'
       max_shards:
         description: Maximum queued matrix shards (1-256)
         required: false
@@ -91,7 +91,7 @@ jobs:
       - id: matrix
         name: Compile short browser/HTTP shard queue
         env:
-          DCE_REQUESTED_MAX_PARALLEL: ${{ github.event.inputs.max_parallel || '20' }}
+          DCE_REQUESTED_MAX_PARALLEL: ${{ github.event.inputs.max_parallel || '24' }}
           DCE_MAX_SHARDS: ${{ github.event.inputs.max_shards || '256' }}
           DCE_TARGET_JOBS_PER_SHARD: ${{ github.event.inputs.jobs_per_shard || '0' }}
           DCE_BROWSER_TARGET_JOBS_PER_SHARD: '2'
@@ -107,14 +107,14 @@ jobs:
           DCE_MAX_PARALLEL="$(python - <<'PY'
           import os
           try:
-              requested=int(os.environ.get('DCE_REQUESTED_MAX_PARALLEL') or 20)
+              requested=int(os.environ.get('DCE_REQUESTED_MAX_PARALLEL') or 24)
           except Exception:
-              requested=20
-          print(max(1,min(20,requested)))
+              requested=24
+          print(max(1,min(60,requested)))
           PY
           )"
           export DCE_MAX_PARALLEL
-          echo "Dynamic runner safety clamp: DCE max_parallel=$DCE_MAX_PARALLEL (hard cap 20)"
+          echo "Dynamic runner safety clamp: DCE max_parallel=$DCE_MAX_PARALLEL (Team hard cap 60)"
           python pipeline/build_dce_shards.py --queue generated/dce_candidates.jsonl
       - id: release
         name: Create durable canonical harvest release
