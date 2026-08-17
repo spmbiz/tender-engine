@@ -1,15 +1,15 @@
 {
   "schema": "QWEN_BATCH_AUTOTUNE_TRIGGER_V1",
   "enabled": true,
-  "candidate_batch_sizes": [8, 12, 16, 24, 32],
+  "candidate_batch_sizes": [1, 2, 4, 8],
   "sample_size": 24,
   "full_sweep_every_hours": 6,
-  "manual_kick": "2026-08-18T00:37:00+02:00-speedup-safe",
-  "scheduled_health_check": "Benchmark multiple batch sizes on the conserved DCE-grounded golden set; production live classification remains fail-closed and only consumes a champion marked safe_for_shadow_scale_out.",
+  "manual_kick": "2026-08-18T00:47:00+02:00-observed-singleton-fastpath",
+  "scheduled_health_check": "Benchmark the empirically viable small-batch frontier on the conserved DCE-grounded golden set; production live classification only consumes a champion marked safe_for_shadow_scale_out.",
   "capacity_policy": {
     "priority": "live discovery and DCE/SUPERGREEN throughput before experimental tuning",
     "max_configured_parallel_candidates": 3,
-    "reason": "Use at most three short 24-row tuning candidates concurrently; live classification and DCE remain protected by their own admission controls."
+    "reason": "Observed live shard: batch 8 passed 0/10 top attempts and recursively split; direct batch 1 passed 60/60 singleton attempts at ~5.77s average. Validate 1/2/4/8 on the golden set before production adoption."
   },
   "policy": {
     "row_conservation_required": true,
