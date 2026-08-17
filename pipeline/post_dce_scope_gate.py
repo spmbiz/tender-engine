@@ -56,6 +56,45 @@ _DOMINANT_PHYSICAL_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
     ),
 )
 
+# Major prime-construction contracts are sometimes described by a generic project title
+# while their deliverables snippets contain digital subcomponents. In those cases, use
+# multiple independent commercial/execution signals from narrowly selected DCE gates.
+# One marker is never enough: requiring >=2 avoids killing a digital subcontract merely
+# because it says "coordinate with the construction contractor".
+_PRIME_CONSTRUCTION_MARKERS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    (
+        "construction_superintendent",
+        re.compile(
+            r"(?:\bproject superintendent\b.{0,180}\bconstruction\b|"
+            r"\bconstruction\b.{0,180}\bproject superintendent\b)",
+            re.I,
+        ),
+    ),
+    (
+        "fixed_price_construction_contract",
+        re.compile(r"\bFAR\s*52\.232-5\b.{0,100}\bFixed-Price Construction Contracts?\b", re.I),
+    ),
+    (
+        "builders_risk",
+        re.compile(r"\bBuilder'?s Risk Insurance\b", re.I),
+    ),
+    (
+        "performance_bond_100pct",
+        re.compile(r"\bPerformance Bond\b.{0,100}\b100\s*(?:percent|%)\b", re.I),
+    ),
+    (
+        "construction_prime_staff",
+        re.compile(
+            r"\b(?:Project Manager|Superintendent)\b.{0,220}\b(?:Site Safety and Health Officer|SSHO|Quality Control Manager)\b",
+            re.I,
+        ),
+    ),
+    (
+        "construction_contractor",
+        re.compile(r"\bConstruction Contractor\b", re.I),
+    ),
+)
+
 _HARD_SCOPE_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
     (
         "NO_SCOPE_PHYSICAL_HVAC_WORKS",
@@ -151,6 +190,13 @@ def _item_text(item: Any) -> str:
     return str(item or "")
 
 
+def _gate_text(evidence: Mapping[str, Any], gate: str, limit: int = 6) -> str:
+    value = evidence.get(gate)
+    if isinstance(value, (list, tuple)):
+        return " ".join(_item_text(item) for item in value[:limit])
+    return _item_text(value) if value else ""
+
+
 def scope_text(row: Mapping[str, Any]) -> str:
     """Return scope-only text; avoid unrelated submission/security evidence."""
     parts = [
@@ -158,12 +204,17 @@ def scope_text(row: Mapping[str, Any]) -> str:
         str(_first(row, "description", "summary", "description_excerpt") or ""),
     ]
     evidence = _evidence_map(row)
-    deliverables = evidence.get("deliverables_scope") if isinstance(evidence, Mapping) else None
-    if isinstance(deliverables, (list, tuple)):
-        parts.extend(_item_text(item) for item in deliverables[:6])
-    elif deliverables:
-        parts.append(_item_text(deliverables))
+    parts.append(_gate_text(evidence, "deliverables_scope"))
     return " ".join(" ".join(parts).split())[:16000]
+
+
+def prime_construction_evidence_text(row: Mapping[str, Any]) -> str:
+    """Narrow evidence surface for proving a candidate is the construction prime."""
+    evidence = _evidence_map(row)
+    parts = [scope_text(row)]
+    for gate in ("staffing_team", "insurance_bonds", "subcontracting_consortium"):
+        parts.append(_gate_text(evidence, gate, limit=4))
+    return " ".join(" ".join(parts).split())[:30000]
 
 
 def _matches(rules: tuple[tuple[str, re.Pattern[str]], ...], text: str) -> tuple[list[str], list[str]]:
@@ -175,6 +226,18 @@ def _matches(rules: tuple[tuple[str, re.Pattern[str]], ...], text: str) -> tuple
             reasons.append(reason)
             matches.append(" ".join(match.group(0).split())[:220])
     return reasons, matches
+
+
+def _prime_construction_markers(row: Mapping[str, Any]) -> tuple[list[str], list[str]]:
+    text = prime_construction_evidence_text(row)
+    names: list[str] = []
+    matches: list[str] = []
+    for name, pattern in _PRIME_CONSTRUCTION_MARKERS:
+        match = pattern.search(text)
+        if match:
+            names.append(name)
+            matches.append(" ".join(match.group(0).split())[:220])
+    return names, matches
 
 
 def evaluate_post_dce_scope(row: Mapping[str, Any]) -> dict[str, Any]:
@@ -189,6 +252,15 @@ def evaluate_post_dce_scope(row: Mapping[str, Any]) -> dict[str, Any]:
             "auto_reject": True,
             "reason_codes": dominant_reasons,
             "matched_patterns": dominant_matches,
+            "digital_override": False,
+        }
+
+    prime_markers, prime_matches = _prime_construction_markers(row)
+    if len(prime_markers) >= 2:
+        return {
+            "auto_reject": True,
+            "reason_codes": ["NO_SCOPE_DOMINANT_PHYSICAL_PRIME_CONSTRUCTION"],
+            "matched_patterns": [f"{name}: {match}" for name, match in zip(prime_markers, prime_matches)],
             "digital_override": False,
         }
 
