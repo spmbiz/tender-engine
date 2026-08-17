@@ -8,6 +8,7 @@ on:
       - 'pipeline/freshness_conveyor_watchdog.py'
       - 'pipeline/build_qwen_shadow_shards.py'
       - 'pipeline/build_qwen_dce_selection.py'
+      - 'pipeline/materialize_dce_selection.py'
       - 'tests/test_freshness_conveyor.py'
       - '.github/workflows/freshness-conveyor-ci.yml'
   pull_request:
@@ -15,6 +16,7 @@ on:
       - 'pipeline/freshness_conveyor_watchdog.py'
       - 'pipeline/build_qwen_shadow_shards.py'
       - 'pipeline/build_qwen_dce_selection.py'
+      - 'pipeline/materialize_dce_selection.py'
       - 'tests/test_freshness_conveyor.py'
       - '.github/workflows/freshness-conveyor-ci.yml'
 
@@ -36,6 +38,6 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check -q requests pytest
       - name: Compile freshness hot path
-        run: python -m py_compile pipeline/freshness_conveyor_watchdog.py pipeline/build_qwen_shadow_shards.py pipeline/build_qwen_dce_selection.py
+        run: python -m py_compile pipeline/freshness_conveyor_watchdog.py pipeline/build_qwen_shadow_shards.py pipeline/build_qwen_dce_selection.py pipeline/materialize_dce_selection.py
       - name: Run freshness regression contracts
         run: python -m pytest -q tests/test_freshness_conveyor.py
