@@ -6,7 +6,7 @@ on:
       per_shard:
         description: Maximum notices classified by each worker in this pass
         required: false
-        default: '48'
+        default: '192'
       auto_continue:
         description: Retained for compatibility; recovery drainer owns continuation
         required: false
@@ -44,7 +44,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  QWEN_WORKERS_REQUESTED: '60'
+  QWEN_WORKERS_REQUESTED: '20'
   QWEN_BATCH_SIZE: '8'
   QWEN_CLASSIFIER_VERSION: 'qwen3-4b-q4km-batch-selfheal-v1'
 
@@ -118,7 +118,7 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          REQUESTED_PER_SHARD: ${{ github.event.inputs.per_shard || '48' }}
+          REQUESTED_PER_SHARD: ${{ github.event.inputs.per_shard || '192' }}
         run: |
           set -euo pipefail
           source_run="$LEDGER_SOURCE_RUN"
@@ -145,8 +145,8 @@ jobs:
           )"
           per_shard="$(python - <<'PY'
           import os
-          try: n=int(os.environ.get('REQUESTED_PER_SHARD') or 48)
-          except Exception: n=48
+          try: n=int(os.environ.get('REQUESTED_PER_SHARD') or 192)
+          except Exception: n=192
           print(max(16,min(480,n)))
           PY
           )"
@@ -154,7 +154,7 @@ jobs:
           python - <<'PY' > input/qwen-capacity-admission.json
           import json, os
           from pipeline.global_admission import dynamic_tender_parallel
-          requested=max(1,min(60,int(os.environ.get('QWEN_WORKERS_REQUESTED') or 60)))
+          requested=max(1,min(20,int(os.environ.get('QWEN_WORKERS_REQUESTED') or 20)))
           allowed, report=dynamic_tender_parallel(requested)
           report['lane']='qwen-live-classification'
           report['requested_workers']=requested
