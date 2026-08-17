@@ -38,7 +38,8 @@ permissions:
 
 concurrency:
   group: qwen-live-notice-classification
-  cancel-in-progress: false
+  # A code push supersedes stale architecture runs; scheduled/self-continued passes stay serialized.
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 env:
   QWEN_WORKERS_REQUESTED: '60'
