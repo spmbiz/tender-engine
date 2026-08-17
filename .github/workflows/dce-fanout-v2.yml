@@ -378,3 +378,12 @@ jobs:
             -f dce_run_id="$GITHUB_RUN_ID" \
             -f workers=4
           echo "Direct Qwen DCE handoff dispatched for durable DCE run $GITHUB_RUN_ID" >> "$GITHUB_STEP_SUMMARY"
+      - name: Persist this exact attempt set and continue the unseen DCE queue immediately
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run dce-progress-ledger.yml --ref main \
+            -f dce_run_id="$GITHUB_RUN_ID"
+          echo "Direct DCE progress handoff dispatched for run $GITHUB_RUN_ID; no workflow_run event is required for continuation." >> "$GITHUB_STEP_SUMMARY"
