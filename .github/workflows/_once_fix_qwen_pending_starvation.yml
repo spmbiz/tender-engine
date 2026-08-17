@@ -27,7 +27,8 @@ jobs:
           p=Path('.github/workflows/qwen-live-classification.yml')
           s=p.read_text(encoding='utf-8')
           old='  group: qwen-live-notice-classification\n'
-          new="  group: qwen-live-notice-classification-${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success' && format('noop-{0}', github.run_id) || 'active' }}\n"
+          expression='$' + "{{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success' && format('noop-{0}', github.run_id) || 'active' }}"
+          new='  group: qwen-live-notice-classification-' + expression + '\n'
           if new in s:
               print('already patched')
           elif old in s:
