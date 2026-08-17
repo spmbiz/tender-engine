@@ -9,6 +9,10 @@ on:
       - '.github/workflows/dce-fanout-v2.yml'
       - '.github/workflows/supergreen-discovery-v2.yml'
       - '.github/workflows/tender-live-canary.yml'
+      - '.github/workflows/qwen-live-classification.yml'
+      - '.github/workflows/qwen-live-recovery-drainer.yml'
+      - '.github/workflows/qwen-live-conveyor.yml'
+      - '.github/workflows/qwen-batch-autotune-selfheal.yml'
       - '.github/workflows/tender-pipeline-regression.yml'
   workflow_dispatch:
 
@@ -38,6 +42,10 @@ jobs:
             Path('.github/workflows/dce-fanout-v2.yml'),
             Path('.github/workflows/supergreen-discovery-v2.yml'),
             Path('.github/workflows/tender-live-canary.yml'),
+            Path('.github/workflows/qwen-live-classification.yml'),
+            Path('.github/workflows/qwen-live-recovery-drainer.yml'),
+            Path('.github/workflows/qwen-live-conveyor.yml'),
+            Path('.github/workflows/qwen-batch-autotune-selfheal.yml'),
             Path('.github/workflows/tender-pipeline-regression.yml'),
           ]
           for p in files:
