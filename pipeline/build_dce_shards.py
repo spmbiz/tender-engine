@@ -16,8 +16,13 @@ MATRIX_JOB_LIMIT = 256
 RUNNER_PARALLEL_LIMIT = 20
 DEFAULT_BROWSER_MAX_JOBS_PER_SHARD = 12
 DEFAULT_HTTP_MAX_JOBS_PER_SHARD = 32
-DEFAULT_BROWSER_TARGET_JOBS_PER_SHARD = 2
-DEFAULT_HTTP_TARGET_JOBS_PER_SHARD = 8
+# Throughput-safe floors. The workflow may still pass the old 2/8 values; those are
+# intentionally treated as lower bounds, not commands, so we never recreate dozens
+# of two-candidate browser jobs.
+DEFAULT_BROWSER_TARGET_JOBS_PER_SHARD = 6
+DEFAULT_HTTP_TARGET_JOBS_PER_SHARD = 12
+DEFAULT_BROWSER_LOCAL_CONCURRENCY = 3
+DEFAULT_HTTP_LOCAL_CONCURRENCY = 8
 
 
 def _norm(value: object) -> str:
@@ -28,12 +33,11 @@ def _norm(value: object) -> str:
 def _requested_parallel_default() -> int:
     for key in ("DCE_REQUESTED_MAX_PARALLEL", "DCE_MAX_PARALLEL"):
         raw = os.getenv(key)
-        if not raw:
-            continue
-        try:
-            return int(raw)
-        except Exception:
-            continue
+        if raw:
+            try:
+                return int(raw)
+            except Exception:
+                pass
     return RUNNER_PARALLEL_LIMIT
 
 
@@ -41,8 +45,7 @@ def _identity_keys(rec: dict) -> tuple[str, tuple[str, str] | None]:
     cid = str(rec.get("candidate_id") or "").strip().casefold()
     title = _norm(rec.get("title"))
     buyer = _norm(rec.get("buyer"))
-    title_buyer = (title, buyer) if title and buyer else None
-    return cid, title_buyer
+    return cid, (title, buyer) if title and buyer else None
 
 
 def _load_exclusions(path: Path | None) -> tuple[set[str], set[tuple[str, str]]]:
@@ -64,9 +67,6 @@ def _split_buckets(jobs: list[dict], count: int) -> list[list[dict]]:
         return []
     count = min(count, len(jobs))
     buckets = [[] for _ in range(count)]
-    # Selection input is already ranked. Preserve that ordering so the first
-    # active shards receive the highest-value candidates rather than letting
-    # portal-name sorting delay a top-ranked opportunity behind lower ranks.
     ordered = sorted(jobs, key=lambda j: j["line"])
     for i, job in enumerate(ordered):
         buckets[i % count].append(job)
@@ -89,29 +89,22 @@ def _fit_matrix_limit(
         http_shards = math.ceil(http_n / http_target) if http_n else 0
         if browser_shards + http_shards <= max_shards:
             return browser_shards, http_shards, browser_target, http_target
-        browser_pressure = (browser_shards / max(1, browser_target)) if browser_n and browser_target < browser_cap else -1
-        http_pressure = (http_shards / max(1, http_target)) if http_n and http_target < http_cap else -1
-        if browser_pressure < 0 and http_pressure < 0:
+        can_b = browser_n and browser_target < browser_cap
+        can_h = http_n and http_target < http_cap
+        if not can_b and not can_h:
             return browser_shards, http_shards, browser_target, http_target
-        if browser_pressure >= http_pressure and browser_target < browser_cap:
+        if can_b and (not can_h or browser_shards >= http_shards):
             browser_target += 1
-        elif http_target < http_cap:
+        else:
             http_target += 1
-        elif browser_target < browser_cap:
-            browser_target += 1
 
 
-def main():
+def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--queue", default="queues/dce_candidates.jsonl")
     ap.add_argument("--exclude-queue", default=os.getenv("DCE_EXCLUDE_QUEUE", ""))
     ap.add_argument("--max-shards", type=int, default=int(os.getenv("DCE_MAX_SHARDS", str(MATRIX_JOB_LIMIT))))
-    ap.add_argument(
-        "--jobs-per-shard",
-        type=int,
-        default=int(os.getenv("DCE_TARGET_JOBS_PER_SHARD", "0")),
-        help="0/1/2 = streaming kind-aware defaults; >2 = manual fixed target for both kinds",
-    )
+    ap.add_argument("--jobs-per-shard", type=int, default=int(os.getenv("DCE_TARGET_JOBS_PER_SHARD", "0")))
     ap.add_argument("--browser-max-jobs-per-shard", type=int, default=int(os.getenv("DCE_BROWSER_MAX_JOBS_PER_SHARD", str(DEFAULT_BROWSER_MAX_JOBS_PER_SHARD))))
     ap.add_argument("--http-max-jobs-per-shard", type=int, default=int(os.getenv("DCE_HTTP_MAX_JOBS_PER_SHARD", str(DEFAULT_HTTP_MAX_JOBS_PER_SHARD))))
     ap.add_argument("--browser-target-jobs-per-shard", type=int, default=int(os.getenv("DCE_BROWSER_TARGET_JOBS_PER_SHARD", str(DEFAULT_BROWSER_TARGET_JOBS_PER_SHARD))))
@@ -143,8 +136,7 @@ def main():
 
     def skip(line_no: int, rec: dict, reason: str) -> None:
         skipped.append({"line": line_no, "candidate_id": rec.get("candidate_id"), "reason": reason})
-        category = reason.split(":", 1)[0]
-        skip_reason_counts[category] += 1
+        skip_reason_counts[reason.split(":", 1)[0]] += 1
 
     for line_no, rec in load_lines(Path(args.queue)):
         status = str(rec.get("status") or "QUEUED").upper()
@@ -200,10 +192,7 @@ def main():
         gh = os.getenv("GITHUB_OUTPUT")
         if gh:
             with open(gh, "a", encoding="utf-8") as f:
-                f.write("matrix=" + json.dumps(payload, separators=(",", ":")) + "\n")
-                f.write("count=0\n")
-                f.write("shard_count=0\n")
-                f.write("max_parallel=0\n")
+                f.write("matrix=" + json.dumps(payload, separators=(",", ":")) + "\ncount=0\nshard_count=0\nmax_parallel=0\n")
         print(json.dumps(plan, indent=2))
         return
 
@@ -216,29 +205,28 @@ def main():
         browser_target = min(browser_cap, fixed) if browser_jobs else 0
         http_target = min(http_cap, fixed) if http_jobs else 0
     else:
-        sizing_mode = "streaming_kind_fixed"
-        browser_target = max(1, min(browser_cap, args.browser_target_jobs_per_shard)) if browser_jobs else 0
-        http_target = max(1, min(http_cap, args.http_target_jobs_per_shard)) if http_jobs else 0
+        sizing_mode = "streaming_kind_throughput_floor"
+        browser_target = max(DEFAULT_BROWSER_TARGET_JOBS_PER_SHARD, args.browser_target_jobs_per_shard) if browser_jobs else 0
+        http_target = max(DEFAULT_HTTP_TARGET_JOBS_PER_SHARD, args.http_target_jobs_per_shard) if http_jobs else 0
+        browser_target = min(browser_cap, browser_target) if browser_jobs else 0
+        http_target = min(http_cap, http_target) if http_jobs else 0
 
     if jobs:
         browser_shards, http_shards, browser_target, http_target = _fit_matrix_limit(
-            len(browser_jobs),
-            len(http_jobs),
+            len(browser_jobs), len(http_jobs),
             browser_target or DEFAULT_BROWSER_TARGET_JOBS_PER_SHARD,
             http_target or DEFAULT_HTTP_TARGET_JOBS_PER_SHARD,
-            browser_cap,
-            http_cap,
-            max_shards,
+            browser_cap, http_cap, max_shards,
         )
     else:
-        browser_shards = 0
-        http_shards = 0
+        browser_shards = http_shards = 0
+
+    browser_local_floor = max(DEFAULT_BROWSER_LOCAL_CONCURRENCY, args.browser_local_concurrency)
+    http_local_floor = max(DEFAULT_HTTP_LOCAL_CONCURRENCY, args.http_local_concurrency)
 
     include: list[dict] = []
     browser_buckets = _split_buckets(browser_jobs, browser_shards)
     http_buckets = _split_buckets(http_jobs, http_shards)
-    # Interleave route kinds so fast HTTP work is not stuck behind a long browser
-    # prefix in the matrix. GitHub can continuously recycle finished runners.
     while browser_buckets or http_buckets:
         if browser_buckets:
             bucket = browser_buckets.pop(0)
@@ -247,7 +235,7 @@ def main():
                 "lines": ",".join(str(x["line"]) for x in bucket),
                 "count": len(bucket),
                 "needs_browser": True,
-                "local_concurrency": min(max(1, args.browser_local_concurrency), len(bucket)),
+                "local_concurrency": min(browser_local_floor, len(bucket)),
                 "portals": ",".join(sorted({x["portal"] for x in bucket})),
             })
         if http_buckets:
@@ -257,9 +245,10 @@ def main():
                 "lines": ",".join(str(x["line"]) for x in bucket),
                 "count": len(bucket),
                 "needs_browser": False,
-                "local_concurrency": min(max(1, args.http_local_concurrency), len(bucket)),
+                "local_concurrency": min(http_local_floor, len(bucket)),
                 "portals": ",".join(sorted({x["portal"] for x in bucket})),
             })
+
     for shard_idx, item in enumerate(include):
         item["shard"] = shard_idx
 
@@ -280,8 +269,8 @@ def main():
         "http_jobs_per_shard_target": http_target,
         "browser_max_jobs_per_shard": browser_cap,
         "http_max_jobs_per_shard": http_cap,
-        "browser_local_concurrency": max(1, args.browser_local_concurrency),
-        "http_local_concurrency": max(1, args.http_local_concurrency),
+        "browser_local_concurrency": browser_local_floor,
+        "http_local_concurrency": http_local_floor,
         "browser_candidates": len(browser_jobs),
         "http_candidates": len(http_jobs),
         "portal_counts": dict(sorted(portal_counts.items())),
