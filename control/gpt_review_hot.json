@@ -1,10 +1,10 @@
 {
   "schema": "GPT_REVIEW_HOT_V3",
-  "updated_at": "2026-08-17T20:10:42.162071+00:00",
+  "updated_at": "2026-08-17T20:10:52.690750+00:00",
   "latest_dce_run_id": 32064225479,
-  "latest_shard": 0,
+  "latest_shard": 4,
   "generation_reset": false,
-  "count": 14,
+  "count": 13,
   "items": [
     {
       "candidate_id": "US-SAM:a80157dd9d994d2f9efa7004ac13ea74",
@@ -2151,87 +2151,6 @@
             "103n"
           ],
           "ratio": 0.3333
-        },
-        "reasons": [
-          "download_succeeded_but_authoritative_dce_content_not_proven"
-        ],
-        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
-      },
-      "review_lane": "SPM_PRIORITY"
-    },
-    {
-      "candidate_id": "GR-KHMDHS:26PROC019632815",
-      "title": "Πρόσκληση Μεταφοράς Βιολογικών Υλικών (Τακτικά & Έκτακτα Δρομολόγια) για 2 μήνες, για το ΓΝ Σύρου",
-      "buyer": "ΝΟΜ.ΓΕΝ. ΝΟΣΟΚΟΜΕΙΟ ΣΥΡΟΥ 'ΒΑΡΔΑΚΕΙΟ Κ ΠΡΩΙΟ'",
-      "portal": "GR_KHMDHS",
-      "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019632815",
-      "deadline": "2026-08-18T23:59:00+00:00",
-      "estimated_value": 2840.0,
-      "currency": "EUR",
-      "preliminary_score": 60,
-      "priority_score": 60,
-      "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
-      "gate_readiness": false,
-      "deadline_authority": {},
-      "deadline_authority_status": "MISSING",
-      "deadline_resolved": false,
-      "evidence_gate_coverage": 0,
-      "evidence_by_gate": {
-        "entity_geography": [],
-        "turnover_financial": [],
-        "references_experience": [],
-        "certifications_partner": [],
-        "staffing_team": [],
-        "insurance_bonds": [],
-        "subcontracting_consortium": [],
-        "deliverables_scope": [],
-        "sla_onsite": [],
-        "term_value": [],
-        "award_criteria": [],
-        "forms_signatures": [],
-        "submission": [],
-        "ip_data_security": []
-      },
-      "source_dce_run_id": 32063860544,
-      "source_shard": 0,
-      "hot_ready_at": "2026-08-17T20:10:25.141704+00:00",
-      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
-      "spm_post_dce_score": 7,
-      "spm_fit_band": "LOW",
-      "spm_fit_reasons": [],
-      "spm_friction_signals": [],
-      "upstream_classification": "YELLOW",
-      "review_stage": "DCE_AUTHENTICITY",
-      "dce_authenticity_review_required": true,
-      "finalization_allowed": false,
-      "artifact_locator": {
-        "dce_run_id": 32063860544,
-        "shard": 0,
-        "candidate_id": "GR-KHMDHS:26PROC019632815",
-        "release_tag": "dce-harvest-32063860544"
-      },
-      "evidence_quality_summary": {
-        "contract": "DCE_EVIDENCE_QUALITY_V1",
-        "candidate_id": "GR-KHMDHS:26PROC019632815",
-        "raw_status": "DOWNLOADED_PUBLIC",
-        "derived_status": "DCE_CONTENT_UNVERIFIED",
-        "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "gate_readiness": false,
-        "text_chars": 5067,
-        "documents_indexed": 1,
-        "documents_with_text": 1,
-        "source_urls": [
-          "https://cerpp.eprocurement.gov.gr/khmdhs-opendata/notice/attachment/26PROC019632815"
-        ],
-        "all_source_files_notice_only": false,
-        "generic_filename_hits": [],
-        "access_guide_hits": [],
-        "interest_required_hits": [],
-        "substantive_marker_hits": [],
-        "candidate_title_overlap": {
-          "tokens": [],
-          "hits": [],
-          "ratio": 0.0
         },
         "reasons": [
           "download_succeeded_but_authoritative_dce_content_not_proven"
