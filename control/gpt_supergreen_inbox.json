@@ -1,63 +1,17 @@
 {
-  "schema": "GPT_INSTANT_SUPERGREEN_INBOX_V5_FINAL_STAGE",
-  "updated_at": "2026-08-17T08:57:22.795682+00:00",
-  "latest_source_dce_run_id": 32010043125,
-  "confirmed_supergreens": [
-    {
-      "candidate_id": "IE:8670172",
-      "title": "Animation and Software Development",
-      "buyer": "Barnagh Greenway Hub",
-      "deadline": "2026-08-17T10:00:00+01:00",
-      "classification": "GREEN",
-      "final_score": 87,
-      "source_dce_run_id": 31955485422,
-      "adjudicated_at": "2026-08-16T15:30:46+00:00",
-      "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
-      "deadline_authority": "RESOLVED_DCE_TENDER_DEADLINE",
-      "mandatory_gate_statuses": {
-        "entity_geography": "NO_RESTRICTIVE_GATE_FOUND_IN_DCE",
-        "turnover_financial": "NO_MINIMUM_TURNOVER_FOUND_IN_DCE",
-        "references_experience": "NO_MANDATORY_REFERENCE_THRESHOLD_FOUND_IN_DCE",
-        "certifications_partner": "NO_MANDATORY_CERTIFICATION_FOUND_IN_DCE",
-        "staffing_team": "NO_MANDATORY_STAFFING_THRESHOLD_FOUND_IN_DCE",
-        "insurance_bonds": "REQUIRED_AMOUNT_UNSPECIFIED_BIDDER_EVIDENCE_NEEDED",
-        "subcontracting_consortium": "NO_PROHIBITION_FOUND_IN_DCE",
-        "deliverables_scope": "DIRECT_SPM_CORE_ANIMATION_AR_WEBAR_QR",
-        "sla_onsite": "ONSITE_ADVISORY_INCLUDED",
-        "term_value": "ESTIMATED_VALUE_EUR_50000_FROM_AUTHORITATIVE_NOTICE",
-        "award_criteria": "PRICE_50_UNDERSTANDING_30_AFTERSALES_20",
-        "forms_signatures": "STANDARD_QUOTATION_SUBMISSION",
-        "submission": "ELECTRONIC_REQUIRED_DEADLINE_2026_08_17_10_00_IRELAND",
-        "ip_data_security": "NO_HARD_SECURITY_CLEARANCE_GATE_FOUND",
-        "payment_tax": "TAX_COMPLIANCE_EVIDENCE_REQUIRED_VAT_IF_APPLICABLE"
-      },
-      "blockers": [],
-      "unknowns": [
-        "SPM evidence of tax compliance must be available/acceptable",
-        "SPM must evidence appropriate insurance cover",
-        "Operational plan for onsite advisory in Ireland"
-      ],
-      "why": "Strong native SPM scope: creative direction, animation/AR assets, WebAR/app deployment, QR integration, mobile optimisation, testing and rollout. DCE shows no turnover, reference, certification or staffing threshold. Not FINAL_SUPER_GREEN because bidder-specific tax/insurance evidence remains unverified.",
-      "action": "URGENT_BID_IF_TAX_AND_INSURANCE_CAN_BE_EVIDENCED",
-      "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8670172"
-    }
-  ],
+  "schema": "GPT_WEB_REVIEW_INBOX_V1",
+  "updated_at": "2026-08-17T09:00:28.015530+00:00",
+  "latest_source_dce_run_id": 32012976398,
+  "review_queue": [],
   "pending_final_review": [],
   "counts": {
-    "confirmed_supergreens": 0,
-    "confirmed_green_total": 1,
-    "confirmed_or_partnerable_green_total": 1,
-    "resolved_total": 13,
-    "resolved_non_green_hidden_from_inbox": 12,
-    "pending_final_review": 0,
-    "review_now": 0,
-    "existing_pending_filtered": 0,
-    "hot_review_filtered": 16,
-    "live_hot_review_items": 0,
-    "live_hot_green_items": 0
+    "pending_gpt_web_review": 0,
+    "reviewed_ticks_total": 10,
+    "excluded_already_reviewed": 0,
+    "excluded_already_in_final_bank": 0
   },
-  "answer_contract": "Read this file only for end-of-pipeline opportunities. Durable RED/YELLOW and internal MAYBE/LOW/exploration rows are deliberately excluded. Pending rows are authoritative-DCE, gate-ready, HOT/GOOD SPM-fit candidates awaiting only GPT Web final adjudication. Unknown is never PASS.",
-  "finality_rule": "Only GPT Web final adjudication from authoritative DCE evidence may create or persist FINAL_SUPER_GREEN in the final bank. GitHub Actions never calls OpenAI and never waits for GPT Web.",
-  "pipeline_contract": "harvest -> Qwen/local triage -> DCE -> deterministic evidence/gates/SPM-fit rejection -> this GPT-ready inbox -> GPT Web final adjudication -> final bank. GPT Web is not a pipeline dependency and cannot block upstream processing.",
-  "live_contract": "DCE shards rebuild this file directly. The scheduled inbox refresh is only a repair/fallback path; no OpenAI API key or remote LLM call is required to reach the inbox."
+  "review_contract": "This file is only GPT Web work. Every row is DCE-ready or an upstream guarded GREEN signal that still requires GPT Web review. Nothing in this inbox is a final verdict.",
+  "tick_contract": "After GPT Web reviews a pass, add one durable reviewed tick per candidate to control/gpt_web_review_ledger.json. The next rebuild removes ticked rows automatically. A later DCE run may re-enter review.",
+  "final_bank_contract": "Decided GREEN/YELLOW/RED/FINAL_SUPER_GREEN results belong in control/final_supergreen_bank.json, never mixed into this inbox.",
+  "pipeline_contract": "harvest -> Qwen/local triage -> DCE/evidence -> this GPT Web review inbox -> GPT Web review + tick -> final bank."
 }
