@@ -25,6 +25,37 @@ _DIGITAL_NATIVE = re.compile(
     re.I,
 )
 
+# These phrases are strong enough to prove that a digital component is subordinate to a
+# physical construction/installation contract. They are evaluated BEFORE the digital
+# override. This prevents a huge facility build from surviving merely because its DCE
+# contains e.g. cybersecurity, audiovisual, or software configuration requirements.
+_DOMINANT_PHYSICAL_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
+    (
+        "NO_SCOPE_DOMINANT_PHYSICAL_STRAIGHT_TO_CONSTRUCTION",
+        re.compile(r"\bstraight[ -]?to[ -]?construction\b", re.I),
+    ),
+    (
+        "NO_SCOPE_DOMINANT_PHYSICAL_FACILITY_CONSTRUCTION",
+        re.compile(
+            r"(?:\b(?:construct|construction of|new construction|facility construction|building construction)\b"
+            r".{0,120}\b(?:building|facility|courthouse|clinic|station|hangar|warehouse)\b|"
+            r"\b(?:building|facility|courthouse|clinic|station|hangar|warehouse)\b"
+            r".{0,120}\b(?:construction project|construction works?|new construction)\b)",
+            re.I,
+        ),
+    ),
+    (
+        "NO_SCOPE_DOMINANT_PHYSICAL_TURNKEY_INSTALLATION",
+        re.compile(
+            r"\bprovide all labor, materials, equipment, supervision(?:,? and incidentals)?\b"
+            r".{0,180}\b(?:furnish and install|design and install|construct)\b"
+            r".{0,180}\b(?:building automation system|bas|generator|hvac|heating|ventilation|"
+            r"air conditioning|electrical system|mechanical system|facility equipment)\b",
+            re.I,
+        ),
+    ),
+)
+
 _HARD_SCOPE_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
     (
         "NO_SCOPE_PHYSICAL_HVAC_WORKS",
@@ -135,25 +166,39 @@ def scope_text(row: Mapping[str, Any]) -> str:
     return " ".join(" ".join(parts).split())[:16000]
 
 
+def _matches(rules: tuple[tuple[str, re.Pattern[str]], ...], text: str) -> tuple[list[str], list[str]]:
+    reasons: list[str] = []
+    matches: list[str] = []
+    for reason, pattern in rules:
+        match = pattern.search(text)
+        if match:
+            reasons.append(reason)
+            matches.append(" ".join(match.group(0).split())[:220])
+    return reasons, matches
+
+
 def evaluate_post_dce_scope(row: Mapping[str, Any]) -> dict[str, Any]:
     """Conservatively auto-reject only unambiguous non-broker physical scopes."""
     text = scope_text(row)
     if not text:
         return {"auto_reject": False, "reason_codes": [], "matched_patterns": [], "digital_override": False}
 
-    # A substantive digital-native scope always survives to GPT. Deliberately omit broad
-    # words such as "design", "portal", "automation", and "content" to avoid false overrides.
+    dominant_reasons, dominant_matches = _matches(_DOMINANT_PHYSICAL_RULES, text)
+    if dominant_reasons:
+        return {
+            "auto_reject": True,
+            "reason_codes": dominant_reasons,
+            "matched_patterns": dominant_matches,
+            "digital_override": False,
+        }
+
+    # A substantive digital-native scope survives ordinary physical keyword matches.
+    # Deliberately omit broad words such as "design", "portal", "automation", and
+    # "content" to avoid false overrides. Dominant construction evidence above wins.
     if _DIGITAL_NATIVE.search(text):
         return {"auto_reject": False, "reason_codes": [], "matched_patterns": [], "digital_override": True}
 
-    reasons: list[str] = []
-    matches: list[str] = []
-    for reason, pattern in _HARD_SCOPE_RULES:
-        match = pattern.search(text)
-        if match:
-            reasons.append(reason)
-            matches.append(" ".join(match.group(0).split())[:220])
-
+    reasons, matches = _matches(_HARD_SCOPE_RULES, text)
     return {
         "auto_reject": bool(reasons),
         "reason_codes": reasons,
