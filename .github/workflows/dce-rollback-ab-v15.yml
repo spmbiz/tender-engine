@@ -1,0 +1,252 @@
+name: DCE Rollback A/B V15
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [agent/dce-ab-regression-v15]
+    paths:
+      - 'pipeline/dce_worker_v*.py'
+      - 'pipeline/dce_batch_worker.py'
+      - 'pipeline/build_matrix.py'
+      - 'pipeline/compare_dce_ab.py'
+      - 'benchmarks/dce_ab_fixed_20260818.ids'
+      - '.github/workflows/dce-rollback-ab-v15.yml'
+  pull_request:
+    paths:
+      - 'pipeline/dce_worker_v*.py'
+      - 'pipeline/dce_batch_worker.py'
+      - 'pipeline/build_matrix.py'
+      - 'pipeline/compare_dce_ab.py'
+      - 'benchmarks/dce_ab_fixed_20260818.ids'
+      - '.github/workflows/dce-rollback-ab-v15.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: dce-rollback-ab-v15-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BASELINE_REF: 112c62fe6a77c3b8c3295ca48bb151366e363d71
+  SOURCE_DCE_RUN: '32081860247'
+  SOURCE_RELEASE: dce-harvest-32081860247
+  SOURCE_QUEUE: dce-candidate-queue-32081860247.jsonl
+
+jobs:
+  static-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile resolver chain and regression tooling
+        run: |
+          python -m py_compile \
+            pipeline/build_matrix.py \
+            pipeline/dce_worker_v11.py \
+            pipeline/dce_worker_v12.py \
+            pipeline/dce_worker_v13.py \
+            pipeline/dce_worker_v14.py \
+            pipeline/dce_batch_worker.py \
+            pipeline/compare_dce_ab.py
+          python pipeline/test_dce_worker_v11_routes.py
+          python pipeline/test_dce_worker_v13_routes.py
+          python pipeline/test_dce_worker_v14_routes.py
+          grep -F 'pipeline/dce_worker_v14.py' pipeline/dce_batch_worker.py
+
+  legacy-rollback-ab:
+    needs: static-contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout current candidate
+        uses: actions/checkout@v4
+        with:
+          path: current
+      - name: Checkout pre-V14 rollback baseline
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BASELINE_REF }}
+          path: baseline
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install identical runtime dependencies once
+        run: python -m pip install --disable-pip-version-check -q requests pypdf python-docx openpyxl python-pptx 'playwright>=1.46,<2'
+      - name: Reuse runner Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+      - name: Recover exact durable canonical queue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p source
+          gh release download "$SOURCE_RELEASE" -R "$GITHUB_REPOSITORY" --pattern "$SOURCE_QUEUE" --dir source
+          test -s "source/$SOURCE_QUEUE"
+      - name: Materialize byte-identical fixed A/B corpus from canonical queue
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          ids=[x.strip() for x in Path('current/benchmarks/dce_ab_fixed_20260818.ids').read_text().splitlines() if x.strip()]
+          wanted=set(ids); found={}
+          source=Path('source') / 'dce-candidate-queue-32081860247.jsonl'
+          for raw in source.read_text(encoding='utf-8').splitlines():
+              if not raw.strip(): continue
+              row=json.loads(raw)
+              cid=str(row.get('candidate_id') or '')
+              if cid in wanted:
+                  found[cid]=raw
+          missing=[cid for cid in ids if cid not in found]
+          if missing:
+              raise SystemExit(f'missing fixed A/B candidates: {missing}')
+          payload='\n'.join(found[cid] for cid in ids)+'\n'
+          Path('ab-queue.jsonl').write_text(payload,encoding='utf-8')
+          assert len(payload.splitlines()) == len(ids) == 20
+          print({'fixed_candidates':len(ids),'bytes':len(payload.encode())})
+          PY
+          mkdir -p current/generated baseline/generated
+          cp ab-queue.jsonl current/generated/dce_ab_queue.jsonl
+          cp ab-queue.jsonl baseline/generated/dce_ab_queue.jsonl
+          cmp current/generated/dce_ab_queue.jsonl baseline/generated/dce_ab_queue.jsonl
+      - name: Run rollback baseline on fixed corpus
+        working-directory: baseline
+        env:
+          DCE_BROWSER_INLINE_RETRIES: '0'
+          DCE_HTTP_INLINE_RETRIES: '0'
+          DCE_BROWSER_FAST_TIMEOUT_SECONDS: '125'
+          DCE_HTTP_FAST_TIMEOUT_SECONDS: '90'
+        run: >-
+          python pipeline/dce_batch_worker.py
+          --queue generated/dce_ab_queue.jsonl
+          --lines '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20'
+          --out ../ab-baseline
+          --concurrency 3
+          --retries 0
+          --timeout-seconds 125
+      - name: Run current pipeline on the exact same corpus
+        working-directory: current
+        env:
+          DCE_BROWSER_INLINE_RETRIES: '0'
+          DCE_HTTP_INLINE_RETRIES: '0'
+          DCE_BROWSER_FAST_TIMEOUT_SECONDS: '125'
+          DCE_HTTP_FAST_TIMEOUT_SECONDS: '90'
+        run: >-
+          python pipeline/dce_batch_worker.py
+          --queue generated/dce_ab_queue.jsonl
+          --lines '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20'
+          --out ../ab-current
+          --concurrency 3
+          --retries 0
+          --timeout-seconds 125
+      - name: Compare rollback vs current and fail closed on functional regression
+        run: >-
+          python current/pipeline/compare_dce_ab.py
+          --baseline-dir ab-baseline
+          --current-dir ab-current
+          --out ab-report
+          --fail-on-regression
+      - name: Publish A/B summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f ab-report/REPORT.md ]; then cat ab-report/REPORT.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dce-rollback-ab-${{ github.run_id }}
+          path: |
+            ab-queue.jsonl
+            ab-report/
+            ab-baseline/batch_results.json
+            ab-baseline/batch_summary.json
+            ab-baseline/**/manifest.json
+            ab-current/batch_results.json
+            ab-current/batch_summary.json
+            ab-current/**/manifest.json
+          retention-days: 7
+          if-no-files-found: warn
+
+  expansion-live:
+    needs: static-contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install live-route dependencies
+        run: python -m pip install --disable-pip-version-check -q requests 'playwright>=1.46,<2'
+      - name: Reuse runner Chromium
+        shell: bash
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
+      - name: Build independent expansion corpus
+        shell: bash
+        run: |
+          mkdir -p generated
+          cat > generated/dce_expansion_live.jsonl <<'JSONL'
+          {"candidate_id":"EXP:CA","portal":"CA_CANADABUYS","notice_url":"https://canadabuys.canada.ca/en/tender-opportunities/tender-notice/cb-829-24574370","route":{"detail_url":"https://canadabuys.canada.ca/en/tender-opportunities/tender-notice/cb-829-24574370"}}
+          {"candidate_id":"EXP:NZ","portal":"NZ_GETS","notice_url":"https://www.gets.govt.nz/NPDC/ExternalTenderDetails.htm?id=34344329","route":{"detail_url":"https://www.gets.govt.nz/NPDC/ExternalTenderDetails.htm?id=34344329"}}
+          {"candidate_id":"EXP:PROCONTRACT","portal":"UK_PROCONTRACT","notice_url":"https://procontract.due-north.com/SupplierRegistration/GridViewOpportunities","route":{"detail_url":"https://procontract.due-north.com/SupplierRegistration/GridViewOpportunities"}}
+          {"candidate_id":"EXP:DELTA","portal":"UK_DELTA","notice_url":"https://www.delta-esourcing.com/delta/loginRespondToList.html","route":{"detail_url":"https://www.delta-esourcing.com/delta/loginRespondToList.html"}}
+          {"candidate_id":"EXP:INTEND","portal":"UK_INTEND","notice_url":"https://ucl.in-tendhost.co.uk/ucl/aspx/FAQ","route":{"detail_url":"https://ucl.in-tendhost.co.uk/ucl/aspx/FAQ"}}
+          {"candidate_id":"EXP:JAGGAER","portal":"UK_JAGGAER","notice_url":"https://ministryofjusticecommercial.ukp.app.jaggaer.com/web/login.html","route":{"detail_url":"https://ministryofjusticecommercial.ukp.app.jaggaer.com/web/login.html"}}
+          {"candidate_id":"EXP:ATAMIS","portal":"UK_ATAMIS","notice_url":"https://atamis-9529.my.salesforce-sites.com/?SearchType=Projects","route":{"detail_url":"https://atamis-9529.my.salesforce-sites.com/?SearchType=Projects"}}
+          {"candidate_id":"EXP:SK","portal":"SK_UVO_PUBLIC","notice_url":"https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/detail/558849","route":{"detail_url":"https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/detail/558849","documents_url":"https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/dokumenty/558849"}}
+          {"candidate_id":"EXP:DE-NRW","portal":"DE_EVERGABE_NRW","notice_url":"https://www.evergabe.nrw.de/VMPSatellite/notice/CXS7YDGYT8D4LQ59/documents","route":{"detail_url":"https://www.evergabe.nrw.de/VMPSatellite/notice/CXS7YDGYT8D4LQ59/documents"}}
+          {"candidate_id":"EXP:BG","portal":"BG_EOP_PUBLIC","notice_url":"https://app.eop.bg/today/584841","route":{"detail_url":"https://app.eop.bg/today/584841"}}
+          {"candidate_id":"EXP:CAT","portal":"ES_CATALONIA_PUBLIC","notice_url":"https://contractaciopublica.cat/ca/detall-publicacio/04a024a4-0945-467b-9689-66fa0e0b05c0/300786198","route":{"detail_url":"https://contractaciopublica.cat/ca/detall-publicacio/04a024a4-0945-467b-9689-66fa0e0b05c0/300786198"}}
+          {"candidate_id":"EXP:HU","portal":"HU_EKR_PUBLIC","notice_url":"https://ekr.gov.hu/portal/kozbeszerzes/eljarasok/EKR000199982025/reszletek","route":{"detail_url":"https://ekr.gov.hu/portal/kozbeszerzes/eljarasok/EKR000199982025/reszletek"}}
+          JSONL
+      - name: Run independent current expansion test
+        env:
+          DCE_BROWSER_INLINE_RETRIES: '0'
+          DCE_HTTP_INLINE_RETRIES: '0'
+        run: >-
+          python pipeline/dce_batch_worker.py
+          --queue generated/dce_expansion_live.jsonl
+          --lines '1,2,3,4,5,6,7,8,9,10,11,12'
+          --out expansion-out
+          --concurrency 3
+          --retries 0
+          --timeout-seconds 125
+      - name: Fail on unwired expansion lanes and summarize
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          rows=json.loads(Path('expansion-out/batch_results.json').read_text())
+          bad=[r for r in rows if r.get('returncode') != 0 or r.get('status') in {'ADAPTER_PENDING','STARTED','WORKER_ERROR','BATCH_EXCEPTION','UNKNOWN'}]
+          print(json.dumps(rows,indent=2,ensure_ascii=False))
+          Path('expansion-summary.json').write_text(json.dumps({'rows':rows,'bad':bad},indent=2,ensure_ascii=False))
+          if bad: raise SystemExit(f'unwired/broken expansion lanes: {bad}')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dce-expansion-live-${{ github.run_id }}
+          path: |
+            expansion-summary.json
+            expansion-out/batch_results.json
+            expansion-out/batch_summary.json
+            expansion-out/**/manifest.json
+          retention-days: 7
+          if-no-files-found: warn
