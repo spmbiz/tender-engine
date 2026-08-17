@@ -1,6 +1,6 @@
 {
-  "schema": "GPT_INSTANT_SUPERGREEN_INBOX_V4_LIVE",
-  "updated_at": "2026-08-17T00:28:37.694827+00:00",
+  "schema": "GPT_INSTANT_SUPERGREEN_INBOX_V3",
+  "updated_at": "2026-08-17T00:41:36.163008+00:00",
   "latest_source_dce_run_id": 31981756062,
   "confirmed_supergreens": [
     {
@@ -434,6 +434,69 @@
       "inbox_live_source": "control/gpt_review_hot.json"
     },
     {
+      "candidate_id": "US-SAM:681ebce5da83457190f2a0b4d941c785",
+      "title": "HAFB Front Desk Data Entry Specialist",
+      "buyer": "DEPT OF DEFENSE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/opp/681ebce5da83457190f2a0b4d941c785/view",
+      "deadline": "2026-08-17T16:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "gate_readiness": true,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "evidence_gate_coverage": 9,
+      "native_spm_core": true,
+      "obvious_noncore_scope": false,
+      "qwen_dce_classification": "QWEN_DCE_INSUFFICIENT",
+      "qwen_dce_lean": "UNKNOWN",
+      "qwen_dce_route": "UNCLEAR",
+      "explicit_blockers": [],
+      "critical_unknowns": [],
+      "qwen_reason": "",
+      "recommended_gpt_action": "REVIEW_IF_CAPACITY",
+      "gpt_priority_score": 50,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [
+          "not including 5.1.3 and 5.1.4. 5.1.6 Data entry tasks, as referred to in 5.1.2 and 5.1.4, shall be performed at 85% accuracy within 2 business days. 5.2 Service Summary Performance Objective Paragraph # Standard Performance Threshold SS-1: Provide Qualified Workforce 13 Contractor provides qualified workforce by filling a vacancy as per the timefra"
+        ],
+        "references_experience": [
+          "COR a monthly data entry report in the format established by M&FRC management not later than the fifth (5th) working day of the month. 10.2 The Contractor shall provide the Chief of M&FRC and the Contracting Officer qualifying documentation (i.e. resume which includes at least three professional references) if a vacancy for the Front Desk/Data Entr"
+        ],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [
+          "ontractor use. 9.4 The Government shall provide telephone service for official use only. Government furnished phones will not be used for personal business or company business. Personal devices will not be used while providing customer service at the front desk. 9.5 The M&FRC will be responsible for providing the necessary paperwork to get the cont"
+        ],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [
+          "ontractor and Government personnel performing or in any way coming in contact with the performance of this contract; and a. Take such additional immediate precautions as the contracting officer may reasonably require for health and safety purposes 2. The contracting officer may, by written order, direct Department of the Air Force Occupational Safe"
+        ],
+        "sla_onsite": [],
+        "term_value": [
+          "ntering all required information and data, and maintaining currency within the Air Force Family Integrated Result Statistical Tracking (AFFIRST) database system. The contractor shall input all Transition Assistance Program (TAP) data and resources in the AFFIRST web application to include but not limited to scheduling clients for classes and worksh"
+        ],
+        "award_criteria": [
+          "===== FILE: files/Front_Desk_Data_Entry-_Bid_Schedule.xlsx ===== [SHEET Sheet1] Front Desk Data Entry Specialist | | | | | | CONTRACT LINE ITEM NO. (CLIN) | PERIOD OF PERFORMANCE | SERVICES | QTY | UNIT | UNIT PRICE | AMOUNT | 30 September 2026- 29 September 2031 | NON-PERSONAL SERVICES: | | | | | | Receive telephone calls, greet visitors, ascertai"
+        ],
+        "forms_signatures": [
+          "hones will not be used for personal business or company business. Personal devices will not be used while providing customer service at the front desk. 9.5 The M&FRC will be responsible for providing the necessary paperwork to get the contractor’s personnel access to the Hanscom AFB Local Area Network (LAN). The contractor is responsible for ensuri"
+        ],
+        "submission": [],
+        "ip_data_security": [
+          "calls at M&FRC as well as greet 100% of customers entering M&FRC. Performance will be monitored by the COR. Performance is acceptable when: 1) Not more than one (1) COR/CO validated complaint per quarter; AND 2) There is no mission impact SS-4: Data Entry/ Reports 5.1.2, 5.1.4, 5.1.6 Contractor personnel, at a minimum, will enter data into their de"
+        ],
+        "payment_tax": [
+          "ialist position is considered vacant on the last day of the contractor employee’s resignation notice. 12.2 Once the Contractor has informed the Government that the Front Desk/Data Entry Specialist position is vacant during the term of this contract, the Contractor shall actively seek to hire a replacement, with the understanding that the security p"
+        ]
+      },
+      "source_dce_run_id": 31981756062,
+      "qwen_dce_version": "qwen3-4b-dce-gate-triage-v3",
+      "finality": "PRE_READ_ONLY_NOT_FINAL_VERDICT",
+      "inbox_recall_override": "NATIVE_SPM_GATE_READY_QWEN_INCONCLUSIVE"
+    },
+    {
       "candidate_id": "IE:8841473",
       "title": "Preliminary Market Consultation - Digital Marketing Expertise to Support Delivery of Stop Food Waste",
       "buyer": "Environmental Protection Agency",
@@ -708,14 +771,11 @@
   "counts": {
     "confirmed_supergreens": 0,
     "confirmed_green_total": 1,
-    "confirmed_or_partnerable_green_total": 1,
     "resolved_total": 3,
-    "pending_final_review": 3,
+    "pending_final_review": 4,
     "review_now": 0,
-    "live_hot_review_items": 2,
-    "live_hot_green_items": 0
+    "recall_overrides": 2
   },
-  "answer_contract": "Read this file first. Durable GPT-Web FINAL_SUPER_GREEN/GREEN verdicts are authoritative. Guarded shard-hot GREEN may appear immediately. Gate-ready shard-hot DCE rows enter pending review immediately instead of waiting for whole-run aggregation. Unknown is never PASS.",
-  "finality_rule": "Only GPT Web final adjudication from authoritative DCE evidence may create or persist FINAL_SUPER_GREEN in the final bank. Qwen, hot review rows and shard-hot caches never create FINAL_SUPER_GREEN.",
-  "live_contract": "This file is rebuilt whenever shard-hot DCE evidence changes, so the user-facing inbox follows completed DCE shards continuously rather than whole-run batch boundaries."
+  "answer_contract": "When the user asks what supergreens exist, read this file first. Report live FINAL_SUPER_GREEN/GREEN verdicts immediately. Then adjudicate FINAL_REVIEW_NOW. If capacity allows, review SPM-core gate-ready rows retained by the recall override when Qwen was inconclusive. This user-facing inbox excludes obvious non-core and evidence-empty rows. Qwen is pre-read only; missing evidence is UNKNOWN.",
+  "finality_rule": "Only GPT Web final adjudication from authoritative DCE evidence may create FINAL_SUPER_GREEN. Qwen and recall overrides never do."
 }
