@@ -25,7 +25,15 @@ SNAPSHOT_WORKFLOW = "live-world-snapshot.yml"
 LEDGER_WORKFLOW = "notice-intelligence-ledger.yml"
 QWEN_WORKFLOW = "qwen-live-classification.yml"
 ACTIVE_RUN_STATES = {"in_progress", "queued", "waiting", "pending", "requested"}
-MAX_ACTIVE_AGE_MINUTES = 90
+# Stage-aware zombie limits. Snapshot/Ledger are short control-plane jobs; Qwen
+# workers legitimately run much longer and must never be killed by the watchdog
+# merely because a bounded semantic pass exceeds the short control-plane budget.
+MAX_ACTIVE_AGE_BY_WORKFLOW = {
+    SNAPSHOT_WORKFLOW: 60,
+    LEDGER_WORKFLOW: 45,
+    QWEN_WORKFLOW: 210,
+}
+DEFAULT_MAX_ACTIVE_AGE_MINUTES = 90
 
 
 @dataclass(frozen=True)
@@ -157,14 +165,15 @@ def workflow_active(workflow: str) -> bool:
     # cancel ancient zombies before allowing the newest generation through.
     data = api_json(f"/repos/{REPO}/actions/workflows/{workflow}/runs?per_page=30")
     now = datetime.now(timezone.utc)
+    max_age = int(MAX_ACTIVE_AGE_BY_WORKFLOW.get(workflow, DEFAULT_MAX_ACTIVE_AGE_MINUTES))
     recent_active = False
     for run in data.get("workflow_runs") or []:
         status = str(run.get("status") or "")
         if status not in ACTIVE_RUN_STATES:
             continue
         ts = _parse_ts(run.get("updated_at") or run.get("run_started_at") or run.get("created_at"))
-        age_minutes = (now - ts).total_seconds() / 60 if ts else MAX_ACTIVE_AGE_MINUTES + 1
-        if age_minutes > MAX_ACTIVE_AGE_MINUTES:
+        age_minutes = (now - ts).total_seconds() / 60 if ts else max_age + 1
+        if age_minutes > max_age:
             cancel_run(run.get("id"))
             continue
         recent_active = True
