@@ -1,117 +1,19 @@
-name: Qwen Live Progress Migration
+name: Qwen Live Progress Migration (Legacy Disabled)
 
+# Retired one-shot migration. Live progress checkpointing is already present in
+# pipeline/qwen_notice_batch_selfheal.py. This file is kept only as an audit
+# marker and must never cancel or restart active Qwen classification runs.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/qwen-live-progress-migration.yml'
+  workflow_dispatch:
 
 permissions:
-  actions: write
-  contents: write
+  contents: read
 
 jobs:
-  migrate:
+  retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Patch classifier for externally readable live progress
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-
-          p = Path('pipeline/qwen_notice_batch_selfheal.py')
-          s = p.read_text(encoding='utf-8')
-
-          def replace_once(text, old, new, label):
-              if old not in text:
-                  raise SystemExit(f'missing patch anchor: {label}')
-              if text.count(old) != 1:
-                  raise SystemExit(f'non-unique patch anchor: {label} count={text.count(old)}')
-              return text.replace(old, new, 1)
-
-          s = replace_once(
-              s,
-              'import argparse\nimport datetime as dt\n',
-              'import argparse\nimport base64\nimport datetime as dt\n',
-              'base64 import',
-          )
-          s = replace_once(
-              s,
-              'import re\nimport time\n',
-              'import re\nimport subprocess\nimport time\n',
-              'subprocess import',
-          )
-          s = replace_once(
-              s,
-              '    sample_by_id = {cid(row): row for row in sample}\n\n    def emit(event: str, **fields: Any) -> None:\n',
-              '''    sample_by_id = {cid(row): row for row in sample}\n    live_release_tag = f"qwen-live-progress-{run_id}" if os.environ.get("GITHUB_ACTIONS") == "true" and run_id != "local" else None\n    live_release_repo = os.environ.get("GITHUB_REPOSITORY")\n    live_release_ready = False\n    live_auth_env: dict[str, str] | None = None\n\n    def emit(event: str, **fields: Any) -> None:\n''',
-              'live release state',
-          )
-          s = replace_once(
-              s,
-              '        print("QWEN_PROGRESS " + json.dumps(payload, ensure_ascii=False, separators=(",", ":")), flush=True)\n\n    def build_record(candidate: str) -> dict[str, Any] | None:\n',
-              '''        print("QWEN_PROGRESS " + json.dumps(payload, ensure_ascii=False, separators=(",", ":")), flush=True)\n\n    def github_auth_env() -> dict[str, str] | None:\n        nonlocal live_auth_env\n        if live_auth_env is not None:\n            return live_auth_env\n        env = os.environ.copy()\n        if env.get("GH_TOKEN"):\n            live_auth_env = env\n            return env\n        try:\n            header = subprocess.check_output(\n                ["git", "config", "--local", "--get", "http.https://github.com/.extraheader"],\n                text=True, stderr=subprocess.DEVNULL, timeout=5,\n            ).strip()\n            match = re.search(r"basic\\s+(\\S+)", header, flags=re.I)\n            if not match:\n                return None\n            decoded = base64.b64decode(match.group(1)).decode("utf-8", errors="ignore")\n            token = decoded.split(":", 1)[1] if ":" in decoded else ""\n            if not token:\n                return None\n            env["GH_TOKEN"] = token\n            live_auth_env = env\n            return env\n        except Exception:\n            return None\n\n    def ensure_live_release() -> bool:\n        nonlocal live_release_ready\n        if live_release_ready:\n            return True\n        if not live_release_tag or not live_release_repo:\n            return False\n        env = github_auth_env()\n        if not env:\n            return False\n        view = subprocess.run(\n            ["gh", "release", "view", live_release_tag, "--repo", live_release_repo],\n            env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15, check=False,\n        )\n        if view.returncode != 0:\n            create = subprocess.run(\n                ["gh", "release", "create", live_release_tag, "--repo", live_release_repo,\n                 "--target", os.environ.get("GITHUB_SHA", "main"),\n                 "--title", f"Qwen Live Progress {run_id}",\n                 "--notes", "Externally readable per-worker Qwen checkpoints; assets are replaced after each checkpoint."],\n                env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=25, check=False,\n            )\n            if create.returncode != 0:\n                view = subprocess.run(\n                    ["gh", "release", "view", live_release_tag, "--repo", live_release_repo],\n                    env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15, check=False,\n                )\n                if view.returncode != 0:\n                    return False\n        live_release_ready = True\n        return True\n\n    def publish_external_checkpoint(event: str) -> None:\n        if not progress_path.exists() or not ensure_live_release():\n            return\n        env = github_auth_env()\n        if not env:\n            return\n        try:\n            cp = subprocess.run(\n                ["gh", "release", "upload", live_release_tag, str(progress_path), "--clobber", "--repo", live_release_repo],\n                env=env, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, timeout=30, check=False,\n            )\n            if cp.returncode == 0:\n                emit("EXTERNAL_CHECKPOINT_PUBLISHED", checkpoint_event=event, asset=progress_path.name, release_tag=live_release_tag)\n            else:\n                emit("EXTERNAL_CHECKPOINT_PUBLISH_FAIL", checkpoint_event=event, asset=progress_path.name, release_tag=live_release_tag, returncode=cp.returncode, stderr_tail=(cp.stderr or "")[-300:])\n        except Exception as exc:\n            emit("EXTERNAL_CHECKPOINT_PUBLISH_FAIL", checkpoint_event=event, asset=progress_path.name, release_tag=live_release_tag, error=type(exc).__name__)\n\n    def build_record(candidate: str) -> dict[str, Any] | None:\n''',
-              'publisher functions',
-          )
-          s = replace_once(
-              s,
-              '        atomic_json(progress_path, live)\n        emit("CHECKPOINT", resolved=live["resolved"], remaining=live["remaining"], attempts=live["request_attempts"], failures=live["failed_attempts"], splits=split_events, decisions=live["decision_counts"])\n',
-              '        atomic_json(progress_path, live)\n        publish_external_checkpoint(event)\n        emit("CHECKPOINT", resolved=live["resolved"], remaining=live["remaining"], attempts=live["request_attempts"], failures=live["failed_attempts"], splits=split_events, decisions=live["decision_counts"])\n',
-              'checkpoint publish call',
-          )
-          s = replace_once(
-              s,
-              '            "github_notice_per_top_batch": True,\n',
-              '            "github_notice_per_top_batch": True,\n            "external_release_checkpoint": bool(live_release_tag and live_release_repo),\n            "external_release_tag": live_release_tag,\n            "external_release_asset": progress_path.name,\n',
-              'summary metadata',
-          )
-          s = replace_once(
-              s,
-              '        "updated_at_utc": now_utc(),\n    })\n    emit("COMPLETE", resolved=len(records), total=len(sample), elapsed_seconds=round(elapsed, 3), seconds_per_notice=summary["seconds_per_notice"], failures=summary["failed_attempts"], splits=split_events, singleton_fallbacks=singleton_fallbacks, decisions=summary["decision_counts"])\n',
-              '        "updated_at_utc": now_utc(),\n    })\n    publish_external_checkpoint("COMPLETE")\n    emit("COMPLETE", resolved=len(records), total=len(sample), elapsed_seconds=round(elapsed, 3), seconds_per_notice=summary["seconds_per_notice"], failures=summary["failed_attempts"], splits=split_events, singleton_fallbacks=singleton_fallbacks, decisions=summary["decision_counts"])\n',
-              'final publish call',
-          )
-          p.write_text(s, encoding='utf-8')
-          PY
-          python -m py_compile pipeline/qwen_notice_batch_selfheal.py
-          grep -F 'EXTERNAL_CHECKPOINT_PUBLISHED' pipeline/qwen_notice_batch_selfheal.py
-          grep -F 'qwen-live-progress-' pipeline/qwen_notice_batch_selfheal.py
-
-      - name: Commit safe live checkpoint publisher
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add pipeline/qwen_notice_batch_selfheal.py
-          git commit -m 'qwen: publish externally readable live checkpoints'
-
-      - name: Cancel current Qwen run before restart
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          current="$(gh run list --workflow qwen-live-classification.yml --limit 20 --json databaseId,status --jq '.[] | select(.status=="in_progress" or .status=="queued" or .status=="pending") | .databaseId')"
-          for run in $current; do
-            echo "Cancelling Qwen run $run"
-            gh api -X POST "repos/${GITHUB_REPOSITORY}/actions/runs/${run}/cancel" >/dev/null || true
-          done
-
-      - name: Push safe migration
-        shell: bash
-        run: |
-          set -euo pipefail
-          for attempt in 1 2 3 4 5; do
-            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
-            git rebase --abort >/dev/null 2>&1 || true
-            sleep "$((attempt * 3))"
-          done
-          exit 1
+      - run: |
+          echo 'QWEN_LIVE_PROGRESS_MIGRATION_RETIRED'
+          echo 'No workflow is patched, cancelled or restarted.'
