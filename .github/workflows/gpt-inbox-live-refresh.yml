@@ -47,6 +47,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install recovery dependency
+        run: python -m pip install --disable-pip-version-check -q requests
 
       - name: Recover recent immutable DCE shard verdicts
         env:
