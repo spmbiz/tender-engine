@@ -9,6 +9,8 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from post_dce_scope_gate import evaluate_post_dce_scope
+
 
 # The inbox is a work queue for GPT Web, not a verdict store.
 # Final/decided opportunities live in control/final_supergreen_bank.json.
@@ -138,11 +140,10 @@ def pending_rank(row: dict[str, Any]):
 def normalize_hot_review(row: dict[str, Any], source_name: str = 'control/gpt_review_hot.json') -> dict[str, Any] | None:
     """Normalize anything deliberately placed on the persistent GPT review surface.
 
-    Eligibility is *not* decided here. BUSINESS_GATES rows already have gate-ready
-    authoritative evidence. DCE_AUTHENTICITY rows have retrieved candidate material
-    that GPT Web must inspect before business-gate adjudication. Neither lane is
-    silently discarded because of a heuristic SPM score or an obvious blocker: GPT
-    Web owns that verdict and will tick the row after review.
+    BUSINESS_GATES rows have authoritative post-DCE evidence. At this final queue
+    boundary, deterministic scope rejects may remove only unambiguous physical
+    non-broker work. DCE_AUTHENTICITY rows are never scope-rejected here because GPT
+    Web must first verify that their retrieved material is actually authoritative DCE.
     """
     if not isinstance(row, dict) or not key(row) or not open_deadline(row):
         return None
@@ -155,6 +156,10 @@ def normalize_hot_review(row: dict[str, Any], source_name: str = 'control/gpt_re
         if not row.get('evidence_quality_summary') and not row.get('content_quality'):
             return None
     elif not gate_ready or coverage <= 0:
+        return None
+    elif evaluate_post_dce_scope(row).get('auto_reject'):
+        # Safety net against stale existing inbox rows and legacy release assets.
+        # New shards are already resolved earlier by final_verdict_guard.py.
         return None
 
     score = int(row.get('spm_post_dce_score') or row.get('priority_score') or 0)
@@ -238,7 +243,8 @@ def main() -> None:
         if cur is None or pending_rank(row) >= pending_rank(cur):
             pending[k] = row
 
-    # Carry forward still-unreviewed items from every prior DCE generation.
+    # Carry forward still-unreviewed items from every prior DCE generation, except
+    # deterministic post-DCE scope rejects that are no longer valid GPT work.
     existing_rows = existing.get('review_queue')
     if not isinstance(existing_rows, list):
         existing_rows = existing.get('pending_final_review') or []
@@ -246,8 +252,8 @@ def main() -> None:
         if isinstance(raw, dict):
             consider(normalize_hot_review(raw, 'existing_inbox'))
 
-    # Persistent recovered DCE review rows. Heuristic ranking changes order only;
-    # it never silently removes a candidate from GPT Web review.
+    # Persistent recovered DCE review rows. Ranking changes order only; the scope gate
+    # removes only the narrowly defined post-DCE physical non-broker cases.
     for raw in hot_review.get('items', []) or []:
         if isinstance(raw, dict):
             consider(normalize_hot_review(raw))
@@ -292,10 +298,10 @@ def main() -> None:
             'excluded_already_in_final_bank': filtered_resolved,
             'pending_by_stage': stage_counts,
         },
-        'review_contract': 'This file is only GPT Web work. BUSINESS_GATES rows have gate-ready DCE. DCE_AUTHENTICITY rows require GPT Web to verify retrieved candidate material first. Nothing in this inbox is a final verdict.',
+        'review_contract': 'This file is only GPT Web work. BUSINESS_GATES rows have gate-ready DCE and narrowly-scoped deterministic physical rejects are removed before this boundary. DCE_AUTHENTICITY rows require GPT Web to verify retrieved candidate material first. Nothing in this inbox is a final verdict.',
         'tick_contract': 'After GPT Web reviews a pass, add one durable reviewed tick per candidate to control/gpt_web_review_ledger.json. The next rebuild removes ticked rows automatically. A later DCE run may re-enter review.',
         'final_bank_contract': 'Decided GREEN/YELLOW/RED/FINAL_SUPER_GREEN results belong in control/final_supergreen_bank.json, never mixed into this inbox.',
-        'pipeline_contract': 'harvest -> Qwen/local triage -> DCE/evidence -> persistent GPT Web review inbox -> GPT Web review + tick -> final bank.',
+        'pipeline_contract': 'harvest -> Qwen/local triage -> DCE/evidence -> deterministic post-DCE scope gate -> persistent GPT Web review inbox -> GPT Web review + tick -> final bank.',
     }
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
