@@ -1,6 +1,6 @@
 {
   "schema": "GPT_WEB_REVIEW_LEDGER_V1",
-  "updated_at": "2026-08-17T08:27:00Z",
+  "updated_at": "2026-08-17T09:56:00Z",
   "ticks": {
     "us-sam:0cef0925d75c415a9ff45ebf13f4571f": {
       "candidate_id": "US-SAM:0cef0925d75c415a9ff45ebf13f4571f",
@@ -81,6 +81,15 @@
       "review_pass_id": "gpt-web-pass-32010043125-001",
       "source_dce_run_id": 32010043125,
       "verdict": "REVIEW_STRONG_RADAR"
+    },
+    "us-sam:0aa4d261de6849138bcea7eaa547ebe9": {
+      "candidate_id": "US-SAM:0aa4d261de6849138bcea7eaa547ebe9",
+      "reviewed": true,
+      "reviewed_at": "2026-08-17T09:56:00Z",
+      "review_pass_id": "gpt-web-pass-32016578412-001",
+      "source_dce_run_id": 32016578412,
+      "review_key": "2fbbf72111b292cda2e8a736f350e2ad4387e5f8fbbeed5c132f6966afd6cd02",
+      "verdict": "NO_SCOPE_US_SMALL_BUSINESS_HARDWARE_INSTALL"
     }
   },
   "passes": [
@@ -100,6 +109,15 @@
         "TED:565066-2026",
         "US-SAM:59d7eede519b46d091104f7bd1af90ea",
         "US-SAM:3ab2d010c38d46809c8a3f1bff03d3e8"
+      ]
+    },
+    {
+      "review_pass_id": "gpt-web-pass-32016578412-001",
+      "reviewed_at": "2026-08-17T09:56:00Z",
+      "source_dce_run_id": 32016578412,
+      "reviewed_count": 1,
+      "candidate_ids": [
+        "US-SAM:0aa4d261de6849138bcea7eaa547ebe9"
       ]
     }
   ]
