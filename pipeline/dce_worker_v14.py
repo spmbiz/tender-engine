@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import html
 import re
 from pathlib import Path
@@ -25,7 +26,6 @@ SUFFIX_ESENDER_HOSTS = (
     (".delta-esourcing.com", "UK_DELTA"),
     (".in-tendhost.co.uk", "UK_INTEND"),
     (".app.jaggaer.com", "UK_JAGGAER"),
-    (".ukp.app.jaggaer.com", "UK_JAGGAER"),
     (".bravosolution.co.uk", "UK_JAGGAER"),
     (".tenderlink.com", "NZ_TENDERLINK"),
 )
@@ -48,8 +48,6 @@ def portal_for_url_v14(url: str) -> str | None:
         if host == suffix.lstrip(".") or host.endswith(suffix):
             return portal
     # Atamis public opportunity sites are Salesforce Experience/Sites domains.
-    # Some tenants include "atamis" in the hostname; others expose the stable
-    # ProSpend public landing page or SearchType=Projects route.
     if host.endswith((".my.salesforce-sites.com", ".my.site.com")):
         if "atamis" in host or "prospend__cs_publiclandingpage" in path or "searchtype=projects" in query:
             return "UK_ATAMIS"
@@ -150,14 +148,59 @@ def adapter_esender_v14(candidate: dict, out: Path, manifest: dict):
         return
 
 
-def adapter_canadabuys_v14(candidate: dict, out: Path, manifest: dict):
-    """Deterministic anonymous CanadaBuys tender-document downloader.
+def _candidate_public_urls(candidate: dict) -> list[str]:
+    urls: list[str] = []
+    def add(value):
+        if isinstance(value, str) and value.startswith(("http://", "https://")) and value not in urls:
+            urls.append(value)
+    add(candidate.get("notice_url"))
+    route = candidate.get("route") or {}
+    if isinstance(route, dict):
+        for value in route.values():
+            if isinstance(value, str):
+                add(value)
+            elif isinstance(value, list):
+                for item in value:
+                    if isinstance(item, str):
+                        add(item)
+                    elif isinstance(item, dict):
+                        add(item.get("url"))
+    for doc in candidate.get("documents") or []:
+        if isinstance(doc, str):
+            add(doc)
+        elif isinstance(doc, dict):
+            add(doc.get("url"))
+    for u in re.findall(r"https?://[^\s<>\"']+", str(candidate.get("description") or ""))[:20]:
+        add(u.rstrip(".,);]"))
+    return urls
 
-    CanadaBuys publishes solicitation attachments under its own tender_notice file
-    tree and explicitly states that these files are available without registration.
-    We download only those first-party attachment URLs and preserve the normal
-    public-page cascade as a fallback for source-system notices.
+
+def adapter_generic_router_v14(candidate: dict, out: Path, manifest: dict):
+    """Resolve downstream eSender hosts for non-TED UK/global discovery rows.
+
+    build_matrix resolves aliases for sharding but does not rewrite the immutable queue.
+    This runtime router closes that gap by inspecting authoritative public URLs before
+    falling back to the mature generic public-page adapter.
     """
+    for url in _candidate_public_urls(candidate):
+        portal = portal_for_url_v14(url)
+        if portal in EXTRA_PUBLIC_ESENDERS:
+            trial = copy.deepcopy(candidate)
+            trial["portal"] = portal
+            route = dict(trial.get("route") or {})
+            route["detail_url"] = url
+            route["downstream_host"] = (urlparse(url).hostname or "").casefold()
+            route["portal_family_v14"] = portal
+            trial["route"] = route
+            manifest.setdefault("dce_method_attempts", []).append({
+                "method": "GENERIC_TO_ESENDER_ROUTE_V14", "url": url, "portal": portal,
+            })
+            return adapter_esender_v14(trial, out, manifest)
+    return v13.adapter_public_spa_v13(candidate, out, manifest)
+
+
+def adapter_canadabuys_v14(candidate: dict, out: Path, manifest: dict):
+    """Deterministic anonymous CanadaBuys tender-document downloader."""
     manifest.setdefault("files", [])
     manifest.setdefault("dce_method_attempts", [])
     route = candidate.get("route") or {}
@@ -228,9 +271,11 @@ v11.V11_PUBLIC_PORTALS.update(EXTRA_PUBLIC_ESENDERS)
 v11.matrix.BROWSER_PORTALS.update(EXTRA_PUBLIC_ESENDERS)
 v11.matrix.SUPPORTED.update(EXTRA_PUBLIC_ESENDERS)
 
-# Strengthen two existing national lanes rather than adding parallel portal keys.
+# Strengthen existing national/aggregate lanes rather than adding parallel records.
 base.ADAPTERS["CA_CANADABUYS"] = adapter_canadabuys_v14
 base.ADAPTERS["NZ_GETS"] = adapter_nz_gets_v14
+for portal in ("GENERIC_PUBLIC_PAGE", "UK_FIND_A_TENDER", "UK_FTS_OCDS", "UK_CONTRACTS_FINDER"):
+    base.ADAPTERS[portal] = adapter_generic_router_v14
 
 if __name__ == "__main__":
     v2.main()
