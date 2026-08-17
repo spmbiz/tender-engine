@@ -1,0 +1,53 @@
+name: Persist GPT Adjudications
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'control/adjudications/*.json'
+      - 'pipeline/merge_gpt_adjudications_into_final_bank.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: persist-gpt-adjudications
+  cancel-in-progress: false
+
+jobs:
+  persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Merge GPT Web adjudications into durable final bank
+        run: python pipeline/merge_gpt_adjudications_into_final_bank.py
+      - name: Refresh GPT inbox after durable resolution
+        run: python pipeline/refresh_gpt_inbox_live.py
+      - name: Persist final bank and refreshed inbox
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add control/final_supergreen_bank.json control/gpt_supergreen_inbox.json
+          if git diff --cached --quiet; then
+            echo 'No durable adjudication delta.'
+            exit 0
+          fi
+          git commit -m 'gpt: persist final adjudications and consume inbox'
+          for attempt in 1 2 3 4 5 6; do
+            if git pull --rebase origin main && git push origin HEAD:main; then
+              exit 0
+            fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((attempt * 3))"
+          done
+          exit 1
