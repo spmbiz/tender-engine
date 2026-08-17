@@ -15,23 +15,20 @@ on:
       - 'control/gpt_web_review_ledger.json'
       - 'pipeline/refresh_gpt_inbox_live.py'
       - 'pipeline/gpt_web_tick.py'
+      - 'pipeline/rebuild_gpt_review_bank_from_release.py'
       - '.github/workflows/gpt-inbox-live-refresh.yml'
 
 permissions:
   contents: write
 
 concurrency:
-  group: ${{ github.event_name == 'workflow_dispatch' && github.actor == 'github-actions[bot]' && format('gpt-inbox-noop-{0}', github.run_id) || 'gpt-inbox-live-refresh' }}
+  group: gpt-inbox-live-refresh
   cancel-in-progress: true
 
 jobs:
   refresh:
-    # DCE shards already publish the inbox directly. Their legacy bot dispatch is a
-    # zero-runner no-op. GPT Web tick pushes, post-DCE completion and explicit human
-    # dispatches rebuild from current main using the durable review ledger.
-    if: github.event_name != 'workflow_dispatch' || github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,37 +38,71 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Rebuild GPT Web work inbox from DCE evidence and durable ticks
+      - name: Recover recent immutable DCE shard verdicts
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          git pull --rebase origin main
-          python pipeline/refresh_gpt_inbox_live.py \
-            --existing control/gpt_supergreen_inbox.json \
-            --final-bank control/final_supergreen_bank.json \
-            --hot-green control/supergreen_hot.json \
-            --hot-review control/gpt_review_hot.json \
-            --review-ledger control/gpt_web_review_ledger.json \
-            --out control/gpt_supergreen_inbox.json \
-            --max-items 60
+          rm -rf /tmp/dce-review-recovery
+          mkdir -p /tmp/dce-review-recovery
+          mapfile -t tags < <(
+            gh release list --limit 50 --json tagName \
+              --jq '.[] | select(.tagName | startswith("dce-harvest-")) | .tagName' \
+              | head -n 5
+          )
+          if [ "${#tags[@]}" -eq 0 ]; then
+            echo 'No DCE releases found.'
+            exit 0
+          fi
+          for tag in "${tags[@]}"; do
+            run_id="${tag#dce-harvest-}"
+            mkdir -p "/tmp/dce-review-recovery/$run_id"
+            gh release download "$tag" \
+              --pattern 'fast-adjudication-shard-*.jsonl' \
+              --dir "/tmp/dce-review-recovery/$run_id" || true
+          done
+          find /tmp/dce-review-recovery -type f -name 'fast-adjudication-shard-*.jsonl' | wc -l
 
-      - name: Persist only when the GPT Web work surface changed
+      - name: Rebuild persistent review bank and GPT Web inbox transactionally
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'tender-engine-bot'
           git config user.email 'tender-engine-bot@users.noreply.github.com'
-          git add control/gpt_supergreen_inbox.json
-          if git diff --cached --quiet; then
-            echo 'Inbox already current.'
-            exit 0
-          fi
-          git commit -m "inbox: GPT Web queue refresh ${GITHUB_RUN_ID}"
-          for n in 1 2 3 4 5; do
-            if git pull --rebase origin main && git push origin HEAD:main; then
+
+          for n in 1 2 3 4 5 6; do
+            git fetch origin main
+            git reset --hard origin/main
+
+            python pipeline/rebuild_gpt_review_bank_from_release.py \
+              --release-root /tmp/dce-review-recovery \
+              --existing control/gpt_review_hot.json \
+              --out control/gpt_review_hot.json \
+              --max-items 160
+
+            python pipeline/refresh_gpt_inbox_live.py \
+              --existing control/gpt_supergreen_inbox.json \
+              --final-bank control/final_supergreen_bank.json \
+              --hot-green control/supergreen_hot.json \
+              --hot-review control/gpt_review_hot.json \
+              --review-ledger control/gpt_web_review_ledger.json \
+              --out control/gpt_supergreen_inbox.json \
+              --max-items 100
+
+            git add control/gpt_review_hot.json control/gpt_supergreen_inbox.json
+            if git diff --cached --quiet; then
+              echo 'Persistent review bank and inbox already current.'
               exit 0
             fi
-            git rebase --abort >/dev/null 2>&1 || true
+
+            git commit -m "inbox: recover persistent GPT Web queue ${GITHUB_RUN_ID}"
+            if git push origin HEAD:main; then
+              exit 0
+            fi
             sleep "$((n * 2))"
           done
+          echo 'Failed to persist recovered GPT inbox after retries.' >&2
           exit 1
