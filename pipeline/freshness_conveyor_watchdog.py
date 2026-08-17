@@ -5,6 +5,7 @@ import json
 import os
 import re
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Any
 
 import requests
@@ -24,6 +25,7 @@ SNAPSHOT_WORKFLOW = "live-world-snapshot.yml"
 LEDGER_WORKFLOW = "notice-intelligence-ledger.yml"
 QWEN_WORKFLOW = "qwen-live-classification.yml"
 ACTIVE_RUN_STATES = {"in_progress", "queued", "waiting", "pending", "requested"}
+MAX_ACTIVE_AGE_MINUTES = 90
 
 
 @dataclass(frozen=True)
@@ -98,6 +100,16 @@ def parse_run_id(text: str | None, *patterns: str) -> str | None:
     return None
 
 
+def _parse_ts(value: object):
+    if not value:
+        return None
+    try:
+        d = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        return d if d.tzinfo else d.replace(tzinfo=timezone.utc)
+    except Exception:
+        return None
+
+
 def snapshot_source_run() -> str | None:
     manifest = release_asset_json("live-world-snapshot-latest", "snapshot-manifest-latest.json")
     if manifest:
@@ -131,12 +143,32 @@ def qwen_source_run() -> str | None:
     )
 
 
+def cancel_run(run_id: object) -> bool:
+    rid = str(run_id or "").strip()
+    if not rid:
+        return False
+    r = requests.post(f"{API}/repos/{REPO}/actions/runs/{rid}/cancel", headers=HEADERS, timeout=30)
+    return r.status_code in (201, 202, 204, 409)
+
+
 def workflow_active(workflow: str) -> bool:
-    # Query once and inspect the returned run states ourselves. Some GitHub API
-    # status filters are permissive/quirky for waiting/requested states and can
-    # return completed historical runs, which previously caused false ACTIVE_WAIT.
+    # Stale queued runs can survive for many hours and permanently block a
+    # freshness lane. Treat only recent active work as an ownership signal;
+    # cancel ancient zombies before allowing the newest generation through.
     data = api_json(f"/repos/{REPO}/actions/workflows/{workflow}/runs?per_page=30")
-    return any(str(run.get("status") or "") in ACTIVE_RUN_STATES for run in data.get("workflow_runs") or [])
+    now = datetime.now(timezone.utc)
+    recent_active = False
+    for run in data.get("workflow_runs") or []:
+        status = str(run.get("status") or "")
+        if status not in ACTIVE_RUN_STATES:
+            continue
+        ts = _parse_ts(run.get("updated_at") or run.get("run_started_at") or run.get("created_at"))
+        age_minutes = (now - ts).total_seconds() / 60 if ts else MAX_ACTIVE_AGE_MINUTES + 1
+        if age_minutes > MAX_ACTIVE_AGE_MINUTES:
+            cancel_run(run.get("id"))
+            continue
+        recent_active = True
+    return recent_active
 
 
 def dispatch(workflow: str, inputs: dict[str, str] | None = None) -> None:
