@@ -1,0 +1,65 @@
+name: DCE To Inbox Production Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dce-to-inbox-production-smoke.yml'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: dce-to-inbox-production-smoke
+  cancel-in-progress: true
+
+jobs:
+  replay-real-dce-shard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Replay one completed real DCE shard through the exact current hot-publish path
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check -q requests
+          mkdir -p replay/transport replay/out replay/aggregate replay/adjudication
+          gh run download 31984835101 -n dce-shard-3 -D replay/transport
+          test -s replay/transport/handoff-shard-3.tar.gz
+          tar -xzf replay/transport/handoff-shard-3.tar.gz -C replay/out
+          python pipeline/aggregate_dce.py --root replay/out --out replay/aggregate
+          python pipeline/auto_adjudicate_dce.py \
+            --queue replay/aggregate/deep_review_queue.jsonl \
+            --out replay/adjudication \
+            --max-model-reviews 0
+          python pipeline/final_verdict_guard.py --review replay/adjudication/adjudication.jsonl
+          python pipeline/publish_supergreen_hot.py \
+            --review replay/adjudication/adjudication.jsonl \
+            --run-id 31984835101 \
+            --shard 3 \
+            --repo '${{ github.repository }}' \
+            --out replay/direct-result.json
+          python - <<'PY'
+          import json
+          x=json.load(open('replay/direct-result.json'))
+          assert x.get('inbox',{}).get('published') is True, x
+          assert not x.get('inbox_error'), x
+          print(json.dumps({
+            'real_dce_shard': 3,
+            'source_dce_run': 31984835101,
+            'direct_inbox': True,
+            'publish_attempt': x['inbox']['attempt'],
+            'green_delta': x.get('green_delta'),
+            'review_delta': x.get('review_delta'),
+          },indent=2))
+          PY
