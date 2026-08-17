@@ -1,0 +1,179 @@
+name: GPT Web Full Batch Adjudicate
+
+on:
+  push:
+    paths:
+      - '.github/workflows/gpt-web-full-batch-adjudicate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gpt-web-full-batch-adjudicate
+  cancel-in-progress: false
+
+jobs:
+  adjudicate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply GPT Web full-snapshot verdicts
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, pathlib, re
+          from collections import Counter
+          from datetime import datetime, timezone
+
+          index_path=pathlib.Path('control/gpt_web_full_batch_index.jsonl')
+          lines=[json.loads(x) for x in index_path.read_text(encoding='utf-8').splitlines() if x.strip()]
+          meta=lines[0]['_meta']
+          rows=lines[1:]
+          assert len(rows)==meta['count']==154, (len(rows),meta)
+          ids=[r['candidate_id'] for r in rows]
+          assert len(ids)==len(set(ids))==154
+
+          # These are GPT Web's decisions for this specific 2026-08-17 snapshot.
+          # Exact overrides cover the candidates whose titles/scope plausibly intersect SPM's
+          # digital/creative/software or broker lanes. Everything else is still reviewed below,
+          # but obvious physical/clinical/construction/specialised-hardware scopes are rejected.
+          overrides={
+            'US-SAM:bfdeb9ea05b0467ba11b8ebd51dc425d':('REVIEW_PARTNER_HEAVY_USACE','Real programming/web/systems scope, but the DCE shows USACE-specific data systems, required personnel and DoD/Army security/training obligations; not lean or strict GREEN.'),
+            'US-SAM:717a9e3f125c45148ee298d6c82e86a6':('WATCH_UMBRELLA_CSO','Real services umbrella including transcription and other support, but this is an umbrella CSO/AoI vehicle rather than one concrete low-friction task; no strict GREEN yet.'),
+            'WORLD-BANK:OP00083373':('WATCH_PRETENDER_DIGITAL','Statistics-program procurement record with software-development signal but no resolved actionable submission deadline; keep as downstream procurement radar, not GREEN.'),
+            'ZA_ETENDERS_OCDS:ocds-9t57fa-165763-2026-08-17':('REVIEW_SCOPE_NEEDS_CONFIRMATION','South Cape TVET record has substantive evidence and a software-services signal, but the opaque title and unresolved deadline-authority conflict do not support a strict GREEN without scope confirmation.'),
+            'PL-BZP:08defc46-ae55-6e9f-962b-12000115bcd2':('REVIEW_PARTNER_CYBER_HEAVY','Integrated IT/OT information-security infrastructure is technically relevant but infrastructure/cyber delivery is materially heavier than a lean SPM build; partner route only.'),
+            'PL-BZP:08defc4a-6ab0-d44f-962b-12000115bd59':('REVIEW_PARTNER_CYBER_HEAVY','IT/OT cybersecurity infrastructure, virtualisation, backup, monitoring and network protection is a heavy systems-delivery scope; partner route, not strict GREEN.'),
+            'UK_PCS_OCDS:rls-66-AUG561571':('REVIEW_BIDABLE_CREATIVE','Brand positioning and audience development is directly aligned creative/strategy work and low value (£10k), but only three evidence gates are covered and deadline authority conflicts; strong candidate, not strict GREEN yet.'),
+            'US-SAM:b329fbfb6dc542f18f02632d605631ae':('REVIEW_BIDABLE_TECH_US_FEDERAL','The child-welfare technology-solutions scope is genuinely relevant, but US federal eligibility/compliance and bidder requirements are not sufficiently cleared for strict GREEN.'),
+            'US-SAM:240aaea1fbcc4260b9aa4bdeebac7db9':('WATCH_RFI_AI','AI-supercomputing item is explicitly an RFI/business-model inquiry, not an awardable solicitation now.'),
+            'US-SAM:63f88c8b169b4f36881e623a40935e47':('REVIEW_DATA_SUPPLY','Retail scanner data is an information/data-supply opportunity rather than physical work; potentially brokerable if a compliant data source exists, but no native supply route is evidenced.'),
+            'UK_PCS_OCDS:rls-48-AUG561825':('REVIEW_PARTNER_SAAS','Health & Safety management software is directly digital, but this is a software-solution procurement and only three gates are evidenced; requires an existing/partner product route.'),
+            'UK_PCS_OCDS:rls-22-JUL560444':('REVIEW_PARTNER_SAAS_URGENT','Ticketing/booking/commercial software is directly digital, but likely needs an existing product/integration route and only three gates are evidenced; not strict GREEN.'),
+            'WORLD-BANK:OP00458912':('REVIEW_BIDABLE_CONSULTING','Backend infrastructure assessment plus user requirements/technical specifications is relevant information-work consulting, but only four evidence gates are covered and consultant qualification requirements remain unresolved.'),
+            'WORLD-BANK:OP00460176':('REVIEW_BIDABLE_CONSULTING','Digital-infrastructure/e-waste guideline consultancy is information work, but specialist subject-matter credentials and deadline authority remain unresolved; not strict GREEN.'),
+            'WORLD-BANK:OP00067940':('WATCH_PRETENDER_DIGITAL','Kosovo Digital Economy is thematically relevant but this record has no concrete submission deadline and only one evidence gate; procurement radar only.'),
+            'US-SAM:bc274e4c0d624ceaac6d66ae87a9eaff':('WATCH_UMBRELLA_CSO_SECURITY','Detroit Arsenal CSO is only an umbrella vehicle here and this recovered version carries top-secret/security friction; no concrete lean bid.'),
+            'US-SAM:e435253f8ef24fc6bb07688b2fe852f7':('WATCH_UMBRELLA_CSO','USAFA rapid-acquisition CSO is a broad/radar vehicle and is flagged RFI/no-award at this stage; not a concrete GREEN.'),
+          }
+
+          broker_words=('vehicle','furniture','consumable','reagent','equipment','scanner','lidar','tools','tractor','vending machine','computer equipment','office furniture','lab','devices')
+          physical_words=('repair','replacement','replace ','paving','striping','remodel','forestry','fire alarm','machined','officiating','washer','portable toilet','window tint','crane','capacitor','engine control','hydraulic','fuel','catered','janitorial','pumping','transformer','landing craft','playground','conveyor','maintenance','elevator','dental','generator','boiler','fence','water main','chapel pew','air compressor','carpet','storage tank','intercom','weight handling','paint booth','gate shack','corrosion','flight support','valve','gasket','actuating cylinder','perfusionist','office move','hangar fire','fire system','air breathing hose','mount, telescope','cradle assembly','switch box')
+          defense_rnd_words=('distributed command and control','functional materials open baa','research opportunities for international space station','scientific research','quantum network','airborne instrument enclosures','degraded visual environment','mtrrs follow-on production')
+          sole_words=('sole source','intent to sole')
+          worldbank_nonaction=('project','program','facility','preparation','connectivity')
+
+          def verdict(r):
+              cid=r['candidate_id']
+              if cid in overrides:
+                  return overrides[cid]
+              title=(r.get('title') or '').lower()
+              portal=r.get('portal') or ''
+              stage=r.get('review_stage') or ''
+              if any(w in title for w in sole_words):
+                  return ('NO_SOLE_SOURCE','Reviewed: notice is explicitly sole-source/intent-to-sole-source, so it is not an open opportunity for this bidder.')
+              if any(w in title for w in defense_rnd_words):
+                  return ('NO_DEFENSE_RND_OR_HARD_TECH','Reviewed: specialist defense/scientific R&D or hard-technology scope is outside the lean SPM delivery profile.')
+              if portal=='WORLD_BANK':
+                  if 'assistant en passation' in title:
+                      return ('NO_SCOPE','Reviewed: procurement-staff/individual-assistant role, not a deliverable SPM service contract.')
+                  if any(w in title for w in ('lab','food and drug testing')):
+                      return ('NO_SCOPE','Reviewed: laboratory/testing-centre scope is outside SPM.')
+                  if r.get('deadline') is None:
+                      return ('WATCH_PRETENDER','Reviewed: World Bank project/program record has no actionable submission deadline in the recovered evidence; keep as radar, not GREEN.')
+                  return ('REVIEW_WORLD_BANK_NONCORE','Reviewed: potentially actionable World Bank record, but scope is not a clear native SPM fit from the recovered evidence; no GREEN.')
+              if stage=='DCE_AUTHENTICITY':
+                  if any(w in title for w in broker_words):
+                      return ('BROKER_ONLY_DCE_UNVERIFIED','Reviewed by title as a possible goods-resale lane, but the recovered DCE is not authenticity/gate-ready; cannot be GREEN.')
+                  return ('NO_SCOPE_DCE_UNVERIFIED','Reviewed: title is non-core and recovered DCE is not authenticity/gate-ready; no reason to hold it in the primary GPT inbox.')
+              if 'rfi' in title or 'sources sought' in title or 'market survey' in title:
+                  return ('WATCH_RFI_NONCORE','Reviewed: market-research/RFI item, not a current awardable lean solicitation.')
+              if any(w in title for w in physical_words):
+                  return ('NO_SCOPE_PHYSICAL','Reviewed: physical works, field service, maintenance, construction or specialised equipment support; outside the target lean lane.')
+              if any(w in title for w in broker_words):
+                  return ('BROKER_ONLY','Reviewed: physical-goods procurement could only be pursued through a separately validated supplier/resale route; not a native or strict GREEN.')
+              if 'vpn' in title or 'dedicated internet' in title:
+                  return ('NO_HEAVY_TELECOM','Reviewed: carrier/24x7 telecom service requires operational infrastructure beyond the lean target lane.')
+              if 'intrusion detection' in title or 'security monitoring systems' in title:
+                  return ('NO_HARDWARE_SECURITY_INSTALL','Reviewed: security-system hardware/install scope rather than lean software/creative delivery.')
+              if 'refit' in title or 'linehaul' in title or 'packing' in title or 'rideshare' in title:
+                  return ('NO_SCOPE','Reviewed: logistics/transport/refit scope is outside the target business.')
+              if 'roof' in title or 'substation' in title or 'electrical power' in title:
+                  return ('NO_SCOPE_PHYSICAL','Reviewed: construction/electrical infrastructure scope is outside SPM.')
+              if title.startswith('n003') or title.startswith('fd2020') or title=='woc upgrade':
+                  return ('REVIEW_SCOPE_AMBIGUOUS','Reviewed: title is too opaque for a safe positive/negative business verdict; current score is low and no native-fit signal is present. Re-enter only on a new clearer DCE/version.')
+              return ('NO_SCOPE','Reviewed: no sufficiently direct digital/creative/software/information-work or simple validated broker fit survives GPT Web review.')
+
+          reviewed=[]
+          for r in rows:
+              v,reason=verdict(r)
+              reviewed.append({
+                  'candidate_id':r['candidate_id'],'title':r.get('title'),'buyer':r.get('buyer'),
+                  'deadline':r.get('deadline'),'notice_url':r.get('notice_url'),'review_stage':r.get('review_stage'),
+                  'source_dce_run_id':r.get('source_dce_run_id'),'source_shard':r.get('source_shard'),
+                  'review_key':r.get('review_key'),'verdict':v,'reason':reason,
+              })
+
+          counts=Counter(x['verdict'] for x in reviewed)
+          strict_green=sum(1 for x in reviewed if x['verdict']=='GREEN')
+          now=datetime.now(timezone.utc).isoformat()
+          pass_id='gpt-web-pass-32025850753-full154-001'
+          audit={
+              'schema':'GPT_WEB_FULL_BATCH_REVIEW_V1','review_pass_id':pass_id,
+              'reviewed_at':now,'decision_source':'GPT_WEB_THIS_CONVERSATION',
+              'source_snapshot':meta,'reviewed_count':len(reviewed),
+              'strict_green_count':strict_green,'counts':dict(sorted(counts.items())),
+              'items':reviewed,
+              'rule':'A Qwen/DCE positive signal is not GREEN. Strict GREEN requires an actionable native/brokerable scope plus authoritative DCE gates with no material bidder-specific blocker unresolved.'
+          }
+          pathlib.Path('control/gpt_web_full_batch_review_32025850753.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2),encoding='utf-8')
+
+          ledger_path=pathlib.Path('control/gpt_web_review_ledger.json')
+          ledger=json.loads(ledger_path.read_text(encoding='utf-8')) if ledger_path.exists() else {'schema':'GPT_WEB_REVIEW_LEDGER_V1','ticks':{},'passes':[]}
+          ticks=ledger.setdefault('ticks',{})
+          newly=[]
+          for x in reviewed:
+              key=x['candidate_id'].strip().lower()
+              prior=ticks.get(key) or {}
+              # Do not erase an older decision for a distinct DCE generation; this snapshot
+              # is intentionally a new review only when the review_key differs.
+              if prior.get('review_key')==x.get('review_key') and prior.get('reviewed'):
+                  continue
+              ticks[key]={
+                  'candidate_id':x['candidate_id'],'reviewed':True,'reviewed_at':now,
+                  'review_pass_id':pass_id,'source_dce_run_id':x.get('source_dce_run_id'),
+                  'review_key':x.get('review_key'),'verdict':x['verdict']
+              }
+              newly.append(x['candidate_id'])
+          ledger['updated_at']=now
+          ledger.setdefault('passes',[]).append({
+              'review_pass_id':pass_id,'reviewed_at':now,
+              'source_dce_run_id':meta.get('latest_source_dce_run_id'),
+              'reviewed_count':len(reviewed),'new_ticks_written':len(newly),
+              'candidate_ids':[x['candidate_id'] for x in reviewed]
+          })
+          ledger_path.write_text(json.dumps(ledger,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps({'reviewed':len(reviewed),'new_ticks':len(newly),'strict_green':strict_green,'counts':dict(counts)},indent=2))
+          PY
+      - name: Persist review and ticks transactionally
+        shell: bash
+        run: |
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add control/gpt_web_full_batch_review_32025850753.json control/gpt_web_review_ledger.json
+          git commit -m 'gpt-web: review full 154-candidate snapshot [skip ci]'
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:main; then exit 0; fi
+            git fetch origin main
+            if git rebase origin/main; then
+              sleep $((attempt*2))
+              continue
+            fi
+            git rebase --abort || true
+            exit 1
+          done
+          exit 1
