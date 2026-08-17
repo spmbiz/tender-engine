@@ -1,0 +1,55 @@
+name: One-shot Fix Qwen Pending Starvation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/_once_fix_qwen_pending_starvation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Keep skipped workflow_run triggers out of active Qwen concurrency
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/qwen-live-classification.yml')
+          s=p.read_text(encoding='utf-8')
+          old='  group: qwen-live-notice-classification\n'
+          new="  group: qwen-live-notice-classification-${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success' && format('noop-{0}', github.run_id) || 'active' }}\n"
+          if new in s:
+              print('already patched')
+          elif old in s:
+              s=s.replace(old,new,1)
+              p.write_text(s,encoding='utf-8')
+          else:
+              raise SystemExit('Qwen concurrency group anchor missing')
+          assert new in p.read_text(encoding='utf-8')
+          PY
+          git diff --check
+      - name: Commit fix
+        run: |
+          set -euo pipefail
+          git config user.name 'qwen-concurrency-fix'
+          git config user.email 'actions@users.noreply.github.com'
+          git add .github/workflows/qwen-live-classification.yml
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'qwen: prevent skipped workflow_run from replacing pending live pass'
+          for attempt in 1 2 3 4; do
+            if git push origin HEAD:main; then exit 0; fi
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort || true; exit 1; }
+            sleep $((attempt*2))
+          done
+          exit 1
