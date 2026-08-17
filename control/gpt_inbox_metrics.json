@@ -1,25 +1,35 @@
 {
   "schema": "GPT_INBOX_HEALTH_V1",
-  "updated_at": "2026-08-17T17:52:59.773825+00:00",
+  "updated_at": "2026-08-17T18:46:40.382738+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V2",
-  "latest_source_dce_run_id": 32051628193,
+  "latest_source_dce_run_id": 32056472546,
   "counts": {
-    "pending_gpt_web_review": 18,
+    "pending_gpt_web_review": 105,
     "reviewed_ticks_total": 171,
     "excluded_already_reviewed": 0,
     "excluded_already_in_final_bank": 0,
     "pending_by_stage": {
-      "BUSINESS_GATES": 18
+      "BUSINESS_GATES": 92,
+      "DCE_AUTHENTICITY": 13
     }
   },
-  "review_bank_count": 21,
+  "review_bank_count": 113,
   "review_bank_schema": "GPT_REVIEW_HOT_V4",
   "recovery_metrics": {
-    "shard_files_scanned": 0,
-    "adjudication_rows_scanned": 0,
-    "model_review_rows_seen": 0,
-    "dce_authenticity_rows_seen": 0,
-    "persistent_unique_pending_surface": 21
+    "shard_files_scanned": 56,
+    "adjudication_rows_scanned": 511,
+    "model_review_rows_seen": 156,
+    "dce_authenticity_rows_seen": 18,
+    "scope_auto_rejected": 36,
+    "scope_auto_reject_reason_counts": {
+      "NO_SCOPE_PHYSICAL_CONSTRUCTION_WORKS": 14,
+      "NO_SCOPE_PHYSICAL_DREDGING": 3,
+      "NO_SCOPE_PHYSICAL_ROAD_BRIDGE_WORKS": 7,
+      "NO_SCOPE_PHYSICAL_HVAC_WORKS": 12,
+      "NO_SCOPE_PHYSICAL_DESIGN_BUILD_INFRASTRUCTURE": 8,
+      "NO_SCOPE_PHYSICAL_WASTE_SERVICE": 2
+    },
+    "persistent_unique_pending_surface": 113
   },
   "healthy": true,
   "contract": "Small health sidecar only; canonical work remains control/gpt_supergreen_inbox.json."
