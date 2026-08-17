@@ -99,9 +99,17 @@ jobs:
           # Goldens are stable benchmark cases and may already be classified, so
           # they must come from the complete canonical generation — never from the
           # shrinking residual classification queue.
-          source_tag="discovery-harvest-${generation}"
-          repaired="supergreen-wide-read-${generation}-repaired.tar.gz"
-          normal="supergreen-wide-read-${generation}.tar.gz"
+          golden_generation="$(python - <<'PYGEN'
+          import json
+          payload=json.load(open('benchmarks/qwen_batch_recall_golden_v1.json',encoding='utf-8'))
+          print(int(payload['canonical_source_run']))
+          PYGEN
+          )"
+          [[ "$golden_generation" =~ ^[0-9]+$ ]] || { echo 'Benchmark canonical_source_run is invalid' >&2; exit 1; }
+          echo "GOLDEN_SOURCE_GENERATION=$golden_generation" >> "$GITHUB_ENV"
+          source_tag="discovery-harvest-${golden_generation}"
+          repaired="supergreen-wide-read-${golden_generation}-repaired.tar.gz"
+          normal="supergreen-wide-read-${golden_generation}.tar.gz"
           assets="$(gh release view "$source_tag" --json assets --jq '.assets[].name')"
           if grep -Fxq "$repaired" <<< "$assets"; then
             source_asset="$repaired"
@@ -175,7 +183,8 @@ jobs:
               'actual':len(ids),
               'golden_count':len(wanted),
               'live_residual_count':max(0,len(ids)-len(wanted)),
-              'golden_source':'canonical_discovery_generation',
+              'golden_source':'benchmark_canonical_discovery_generation',
+              'golden_source_generation':os.environ.get('GOLDEN_SOURCE_GENERATION'),
               'live_source':'residual_classification_queue',
               'ids':ids,
           },indent=2)+'\n',encoding='utf-8')

@@ -30,6 +30,7 @@ on:
       - 'pipeline/merge_qwen_classification_state.py'
       - 'pipeline/qwen_notice_batch_selfheal.py'
       - 'pipeline/qwen_notice_post_guard.py'
+      - 'control/qwen_batch_runtime_config.json'
 
 permissions:
   actions: write
@@ -55,6 +56,7 @@ jobs:
       per_shard: ${{ steps.plan.outputs.per_shard }}
       allowed_workers: ${{ steps.plan.outputs.allowed_workers }}
       matrix: ${{ steps.plan.outputs.matrix }}
+      batch_size: ${{ steps.plan.outputs.batch_size }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -174,6 +176,25 @@ jobs:
           print(json.dumps({'include':[{'shard':i,'shard_count_padded':padded} for i in range(n)]},separators=(',',':')))
           PY
           )"
+          batch_size="$(python - <<'PYBATCH'
+          import json
+          from pathlib import Path
+          fallback=8
+          p=Path('control/qwen_batch_runtime_config.json')
+          try:
+              cfg=json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
+          except Exception:
+              cfg={}
+          champ=cfg.get('champion') if cfg.get('status') == 'PASS' else None
+          if isinstance(champ,dict) and champ.get('safe_for_shadow_scale_out'):
+              try: n=int(champ.get('initial_batch_size') or fallback)
+              except Exception: n=fallback
+          else:
+              n=fallback
+          print(max(1,min(32,n)))
+          PYBATCH
+          )"
+          echo "batch_size=$batch_size" >> "$GITHUB_OUTPUT"
           echo "source_run=$source_run" >> "$GITHUB_OUTPUT"
           echo "remaining=$remaining" >> "$GITHUB_OUTPUT"
           echo "per_shard=$per_shard" >> "$GITHUB_OUTPUT"
@@ -196,7 +217,7 @@ jobs:
         run: |
           echo "Source discovery: ${{ steps.plan.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Exact-hash queue remaining before this pass: ${{ steps.plan.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Workers requested: $QWEN_WORKERS_REQUESTED; workers admitted: ${{ steps.plan.outputs.allowed_workers }}; max notices/worker: ${{ steps.plan.outputs.per_shard }}; batch size: $QWEN_BATCH_SIZE" >> "$GITHUB_STEP_SUMMARY"
+          echo "Workers requested: $QWEN_WORKERS_REQUESTED; workers admitted: ${{ steps.plan.outputs.allowed_workers }}; max notices/worker: ${{ steps.plan.outputs.per_shard }}; batch size: ${{ steps.plan.outputs.batch_size }}" >> "$GITHUB_STEP_SUMMARY"
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
           cat input/qwen-capacity-admission.json >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
@@ -299,7 +320,7 @@ jobs:
             --queue '${{ steps.shard.outputs.path }}' \
             --out "qwen-live-${idx}-raw.jsonl" \
             --summary "qwen-live-${idx}-summary.json" \
-            --batch-size "$QWEN_BATCH_SIZE" \
+            --batch-size '${{ needs.plan.outputs.batch_size }}' \
             --sample-size '${{ needs.plan.outputs.per_shard }}' \
             --source-ledger-generation '${{ needs.plan.outputs.source_run }}' \
             --description-chars 500 \
