@@ -18,7 +18,7 @@ DEFAULT_POLICY = {
 
 
 def _request(url: str):
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.5"})
+    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.6"})
     tok = os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")
     if tok:
         req.add_header("Authorization", f"Bearer {tok}")
@@ -127,17 +127,26 @@ def _workflow_selection_path() -> str:
 
 
 def _spm_curated_fast_lane() -> bool:
-    """Only the tiny GPT-curated rescue manifest gets bounded free-slot priority.
-
-    This does not preempt siblings and does not bypass the account's physical
-    capacity. It merely allows an already curated, high-value DCE queue to use
-    currently idle slots instead of leaving them reserved for a sibling workload
-    that is not using them at that instant.
-    """
+    """Only the tiny GPT-curated rescue manifest gets bounded free-slot priority."""
     flag = str(os.getenv("DCE_SPM_CURATED_FAST_LANE") or "").strip().lower()
     if flag in {"1", "true", "yes"}:
         return True
     return "spm_rescue_selection" in _workflow_selection_path().lower()
+
+
+def _qwen_live_streaming_lane() -> bool:
+    """True for the rolling exact-unseen Qwen→DCE conveyor.
+
+    This lane is not speculative bulk work: every row has already passed semantic
+    notice triage and the durable exact-version anti-repeat barrier. Letting it use
+    a few currently idle physical slots prevents the user-facing DCE inbox from
+    freezing merely because fair-share headroom is reserved for sibling workloads
+    that have not actually occupied those runners yet.
+    """
+    flag = str(os.getenv("DCE_QWEN_LIVE_STREAMING_LANE") or "").strip().lower()
+    if flag in {"1", "true", "yes"}:
+        return True
+    return "qwen_live_selection" in _workflow_selection_path().lower()
 
 
 def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
@@ -148,9 +157,9 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     with durable demand normally receive fair-target headroom before Tender
     borrows idle capacity.
 
-    GPT-curated SPM rescue queues are a deliberately tiny exception: they may use
-    up to three *currently free* physical runner slots even when those idle slots
-    were being held as sibling headroom. Nothing running is killed or displaced.
+    Two latency-sensitive DCE lanes may borrow a bounded number of *currently
+    free* physical slots: the GPT-curated rescue lane and the rolling exact-unseen
+    Qwen lane. Neither kills running sibling work or exceeds account capacity.
     """
     requested = max(0, int(requested))
     if _controller_preauthorized():
@@ -197,15 +206,26 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     existing_tender_active = int(active.get("tenders", 0))
     tender_room = max(0, tender_max - existing_tender_active)
 
-    if _spm_curated_fast_lane():
+    if _spm_curated_fast_lane() or _qwen_live_streaming_lane():
         physical_free = max(0, total - active_total)
-        allowed = min(requested, 3, physical_free, tender_room)
+        if _spm_curated_fast_lane():
+            lane = "spm-curated"
+            cap = 3
+            reason = "GPT-curated SPM DCE shortlist receives bounded latency priority"
+        else:
+            lane = "qwen-live-unseen"
+            try:
+                cap = max(1, min(8, int(os.getenv("DCE_QWEN_LIVE_FAST_LANE_CAP") or 5)))
+            except Exception:
+                cap = 5
+            reason = "rolling Qwen exact-unseen DCE conveyor may borrow idle physical slots so the live inbox never waits behind unoccupied sibling reservations"
+        allowed = min(requested, cap, physical_free, tender_room)
         return allowed, {
-            "mode": "spm-curated-free-slot-fast-lane",
+            "mode": f"{lane}-free-slot-fast-lane",
             "capacity": total,
             "requested": requested,
             "allowed": allowed,
-            "fast_lane_cap": 3,
+            "fast_lane_cap": cap,
             "active_commitments": dict(active),
             "queued_backlog": dict(queued),
             "active_total": active_total,
@@ -214,7 +234,7 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
             "tender_room": tender_room,
             "selection_path": _workflow_selection_path(),
             "preemption": "none; only currently free physical slots are consumed",
-            "reason": "GPT-curated SPM DCE shortlist receives bounded latency priority so high-value resolved candidates are not stranded behind sibling headroom reservations",
+            "reason": reason,
         }
 
     sibling_targets = {
