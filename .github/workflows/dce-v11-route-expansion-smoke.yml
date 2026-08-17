@@ -1,0 +1,97 @@
+name: DCE V11 Route Expansion Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/dce_worker_v11.py'
+      - 'pipeline/dce_batch_worker.py'
+      - 'pipeline/test_dce_worker_v11_routes.py'
+      - '.github/workflows/dce-v11-route-expansion-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  route-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install resolver dependencies
+        run: python -m pip install --disable-pip-version-check -q requests 'playwright>=1.46,<2'
+      - name: Reuse runner Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Compile worker stack and route mappings
+        run: |
+          python -m py_compile pipeline/dce_worker_v11.py pipeline/dce_batch_worker.py
+          python pipeline/test_dce_worker_v11_routes.py
+      - name: Build live anonymous route corpus
+        shell: bash
+        run: |
+          mkdir -p generated
+          cat > generated/v11_route_smoke.jsonl <<'JSONL'
+          {"candidate_id":"V11:EU-FT:66f3ce1e","portal":"EU_FUNDING_TENDERS","notice_url":"https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/tender-details/66f3ce1e-ffc1-4b6f-bb6b-9da6bc428a5a-CN?#anchorDocuments","route":{"detail_url":"https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/tender-details/66f3ce1e-ffc1-4b6f-bb6b-9da6bc428a5a-CN?#anchorDocuments"}}
+          {"candidate_id":"V11:BE:c4672ea4","portal":"BE_EPROC_V11","notice_url":"https://www.publicprocurement.be/publication-workspaces/c4672ea4-fba4-4fff-aa81-c86156b2e23d/documents","route":{"detail_url":"https://www.publicprocurement.be/publication-workspaces/c4672ea4-fba4-4fff-aa81-c86156b2e23d/documents"}}
+          {"candidate_id":"V11:MERCELL:227119","portal":"MERCELL_S2C","notice_url":"https://s2c.mercell.com/today/227119","route":{"detail_url":"https://s2c.mercell.com/today/227119"}}
+          {"candidate_id":"V11:CLIRA:c089c3e2","portal":"SE_CLIRA","notice_url":"https://annonser.clira.io/upphandling/c089c3e2-94ad-44a6-8aa0-fa08b5d7dd07","route":{"detail_url":"https://annonser.clira.io/upphandling/c089c3e2-94ad-44a6-8aa0-fa08b5d7dd07"}}
+          {"candidate_id":"V11:BG:584841","portal":"BG_EOP_PUBLIC","notice_url":"https://app.eop.bg/today/584841","route":{"detail_url":"https://app.eop.bg/today/584841"}}
+          {"candidate_id":"V11:HU:EKR000199982025","portal":"HU_EKR_PUBLIC","notice_url":"https://ekr.gov.hu/portal/kozbeszerzes/eljarasok/EKR000199982025/reszletek","route":{"detail_url":"https://ekr.gov.hu/portal/kozbeszerzes/eljarasok/EKR000199982025/reszletek"}}
+          JSONL
+      - name: Exercise live routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          for line in 1 2 3 4 5 6; do
+            echo "=== route $line ==="
+            timeout 150s python pipeline/dce_worker_v11.py --queue generated/v11_route_smoke.jsonl --line "$line" --out out || true
+          done
+      - name: Validate manifests and summarize outcomes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          manifests=[]
+          for p in Path('out').rglob('manifest.json'):
+              m=json.loads(p.read_text(encoding='utf-8'))
+              manifests.append({
+                  'candidate_id':m.get('candidate_id'),
+                  'portal':m.get('portal'),
+                  'status':m.get('status'),
+                  'files':len(m.get('files') or []),
+                  'attempts':len(m.get('dce_method_attempts') or []),
+              })
+          print(json.dumps(manifests, indent=2, ensure_ascii=False))
+          if len(manifests) < 6:
+              raise SystemExit(f'expected 6 manifests, got {len(manifests)}')
+          bad=[m for m in manifests if m['status'] in {None,'STARTED','WORKER_ERROR'}]
+          if bad:
+              raise SystemExit(f'incomplete worker results: {bad}')
+          if any((m['attempts'] or m['files']) for m in manifests) is False:
+              raise SystemExit('no route attempts were executed')
+          Path('v11-route-smoke-summary.json').write_text(json.dumps(manifests, indent=2, ensure_ascii=False), encoding='utf-8')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dce-v11-route-smoke-${{ github.run_id }}
+          path: |
+            v11-route-smoke-summary.json
+            out/**/manifest.json
+            out/**/portal_page*.txt
+          retention-days: 3
+          if-no-files-found: warn
