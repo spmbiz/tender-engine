@@ -11,15 +11,15 @@ TENDER_REPO = "spmbiz/tender-engine"
 DEFAULT_POLICY = {
     "github": {"capacity": 60},
     "workloads": {
-        "hospitality": {"enabled": True, "weight": 0.25, "min_slots_when_demanding": 5, "max_slots": 60},
-        "tenders": {"enabled": True, "weight": 0.25, "min_slots_when_demanding": 5, "max_slots": 60},
-        "gws": {"enabled": True, "weight": 0.25, "min_slots_when_demanding": 5, "max_slots": 60},
+        "hospitality": {"enabled": True, "weight": 1.0 / 3.0, "min_slots_when_demanding": 20, "max_slots": 60},
+        "tenders": {"enabled": True, "weight": 1.0 / 3.0, "min_slots_when_demanding": 20, "max_slots": 60},
+        "gws": {"enabled": True, "weight": 1.0 / 3.0, "min_slots_when_demanding": 20, "max_slots": 60},
     },
 }
 
 
 def _request(url: str):
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.7"})
+    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.8"})
     tok = os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")
     if tok:
         req.add_header("Authorization", f"Bearer {tok}")
@@ -58,11 +58,9 @@ def _classify(repo: str, name: str, path: str) -> str:
 def _repo_capacity_state(repo: str, ignore_run_id: str = "") -> tuple[Counter, Counter]:
     """Return (active slots, queued jobs) by workload.
 
-    GitHub queued jobs are backlog/demand, not currently occupied hosted-runner
-    capacity. Counting them as active commitments caused a self-deadlock where a
-    large queued Tender matrix could make the DCE fast lane admit zero new work.
-    We therefore use only in-progress jobs for slot occupancy while retaining
-    queued counts for observability and demand protection.
+    Queued jobs are backlog/demand signals, not physical occupancy. Active jobs
+    consume the 60 hosted-runner slots. This lets every top-level workload keep a
+    20-slot target while idle shares are immediately borrowable by siblings.
     """
     active: Counter[str] = Counter()
     queued: Counter[str] = Counter()
@@ -133,12 +131,10 @@ def _spm_curated_fast_lane() -> bool:
 
 
 def _qwen_live_streaming_lane() -> bool:
-    """True for both sides of the continuous Qwen→DCE conveyor.
+    """Identify Qwen work for observability only.
 
-    The DCE selector path identifies the downstream exact-unseen lane. The
-    GITHUB_WORKFLOW check identifies the upstream Qwen notice-classifier itself,
-    which otherwise could deadlock behind the DCE workers it is supposed to keep
-    fed. Both may borrow only currently idle physical slots and never preempt.
+    Qwen is deliberately NOT a fourth capacity pool. The classifier and its DCE
+    handoff are normal Tender work and therefore consume/borrow the Tender share.
     """
     flag = str(os.getenv("DCE_QWEN_LIVE_STREAMING_LANE") or "").strip().lower()
     if flag in {"1", "true", "yes"}:
@@ -173,11 +169,10 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     demand = (last or {}).get("demand") or {}
 
     hospitality_cfg = workloads.get("hospitality") or {}
-    hospitality_floor = max(1, int(hospitality_cfg.get("min_slots_when_demanding") or 5))
+    gws_cfg = workloads.get("gws") or {}
+    hospitality_floor = max(1, int(hospitality_cfg.get("min_slots_when_demanding") or 20))
+    gws_floor = max(1, int(gws_cfg.get("min_slots_when_demanding") or 20))
     hospitality_demand = int(demand.get("hospitality") or 0)
-    if hospitality_demand <= 0:
-        hospitality_demand = hospitality_floor
-
     gws_demand = int(demand.get("gws") or 0)
     tender_demand = int(demand.get("tenders") or max(requested, 1))
 
@@ -189,35 +184,31 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
         active.update(repo_active)
         queued.update(repo_queued)
 
+    # If the remote demand snapshot is stale/missing but work is visibly active or
+    # queued, protect that workload's 20-slot target. If there is genuinely no
+    # demand, its share is fully borrowable immediately.
+    hospitality_visible = int(active.get("hospitality", 0)) + int(queued.get("hospitality", 0))
+    gws_visible = int(active.get("gws", 0)) + int(queued.get("gws", 0))
+    if hospitality_demand <= 0 and hospitality_visible > 0:
+        hospitality_demand = max(hospitality_floor, hospitality_visible)
+    if gws_demand <= 0 and gws_visible > 0:
+        gws_demand = max(gws_floor, gws_visible)
+
     active_total = sum(int(v) for v in active.values())
     tender_cfg = workloads.get("tenders") or {}
     tender_max = int(tender_cfg.get("max_slots") or total)
     existing_tender_active = int(active.get("tenders", 0))
     tender_room = max(0, tender_max - existing_tender_active)
 
-    if _spm_curated_fast_lane() or _qwen_live_streaming_lane():
+    # Only the tiny GPT-curated rescue lane keeps a special latency cap. Qwen and
+    # normal DCE are regular Tender work and flow through the same fair-share
+    # admission below.
+    if _spm_curated_fast_lane():
         physical_free = max(0, total - active_total)
-        if _spm_curated_fast_lane():
-            lane = "spm-curated"
-            cap = 3
-            reason = "GPT-curated SPM DCE shortlist receives bounded latency priority"
-        else:
-            workflow = str(os.getenv("GITHUB_WORKFLOW") or "").strip().lower()
-            if "qwen live notice classification" in workflow:
-                lane = "qwen-live-classifier"
-                cap_default = 8
-                reason = "Qwen notice classification continuously feeds the exact-unseen DCE conveyor and may use a bounded slice of currently idle physical slots"
-            else:
-                lane = "qwen-live-unseen"
-                cap_default = 8
-                reason = "rolling Qwen exact-unseen DCE conveyor may borrow idle physical slots so the live inbox never waits behind unoccupied sibling reservations"
-            try:
-                cap = max(1, min(16, int(os.getenv("DCE_QWEN_LIVE_FAST_LANE_CAP") or cap_default)))
-            except Exception:
-                cap = cap_default
+        cap = 3
         allowed = min(requested, cap, physical_free, tender_room)
         return allowed, {
-            "mode": f"{lane}-free-slot-fast-lane",
+            "mode": "spm-curated-free-slot-fast-lane",
             "capacity": total,
             "requested": requested,
             "allowed": allowed,
@@ -231,12 +222,12 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
             "selection_path": _workflow_selection_path(),
             "workflow": os.getenv("GITHUB_WORKFLOW") or "",
             "preemption": "none; only currently free physical slots are consumed",
-            "reason": reason,
+            "reason": "GPT-curated SPM DCE shortlist receives bounded latency priority",
         }
 
     sibling_targets = {
         "hospitality": _fair_target(total, hospitality_demand, hospitality_cfg),
-        "gws": _fair_target(total, gws_demand, workloads.get("gws") or {}),
+        "gws": _fair_target(total, gws_demand, gws_cfg),
     }
     sibling_missing = sum(max(0, sibling_targets[w] - int(active.get(w, 0))) for w in sibling_targets)
     global_room_after_protection = max(0, total - active_total - sibling_missing)
@@ -246,10 +237,11 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     allowed = min(requested, global_room_after_protection, tender_room, unmet_tender_demand)
 
     report = {
-        "mode": "active-slot-fair-share-admission",
+        "mode": "elastic-20-20-20-tender-admission",
         "capacity": total,
         "requested": requested,
         "allowed": allowed,
+        "sublane": "qwen" if _qwen_live_streaming_lane() else "tender-general",
         "active_commitments": dict(active),
         "queued_backlog": dict(queued),
         "active_total": active_total,
@@ -266,7 +258,7 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
         "queued_tender_backlog": int(queued.get("tenders", 0)),
         "tender_max": tender_max,
         "preemption": "none; admission control only",
-        "queue_rule": "queued jobs are backlog/demand, not occupied runner slots",
-        "policy_fallback": "25% hospitality + 25% tenders + 25% gws + 25% elastic/borrowable",
+        "queue_rule": "queued jobs signal demand; only active jobs consume physical runner capacity",
+        "policy_fallback": "20 hospitality + 20 tenders + 20 gws when all demand; idle shares are immediately borrowable",
     }
     return allowed, report
