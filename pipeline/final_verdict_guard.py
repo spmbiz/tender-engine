@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import datetime, timezone
 from pathlib import Path
+
+from post_dce_scope_gate import evaluate_post_dce_scope
 
 REQUIRED_GATES = [
     "entity_geography",
@@ -22,6 +25,7 @@ REQUIRED_GATES = [
 ]
 ALLOWED_RESOLVED = {"PASS", "PASS_CONDITIONAL", "NOT_APPLICABLE"}
 FINAL_GREEN = {"FINAL_SUPER_GREEN"}
+MODEL_REVIEW = "MODEL_REVIEW_REQUIRED"
 
 
 def load_records(path: Path) -> list[dict]:
@@ -38,6 +42,14 @@ def load_records(path: Path) -> list[dict]:
     return [obj] if isinstance(obj, dict) else []
 
 
+def write_records(path: Path, records: list[dict]) -> None:
+    if path.suffix.lower() == ".jsonl":
+        text = "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in records)
+    else:
+        text = json.dumps(records, indent=2, ensure_ascii=False) + "\n"
+    path.write_text(text, encoding="utf-8")
+
+
 def _classification(rec: dict) -> str:
     return str(rec.get("final_classification") or rec.get("classification") or rec.get("verdict") or "").upper()
 
@@ -50,6 +62,44 @@ def _score(rec: dict) -> int:
         except Exception:
             pass
     return 0
+
+
+def _gate_ready(rec: dict) -> bool:
+    eq = rec.get("evidence_quality") or {}
+    if not isinstance(eq, dict):
+        eq = {}
+    return bool(eq.get("gate_readiness", rec.get("gate_readiness", False)))
+
+
+def apply_post_dce_scope_guard(rec: dict) -> bool:
+    """Resolve only authoritative, obvious physical non-broker scopes before GPT Web.
+
+    Qwen stays recall-first. Ambiguous, digital, mixed and supply/brokerable rows remain
+    MODEL_REVIEW_REQUIRED. This guard runs only after DCE evidence is gate-ready.
+    """
+    if _classification(rec) != MODEL_REVIEW or not _gate_ready(rec):
+        return False
+    result = evaluate_post_dce_scope(rec)
+    if not result.get("auto_reject"):
+        return False
+
+    previous = _classification(rec)
+    rec["classification"] = "RED"
+    if "final_classification" in rec:
+        rec["final_classification"] = "RED"
+    if rec.get("final_score") is not None:
+        rec["final_score"] = min(_score(rec), 0)
+    rec["scope_auto_rejected"] = True
+    rec["deterministic_scope_reject"] = {
+        "previous_classification": previous,
+        "classification": "RED",
+        "reason_codes": list(result.get("reason_codes") or []),
+        "matched_patterns": list(result.get("matched_patterns") or []),
+        "digital_override": bool(result.get("digital_override")),
+        "applied_at": datetime.now(timezone.utc).isoformat(),
+        "contract": "Post-DCE deterministic scope reject only; digital, mixed, ambiguous and supply/brokerable scopes are not hard rejected here.",
+    }
+    return True
 
 
 def validate_record(rec: dict) -> list[str]:
@@ -106,15 +156,27 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--review", required=True)
     args = ap.parse_args()
-    records = load_records(Path(args.review))
-    errors = []
+    path = Path(args.review)
+    records = load_records(path)
+    errors: list[str] = []
+    scope_rejected = 0
+
     for rec in records:
         if isinstance(rec, dict):
+            scope_rejected += int(apply_post_dce_scope_guard(rec))
             errors.extend(validate_record(rec))
-    result = {"records": len(records), "violations": len(errors), "errors": errors}
+
+    result = {
+        "records": len(records),
+        "scope_auto_rejected": scope_rejected,
+        "violations": len(errors),
+        "errors": errors,
+    }
     print(json.dumps(result, indent=2, ensure_ascii=False))
     if errors:
         raise SystemExit(2)
+    if scope_rejected:
+        write_records(path, records)
 
 
 if __name__ == "__main__":
