@@ -1,0 +1,41 @@
+name: Post-DCE Scope Gate Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/post_dce_scope_gate.py'
+      - 'pipeline/final_verdict_guard.py'
+      - 'pipeline/rebuild_gpt_review_bank_from_release.py'
+      - 'pipeline/rebuild_gpt_web_review_bank_v4.py'
+      - 'pipeline/refresh_gpt_inbox_live.py'
+      - 'tests/test_post_dce_scope_gate.py'
+      - 'tests/test_final_verdict_guard.py'
+      - '.github/workflows/post-dce-scope-gate-tests.yml'
+  pull_request:
+    paths:
+      - 'pipeline/post_dce_scope_gate.py'
+      - 'pipeline/final_verdict_guard.py'
+      - 'pipeline/rebuild_gpt_review_bank_from_release.py'
+      - 'pipeline/rebuild_gpt_web_review_bank_v4.py'
+      - 'pipeline/refresh_gpt_inbox_live.py'
+      - 'tests/test_post_dce_scope_gate.py'
+      - 'tests/test_final_verdict_guard.py'
+      - '.github/workflows/post-dce-scope-gate-tests.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test runner
+        run: python -m pip install pytest
+      - name: Run scope and final-verdict guards
+        run: python -m pytest -q tests/test_post_dce_scope_gate.py tests/test_final_verdict_guard.py
