@@ -1,0 +1,40 @@
+name: Freshness Conveyor Watchdog
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/freshness_conveyor_watchdog.py'
+      - '.github/workflows/freshness-conveyor-watchdog.yml'
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: freshness-conveyor-watchdog
+  cancel-in-progress: true
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install watchdog dependency
+        run: python -m pip install --disable-pip-version-check -q requests
+      - name: Repair Discovery -> Snapshot -> Ledger -> Qwen generation drift
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python pipeline/freshness_conveyor_watchdog.py
+      - name: Watchdog summary
+        if: always()
+        run: |
+          echo 'Freshness invariant: latest usable discovery generation must propagate monotonically through Snapshot, Ledger and Qwen.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'The DCE Queue Drainer remains the durable downstream consumer of persisted Qwen selections.' >> "$GITHUB_STEP_SUMMARY"
