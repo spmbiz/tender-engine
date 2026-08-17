@@ -7,15 +7,16 @@ on:
   workflow_dispatch:
     inputs:
       source_run:
-        description: DCE Fanout V2 run ID to recover into the persistent GPT Web review bank
+        description: DCE Fanout V2 run ID; leave blank to use the newest complete deep-review release
         required: false
-        default: '31941279207'
+        default: ''
   push:
     branches: [main]
     paths:
       - '.github/workflows/dce-gpt-web-handoff.yml'
       - 'pipeline/build_gpt_web_review_bank.py'
       - 'pipeline/rebuild_gpt_web_review_bank_v4.py'
+      - 'pipeline/post_dce_scope_gate.py'
 
 permissions:
   contents: write
@@ -26,6 +27,9 @@ concurrency:
 
 jobs:
   build-handoff:
+    # A workflow_run handoff is valid only when the aggregate DCE run succeeded and
+    # therefore published a complete deep-review tarball. Failed DCE runs still feed
+    # the live inbox shard-by-shard through final_verdict_guard/publish_supergreen_hot.
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 12
@@ -38,19 +42,63 @@ jobs:
           python-version: '3.12'
       - name: Resolve source DCE run
         id: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MANUAL_SOURCE_RUN: ${{ github.event.inputs.source_run || '' }}
+          WORKFLOW_SOURCE_RUN: ${{ github.event.workflow_run.id || '' }}
         shell: bash
         run: |
           set -euo pipefail
+
+          resolve_latest_complete() {
+            local page releases run_id
+            run_id=''
+            for page in 1 2 3 4 5; do
+              releases="$(gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100&page=${page}")"
+              run_id="$(jq -r '
+                [ .[]
+                  | select(.tag_name | startswith("dce-harvest-"))
+                  | . as $release
+                  | ($release.tag_name | sub("^dce-harvest-"; "")) as $id
+                  | select(any($release.assets[]?; .name == ("dce-deep-review-" + $id + ".tar.gz")))
+                  | $id
+                ][0] // empty
+              ' <<<"$releases")"
+              if [ -n "$run_id" ]; then
+                printf '%s' "$run_id"
+                return 0
+              fi
+            done
+            return 1
+          }
+
+          reason=''
           if [ "${{ github.event_name }}" = "workflow_run" ]; then
-            run_id='${{ github.event.workflow_run.id }}'
-          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            run_id='${{ github.event.inputs.source_run }}'
+            run_id="$WORKFLOW_SOURCE_RUN"
+            reason='successful_dce_workflow_run'
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "$MANUAL_SOURCE_RUN" ]; then
+            run_id="$MANUAL_SOURCE_RUN"
+            reason='explicit_manual_source_run'
           else
-            run_id='31941279207'
+            run_id="$(resolve_latest_complete || true)"
+            reason='latest_complete_dce_release'
           fi
-          test -n "$run_id"
+
+          if [ -z "$run_id" ]; then
+            echo '::error::No complete DCE deep-review release could be resolved.'
+            exit 3
+          fi
+
+          tag="dce-harvest-${run_id}"
+          asset="dce-deep-review-${run_id}.tar.gz"
+          if ! gh release view "$tag" --json assets --jq '.assets[].name' | grep -Fxq "$asset"; then
+            echo "::error::Resolved DCE run ${run_id} has no complete ${asset}; refusing stale/partial handoff."
+            exit 4
+          fi
+
           echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
-          echo "Recovering DCE run $run_id"
+          echo "reason=$reason" >> "$GITHUB_OUTPUT"
+          echo "Recovering complete DCE run $run_id ($reason)"
       - name: Download existing deep-review pack only
         env:
           GH_TOKEN: ${{ github.token }}
@@ -72,9 +120,11 @@ jobs:
       - name: Rebuild persistent GPT Web review bank without any model API
         env:
           SOURCE_RUN: ${{ steps.source.outputs.run_id }}
+          SOURCE_REASON: ${{ steps.source.outputs.reason }}
         shell: bash
         run: |
           set -euo pipefail
+          echo "Handoff source: ${SOURCE_RUN} (${SOURCE_REASON})"
           python pipeline/rebuild_gpt_web_review_bank_v4.py \
             --queue "$REVIEW_QUEUE" \
             --existing control/gpt_review_pending.json \
@@ -92,6 +142,9 @@ jobs:
               'schema':x.get('schema'),
               'latest_source_dce_run_id':x.get('latest_source_dce_run_id'),
               'incoming_gate_ready':x.get('incoming_gate_ready'),
+              'incoming_scope_eligible':x.get('incoming_scope_eligible'),
+              'incoming_scope_auto_rejected':x.get('incoming_scope_auto_rejected'),
+              'scope_auto_rejected_this_rebuild':x.get('scope_auto_rejected_this_rebuild'),
               'incoming_open':x.get('incoming_open'),
               'incoming_with_gate_evidence':x.get('incoming_with_gate_evidence'),
               'pending_total':x.get('count'),
