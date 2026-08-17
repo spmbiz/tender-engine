@@ -1,0 +1,134 @@
+name: Team 60 Migrate Tender
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/team60-migrate-tender.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Apply scoped transfer and Team 60 migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          roots=[Path('.github/workflows'),Path('pipeline'),Path('config'),Path('scripts')]
+          suffixes={'.yml','.yaml','.json','.py','.ps1','.sh','.md','.toml'}
+          excluded={'team60-capacity-audit.yml','team60-migrate-tender.yml'}
+          repo_repls={
+              'walidgdg1-ai/tender-engine':'spmbiz/tender-engine',
+              'walidgdg1-ai/evergreenleadminer':'spmbiz/evergreenleadminer',
+              'walidgdg1-ai/coldemailtool':'spmbiz/coldemailtool',
+          }
+
+          def write_if_changed(p,s,old):
+              if s!=old:
+                  p.write_text(s,encoding='utf-8')
+                  print('UPDATED',p)
+
+          # Migrate operational repo coordinates only. Durable control/data stores
+          # are intentionally not rewritten, preserving historical provenance.
+          for root in roots:
+              if not root.exists(): continue
+              for p in root.rglob('*'):
+                  if not p.is_file() or p.suffix.lower() not in suffixes or p.name in excluded: continue
+                  try: old=p.read_text(encoding='utf-8')
+                  except Exception: continue
+                  s=old
+                  for a,b in repo_repls.items(): s=s.replace(a,b)
+                  write_if_changed(p,s,old)
+
+          exact={
+              '.github/workflows/global-official-smoke.yml':[
+                  ('max-parallel: 20','max-parallel: 60'),
+              ],
+              '.github/workflows/qwen-live-classification.yml':[
+                  ("QWEN_WORKERS_REQUESTED: '8'","QWEN_WORKERS_REQUESTED: '16'"),
+                  ("requested=max(1,min(20,int(os.environ.get('QWEN_WORKERS_REQUESTED') or 8)))","requested=max(1,min(60,int(os.environ.get('QWEN_WORKERS_REQUESTED') or 16)))"),
+              ],
+              'pipeline/global_admission.py':[
+                  ('cap_default = 3\n                reason = "Qwen notice classification continuously feeds', 'cap_default = 12\n                reason = "Qwen notice classification continuously feeds'),
+                  ('cap_default = 5\n                reason = "rolling Qwen exact-unseen', 'cap_default = 8\n                reason = "rolling Qwen exact-unseen'),
+                  ('cap = max(1, min(8, int(os.getenv("DCE_QWEN_LIVE_FAST_LANE_CAP") or cap_default)))','cap = max(1, min(24, int(os.getenv("DCE_QWEN_LIVE_FAST_LANE_CAP") or cap_default)))'),
+              ],
+          }
+          for rel,repls in exact.items():
+              p=Path(rel)
+              if not p.exists(): raise SystemExit(f'missing expected file: {rel}')
+              old=p.read_text(encoding='utf-8'); s=old
+              for a,b in repls:
+                  s=s.replace(a,b)
+              write_if_changed(p,s,old)
+          PY
+
+      - name: Validate Tender migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile \
+            pipeline/global_admission.py \
+            pipeline/fleet_controller.py \
+            pipeline/fleet_controller_v5.py \
+            pipeline/setup_circleci_bridge.py
+          git diff --check
+          python - <<'PY'
+          from pathlib import Path
+          ga=Path('pipeline/global_admission.py').read_text(encoding='utf-8')
+          assert 'GLOBAL_REPO = "spmbiz/evergreenleadminer"' in ga
+          assert 'TENDER_REPO = "spmbiz/tender-engine"' in ga
+          assert '"capacity": 60' in ga
+          assert '"max_slots": 60' in ga
+          assert 'min(24, int(os.getenv("DCE_QWEN_LIVE_FAST_LANE_CAP")' in ga
+          q=Path('.github/workflows/qwen-live-classification.yml').read_text(encoding='utf-8')
+          assert "QWEN_WORKERS_REQUESTED: '16'" in q
+          assert 'min(60,int(os.environ.get' in q
+          smoke=Path('.github/workflows/global-official-smoke.yml').read_text(encoding='utf-8')
+          assert 'max-parallel: 60' in smoke
+          for root in [Path('.github/workflows'),Path('pipeline')]:
+              for p in root.rglob('*'):
+                  if not p.is_file() or p.name.startswith('team60-'): continue
+                  try:s=p.read_text(encoding='utf-8')
+                  except Exception:continue
+                  for old in ['walidgdg1-ai/tender-engine','walidgdg1-ai/evergreenleadminer','walidgdg1-ai/coldemailtool']:
+                      assert old not in s,(p,old)
+          print('TEAM60_TENDER_VALIDATION=PASS')
+          PY
+          git diff --stat
+
+      - name: Persist migration atomically
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'spmbiz-team60-migrator'
+          git config user.email 'actions@users.noreply.github.com'
+          git add .github/workflows pipeline config scripts 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo 'TEAM60_TENDER no_delta=1'
+            exit 0
+          fi
+          git commit -m '[team60] migrate Tender fleet to spmbiz capacity 60 [skip ci]'
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then
+              echo "TEAM60_TENDER pushed=1 sha=$(git rev-parse HEAD)"
+              exit 0
+            fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((attempt*2))
+          done
+          echo 'TEAM60_TENDER push_failed=1' >&2
+          exit 1
