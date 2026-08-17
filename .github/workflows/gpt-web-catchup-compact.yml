@@ -1,0 +1,37 @@
+name: GPT Web Catchup Compact
+on:
+  push:
+    paths:
+      - '.github/workflows/gpt-web-catchup-compact.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  compact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compact residual queue
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          d=json.loads(pathlib.Path('control/gpt_supergreen_inbox.json').read_text(encoding='utf-8'))
+          q=d.get('review_queue') or []
+          out=pathlib.Path('control/gpt_web_catchup_index.jsonl')
+          with out.open('w',encoding='utf-8') as f:
+            f.write(json.dumps({'_meta':{'count':len(q),'source_inbox_updated_at':d.get('updated_at'),'latest_source_dce_run_id':d.get('latest_source_dce_run_id')}},ensure_ascii=False)+'\n')
+            for r in q:
+              f.write(json.dumps({k:r.get(k) for k in ['candidate_id','title','buyer','portal','notice_url','deadline','estimated_value','currency','gpt_priority_score','review_stage','spm_post_dce_score','spm_fit_band','spm_fit_reasons','spm_friction_signals','content_quality','gate_readiness','evidence_gate_coverage','deadline_authority_status','source_dce_run_id','source_shard','review_key']},ensure_ascii=False)+'\n')
+          print('COUNT',len(q))
+          PY
+      - name: Persist
+        shell: bash
+        run: |
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add control/gpt_web_catchup_index.jsonl
+          git commit -m 'gpt-web: compact residual queue [skip ci]' || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
