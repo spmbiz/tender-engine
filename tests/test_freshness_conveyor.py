@@ -14,7 +14,11 @@ def test_watchdog_repairs_stages_in_dependency_order():
     assert decide(StageState("42", "41", "41", "41")) == ("SNAPSHOT", "42")
     assert decide(StageState("42", "42", "41", "41")) == ("LEDGER", "42")
     assert decide(StageState("42", "42", "42", "41")) == ("QWEN", "42")
-    assert decide(StageState("42", "42", "42", "42")) == ("HEALTHY", "42")
+    assert decide(StageState("42", "42", "42", "42", 0)) == ("HEALTHY", "42")
+
+
+def test_watchdog_keeps_qwen_hot_while_residual_queue_remains():
+    assert decide(StageState("42", "42", "42", "42", 38113)) == ("QWEN", "42")
 
 
 def test_watchdog_never_advances_without_usable_discovery():
