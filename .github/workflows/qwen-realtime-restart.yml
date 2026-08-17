@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/qwen-realtime-restart.yml'
+      - 'pipeline/global_admission.py'
 
 permissions:
   actions: write
@@ -21,14 +22,14 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-      - name: Replace long Qwen notice pass with short continuously-published shards
+      - name: Replace long or zero-admission Qwen pass with short continuously-published shards
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           for rid in $(gh run list --workflow qwen-live-classification.yml --limit 10 --json databaseId,status --jq '.[] | select(.status=="in_progress" or .status=="queued") | .databaseId'); do
-            echo "Cancelling stale long Qwen pass $rid"
+            echo "Cancelling superseded Qwen pass $rid"
             gh run cancel "$rid" || true
           done
           for i in $(seq 1 30); do
