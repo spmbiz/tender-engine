@@ -1,10 +1,10 @@
 {
   "schema": "GPT_REVIEW_HOT_V3",
-  "updated_at": "2026-08-17T09:14:31.064983+00:00",
+  "updated_at": "2026-08-17T09:14:54.650169+00:00",
   "latest_dce_run_id": 32013885449,
-  "latest_shard": 8,
+  "latest_shard": 9,
   "generation_reset": false,
-  "count": 6,
+  "count": 9,
   "items": [
     {
       "candidate_id": "US-SAM:493b81b1d057492ba7d0e331378fe19a",
@@ -300,6 +300,392 @@
       "spm_fit_reasons": [
         "training-course"
       ],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
+      "candidate_id": "US-SAM:b8b0b25d9aa2405597740357d4cd02c3",
+      "title": "Financial Management - Financial Improvement Audit Remediation (FIAR)",
+      "buyer": "DEPT OF DEFENSE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/opp/b8b0b25d9aa2405597740357d4cd02c3/view",
+      "deadline": "2026-08-31T06:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 60,
+      "priority_score": 60,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNLABELLED_DCE_DEADLINE_CONFLICT_REVIEW_REQUIRED",
+        "conflict": true,
+        "notice_deadline_raw": "2026-08-31T06:00:00+00:00",
+        "notice_deadline_date": "2026-08-31",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [
+          "2018-08-28",
+          "2018-09-14",
+          "2024-04-30",
+          "2024-06-01",
+          "2026-03-31"
+        ],
+        "labelled_evidence": [],
+        "evidence": [
+          {
+            "date": "2026-03-31",
+            "match": "2026-03-31",
+            "context": "rovide any additional documentation over the variance. | Air Force General Fund | True | AFIPACAP-504 | AF-5515\nAF-5263 | Lack of Operating Materials and Supplies Repair Allowance | GF-FIN-2018-034(R5) | SAF/FM | Open | 2026-03-31 00:00:00 | Although the Air Force asserts that DOD FMR Volume 4 Chapter 4 Paragraph 040303.D is the basis for valuing Air Force held for repair OM&S, the Air Force does not report a repair allowance for Held for Repair "
+          },
+          {
+            "date": "2018-08-28",
+            "match": "August 28, 2018",
+            "context": "l statement note.  The Air Force does not report Inventory and Related Property net of an allowance for repairs on the balance sheet.EY requested an update for the Air Force’s held for repair OM&S accounting policies on August 28, 2018 but had not received a response by September 14, 2018. | Air Force General Fund | True | AFIPACAP-2885 | AF-5109\nAF-5246 | Trading Partner Adj\ns recorded in FY 2019 and FY 2020 due to the PRV rebaseline in FY 2019o A ba"
+          },
+          {
+            "date": "2018-09-14",
+            "match": "September 14, 2018",
+            "context": "ventory and Related Property net of an allowance for repairs on the balance sheet.EY requested an update for the Air Force’s held for repair OM&S accounting policies on August 28, 2018 but had not received a response by September 14, 2018. | Air Force General Fund | True | AFIPACAP-2885 | AF-5109\nAF-5246 | Trading Partner Adj\ns recorded in FY 2019 and FY 2020 due to the PRV rebaseline in FY 2019o A batch file processing error between NexGen-IT and DEAMS "
+          },
+          {
+            "date": "2024-04-30",
+            "match": "2024-04-30",
+            "context": "orce General Fund | True | AFIPACAP-13238 | AF-5528\nAF-5806 | Lack of a sufficient analysis governing the appropriate accounting treatment of BRAC E&DL liabilities funded by TI-97 | GF-FIN-2021-005(R2) | SAF/FM | Open | 2024-04-30 00:00:00 | Based on inquiries made in FY20, and high-level testing procedures, as well as current year inquiries and additional information obtained, EY identified that the funding and project costs remain under departm"
+          },
+          {
+            "date": "2024-06-01",
+            "match": "2024-06-01",
+            "context": "of accounting.  | Air Force General Fund | True | AFIPACAP-13911 | AF-5747\nAF-5681 | Further Evaluation Needed in Determining the Net Realizable Value of Military Equipment Assets | GF-FIN-2021-006(R2) | SAF/FM | Open | 2024-06-01 00:00:00 | DAF has not sufficiently evaluated the materiality, and if appropriate, developed policies on the related accounting treatment for the following:1.Estimated salvage/residual value at time of acquisition— Depr"
+          }
+        ],
+        "context_stats": {
+          "gate_contexts": 38,
+          "corpus_contexts": 54,
+          "unique_contexts": 77
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNLABELLED_DCE_DEADLINE_CONFLICT_REVIEW_REQUIRED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 14,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "ment related to the NIMMS OM&S Process | WCF-FIN-2023-011 | AFMC/FM | Open | 2024-12-13 00:00:00 | EY identified the following internal control deficiencies within the NIMMS OM&S assessable unit (AU), sorted into the categories detailed above:Design Deficiency► Design Deficiency #1: DAF KC 4.8.700 (OMS-KC1): When parts are available in the Y-Store, DLA personnel will print the NIMMS Direct Issue Document and check the Storage Location for availability of the material. If the material is available as requested, the DLA representative will prepare and ship the material to the specific RCC delivery location for pickup. This information is also resident in the maintenance and supply systems (B51b.000 page 3/).o The current design of this control does not mitigate the identified risks of material misstatement and is therefore considered a design deficiency. This control’s design and documentation should include the process and documentation of ensuring that the OM&S balance is appropriately decreased, as NIMMS decreases the balance immediately upon interface with ABOM, and that the parts are pulled timely from the NIMMS stores. As part of the control, sufficient audit evidence should be retained of any discrepancy investigations and corrective actions taken. As such, EY was unable to reperfo",
+            "source": null,
+            "match": "resident"
+          },
+          {
+            "text": "a DFAS employee is performing a secondary review and approving JVs over $1 billion from all WCF systems on behalf of USAF. WCF-FIN-2018-006 | Lack of Standard Operating Procedure (SOPs) and lack of precision in management review controls over Contract Authority | SAF/FM | Closed | During the planning phase, EY reviewed the Contract Authority narrative and conducted a walkthrough with the SAF/FMBOR personnel about the process by which the working capital fund receives funding. EY also walked through the process over the key control C-4.1.18 which states that SAF/FMBOR visually inspects the Annual Operating Budget (AOB) and compares it to the President's Budget (PB). There is no standard process by which the documents are reconciled. EY requested documentation supporting the performance of this control but was informed that no formal documentation exists.EY also inquired as to whether the SAF/FMBOR team follows a more specific Standard Operating Procedure (SOP) or a Desktop manual over the Contract Authority process. Ms. Jennifer Matney, Assistant for Revolving Funds, stated that there is no written documentation, instruction manual, or training available for the Contract Authority process. WCF-FIN-2018-009(R1) | Improper Postings of Inventory Transactions per USSGL Guidance | AFMC/FM | Cl",
+            "source": null,
+            "match": "resident"
+          },
+          {
+            "text": "ack of Aspects of an Effective Internal Control Environment - NIMMS Inventory | AFMC/FM | Closed | EY identified the following internal control deficiencies within the NIMMS OM&S assessable unit (AU), sorted into the categories detailed above:Design Deficiency? Design Deficiency #1: DAF KC 4.8.700 (OMS-KC1): When parts are available in the Y-Store, DLA personnel will print the NIMMS Direct Issue Document and check the Storage Location for availability of the material. If the material is available as requested, the DLA representative will prepare and ship the material to the specific RCC delivery location for pickup. This information is also resident in the maintenance and supply systems.o The current design of this control does not mitigate the identified risks of material misstatement and is therefore considered a design deficiency. This control's design and documentation should include the process and documentation of ensuring that the OM&S balance is appropriately decreased, as NIMMS decreases the balance immediately upon interface with ABOM, and that the parts are pulled timely from the NIMMS stores. As part of the control, sufficient audit evidence should be retained of any discrepancy investigations and corrective actions taken. As such, EY was unable to reperform management's rev",
+            "source": null,
+            "match": "resident"
+          },
+          {
+            "text": "of Aspects of an Effective Control Environment Related to the NIMMS OMS Process | AFMC/FM | Open | EY identified the following internal control deficiencies within the NIMMS OM&S assessable unit (AU), sorted into the categories detailed above:Design Deficiency► Design Deficiency #1: DAF KC 4.8.700 (OMS-KC1): When parts are available in the Y-Store, DLA personnel will print the NIMMS Direct Issue Document and check the Storage Location for availability of the material. If the material is available as requested, the DLA representative will prepare and ship the material to the specific RCC delivery location for pickup. This information is also resident in the maintenance and supply systems (B51b.000 page 3/).o The current design of this control does not mitigate the identified risks of material misstatement and is therefore considered a design deficiency. This control’s design and documentation should include the process and documentation of ensuring that the OM&S balance is appropriately decreased, as NIMMS decreases the balance immediately upon interface with ABOM, and that the parts are pulled timely from the NIMMS stores. As part of the control, sufficient audit evidence should be retained of any discrepancy investigations and corrective actions taken. As such, EY was unable to reperfo",
+            "source": null,
+            "match": "resident"
+          }
+        ],
+        "turnover_financial": [
+          {
+            "text": "ry good when 95% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is satisfactory when 90% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is marginal when 80 to 89% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is unacceptable when < 80% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. Maintain stable key personnel workforce | Performance is excellent when the turnover rate for key personnel does not exceed 5%. | Performance is very good when the turnover rate for key personnel does not exceed 10%. | Performance is satisfactory when the turnover rate for key personnel does not exceed 20%. | Performance is marginal when the turnover rate for key personnel does not exceed 30%. | Performance is unacceptable when the turnover rate for key personnel exceeds 30%. Effectively replaces/ substitutes key personnel | Performance is excellent when key personnel vacancies are filled with qualified personnel within 5 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO",
+            "source": null,
+            "match": "turnover"
+          },
+          {
+            "text": "s previously negotiated by the CO. | Performance is satisfactory when 90% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is marginal when 80 to 89% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is unacceptable when < 80% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. Maintain stable key personnel workforce | Performance is excellent when the turnover rate for key personnel does not exceed 5%. | Performance is very good when the turnover rate for key personnel does not exceed 10%. | Performance is satisfactory when the turnover rate for key personnel does not exceed 20%. | Performance is marginal when the turnover rate for key personnel does not exceed 30%. | Performance is unacceptable when the turnover rate for key personnel exceeds 30%. Effectively replaces/ substitutes key personnel | Performance is excellent when key personnel vacancies are filled with qualified personnel within 5 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is no mission impact due to position vacancies or unqualified personnel. | Pe",
+            "source": null,
+            "match": "turnover"
+          },
+          {
+            "text": "nel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is marginal when 80 to 89% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is unacceptable when < 80% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. Maintain stable key personnel workforce | Performance is excellent when the turnover rate for key personnel does not exceed 5%. | Performance is very good when the turnover rate for key personnel does not exceed 10%. | Performance is satisfactory when the turnover rate for key personnel does not exceed 20%. | Performance is marginal when the turnover rate for key personnel does not exceed 30%. | Performance is unacceptable when the turnover rate for key personnel exceeds 30%. Effectively replaces/ substitutes key personnel | Performance is excellent when key personnel vacancies are filled with qualified personnel within 5 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is no mission impact due to position vacancies or unqualified personnel. | Performance is very good when key personnel vacancies are filled with qualified personnel within",
+            "source": null,
+            "match": "turnover"
+          },
+          {
+            "text": "| Performance is marginal when 80 to 89% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is unacceptable when < 80% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. Maintain stable key personnel workforce | Performance is excellent when the turnover rate for key personnel does not exceed 5%. | Performance is very good when the turnover rate for key personnel does not exceed 10%. | Performance is satisfactory when the turnover rate for key personnel does not exceed 20%. | Performance is marginal when the turnover rate for key personnel does not exceed 30%. | Performance is unacceptable when the turnover rate for key personnel exceeds 30%. Effectively replaces/ substitutes key personnel | Performance is excellent when key personnel vacancies are filled with qualified personnel within 5 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is no mission impact due to position vacancies or unqualified personnel. | Performance is very good when key personnel vacancies are filled with qualified personnel within 10 calendar days of vacancy, unless approved in writing or otherwise directed in advance",
+            "source": null,
+            "match": "turnover"
+          }
+        ],
+        "references_experience": [
+          {
+            "text": "/xs:attribute> <xs:attribute ref=\"pc:EntityName\"></xs:attribute> <xs:attribute ref=\"pc:SystemInstanceName\"></xs:attribute> <xs:attribute ref=\"pc:AssociationName\"></xs:attribute> </xs:complexType> </xs:element> <xs:attribute name=\"EntityNamespace\" type=\"xs:string\"></xs:attribute> <xs:attribute name=\"EntityName\" type=\"xs:string\"></xs:attribute> <xs:attribute name=\"SystemInstanceName\" type=\"xs:string\"></xs:attribute> <xs:attribute name=\"AssociationName\" type=\"xs:string\"></xs:attribute> <xs:element name=\"BDCEntity\"> <xs:complexType> <xs:sequence> <xs:element ref=\"pc:EntityDisplayName\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityInstanceReference\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId1\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId2\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId3\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId4\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId5\" minOccurs=\"0\"></xs:element> </xs:sequence> </xs:complexType> </xs:element> <xs:element name=\"EntityDisplayName\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityInstanceReference\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId1\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId2\" type=\"xs:string\"></xs:element> <xs:element name",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "ibute> <xs:element name=\"BDCEntity\"> <xs:complexType> <xs:sequence> <xs:element ref=\"pc:EntityDisplayName\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityInstanceReference\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId1\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId2\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId3\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId4\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId5\" minOccurs=\"0\"></xs:element> </xs:sequence> </xs:complexType> </xs:element> <xs:element name=\"EntityDisplayName\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityInstanceReference\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId1\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId2\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId3\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId4\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId5\" type=\"xs:string\"></xs:element> <xs:element name=\"Terms\"> <xs:complexType> <xs:sequence> <xs:element ref=\"pc:TermInfo\" minOccurs=\"0\" maxOccurs=\"unbounded\"></xs:element> </xs:sequence> </xs:complexType> </xs:element> <xs:element name=\"TermInfo\"> <xs:complexType> <xs:sequence> <xs:element ref=\"pc:TermName\" minOccurs=\"0\"></xs:element> <xs:element ref",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "7\" spans=\"1:2\" ht=\"46.5\" x14ac:dyDescent=\"0.35\"><c r=\"A27\" s=\"9\"/><c r=\"B27\" s=\"6\" t=\"s\"><v>30</v></c></row><row r=\"28\" spans=\"1:2\" ht=\"62.5\" thickBot=\"1\" x14ac:dyDescent=\"0.4\"><c r=\"A28\" s=\"10\"/><c r=\"B28\" s=\"7\" t=\"s\"><v>31</v></c></row></sheetData><mergeCells count=\"7\"><mergeCell ref=\"A24:A28\"/><mergeCell ref=\"A2:A3\"/><mergeCell ref=\"B2:B3\"/><mergeCell ref=\"A4:A8\"/><mergeCell ref=\"A9:A13\"/><mergeCell ref=\"A14:A18\"/><mergeCell ref=\"A19:A23\"/></mergeCells><pageMargins left=\"0.7\" right=\"0.7\" top=\"0.75\" bottom=\"0.75\" header=\"0.3\" footer=\"0.3\"/></worksheet> ===== FILE: files/Appendix_B_Deliverables.xlsx ===== [SHEET Deliverables] Deliverable | Reference | Due Date/Frequency | AU | Delivery | Updates/Notes Updated A-123 Publications (AFPD, AFI, RMIC Playbook/DAFMAN) | PWS Section 2.1a.1 | Annually, Q1 | A-123 | Email to govt POCs | Quarterly Statement of Assurance Submission Packages | PWS Section 2.1a.2 & 2.1a.6.3 | Quarterly Q1 ~ 1/24 Q2 ~ 4/03 Q3 ~ 6/26 Q4 ~ 10/02 | A-123 | Email to govt POCs | As required by OUSD(C) SOA Handbook Draft Self Identified Deficiencies (SIDs) | PWS Section 2.1a.3 | As required | A-123 | Email to govt POCs | Certification Statement Call Letter | PWS Section 2.1a.3 | Annual, Q1 | A-123 | Email to govt POCs | Annual RMIC Training | PWS Section 2.1a.4 | Annual",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "arterly Q1 ~ 1/24 Q2 ~ 4/03 Q3 ~ 6/26 Q4 ~ 10/02 | A-123 | Email to govt POCs | As required by OUSD(C) SOA Handbook Draft Self Identified Deficiencies (SIDs) | PWS Section 2.1a.3 | As required | A-123 | Email to govt POCs | Certification Statement Call Letter | PWS Section 2.1a.3 | Annual, Q1 | A-123 | Email to govt POCs | Annual RMIC Training | PWS Section 2.1a.4 | Annually, Q1 | A-123 | Posted to MyLearning | Modules 1 - 5 are posted to MyLearning. Module 0 is presented live twice to accomodate the organizations in different time zones. Both sessions are recorded and the better of the 2 is posted to the FIAR communications web site for reference. Summary of Aggregated Deficiencies (SAD) Template | PWS Section 2.1a.5 | Annually, Q3 | A-123 | Email to govt POCs | Schedule for the full A-123 Cycle | PWS Section 2.1a.6 | Annually, Q4 | A-123 | Email to govt POCs | DAF General Fund Scoping Document | PWS Section 2.1a.6.1 | Annually, Draft in Q3 and Final in Q1 | A-123 | Email to govt POCs | Updated Process Cycle Memorandum (PCM) Template | PWS Section 2.1a.6.2 | Annually, Q3 draft and Final in Q4 | A-123 | Data entered into eGRC | Assessable Unit (AU) PCM Review comments | PWS Section 2.1a.6.2 | Annually ,Q1 | A-123 | Data entered into eGRC | Updated Control Evaluation Matrix (CEM)",
+            "source": null,
+            "match": "reference"
+          }
+        ],
+        "certifications_partner": [
+          {
+            "text": "bottom=\"0.75\" header=\"0.3\" footer=\"0.3\"/></worksheet> ===== FILE: files/Appendix_B_Deliverables.xlsx ===== [SHEET Deliverables] Deliverable | Reference | Due Date/Frequency | AU | Delivery | Updates/Notes Updated A-123 Publications (AFPD, AFI, RMIC Playbook/DAFMAN) | PWS Section 2.1a.1 | Annually, Q1 | A-123 | Email to govt POCs | Quarterly Statement of Assurance Submission Packages | PWS Section 2.1a.2 & 2.1a.6.3 | Quarterly Q1 ~ 1/24 Q2 ~ 4/03 Q3 ~ 6/26 Q4 ~ 10/02 | A-123 | Email to govt POCs | As required by OUSD(C) SOA Handbook Draft Self Identified Deficiencies (SIDs) | PWS Section 2.1a.3 | As required | A-123 | Email to govt POCs | Certification Statement Call Letter | PWS Section 2.1a.3 | Annual, Q1 | A-123 | Email to govt POCs | Annual RMIC Training | PWS Section 2.1a.4 | Annually, Q1 | A-123 | Posted to MyLearning | Modules 1 - 5 are posted to MyLearning. Module 0 is presented live twice to accomodate the organizations in different time zones. Both sessions are recorded and the better of the 2 is posted to the FIAR communications web site for reference. Summary of Aggregated Deficiencies (SAD) Template | PWS Section 2.1a.5 | Annually, Q3 | A-123 | Email to govt POCs | Schedule for the full A-123 Cycle | PWS Section 2.1a.6 | Annually, Q4 | A-123 | Email to govt POCs | DAF Gene",
+            "source": null,
+            "match": "Certification"
+          },
+          {
+            "text": "rdance with a mutually agreed upon schedule, Demonstration and UAT | A-123 | | Automated initiation of fraud control assessment to populate OUSD(C) Template | PWS Paragraph 2.1.1 | In accordance with a mutually agreed upon schedule, Demonstration and UAT | A-123 | | Automated data quality control assessments and population of the OUSD(C) data quality testing and reporting template | PWS Paragraph 2.1.1 | In accordance with a mutually agreed upon schedule, Demonstration and UAT | A-123 | | User training, and configuration documentation | PWS Paragraph 2.1.1 | Prior to Go-Live, “How to” function embedded in the GRC system | A-123 | | Certification Statement Call Letter | PWS Paragraph 2.1. | Annual, Quarter 4 | A-123 | | SOC 1 Monitoring Reports | PWS Paragraph 2.1.7 | Annual, End of Quarter 3 | Service Provider | Email to govt POCs | SOC 1 Report Feedback | PWS Paragraph 2.1.7 | Annual, as required by the Service Provider Working Group | Service Provider | Email to govt POCs | SOC 1 Deficiency Tracker | PWS Paragraph 2.1.7 | Annual, two weeks after receipt of last SOC 1 Report | Service Provider | Email to govt POCs | Review/refresh Service Provider MOUs | PWS Paragraph 2.1.7 | Annual, initiate review 60 days prior to expiration date | Service Provider | Email to govt POCs | Re",
+            "source": null,
+            "match": "Certification"
+          },
+          {
+            "text": "<t>Annual, after completion of PCMs/CEMs</t></si><si><t>CUEC Update Distribution</t></si><si><t>Bi-Annual, within five business days of the OUSD(C) Service Provider Working Group</t></si><si><t>Updated A-123 Publications (AFPD, AFI, RMIC Playbook/DAFMAN)</t></si><si><t>Annually, Q1</t></si><si><t>A-123</t></si><si><t>CAP for A-123 deficiencies (Self-Identified or External)</t></si><si><t>Quarterly</t></si><si><t>Quarterly Statement of Assurance Submission Packages</t></si><si><t>Quarterly Q1 ~ 1/24 Q2 ~ 4/03 Q3 ~ 6/26 Q4 ~ 10/02</t></si><si><t xml:space=\"preserve\">As required by OUSD(C) SOA Handbook </t></si><si><t>As required</t></si><si><t>Certification Statement Call Letter</t></si><si><t>Annual, Q1</t></si><si><t>Annual RMIC Training</t></si><si><t>PWS Section 2.1a.4</t></si><si><t>Posted to MyLearning</t></si><si><t>Modules 1 - 5 are posted to MyLearning. Module 0 is presented live twice to accomodate the organizations in different time zones. Both sessions are recorded and the better of the 2 is posted to the FIAR communications web site for reference.</t></si><si><t>Schedule for the full A-123 Cycle</t></si><si><t>PWS Section 2.1a.5</t></si><si><t>Annually, Q4</t></si><si><t>Summary of Aggregated Deficiencies (SAD) Template</t></si><si><t>PWS Section 2.1a.6</t></si><si><t>Annually, Q3",
+            "source": null,
+            "match": "Certification"
+          },
+          {
+            "text": "diation of the CDS 3801 SOD, the DFAS Branch Chief only uses the support package PDF created by the “IPAC” lead accountant, and did not incorporate the source files or SOD worksheet Excel files as part of their review for researching underlying reasons for SOD variances within the Combined SOD Report. Source files and SOD worksheet include the following: • The IPAC month-to-date Transactions Received and Transactions Sent Report - Report is generated and sent from the Treasury IPAC system and shows the overall sum in net dollars for the transactions the Accountability and Reconciliation Division prepared under CDS 3801. • While the IPAC SOD certification statement, which attests to evaluation of management internal controls performed in accordance with DFAS policy and guidance, the certification statement does not specify procedures performed by the supervisor to identify misstatements, items for follow ups, or procedures to determine whether those items on the SOD were appropriately addressed. Similarly, documentation retained does not include sufficient evidence to support procedures performed. The Branch Chief (supervisor) responsible for the review of the DIT SOD did not adequately document their review procedures over the spreadsheet retained: • The supervisor utilizes Daily Disbursi",
+            "source": null,
+            "match": "certification"
+          }
+        ],
+        "staffing_team": [
+          {
+            "text": "unless previously negotiated by the CO. | Performance is very good when 95% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is satisfactory when 90% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is marginal when 80 to 89% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is unacceptable when < 80% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. Maintain stable key personnel workforce | Performance is excellent when the turnover rate for key personnel does not exceed 5%. | Performance is very good when the turnover rate for key personnel does not exceed 10%. | Performance is satisfactory when the turnover rate for key personnel does not exceed 20%. | Performance is marginal when the turnover rate for key personnel does not exceed 30%. | Performance is unacceptable when the turnover rate for key personnel exceeds 30%. Effectively replaces/ substitutes key personnel | Performance is excellent when key personnel vacancies are filled with qualified personnel within 5 calendar days of vacancy, unless approve",
+            "source": null,
+            "match": "key personnel"
+          },
+          {
+            "text": "f qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is satisfactory when 90% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is marginal when 80 to 89% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is unacceptable when < 80% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. Maintain stable key personnel workforce | Performance is excellent when the turnover rate for key personnel does not exceed 5%. | Performance is very good when the turnover rate for key personnel does not exceed 10%. | Performance is satisfactory when the turnover rate for key personnel does not exceed 20%. | Performance is marginal when the turnover rate for key personnel does not exceed 30%. | Performance is unacceptable when the turnover rate for key personnel exceeds 30%. Effectively replaces/ substitutes key personnel | Performance is excellent when key personnel vacancies are filled with qualified personnel within 5 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is no missi",
+            "source": null,
+            "match": "key personnel"
+          },
+          {
+            "text": "iated by the CO. | Performance is satisfactory when 90% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is marginal when 80 to 89% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is unacceptable when < 80% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. Maintain stable key personnel workforce | Performance is excellent when the turnover rate for key personnel does not exceed 5%. | Performance is very good when the turnover rate for key personnel does not exceed 10%. | Performance is satisfactory when the turnover rate for key personnel does not exceed 20%. | Performance is marginal when the turnover rate for key personnel does not exceed 30%. | Performance is unacceptable when the turnover rate for key personnel exceeds 30%. Effectively replaces/ substitutes key personnel | Performance is excellent when key personnel vacancies are filled with qualified personnel within 5 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is no mission impact due to position vacancies or unqualified personnel. | Performance is very good",
+            "source": null,
+            "match": "key personnel"
+          },
+          {
+            "text": "at the start of the contract, unless previously negotiated by the CO. | Performance is marginal when 80 to 89% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is unacceptable when < 80% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. Maintain stable key personnel workforce | Performance is excellent when the turnover rate for key personnel does not exceed 5%. | Performance is very good when the turnover rate for key personnel does not exceed 10%. | Performance is satisfactory when the turnover rate for key personnel does not exceed 20%. | Performance is marginal when the turnover rate for key personnel does not exceed 30%. | Performance is unacceptable when the turnover rate for key personnel exceeds 30%. Effectively replaces/ substitutes key personnel | Performance is excellent when key personnel vacancies are filled with qualified personnel within 5 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is no mission impact due to position vacancies or unqualified personnel. | Performance is very good when key personnel vacancies are filled with qualified personnel within 10 calendar days of va",
+            "source": null,
+            "match": "key personnel"
+          }
+        ],
+        "insurance_bonds": [
+          {
+            "text": "\"s\"><v>31</v></c></row></sheetData><mergeCells count=\"7\"><mergeCell ref=\"A24:A28\"/><mergeCell ref=\"A2:A3\"/><mergeCell ref=\"B2:B3\"/><mergeCell ref=\"A4:A8\"/><mergeCell ref=\"A9:A13\"/><mergeCell ref=\"A14:A18\"/><mergeCell ref=\"A19:A23\"/></mergeCells><pageMargins left=\"0.7\" right=\"0.7\" top=\"0.75\" bottom=\"0.75\" header=\"0.3\" footer=\"0.3\"/></worksheet> ===== FILE: files/Appendix_B_Deliverables.xlsx ===== [SHEET Deliverables] Deliverable | Reference | Due Date/Frequency | AU | Delivery | Updates/Notes Updated A-123 Publications (AFPD, AFI, RMIC Playbook/DAFMAN) | PWS Section 2.1a.1 | Annually, Q1 | A-123 | Email to govt POCs | Quarterly Statement of Assurance Submission Packages | PWS Section 2.1a.2 & 2.1a.6.3 | Quarterly Q1 ~ 1/24 Q2 ~ 4/03 Q3 ~ 6/26 Q4 ~ 10/02 | A-123 | Email to govt POCs | As required by OUSD(C) SOA Handbook Draft Self Identified Deficiencies (SIDs) | PWS Section 2.1a.3 | As required | A-123 | Email to govt POCs | Certification Statement Call Letter | PWS Section 2.1a.3 | Annual, Q1 | A-123 | Email to govt POCs | Annual RMIC Training | PWS Section 2.1a.4 | Annually, Q1 | A-123 | Posted to MyLearning | Modules 1 - 5 are posted to MyLearning. Module 0 is presented live twice to accomodate the organizations in different time zones. Both sessions are recorded and the better of",
+            "source": null,
+            "match": "Assurance"
+          },
+          {
+            "text": "ection 17.1 | Within 10 days of contract award | All | Via email to COR | [SHEET Potential RFP Deliverables ] Deliverable | Reference | Due Date/Frequency | AU | Delivery | Updates/Notes Management/Staffing Plan | Request for Proposal | All plans listed at left will be submitted as part of the Proposal, and will be incorporated into the contract. | | · All documents shall be delivered IAW the criteria established in the ID/IQ RFP Technical Criteria · The OCI Plan shall also be submitted IAW RFP/contract section 4, paragraph 4a-6 | The Contractor shall provide any changes or updates to the Government PMO (CO, Program Manager, Quality Assurance Manager (QAM)) and COR prior to Contractor implementation. Organizational Conflict of Interest (OCI) Plan | Request for Proposal | All plans listed at left will be submitted as part of the Proposal, and will be incorporated into the contract. | | · All documents shall be delivered IAW the criteria established in the ID/IQ RFP Technical Criteria · The OCI Plan shall also be submitted IAW RFP/contract section 4, paragraph 4a-6 | The Contractor shall provide any changes or updates to the Government PMO (CO, Program Manager, Quality Assurance Manager (QAM)) and COR prior to Contractor implementation. Transition Plan | Request for Proposal",
+            "source": null,
+            "match": "Assurance"
+          },
+          {
+            "text": "ntractor shall provide any changes or updates to the Government PMO (CO, Program Manager, Quality Assurance Manager (QAM)) and COR prior to Contractor implementation. Organizational Conflict of Interest (OCI) Plan | Request for Proposal | All plans listed at left will be submitted as part of the Proposal, and will be incorporated into the contract. | | · All documents shall be delivered IAW the criteria established in the ID/IQ RFP Technical Criteria · The OCI Plan shall also be submitted IAW RFP/contract section 4, paragraph 4a-6 | The Contractor shall provide any changes or updates to the Government PMO (CO, Program Manager, Quality Assurance Manager (QAM)) and COR prior to Contractor implementation. Transition Plan | Request for Proposal | All plans listed at left will be submitted as part of the Proposal, and will be incorporated into the contract. | | · All documents shall be delivered IAW the criteria established in the ID/IQ RFP Technical Criteria | The Contractor shall provide any changes or updates to the Government PMO (CO, Program Manager, Quality Assurance Manager (QAM)) and COR prior to Contractor implementation. Small Business SubcontractingPlan | Request for Proposal | All plans listed at left will be submitted as part of the Proposal, and will be incorporated in",
+            "source": null,
+            "match": "Assurance"
+          },
+          {
+            "text": "RFP Technical Criteria · The OCI Plan shall also be submitted IAW RFP/contract section 4, paragraph 4a-6 | The Contractor shall provide any changes or updates to the Government PMO (CO, Program Manager, Quality Assurance Manager (QAM)) and COR prior to Contractor implementation. Transition Plan | Request for Proposal | All plans listed at left will be submitted as part of the Proposal, and will be incorporated into the contract. | | · All documents shall be delivered IAW the criteria established in the ID/IQ RFP Technical Criteria | The Contractor shall provide any changes or updates to the Government PMO (CO, Program Manager, Quality Assurance Manager (QAM)) and COR prior to Contractor implementation. Small Business SubcontractingPlan | Request for Proposal | All plans listed at left will be submitted as part of the Proposal, and will be incorporated into the contract. | | · All documents shall be delivered IAW the criteria established in the ID/IQ RFP Technical Criteria · The Small Business Subcontracting Plan shall also be submitted IAW RFP/contract section 4, paragraph 4a-6 | The Contractor shall provide any changes or updates to the Government PMO (CO, Program Manager, Quality Assurance Manager (QAM)) and COR prior to Contractor implementation. Quality Control Plan (QCP",
+            "source": null,
+            "match": "Assurance"
+          }
+        ],
+        "subcontracting_consortium": [
+          {
+            "text": "ction 4, paragraph 4a-6 | The Contractor shall provide any changes or updates to the Government PMO (CO, Program Manager, Quality Assurance Manager (QAM)) and COR prior to Contractor implementation. Transition Plan | Request for Proposal | All plans listed at left will be submitted as part of the Proposal, and will be incorporated into the contract. | | · All documents shall be delivered IAW the criteria established in the ID/IQ RFP Technical Criteria | The Contractor shall provide any changes or updates to the Government PMO (CO, Program Manager, Quality Assurance Manager (QAM)) and COR prior to Contractor implementation. Small Business SubcontractingPlan | Request for Proposal | All plans listed at left will be submitted as part of the Proposal, and will be incorporated into the contract. | | · All documents shall be delivered IAW the criteria established in the ID/IQ RFP Technical Criteria · The Small Business Subcontracting Plan shall also be submitted IAW RFP/contract section 4, paragraph 4a-6 | The Contractor shall provide any changes or updates to the Government PMO (CO, Program Manager, Quality Assurance Manager (QAM)) and COR prior to Contractor implementation. Quality Control Plan (QCP) | PWS Section 6.5.2 | The Contractor shall provide a QCP to the Government PMO and",
+            "source": null,
+            "match": "Subcontract"
+          },
+          {
+            "text": "rt of the Proposal, and will be incorporated into the contract. | | · All documents shall be delivered IAW the criteria established in the ID/IQ RFP Technical Criteria | The Contractor shall provide any changes or updates to the Government PMO (CO, Program Manager, Quality Assurance Manager (QAM)) and COR prior to Contractor implementation. Small Business SubcontractingPlan | Request for Proposal | All plans listed at left will be submitted as part of the Proposal, and will be incorporated into the contract. | | · All documents shall be delivered IAW the criteria established in the ID/IQ RFP Technical Criteria · The Small Business Subcontracting Plan shall also be submitted IAW RFP/contract section 4, paragraph 4a-6 | The Contractor shall provide any changes or updates to the Government PMO (CO, Program Manager, Quality Assurance Manager (QAM)) and COR prior to Contractor implementation. Quality Control Plan (QCP) | PWS Section 6.5.2 | The Contractor shall provide a QCP to the Government PMO and COR, as specified in PWS paragraph 6.5.2, NLT 10 calendar days after AF FIAR Support contract award | | | The Contractor shall provide any changes or updates to the Government PMO and COR prior to Contractor implementation. Data Accession List CDRL AF FIAR Spt CDRL A001 Data Accession",
+            "source": null,
+            "match": "Subcontract"
+          },
+          {
+            "text": "s or updates to the Government PMO and COR prior to Contractor implementation. Data Accession List CDRL AF FIAR Spt CDRL A001 Data Accession | | Data shall be as of the last day of the contractual quarter. First submittal shall be NLT 90 days after contract start. Following submittals shall be NLT the 15th calendar day (last weekday before the 15th calendar day if it falls on a weekend or holiday) following the contractual quarter. | | | Quarterly above. Kick-off Meeting | PWS Section 6.2.1 | The Contractor shall attend the Kick-Off Meeting within 10 business days of contract award. | | Government PM responsible for setting up meeting | SubContractor List | | The Contractor shall provide a SubContractor List to the Government PMO NLT 10 calendar days after AF FIAR Support ID/IQ contract award. | | | The Contractor shall disclose new teaming partners/ subContractors prior to that entity’s participation in response to a task order solicitation. The Contractor shall coordinate with the CO prior to adding or deleting subContractors from the prime’s subContractor list. The Contractor shall provide timely notification to the CO of any acquisitions or mergers that impact this contract. Individual and/or Summary SubcontractingReport (ISR/SSR). | | | | The Contractor shall submit ISR/SSR",
+            "source": null,
+            "match": "SubContract"
+          },
+          {
+            "text": "tractor implementation. Data Accession List CDRL AF FIAR Spt CDRL A001 Data Accession | | Data shall be as of the last day of the contractual quarter. First submittal shall be NLT 90 days after contract start. Following submittals shall be NLT the 15th calendar day (last weekday before the 15th calendar day if it falls on a weekend or holiday) following the contractual quarter. | | | Quarterly above. Kick-off Meeting | PWS Section 6.2.1 | The Contractor shall attend the Kick-Off Meeting within 10 business days of contract award. | | Government PM responsible for setting up meeting | SubContractor List | | The Contractor shall provide a SubContractor List to the Government PMO NLT 10 calendar days after AF FIAR Support ID/IQ contract award. | | | The Contractor shall disclose new teaming partners/ subContractors prior to that entity’s participation in response to a task order solicitation. The Contractor shall coordinate with the CO prior to adding or deleting subContractors from the prime’s subContractor list. The Contractor shall provide timely notification to the CO of any acquisitions or mergers that impact this contract. Individual and/or Summary SubcontractingReport (ISR/SSR). | | | | The Contractor shall submit ISR/SSR using the Electronic Subcontracting Reporting System (",
+            "source": null,
+            "match": "SubContract"
+          }
+        ],
+        "deliverables_scope": [
+          {
+            "text": "to position vacancies or unqualified personnel. | Performance is marginal when key personnel vacancies are filled with qualified personnel within 30 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is no mission impact due to position vacancies or unqualified personnel. | Performance is unacceptable when key personnel vacancies are not filled with qualified personnel within 30 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is mission impact due to position vacancies or unqualified personnel. Develop and submit all required deliverables | Performance is excellent when 98% of deliverables are received on time AND do not require rework | Performance is very good when 95% of deliverables are received on time AND do not require rework | Performance is satisfactory when 90% of deliverables are received on time AND do not require rework | Performance is marginal when 85% of deliverables are received on time AND do not require rework | Performance is unacceptable when less than 85% of deliverables are received on time OR greater than 15% require rework Maintain schedule and meet major milestones | Performance is excellent when current progress is within 5% of planned Audit Ac",
+            "source": null,
+            "match": "deliverable"
+          },
+          {
+            "text": "Performance is marginal when key personnel vacancies are filled with qualified personnel within 30 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is no mission impact due to position vacancies or unqualified personnel. | Performance is unacceptable when key personnel vacancies are not filled with qualified personnel within 30 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is mission impact due to position vacancies or unqualified personnel. Develop and submit all required deliverables | Performance is excellent when 98% of deliverables are received on time AND do not require rework | Performance is very good when 95% of deliverables are received on time AND do not require rework | Performance is satisfactory when 90% of deliverables are received on time AND do not require rework | Performance is marginal when 85% of deliverables are received on time AND do not require rework | Performance is unacceptable when less than 85% of deliverables are received on time OR greater than 15% require rework Maintain schedule and meet major milestones | Performance is excellent when current progress is within 5% of planned Audit Acceleration Plan (AAP) tasks which the AU is responsi",
+            "source": null,
+            "match": "deliverable"
+          },
+          {
+            "text": "alendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is no mission impact due to position vacancies or unqualified personnel. | Performance is unacceptable when key personnel vacancies are not filled with qualified personnel within 30 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is mission impact due to position vacancies or unqualified personnel. Develop and submit all required deliverables | Performance is excellent when 98% of deliverables are received on time AND do not require rework | Performance is very good when 95% of deliverables are received on time AND do not require rework | Performance is satisfactory when 90% of deliverables are received on time AND do not require rework | Performance is marginal when 85% of deliverables are received on time AND do not require rework | Performance is unacceptable when less than 85% of deliverables are received on time OR greater than 15% require rework Maintain schedule and meet major milestones | Performance is excellent when current progress is within 5% of planned Audit Acceleration Plan (AAP) tasks which the AU is responsible AND there are less than 10 date extensions for the year. | Performance is very good when curren",
+            "source": null,
+            "match": "deliverable"
+          },
+          {
+            "text": "re is no mission impact due to position vacancies or unqualified personnel. | Performance is unacceptable when key personnel vacancies are not filled with qualified personnel within 30 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is mission impact due to position vacancies or unqualified personnel. Develop and submit all required deliverables | Performance is excellent when 98% of deliverables are received on time AND do not require rework | Performance is very good when 95% of deliverables are received on time AND do not require rework | Performance is satisfactory when 90% of deliverables are received on time AND do not require rework | Performance is marginal when 85% of deliverables are received on time AND do not require rework | Performance is unacceptable when less than 85% of deliverables are received on time OR greater than 15% require rework Maintain schedule and meet major milestones | Performance is excellent when current progress is within 5% of planned Audit Acceleration Plan (AAP) tasks which the AU is responsible AND there are less than 10 date extensions for the year. | Performance is very good when current progress is within 10% of planned AAP tasks which the AU is responsible AND there are less than 10 da",
+            "source": null,
+            "match": "deliverable"
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "Assessment Summary | PWS Section 2.1b.5.2 | Annually | WCF Service Provider | Email to Government POCs | Service Provider PCM Updates | PWS Section 2.1b.5.3 | Annually | WCF Service Provider | Email to Government POCs | Service Provider CEM | PWS Section 2.1b.5.3 | Annually | WCF Service Provider | Email to Government POCs | Correspondence with Service Providers on Corrective Actions | PWS Section 2.1b.5.4 | As required | WCF Service Provider | Email to Government POCs | Audit Support MOUs | PWS Section 2.1b.5.5 | Annually | WCF Service Provider | Email to Government POCs | Trip Report | PWS Section 24.5 | Following official travel, the Contractor shall prepare a trip report detailing the purpose of the trip, the individuals contacted, any agreements that were reached during the trip or any other significant issues that were identified during the travel. The Contractor shall provide this trip report to the COR within 5 business days after the completion of travel | All | Email to govt POCs | Create Corrective Action Plan (CAP) closure packages | PWS Section 3.1 | As needed | All | As requested by AU lead | Create new Corrective Action Plan (CAP) records and milestones for newly issued / re-issued Notice of Findings and Recommendations | PWS Section 3.1 | As determ",
+            "source": null,
+            "match": "travel"
+          },
+          {
+            "text": "| Service Provider CEM | PWS Section 2.1b.5.3 | Annually | WCF Service Provider | Email to Government POCs | Correspondence with Service Providers on Corrective Actions | PWS Section 2.1b.5.4 | As required | WCF Service Provider | Email to Government POCs | Audit Support MOUs | PWS Section 2.1b.5.5 | Annually | WCF Service Provider | Email to Government POCs | Trip Report | PWS Section 24.5 | Following official travel, the Contractor shall prepare a trip report detailing the purpose of the trip, the individuals contacted, any agreements that were reached during the trip or any other significant issues that were identified during the travel. The Contractor shall provide this trip report to the COR within 5 business days after the completion of travel | All | Email to govt POCs | Create Corrective Action Plan (CAP) closure packages | PWS Section 3.1 | As needed | All | As requested by AU lead | Create new Corrective Action Plan (CAP) records and milestones for newly issued / re-issued Notice of Findings and Recommendations | PWS Section 3.1 | As determined by internal and external policy | All | Government OM&S Teams Site or email, DoD SAFE (Large Files) | CAP validation package | PWS Section 3.1 | As needed | All | As requested by AU lead | Update to ODFO database. | PWS",
+            "source": null,
+            "match": "travel"
+          },
+          {
+            "text": "Correspondence with Service Providers on Corrective Actions | PWS Section 2.1b.5.4 | As required | WCF Service Provider | Email to Government POCs | Audit Support MOUs | PWS Section 2.1b.5.5 | Annually | WCF Service Provider | Email to Government POCs | Trip Report | PWS Section 24.5 | Following official travel, the Contractor shall prepare a trip report detailing the purpose of the trip, the individuals contacted, any agreements that were reached during the trip or any other significant issues that were identified during the travel. The Contractor shall provide this trip report to the COR within 5 business days after the completion of travel | All | Email to govt POCs | Create Corrective Action Plan (CAP) closure packages | PWS Section 3.1 | As needed | All | As requested by AU lead | Create new Corrective Action Plan (CAP) records and milestones for newly issued / re-issued Notice of Findings and Recommendations | PWS Section 3.1 | As determined by internal and external policy | All | Government OM&S Teams Site or email, DoD SAFE (Large Files) | CAP validation package | PWS Section 3.1 | As needed | All | As requested by AU lead | Update to ODFO database. | PWS Section 3.2 | Monthly | All | As requested by AU lead | Accelerated Audit Plan (AAP) | PWS Section 3.3 | Bi-we",
+            "source": null,
+            "match": "travel"
+          },
+          {
+            "text": "n 3.3 | Bi-weekly | All | Sharepoint | AAP updates in SharePoint | PWS Section 3.3 | As needed | All | As requested by AU lead | Metrics | PWS Section 3.4 | Monthly | All | As requested by AU lead | Metrics | PWS Section 3.5 | Monthly | WCF, DSCA SAA | As requested by AU lead | Key Supporting Documentation | PWS Section 4.1 | As needed | All | As requested by AU lead | Audit tools/process training | PWS Section 4.10 | As needed | All | As requested by AU lead | Helpdesk Capability | PWS Section 4.11 | As needed | All | As requested by AU lead | Meeting minutes | PWS Section 4.2 | As needed | All | As requested by AU lead | Update site visit tool in SharePoint | PWS Section 4.3 | As needed | All | As requested by AU lead | Report generation and PBC/Sample Tool updates | PWS Section 4.4 | As needed | All | As requested by AU lead | SOPs | PWS Section 4.5 | As needed | All | As requested by AU lead | Update to SharePoint tools | PWS Section 4.6 | As needed | All | As requested by AU lead | Update to SharePoint tools | PWS Section 4.7 | As needed | All | As requested by AU lead | Update to SharePoint tools | PWS Section 4.8 | As needed | All | As requested by AU lead | Briefings | PWS Section 4.9 | As needed | All | As requested by AU lead | OMB A-136 compliance review | PWS",
+            "source": null,
+            "match": "site visit"
+          }
+        ],
+        "term_value": [
+          {
+            "text": "quire rework | Performance is very good when 95% of deliverables are received on time AND do not require rework | Performance is satisfactory when 90% of deliverables are received on time AND do not require rework | Performance is marginal when 85% of deliverables are received on time AND do not require rework | Performance is unacceptable when less than 85% of deliverables are received on time OR greater than 15% require rework Maintain schedule and meet major milestones | Performance is excellent when current progress is within 5% of planned Audit Acceleration Plan (AAP) tasks which the AU is responsible AND there are less than 10 date extensions for the year. | Performance is very good when current progress is within 10% of planned AAP tasks which the AU is responsible AND there are less than 10 date extensions for the year. | Performance is satisfactory when current progress is within 10% of planned AAP tasks which the AU is responsible AND there are less than 20 date extensions for the year. | Performance is marginal when current progress is within 15% of planned AAP tasks which the AU is responsible AND there are less than 20 date extensions for the year. | Performance is unacceptable when current progress is greater than 20% behind planned AAP tasks which the AU is responsi",
+            "source": null,
+            "match": "extension"
+          },
+          {
+            "text": "re received on time AND do not require rework | Performance is marginal when 85% of deliverables are received on time AND do not require rework | Performance is unacceptable when less than 85% of deliverables are received on time OR greater than 15% require rework Maintain schedule and meet major milestones | Performance is excellent when current progress is within 5% of planned Audit Acceleration Plan (AAP) tasks which the AU is responsible AND there are less than 10 date extensions for the year. | Performance is very good when current progress is within 10% of planned AAP tasks which the AU is responsible AND there are less than 10 date extensions for the year. | Performance is satisfactory when current progress is within 10% of planned AAP tasks which the AU is responsible AND there are less than 20 date extensions for the year. | Performance is marginal when current progress is within 15% of planned AAP tasks which the AU is responsible AND there are less than 20 date extensions for the year. | Performance is unacceptable when current progress is greater than 20% behind planned AAP tasks which the AU is responsible AND there are more than 20 date extensions for the year. ===== FILE: files/Appendix_A_Service_Summary_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding",
+            "source": null,
+            "match": "extension"
+          },
+          {
+            "text": "le when less than 85% of deliverables are received on time OR greater than 15% require rework Maintain schedule and meet major milestones | Performance is excellent when current progress is within 5% of planned Audit Acceleration Plan (AAP) tasks which the AU is responsible AND there are less than 10 date extensions for the year. | Performance is very good when current progress is within 10% of planned AAP tasks which the AU is responsible AND there are less than 10 date extensions for the year. | Performance is satisfactory when current progress is within 10% of planned AAP tasks which the AU is responsible AND there are less than 20 date extensions for the year. | Performance is marginal when current progress is within 15% of planned AAP tasks which the AU is responsible AND there are less than 20 date extensions for the year. | Performance is unacceptable when current progress is greater than 20% behind planned AAP tasks which the AU is responsible AND there are more than 20 date extensions for the year. ===== FILE: files/Appendix_A_Service_Summary_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats",
+            "source": null,
+            "match": "extension"
+          },
+          {
+            "text": "current progress is within 5% of planned Audit Acceleration Plan (AAP) tasks which the AU is responsible AND there are less than 10 date extensions for the year. | Performance is very good when current progress is within 10% of planned AAP tasks which the AU is responsible AND there are less than 10 date extensions for the year. | Performance is satisfactory when current progress is within 10% of planned AAP tasks which the AU is responsible AND there are less than 20 date extensions for the year. | Performance is marginal when current progress is within 15% of planned AAP tasks which the AU is responsible AND there are less than 20 date extensions for the year. | Performance is unacceptable when current progress is greater than 20% behind planned AAP tasks which the AU is responsible AND there are more than 20 date extensions for the year. ===== FILE: files/Appendix_A_Service_Summary_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-of",
+            "source": null,
+            "match": "extension"
+          }
+        ],
+        "award_criteria": [
+          {
+            "text": "\"xsd:string\" ma:index=\"0\" ma:displayName=\"Content Type\"/> <xsd:element ref=\"dc:title\" minOccurs=\"0\" maxOccurs=\"1\" ma:index=\"4\" ma:displayName=\"Title\"/> <xsd:element ref=\"dc:subject\" minOccurs=\"0\" maxOccurs=\"1\"/> <xsd:element ref=\"dc:description\" minOccurs=\"0\" maxOccurs=\"1\"/> <xsd:element name=\"keywords\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element ref=\"dc:language\" minOccurs=\"0\" maxOccurs=\"1\"/> <xsd:element name=\"category\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element name=\"version\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element name=\"revision\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"> <xsd:annotation> <xsd:documentation> This value indicates the number of saves or revisions. The application is responsible for updating this value after each revision. </xsd:documentation> </xsd:annotation> </xsd:element> <xsd:element name=\"lastModifiedBy\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element ref=\"dcterms:modified\" minOccurs=\"0\" maxOccurs=\"1\"/> <xsd:element name=\"contentStatus\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> </xsd:all> </xsd:complexType> </xsd:schema> <xs:schema targetNamespace=\"http://schemas.microsoft.com/office/infopath/2007/PartnerControls\" elementFormDefault=\"qualified",
+            "source": null,
+            "match": "notation"
+          },
+          {
+            "text": "escription\" minOccurs=\"0\" maxOccurs=\"1\"/> <xsd:element name=\"keywords\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element ref=\"dc:language\" minOccurs=\"0\" maxOccurs=\"1\"/> <xsd:element name=\"category\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element name=\"version\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element name=\"revision\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"> <xsd:annotation> <xsd:documentation> This value indicates the number of saves or revisions. The application is responsible for updating this value after each revision. </xsd:documentation> </xsd:annotation> </xsd:element> <xsd:element name=\"lastModifiedBy\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> <xsd:element ref=\"dcterms:modified\" minOccurs=\"0\" maxOccurs=\"1\"/> <xsd:element name=\"contentStatus\" minOccurs=\"0\" maxOccurs=\"1\" type=\"xsd:string\"/> </xsd:all> </xsd:complexType> </xsd:schema> <xs:schema targetNamespace=\"http://schemas.microsoft.com/office/infopath/2007/PartnerControls\" elementFormDefault=\"qualified\" attributeFormDefault=\"unqualified\" xmlns:pc=\"http://schemas.microsoft.com/office/infopath/2007/PartnerControls\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"> <xs:element name=\"Person\"> <xs:complexType> <xs:sequence> <xs:element ref=\"",
+            "source": null,
+            "match": "notation"
+          },
+          {
+            "text": "roject Plan (development) | PWS Section 5.9.1 | Annually | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | Feedback/Revisions for Draft Acct Policy Data Calls | PWS Section 5.9.2 | As Required | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | Tracking system/tool to identify responsible Air Force policy implementation owners | PWS Section 5.9.3 | Weekly | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | https://fasab.gov/accounting-standards/ https://www.whitehouse.gov/omb/information-resources/guidance/circulars/ https://comptroller.defense.gov/FMR.aspx Oversight process for quality reviews and remediation plans (development) | PWS Section 5.9.3 | As Required | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | White paper template for gap analysis documentation (development) | PWS Section 5.9.3 | As Required | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | OUSD FMPR Tool Tracker | PWS Section 5.9.3 | Weekly | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | Policies and procedures for oversight of accounting standard implementation (development) | PWS Section 5.9.4 | Quarterly, or as needed when developed | FRPG | Maintained on Sharepoint | Templates for documenting ownership and implementation (development) | PWS Section 5.9.4 | Quarterly, or as needed when developed | FRPG | Maintained on Sharepoint | Unimplemented Standards Tracker | PWS Section 5.9.4 | Quarterly | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | White papers documenting ownership and accounting standards implementation at DAF level (development) | PWS Section 5.9.4 | Quarterly, or as needed when developed | FRPG | Maintained on Sharepoint | GAO Financ",
+            "source": null,
+            "match": "quality reviews and remediation plans (development) | PWS Section 5.9.3 | As Required | FRPG | Email to govt lead and po"
+          },
+          {
+            "text": "2\" spans=\"1:4\" x14ac:dyDescent=\"0.35\"><c r=\"C32\" s=\"7\"/></row><row r=\"33\" spans=\"3:3\" x14ac:dyDescent=\"0.35\"><c r=\"C33\" s=\"7\"/></row><row r=\"34\" spans=\"3:3\" x14ac:dyDescent=\"0.35\"><c r=\"C34\" s=\"8\"/></row><row r=\"35\" spans=\"3:3\" x14ac:dyDescent=\"0.35\"><c r=\"C35\" s=\"8\"/></row></sheetData><mergeCells count=\"1\"><mergeCell ref=\"A1:B1\"/></mergeCells><pageMargins left=\"0.7\" right=\"0.7\" top=\"0.75\" bottom=\"0.75\" header=\"0.3\" footer=\"0.3\"/></worksheet> ===== FILE: files/sam_http_resources.json ===== { \"notice_id\": \"b8b0b25d9aa2405597740357d4cd02c3\", \"resources\": [ { \"resource_id\": \"6bf129a4b6a0453cb593d1af5eb6f10f\", \"name\": \"Draft Evaluation Criteria 20NOV2025.docx\", \"access\": \"0\", \"deleted\": null, \"path\": \"root._embedded.opportunityAttachmentList[0].attachments[0]\" }, { \"resource_id\": \"b9b7b9ea508a42a8a67c890b74dea00e\", \"name\": \"Draft Evaluation Criteria 19NOV2025.docx\", \"access\": \"0\", \"deleted\": null, \"path\": \"root._embedded.opportunityAttachmentList[0].attachments[1]\" }, { \"resource_id\": \"2bd4ab30da31425d9e1eab91112f0087\", \"name\": \"DRAFT Instructions to Offerors 19NOV2025.docx\", \"access\": \"0\", \"deleted\": null, \"path\": \"root._embedded.opportunityAttachmentList[0].attachments[2]\" }, {",
+            "source": null,
+            "match": "Evaluation Criteria"
+          }
+        ],
+        "forms_signatures": [
+          {
+            "text": "===== FILE: files/Appendix_A_Service_Summary.xlsx ===== [SHEET Service Summary ] Performance Objective | Performance Threshold Provide qualified people at TO start | Performance is excellent when 100% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is very good when 95% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is satisfactory when 90% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is marginal when 80 to 89% of qualified personnel are on t",
+            "source": null,
+            "match": "Appendix"
+          },
+          {
+            "text": "re is mission impact due to position vacancies or unqualified personnel. Develop and submit all required deliverables | Performance is excellent when 98% of deliverables are received on time AND do not require rework | Performance is very good when 95% of deliverables are received on time AND do not require rework | Performance is satisfactory when 90% of deliverables are received on time AND do not require rework | Performance is marginal when 85% of deliverables are received on time AND do not require rework | Performance is unacceptable when less than 85% of deliverables are received on time OR greater than 15% require rework Maintain schedule and meet major milestones | Performance is excellent when current progress is within 5% of planned Audit Acceleration Plan (AAP) tasks which the AU is responsible AND there are less than 10 date extensions for the year. | Performance is very good when current progress is within 10% of planned AAP tasks which the AU is responsible AND there are less than 10 date extensions for the year. | Performance is satisfactory when current progress is within 10% of planned AAP tasks which the AU is responsible AND there are less than 20 date extensions for the year. | Performance is marginal when current progress is within 15% of planned AAP tasks which the AU is responsible AND there are less than 20 date extensions for the year. | Performance is unacceptable when current progress is greater than 20% behind planned AAP tasks which the AU is responsible AND there are more than 20 date extensions for the year. ===== FILE: files/Appendix_A_Service_Summary_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"re",
+            "source": null,
+            "match": "schedule and meet major milestones | Performance is excellent when current progress is within 5% of planned Audit Accele"
+          },
+          {
+            "text": "t of monthly / quarterly reconciliations can be found withing the Deliverables section. </t></si><si><t>Sustainment testing of key controls and documentation is required in accordance with OMB Circular number A-123 for historical NFRs that were closed by auditors and still identified in the AU listing.</t></si><si><t>In order to achieve an unmodified opinion in FY28, all Assessable Units are considered a priority.</t></si><si><t>The list of 37 reconciliations needed as part of the DAFs audit acceleration efforts are included within the Bidders Library</t></si><si><t>Some deliverables will be rolled up at the enterprise level as identified in Appendix B and the PWS.</t></si><si><t xml:space=\"preserve\"> All services in this PWS HAVE NOT been defined or designated as essential services for performance during crisis IAW DFARs 252.237-7023, “Continuation of Essential Contractor Services.” </t></si><si><t xml:space=\"preserve\">Based on the PWS language in sections 17.1-17.2, key personnel are defined as all Lead or Partner/Director/Executive labor categories that are deemed critical to managing the overall performance of the PWS, which would include but not be limited to RMIC, Audit Liaison, and Financial Reporting SMEs. </t></si><si><t>The Air Force has separate resources for each of the list",
+            "source": null,
+            "match": "Appendix"
+          },
+          {
+            "text": "rtunityAttachmentList[0].attachments[10]\" }, { \"resource_id\": \"de04472d53ac4e2083e90dcfcb04748c\", \"name\": \"Financial Management FIAR Sources Sought 3SEP25.xlsx\", \"access\": \"0\", \"deleted\": null, \"path\": \"root._embedded.opportunityAttachmentList[0].attachments[11]\" }, { \"resource_id\": \"57aa231991444663924e99ce03187b57\", \"name\": \"FIAR Performance Work Statement FIAR2.0 8.28 final.docx\", \"access\": \"0\", \"deleted\": null, \"path\": \"root._embedded.opportunityAttachmentList[0].attachments[12]\" }, { \"resource_id\": \"a675956302824ca18efeef88c6ebab4a\", \"name\": \"Appendix A Service Summary.xlsx\", \"access\": \"0\", \"deleted\": null, \"path\": \"root._embedded.opportunityAttachmentList[0].attachments[13]\" }, { \"resource_id\": \"94a6db4a878841f8b5f7048dd971749d\", \"name\": \"Appendix B Deliverables.xlsx\", \"access\": \"0\", \"deleted\": null, \"path\": \"root._embedded.opportunityAttachmentList[0].attachments[14]\" }, { \"resource_id\": \"1f133b2b31e243d58fa24cbc00329eb7\", \"name\": \"Appendix C NFR and Conditions.xlsx\", \"access\": \"0\", \"deleted\": null, \"path\": \"root._embedded.opportunityAttachmentList[0].attachments[15]\" }, { \"resour",
+            "source": null,
+            "match": "Appendix"
+          }
+        ],
+        "submission": [
+          {
+            "text": "all it reestablish the agreement base period. BPA Off Ramping (active BPA holders) The following situations shall require FIAR BPA Contractors to be off ramped (removed) as an FIAR BPA Contractor and will no longer be able to propose on future COQRs: Any notices of removal will be provided in writing to the Contractor from the CO: Awarded FIAR BPA holders are only allowed to declare a “no bid” two (2) consecutive times OR no more than three (3) times over the entire 5-year ordering period. Whichever threshold is met first. No bids are tracked based on the COQR release date. Poor Performance. Poor performance includes: missing milestones and deadlines, not performing IAW Quote/PWS, misconduct of employees, poor quality of deliverables, uncleared personnel, and termination for cause. Marginal or below CPARS on any call orders over the ordering period, etc. Poor performance determinations are at the sole discretion of the Government. Marginal, Unacceptable, . For Standard and Extended COQRs. Contractors are only allowed to receive one (1) Marginal or Unacceptable technical Quote ratings one (1) time during the five (5) year ordering period. If a Prime contractor utilized subcontractor/teaming partner(s) technical experience to meet the qualifications for an FIAR BPA award and that relation",
+            "source": null,
+            "match": "deadline"
+          },
+          {
+            "text": "w:val=\"24\"/><w:szCs w:val=\"24\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r w:rsidRPr=\"00687381\"><w:rPr><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/></w:rPr><w:t>milestones</w:t></w:r><w:r w:rsidRPr=\"00687381\"><w:rPr><w:spacing w:val=\"-4\"/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r w:rsidRPr=\"00687381\"><w:rPr><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/></w:rPr><w:t>and</w:t></w:r><w:r w:rsidRPr=\"00687381\"><w:rPr><w:spacing w:val=\"-6\"/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r w:rsidRPr=\"00687381\"><w:rPr><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/></w:rPr><w:t>deadlines,</w:t></w:r><w:r w:rsidRPr=\"00687381\"><w:rPr><w:spacing w:val=\"-4\"/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r w:rsidRPr=\"00687381\"><w:rPr><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/></w:rPr><w:t xml:space=\"preserve\">not performing IAW </w:t></w:r><w:r w:rsidR=\"00D07A59\" w:rsidRPr=\"00687381\"><w:rPr><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/></w:rPr><w:t>Quote</w:t></w:r><w:r w:rsidRPr=\"00687381\"><w:rPr><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/></w:rPr><w:t>/PWS, misconduct of employees, poor quality of deliverables, uncleared personnel, and termination for cause.</w:t></w:r></w:p><w:p w14:paraId=\"1C6D5F72\" w1",
+            "source": null,
+            "match": "deadline"
+          },
+          {
+            "text": "ful, they prohibited from proposing to be a prime again. No exceptions. Off Ramping The following situations shall require FIAR BPA Contractors to be off ramped (removed) as an FIAR BPA Contractor and will no longer be able to propose on future COQRs: Any notices of removal will be provided in writing to the Contractor from the CO: Awarded FIAR BPA holders are only allowed to declare a “no bid” two (2) consecutive times OR no more than three (3) times over the entire 5-year ordering period. Whichever threshold is met first. No bids are tracked based on the COQR release date. Poor Performance. Poor performance includes: missing milestones and deadlines, not performing IAW Quote/PWS, misconduct of employees, poor quality of deliverables, uncleared personnel, and termination for cause. Marginal or below CPARS on any call orders over the ordering period, etc. Poor performance determinations are at the sole discretion of the Government. Marginal, Unacceptable, Unfair/Unreasonable Price. For Standard and Extended COQRs. Contractors are only allowed to receive one (1) Marginal or Unacceptable technical Quote ratings AND/OR if the pricing is determined unfair and/or unreasonable one (1) time during the five (5) year ordering period. If a Prime contractor utilized subcontractor/teaming partner(s)",
+            "source": null,
+            "match": "deadline"
+          },
+          {
+            "text": "er monitoring activities. Deliverable: Service Provider Working Group Slides 2.1a.7.3. The contractor shall collect System and Organization Control (SOC) 1 Reports and Bridge Letters from OUSD (C) and upload them to SharePoint in appropriate folders, marking CUI as necessary, within three business days of receipt. The contractor shall distribute SOC reports and Bridge Letters to stakeholders within five business days of receipt. The contractor shall maintain a SOC Reports and Bridge Letters Tracker of all reports expected to be received and update the government lead immediately when any reports or bridge letters are not received by expected deadlines. This systematic collection and distribution process ensures timely stakeholder access to critical third-party control documentation, supporting clean audit opinion requirements by enabling prompt review and reliance assessment of service provider controls. Deliverables: SOC Report and Bridge Letter Tracker 2.1a.7.4. The contractor shall maintain, update, and build the Service Provider Assessments during the first quarter and distribute to stakeholders for completion by the end of the first quarter. The contractor shall establish completion timelines during the build phase and distribute the Service Provider Assessment Timeline with each as",
+            "source": null,
+            "match": "deadline"
+          }
+        ],
+        "ip_data_security": [
+          {
+            "text": "emediation plans (development) | PWS Section 5.9.3 | As Required | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | White paper template for gap analysis documentation (development) | PWS Section 5.9.3 | As Required | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | OUSD FMPR Tool Tracker | PWS Section 5.9.3 | Weekly | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | Policies and procedures for oversight of accounting standard implementation (development) | PWS Section 5.9.4 | Quarterly, or as needed when developed | FRPG | Maintained on Sharepoint | Templates for documenting ownership and implementation (development) | PWS Section 5.9.4 | Quarterly, or as needed when developed | FRPG | Maintained on Sharepoint | Unimplemented Standards Tracker | PWS Section 5.9.4 | Quarterly | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | White papers documenting ownership and accounting standards implementation at DAF level (development) | PWS Section 5.9.4 | Quarterly, or as needed when developed | FRPG | Maintained on Sharepoint | GAO Financial Audit Manual (FAM) Volume 3 Checklist | PWS Section 5.9.5 | Annually | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | FASAB Board Meeting Minut",
+            "source": null,
+            "match": "ownership"
+          },
+          {
+            "text": "nnel | OUSD FMPR Tool Tracker | PWS Section 5.9.3 | Weekly | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | Policies and procedures for oversight of accounting standard implementation (development) | PWS Section 5.9.4 | Quarterly, or as needed when developed | FRPG | Maintained on Sharepoint | Templates for documenting ownership and implementation (development) | PWS Section 5.9.4 | Quarterly, or as needed when developed | FRPG | Maintained on Sharepoint | Unimplemented Standards Tracker | PWS Section 5.9.4 | Quarterly | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | White papers documenting ownership and accounting standards implementation at DAF level (development) | PWS Section 5.9.4 | Quarterly, or as needed when developed | FRPG | Maintained on Sharepoint | GAO Financial Audit Manual (FAM) Volume 3 Checklist | PWS Section 5.9.5 | Annually | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | FASAB Board Meeting Minutes and Deliverables | PWS Section 5.9.6 | Quarterly | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | SFFAS Compliant Solutions (development) | PWS Section 6.1 and 6.2 | As Needed | MCA | As requested by AU lead | SFFAS Compliant Solution (development) | PWS Section 6.10 | Ad ho",
+            "source": null,
+            "match": "ownership"
+          },
+          {
+            "text": "5.9.2</t></si><si><t>PWS Section 5.9.3</t></si><si><t>https://fasab.gov/accounting-standards/ https://www.whitehouse.gov/omb/information-resources/guidance/circulars/ https://comptroller.defense.gov/FMR.aspx</t></si><si><t>Oversight process for quality reviews and remediation plans (development)</t></si><si><t>White paper template for gap analysis documentation (development)</t></si><si><t>OUSD FMPR Tool Tracker</t></si><si><t>Policies and procedures for oversight of accounting standard implementation (development)</t></si><si><t>PWS Section 5.9.4</t></si><si><t>Quarterly, or as needed when developed</t></si><si><t>Templates for documenting ownership and implementation (development)</t></si><si><t>Unimplemented Standards Tracker</t></si><si><t>White papers documenting ownership and accounting standards implementation at DAF level (development)</t></si><si><t>GAO Financial Audit Manual (FAM) Volume 3 Checklist</t></si><si><t>PWS Section 5.9.5</t></si><si><t>FASAB Board Meeting Minutes and Deliverables</t></si><si><t>PWS Section 5.9.6</t></si><si><t>SFFAS Compliant Solutions (development)</t></si><si><t>PWS Section 6.1 and 6.2</t></si><si><t>As Needed</t></si><si><t>SFFAS Compliant Solution (development)</t></si><si><t>PWS Section 6.10</t></si><si><t>As requested by AU Lead</t></si><si><t>",
+            "source": null,
+            "match": "ownership"
+          },
+          {
+            "text": "rmation-resources/guidance/circulars/ https://comptroller.defense.gov/FMR.aspx</t></si><si><t>Oversight process for quality reviews and remediation plans (development)</t></si><si><t>White paper template for gap analysis documentation (development)</t></si><si><t>OUSD FMPR Tool Tracker</t></si><si><t>Policies and procedures for oversight of accounting standard implementation (development)</t></si><si><t>PWS Section 5.9.4</t></si><si><t>Quarterly, or as needed when developed</t></si><si><t>Templates for documenting ownership and implementation (development)</t></si><si><t>Unimplemented Standards Tracker</t></si><si><t>White papers documenting ownership and accounting standards implementation at DAF level (development)</t></si><si><t>GAO Financial Audit Manual (FAM) Volume 3 Checklist</t></si><si><t>PWS Section 5.9.5</t></si><si><t>FASAB Board Meeting Minutes and Deliverables</t></si><si><t>PWS Section 5.9.6</t></si><si><t>SFFAS Compliant Solutions (development)</t></si><si><t>PWS Section 6.1 and 6.2</t></si><si><t>As Needed</t></si><si><t>SFFAS Compliant Solution (development)</t></si><si><t>PWS Section 6.10</t></si><si><t>As requested by AU Lead</t></si><si><t>Develop quarterly GPP&amp;E on-top JVs and PPAs</t></si><si><t>PWS Section 6.11</t></si><si><t>Support the development of executi",
+            "source": null,
+            "match": "ownership"
+          }
+        ]
+      },
+      "source_dce_run_id": 32013885449,
+      "source_shard": 9,
+      "hot_ready_at": "2026-08-17T09:14:54.439088+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 19,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
       "spm_friction_signals": [],
       "review_lane": "SPM_PRIORITY"
     },
@@ -764,6 +1150,130 @@
       "review_lane": "SPM_PRIORITY"
     },
     {
+      "candidate_id": "US-SAM:232431680f6348939cdb1bd218619238",
+      "title": "Z1DA--679-24-102 | B18 Laundry Renovations & Additions Tuscaloosa VA Medical Center",
+      "buyer": "VETERANS AFFAIRS, DEPARTMENT OF",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/opp/232431680f6348939cdb1bd218619238/view",
+      "deadline": "2026-08-28T00:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 60,
+      "priority_score": 60,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-28T00:00:00+00:00",
+        "notice_deadline_date": "2026-08-28",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 4,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "907CF\" w:rsidRPr=\"00DB2BA9\" w:rsidRDefault=\"006907CF\" w:rsidP=\"00B26644\"><w:pPr><w:spacing w:after=\"160\" w:line=\"252\" w:lineRule=\"auto\"/><w:rPr><w:rFonts w:eastAsia=\"Calibri\" w:cstheme=\"minorHAnsi\"/><w:b/></w:rPr></w:pPr></w:p><w:p w14:paraId=\"7076289A\" w14:textId=\"6A786071\" w:rsidR=\"006907CF\" w:rsidRPr=\"00DB2BA9\" w:rsidRDefault=\"006907CF\" w:rsidP=\"00CA0FE5\"><w:pPr><w:pBdr><w:top w:val=\"single\" w:sz=\"4\" w:space=\"1\" w:color=\"auto\"/><w:bottom w:val=\"single\" w:sz=\"4\" w:space=\"1\" w:color=\"auto\"/></w:pBdr><w:jc w:val=\"center\"/><w:rPr><w:rFonts w:cstheme=\"minorHAnsi\"/></w:rPr></w:pPr></w:p><w:sectPr w:rsidR=\"00BF7BE8\" w:rsidRPr=\"00DB2BA9\"><w:headerReference w:type=\"default\" r:id=\"rId6\"/><w:footerReference w:type=\"default\" r:id=\"rId7\"/><w:headerReference w:type=\"first\" r:id=\"rId8\"/><w:footerReference w:type=\"first\" r:id=\"rId9\"/><w:type w:val=\"continuous\"/><w:pgSz w:w=\"12240\" w:h=\"15840\"/><w:pgMar w:top=\"1080\" w:right=\"1440\" w:bottom=\"1080\" w:left=\"1440\" w:header=\"360\" w:footer=\"360\" w:gutter=\"0\"/><w:cols w:space=\"720\"/><w:titlePg/><w:docGrid w:linePitch=\"360\"/></w:sectPr></w:body></w:document> ===== FILE: files/36C24726C0062_1_unpacked/word/endnotes.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <w:endnotes xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessi",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "7CF\" w:rsidP=\"00B26644\"><w:pPr><w:spacing w:after=\"160\" w:line=\"252\" w:lineRule=\"auto\"/><w:rPr><w:rFonts w:eastAsia=\"Calibri\" w:cstheme=\"minorHAnsi\"/><w:b/></w:rPr></w:pPr></w:p><w:p w14:paraId=\"7076289A\" w14:textId=\"6A786071\" w:rsidR=\"006907CF\" w:rsidRPr=\"00DB2BA9\" w:rsidRDefault=\"006907CF\" w:rsidP=\"00CA0FE5\"><w:pPr><w:pBdr><w:top w:val=\"single\" w:sz=\"4\" w:space=\"1\" w:color=\"auto\"/><w:bottom w:val=\"single\" w:sz=\"4\" w:space=\"1\" w:color=\"auto\"/></w:pBdr><w:jc w:val=\"center\"/><w:rPr><w:rFonts w:cstheme=\"minorHAnsi\"/></w:rPr></w:pPr></w:p><w:sectPr w:rsidR=\"00BF7BE8\" w:rsidRPr=\"00DB2BA9\"><w:headerReference w:type=\"default\" r:id=\"rId6\"/><w:footerReference w:type=\"default\" r:id=\"rId7\"/><w:headerReference w:type=\"first\" r:id=\"rId8\"/><w:footerReference w:type=\"first\" r:id=\"rId9\"/><w:type w:val=\"continuous\"/><w:pgSz w:w=\"12240\" w:h=\"15840\"/><w:pgMar w:top=\"1080\" w:right=\"1440\" w:bottom=\"1080\" w:left=\"1440\" w:header=\"360\" w:footer=\"360\" w:gutter=\"0\"/><w:cols w:space=\"720\"/><w:titlePg/><w:docGrid w:linePitch=\"360\"/></w:sectPr></w:body></w:document> ===== FILE: files/36C24726C0062_1_unpacked/word/endnotes.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <w:endnotes xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:cx=\"http://schemas.microsoft.com/",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "=\"160\" w:line=\"252\" w:lineRule=\"auto\"/><w:rPr><w:rFonts w:eastAsia=\"Calibri\" w:cstheme=\"minorHAnsi\"/><w:b/></w:rPr></w:pPr></w:p><w:p w14:paraId=\"7076289A\" w14:textId=\"6A786071\" w:rsidR=\"006907CF\" w:rsidRPr=\"00DB2BA9\" w:rsidRDefault=\"006907CF\" w:rsidP=\"00CA0FE5\"><w:pPr><w:pBdr><w:top w:val=\"single\" w:sz=\"4\" w:space=\"1\" w:color=\"auto\"/><w:bottom w:val=\"single\" w:sz=\"4\" w:space=\"1\" w:color=\"auto\"/></w:pBdr><w:jc w:val=\"center\"/><w:rPr><w:rFonts w:cstheme=\"minorHAnsi\"/></w:rPr></w:pPr></w:p><w:sectPr w:rsidR=\"00BF7BE8\" w:rsidRPr=\"00DB2BA9\"><w:headerReference w:type=\"default\" r:id=\"rId6\"/><w:footerReference w:type=\"default\" r:id=\"rId7\"/><w:headerReference w:type=\"first\" r:id=\"rId8\"/><w:footerReference w:type=\"first\" r:id=\"rId9\"/><w:type w:val=\"continuous\"/><w:pgSz w:w=\"12240\" w:h=\"15840\"/><w:pgMar w:top=\"1080\" w:right=\"1440\" w:bottom=\"1080\" w:left=\"1440\" w:header=\"360\" w:footer=\"360\" w:gutter=\"0\"/><w:cols w:space=\"720\"/><w:titlePg/><w:docGrid w:linePitch=\"360\"/></w:sectPr></w:body></w:document> ===== FILE: files/36C24726C0062_1_unpacked/word/endnotes.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <w:endnotes xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:cx=\"http://schemas.microsoft.com/office/drawing/2014/chartex\" xmlns:cx1=\"http://sc",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "w:rFonts w:eastAsia=\"Calibri\" w:cstheme=\"minorHAnsi\"/><w:b/></w:rPr></w:pPr></w:p><w:p w14:paraId=\"7076289A\" w14:textId=\"6A786071\" w:rsidR=\"006907CF\" w:rsidRPr=\"00DB2BA9\" w:rsidRDefault=\"006907CF\" w:rsidP=\"00CA0FE5\"><w:pPr><w:pBdr><w:top w:val=\"single\" w:sz=\"4\" w:space=\"1\" w:color=\"auto\"/><w:bottom w:val=\"single\" w:sz=\"4\" w:space=\"1\" w:color=\"auto\"/></w:pBdr><w:jc w:val=\"center\"/><w:rPr><w:rFonts w:cstheme=\"minorHAnsi\"/></w:rPr></w:pPr></w:p><w:sectPr w:rsidR=\"00BF7BE8\" w:rsidRPr=\"00DB2BA9\"><w:headerReference w:type=\"default\" r:id=\"rId6\"/><w:footerReference w:type=\"default\" r:id=\"rId7\"/><w:headerReference w:type=\"first\" r:id=\"rId8\"/><w:footerReference w:type=\"first\" r:id=\"rId9\"/><w:type w:val=\"continuous\"/><w:pgSz w:w=\"12240\" w:h=\"15840\"/><w:pgMar w:top=\"1080\" w:right=\"1440\" w:bottom=\"1080\" w:left=\"1440\" w:header=\"360\" w:footer=\"360\" w:gutter=\"0\"/><w:cols w:space=\"720\"/><w:titlePg/><w:docGrid w:linePitch=\"360\"/></w:sectPr></w:body></w:document> ===== FILE: files/36C24726C0062_1_unpacked/word/endnotes.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <w:endnotes xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:cx=\"http://schemas.microsoft.com/office/drawing/2014/chartex\" xmlns:cx1=\"http://schemas.microsoft.com/office/drawing/2015/9/8/cha",
+            "source": null,
+            "match": "Reference"
+          }
+        ],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [],
+        "term_value": [
+          {
+            "text": "3701 Loop Rd East Room 223 Tuscaloosa, AL 35404 POINT OF CONTACT* | Contracting Officer Joseph Osborn Joseph.Osborn@va.gov AWARD NUMBER* | 36C24726C0062 AWARD AMOUNT* | $15,919,579.62 LINE ITEM NUMBER | 1 AWARD DATE (MM-DD-YYYY)* | 07-29-2026 AWARDEE NAME* | AAECON GENERAL CONTRACTING LLC CONTRACTOR’S UEI | Y9FRK3A8ZNE7 AWARDEE ADDRESS LINE 3* | 1147 LOGAN ST AWARDEE CITY | LOUISVILLE AWARDEE STATE | KY AWARDEE ZIP CODE | 40204 ===== FILE: files/36C24726C0062_1_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/><Override PartName=\"/word/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml\"/><Override PartName=\"/word/settings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml\"/><Override PartName=\"/word/webSettings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.w",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "eph Osborn Joseph.Osborn@va.gov AWARD NUMBER* | 36C24726C0062 AWARD AMOUNT* | $15,919,579.62 LINE ITEM NUMBER | 1 AWARD DATE (MM-DD-YYYY)* | 07-29-2026 AWARDEE NAME* | AAECON GENERAL CONTRACTING LLC CONTRACTOR’S UEI | Y9FRK3A8ZNE7 AWARDEE ADDRESS LINE 3* | 1147 LOGAN ST AWARDEE CITY | LOUISVILLE AWARDEE STATE | KY AWARDEE ZIP CODE | 40204 ===== FILE: files/36C24726C0062_1_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/><Override PartName=\"/word/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml\"/><Override PartName=\"/word/settings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml\"/><Override PartName=\"/word/webSettings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml\"/><Override PartName=\"/word/footnotes.xml\" ContentType=\"application/vnd.openxmlform",
+            "source": null,
+            "match": "Extension"
+          }
+        ],
+        "award_criteria": [
+          {
+            "text": "=\"toc 4\" w:uiPriority=\"39\"/><w:lsdException w:name=\"toc 5\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 6\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 7\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 8\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 9\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Normal Indent\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footnote text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"annotation text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"index heading\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"caption\" w:semiHidden=\"1\" w:uiPriority=\"35\" w:unhideWhenUsed=\"1\" w:qFormat=\"1\"/><w:lsdException w:name=\"table of figures\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope address\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope return\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footnote reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"annotation reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdExcept",
+            "source": null,
+            "match": "notation"
+          },
+          {
+            "text": "semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"annotation text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"index heading\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"caption\" w:semiHidden=\"1\" w:uiPriority=\"35\" w:unhideWhenUsed=\"1\" w:qFormat=\"1\"/><w:lsdException w:name=\"table of figures\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope address\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope return\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footnote reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"annotation reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"line number\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"page number\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"endnote reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"endnote text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"table of authorities\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"macro\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toa heading\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List\" w:semiHidden=\"1\" w:unhideWh",
+            "source": null,
+            "match": "notation"
+          },
+          {
+            "text": "w:lsdException w:name=\"HTML Code\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Definition\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Keyboard\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Preformatted\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Sample\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Typewriter\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Variable\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Normal Table\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"annotation subject\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"No List\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Outline List 1\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Outline List 2\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Outline List 3\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Table Simple 1\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Table Simple 2\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Table Simple 3\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Table Classic 1\" w:semiHidden=\"",
+            "source": null,
+            "match": "notation"
+          },
+          {
+            "text": ":themeColor=\"accent1\"/></w:rPr></w:style><w:style w:type=\"character\" w:styleId=\"SubtleEmphasis\"><w:name w:val=\"Subtle Emphasis\"/><w:basedOn w:val=\"DefaultParagraphFont\"/><w:uiPriority w:val=\"19\"/><w:qFormat/><w:rsid w:val=\"00BB1BA2\"/><w:rPr><w:i/><w:iCs/><w:color w:val=\"808080\" w:themeColor=\"text1\" w:themeTint=\"7F\"/></w:rPr></w:style><w:style w:type=\"paragraph\" w:styleId=\"ListParagraph\"><w:name w:val=\"List Paragraph\"/><w:basedOn w:val=\"Normal\"/><w:uiPriority w:val=\"34\"/><w:qFormat/><w:rsid w:val=\"00BB1BA2\"/><w:pPr><w:ind w:left=\"720\"/><w:contextualSpacing/></w:pPr></w:style><w:style w:type=\"paragraph\" w:styleId=\"CommentText\"><w:name w:val=\"annotation text\"/><w:basedOn w:val=\"Normal\"/><w:link w:val=\"CommentTextChar\"/><w:uiPriority w:val=\"99\"/><w:rsid w:val=\"00BB1BA2\"/><w:pPr><w:spacing w:line=\"240\" w:lineRule=\"auto\"/></w:pPr><w:rPr><w:i/><w:color w:val=\"808080\" w:themeColor=\"background1\" w:themeShade=\"80\"/><w:szCs w:val=\"20\"/></w:rPr></w:style><w:style w:type=\"character\" w:customStyle=\"1\" w:styleId=\"CommentTextChar\"><w:name w:val=\"Comment Text Char\"/><w:basedOn w:val=\"DefaultParagraphFont\"/><w:link w:val=\"CommentText\"/><w:uiPriority w:val=\"99\"/><w:rsid w:val=\"00BB1BA2\"/><w:rPr><w:i/><w:color w:val=\"808080\" w:themeColor=\"background1\" w:themeShade=\"80\"/><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/",
+            "source": null,
+            "match": "notation"
+          }
+        ],
+        "forms_signatures": [
+          {
+            "text": "w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Bullet 4\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Bullet 5\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 2\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 3\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 4\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 5\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Title\" w:uiPriority=\"10\" w:qFormat=\"1\"/><w:lsdException w:name=\"Closing\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Signature\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Default Paragraph Font\" w:semiHidden=\"1\" w:uiPriority=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Body Text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Body Text Indent\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue 2\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue 3\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue 4\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Con",
+            "source": null,
+            "match": "Signature"
+          },
+          {
+            "text": ":unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Body Text Indent 3\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Block Text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Hyperlink\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"FollowedHyperlink\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Strong\" w:uiPriority=\"22\" w:qFormat=\"1\"/><w:lsdException w:name=\"Emphasis\" w:uiPriority=\"20\" w:qFormat=\"1\"/><w:lsdException w:name=\"Document Map\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Plain Text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"E-mail Signature\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Top of Form\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Bottom of Form\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Normal (Web)\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Acronym\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Address\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Cite\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Code\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Definition\" w:semiHidden=\"1\" w:unhid",
+            "source": null,
+            "match": "Signature"
+          }
+        ],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32013885449,
+      "source_shard": 9,
+      "hot_ready_at": "2026-08-17T09:14:54.439088+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 11,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
       "candidate_id": "US-SAM:b173052a4ab44acbb0ee73248125dee6",
       "title": "DG11--National Local Exchange Carrier Services Service Order 26 - Recompete",
       "buyer": "VETERANS AFFAIRS, DEPARTMENT OF",
@@ -1054,6 +1564,303 @@
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
+      "candidate_id": "US-SAM:819067b8f57f4a07b68b96a7fdd3a154",
+      "title": "459 MXS Rotary Air Compressor Replacement",
+      "buyer": "DEPT OF DEFENSE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/opp/819067b8f57f4a07b68b96a7fdd3a154/view",
+      "deadline": "2026-08-28T16:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 60,
+      "priority_score": 60,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNLABELLED_DCE_DEADLINE_CONFLICT_REVIEW_REQUIRED",
+        "conflict": true,
+        "notice_deadline_raw": "2026-08-28T16:00:00+00:00",
+        "notice_deadline_date": "2026-08-28",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [
+          "2015-01-01",
+          "2022-01-29",
+          "2022-01-30",
+          "2026-05-11",
+          "2026-12-31"
+        ],
+        "labelled_evidence": [],
+        "evidence": [
+          {
+            "date": "2015-01-01",
+            "match": "January 1, 2015",
+            "context": "rements and worker protections \nunder the EO is available at www.dol.gov/whd/govcontracts.\n\nNote: Executive Order 13658 generally applies to contracts subject to the Service \nContract Act that were awarded on or between January 1, 2015 and January 29, 2022, \nand that have not been renewed or extended on or after January 30, 2022. If a \ncontract is subject to Executive Order 13658, the contractor must pay all covered \nworkers at least $13.65 per hour ("
+          },
+          {
+            "date": "2022-01-29",
+            "match": "January 29, 2022",
+            "context": "rotections \nunder the EO is available at www.dol.gov/whd/govcontracts.\n\nNote: Executive Order 13658 generally applies to contracts subject to the Service \nContract Act that were awarded on or between January 1, 2015 and January 29, 2022, \nand that have not been renewed or extended on or after January 30, 2022. If a \ncontract is subject to Executive Order 13658, the contractor must pay all covered \nworkers at least $13.65 per hour (or the applicable wag"
+          },
+          {
+            "date": "2022-01-30",
+            "match": "January 30, 2022",
+            "context": "te: Executive Order 13658 generally applies to contracts subject to the Service \nContract Act that were awarded on or between January 1, 2015 and January 29, 2022, \nand that have not been renewed or extended on or after January 30, 2022. If a \ncontract is subject to Executive Order 13658, the contractor must pay all covered \nworkers at least $13.65 per hour (or the applicable wage rate listed on this wage determination, if it is higher) for all hours s"
+          },
+          {
+            "date": "2026-05-11",
+            "match": "May 11, 2026",
+            "context": "ive Order 13658, the contractor must pay all covered \nworkers at least $13.65 per hour (or the applicable wage rate listed on this wage determination, if it is higher) for all hours spent performing on the contract from May 11, 2026, through December 31, 2026. The applicable Executive Order minimum wage rate will be adjusted annually. \nAdditional information on contractor requirements and worker protections under \nExecutive Order 13658 is available"
+          },
+          {
+            "date": "2026-12-31",
+            "match": "December 31, 2026",
+            "context": "ontractor must pay all covered \nworkers at least $13.65 per hour (or the applicable wage rate listed on this wage determination, if it is higher) for all hours spent performing on the contract from May 11, 2026, through December 31, 2026. The applicable Executive Order minimum wage rate will be adjusted annually. \nAdditional information on contractor requirements and worker protections under \nExecutive Order 13658 is available at www.dol.gov/whd/govcont"
+          },
+          {
+            "date": "2015-01-01",
+            "match": "January 1, 2015",
+            "context": " contract also covered by EO 13706, Establishing Paid \nle at www.dol.gov/whd/govcontracts.\n\nNote: Executive Order 13658 generally applies to contracts subject to the Service \nContract Act that were awarded on or between January 1, 2015 and January 29, 2022, \nand that have not been renewed or extended on or after January 30, 2022. If a \ncontract is subject to Executive Order 13658, the contractor must pay all covered \nworkers at least $13.65 per hour ("
+          },
+          {
+            "date": "2022-01-29",
+            "match": "January 29, 2022",
+            "context": "ed by EO 13706, Establishing Paid \nle at www.dol.gov/whd/govcontracts.\n\nNote: Executive Order 13658 generally applies to contracts subject to the Service \nContract Act that were awarded on or between January 1, 2015 and January 29, 2022, \nand that have not been renewed or extended on or after January 30, 2022. If a \ncontract is subject to Executive Order 13658, the contractor must pay all covered \nworkers at least $13.65 per hour (or the applicable wag"
+          },
+          {
+            "date": "2022-01-30",
+            "match": "January 30, 2022",
+            "context": "te: Executive Order 13658 generally applies to contracts subject to the Service \nContract Act that were awarded on or between January 1, 2015 and January 29, 2022, \nand that have not been renewed or extended on or after January 30, 2022. If a \ncontract is subject to Executive Order 13658, the contractor must pay all covered \nworkers at least $13.65 per hour (or the applicable wage rate listed on this wage determination, if it is higher) for all hours s"
+          },
+          {
+            "date": "2026-05-11",
+            "match": "May 11, 2026",
+            "context": "ive Order 13658, the contractor must pay all covered \nworkers at least $13.65 per hour (or the applicable wage rate listed on this wage determination, if it is higher) for all hours spent performing on the contract from May 11, 2026, through December 31, 2026. The applicable Executive Order minimum wage rate will be adjusted annually. \nAdditional information on contractor requirements and worker protections under \nExecutive Order 13658 is available"
+          },
+          {
+            "date": "2026-12-31",
+            "match": "December 31, 2026",
+            "context": "ontractor must pay all covered \nworkers at least $13.65 per hour (or the applicable wage rate listed on this wage determination, if it is higher) for all hours spent performing on the contract from May 11, 2026, through December 31, 2026. The applicable Executive Order minimum wage rate will be adjusted annually. \nAdditional information on contractor requirements and worker protections under \nExecutive Order 13658 is available at www.dol.gov/whd/govcont"
+          }
+        ],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 3,
+          "unique_contexts": 3
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNLABELLED_DCE_DEADLINE_CONFLICT_REVIEW_REQUIRED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 11,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "RFORMANCE: Work should be completed within 30 calendar days of contract award. 4. HOURS OF PERFORMANCE: Work shall generally be performed during the working hours of 0700 – 1530, Monday through Friday. Work performed during other than standard hours shall be coordinated with the COR. Any unresolved coordination will be referred to the Contracting Officer (CO). The contractor shall maintain personal continuity to the maximum extent possible. Service will not be required for the following federal holidays on the observed day: New Year’s Day, January 1 st (or as observed) Martin Luther King’s Birthday, 3rd Monday in January President’s Day, 3rd Monday in February Memorial Day, Last Monday in May Juneteenth, June 19th (or as observed) Independence Day, July 4th (or as observed) Labor Day, 1st Monday in September Columbus Day, 2nd Monday in October Veteran’s Day, November 11th (or as observed) Thanksgiving Day, 4th Thursday in November Christmas Day, December 25th (or as observed) 5. Contractor Personnel and Security Clearance Requirements: All tasks must be conducted in full compliance with DOD security regulations. 6. GOVERNMENT FURNISHED PROPERTY AND SERVICES: 6.1. Facilities and Support Services. 6.1.1. The contractor shall keep government-furnished",
+            "source": null,
+            "match": "resident"
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "/xs:attribute> <xs:attribute ref=\"pc:EntityName\"></xs:attribute> <xs:attribute ref=\"pc:SystemInstanceName\"></xs:attribute> <xs:attribute ref=\"pc:AssociationName\"></xs:attribute> </xs:complexType> </xs:element> <xs:attribute name=\"EntityNamespace\" type=\"xs:string\"></xs:attribute> <xs:attribute name=\"EntityName\" type=\"xs:string\"></xs:attribute> <xs:attribute name=\"SystemInstanceName\" type=\"xs:string\"></xs:attribute> <xs:attribute name=\"AssociationName\" type=\"xs:string\"></xs:attribute> <xs:element name=\"BDCEntity\"> <xs:complexType> <xs:sequence> <xs:element ref=\"pc:EntityDisplayName\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityInstanceReference\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId1\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId2\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId3\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId4\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId5\" minOccurs=\"0\"></xs:element> </xs:sequence> </xs:complexType> </xs:element> <xs:element name=\"EntityDisplayName\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityInstanceReference\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId1\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId2\" type=\"xs:string\"></xs:element> <xs:element name",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "ibute> <xs:element name=\"BDCEntity\"> <xs:complexType> <xs:sequence> <xs:element ref=\"pc:EntityDisplayName\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityInstanceReference\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId1\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId2\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId3\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId4\" minOccurs=\"0\"></xs:element> <xs:element ref=\"pc:EntityId5\" minOccurs=\"0\"></xs:element> </xs:sequence> </xs:complexType> </xs:element> <xs:element name=\"EntityDisplayName\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityInstanceReference\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId1\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId2\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId3\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId4\" type=\"xs:string\"></xs:element> <xs:element name=\"EntityId5\" type=\"xs:string\"></xs:element> <xs:element name=\"Terms\"> <xs:complexType> <xs:sequence> <xs:element ref=\"pc:TermInfo\" minOccurs=\"0\" maxOccurs=\"unbounded\"></xs:element> </xs:sequence> </xs:complexType> </xs:element> <xs:element name=\"TermInfo\"> <xs:complexType> <xs:sequence> <xs:element ref=\"pc:TermName\" minOccurs=\"0\"></xs:element> <xs:element ref",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": ": 2408573103 16. ADMINISTERED BY CODE: 17a. CONTRACTOR/ OFFERER CODE FACILITY CODE: TELEPHONE NUMBER 18a. PAYMENT WILL BE MADE BY CODE: 17b. CHECK IF REMITTANCE IS DIFFERENT AND PUT SUCH ADDRESS IN OFFER 18b. SUBMIT INVOICES TO ADDRESS SHOWN IN BLOCK 18a UNLESS BLOCK BELOW IS CHECKED SEE ADDENDUM 19. ITEM NUMBER 20. SCHEDULE OF SUPPLIES/SERVICES 21. QUANTITY 22. UNIT 23. UNIT PRICE 24. AMOUNT See Schedule (Use Reverse and/or Attach Additional Sheets as Necessary) 25. ACCOUNTING AND APPROPRIATION DATA See Section G - Contract Administration Data 26. TOTAL AWARD AMOUNT (For Government Use Only) 27a. SOLICITATION INCORPORATES BY REFERENCE (FEDERAL ACQUISITION REGULATION) FAR 52.212-1, 52.212-4. FAR 52.212-3 AND 52.212-5 ARE ATTACHED. ADDENDA ARE ARE NOT ATTACHED 27b. CONTRACT/PURCHASE ORDER INCORPORATES BY REFERENCE FAR 52.212-4. FAR 52.212-5 IS ATTACHED. ADDENDA ARE ARE NOT ATTACHED 28. CONTRACTOR IS REQUIRED TO SIGN THIS DOCUMENT AND RETURN COPIES TO ISSUING OFFICE. CONTRACTOR AGREES TO FURNISH AND DELIVER ALL ITEMS SET FORTH OR OTHERWISE IDENTIFIED ABOVE AND ON ANY ADDITIONAL SHEETS SUBJECT TO THE TERMS AND CONDITIONS SPECIFIED 29. AWARD OF CONTRACT: REFERENCE OFFER DATED . YOUR OFFER ON SOLICITATION (BLOCK 5), INCLUDING ANY ADDITIONS OR C",
+            "source": null,
+            "match": "REFERENCE"
+          },
+          {
+            "text": "CH ADDRESS IN OFFER 18b. SUBMIT INVOICES TO ADDRESS SHOWN IN BLOCK 18a UNLESS BLOCK BELOW IS CHECKED SEE ADDENDUM 19. ITEM NUMBER 20. SCHEDULE OF SUPPLIES/SERVICES 21. QUANTITY 22. UNIT 23. UNIT PRICE 24. AMOUNT See Schedule (Use Reverse and/or Attach Additional Sheets as Necessary) 25. ACCOUNTING AND APPROPRIATION DATA See Section G - Contract Administration Data 26. TOTAL AWARD AMOUNT (For Government Use Only) 27a. SOLICITATION INCORPORATES BY REFERENCE (FEDERAL ACQUISITION REGULATION) FAR 52.212-1, 52.212-4. FAR 52.212-3 AND 52.212-5 ARE ATTACHED. ADDENDA ARE ARE NOT ATTACHED 27b. CONTRACT/PURCHASE ORDER INCORPORATES BY REFERENCE FAR 52.212-4. FAR 52.212-5 IS ATTACHED. ADDENDA ARE ARE NOT ATTACHED 28. CONTRACTOR IS REQUIRED TO SIGN THIS DOCUMENT AND RETURN COPIES TO ISSUING OFFICE. CONTRACTOR AGREES TO FURNISH AND DELIVER ALL ITEMS SET FORTH OR OTHERWISE IDENTIFIED ABOVE AND ON ANY ADDITIONAL SHEETS SUBJECT TO THE TERMS AND CONDITIONS SPECIFIED 29. AWARD OF CONTRACT: REFERENCE OFFER DATED . YOUR OFFER ON SOLICITATION (BLOCK 5), INCLUDING ANY ADDITIONS OR CHANGES WHICH ARE SET FORTH HEREIN, IS ACCEPTED AS TO ITEMS: 30a. SIGNATURE OF OFFEROR/CONTRACTOR 31a. UNITED STATES OF AMERICA (SIGNATURE OF CONTRACTING OFFICER) 30b. NAME AND TITLE OF",
+            "source": null,
+            "match": "REFERENCE"
+          }
+        ],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [
+          {
+            "text": "Air Force ombudsman, Associate Deputy Assistant Secretary (ADAS) (Contracting), SAF/AQC, 1060 Air Force Pentagon, Washington DC 20330-1060, phone number (571) 256-2395, facsimile number (571) 256-2431. (d) The ombudsman has no authority to render a decision that binds the agency. (e) Do not contact the ombudsman to request copies of the solicitation, verify offer due date, or clarify technical requirements. Such inquiries shall be directed to the contracting ofﬁcer. Health and Safety on Government Installations In performing work under this contract on a Government installation, the contractor shall: 1. Take all reasonable steps and precautions to prevent accidents and preserve the health and safety of contractor and Government personnel performing or in any way coming in contact with the performance of this contract; and A. Take such additional immediate precautions as the contracting ofﬁcer may reasonably require for health and safety purposes FA286026Q00250001 Page 10 of 19 2. The contracting ofﬁcer may, by written order, direct Department of the Air Force Occupational Safety and Health (AFOSH) Standards and/or health/safety standards as may be required in the performance of this contract and any adjustments resulting from such direction will be in accordan",
+            "source": null,
+            "match": "caution"
+          },
+          {
+            "text": "render a decision that binds the agency. (e) Do not contact the ombudsman to request copies of the solicitation, verify offer due date, or clarify technical requirements. Such inquiries shall be directed to the contracting ofﬁcer. Health and Safety on Government Installations In performing work under this contract on a Government installation, the contractor shall: 1. Take all reasonable steps and precautions to prevent accidents and preserve the health and safety of contractor and Government personnel performing or in any way coming in contact with the performance of this contract; and A. Take such additional immediate precautions as the contracting ofﬁcer may reasonably require for health and safety purposes FA286026Q00250001 Page 10 of 19 2. The contracting ofﬁcer may, by written order, direct Department of the Air Force Occupational Safety and Health (AFOSH) Standards and/or health/safety standards as may be required in the performance of this contract and any adjustments resulting from such direction will be in accordance with the Changes clause of this contract. 3. Any violation of these health and safety rules and requirements, unless promptly corrected as directed by the contracting ofﬁcer, shall be grounds for termination of this contract in accordance",
+            "source": null,
+            "match": "caution"
+          },
+          {
+            "text": "erhead to the contracting ofﬁcer listing the following: contract number, location of work site, start and stop dates, and names of employees and subcontractor employees needing access to the base. The letter will also specify the individual(s) authorized to sign for a request for base identiﬁcation credentials or vehicle passes. The contracting ofﬁcer will endorse the request and forward it to the issuing base pass and registration ofﬁce or Security Forces for processing. When reporting to the registration ofﬁce, the authorized contractor individual(s) should provide a valid driver's license, current vehicle registration, valid vehicle insurance certiﬁcate, and [insert any additional requirements to comply with local security procedures] to obtain a vehicle pass. * During performance of the contract, the contractor shall be responsible for obtaining required identiﬁcation for newly assigned personnel and for prompt return of credentials and vehicle passes for any employee who no longer requires access to the work site. FA286026Q00250001 Page 11 of 19 * When work under this contract requires unescorted entry to controlled or restricted areas, the contractor shall comply with[insert any additional requirements to comply withDAFI 31-101, Integrated Defense, andDODMAN5200.02_D",
+            "source": null,
+            "match": "insurance"
+          }
+        ],
+        "subcontracting_consortium": [
+          {
+            "text": "The contractor shall obtain base identiﬁcation and vehicle passes, if required, for all contractor personnel who make frequent visits to or perform work on the Department of the Air Force installation(s) cited in the contract. Contractor personnel are required to wear or prominently display installation identiﬁcation badges or contractor-furnished, contractor identiﬁcation badges while visiting or performing work on the installation. * The contractor shall submit a written request on company letterhead to the contracting ofﬁcer listing the following: contract number, location of work site, start and stop dates, and names of employees and subcontractor employees needing access to the base. The letter will also specify the individual(s) authorized to sign for a request for base identiﬁcation credentials or vehicle passes. The contracting ofﬁcer will endorse the request and forward it to the issuing base pass and registration ofﬁce or Security Forces for processing. When reporting to the registration ofﬁce, the authorized contractor individual(s) should provide a valid driver's license, current vehicle registration, valid vehicle insurance certiﬁcate, and [insert any additional requirements to comply with local security procedures] to obtain a vehicle pass. * During performance of t",
+            "source": null,
+            "match": "subcontract"
+          },
+          {
+            "text": "entials and vehicle passes for any employee who no longer requires access to the work site. FA286026Q00250001 Page 11 of 19 * When work under this contract requires unescorted entry to controlled or restricted areas, the contractor shall comply with[insert any additional requirements to comply withDAFI 31-101, Integrated Defense, andDODMAN5200.02_DAFMAN 16-1405 , Air Force Personnel Security Program]citing the appropriate paragraphs as applicable. * Upon completion or termination of the contract or expiration of the identiﬁcation passes, the prime contractor shall ensure that all base identiﬁcation passes issued to employees and subcontractor employees are returned to the issuing ofﬁce.The contractor shall provide an after-hours contact number or after-hours email in the Emergency Mass Notiﬁcation System (EMNS) for each of their personnel, whose normal place of duty is on a DoD installation or within a DoD facility. The contractor shall comply with any additional requirements in DAFMAN 10-206 for emergency operational reporting. Foreign Nationals may participate and may remove themselves from the Emergency Mass Notiﬁcation System at any time. To update information, personnel can access the globe icon on their system desktop screens and choose the \"Access Self-Service\" opt",
+            "source": null,
+            "match": "subcontract"
+          },
+          {
+            "text": "on System at any time. To update information, personnel can access the globe icon on their system desktop screens and choose the \"Access Self-Service\" option. * Failure to comply with these requirements may result in withholding of ﬁnal payment. FA286026Q00250001 Page 12 of 19 Contract Clauses FAR Clauses Incorporated by Reference Number Title Effective Date Alternate/ Deviation Variation Effective Date 52.203-19 Prohibition on Requiring Certain Internal Conﬁdentiality Agreements or Statements. Jan 2017 52.204-13 System for Award Management-Maintenance. (Deviation 2026-O0038) Feb 2026 52.209-6 Protecting the Government's Interest When Subcontracting With Contractors Debarred, Suspended, Proposed for Debarment, or Voluntarily Excluded. (Deviation 2026-O0038) Feb 2026 52.209-10 Prohibition on Contracting With Inverted Domestic Corporations. (Deviation 2026-O0038) Feb 2026 52.212-4 Terms and Conditions-Commercial Products and Commercial Services. (Deviation 2026-O0038) Feb 2026 52.219-6 Notice of Total Small Business Set-Aside. (Deviation 2026-O0038) Feb 2026 52.222-3 Convict Labor. (Deviation 2026-O0038) Feb 2026 52.222-36 Equal Opportunity for Workers with Disabilities. (Deviation 2026-O0038) Feb 2026 52.222-41 Service Contract Labor Standards. (Deviation 2026-O0038) Feb 2026 52.222-",
+            "source": null,
+            "match": "Subcontract"
+          },
+          {
+            "text": "026-O0038) Feb 2026 52.222-50 Combating Trafﬁcking in Persons. (Deviation 2026-O0038) Feb 2026 52.222-62 Paid Sick Leave Under Executive Order 13706. (Deviation 2026-O0038) Feb 2026 52.222-90 Addressing DEI Discrimination by Federal Contractors. (Deviation 2026-O0040, Revision 1) Apr 2026 52.223-23 Sustainable Products. (Deviation 2026-O0038) Feb 2026 52.226-8 Encouraging Contractor Policies to Ban Text Messaging While Driving. May 2024 52.232-33 Payment by Electronic Funds Transfer-System for Award Management. Oct 2018 52.232-39 Unenforceability of Unauthorized Obligations. Jun 2013 52.232-40 Providing Accelerated Payments to Small Business Subcontractors. Mar 2023 52.233-3 Protest after Award. (Deviation 2026-O0038) Feb 2026 52.233-4 Applicable Law for Breach of Contract Claim. (Deviation 2026-O0038) Feb 2026 52.240-91 Security Prohibitions and Exclusions. (Deviation 2026-O0038) Feb 2026 52.244-6 Subcontracts for Commercial Products and Commercial Services. (Deviation 2026-O0038) Apr 2026 DFARS Clauses Incorporated by Reference Number Title Effective Date Alternate/ Deviation Variation Effective Date 252.203-7000 Requirements Relating to Compensation of Former DoD Ofﬁcials. Sep 2011 252.203-7002 Requirement to Inform Employees of Whistleblower Rights. Dec 2022 252.204-7003 Control of G",
+            "source": null,
+            "match": "Subcontract"
+          }
+        ],
+        "deliverables_scope": [
+          {
+            "text": "===== FILE: files/Hangar_10_Compressor_Statement_of_Work.pdf ===== Page 1 of 4 HANGAR 10 AIR COMPRESSOR STATEMENT OF WORK 13 May 2026 1. DESCRIPTION OF SERVICES: BACKGROUND: 1.1. This Statement of Work (SOW) defines 1.2. TASK/SCOPE OF WORK: The Contractor will conduct the following tasks under this effort. 1.2.1. This Statement of Work (SOW) outlines the responsibilities of contractor chosen for the supply and installation of two each, air compressors, air dryer and oil water separator. It’s also for the removal and haul away of 2 each air compressor at 3640 Patrick Avenue, Joint Base Andrews. This project includes the replacement of the existing Ingersoll Rand 30 hp rotary screw compressors (2 each), refrigerated air dryer, and oil-wate",
+            "source": null,
+            "match": "STATEMENT OF WORK"
+          },
+          {
+            "text": "for the removal and haul away of 2 each air compressor at 3640 Patrick Avenue, Joint Base Andrews. This project includes the replacement of the existing Ingersoll Rand 30 hp rotary screw compressors (2 each), refrigerated air dryer, and oil-water separator with two each of the same spec air compressor, air dryer and oil-water separator. This will include all the piping needed to connect the two air compressors, air dryer and oil-water separator to the existing piping to disperse the air through the building. 1.2.2. The two Quincy QGD-30 or equivalent air compressors will provide a reliable and continuous source of high-pressure, high-volume compressed air, which is critical for all pneumatic operations within the aircraft structural maintenance shop. They will replace our current, failing system, which consists of one inoperable unit and one that consistently overheats, causing severe operational delays. This new system is expected to eliminate work stoppages and significantly improve the efficiency of critical maintenance tasks such as sandblasting, painting, sanding, and operating various pneumatic hand tools. The continuous-duty rating and robust cooling will ensure the compressors can meet our high operational tempo without failure. This directly supports our missio",
+            "source": null,
+            "match": "volume"
+          },
+          {
+            "text": "blasting, painting, sanding, and operating various pneumatic hand tools. The continuous-duty rating and robust cooling will ensure the compressors can meet our high operational tempo without failure. This directly supports our mission by increasing productivity, reducing aircraft downtime, and ensuring maintenance schedules are met consistently and safely. 1.2.3. Physical characteristics: 1.2.4. Performance: Must be a 30-horsepower, continuous-duty rotary screw air compressor. 1.2.5. Equipment Supply and Delivery: Furnish and deliver the specified new compressor system (2 each air compressors, oil-water separator and air dryer) • Quantity: Two (2) rotary screw air compressors • Model: Quincy QGD-30 or equivalent • Power Supply: 230/460V 3-Phase industrial power • Configuration: Tank-mounted to ensure a ready supply of compressed air and reduce cycle frequency. • Footprint: Approximate dimensions should not exceed 75\" L x 40\" W x 70\" H to fit within the existing equipment space. Page 2 of 4 equipment to 3640 Patrick Ave., Joint Base Andrews. (Details of the new equipment are provided in a separate appendix/attachment.) 1.2.6. Removal of Existing Equipment: Remove two each Ingersoll Rand 30 hp rotary screw compressors, refrigerated air dryer, and oil-water separa",
+            "source": null,
+            "match": "Quantity"
+          },
+          {
+            "text": "is complete the contractor along with end user will ensure there aren’t any air leaks in new work. 1.2.14. Electrical Connection: Connect the new equipment to the existing electrical supply. If incorrect power supply is in breaker box. Contractor will run a line to breaker box for correct hook up power. Contractor will follow all Joint Base Andrews, DoW, county, state and federal codes to hook up new equipment to existing power supply. 1.2.15. Equipment Disposal: Upon completion of the installation, contractor will haul away the existing equipment removed and dispose of it in a manner that meets EPA, State of Maryland and Federal requirements 1.2.16. Operational Standards: all work to be performed in accordance with federal, state, and local regulatory requirements and standard operating procedures. 1.2.17. Project Timeline and Working Hours 1.2.18. All work will be performed during regular working hours, Monday through Friday, from 7:00 AM to 3:30 PM. A detailed project schedule will be provided by contractor following contract award. 1.2.19. Contractor will secure all appropriate badging to get on Joint Base Andrews, Md. Page 3 of 4 1.2.20. Civil engineering will provide all escorts and end user will not be responsible for monitoring workers at the jobsite 1",
+            "source": null,
+            "match": "requirements"
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "1.4.3. Understand systems/security requirements. 1.4.4. Present a professional appearance and wear badges identifying them as contractors. 2. PLACE OF PERFORMANCE: 3640 Patrick Avenue, Hangar 11, Joint Base Andrews, MD 20762 3. PERIOD OF PERFORMANCE: Work should be completed within 30 calendar days of contract award. 4. HOURS OF PERFORMANCE: Work shall generally be performed during the working hours of 0700 – 1530, Monday through Friday. Work performed during other than standard hours shall be coordinated with the COR. Any unresolved coordination will be referred to the Contracting Officer (CO). The contractor shall maintain personal continuity to the maximum extent possible. Service will not be required for the following federal holidays on the observed day: New Year’s Day, January 1 st (or as observed) Martin Luther King’s Birthday, 3rd Monday in January President’s Day, 3rd Monday in February Memorial Day, Last Monday in May Juneteenth, June 19th (or as observed) Independence Day, July 4th (or as observed) Labor Day, 1st Monday in September Columbus Day, 2nd Monday in October Veteran’s Day, November 11th (or as observed) Thanksgiving Day, 4th Thursday in November Christmas Day, December 25th (or as observed) 5. Contractor Personnel and Security Clea",
+            "source": null,
+            "match": "in person"
+          },
+          {
+            "text": "| | | | | | | | | | | | SFS | | | | | | | | | | da | | Sponsor Information | | | | | | | | | | | | Last name | | | First Name | | | Unit/Organization | | | Contact # | | | E-Mail Address | | | | | | | | | | | | Visitor Information | | | | | | | | | | | | INSTRUCTIONS TO OFFERORS: PRIVACY ACT 1974- Contents shall not be disclosed, discussed, or shared with individuals unless they have direct need-to-know in the performance of their official duties. Deliver this document directly to the intended recipient DO NOT drop off with a third-party. | | | | | | | | | | | | Site visits will be conducted on 25 August 2026 (starting at 1000 EST at 3640 Patrick Ave, Joint Base Andrews, MD 20762). Contractors MUST fill out the attached security base access form and submit to MSgt Kalani Herrera at kalani.herrera.2@us.af.mil NLT than 1600 EST on 20 August 2026 to secure base access. On the day of the event, attendees must meet at the Visitor Control Center 1832 Robert M. Bond Dr, Morningside, MD 20746) 15–20 minutes PRIOR to clear security, while all other contractual or solicitation-related inquiries must be routed directly to the Contract Specialist, 2d Lt Trixie Delacruz, at trixie_ann.delacruz@us.af.mil Last Name | First N",
+            "source": null,
+            "match": "Site visit"
+          },
+          {
+            "text": "be disclosed, discussed, or shared with individuals unless they have direct need-to-know in the performance of their official duties. Deliver this document directly to the intended recipient DO NOT drop off with a third-party.</t></r><r><rPr><sz val=\"14\"/><rFont val=\"Arial\"/><family val=\"2\"/></rPr><t xml:space=\"preserve\"> </t></r></si><si><t>Last Name</t></si><si><t>MI</t></si><si><t>SSN</t></si><si><t>DOB</t></si><si><t>Start Date</t></si><si><t>End Date</t></si><si><t>Destination</t></si><si><t>State/DL Number</t></si><si><t xml:space=\"preserve\">State/Tag </t></si><si><t>Company/Org</t></si><si><t>INSTRUCTIONS TO OFFERORS:</t></si><si><t>Site visits will be conducted on 25 August 2026 (starting at 1000 EST at 3640 Patrick Ave, Joint Base Andrews, MD 20762). Contractors MUST fill out the attached security base access form and submit to MSgt Kalani Herrera at kalani.herrera.2@us.af.mil NLT than 1600 EST on 20 August 2026 to secure base access. On the day of the event, attendees must meet at the Visitor Control Center 1832 Robert M. Bond Dr, Morningside, MD 20746) 15–20 minutes PRIOR to clear security, while all other contractual or solicitation-related inquiries must be routed directly to the Contract Specialist, 2d Lt Trixie Delacruz, at trixie_ann.delacruz@us.af.mil</t></si></sst> ===",
+            "source": null,
+            "match": "Site visit"
+          },
+          {
+            "text": "arred, Suspended, Proposed for Debarment, or Voluntarily Excluded. (Deviation 2026-O0038) Feb 2026 52.209-10 Prohibition on Contracting With Inverted Domestic Corporations. (Deviation 2026-O0038) Feb 2026 52.212-4 Terms and Conditions-Commercial Products and Commercial Services. (Deviation 2026-O0038) Feb 2026 52.219-6 Notice of Total Small Business Set-Aside. (Deviation 2026-O0038) Feb 2026 52.222-3 Convict Labor. (Deviation 2026-O0038) Feb 2026 52.222-36 Equal Opportunity for Workers with Disabilities. (Deviation 2026-O0038) Feb 2026 52.222-41 Service Contract Labor Standards. (Deviation 2026-O0038) Feb 2026 52.222-50 Combating Trafﬁcking in Persons. (Deviation 2026-O0038) Feb 2026 52.222-62 Paid Sick Leave Under Executive Order 13706. (Deviation 2026-O0038) Feb 2026 52.222-90 Addressing DEI Discrimination by Federal Contractors. (Deviation 2026-O0040, Revision 1) Apr 2026 52.223-23 Sustainable Products. (Deviation 2026-O0038) Feb 2026 52.226-8 Encouraging Contractor Policies to Ban Text Messaging While Driving. May 2024 52.232-33 Payment by Electronic Funds Transfer-System for Award Management. Oct 2018 52.232-39 Unenforceability of Unauthorized Obligations. Jun 2013 52.232-40 Providing Accelerated Payments to Small Business Subcontractors. Mar 2023 52.233-3 Protest after Award. (Devi",
+            "source": null,
+            "match": "in Person"
+          }
+        ],
+        "term_value": [
+          {
+            "text": "must meet at the Visitor Control Center 1832 Robert M. Bond Dr, Morningside, MD 20746) 15–20 minutes PRIOR to clear security, while all other contractual or solicitation-related inquiries must be routed directly to the Contract Specialist, 2d Lt Trixie Delacruz, at trixie_ann.delacruz@us.af.mil Last Name | First Name | MI | SSN | DOB | Start Date | End Date | Destination | State/DL Number | State/Tag | Company/Org | | ===== FILE: files/Security_Base_Access_Form_ch1_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"bin\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.printerSettings\"/><Default Extension=\"jpeg\" ContentType=\"image/jpeg\"/><Default Extension=\"png\" ContentType=\"image/png\"/><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/><Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/><Override PartName=\"/xl/theme/th",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "security, while all other contractual or solicitation-related inquiries must be routed directly to the Contract Specialist, 2d Lt Trixie Delacruz, at trixie_ann.delacruz@us.af.mil Last Name | First Name | MI | SSN | DOB | Start Date | End Date | Destination | State/DL Number | State/Tag | Company/Org | | ===== FILE: files/Security_Base_Access_Form_ch1_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"bin\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.printerSettings\"/><Default Extension=\"jpeg\" ContentType=\"image/jpeg\"/><Default Extension=\"png\" ContentType=\"image/png\"/><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/><Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/><Override PartName=\"/xl/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/><Override PartName=\"/xl/styles.xml\"",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "n-related inquiries must be routed directly to the Contract Specialist, 2d Lt Trixie Delacruz, at trixie_ann.delacruz@us.af.mil Last Name | First Name | MI | SSN | DOB | Start Date | End Date | Destination | State/DL Number | State/Tag | Company/Org | | ===== FILE: files/Security_Base_Access_Form_ch1_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"bin\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.printerSettings\"/><Default Extension=\"jpeg\" ContentType=\"image/jpeg\"/><Default Extension=\"png\" ContentType=\"image/png\"/><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/><Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/><Override PartName=\"/xl/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/><Override PartName=\"/xl/styles.xml\" ContentType=\"application/vnd.openxmlformats-officed",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "Contract Specialist, 2d Lt Trixie Delacruz, at trixie_ann.delacruz@us.af.mil Last Name | First Name | MI | SSN | DOB | Start Date | End Date | Destination | State/DL Number | State/Tag | Company/Org | | ===== FILE: files/Security_Base_Access_Form_ch1_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"bin\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.printerSettings\"/><Default Extension=\"jpeg\" ContentType=\"image/jpeg\"/><Default Extension=\"png\" ContentType=\"image/png\"/><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/><Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/><Override PartName=\"/xl/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/><Override PartName=\"/xl/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\"/><Override PartN",
+            "source": null,
+            "match": "Extension"
+          }
+        ],
+        "award_criteria": [
+          {
+            "text": "ring operating parameters, managing load/unload cycles, and providing service alerts. 1.2.9. Duty Cycle: Must be rated for 100% continuous duty to operate reliably without overheating in a high-demand, non-climate-controlled environment. 1.2.10. Air Delivery: Capable of delivering a minimum of 125 CFM at 125 PSIG to power multiple high-demand pneumatic tools simultaneously. 1.2.11. Moisture Control: The new compressor system must include an automated means of expelling any water and moisture accumulation, such as an auto purge valve, to prevent corrosion and ensure the integrity of the compressed air distribution system. 1.2.12. Air Quality: Must include an integrated air-aftercooler to cool the compressed air and remove excess moisture, protecting air tools and ensuring high-quality finishes in applications like painting. 1.2.13. Piping: Utilize piping to connect the new 2 each air compressors, air dryer and oil water separators to the existing “blue” aluminum compressed air piping system. Contractor will take reasonable measures to minimize disruption to the existing compressed air system during the connection process. When work is complete the contractor along with end user will ensure there aren’t any air leaks in new work. 1.2.14. Electrical Connection: Connect the new equipment to the existing electrical supply. If incorrect power supply is in breaker box. Contractor will run a line to breaker box for correct hook up power. Contractor will follow all Joint Base Andrews, DoW, county, state and federal codes to hook up new equipment to existing power supply. 1.2.15. Equipment Disposal: Upon completion of the installation, contractor will haul away the existing equipment removed and dispose of it in a manner that meets EPA, State of Maryland and Federal requirements ",
+            "source": null,
+            "match": "Quality: Must include an integrated air-aftercooler to cool the compressed air \nand remove excess moisture, protecting a"
+          }
+        ],
+        "forms_signatures": [
+          {
+            "text": "structural maintenance shop. They will replace our current, failing system, which consists of one inoperable unit and one that consistently overheats, causing severe operational delays. This new system is expected to eliminate work stoppages and significantly improve the efficiency of critical maintenance tasks such as sandblasting, painting, sanding, and operating various pneumatic hand tools. The continuous-duty rating and robust cooling will ensure the compressors can meet our high operational tempo without failure. This directly supports our mission by increasing productivity, reducing aircraft downtime, and ensuring maintenance schedules are met consistently and safely. 1.2.3. Physical characteristics: 1.2.4. Performance: Must be a 30-horsepower, continuous-duty rotary screw air compressor. 1.2.5. Equipment Supply and Delivery: Furnish and deliver the specified new compressor system (2 each air compressors, oil-water separator and air dryer) • Quantity: Two (2) rotary screw air compressors • Model: Quincy QGD-30 or equivalent • Power Supply: 230/460V 3-Phase industrial power • Configuration: Tank-mounted to ensure a ready supply of compressed air and reduce cycle frequency. • Footprint: Approximate dimensions should not exceed 75\" L x 40\" W x 70\" H to fit within the existing equipment space. Page 2 of 4 equipment to 3640 Patrick Ave., Joint Base Andrews. (Details of the new equipment are provided in a separate appendix/attachment.) 1.2.6. Removal of Existing Equipment: Remove two each Ingersoll Rand 30 hp rotary screw compressors, refrigerated air dryer, and oil-water separator from their current location at 3640 Patrick Ave., Joint Base Andrews. 1.2.7. Equipment Installation: Set two air compressor systems, refrigerated air dryer and oil water separator in place a",
+            "source": null,
+            "match": "schedules are met consistently and \nsafely. \n1.2.3. Physical characteristics:  \n1.2.4. Performance: Must be a 30-horsepo"
+          },
+          {
+            "text": "orningside, MD 20746) 15-20 minutes PRIOR to their scheduled slot to clear security, while all other contractual or solicitation-related inquiries must be routed directly to the Contract Specialist, 2d Lt Trixie Delacruz, at trixie_ann.delacruz@us.af.mil Except as provided herein, all terms and conditions of the document referenced in Item 9A or 10A, as heretofore changed, remains unchanged and in full force and effect. 15A. NAME AND TITLE OF SIGNER (Type or print) 16A. NAME AND TITLE OF CONTRACTING OFFICER (Type or print) Antoine L. Toran, Contracting Ofﬁcer 15B. CONTRACTOR/OFFEROR ____________________________________________________ (Signature of person authorized to sign) 15C. DATE SIGNED 16B. UNITED STATES OF AMERICA _________________________________________________________ (Signature of Contracting Ofﬁcer) 16C. DATE SIGNED 12 Aug 2026 Computer generated. Previous edition unusable STANDARD FORM 30 (REV. 11/2016) Prescribed by GSA-FAR (48 CFR) 53.243 SF 30 BLOCK 14 CONTINUATION PAGE SUMMARY OF CHANGES Solicitation/Contract Form The following modiﬁcations were made: Information From To Response Due Time 04:00 PM 12:00 PM Response Due Date 12 Aug 2026 28 Aug 2026 Solicitation Number FA286026Q0025 FA286026Q00250001 Deliveries or Performance Line Item 0001 The following De",
+            "source": null,
+            "match": "Signature"
+          },
+          {
+            "text": "st be routed directly to the Contract Specialist, 2d Lt Trixie Delacruz, at trixie_ann.delacruz@us.af.mil Except as provided herein, all terms and conditions of the document referenced in Item 9A or 10A, as heretofore changed, remains unchanged and in full force and effect. 15A. NAME AND TITLE OF SIGNER (Type or print) 16A. NAME AND TITLE OF CONTRACTING OFFICER (Type or print) Antoine L. Toran, Contracting Ofﬁcer 15B. CONTRACTOR/OFFEROR ____________________________________________________ (Signature of person authorized to sign) 15C. DATE SIGNED 16B. UNITED STATES OF AMERICA _________________________________________________________ (Signature of Contracting Ofﬁcer) 16C. DATE SIGNED 12 Aug 2026 Computer generated. Previous edition unusable STANDARD FORM 30 (REV. 11/2016) Prescribed by GSA-FAR (48 CFR) 53.243 SF 30 BLOCK 14 CONTINUATION PAGE SUMMARY OF CHANGES Solicitation/Contract Form The following modiﬁcations were made: Information From To Response Due Time 04:00 PM 12:00 PM Response Due Date 12 Aug 2026 28 Aug 2026 Solicitation Number FA286026Q0025 FA286026Q00250001 Deliveries or Performance Line Item 0001 The following Delivery Information modiﬁcations were made: Information From To Period of Performance 01 Aug 2026 to 31 Aug 2026 30 Sep 2026 to 30 Oct 2026 List of Att",
+            "source": null,
+            "match": "Signature"
+          }
+        ],
+        "submission": [
+          {
+            "text": "e Item Delivery Schedule Quantity Address and POC 0001 Delivery Schedule From date of lead time event to completion of performance 30 Calendar Days Date of Award 2 Each Place of Performance DoDAAC: F1DT07 CountryCode: USA F1DT07 459 ARW AF NO MILSBILLS PROC, 3755 PATRICK AVE STE 216 JB ANDREWS, MD 20762-4814 UNITED STATES Zerrik King Email: zerrik.king.1@us.af.mil Telephone: 2408573103 Period of Performance From 30 Sep 2026 To 30 Oct 2026 FA286026Q00250001 Page 6 of 19 Contract Administration Data DFARS Clauses Incorporated by Reference Number Title Effective Date Alternate/ Deviation Variation Effective Date 252.232-7003 Electronic Submission of Payment Requests and Receiving Reports. Dec 2018 DFARS Clauses Incorporated by Full Text 252.232-7006 Wide Area WorkFlow Payment Instructions. (Jan 2023) WIDE AREA WORKFLOW PAYMENT INSTRUCTIONS (JAN 2023) (a) As used in this clause- Deﬁnitions. \"Department of Defense Activity Address Code (DoDAAC)\" is a six position code that uniquely identiﬁes a unit, activity, or organization. \"Document type\" means the type of payment request or receiving report available for creation in Wide Area WorkFlow (WAWF). \"Local processing ofﬁce (LPO)\" is the ofﬁce responsible for payment certiﬁcation when payment certiﬁcation is done exter",
+            "source": null,
+            "match": "Electronic Submission"
+          },
+          {
+            "text": "Flow Payment Instructions. (Jan 2023) WIDE AREA WORKFLOW PAYMENT INSTRUCTIONS (JAN 2023) (a) As used in this clause- Deﬁnitions. \"Department of Defense Activity Address Code (DoDAAC)\" is a six position code that uniquely identiﬁes a unit, activity, or organization. \"Document type\" means the type of payment request or receiving report available for creation in Wide Area WorkFlow (WAWF). \"Local processing ofﬁce (LPO)\" is the ofﬁce responsible for payment certiﬁcation when payment certiﬁcation is done external to the entitlement system. \"Payment request\" and \"receiving report\" are deﬁned in the clause at 252.232-7003, Electronic Submission of Payment Requests and Receiving Reports. (b) The WAWF system provides the method to electronically process vendor payment requests and receiving reports, as authorized by Defense Electronic invoicing. Federal Acquisition Regulation Supplement (DFARS) 252.232-7003, Electronic Submission of Payment Requests and Receiving Reports. (c) To access WAWF, the Contractor shall- WAWF access. (1) Have a designated electronic business point of contact in the System for Award Management at https://www.sam.gov; and (2) Be registered to use WAWF at https://wawf.eb.mil/ following the step-by-step procedures for sel",
+            "source": null,
+            "match": "Electronic Submission"
+          },
+          {
+            "text": "e type of payment request or receiving report available for creation in Wide Area WorkFlow (WAWF). \"Local processing ofﬁce (LPO)\" is the ofﬁce responsible for payment certiﬁcation when payment certiﬁcation is done external to the entitlement system. \"Payment request\" and \"receiving report\" are deﬁned in the clause at 252.232-7003, Electronic Submission of Payment Requests and Receiving Reports. (b) The WAWF system provides the method to electronically process vendor payment requests and receiving reports, as authorized by Defense Electronic invoicing. Federal Acquisition Regulation Supplement (DFARS) 252.232-7003, Electronic Submission of Payment Requests and Receiving Reports. (c) To access WAWF, the Contractor shall- WAWF access. (1) Have a designated electronic business point of contact in the System for Award Management at https://www.sam.gov; and (2) Be registered to use WAWF at https://wawf.eb.mil/ following the step-by-step procedures for self-registration available at this web site. (d) The Contractor should follow the training instructions of the WAWF Web-Based Training Course and use the Practice Training Site before WAWF training. submitting payment requests through WAWF. Both can be accessed by selecting the \"W",
+            "source": null,
+            "match": "Electronic Submission"
+          }
+        ],
+        "ip_data_security": [
+          {
+            "text": "provided by contractor following contract award. 1.2.19. Contractor will secure all appropriate badging to get on Joint Base Andrews, Md. Page 3 of 4 1.2.20. Civil engineering will provide all escorts and end user will not be responsible for monitoring workers at the jobsite 1.3. APPLICABLE DOCUMENTS: The contractor shall follow appropriate format and staff publications in compliance with applicable Air force and DoW guidance. 1.4. SPECIAL QUALIFICATIONS: At a minimum, all contract personnel shall: 1.4.1. Be a US citizen. 1.4.2. Acquired experience as the designated lead of a project or program. 1.4.3. Understand systems/security requirements. 1.4.4. Present a professional appearance and wear badges identifying them as contractors. 2. PLACE OF PERFORMANCE: 3640 Patrick Avenue, Hangar 11, Joint Base Andrews, MD 20762 3. PERIOD OF PERFORMANCE: Work should be completed within 30 calendar days of contract award. 4. HOURS OF PERFORMANCE: Work shall generally be performed during the working hours of 0700 – 1530, Monday through Friday. Work performed during other than standard hours shall be coordinated with the COR. Any unresolved coordination will be referred to the Contracting Officer (CO). The contractor shall maintain personal continuity to the maximum extent po",
+            "source": null,
+            "match": "security requirement"
+          },
+          {
+            "text": "or Breach of Contract Claim. (Deviation 2026-O0038) Feb 2026 52.240-91 Security Prohibitions and Exclusions. (Deviation 2026-O0038) Feb 2026 52.244-6 Subcontracts for Commercial Products and Commercial Services. (Deviation 2026-O0038) Apr 2026 DFARS Clauses Incorporated by Reference Number Title Effective Date Alternate/ Deviation Variation Effective Date 252.203-7000 Requirements Relating to Compensation of Former DoD Ofﬁcials. Sep 2011 252.203-7002 Requirement to Inform Employees of Whistleblower Rights. Dec 2022 252.204-7003 Control of Government Personnel Work Product. Apr 1992 252.204-7012 Safeguarding Covered Defense Information and Cyber Incident Reporting. (DEVIATION 2024- O0013 REVISION 1) May 2024 Deviation 2024-O0013 May 2024 252.204-7018 Prohibition on the Acquisition of Covered Defense Telecommunications Equipment or Services. Jan 2023 252.225-7048 Export-Controlled Items. Jun 2013 252.225-7056 Prohibition Regarding Business Operations with the Maduro Regime. Jan 2023 252.225-7060 Prohibition on Certain Procurements from the Xinjiang Uyghur Autonomous Region. Jun 2023 252.232-7010 Levies on Contract Payments. Dec 2006 252.232-7011 Payments in Support of Emergencies and Contingency Operations. May 2013 252.237-7010 Prohibition on Interrogation of Detainees by Contractor",
+            "source": null,
+            "match": "Cyber"
+          }
+        ]
+      },
+      "source_dce_run_id": 32013885449,
+      "source_shard": 9,
+      "hot_ready_at": "2026-08-17T09:14:54.439088+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": -16,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [
+        "training-course"
+      ],
+      "spm_friction_signals": [
+        "security-clearance"
+      ],
       "review_lane": "SPM_PRIORITY"
     }
   ],
