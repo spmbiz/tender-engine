@@ -23,8 +23,9 @@ concurrency:
 
 jobs:
   refresh:
-    # Event-driven only: DCE shards publish directly, GPT Web ticks trigger a push
-    # refresh, and workflow_dispatch is the fallback if a direct shard publish fails.
+    # DCE shards already publish the inbox directly. Their legacy bot dispatch is a
+    # zero-runner no-op; GPT Web tick pushes and explicit human dispatches do refresh.
+    if: github.event_name != 'workflow_dispatch' || github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
