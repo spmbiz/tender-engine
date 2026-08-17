@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 from pathlib import Path
 
+# This file is intentionally trigger-scoped: updates re-run the one-shot runtime
+# patch with the latest safety rules while the patch workflow uses a shallow clone.
+
 
 def replace_once(text: str, old: str, new: str, label: str) -> str:
     if new in text:
@@ -14,8 +17,6 @@ def main() -> None:
     path = Path('.github/workflows/qwen-live-classification.yml')
     text = path.read_text(encoding='utf-8')
 
-    # A code deployment must never kill already-running semantic workers. New
-    # pushes queue behind the active pass and then pick up the newest runtime.
     text = replace_once(
         text,
         "  cancel-in-progress: ${{ github.event_name == 'push' }}",
@@ -23,16 +24,11 @@ def main() -> None:
         'non-preemptive Qwen concurrency',
     )
 
-    # Use short bounded passes everywhere, not only when the watchdog explicitly
-    # dispatches one. Auto-continue preserves total throughput while artifacts are
-    # published much sooner.
     text = text.replace("default: '240'", "default: '48'", 1)
     text = text.replace("${{ github.event.inputs.per_shard || '240' }}", "${{ github.event.inputs.per_shard || '48' }}", 1)
     text = text.replace("or 240)", "or 48)", 1)
     text = text.replace("except Exception: n=240", "except Exception: n=48", 1)
 
-    # A sharding/freshness implementation change is part of Qwen runtime and
-    # should schedule a new pass after (not instead of) the current one.
     if "      - 'pipeline/build_qwen_shadow_shards.py'" not in text:
         text = replace_once(
             text,
@@ -41,8 +37,6 @@ def main() -> None:
             'Qwen shadow-shard trigger path',
         )
 
-    # Read the newest durable DCE attempt ledger at aggregate time. The workflow
-    # checkout SHA can be older than DCE progress made while Qwen was classifying.
     old = """          git fetch origin main\n          git show origin/main:control/controller_state_checkpoint.json > latest-controller-state.json 2>/dev/null || printf '{}\\n' > latest-controller-state.json\n"""
     new = old + """          git show origin/main:control/dce_attempt_ledger.jsonl > latest-attempt-ledger.jsonl 2>/dev/null || : > latest-attempt-ledger.jsonl\n"""
     text = replace_once(text, old, new, 'fresh durable DCE attempt ledger')
@@ -51,11 +45,6 @@ def main() -> None:
     new_arg = """            --blocked-state latest-controller-state.json \\\n            --attempt-ledger latest-attempt-ledger.jsonl \\\n            --out qwen-live-selection.jsonl \\\n"""
     text = replace_once(text, old_arg, new_arg, 'selector attempt-ledger argument')
 
-    # Generated queue files are mutable by design. Rebasing a commit that writes
-    # them against another concurrently-updated queue creates deterministic merge
-    # conflicts. Preserve the generated artifacts outside the worktree, reset to
-    # the latest main, then re-materialize and commit on top. On a push race, repeat
-    # from the new main instead of rebasing generated state.
     old_persist = '''      - name: Persist current Qwen DCE selection for DCE Fanout V2
         if: steps.selection.outputs.count != '0'
         shell: bash
