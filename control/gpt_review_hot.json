@@ -1,10 +1,10 @@
 {
   "schema": "GPT_REVIEW_HOT_V3",
-  "updated_at": "2026-08-17T00:25:26.354870+00:00",
+  "updated_at": "2026-08-17T00:25:33.979601+00:00",
   "latest_dce_run_id": 31981756062,
-  "latest_shard": 20,
+  "latest_shard": 6,
   "generation_reset": false,
-  "count": 11,
+  "count": 12,
   "items": [
     {
       "candidate_id": "EE-RHR:acd10bb9-ffad-42b3-b273-01ce0869cfe8",
@@ -1240,6 +1240,234 @@
       "hot_ready_at": "2026-08-17T00:25:25.798448+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 17,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
+      "candidate_id": "EE-RHR:7b0473a3-0b62-40c0-9b3e-160c5f2550f8",
+      "title": "Tartu maakond, Kambja vald, Tõrvandi alevik, Tehno tee 10 kinnistu liitumisega seotud II ehitusetapi mahus ette nähtud uute KP maakaablite paigaldamine (IP4819, LR4560)",
+      "buyer": "Elektrilevi OÜ",
+      "portal": "EE_RHR",
+      "notice_url": "https://riigihanked.riik.ee/rhr-web/#/procurement/10661545/general-info",
+      "deadline": "2026-08-18T08:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 60,
+      "priority_score": 60,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-18T08:00:00+00:00",
+        "notice_deadline_date": "2026-08-18",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 8,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "6/cyw==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIFnDCCA4SgAwIBAgIQT8JQNYrivfVh3/VKdc/1QjANBgkqhkiG9w0BAQsFADBjMQswCQYDVQQGEwJFRTEiMCAGA1UECgwZQVMgU2VydGlmaXRzZWVyaW1pc2tlc2t1czEXMBUGA1UEYQwOTlRSRUUtMTA3NDcwMTMxFzAVBgNVBAMMDkVTVEVJRC1TSyAyMDE1MB4XDTIyMDExMzA5NDc1NFoXDTI3MDExMzIxNTk1OVowbTELMAkGA1UEBhMCRUUxITAfBgNVBAMMGEtFUk5FUixUQU5FTCwzODIxMTA3MjcxOTEPMA0GA1UEBAwGS0VSTkVSMQ4wDAYDVQQqDAVUQU5FTDEaMBgGA1UEBRMRUE5PRUUtMzgyMTEwNzI3MTkwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARrt96akuggaoxAsfeOJPcyihoPXE7BUCC5fe+cuV9rFixHxSIcZ+9tKf6uQn2z57IybtoaBI54vxKXeP50Oc88o4ICCzCCAgcwCQYDVR0TBAIwADAOBgNVHQ8BAf8EBAMCBkAwcwYDVR0gBGwwajBdBgkrBgEEAc4fAQMwUDAdBggrBgEFBQcCAjARDA9Db250cmFjdCAxLjExLTkwLwYIKwYBBQUHAgEWI2h0dHBzOi8vd3d3LnNrLmVlL3JlcG9zaXRvb3JpdW0vQ1BTMAkGBwQAi+xAAQIwHQYDVR0OBBYEFLgtYvtlj4UG6MuscOSY9OrgKuuzMIGKBggrBgEFBQcBAwR+MHwwCAYGBACORgEBMAgGBgQAjkYBBDBRBgYEAI5GAQUwRzBFFj9odHRwczovL3NrLmVlL2VuL3JlcG9zaXRvcnkvY29uZGl0aW9ucy1mb3ItdXNlLW9mLWNlcnRpZmljYXRlcy8TAkVOMBMGBgQAjkYBBjAJBgcEAI5GAQYBMB8GA1UdIwQYMBaAFLOriLyZ1WKkhSoIzbQdcjuDckdRMGoGCCsGAQUFBwEBBF4wXDAnBggrBgEFBQcwAYYbaHR0cDovL2FpYS5zay5lZS9lc3RlaWQyMDE1MDEGCCsGAQUFBzAChiVodHRwOi8vYy5zay5lZS9FU1RFSUQtU0tfMjAxNS5kZXIuY3J0MDwGA1UdHwQ1MDMwMaAvoC2GK2h0dHA6Ly93d3cuc2suZWUvY3Jscy9lc3RlaWQvZXN0ZWlkMjAxNS5jcmwwDQYJKoZIhvcNAQELBQA",
+            "source": null,
+            "match": "EEA"
+          },
+          {
+            "text": "UGbGr4OK/DwebQ5PjhdS40gCUNwmC7fPQ4vIH+x+TCk2aG+u3MoAz0IrpVWqiwzG/vxreuPPAkgXeFCeYf6fXLsGz4WivsZFbph2pMjELu6sltlBXfAG3fGv43t91VXicyzR/eT5dsB+zFsW1sHV+1ONPr+qzgDxCH2cmuqoZNfIIq+buob3eA8ee+XpJKJQr+1qGrmhggjvAhc7m6cU4x/QfxwRYhIVNhJf+sKVThkQhbJ9XxuKk3c18wymwL1mpDD0PIGJqlssMeiuJ4IzagFbgESGNDUd4icm0hQT8CmQeUm1GbWeBYseqPhMQX97QFBLXJLVy2SCyoAz7Bq1qA43++EcibN+yBc1nQs2Zoq8ck9MK0bCxDMeUkQUz6VeQGp69ImOQrsw46qTz0mtdQrMSbnkXCuLan5dPm284J9HmaqiYi6j6KLcZ2NkUnDQFesBVlMEm+fHa2iR6lnAFYZ06UECAwEAAaOCAgowggIGMB8GA1UdIwQYMBaAFBLyWj7qVhy/zQas8fElyalL1BSZMB0GA1UdDgQWBBSzq4i8mdVipIUqCM20HXI7g3JHUTAOBgNVHQ8BAf8EBAMCAQYwdwYDVR0gBHAwbjAIBgYEAI96AQIwCQYHBACL7EABAjAwBgkrBgEEAc4fAQEwIzAhBggrBgEFBQcCARYVaHR0cHM6Ly93d3cuc2suZWUvQ1BTMAsGCSsGAQQBzh8BAjALBgkrBgEEAc4fAQMwCwYJKwYBBAHOHwEEMBIGA1UdEwEB/wQIMAYBAf8CAQAwQQYDVR0eBDowOKE2MASCAiIiMAqHCAAAAAAAAAAAMCKHIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMCcGA1UdJQQgMB4GCCsGAQUFBwMJBggrBgEFBQcDAgYIKwYBBQUHAwQwfAYIKwYBBQUHAQEEcDBuMCAGCCsGAQUFBzABhhRodHRwOi8vb2NzcC5zay5lZS9DQTBKBggrBgEFBQcwAoY+aHR0cDovL3d3dy5zay5lZS9jZXJ0cy9FRV9DZXJ0aWZpY2F0aW9uX0NlbnRyZV9Sb290X0NBLmRlci5jcnQwPQYDVR0fBDYwNDAyoDCgLoYsaHR0cDovL3d3dy5zay5lZS9yZXBvc2l0b3J5L2NybHMvZWVjY3JjYS5jcmwwDQYJKoZIhvcNAQEMBQADggEBAHRWDGI3P00r2sOnlvLHKk9eE7X93eT+4e5TeaQsOpE5zQRUTtshxN8Bnx2ToQ9rgi18q+MwXm2f0mrGakYYG0bix7ZgDQv",
+            "source": null,
+            "match": "EEA"
+          },
+          {
+            "text": "XLsGz4WivsZFbph2pMjELu6sltlBXfAG3fGv43t91VXicyzR/eT5dsB+zFsW1sHV+1ONPr+qzgDxCH2cmuqoZNfIIq+buob3eA8ee+XpJKJQr+1qGrmhggjvAhc7m6cU4x/QfxwRYhIVNhJf+sKVThkQhbJ9XxuKk3c18wymwL1mpDD0PIGJqlssMeiuJ4IzagFbgESGNDUd4icm0hQT8CmQeUm1GbWeBYseqPhMQX97QFBLXJLVy2SCyoAz7Bq1qA43++EcibN+yBc1nQs2Zoq8ck9MK0bCxDMeUkQUz6VeQGp69ImOQrsw46qTz0mtdQrMSbnkXCuLan5dPm284J9HmaqiYi6j6KLcZ2NkUnDQFesBVlMEm+fHa2iR6lnAFYZ06UECAwEAAaOCAgowggIGMB8GA1UdIwQYMBaAFBLyWj7qVhy/zQas8fElyalL1BSZMB0GA1UdDgQWBBSzq4i8mdVipIUqCM20HXI7g3JHUTAOBgNVHQ8BAf8EBAMCAQYwdwYDVR0gBHAwbjAIBgYEAI96AQIwCQYHBACL7EABAjAwBgkrBgEEAc4fAQEwIzAhBggrBgEFBQcCARYVaHR0cHM6Ly93d3cuc2suZWUvQ1BTMAsGCSsGAQQBzh8BAjALBgkrBgEEAc4fAQMwCwYJKwYBBAHOHwEEMBIGA1UdEwEB/wQIMAYBAf8CAQAwQQYDVR0eBDowOKE2MASCAiIiMAqHCAAAAAAAAAAAMCKHIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMCcGA1UdJQQgMB4GCCsGAQUFBwMJBggrBgEFBQcDAgYIKwYBBQUHAwQwfAYIKwYBBQUHAQEEcDBuMCAGCCsGAQUFBzABhhRodHRwOi8vb2NzcC5zay5lZS9DQTBKBggrBgEFBQcwAoY+aHR0cDovL3d3dy5zay5lZS9jZXJ0cy9FRV9DZXJ0aWZpY2F0aW9uX0NlbnRyZV9Sb290X0NBLmRlci5jcnQwPQYDVR0fBDYwNDAyoDCgLoYsaHR0cDovL3d3dy5zay5lZS9yZXBvc2l0b3J5L2NybHMvZWVjY3JjYS5jcmwwDQYJKoZIhvcNAQEMBQADggEBAHRWDGI3P00r2sOnlvLHKk9eE7X93eT+4e5TeaQsOpE5zQRUTtshxN8Bnx2ToQ9rgi18q+MwXm2f0mrGakYYG0bix7ZgDQvCMD/kuRYmwLGdfsTXwh8KuL6uSHF+U/ZTss6qG7mxCHG9YvebkN5Yj/rYRvZ9/uJ9rieByxw4wo7b19p22PX",
+            "source": null,
+            "match": "EEA"
+          },
+          {
+            "text": "xGzAZBgNVBAoMElNLIElEIFNvbHV0aW9ucyBBUzEXMBUGA1UEYQwOTlRSRUUtMTA3NDcwMTMxITAfBgNVBAMMGFNLIElEIFNvbHV0aW9ucyBST09UIEcxRTCBmzAQBgcqhkjOPQIBBgUrgQQAIwOBhgAEAN+zN0QNRH0pL6ozIEqFSBiqASoVlcgoi2+epQ6fU/gJ5ZbySnNtjcfxqqi3sW+XHK3IXN2kwMImzWx/P7S4ZhRfAJNJi6qPmyyDnXIE17jUuqVBcPZwpap3cqQND3FA3/wgs3r/dnBHyQD4M2ihf3j4IDy/ANl6IiI2D4Z50ik4QUfYo2MwYTAPBgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUhnRPOus48rCn7u25hZudgwlFMWswHwYDVR0jBBgwFoAUhnRPOus48rCn7u25hZudgwlFMWswCgYIKoZIzj0EAwQDgYsAMIGHAkF+pYLDdJjsHc7hvW0dlIPk6riZKr3PDe6+3t3Paq+Udb4OGw3yzJoxCKQbnLULtlN6weO6wupBn91X+wX6QbCy/gJCAK/JtP1UsWLkmxCannuKGOIH8CgcKIXdW/z7/TQLfrygdJMgZ5TjzLMHXoX3gKSTNpCuZEeamEYBzd8HKLDnKYWV</xades:EncapsulatedX509Certificate><xades:EncapsulatedX509Certificate>MIIDfzCCAuCgAwIBAgIUUojIXV1U05Kq/QkW1ndO8lzcwDEwCgYIKoZIzj0EAwMwZjELMAkGA1UEBhMCRUUxGzAZBgNVBAoMElNLIElEIFNvbHV0aW9ucyBBUzEXMBUGA1UEYQwOTlRSRUUtMTA3NDcwMTMxITAfBgNVBAMMGFNLIElEIFNvbHV0aW9ucyBST09UIEcxRTAeFw0yMzA3MDQwODUyMDNaFw0zODA2MzAwODUyMDJaMF0xGDAWBgNVBAMMD1NLIFRTQSBDQSAyMDIzRTEXMBUGA1UEYQwOTlRSRUUtMTA3NDcwMTMxGzAZBgNVBAoMElNLIElEIFNvbHV0aW9ucyBBUzELMAkGA1UEBhMCRUUwdjAQBgcqhkjOPQIBBgUrgQQAIgNiAAQCpJoo7i3cZ7bcNtOSt7+r64QYdlmYkXkss+C1w/fEZoBbIte47bRTpIhJ0otdHoi809iCIF0MXAVbB7M1Ilby2dC+/TYcwQ7Oidx3ynvJR1w44Bh2KY5inyLueipEw4SjggFWMIIBUjAPBgNVHRMBAf8EBTADAQH",
+            "source": null,
+            "match": "Eea"
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "st:media-type=\"application/octet-stream\"/> </manifest:manifest> ===== FILE: files/files_unpacked/Tööprojekt IP4819, LR4560_unpacked/Tööprojekt IP4819, LR4560/Kooskõlastused/13.KK-Gaasivõrk_2607161037_unpacked/META-INF/signatures0.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><asic:XAdESSignatures xmlns:asic=\"http://uri.etsi.org/02918/v1.2.1#\"><ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" Id=\"id-6e061676f0c5a99e58b5b9b9725e9b8e\"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256\"/><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-1\" URI=\"Seisukoht_nr_3-7_504-26_TP_osas.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>622neJk6ISmK3RJVrDhMWfPOWNhL83zNmD77eh+gPaU=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-2\" URI=\"IP4819-LR4560_EL-3-01_Seletuskiri.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>3SiORdxel3/2wKUM4ZkEHcpYfYN7bQW1gQMTsdFNwDY=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-3\" URI=\"IP4819-LR4560_TP_EL-4-01_Asendiplaan_Bind.dwg\"><ds:DigestMethod Algorit",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "ersion=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><asic:XAdESSignatures xmlns:asic=\"http://uri.etsi.org/02918/v1.2.1#\"><ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" Id=\"id-6e061676f0c5a99e58b5b9b9725e9b8e\"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256\"/><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-1\" URI=\"Seisukoht_nr_3-7_504-26_TP_osas.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>622neJk6ISmK3RJVrDhMWfPOWNhL83zNmD77eh+gPaU=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-2\" URI=\"IP4819-LR4560_EL-3-01_Seletuskiri.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>3SiORdxel3/2wKUM4ZkEHcpYfYN7bQW1gQMTsdFNwDY=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-3\" URI=\"IP4819-LR4560_TP_EL-4-01_Asendiplaan_Bind.dwg\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>sfDXFbDt6Df+PZe74k3mCY04vw9RhvwjNLGEebDtCos=</ds:DigestValue></ds:Reference><ds:Reference Type=\"http://uri.etsi.org/01903#SignedProperties\" URI=\"#xades-id-6e061676f0c5a99e58b5b9b9725e9b8e",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "ncoding=\"UTF-8\" standalone=\"no\"?><asic:XAdESSignatures xmlns:asic=\"http://uri.etsi.org/02918/v1.2.1#\"><ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" Id=\"id-6e061676f0c5a99e58b5b9b9725e9b8e\"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256\"/><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-1\" URI=\"Seisukoht_nr_3-7_504-26_TP_osas.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>622neJk6ISmK3RJVrDhMWfPOWNhL83zNmD77eh+gPaU=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-2\" URI=\"IP4819-LR4560_EL-3-01_Seletuskiri.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>3SiORdxel3/2wKUM4ZkEHcpYfYN7bQW1gQMTsdFNwDY=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-3\" URI=\"IP4819-LR4560_TP_EL-4-01_Asendiplaan_Bind.dwg\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>sfDXFbDt6Df+PZe74k3mCY04vw9RhvwjNLGEebDtCos=</ds:DigestValue></ds:Reference><ds:Reference Type=\"http://uri.etsi.org/01903#SignedProperties\" URI=\"#xades-id-6e061676f0c5a99e58b5b9b9725e9b8e\"><ds:Transfor",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "thm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256\"/><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-1\" URI=\"Seisukoht_nr_3-7_504-26_TP_osas.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>622neJk6ISmK3RJVrDhMWfPOWNhL83zNmD77eh+gPaU=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-2\" URI=\"IP4819-LR4560_EL-3-01_Seletuskiri.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>3SiORdxel3/2wKUM4ZkEHcpYfYN7bQW1gQMTsdFNwDY=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-3\" URI=\"IP4819-LR4560_TP_EL-4-01_Asendiplaan_Bind.dwg\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>sfDXFbDt6Df+PZe74k3mCY04vw9RhvwjNLGEebDtCos=</ds:DigestValue></ds:Reference><ds:Reference Type=\"http://uri.etsi.org/01903#SignedProperties\" URI=\"#xades-id-6e061676f0c5a99e58b5b9b9725e9b8e\"><ds:Transforms><ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/></ds:Transforms><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>Dq136dNWo/ONYvVSbIHFSEI8hf4MUpAYjEfUVW5AavE=</ds:DigestValue></ds:Reference></d",
+            "source": null,
+            "match": "Reference"
+          }
+        ],
+        "certifications_partner": [
+          {
+            "text": "04vw9RhvwjNLGEebDtCos=</ds:DigestValue></ds:Reference><ds:Reference Type=\"http://uri.etsi.org/01903#SignedProperties\" URI=\"#xades-id-6e061676f0c5a99e58b5b9b9725e9b8e\"><ds:Transforms><ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/></ds:Transforms><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>Dq136dNWo/ONYvVSbIHFSEI8hf4MUpAYjEfUVW5AavE=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue Id=\"value-id-6e061676f0c5a99e58b5b9b9725e9b8e\">n4kSTOel0kEUb7Eu0dzhzzWyYAN2nNdHCTdAEwkSNUQ2Bxy5Sgw47XxAZsAdP9PGlzewn/HbDKcAK6IK16/cyw==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIFnDCCA4SgAwIBAgIQT8JQNYrivfVh3/VKdc/1QjANBgkqhkiG9w0BAQsFADBjMQswCQYDVQQGEwJFRTEiMCAGA1UECgwZQVMgU2VydGlmaXRzZWVyaW1pc2tlc2t1czEXMBUGA1UEYQwOTlRSRUUtMTA3NDcwMTMxFzAVBgNVBAMMDkVTVEVJRC1TSyAyMDE1MB4XDTIyMDExMzA5NDc1NFoXDTI3MDExMzIxNTk1OVowbTELMAkGA1UEBhMCRUUxITAfBgNVBAMMGEtFUk5FUixUQU5FTCwzODIxMTA3MjcxOTEPMA0GA1UEBAwGS0VSTkVSMQ4wDAYDVQQqDAVUQU5FTDEaMBgGA1UEBRMRUE5PRUUtMzgyMTEwNzI3MTkwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARrt96akuggaoxAsfeOJPcyihoPXE7BUCC5fe+cuV9rFixHxSIcZ+9tKf6uQn2z57IybtoaBI54vxKXeP50Oc88o4ICCzCCAgcwCQYDVR0TBAIwADAOBgNVHQ8BAf8EBAMCBkAwcwYDVR0gBGwwajBdBgkrBgEEAc4fAQMwUDAdBggrBgEFBQcCAjARDA9Db250cmFjdCAxLjExLTkwLwYIKwYBBQUHAgEWI",
+            "source": null,
+            "match": "Certificate"
+          },
+          {
+            "text": "sN5eSzRAwm7l42I75fBkxarXxp1udaDfm3rib5Zl7+OlqaRTUTyRSfUYq+O/Ptmcz/037R+1byKlCpQX2BQznUfujQwadd5mWV176rx+BFjVp84sfkpmOyUEdBtDVV6sclRVCNApZmzkeArVbzYbdgm/TwHemA/cQ4Z6upgg2XDdqvlsRcxMcyxfL+EOu3DA+5jig330PcFlE0dqkiyIT/X7mpTqznJPLhYuC5CVUoHG9QWiJLnfUhgKWlDg3o9LSrbx7ijHkA/LcynamjPUngrzNcD/0I+Bi2DqtAwHt2lM3CH8Y/nYFsjL1feAsQNmmgsP0WxWUasHjEdQrxs0gh5ZpCQjqfwUboTBM6HljsxEYGt87DpzXFW49V+w2/r4vv+HbCPOxlCmS6uWATZgpTs9C4bfZj2Fy2pko32s3LG7VWCw2Lv1yy2dwixlS2pRfZ2w/Uo8LWc1KSGGXlhwoDLKQDB6A2vNXp9mi6ulnr8Q1G/z8DK0LsM9vg3gckdbgxsKj9L0F0SpcEgTaBhvde+7prgzqaPkZTvo0pzwcWM1/tbB4SKvpIhVpS7+S5To/sowOPYNp3aEmDRqoKQZYr7A3hIKJ2/EOrjA+v1WjbmrFmcFkAn2MBqXcO9ZUpwuo</ds:X509Certificate></ds:X509Data></ds:KeyInfo><ds:Object><xades:QualifyingProperties xmlns:xades=\"http://uri.etsi.org/01903/v1.3.2#\" Target=\"#id-6e061676f0c5a99e58b5b9b9725e9b8e\"><xades:SignedProperties Id=\"xades-id-6e061676f0c5a99e58b5b9b9725e9b8e\"><xades:SignedSignatureProperties><xades:SigningTime>2026-05-12T06:26:23Z</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>yhAx4N5I7Ji9xqbqk76VBdEs0iDQYV8DjdiXjrsSfAo=</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>CN=ESTEID-SK 2015,2.5.4.97=#0c0e4e545245452d3130373437303133,O=AS",
+            "source": null,
+            "match": "Certificate"
+          },
+          {
+            "text": "fwUboTBM6HljsxEYGt87DpzXFW49V+w2/r4vv+HbCPOxlCmS6uWATZgpTs9C4bfZj2Fy2pko32s3LG7VWCw2Lv1yy2dwixlS2pRfZ2w/Uo8LWc1KSGGXlhwoDLKQDB6A2vNXp9mi6ulnr8Q1G/z8DK0LsM9vg3gckdbgxsKj9L0F0SpcEgTaBhvde+7prgzqaPkZTvo0pzwcWM1/tbB4SKvpIhVpS7+S5To/sowOPYNp3aEmDRqoKQZYr7A3hIKJ2/EOrjA+v1WjbmrFmcFkAn2MBqXcO9ZUpwuo</ds:X509Certificate></ds:X509Data></ds:KeyInfo><ds:Object><xades:QualifyingProperties xmlns:xades=\"http://uri.etsi.org/01903/v1.3.2#\" Target=\"#id-6e061676f0c5a99e58b5b9b9725e9b8e\"><xades:SignedProperties Id=\"xades-id-6e061676f0c5a99e58b5b9b9725e9b8e\"><xades:SignedSignatureProperties><xades:SigningTime>2026-05-12T06:26:23Z</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>yhAx4N5I7Ji9xqbqk76VBdEs0iDQYV8DjdiXjrsSfAo=</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>CN=ESTEID-SK 2015,2.5.4.97=#0c0e4e545245452d3130373437303133,O=AS Sertifitseerimiskeskus,C=EE</ds:X509IssuerName><ds:X509SerialNumber>106017944092408061553328193628875519298</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate><xades:SignerRole><xades:ClaimedRoles><xades:ClaimedRole>Spetsialist / AS Gaasivõrk</xades:ClaimedRole></xades:ClaimedRoles></xades:SignerRole></xades:SignedS",
+            "source": null,
+            "match": "Certificate"
+          },
+          {
+            "text": "rties Id=\"xades-id-6e061676f0c5a99e58b5b9b9725e9b8e\"><xades:SignedSignatureProperties><xades:SigningTime>2026-05-12T06:26:23Z</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>yhAx4N5I7Ji9xqbqk76VBdEs0iDQYV8DjdiXjrsSfAo=</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>CN=ESTEID-SK 2015,2.5.4.97=#0c0e4e545245452d3130373437303133,O=AS Sertifitseerimiskeskus,C=EE</ds:X509IssuerName><ds:X509SerialNumber>106017944092408061553328193628875519298</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate><xades:SignerRole><xades:ClaimedRoles><xades:ClaimedRole>Spetsialist / AS Gaasivõrk</xades:ClaimedRole></xades:ClaimedRoles></xades:SignerRole></xades:SignedSignatureProperties><xades:SignedDataObjectProperties><xades:DataObjectFormat ObjectReference=\"#r-id-6e061676f0c5a99e58b5b9b9725e9b8e-1\"><xades:MimeType>application/octet-stream</xades:MimeType></xades:DataObjectFormat><xades:DataObjectFormat ObjectReference=\"#r-id-6e061676f0c5a99e58b5b9b9725e9b8e-2\"><xades:MimeType>application/octet-stream</xades:MimeType></xades:DataObjectFormat><xades:DataObjectFormat ObjectReference=\"#r-id-6e061676f0c5a99e58b5b9b9725e9b8e-3\"><xades:MimeType>applicati",
+            "source": null,
+            "match": "Certificate"
+          }
+        ],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [
+          {
+            "text": "alt paigaldatud kaks D160 reservtoru ning täiendavalt on ette nähtud paigaldada üks uus D160 PE kaablitoru kinnisel meetodil. Tähe tänaval Ringtee tänavast alates kuni linna piirini on maakaablid ette nähtud paigaldada tänavamaal asuvate olemasolevate maakaablite asukohas . Kaablid paigaldada paralleelselt olemasolevate k/p ja m/p maakaablitega ning paigaldada võimalikult olemasolevate maakaablite kõrvale tagades nõutud paigaldusvahed. Täheveere kinnistult alates Tähe põik tänavale (endine Kevini ja Luha DP ala) on eelnevalt liitumisprojekti LL2284 raames koos m/p maakaablitega paigaldatud 3xD160 reservtoru 483m ulatuses kuni Kuslapuu tänavani. Projekteeritud maakaablid paigaldada Tähe põik tänaval ca 74m ulatuses olemasolevatesse reservtorudesse. . Edasi paigaldada maakaablid Lehise DP alale koostatud liitumisprojekti LC4560 mahus paigaldatud reservtorudesse ca 265m ulatuses kuni Kuslapuu teeni. Selleks on vastavalt vajadusele ette nähtud haljasalal pöörangukohtades avada olemasolevad reservtorud, et saaks kaableid torudesse tõmmata. Kuslapuu tänaval on kaabel ette nähtud paigaldada kruusatee äärde kuni olemasoleva Kasela, Karli ja Kuslapuu tn 1 kinnistute detailplaneeringu mahus ette nähtud tee asukohani. Tee alasse on ette nähtud trassikoridor kaablitele, mil",
+            "source": null,
+            "match": "sla"
+          },
+          {
+            "text": "blite asukohas . Kaablid paigaldada paralleelselt olemasolevate k/p ja m/p maakaablitega ning paigaldada võimalikult olemasolevate maakaablite kõrvale tagades nõutud paigaldusvahed. Täheveere kinnistult alates Tähe põik tänavale (endine Kevini ja Luha DP ala) on eelnevalt liitumisprojekti LL2284 raames koos m/p maakaablitega paigaldatud 3xD160 reservtoru 483m ulatuses kuni Kuslapuu tänavani. Projekteeritud maakaablid paigaldada Tähe põik tänaval ca 74m ulatuses olemasolevatesse reservtorudesse. . Edasi paigaldada maakaablid Lehise DP alale koostatud liitumisprojekti LC4560 mahus paigaldatud reservtorudesse ca 265m ulatuses kuni Kuslapuu teeni. Selleks on vastavalt vajadusele ette nähtud haljasalal pöörangukohtades avada olemasolevad reservtorud, et saaks kaableid torudesse tõmmata. Kuslapuu tänaval on kaabel ette nähtud paigaldada kruusatee äärde kuni olemasoleva Kasela, Karli ja Kuslapuu tn 1 kinnistute detailplaneeringu mahus ette nähtud tee asukohani. Tee alasse on ette nähtud trassikoridor kaablitele, mille asukohas on ette nähtud ka kaabel paigaldada olemasoleva Tani kinnistu piires olemasolevate trassidega samale koridorile kuni tee 22140 Tõrvandi-Roiu-Uniküla tee ni. Ristmiku juures tuleb arvestada kaablite asukoha ja paigaldussügavuse juures rajatava tee",
+            "source": null,
+            "match": "sla"
+          },
+          {
+            "text": "s nõutud paigaldusvahed. Täheveere kinnistult alates Tähe põik tänavale (endine Kevini ja Luha DP ala) on eelnevalt liitumisprojekti LL2284 raames koos m/p maakaablitega paigaldatud 3xD160 reservtoru 483m ulatuses kuni Kuslapuu tänavani. Projekteeritud maakaablid paigaldada Tähe põik tänaval ca 74m ulatuses olemasolevatesse reservtorudesse. . Edasi paigaldada maakaablid Lehise DP alale koostatud liitumisprojekti LC4560 mahus paigaldatud reservtorudesse ca 265m ulatuses kuni Kuslapuu teeni. Selleks on vastavalt vajadusele ette nähtud haljasalal pöörangukohtades avada olemasolevad reservtorud, et saaks kaableid torudesse tõmmata. Kuslapuu tänaval on kaabel ette nähtud paigaldada kruusatee äärde kuni olemasoleva Kasela, Karli ja Kuslapuu tn 1 kinnistute detailplaneeringu mahus ette nähtud tee asukohani. Tee alasse on ette nähtud trassikoridor kaablitele, mille asukohas on ette nähtud ka kaabel paigaldada olemasoleva Tani kinnistu piires olemasolevate trassidega samale koridorile kuni tee 22140 Tõrvandi-Roiu-Uniküla tee ni. Ristmiku juures tuleb arvestada kaablite asukoha ja paigaldussügavuse juures rajatava tee ning selle äärde projekteeritud kraavide sügavustega, et maakaablit ei oleks vajalik ümber tõsta tee ehituse käigus. Kõrvalmaantee 22140 Tõrvandi- Roiu-Unik",
+            "source": null,
+            "match": "sla"
+          },
+          {
+            "text": "ala) on eelnevalt liitumisprojekti LL2284 raames koos m/p maakaablitega paigaldatud 3xD160 reservtoru 483m ulatuses kuni Kuslapuu tänavani. Projekteeritud maakaablid paigaldada Tähe põik tänaval ca 74m ulatuses olemasolevatesse reservtorudesse. . Edasi paigaldada maakaablid Lehise DP alale koostatud liitumisprojekti LC4560 mahus paigaldatud reservtorudesse ca 265m ulatuses kuni Kuslapuu teeni. Selleks on vastavalt vajadusele ette nähtud haljasalal pöörangukohtades avada olemasolevad reservtorud, et saaks kaableid torudesse tõmmata. Kuslapuu tänaval on kaabel ette nähtud paigaldada kruusatee äärde kuni olemasoleva Kasela, Karli ja Kuslapuu tn 1 kinnistute detailplaneeringu mahus ette nähtud tee asukohani. Tee alasse on ette nähtud trassikoridor kaablitele, mille asukohas on ette nähtud ka kaabel paigaldada olemasoleva Tani kinnistu piires olemasolevate trassidega samale koridorile kuni tee 22140 Tõrvandi-Roiu-Uniküla tee ni. Ristmiku juures tuleb arvestada kaablite asukoha ja paigaldussügavuse juures rajatava tee ning selle äärde projekteeritud kraavide sügavustega, et maakaablit ei oleks vajalik ümber tõsta tee ehituse käigus. Kõrvalmaantee 22140 Tõrvandi- Roiu-Uniküla tee ääres on ette nähtud projekteeritud maakaablid KPL212214 ja KPL212213 kokku ühendada olemas",
+            "source": null,
+            "match": "sla"
+          }
+        ],
+        "term_value": [
+          {
+            "text": "vad riigihankega ning hankelepingu sõlmimise ja täitmisega seotud toimingute tegemiseks endi seast volitatud esindaja. Küsimused ettevõtjale: 1. Kas tegemist on ühispakkumusega? (Raadionupp valikutega \"Jah/Ei\") 2. Kui tegemist on ühispakkumusega, kas olete lisanud pakkumuse \"Lisadokumentide\" lehele ühispakkujate volikirja? Kui tegemist ei ole ühispakkumusega, vastake \"Ei\"\". (Raadionupp valikutega \"Jah/Ei\") ===== FILE: files/files_unpacked/Maksumuse_tabel_LR4560_IP4819_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/theme/theme/themeManager.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.themeManager+xml\"/><Override PartName=\"/theme/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/></Types> ===== FILE: files/files_unpacked/Maksumuse_tabel_LR4560_IP4819_unpacked/theme/theme/theme1.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <a:theme xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" name=\"Office Theme\"><a:themeE",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "volitatud esindaja. Küsimused ettevõtjale: 1. Kas tegemist on ühispakkumusega? (Raadionupp valikutega \"Jah/Ei\") 2. Kui tegemist on ühispakkumusega, kas olete lisanud pakkumuse \"Lisadokumentide\" lehele ühispakkujate volikirja? Kui tegemist ei ole ühispakkumusega, vastake \"Ei\"\". (Raadionupp valikutega \"Jah/Ei\") ===== FILE: files/files_unpacked/Maksumuse_tabel_LR4560_IP4819_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/theme/theme/themeManager.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.themeManager+xml\"/><Override PartName=\"/theme/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/></Types> ===== FILE: files/files_unpacked/Maksumuse_tabel_LR4560_IP4819_unpacked/theme/theme/theme1.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <a:theme xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" name=\"Office Theme\"><a:themeElements><a:clrScheme name=\"Office\"><a:dk1><a:sysClr val=\"windowText\" lastClr=\"000000\"/></a:dk1><a:",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "llkiri | Allkiri | /digiallkiri/ | /digiallkiri/ Taotluse esitamise kuupäev | Taotluse esitamise kuupäev | Taotluse esitamise kuupäev | 16.04.2026 | 16.04.2026 | 16.04.2026 | 16.04.2026 ===== FILE: files/files_unpacked/Tööprojekt IP4819, LR4560_unpacked/Tööprojekt IP4819, LR4560/Kooskõlastused/6.KK-TRAM_2607161037_unpacked/IP4819_taotlus_kooskolastada_tehnovorgu_ja_-rajatise_projekt_unpacked/IP4819_taotlus_kooskolastada_tehnovorgu_ja_-rajatise_projekt – koopia_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/><Override PartName=\"/customXml/itemProps1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXmlProperties+xml\"/><Override PartName=\"/word/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml\"/><Override PartName=\"/word/settings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.set",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "se kuupäev | Taotluse esitamise kuupäev | 16.04.2026 | 16.04.2026 | 16.04.2026 | 16.04.2026 ===== FILE: files/files_unpacked/Tööprojekt IP4819, LR4560_unpacked/Tööprojekt IP4819, LR4560/Kooskõlastused/6.KK-TRAM_2607161037_unpacked/IP4819_taotlus_kooskolastada_tehnovorgu_ja_-rajatise_projekt_unpacked/IP4819_taotlus_kooskolastada_tehnovorgu_ja_-rajatise_projekt – koopia_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/><Override PartName=\"/customXml/itemProps1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.customXmlProperties+xml\"/><Override PartName=\"/word/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml\"/><Override PartName=\"/word/settings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml\"/><Override PartName=\"/word/webSettings.xml\" ContentType=\"application/vnd.openxmlformats",
+            "source": null,
+            "match": "Extension"
+          }
+        ],
+        "award_criteria": [
+          {
+            "text": "olor=\"auto\"/></w:tcBorders><w:noWrap/><w:tcMar><w:top w:w=\"15\" w:type=\"dxa\"/><w:left w:w=\"15\" w:type=\"dxa\"/><w:bottom w:w=\"0\" w:type=\"dxa\"/><w:right w:w=\"15\" w:type=\"dxa\"/></w:tcMar></w:tcPr><w:p w14:paraId=\"0CA0BE33\" w14:textId=\"77777777\" w:rsidR=\"005B59EA\" w:rsidRDefault=\"005B59EA\"><w:pPr><w:ind w:left=\"57\"/><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr></w:pPr><w:r><w:rPr><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr><w:fldChar w:fldCharType=\"begin\"><w:ffData><w:name w:val=\"Text14\"/><w:enabled/><w:calcOnExit w:val=\"0\"/><w:textInput/></w:ffData></w:fldChar></w:r><w:bookmarkStart w:id=\"0\" w:name=\"Text14\"/><w:r><w:rPr><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr><w:instrText xml:space=\"preserve\"> FORMTEXT </w:instrText></w:r><w:r><w:rPr><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr></w:r><w:r><w:rPr><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr><w:fldChar w:fldCharType=\"separate\"/></w:r><w:r><w:rPr><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr><w:t> </w:t></w:r><w:r><w:rPr><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr><w:t> </w:t></w:r><w:r><w:rPr><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr><w:t> </w:t></w:r><w:r><w:rPr><w:noProof/><w:sz w:",
+            "source": null,
+            "match": "markS"
+          },
+          {
+            "text": "></w:tcMar></w:tcPr><w:p w14:paraId=\"1E78F827\" w14:textId=\"653B86B9\" w:rsidR=\"00056AC8\" w:rsidRDefault=\"00056AC8\"><w:pPr><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr><w:fldChar w:fldCharType=\"begin\"><w:ffData><w:name w:val=\"Text25\"/><w:enabled/><w:calcOnExit w:val=\"0\"/><w:textInput/></w:ffData></w:fldChar></w:r><w:bookmarkStart w:id=\"1\" w:name=\"Text25\"/><w:r><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr><w:instrText xml:space=\"preserve\"> FORMTEXT </w:instrText></w:r><w:r><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr></w:r><w:r><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr><w:fldChar w:fldCharType=\"separate\"/></w:r><w:r><w:rPr><w:rFonts w:eastAsia=\"Arial Unicode MS\"/><w:noProof/><w:sz w:val=\"22\"/><w:szCs w:val=\"20\"/></w:rPr><w:t> </w:t></w:r><w:r><w:rPr><w:rFonts w:eastAsia=\"Arial Unic",
+            "source": null,
+            "match": "markS"
+          },
+          {
+            "text": "=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 5\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 6\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 7\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 8\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toc 9\" w:semiHidden=\"1\" w:uiPriority=\"39\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Normal Indent\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footnote text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"annotation text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"header\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footer\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"index heading\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"caption\" w:semiHidden=\"1\" w:uiPriority=\"35\" w:unhideWhenUsed=\"1\" w:qFormat=\"1\"/><w:lsdException w:name=\"table of figures\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope address\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope return\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footnote refer",
+            "source": null,
+            "match": "notation"
+          },
+          {
+            "text": "eader\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footer\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"index heading\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"caption\" w:semiHidden=\"1\" w:uiPriority=\"35\" w:unhideWhenUsed=\"1\" w:qFormat=\"1\"/><w:lsdException w:name=\"table of figures\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope address\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope return\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footnote reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"annotation reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"line number\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"page number\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"endnote reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"endnote text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"table of authorities\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"macro\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toa heading\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List\" w:semiHidden=\"1\" w:unhideWh",
+            "source": null,
+            "match": "notation"
+          }
+        ],
+        "forms_signatures": [
+          {
+            "text": "est:full-path=\"/\" manifest:media-type=\"application/vnd.etsi.asic-e+zip\"/> <manifest:file-entry manifest:full-path=\"Seisukoht_nr_3-7_504-26_TP_osas.pdf\" manifest:media-type=\"application/octet-stream\"/> <manifest:file-entry manifest:full-path=\"IP4819-LR4560_EL-3-01_Seletuskiri.pdf\" manifest:media-type=\"application/octet-stream\"/> <manifest:file-entry manifest:full-path=\"IP4819-LR4560_TP_EL-4-01_Asendiplaan_Bind.dwg\" manifest:media-type=\"application/octet-stream\"/> </manifest:manifest> ===== FILE: files/files_unpacked/Tööprojekt IP4819, LR4560_unpacked/Tööprojekt IP4819, LR4560/Kooskõlastused/13.KK-Gaasivõrk_2607161037_unpacked/META-INF/signatures0.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><asic:XAdESSignatures xmlns:asic=\"http://uri.etsi.org/02918/v1.2.1#\"><ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" Id=\"id-6e061676f0c5a99e58b5b9b9725e9b8e\"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256\"/><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-1\" URI=\"Seisukoht_nr_3-7_504-26_TP_osas.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>622neJk6ISmK3RJVrDhMWfPOWNhL83zNmD77eh+gPaU=</",
+            "source": null,
+            "match": "signature"
+          },
+          {
+            "text": "ile-entry manifest:full-path=\"Seisukoht_nr_3-7_504-26_TP_osas.pdf\" manifest:media-type=\"application/octet-stream\"/> <manifest:file-entry manifest:full-path=\"IP4819-LR4560_EL-3-01_Seletuskiri.pdf\" manifest:media-type=\"application/octet-stream\"/> <manifest:file-entry manifest:full-path=\"IP4819-LR4560_TP_EL-4-01_Asendiplaan_Bind.dwg\" manifest:media-type=\"application/octet-stream\"/> </manifest:manifest> ===== FILE: files/files_unpacked/Tööprojekt IP4819, LR4560_unpacked/Tööprojekt IP4819, LR4560/Kooskõlastused/13.KK-Gaasivõrk_2607161037_unpacked/META-INF/signatures0.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><asic:XAdESSignatures xmlns:asic=\"http://uri.etsi.org/02918/v1.2.1#\"><ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" Id=\"id-6e061676f0c5a99e58b5b9b9725e9b8e\"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256\"/><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-1\" URI=\"Seisukoht_nr_3-7_504-26_TP_osas.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>622neJk6ISmK3RJVrDhMWfPOWNhL83zNmD77eh+gPaU=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-2",
+            "source": null,
+            "match": "Signature"
+          },
+          {
+            "text": "pdf\" manifest:media-type=\"application/octet-stream\"/> <manifest:file-entry manifest:full-path=\"IP4819-LR4560_EL-3-01_Seletuskiri.pdf\" manifest:media-type=\"application/octet-stream\"/> <manifest:file-entry manifest:full-path=\"IP4819-LR4560_TP_EL-4-01_Asendiplaan_Bind.dwg\" manifest:media-type=\"application/octet-stream\"/> </manifest:manifest> ===== FILE: files/files_unpacked/Tööprojekt IP4819, LR4560_unpacked/Tööprojekt IP4819, LR4560/Kooskõlastused/13.KK-Gaasivõrk_2607161037_unpacked/META-INF/signatures0.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><asic:XAdESSignatures xmlns:asic=\"http://uri.etsi.org/02918/v1.2.1#\"><ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" Id=\"id-6e061676f0c5a99e58b5b9b9725e9b8e\"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256\"/><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-1\" URI=\"Seisukoht_nr_3-7_504-26_TP_osas.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>622neJk6ISmK3RJVrDhMWfPOWNhL83zNmD77eh+gPaU=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-2\" URI=\"IP4819-LR4560_EL-3-01_Seletuskiri.pdf\"><ds:DigestMethod",
+            "source": null,
+            "match": "Signature"
+          },
+          {
+            "text": ":file-entry manifest:full-path=\"IP4819-LR4560_TP_EL-4-01_Asendiplaan_Bind.dwg\" manifest:media-type=\"application/octet-stream\"/> </manifest:manifest> ===== FILE: files/files_unpacked/Tööprojekt IP4819, LR4560_unpacked/Tööprojekt IP4819, LR4560/Kooskõlastused/13.KK-Gaasivõrk_2607161037_unpacked/META-INF/signatures0.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><asic:XAdESSignatures xmlns:asic=\"http://uri.etsi.org/02918/v1.2.1#\"><ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" Id=\"id-6e061676f0c5a99e58b5b9b9725e9b8e\"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256\"/><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-1\" URI=\"Seisukoht_nr_3-7_504-26_TP_osas.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>622neJk6ISmK3RJVrDhMWfPOWNhL83zNmD77eh+gPaU=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725e9b8e-2\" URI=\"IP4819-LR4560_EL-3-01_Seletuskiri.pdf\"><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>3SiORdxel3/2wKUM4ZkEHcpYfYN7bQW1gQMTsdFNwDY=</ds:DigestValue></ds:Reference><ds:Reference Id=\"r-id-6e061676f0c5a99e58b5b9b9725",
+            "source": null,
+            "match": "Signature"
+          }
+        ],
+        "submission": [],
+        "ip_data_security": [
+          {
+            "text": "mused ver.5.pdf ===== Elektrilevi OÜ Kehtiv alates: 17.06.2025 Dokumendi tähis: P1111 / 5 Kinnitas: C. Linnumäe Ülemdokument: P167 Koostas Triin Kihuoja Lk: 1 / 5 ISIKUANDMETE TÖÖTLEMISE TINGIMUSED Elektrilevi OÜ (edaspidi Tellija) isikuandmete töötlemise tüüptingimused reguleerivad Tellija poolt Täitjale Lepingu täitmiseks edastatavate isikuandmete töötlemist. Tingimused on Tellija ja Täitja vahel sõlmitud Lepingu lahutamatu osa. 1. Mõisted Pool/Pooled Täitja või Tellija, koos Pooled Tingimused Käesolevad Isikuandmete töötlemise tingimused Leping Poolte vahel sõlmitud leping tööde teostamiseks ja/või teenuse osutamiseks GDPR Euroopa Liidu isikuandmete kaitse üldmäärus (EL) 2016/679 Andmesubjekt Otseselt või kaudselt tuvastatav füüsiline isik, nt Tellija kliendid, töötajad ning muud füüsilised isikud, kelle isikuandmeid Tellija töötleb Isikuandmed Igasugune teave, mille kaudu saab otseselt või kaudselt tuvastada füüsilist isikut ning mis on Tellija poolt edastatud Täitjale Lepingu täitmise raames Isikuandmete töötlemine Ükskõik milline toiming Isikuandmetega Isikuandmetega seotud rikkumine Isikuandmete juhuslik või tahtlik muutmine, hävimine, kahjustumine või muul moel volitamata isiku valdusesse sattumine Vastutav töötleja Elektrilevi OÜ, registr",
+            "source": null,
+            "match": "GDPR"
+          },
+          {
+            "text": "e Ükskõik milline toiming Isikuandmetega Isikuandmetega seotud rikkumine Isikuandmete juhuslik või tahtlik muutmine, hävimine, kahjustumine või muul moel volitamata isiku valdusesse sattumine Vastutav töötleja Elektrilevi OÜ, registrikood 11050857, Harju maakond, Tallinn, Kesklinna linnaosa, Veskiposti tn 2, 10138, Tellija Volitatud töötleja Täitja, kes töötleb Isikuandmeid Vastutava töötleja nimel Alltöötleja Täitjaga lepingulises suhtes olev isik, kes on Täitja poolt volitatud Isikuandmeid töötlema Vastutava töötleja nimel Kolmandad riigid Riigid, mis ei kuulu Euroopa Majanduspiirkonda 2. Tingimuste eesmärk ning ulatus 2.1. GDPR artikkel 28(3) järgi peavad Vastutav ning Volitatud töötleja sõlmima siduva kirjaliku lepingu, kui Vastutav töötleja kaasab Isikuandmete töötlemiseks Volitatud töötleja. GDPR artikkel 28(1) kohaselt võib Vastutav töötleja Isikuandmete töötlemiseks kaasata vaid sellised Volitatud töötlejad, kes tagavad vähemalt sama Isikuandmete kaitse taseme, mida rakendab Vastutav töötleja, ning implementeerivad vastavad organisatsioonilised ning tehnilised meetmed, et kaitsta Andmesubjektide õigusi ning huve. 2.2. Käesolevaga avaldavad Pooled soovi kokku leppida Isikuandmete töötlemise tingimustes, mis on kooskõlas isikuandmete töötlemisele kohald",
+            "source": null,
+            "match": "GDPR"
+          },
+          {
+            "text": "valdusesse sattumine Vastutav töötleja Elektrilevi OÜ, registrikood 11050857, Harju maakond, Tallinn, Kesklinna linnaosa, Veskiposti tn 2, 10138, Tellija Volitatud töötleja Täitja, kes töötleb Isikuandmeid Vastutava töötleja nimel Alltöötleja Täitjaga lepingulises suhtes olev isik, kes on Täitja poolt volitatud Isikuandmeid töötlema Vastutava töötleja nimel Kolmandad riigid Riigid, mis ei kuulu Euroopa Majanduspiirkonda 2. Tingimuste eesmärk ning ulatus 2.1. GDPR artikkel 28(3) järgi peavad Vastutav ning Volitatud töötleja sõlmima siduva kirjaliku lepingu, kui Vastutav töötleja kaasab Isikuandmete töötlemiseks Volitatud töötleja. GDPR artikkel 28(1) kohaselt võib Vastutav töötleja Isikuandmete töötlemiseks kaasata vaid sellised Volitatud töötlejad, kes tagavad vähemalt sama Isikuandmete kaitse taseme, mida rakendab Vastutav töötleja, ning implementeerivad vastavad organisatsioonilised ning tehnilised meetmed, et kaitsta Andmesubjektide õigusi ning huve. 2.2. Käesolevaga avaldavad Pooled soovi kokku leppida Isikuandmete töötlemise tingimustes, mis on kooskõlas isikuandmete töötlemisele kohalduva õigusega. Isikuandmete töötlemisel lähtuvad Pooled GDPR -is ning isikuandmete kaitse seaduses sätestatust. Kui kumbki Pool peab järgima täiendavaid õigusakte, vastutab õi",
+            "source": null,
+            "match": "GDPR"
+          },
+          {
+            "text": "tleja sõlmima siduva kirjaliku lepingu, kui Vastutav töötleja kaasab Isikuandmete töötlemiseks Volitatud töötleja. GDPR artikkel 28(1) kohaselt võib Vastutav töötleja Isikuandmete töötlemiseks kaasata vaid sellised Volitatud töötlejad, kes tagavad vähemalt sama Isikuandmete kaitse taseme, mida rakendab Vastutav töötleja, ning implementeerivad vastavad organisatsioonilised ning tehnilised meetmed, et kaitsta Andmesubjektide õigusi ning huve. 2.2. Käesolevaga avaldavad Pooled soovi kokku leppida Isikuandmete töötlemise tingimustes, mis on kooskõlas isikuandmete töötlemisele kohalduva õigusega. Isikuandmete töötlemisel lähtuvad Pooled GDPR -is ning isikuandmete kaitse seaduses sätestatust. Kui kumbki Pool peab järgima täiendavaid õigusakte, vastutab õigusaktide täitmise eest Pool, kellele õigusakt kohaldub. Elektrilevi OÜ Kehtiv alates: 17.06.2025 Dokumendi tähis: P1111 / 5 Kinnitas: C. Linnumäe Ülemdokument: P167 Koostas Triin Kihuoja Lk: 2 / 5 3. Isikuandmete töötlemine 3.1. Volitatud töötleja töötleb Isikuandmeid vaid Vastutava töötleja õiguspäraste kirjalike juhiste alusel ning vaid Pooltevahelise Lepingu täitmise eesmärgil. 3.2. Volitatud töötlejal on keelatud töödelda Isikuandmeid muul eesmärgil kui Pooltevahelise Lepingu täitmiseks. Juhul kui Voli",
+            "source": null,
+            "match": "GDPR"
+          }
+        ]
+      },
+      "source_dce_run_id": 31981756062,
+      "source_shard": 6,
+      "hot_ready_at": "2026-08-17T00:25:33.781558+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 15,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
