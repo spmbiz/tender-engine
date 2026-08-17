@@ -2,8 +2,6 @@ name: GPT Inbox Live Refresh
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '*/5 * * * *'
   push:
     branches: [main]
     paths:
@@ -25,9 +23,8 @@ concurrency:
 
 jobs:
   refresh:
-    # DCE shards publish the inbox directly while this scheduled/push path repairs
-    # races and immediately applies GPT Web review ticks.
-    if: github.event_name != 'workflow_dispatch'
+    # Event-driven only: DCE shards publish directly, GPT Web ticks trigger a push
+    # refresh, and workflow_dispatch is the fallback if a direct shard publish fails.
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
