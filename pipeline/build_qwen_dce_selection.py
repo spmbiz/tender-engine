@@ -27,6 +27,8 @@ FRICTION_DELTA = {
     'SECURITY_CLEARANCE': -12,
     'OTHER': -2,
 }
+DEFAULT_FRESH_HOURS = 24
+FRESHNESS_LABELS = {0: 'material_new_or_updated', 1: 'recent_unseen_carryover', 2: 'historical_backfill'}
 
 
 def open_text(p: Path, m: str):
@@ -78,6 +80,25 @@ def parse_deadline(v):
         return d if d.tzinfo else d.replace(tzinfo=timezone.utc)
     except Exception:
         return None
+
+
+def freshness_rank(ledger_row, *, now=None, fresh_hours=DEFAULT_FRESH_HOURS):
+    """0=current material change, 1=recently first-seen, 2=historical backlog.
+
+    This mirrors the Qwen input priority so freshness survives the semantic stage
+    instead of being lost immediately when the DCE shortlist is rebuilt from
+    cumulative classification state.
+    """
+    event = str((ledger_row or {}).get('ledger_event') or '').upper()
+    if event in {'NEW', 'UPDATED'}:
+        return 0
+    current = now or datetime.now(timezone.utc)
+    first = parse_deadline((ledger_row or {}).get('first_seen_at'))
+    if first is not None:
+        age_hours = (current - first).total_seconds() / 3600
+        if -1 <= age_hours <= fresh_hours:
+            return 1
+    return 2
 
 
 def controller_blocked_ids(p):
@@ -191,7 +212,7 @@ def main():
         # Hard upstream anti-repeat barrier. The Qwen rolling shortlist must contain
         # only exact notice versions that DCE has never already attempted. This is
         # deliberately the same durable identity policy used by materialization, so
-        # downstream never wastes cycles rediscovering 155/160 already-consumed rows.
+        # downstream never wastes cycles rediscovering already-consumed rows.
         probe = {
             'candidate_id': c,
             'material_fields_hash': mh(s),
@@ -205,24 +226,29 @@ def main():
         if str(s.get('classification') or '').upper() == 'STRONG_FIT' and dl is None:
             score = min(score, 79)
             reasons.append('cap:deadline-unverified')
-        valid.append((score, c, s, n, reasons))
+        fresh = freshness_rank(led, now=now)
+        reasons.append(f'freshness:{FRESHNESS_LABELS[fresh]}')
+        valid.append((fresh, score, c, s, n, reasons))
 
-    valid.sort(key=lambda x: (-x[0], str(x[3].get('deadline') or '9999'), x[1]))
+    # Freshness is a lane-level scheduling priority, not a quality-score boost:
+    # current material changes are exhausted first, then recent unseen carryover,
+    # then historical backfill. Within each class, semantic quality remains king.
+    valid.sort(key=lambda x: (x[0], -x[1], str(x[4].get('deadline') or '9999'), x[2]))
     eligible = [
         x for x in valid
-        if str(x[2].get('survival_decision') or 'KEEP').upper() == 'KEEP'
-        and bool(x[2].get('dce_eligible', True))
+        if str(x[3].get('survival_decision') or 'KEEP').upper() == 'KEEP'
+        and bool(x[3].get('dce_eligible', True))
     ]
-    primary = [x for x in eligible if str(x[2].get('classification') or '').upper() in {'STRONG_FIT', 'FIT'}]
+    primary = [x for x in eligible if str(x[3].get('classification') or '').upper() in {'STRONG_FIT', 'FIT'}]
     exploratory = [
         x for x in eligible
-        if str(x[2].get('classification') or '').upper() == 'MAYBE' or x[2].get('novelty_or_unusual_flag')
+        if str(x[3].get('classification') or '').upper() == 'MAYBE' or x[3].get('novelty_or_unusual_flag')
     ]
     rejects = [
         x for x in valid
-        if str(x[2].get('classification') or '').upper() == 'REJECT_OBVIOUS'
-        or str(x[2].get('survival_decision') or '').upper() == 'DROP'
-        or not bool(x[2].get('dce_eligible', True))
+        if str(x[3].get('classification') or '').upper() == 'REJECT_OBVIOUS'
+        or str(x[3].get('survival_decision') or '').upper() == 'DROP'
+        or not bool(x[3].get('dce_eligible', True))
     ]
 
     rn = max(0, min(args.limit, round(args.limit * max(0, min(.25, args.reject_audit_share)))))
@@ -236,19 +262,19 @@ def main():
         for item in pool:
             if k >= n or len(chosen) >= args.limit:
                 break
-            if item[1] in seen:
+            if item[2] in seen:
                 continue
-            seen.add(item[1])
+            seen.add(item[2])
             chosen.append((*item, lane))
             k += 1
 
     take(primary, pn, 'qwen-primary')
     take(exploratory, en, 'qwen-open-world-explore')
-    take(sorted(rejects, key=lambda x: (key(x[1]), x[1])), rn, 'qwen-reject-audit')
+    take(sorted(rejects, key=lambda x: (x[0], key(x[2]), x[2])), rn, 'qwen-reject-audit')
     take(eligible, args.limit - len(chosen), 'qwen-elastic')
 
     rows = []
-    for score, c, s, n, reasons, lane in chosen:
+    for fresh, score, c, s, n, reasons, lane in chosen:
         rows.append({
             'candidate_id': c,
             'preliminary_score': min(89, int(score)),
@@ -258,6 +284,7 @@ def main():
             'status': 'AUTO_DCE_PREFETCH_QWEN',
             'selection_portal': str(n.get('portal') or n.get('source') or 'UNKNOWN').upper(),
             'selection_bucket': lane,
+            'selection_freshness': FRESHNESS_LABELS[fresh],
             'selection_reason': 'QWEN calibrated semantic routing; notice-only ranking, DCE remains authoritative | ' + ', '.join(reasons[:24]),
             'qwen': {
                 'classifier_version': s.get('classifier_version'),
@@ -278,7 +305,7 @@ def main():
     op.write_text(''.join(json.dumps(x, ensure_ascii=False, separators=(',', ':')) + '\n' for x in rows), encoding='utf-8')
 
     summary = {
-        'schema': 'QWEN_LIVE_DCE_SELECTION_SUMMARY_V3',
+        'schema': 'QWEN_LIVE_DCE_SELECTION_SUMMARY_V4',
         'generated_at_utc': now.replace(microsecond=0).isoformat(),
         'source_run': str(args.source_run),
         'state_rows': len(state_rows),
@@ -295,6 +322,7 @@ def main():
         'selection_decisions': dict(Counter(str(x.get('qwen', {}).get('classification') or 'UNKNOWN') for x in rows)),
         'selection_survival': dict(Counter(str(x.get('qwen', {}).get('survival_decision') or 'UNKNOWN') for x in rows)),
         'selection_lanes': dict(Counter(str(x.get('selection_bucket') or 'UNKNOWN') for x in rows)),
+        'selection_freshness': dict(Counter(str(x.get('selection_freshness') or 'UNKNOWN') for x in rows)),
         'policy': {
             'keep_is_not_fit': True,
             'drop_is_retained_in_state_but_not_primary_dce': True,
@@ -303,6 +331,8 @@ def main():
             'exact_material_hash_required': True,
             'durable_dce_attempts_excluded_before_ranking': True,
             'deadline_unverified_caps_strong_priority': True,
+            'freshness_preempts_backfill_within_dce_lanes': True,
+            'freshness_is_not_eligibility_truth': True,
         },
     }
     Path(args.summary).write_text(json.dumps(summary, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
