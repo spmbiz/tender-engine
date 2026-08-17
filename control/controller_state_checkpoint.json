@@ -18552,11 +18552,25 @@
   ],
   "last_discovery_dispatch_at": "2026-08-17T22:05:29.248339+00:00",
   "last_circleci_tick_at": "2026-08-14T21:41:04.485184+00:00",
-  "updated_at": "2026-08-17T22:35:50.493721+00:00",
+  "updated_at": "2026-08-17T22:55:38.083501+00:00",
   "enabled": true,
   "mode": "maximum",
   "active_discovery_run_id": "32074403563",
-  "pending_dce_batch": null,
+  "pending_dce_batch": {
+    "candidate_ids": [
+      "US-SAM:bb8ca1996f9a40b2ad5ec00227494207",
+      "DE-DOE:7d4bc192-967a-4c34-b120-cebf3b5d921e:2",
+      "UK_PCS_OCDS:rls-21-AUG561510",
+      "DE-DOE:25cecc38-f1a3-4ca9-b27d-29acd25ad83c:3",
+      "DE-DOE:adf1f801-5648-4674-be26-1fdb20ce3325:1"
+    ],
+    "source_run": "32074403563",
+    "selection_path": "queues/auto_selection_32078197642.jsonl",
+    "queue_commit_sha": "9147cf61be0fce698ec797af2f865b22be4b5418",
+    "commit_message": "Autonomous DCE batch 32078197642 from discovery 32074403563",
+    "dispatched_at": "2026-08-17T22:55:38.083501+00:00",
+    "max_parallel": 6
+  },
   "legacy_dispatched_candidate_ids": [
     "TED:545556-2026",
     "TED:543796-2026",
