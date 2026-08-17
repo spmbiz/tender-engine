@@ -1,0 +1,52 @@
+name: GPT Web Freeze Pending API Once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/gpt-web-freeze-pending-api-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fetch inbox and persist compact immutable snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/${REPO}/contents/control/gpt_supergreen_inbox.json?ref=main" \
+            -H 'Accept: application/vnd.github.raw+json' > /tmp/inbox.json
+          python - <<'PY'
+          import json, os, base64, subprocess
+          from pathlib import Path
+          obj=json.loads(Path('/tmp/inbox.json').read_text(encoding='utf-8'))
+          rows=[x for x in obj.get('review_queue',[]) if isinstance(x,dict)]
+          run=os.environ['GITHUB_RUN_ID']
+          meta={'schema':'GPT_WEB_PENDING_SNAPSHOT_V1','snapshot_run_id':int(run),'source_inbox_updated_at':obj.get('updated_at'),'latest_source_dce_run_id':obj.get('latest_source_dce_run_id'),'count':len(rows)}
+          core=['candidate_id','title','buyer','portal','deadline','notice_url','review_stage','source_dce_run_id','source_shard','review_key','content_quality','gate_readiness','deadline_authority_status','evidence_gate_coverage','preliminary_score','estimated_value','currency']
+          lines=[json.dumps({'_meta':meta},ensure_ascii=False)]
+          for r in rows:
+            item={k:r.get(k) for k in core if k in r}
+            extra={}
+            for k,v in r.items():
+              if k in core or k in {'raw_text','raw_dce','documents','attachments','full_text'} or v in (None,'',[],{}): continue
+              extra[k]=v
+            raw=json.dumps(extra,ensure_ascii=False,default=str)
+            item['evidence_brief']=raw[:12000]+('…' if len(raw)>12000 else '')
+            lines.append(json.dumps(item,ensure_ascii=False,default=str))
+          snap=('\n'.join(lines)+'\n').encode()
+          met=(json.dumps(meta,ensure_ascii=False,indent=2)+'\n').encode()
+          def put(path,data):
+            payload=json.dumps({'message':f'gpt-web: freeze pending snapshot {run} [skip ci]','content':base64.b64encode(data).decode(),'branch':'main'})
+            subprocess.run(['gh','api','--method','PUT',f'repos/{os.environ["REPO"]}/contents/{path}','--input','-'],input=payload.encode(),check=True)
+          put(f'control/gpt_web_pending_snapshot_{run}.jsonl',snap)
+          put(f'control/gpt_web_pending_snapshot_{run}.meta.json',met)
+          print(json.dumps(meta,indent=2))
+          PY
