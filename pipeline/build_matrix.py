@@ -44,6 +44,9 @@ BROWSER_PORTALS = {
     "IT_EPAL", "NL_TENDERNED_PUBLIC", "CH_SIMAP_PUBLIC", "DE_BI_MEDIEN",
     "ES_LAJUNTA", "DE_EVERGABE_DE", "DE_LWL", "THREEP_CLOUD", "PL_BIP_SLASKIE",
     "COMDIA_PUBLIC", "FR_E_MARCHESPUBLICS", "NETSERVER_PUBLIC",
+    # v14 UK/NZ eSender families. The worker attempts anonymous public files first,
+    # then reports the legitimate login/register-interest barrier without bypassing it.
+    "UK_PROCONTRACT", "UK_ATAMIS", "UK_DELTA", "UK_INTEND", "UK_JAGGAER", "NZ_TENDERLINK",
 }
 SUPPORTED = BROWSER_PORTALS | {
     "US_SAM", "US_SAM_BULK",
