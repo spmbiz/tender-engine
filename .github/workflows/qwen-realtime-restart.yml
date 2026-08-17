@@ -22,7 +22,7 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-      - name: Replace long or zero-admission Qwen pass with short continuously-published shards
+      - name: Replace long or zero-admission Qwen pass with tiny continuously-published shards
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -38,7 +38,7 @@ jobs:
             sleep 2
           done
           gh workflow run qwen-live-classification.yml --ref main \
-            -f per_shard=48 \
+            -f per_shard=16 \
             -f auto_continue=true \
             -f dce_limit=160
-          echo 'Short 48-row Qwen pass dispatched; auto-continue preserves the same shard size.'
+          echo 'Realtime 16-row Qwen pass dispatched; auto-continue preserves the same tiny shard size for continuous output.'
