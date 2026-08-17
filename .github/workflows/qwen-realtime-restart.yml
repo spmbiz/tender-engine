@@ -1,0 +1,43 @@
+name: Qwen Realtime Restart
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qwen-realtime-restart.yml'
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: qwen-realtime-restart
+  cancel-in-progress: true
+
+jobs:
+  restart:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replace long Qwen notice pass with short continuously-published shards
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for rid in $(gh run list --workflow qwen-live-classification.yml --limit 10 --json databaseId,status --jq '.[] | select(.status=="in_progress" or .status=="queued") | .databaseId'); do
+            echo "Cancelling stale long Qwen pass $rid"
+            gh run cancel "$rid" || true
+          done
+          for i in $(seq 1 30); do
+            active="$(gh run list --workflow qwen-live-classification.yml --limit 10 --json status --jq '[.[] | select(.status=="in_progress" or .status=="queued")] | length')"
+            [ "$active" = 0 ] && break
+            sleep 2
+          done
+          gh workflow run qwen-live-classification.yml --ref main \
+            -f per_shard=48 \
+            -f auto_continue=true \
+            -f dce_limit=160
+          echo 'Short 48-row Qwen pass dispatched; auto-continue preserves the same shard size.'
