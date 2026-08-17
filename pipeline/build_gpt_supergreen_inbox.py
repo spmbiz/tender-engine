@@ -43,10 +43,6 @@ def source_run_from_row(r):
 def normalize_for_inbox(r):
     if not isinstance(r,dict): return r
     x=dict(r)
-    # High recall after DCE: an authoritative, gate-ready, native SPM scope must
-    # not disappear merely because the small local model answered INSUFFICIENT.
-    # Route it to secondary GPT review, never to FINAL_REVIEW_NOW, and never
-    # promote its final eligibility automatically.
     if (
         str(x.get('qwen_dce_classification') or '')=='QWEN_DCE_INSUFFICIENT'
         and bool(x.get('native_spm_core'))
@@ -75,6 +71,23 @@ def user_inbox_eligible(r):
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--triage',action='append',default=[]);ap.add_argument('--existing');ap.add_argument('--final-bank');ap.add_argument('--out',required=True);ap.add_argument('--max-items',type=int,default=40);ap.add_argument('--source-run',required=True);args=ap.parse_args()
     existing=load_json(Path(args.existing)) if args.existing else {}
+
+    # Compatibility bridge: Qwen DCE is a PRE-READ only. Once the persistent GPT
+    # Web queue contract is active, this legacy builder is forbidden from rewriting,
+    # filtering, truncating, or changing that queue. The immutable DCE shard recovery
+    # path owns GPT_WEB_REVIEW_INBOX_V2 and GPT Web ticks own removals.
+    if str(existing.get('schema') or '') == 'GPT_WEB_REVIEW_INBOX_V2':
+        Path(args.out).parent.mkdir(parents=True,exist_ok=True)
+        Path(args.out).write_text(json.dumps(existing,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+        print(json.dumps({
+            'preserved_persistent_gpt_web_inbox': True,
+            'pending_gpt_web_review': int((existing.get('counts') or {}).get('pending_gpt_web_review') or len(existing.get('review_queue') or [])),
+            'qwen_pre_read_may_mutate_inbox': False,
+        },indent=2))
+        return
+
+    # Legacy fallback kept only for historical branches/runs that do not yet have
+    # the persistent queue schema. It cannot run once V2 exists on current main.
     final=load_json(Path(args.final_bank)) if args.final_bank else {}
     triage_rows=load_jsonl(args.triage)
     resolved={key(x) for x in final.get('items',[]) if isinstance(x,dict) and key(x)}
@@ -99,7 +112,7 @@ def main():
       'schema':'GPT_INSTANT_SUPERGREEN_INBOX_V3','updated_at':datetime.now(timezone.utc).isoformat(),'latest_source_dce_run_id':latest_source,
       'confirmed_supergreens':confirmed,'pending_final_review':pending,
       'counts':{'confirmed_supergreens':sum(str(x.get('classification'))=='FINAL_SUPER_GREEN' for x in confirmed),'confirmed_green_total':sum(str(x.get('classification')) in {'FINAL_SUPER_GREEN','GREEN'} for x in confirmed),'resolved_total':len(confirmed),'pending_final_review':len(pending),'review_now':sum(x.get('recommended_gpt_action')=='FINAL_REVIEW_NOW' for x in pending),'recall_overrides':sum(bool(x.get('inbox_recall_override')) for x in pending)},
-      'answer_contract':'When the user asks what supergreens exist, read this file first. Report live FINAL_SUPER_GREEN/GREEN verdicts immediately. Then adjudicate FINAL_REVIEW_NOW. If capacity allows, review SPM-core gate-ready rows retained by the recall override when Qwen was inconclusive. This user-facing inbox excludes obvious non-core and evidence-empty rows. Qwen is pre-read only; missing evidence is UNKNOWN.',
+      'answer_contract':'Legacy compatibility only. Current main must use GPT_WEB_REVIEW_INBOX_V2.',
       'finality_rule':'Only GPT Web final adjudication from authoritative DCE evidence may create FINAL_SUPER_GREEN. Qwen and recall overrides never do.',
     }
     Path(args.out).parent.mkdir(parents=True,exist_ok=True);Path(args.out).write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
