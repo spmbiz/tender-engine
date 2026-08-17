@@ -1,0 +1,125 @@
+name: DCE V13 Route Expansion Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/dce_worker_v11.py'
+      - 'pipeline/dce_worker_v12.py'
+      - 'pipeline/dce_worker_v13.py'
+      - 'pipeline/dce_batch_worker.py'
+      - 'pipeline/build_matrix.py'
+      - 'pipeline/test_dce_worker_v11_routes.py'
+      - 'pipeline/test_dce_worker_v13_routes.py'
+      - '.github/workflows/dce-v13-route-expansion-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  route-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install resolver dependencies
+        run: python -m pip install --disable-pip-version-check -q requests 'playwright>=1.46,<2'
+      - name: Reuse runner Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Compile full resolver chain and route mappings
+        run: |
+          python -m py_compile \
+            pipeline/build_matrix.py \
+            pipeline/dce_worker_v11.py \
+            pipeline/dce_worker_v12.py \
+            pipeline/dce_worker_v13.py \
+            pipeline/dce_batch_worker.py
+          python pipeline/test_dce_worker_v11_routes.py
+          python pipeline/test_dce_worker_v13_routes.py
+      - name: Build live route corpus
+        shell: bash
+        run: |
+          mkdir -p generated
+          cat > generated/v13_route_smoke.jsonl <<'JSONL'
+          {"candidate_id":"V13:EU-FT","portal":"EU_FUNDING_TENDERS","notice_url":"https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/tender-details/8e2f26dd-ba59-4631-a3bd-f06b7f06bfbe-CN","route":{"detail_url":"https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/tender-details/8e2f26dd-ba59-4631-a3bd-f06b7f06bfbe-CN"}}
+          {"candidate_id":"V13:BE","portal":"BE_EPROC_V11","notice_url":"https://www.publicprocurement.be/publication-workspaces/72fc84be-3879-48d6-b6d7-264433011cc6/documents","route":{"detail_url":"https://www.publicprocurement.be/publication-workspaces/72fc84be-3879-48d6-b6d7-264433011cc6/documents"}}
+          {"candidate_id":"V13:BG","portal":"BG_EOP_PUBLIC","notice_url":"https://app.eop.bg/today/584841","route":{"detail_url":"https://app.eop.bg/today/584841"}}
+          {"candidate_id":"V13:HU","portal":"HU_EKR_PUBLIC","notice_url":"https://ekr.gov.hu/portal/kozbeszerzes/eljarasok/EKR000199982025/reszletek","route":{"detail_url":"https://ekr.gov.hu/portal/kozbeszerzes/eljarasok/EKR000199982025/reszletek"}}
+          {"candidate_id":"V13:SK","portal":"SK_UVO_PUBLIC","notice_url":"https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/detail/558849","route":{"detail_url":"https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/detail/558849","documents_url":"https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/dokumenty/558849"}}
+          {"candidate_id":"V13:DE-NRW","portal":"DE_EVERGABE_NRW","notice_url":"https://www.evergabe.nrw.de/VMPSatellite/notice/CXS7YDGYT8D4LQ59/documents","route":{"detail_url":"https://www.evergabe.nrw.de/VMPSatellite/notice/CXS7YDGYT8D4LQ59/documents"}}
+          {"candidate_id":"V13:PL-PLATFORM","portal":"PL_PLATFORMZAKUPOWA","notice_url":"https://platformazakupowa.pl/transakcja/1341777","route":{"detail_url":"https://platformazakupowa.pl/transakcja/1341777"}}
+          {"candidate_id":"V13:CAT","portal":"ES_CATALONIA_PUBLIC","notice_url":"https://contractaciopublica.cat/ca/detall-publicacio/04a024a4-0945-467b-9689-66fa0e0b05c0/300786198","route":{"detail_url":"https://contractaciopublica.cat/ca/detall-publicacio/04a024a4-0945-467b-9689-66fa0e0b05c0/300786198"}}
+          {"candidate_id":"V13:NL","portal":"NL_TENDERNED_PUBLIC","notice_url":"https://www.tenderned.nl/aankondigingen/overzicht/408958","route":{"detail_url":"https://www.tenderned.nl/aankondigingen/overzicht/408958"}}
+          {"candidate_id":"V13:SE-EAVROP","portal":"SE_EAVROP","notice_url":"https://www.e-avrop.com/forma/e-Upphandling/leverantor/annons/procurement.aspx?id=72089&ownerid=1703","route":{"detail_url":"https://www.e-avrop.com/forma/e-Upphandling/leverantor/annons/procurement.aspx?id=72089&ownerid=1703"}}
+          {"candidate_id":"V13:PT-ACINGOV","portal":"PT_ACINGOV","notice_url":"https://www.acingov.pt/acingovprod/2/index.php/zonaPublica/zona_publica_c/indexProcedimentosActivos/356","route":{"detail_url":"https://www.acingov.pt/acingovprod/2/index.php/zonaPublica/zona_publica_c/indexProcedimentosActivos/356"}}
+          {"candidate_id":"V13:MERCELL","portal":"MERCELL_S2C","notice_url":"https://s2c.mercell.com/today/227119","route":{"detail_url":"https://s2c.mercell.com/today/227119"}}
+          {"candidate_id":"V13:CLIRA","portal":"SE_CLIRA","notice_url":"https://annonser.clira.io/upphandling/c089c3e2-94ad-44a6-8aa0-fa08b5d7dd07","route":{"detail_url":"https://annonser.clira.io/upphandling/c089c3e2-94ad-44a6-8aa0-fa08b5d7dd07"}}
+          JSONL
+      - name: Exercise live routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          for line in $(seq 1 13); do
+            echo "=== route $line ==="
+            timeout 170s python pipeline/dce_worker_v13.py \
+              --queue generated/v13_route_smoke.jsonl \
+              --line "$line" \
+              --out out || true
+          done
+      - name: Validate manifests and barrier semantics
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          rows=[]
+          by_id={}
+          for p in Path('out').rglob('manifest.json'):
+              m=json.loads(p.read_text(encoding='utf-8'))
+              row={
+                  'candidate_id':m.get('candidate_id'),
+                  'portal':m.get('portal'),
+                  'status':m.get('status'),
+                  'files':len(m.get('files') or []),
+                  'attempts':len(m.get('dce_method_attempts') or []),
+              }
+              rows.append(row); by_id[row['candidate_id']]=row
+          rows.sort(key=lambda r:r['candidate_id'] or '')
+          print(json.dumps(rows, indent=2, ensure_ascii=False))
+          if len(rows) < 13:
+              raise SystemExit(f'expected 13 manifests, got {len(rows)}')
+          incomplete=[r for r in rows if r['status'] in {None,'STARTED','WORKER_ERROR'}]
+          if incomplete:
+              raise SystemExit(f'incomplete worker results: {incomplete}')
+          # These two pages currently publish explicit non-public access semantics.
+          # Fail if the resolver silently treats them as ordinary unresolved pages.
+          for cid in ('V13:SE-EAVROP','V13:PT-ACINGOV'):
+              if by_id[cid]['status'] not in {'INTEREST_RECORDING_REQUIRED','AUTH_REQUIRED','CAPTCHA_REQUIRED'}:
+                  raise SystemExit(f'barrier classification regressed for {cid}: {by_id[cid]}')
+          if not any(r['files'] > 0 for r in rows):
+              print('WARNING: no live download in this time-sensitive smoke corpus; route diagnostics still preserved')
+          Path('v13-route-smoke-summary.json').write_text(json.dumps(rows, indent=2, ensure_ascii=False), encoding='utf-8')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dce-v13-route-smoke-${{ github.run_id }}
+          path: |
+            v13-route-smoke-summary.json
+            out/**/manifest.json
+            out/**/portal_page*.txt
+          retention-days: 3
+          if-no-files-found: warn
