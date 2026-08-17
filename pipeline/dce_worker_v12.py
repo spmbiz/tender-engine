@@ -18,6 +18,14 @@ AUTH_GATE_RE = re.compile(
     r".{0,120}(?:login|log in|sign in|se connecter|connexion|anmelden|bejelentkez|zaloguj|accedi)",
     re.I | re.S,
 )
+v11.DOC_CONTROL_RE = re.compile(v11.DOC_CONTROL_RE.pattern + r"|\.(?:pdf|zip|docx?|xlsx?|xls|pptx?|csv|7z|rar)(?:$|\s)", re.I)
+
+PROCEDURE_AUTH_RE = re.compile(
+    r"para que possa aceder a este procedimento.{0,120}(?:inicie sess[aã]o|registe-se)|"
+    r"(?:authentication|login|registration).{0,120}(?:required|necessary).{0,120}(?:procedure|tender|documents?)",
+    re.I | re.S,
+)
+
 INTEREST_GATE_RE = re.compile(
     r"(?:record|register|express|manifest).{0,80}(?:interest|int[eé]r[eê]t).{0,160}(?:document|download|access|dce)|"
     r"(?:document|download|access|dce).{0,160}(?:record|register|express|manifest).{0,80}(?:interest|int[eé]r[eê]t)",
@@ -31,7 +39,7 @@ def _page_state_v12(body: str, status: int | None = None) -> str:
         return "CAPTCHA_REQUIRED"
     if INTEREST_GATE_RE.search(text):
         return "INTEREST_RECORDING_REQUIRED"
-    if status in (401, 403) or AUTH_GATE_RE.search(text):
+    if status in (401, 403) or PROCEDURE_AUTH_RE.search(text) or AUTH_GATE_RE.search(text):
         return "AUTH_REQUIRED"
     return "GENERIC_PUBLIC_PAGE_UNRESOLVED"
 
