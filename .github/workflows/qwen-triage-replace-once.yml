@@ -1,0 +1,42 @@
+name: Qwen Triage Replace Once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/qwen_triage_replace_once.json'
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  replace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Cancel stale pre-V2 triage and dispatch patched replacement
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          stale_run="$(python - <<'PY'
+          import json
+          x=json.load(open('control/qwen_triage_replace_once.json',encoding='utf-8'))
+          print(x['stale_run_id'])
+          PY
+          )"
+          dce_run="$(python - <<'PY'
+          import json
+          x=json.load(open('control/qwen_triage_replace_once.json',encoding='utf-8'))
+          print(x['dce_run_id'])
+          PY
+          )"
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/actions/runs/${stale_run}/cancel" || true
+          sleep 2
+          gh workflow run qwen-dce-triage.yml --ref main -f dce_run_id="$dce_run" -f workers=4
+          echo "cancelled stale=$stale_run; dispatched patched triage for dce=$dce_run"
