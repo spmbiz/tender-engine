@@ -1,0 +1,153 @@
+name: Qwen Control Plane Repair
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qwen-control-plane-repair.yml'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: qwen-control-plane-repair
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Anchor autotune goldens and wire champion into live classifier
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          auto = Path('.github/workflows/qwen-batch-autotune-selfheal.yml')
+          text = auto.read_text(encoding='utf-8')
+          old = '''          source_tag="discovery-harvest-${generation}"
+          repaired="supergreen-wide-read-${generation}-repaired.tar.gz"
+          normal="supergreen-wide-read-${generation}.tar.gz"
+'''
+          new = '''          golden_generation="$(python - <<'PYGEN'
+          import json
+          payload=json.load(open('benchmarks/qwen_batch_recall_golden_v1.json',encoding='utf-8'))
+          print(int(payload['canonical_source_run']))
+          PYGEN
+          )"
+          [[ "$golden_generation" =~ ^[0-9]+$ ]] || { echo 'Benchmark canonical_source_run is invalid' >&2; exit 1; }
+          echo "GOLDEN_SOURCE_GENERATION=$golden_generation" >> "$GITHUB_ENV"
+          source_tag="discovery-harvest-${golden_generation}"
+          repaired="supergreen-wide-read-${golden_generation}-repaired.tar.gz"
+          normal="supergreen-wide-read-${golden_generation}.tar.gz"
+'''
+          if old not in text:
+              raise SystemExit('autotune golden-source block not found; refusing unsafe mutation')
+          text = text.replace(old, new, 1)
+          text = text.replace(
+              "'golden_source':'canonical_discovery_generation',\n              'live_source':'residual_classification_queue',",
+              "'golden_source':'benchmark_canonical_discovery_generation',\n              'golden_source_generation':os.environ.get('GOLDEN_SOURCE_GENERATION'),\n              'live_source':'residual_classification_queue',",
+              1,
+          )
+          auto.write_text(text, encoding='utf-8')
+
+          live = Path('.github/workflows/qwen-live-classification.yml')
+          text = live.read_text(encoding='utf-8')
+          old = '''      allowed_workers: ${{ steps.plan.outputs.allowed_workers }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+'''
+          new = '''      allowed_workers: ${{ steps.plan.outputs.allowed_workers }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+      batch_size: ${{ steps.plan.outputs.batch_size }}
+'''
+          if old not in text:
+              raise SystemExit('live plan outputs block not found; refusing unsafe mutation')
+          text = text.replace(old, new, 1)
+
+          marker = '''          echo "source_run=$source_run" >> "$GITHUB_OUTPUT"
+'''
+          insert = '''          batch_size="$(python - <<'PYBATCH'
+          import json
+          from pathlib import Path
+          fallback=8
+          p=Path('control/qwen_batch_runtime_config.json')
+          try:
+              cfg=json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
+          except Exception:
+              cfg={}
+          champ=cfg.get('champion') if cfg.get('status') == 'PASS' else None
+          if isinstance(champ,dict) and champ.get('safe_for_shadow_scale_out'):
+              try: n=int(champ.get('initial_batch_size') or fallback)
+              except Exception: n=fallback
+          else:
+              n=fallback
+          print(max(1,min(32,n)))
+          PYBATCH
+          )"
+          echo "batch_size=$batch_size" >> "$GITHUB_OUTPUT"
+          echo "source_run=$source_run" >> "$GITHUB_OUTPUT"
+'''
+          if marker not in text:
+              raise SystemExit('live output marker not found; refusing unsafe mutation')
+          text = text.replace(marker, insert, 1)
+          old_batch = '            --batch-size "$QWEN_BATCH_SIZE" \\\n'
+          new_batch = "            --batch-size '${{ needs.plan.outputs.batch_size }}' \\\n"
+          if old_batch not in text:
+              raise SystemExit('live fixed batch invocation not found; refusing unsafe mutation')
+          text = text.replace(old_batch, new_batch, 1)
+          text = text.replace('batch size: $QWEN_BATCH_SIZE', 'batch size: ${{ steps.plan.outputs.batch_size }}', 1)
+          trigger = "      - 'pipeline/qwen_notice_post_guard.py'\n"
+          if "      - 'control/qwen_batch_runtime_config.json'\n" not in text:
+              if trigger not in text:
+                  raise SystemExit('live trigger insertion point not found')
+              text = text.replace(trigger, trigger + "      - 'control/qwen_batch_runtime_config.json'\n", 1)
+          live.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Validate YAML and exact intended diffs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import pathlib
+          a=pathlib.Path('.github/workflows/qwen-batch-autotune-selfheal.yml').read_text()
+          l=pathlib.Path('.github/workflows/qwen-live-classification.yml').read_text()
+          assert 'GOLDEN_SOURCE_GENERATION' in a
+          assert 'benchmark_canonical_discovery_generation' in a
+          assert 'batch_size: ${{ steps.plan.outputs.batch_size }}' in l
+          assert "--batch-size '${{ needs.plan.outputs.batch_size }}'" in l
+          assert "control/qwen_batch_runtime_config.json" in l
+          print('control-plane repair assertions passed')
+          PY
+          git diff --check
+          git diff -- .github/workflows/qwen-batch-autotune-selfheal.yml .github/workflows/qwen-live-classification.yml
+
+      - name: Persist repair transactionally
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/qwen-batch-autotune-selfheal.yml .github/workflows/qwen-live-classification.yml
+          if git diff --cached --quiet; then
+            echo 'Repair already applied.'
+            exit 0
+          fi
+          git commit -m 'qwen: anchor autotune goldens and consume safe champion'
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then
+              exit 0
+            fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((attempt * 3))"
+          done
+          echo 'Failed to persist Qwen control-plane repair' >&2
+          exit 1
