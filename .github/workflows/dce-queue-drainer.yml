@@ -155,7 +155,7 @@ jobs:
             -f selection_path="$path" \
             -f source_discovery_run="$source_run" \
             -f max_jobs="$jobs" \
-            -f max_parallel=10 \
+            -f max_parallel=24 \
             -f max_shards=80 \
             -f jobs_per_shard=0
-          echo "Dispatched $jobs unseen candidate versions from $path (rows=$rows unseen=$unseen source=$source_run policy=$reason)."
+          echo "Dispatched $jobs unseen candidate versions from $path (rows=$rows unseen=$unseen source=$source_run policy=$reason max_parallel=24)."
