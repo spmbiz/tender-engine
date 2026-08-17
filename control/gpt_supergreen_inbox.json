@@ -1,6 +1,6 @@
 {
   "schema": "GPT_WEB_REVIEW_INBOX_V2",
-  "updated_at": "2026-08-17T11:55:17.631469+00:00",
+  "updated_at": "2026-08-17T11:55:46.226046+00:00",
   "latest_source_dce_run_id": 32026769574,
   "review_queue": [
     {
@@ -313,7 +313,7 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 1,
-      "hot_ready_at": "2026-08-17T11:52:15.874105+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 26,
       "spm_fit_band": "MAYBE",
@@ -321,20 +321,75 @@
         "training-course"
       ],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 1,
+        "candidate_id": "US-SAM:89a61edcb14e409086436577320da427",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:89a61edcb14e409086436577320da427",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 202523,
+        "documents_indexed": 35,
+        "documents_with_text": 27,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/65e/65e501f5fb694aeb83c2bbe03bc8a1c8.pdf?response-content-disposition=attachment%3B%20filename%3DSolicitation%2BAmendment%2BFA468626Q00060001%2BSF%2B30.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=7a2a6a5e7abfae8f23f259109c9ed9440d86663152ac564931e7a3e1ef2a7e45",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/af7/af791269ec8d4818bd6b324a7a8ddc08.pdf?response-content-disposition=attachment%3B%20filename%3DAttach%2B1.%2BSolicitation%2B-%2BFA468626Q0006.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=80f849e33113221feebd19c358a9f7474c24bfa760540e7747ffb2c2cae9899f",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/17e/17e09c7a7daa49839acc67047f9e6a09.pdf?response-content-disposition=attachment%3B%20filename%3DAttach%2B2.%2BSports%2BOfficiating%2Band%2BScorekeeping%2BServices%2BIDIQ%2BPWS.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=369fddca8d88cd76041da974ac42c3dcbc8e8f533b5a2ad49e9ba5d5b806dbc5",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/ea2/ea2308f577414af89d417c2d406d72c9.pdf?response-content-disposition=attachment%3B%20filename%3DAttach%2B5.%2BSports%2BOfficiating%2Band%2BScorekeeping%2BServices%2BIDIQ%2BPWS%2BSeptember%2B2026.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=88319ea750fa95b46714648d24386ef62d5578470178fefeeb8ea5a42f45e0fb",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/8a1/8a1eb33fe74044649d621847e395ed83.pdf?response-content-disposition=attachment%3B%20filename%3DAttach%2B3.%2BWD%2BNo.%2B2015-5659%2BRev%2BNo.%2B26%2Bdated%2B13%2BMay%2B2026.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=ded9c8e8b8631d6d7396b6bdba10c6d166203143febcb02008d2a5f794f3d461",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/719/719f0261a19f4425a4beb9ddf47d5e9a.xlsx?response-content-disposition=attachment%3B%20filename%3DAttach%2B4.%2BPrice%2BSchedule%2B-%2BSports%2BOfficiating%2Band%2BScorekeeping%2BServices%2BIDIQ.xlsx&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=82d2af250cd223d82e39345d2546205c5865d00711ada7f6323e3bd196683eea"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "SCOPE OF WORK",
+          "Statement of Work"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "idiq",
+            "officiating",
+            "scorekeeping",
+            "sports"
+          ],
+          "hits": [
+            "idiq",
+            "officiating",
+            "scorekeeping",
+            "sports"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "7f7b3c1773578c0989ce879dc7775a979e919115ffe6500b54dd128e9a01ce76",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 26,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 1,
         "candidate_id": "US-SAM:89a61edcb14e409086436577320da427",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -724,26 +779,89 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 5,
-      "hot_ready_at": "2026-08-17T11:55:15.497767+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 18,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 5,
+        "candidate_id": "US-SAM:8f73b2ade3ff49408f20614050b25011",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:8f73b2ade3ff49408f20614050b25011",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 1457357,
+        "documents_indexed": 56,
+        "documents_with_text": 37,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/1b3/1b39ba2045024214981e6922df55047d.pdf?response-content-disposition=attachment%3B%20filename%3DAmendment%2B00001.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115455Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=041c20937256b8d8f1c4ed8a72e355c8e0513dbf0bbec2b29456c3f5141251a7",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/eac/eac9ef5f55c04dddb85131c331df2268.pdf?response-content-disposition=attachment%3B%20filename%3D2.2.1%2BSolicitation%2BDOTS%2BVIPR%2B-%2B70FB7026R00000014.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=bb08cbc9985925a1b92df7eb673d3175862a935711e99b5c1f2cc40986b7a70e",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/0de/0de3fbada2044ecdb5ed5d97ed6ab4f6.pdf?response-content-disposition=attachment%3B%20filename%3D2.2.1%2BAttachment%2BI%2B-%2BDOTS%2BVIPR%2BPWS.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=eec671e734c08ddbf06b9883c1e67639793ae1247be9ffee81277f6ef24107df",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/284/284401ff42ce4e7ab976ded0d145cdef.xlsx?response-content-disposition=attachment%3B%20filename%3D2.2.1%2BAttachment%2BII%2B-%2BPricing%2BSheet.xlsx&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=c3b07e548865affd0e6f0d7d0756c2d386eeef2e96498bc8547d5572c934490b",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/e7e/e7e3e596933f471db95aff00dfc4b265.pdf?response-content-disposition=attachment%3B%20filename%3D2.2.1%2BAttachment%2BIII%2B-%2BPast%2BPerformance%2BQuestionnaire%2B%2528PPQ%2529.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=d27f641e26148ff5187d8547a443af09340db47883e8bf575bc2367539f26cd7",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/67d/67d9e4fa0bb348cbb29cee3ea2827ec4.pdf?response-content-disposition=attachment%3B%20filename%3D2.2.1%2BAttachment%2BIV%2B-%2BDOTS%2BVIPR%2BQASP.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=783446b65c8402a7c134d61af90b201e23c44ea3b66a1a5ebab4b2203f9490b7"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "Request for Proposal",
+          "evaluation criteria",
+          "PRICING SCHEDULE",
+          "deadline for submission"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "disaster",
+            "islands",
+            "overseas",
+            "puerto",
+            "rico",
+            "transportation",
+            "virgin"
+          ],
+          "hits": [
+            "disaster",
+            "islands",
+            "overseas",
+            "puerto",
+            "rico",
+            "transportation",
+            "virgin"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "8021c053df7dbb5bd654d2d67eedd27fbc0005c5c4fffb565c7e7ac62c95ffdf",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 18,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 5,
         "candidate_id": "US-SAM:8f73b2ade3ff49408f20614050b25011",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -1151,26 +1269,121 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 4,
-      "hot_ready_at": "2026-08-17T11:54:49.331184+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 18,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 4,
+        "candidate_id": "TED:560501-2026",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "TED:560501-2026",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 3081932,
+        "documents_indexed": 335,
+        "documents_with_text": 220,
+        "source_urls": [
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/address/Aufforderungsschreiben+Offenes+Verfahren+VgV.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/address/Hinweisblatt+f%25C3%25BCr+Ausschreibungen.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/address/Information+nach+EU-Datenschutz-Grundverordnung+%2528DSGVO%2529.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/serviceDescription/Fensternische+Flur+OG+2.jpg",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/serviceDescription/Geb%25C3%25A4udeteile+Hort+u+TH.png",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/serviceDescription/Holzverkleidung+H+150+cm.jpg",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/serviceDescription/Holzverkleidung+von+oben.jpg",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/serviceDescription/LVStadt+K%25C3%25B6nigs+Wusterhausen.xlsx",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/234+Erkl%25C3%25A4rung+der+Arbeits_Bietergemeinschaft.docx",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/236+Verpflichtungserkl%25C3%25A4rung+anderer+Unternehmen.docx",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Angebotsschreiben.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/CSX-59-Eigenerklaerung-Informationen-zum-Bieter.docx",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Eigenerkl%25C3%25A4rung+Ausschluss+Offenes+Verfahren+VgV.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Eigenerkl%25C3%25A4rung+Betriebliche+Haftpflichtversicherung.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Eigenerkl%25C3%25A4rung+Umsatz+Unternehmensform+und+Registerauszug.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Eigenerkl%25C3%25A4rung+zu+5.+EU+Sanktionspaket+RUS+Sanktionen.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/ERK+Stadt+K%25C3%25B6nigs+Wusterhausen.xlsx",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Erkl%25C3%25A4rung+Qualit%25C3%25A4tsmanagement+und+Reinigungstechnik.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Leistungs%25C3%25BCbersicht+Nachunternehmer+Optional.xlsx",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Referenzliste+Vorlage.xlsx",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Vereinbarung+Mindestanforderungen+BbgVergG+NU+Verleiher.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Vereinbarung+Mindestanforderungen+BbgVergG.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/contractCondition/5.1+Erg%25C3%25A4nzende+Vergabebedingung+BbgVergG.pdf"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [
+          "Information_20nach_20EU-Datenschutz-Grundverordnung_20_28DSGVO_29.pdf"
+        ],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "Leistungsbeschreibung",
+          "Vergabeunterlagen",
+          "Zuschlagskriterien",
+          "Eignungskriterien",
+          "Angebotsfrist",
+          "Preisblatt",
+          "Vertragsbedingungen"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "accommodation",
+            "building",
+            "cleaning",
+            "germany",
+            "glasreinigung",
+            "grund",
+            "grundschule",
+            "hort",
+            "königs",
+            "stadt",
+            "unterhalts",
+            "window",
+            "wusterhausen",
+            "zeesen"
+          ],
+          "hits": [
+            "glasreinigung",
+            "grund",
+            "grundschule",
+            "hort",
+            "königs",
+            "stadt",
+            "unterhalts",
+            "window",
+            "wusterhausen",
+            "zeesen"
+          ],
+          "ratio": 0.7143
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "78a8839fba10e92f49389013f9151900663d3a8417c599612ec624edfeb740ff",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 18,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 4,
         "candidate_id": "TED:560501-2026",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -1588,26 +1801,76 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 5,
-      "hot_ready_at": "2026-08-17T11:55:15.497767+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 18,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 5,
+        "candidate_id": "US-SAM:d85c956e3c594e9ca19b30e5012a0234",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:d85c956e3c594e9ca19b30e5012a0234",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 285232,
+        "documents_indexed": 6,
+        "documents_with_text": 6,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/5c8/5c81df1cf84d465991852c28395ec3ea.pdf?response-content-disposition=attachment%3B%20filename%3DAmendment%2B0004%2B-%2BSPRDL125R0117.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=d2b5d15233e1f5996877dfeb80b33225ae5d8cd6d6783358384f4f7d3d89fa2a",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/ff6/ff6fb114802f4d1bba1ef7f774286cd8.pdf?response-content-disposition=attachment%3B%20filename%3DAmendment%2B0003%2B-%2BSPRDL125R0117.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=b84b36dadf31492caed065bf6d609ac33c0ccb0703d1a2fcfc7dfc2915d109b4",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/958/95889a4b18ef40f48838bad66804c8bd.pdf?response-content-disposition=attachment%3B%20filename%3DAmendment%2B0001%2B-%2BSPRDL125R0117.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=5bfcb9faa65e3aee70544b5d4d2c9f4026d80adbe5accc51245f1c80bbdafd5b",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/9a9/9a93f18e12e54d64a13b1fdc42d8a9f1.pdf?response-content-disposition=attachment%3B%20filename%3DAK16655724_A.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=c0b4bfbbe4280424369913aebf75b8b916e6ce8cfba3768a4566f805e7e4e077",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/56e/56e054ad6c0a455988e1b80c68e9b27c.pdf?response-content-disposition=attachment%3B%20filename%3DSPRDL125R0117.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=ba7c7fca44baba8fde7ea318386d7990473ccfd28d7211bfe46f9f535b617e2f"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "request for proposal",
+          "technical specifications"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "diesel",
+            "engine"
+          ],
+          "hits": [
+            "diesel",
+            "engine"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "06d113fa5a5ef5238db509f308013fb61771438cfaf0d0d0ac3b7da4cd88baf2",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 18,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 5,
         "candidate_id": "US-SAM:d85c956e3c594e9ca19b30e5012a0234",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -1916,26 +2179,83 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 1,
-      "hot_ready_at": "2026-08-17T11:52:15.874105+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 17,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 1,
+        "candidate_id": "US-SAM:4efa2f4446754f0dbe9be983e35f457c",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:4efa2f4446754f0dbe9be983e35f457c",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 287875,
+        "documents_indexed": 9,
+        "documents_with_text": 9,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/696/696493205ad048a6adcdcdc2624f05e5.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B6%2B-%2BNMR%2BCG%2BRecon_CnxnPlans.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=65c640eb47e18b85454246dcb8bcd9aa972e534793cc4558070dfe26275a9113",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/c9a/c9ac4a576e614589921aea4c0a2d6daa.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B1%2B-%2BNMR%2BCG%2BRecon_Specifications.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=f554c6e51b0b3fc563d957469569c06fa446e3312042339e30bd40d85498f1ea",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/cfb/cfb1fa986b38494f9119819e0fb97fc8.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B9-%2BPast%2BPerformance%2BQuestionnaire.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=dc652ed05274389e69b086f1cf30c2ac37e3761f1525d9dd66574e7e430b8e1f",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/db7/db73bc0b63e44dbb9db9ca7934352eff.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B4-%2BNMR%2BCulverts_FSSS.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=c589ea54e47e248f2c34c0fef0843c90404617c02379a13685de4589edec6485",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/ccb/ccbfb6f9bc0f4184a045ec4d74545ec2.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B3-%2BNMR%2BCG%2BRecon_SOI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115017Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=ae1fc6f74f5d70f26e31d665dbcb3dbd977746be17f7eaa26c7d3ee36fb6a079",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/5b1/5b1f800f7d5f4ccaab26a1d07e6c8470.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B7-%2BWage%2BDetermination%2BBuilding.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115017Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=b1ab9e4998b7302ab908c64af9140fb008df558254494d3804e0cd3b2c468968",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/5a9/5a915a41921c41808d3cd9f64eb7ec35.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B8-%2BWage%2BDetermination%2BHighway.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115017Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=bd39a1550f0f0e0e6fe83b91350d975d29cd4a72570f855d6a1b8c33d58d4fd2",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/e2b/e2b70b9b954d418daad45f994dda943b.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B2-%2BNMR%2BCulverts_SOI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115017Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=430d31131b90415ce933fa23e54861aab1015f9968071c588b2b09ae8c01127a"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "SCOPE OF WORK",
+          "Statement of Work"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "campground",
+            "mills",
+            "north",
+            "river"
+          ],
+          "hits": [
+            "campground",
+            "mills",
+            "north",
+            "river"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "19299380faed3fc1385ec3eea3fb4d43bc07af9454871f75b9ab5d9b4a38bd87",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 17,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 1,
         "candidate_id": "US-SAM:4efa2f4446754f0dbe9be983e35f457c",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -2215,26 +2535,76 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 1,
-      "hot_ready_at": "2026-08-17T11:52:15.874105+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 17,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 1,
+        "candidate_id": "US-SAM:8348dd5c51cf4b4eb1d2dca6eeb465c4",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:8348dd5c51cf4b4eb1d2dca6eeb465c4",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 590839,
+        "documents_indexed": 47,
+        "documents_with_text": 36,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/2cb/2cb10c4a68974a109ec0a0aebd3fa9d9.docx?response-content-disposition=attachment%3B%20filename%3DSOW%2B-%2BGarage%2Bdoors.docx&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=b267616927a0348245c29a006cc9835548e1b7c812d390713ae4f23fca986cfe",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/2b3/2b3f0e31aabd41b4afe1242d8f117321.docx?response-content-disposition=attachment%3B%20filename%3DCombined%2BSynopsis%2BSolicitation_garage%2Bdoors.docx&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=349fc6b5afbdeb2b2f2cc23f4cffcc22d82bfef0d3cd90453231dbb42b9fcf7b"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "SCOPE OF WORK",
+          "Statement of Work",
+          "Evaluation Criteria"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "doors",
+            "garage",
+            "replace"
+          ],
+          "hits": [
+            "doors",
+            "garage",
+            "replace"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "80d581eae33220266bd6f3e051f031649f75efd9b475701744905aa5c9e5fb92",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 17,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 1,
         "candidate_id": "US-SAM:8348dd5c51cf4b4eb1d2dca6eeb465c4",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -2527,26 +2897,90 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 0,
-      "hot_ready_at": "2026-08-17T11:52:54.881061+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 16,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 0,
+        "candidate_id": "TED:562225-2026",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "TED:562225-2026",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 290511,
+        "documents_indexed": 38,
+        "documents_with_text": 33,
+        "source_urls": [
+          "https://vergabe.vmstart.de/NetServer/TenderingProcedureDetails?function=_DownloadTenderDocuments&documentOID=54321-SpecificationVersion-19ff43dd9b2-58d4e31df81caae5&TenderAuthority=86-2026-EU&TenderDate=1786509103374"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [
+          "Nutzungsbedingungen.pdf"
+        ],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "Leistungsbeschreibung",
+          "Vergabeunterlagen",
+          "Zuschlagskriterien",
+          "Angebotsfrist",
+          "Vertragsbedingungen"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "bodenbelagsarbeiten",
+            "carl",
+            "covering",
+            "floor",
+            "germany",
+            "kita",
+            "laying",
+            "neubau",
+            "straße",
+            "villinger",
+            "work"
+          ],
+          "hits": [
+            "bodenbelagsarbeiten",
+            "carl",
+            "kita",
+            "neubau",
+            "straße",
+            "villinger"
+          ],
+          "ratio": 0.5455
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "514a4021289bedfffd0b9e3aebeb4e29771169bcb7a59a339c8209fc2fa90419",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 16,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 0,
         "candidate_id": "TED:562225-2026",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -2696,26 +3130,76 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 3,
-      "hot_ready_at": "2026-08-17T11:54:32.973402+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 13,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 3,
+        "candidate_id": "US-SAM:b27d13258a7544dd89b05ccb6c71c511",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:b27d13258a7544dd89b05ccb6c71c511",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 12521,
+        "documents_indexed": 3,
+        "documents_with_text": 3,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/e48/e485e58d80cd40b38f030e07d0800246.pdf?response-content-disposition=attachment%3B%20filename%3D19VE3026Q0009%2B-%2BQA.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=446d828d5757d07fde7cfa5a73140014795cfa10b37c499104862a970e71f2c0",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/7e5/7e545c95fcf74982a03e1bc92526217a.pdf?response-content-disposition=attachment%3B%20filename%3D19VE3026Q0009%2B-%2BRFQ%2B-%2BBatteries%2Bfor%2BChancery%2BMain%2BUPS.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=b470baf3b4afd08e481b2a137cb96f8434f715380f816900468df91296fce2c1"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "batteries",
+            "caracas",
+            "chancery",
+            "embassy",
+            "main"
+          ],
+          "hits": [
+            "batteries",
+            "caracas",
+            "chancery",
+            "embassy",
+            "main"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "00e00993285027ab0fb7b752a1d9129ae2c4be3486ba3bff60cc3acf3076dc3c",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 13,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 3,
         "candidate_id": "US-SAM:b27d13258a7544dd89b05ccb6c71c511",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -2787,26 +3271,77 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 5,
-      "hot_ready_at": "2026-08-17T11:55:15.497767+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 8,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 5,
+        "candidate_id": "US-SAM:6dc90e64d1f1491386fafca311afcf3c",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:6dc90e64d1f1491386fafca311afcf3c",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 2022,
+        "documents_indexed": 2,
+        "documents_with_text": 2,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/15c/15c6ed2b6ac74eb1b92681069c438709.pdf?response-content-disposition=attachment%3B%20filename%3DA16_LifeTech_FY26_Single_Source_Justification_signed_1.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115455Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=3a24532ab453fbe7d03b7755aac28ff4ab67eb7302654c1c69cb05f86c17afc3"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "agreement",
+            "instrument",
+            "justification",
+            "life",
+            "sole",
+            "source",
+            "technologies"
+          ],
+          "hits": [
+            "agreement",
+            "justification",
+            "life",
+            "sole",
+            "source"
+          ],
+          "ratio": 0.7143
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "114305dc8fdaefa6d2f8d13e814f59f64f569c146f75f377ac2aabcdc0a938ee",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 8,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 5,
         "candidate_id": "US-SAM:6dc90e64d1f1491386fafca311afcf3c",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -2882,26 +3417,71 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 4,
-      "hot_ready_at": "2026-08-17T11:54:49.331184+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 7,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 4,
+        "candidate_id": "GR-KHMDHS:26PROC019626855",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "GR-KHMDHS:26PROC019626855",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 26442,
+        "documents_indexed": 1,
+        "documents_with_text": 1,
+        "source_urls": [
+          "https://cerpp.eprocurement.gov.gr/khmdhs-opendata/notice/attachment/26PROC019626855"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "10626",
+            "2026",
+            "supplies"
+          ],
+          "hits": [
+            "10626",
+            "2026",
+            "supplies"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "0772323f3c7ac8ef68ac264fbe24a1065aadf5176030016884f859ff5fde6c92",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 7,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 4,
         "candidate_id": "GR-KHMDHS:26PROC019626855",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -3217,7 +3797,7 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 3,
-      "hot_ready_at": "2026-08-17T11:54:32.973402+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": -40,
       "spm_fit_band": "LOW",
@@ -3225,20 +3805,81 @@
       "spm_friction_signals": [
         "top-secret-clearance"
       ],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 3,
+        "candidate_id": "US-SAM:7c54e0f8c26446e9a7d0cb7ea14e8f59",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:7c54e0f8c26446e9a7d0cb7ea14e8f59",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 174520,
+        "documents_indexed": 12,
+        "documents_with_text": 12,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/326/326b54b3dc8f4c85a01daf8d8149f45f.pdf?response-content-disposition=attachment%3B%20filename%3DQuestions%2Band%2BAnswers%2B-%2BFA860126Q0111.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=6324ee21a11fbf1db5858ff8db9adc8a21f47c1cfd71bf174737b14675b3767c",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/623/6235654a841f491d9414978c7f152cd5.pdf?response-content-disposition=attachment%3B%20filename%3D01-Att%2BE-CS%2BEngineer%2BDrawing%2BRequirements%2B-Attachment%2BE%2BCoverSheet-fillable-add%2BCS%2Bdrawings.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=c8cf6f83230ed7fb40eed19122047ecd2e6338d40ee2ba7734f90dc98cda28b8",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/2bf/2bf73252bc064f7ba9e77a839e741578.pdf?response-content-disposition=attachment%3B%20filename%3D01_Att%2BC%2B-%2BG11_Wright_Patterson_AFB_IFS_Telecommunications.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=d91ad9561e1c96405a119470a8e1b9ebcc667012915a344345fd16b3310994a0",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/820/8203e5661e0848ad8e07e667c41cf6dc.pdf?response-content-disposition=attachment%3B%20filename%3D01_Att%2BB-Telecommunication%2BRequirements%2Bfrom%2B88%2BABW.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115321Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=9a4727922b645d1a7117ddd03d3925e5bf8bf4b9963b91a950765931410c88b5",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/d58/d58ad37e384c48a98d4660d8b8a0a17b.pdf?response-content-disposition=attachment%3B%20filename%3D01a-%2BAtt%2BA%2BCarpet%2BProgram%2BPurchase%2Bwithin%2B%2BFurniture%2BContract%2BPackage.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115321Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=a80ea209cf0031e05d5989326882b819dcb20ebb0e8bf32ba48e7f4f42909e95",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/ab4/ab4c7e224d094be58fb3eda31c2fb6e4.pdf?response-content-disposition=attachment%3B%20filename%3D05b-CTS-ALL-F30001%2BWorkstation%2BExpansion%2BMAX%2BOut%2B2026TP096.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115321Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=1ba55f1ecadc61e7bc7e4dc1f29a77a9d69d8d6e0c38355620c1391528eefd13",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/444/444cac75cbc44966bb9d1fbe35deb984.pdf?response-content-disposition=attachment%3B%20filename%3D05a-PLNS-ALL-F30001%2BWorkstation%2BExpansion%2BMAX%2BOut%2B2026TP096.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115321Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=0aca4cbeea28da040e5ead964def4b8cd0d56fa8f150f6d213dcdf4022e9b513",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/ed0/ed0df1ff09e34d81ab1a25962962b928.pdf?response-content-disposition=attachment%3B%20filename%3DAttachment%2B4.%2BSSJ_F30001%2BWorkstations_Redacted.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115321Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=70f2afa59f21b4d30fbe0e32f7cd93c1a3c2eafa972c0121802ab8141c3b9cca",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/e33/e33f10f8d02f401584163b980c9a99db.pdf?response-content-disposition=attachment%3B%20filename%3DAttachment%2B3.%2B%2BReps%2Band%2BCerts.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115321Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=150a3ae5a167d18468c263125e245ab84c6b4ce3dda366a02f4c6bd0d52d5d79",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/a91/a9119270ba8a4881890b47fab044c77e.pdf?response-content-disposition=attachment%3B%20filename%3DAttachment%2B2.%2BSolicitation%2B-%2BFA860126Q0111-Draft.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115321Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=fa225dbdd3dc50500de43a782977983d95949d48187f229c34053888520ff5df",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/eda/eda7fb30c59543e987b2ec213ab025c8.pdf?response-content-disposition=attachment%3B%20filename%3DAttachment%2B1-SOW%2BF30001%2BWorkstation%2BExpansion%2BMAX%2BOut%2B2026TP096.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115322Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=d960f907451c41f33d462506cefbd05f145091c02eeb3d7a66749770f62614c0"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "request for proposal",
+          "Scope of Work",
+          "Statement of Work"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "2026tp096",
+            "expansion",
+            "f30001",
+            "workstation"
+          ],
+          "hits": [
+            "2026tp096",
+            "expansion",
+            "f30001",
+            "workstation"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "db4bf3f2ee40e341f14a03d1c4f6744a13fad56c6e9a3acb2b3dcbf14c10f9c1",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 1,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 3,
         "candidate_id": "US-SAM:7c54e0f8c26446e9a7d0cb7ea14e8f59",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -3485,7 +4126,7 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 3,
-      "hot_ready_at": "2026-08-17T11:54:32.973402+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": -28,
       "spm_fit_band": "LOW",
@@ -3496,20 +4137,275 @@
         "security-clearance",
         "24x7-operations"
       ],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 3,
+        "candidate_id": "US-SAM:66c0845aa8c24f648762ec03ba06be73",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:66c0845aa8c24f648762ec03ba06be73",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 95671,
+        "documents_indexed": 4,
+        "documents_with_text": 4,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/532/532147b4761d4b11865231a7cb095a85.pdf?response-content-disposition=attachment%3B%20filename%3DC2%2B26Q5732%2BCombined%2BSynopsis%2BSolicitation.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=1c6fccff93972a05747511fda0dabc560101bfe529cdfa574000c29eb9fd07a6",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/3c0/3c03fe6b95cb40afa5d3a43a5be9d884.pdf?response-content-disposition=attachment%3B%20filename%3DA5%2B26Q5732%2BPerformance%2BWork%2BStatement%2B500kW%2BDG.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=f86bd8483b02f72d9852da4eedeccdbf2a251b75f7b19210d8d9d8264e45b23e",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/4c6/4c6786f0519743cfbfa11046a98ab4fe.pdf?response-content-disposition=attachment%3B%20filename%3DAttachment%2B2%2BContractor%2BBadging%2Band%2BAccess.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=f4d8b06590466d41458ea54b3af320b6e00a8f95381104e31c225f4f1681fa62"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "Statement of Work",
+          "pricing schedule"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "500kw",
+            "diesel",
+            "generator",
+            "lease"
+          ],
+          "hits": [
+            "500kw",
+            "diesel",
+            "generator",
+            "lease"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "8021331ef1e88fe22aecaad2615632e3f281e080ffcdf27481aed9df7ba56247",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 1,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 3,
         "candidate_id": "US-SAM:66c0845aa8c24f648762ec03ba06be73",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
+      }
+    },
+    {
+      "candidate_id": "CA:87054",
+      "title": "ADVANCE PROCUREMENT NOTICE - NORAD NORTHERN BASING INFRASTRUCTURE",
+      "buyer": null,
+      "portal": "CA_CANADABUYS",
+      "notice_url": "https://www.merx.com/public/solicitations/3914690261/abstract?language=EN",
+      "deadline": "2026-08-31T13:00:00+00:00",
+      "estimated_value": null,
+      "currency": "CAD",
+      "preliminary_score": 49,
+      "priority_score": 49,
+      "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+      "gate_readiness": false,
+      "deadline_authority": {},
+      "deadline_authority_status": "MISSING",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 0,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32026769574,
+      "source_shard": 2,
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 6,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "upstream_classification": "YELLOW",
+      "review_stage": "DCE_AUTHENTICITY",
+      "dce_authenticity_review_required": true,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 2,
+        "candidate_id": "CA:87054",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "CA:87054",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DCE_CONTENT_UNVERIFIED",
+        "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "gate_readiness": false,
+        "text_chars": 16607,
+        "documents_indexed": 2,
+        "documents_with_text": 2,
+        "source_urls": [
+          "https://www.dcc-cdc.gc.ca/documents/Website-Privacy-Policy.pdf"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "advance",
+            "basing",
+            "infrastructure",
+            "norad",
+            "northern",
+            "notice"
+          ],
+          "hits": [
+            "notice"
+          ],
+          "ratio": 0.1667
+        },
+        "reasons": [
+          "download_succeeded_but_authoritative_dce_content_not_proven"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "499c21b299de6fcb5e3c555e56536cb04d9c53f8d9ab30992ee5f46c397546a9",
+      "recommended_gpt_action": "GPT_WEB_VERIFY_DCE_AUTHENTICITY",
+      "gpt_priority_score": 6,
+      "upstream_signal": "YELLOW",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 2,
+        "candidate_id": "CA:87054",
+        "release_tag": "dce-harvest-32026769574"
+      }
+    },
+    {
+      "candidate_id": "US-SAM:676bfc12f2fd4cb0925f35a1ab5315ec",
+      "title": "RTI Lifecycle Furniture Replacement",
+      "buyer": "DEPT OF DEFENSE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/opp/676bfc12f2fd4cb0925f35a1ab5315ec/view",
+      "deadline": "2026-09-14T13:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 49,
+      "priority_score": 49,
+      "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+      "gate_readiness": false,
+      "deadline_authority": {},
+      "deadline_authority_status": "MISSING",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 0,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32026769574,
+      "source_shard": 3,
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 6,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "upstream_classification": "YELLOW",
+      "review_stage": "DCE_AUTHENTICITY",
+      "dce_authenticity_review_required": true,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 3,
+        "candidate_id": "US-SAM:676bfc12f2fd4cb0925f35a1ab5315ec",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:676bfc12f2fd4cb0925f35a1ab5315ec",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DCE_CONTENT_UNVERIFIED",
+        "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "gate_readiness": false,
+        "text_chars": 42599,
+        "documents_indexed": 13,
+        "documents_with_text": 11,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/f8a/f8ab000ebb5146a3a3a4878bdd582b2a.xlsx?response-content-disposition=attachment%3B%20filename%3DMaster%2BMaterial%2BListing.xlsx&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=030867d37f4a24c27762f9c6afd01faa0e12f16f26d67173b31e8b68799071ec"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "furniture",
+            "lifecycle",
+            "replacement"
+          ],
+          "hits": [
+            "furniture"
+          ],
+          "ratio": 0.3333
+        },
+        "reasons": [
+          "download_succeeded_but_authoritative_dce_content_not_proven"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "ea7077aa7a083d65e46d13d0fc688f8c18094ace138036dfddeeb4adbf6331cf",
+      "recommended_gpt_action": "GPT_WEB_VERIFY_DCE_AUTHENTICITY",
+      "gpt_priority_score": 6,
+      "upstream_signal": "YELLOW",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 3,
+        "candidate_id": "US-SAM:676bfc12f2fd4cb0925f35a1ab5315ec",
+        "release_tag": "dce-harvest-32026769574"
       }
     }
   ],
@@ -3824,7 +4720,7 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 1,
-      "hot_ready_at": "2026-08-17T11:52:15.874105+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 26,
       "spm_fit_band": "MAYBE",
@@ -3832,20 +4728,75 @@
         "training-course"
       ],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 1,
+        "candidate_id": "US-SAM:89a61edcb14e409086436577320da427",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:89a61edcb14e409086436577320da427",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 202523,
+        "documents_indexed": 35,
+        "documents_with_text": 27,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/65e/65e501f5fb694aeb83c2bbe03bc8a1c8.pdf?response-content-disposition=attachment%3B%20filename%3DSolicitation%2BAmendment%2BFA468626Q00060001%2BSF%2B30.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=7a2a6a5e7abfae8f23f259109c9ed9440d86663152ac564931e7a3e1ef2a7e45",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/af7/af791269ec8d4818bd6b324a7a8ddc08.pdf?response-content-disposition=attachment%3B%20filename%3DAttach%2B1.%2BSolicitation%2B-%2BFA468626Q0006.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=80f849e33113221feebd19c358a9f7474c24bfa760540e7747ffb2c2cae9899f",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/17e/17e09c7a7daa49839acc67047f9e6a09.pdf?response-content-disposition=attachment%3B%20filename%3DAttach%2B2.%2BSports%2BOfficiating%2Band%2BScorekeeping%2BServices%2BIDIQ%2BPWS.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=369fddca8d88cd76041da974ac42c3dcbc8e8f533b5a2ad49e9ba5d5b806dbc5",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/ea2/ea2308f577414af89d417c2d406d72c9.pdf?response-content-disposition=attachment%3B%20filename%3DAttach%2B5.%2BSports%2BOfficiating%2Band%2BScorekeeping%2BServices%2BIDIQ%2BPWS%2BSeptember%2B2026.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=88319ea750fa95b46714648d24386ef62d5578470178fefeeb8ea5a42f45e0fb",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/8a1/8a1eb33fe74044649d621847e395ed83.pdf?response-content-disposition=attachment%3B%20filename%3DAttach%2B3.%2BWD%2BNo.%2B2015-5659%2BRev%2BNo.%2B26%2Bdated%2B13%2BMay%2B2026.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=ded9c8e8b8631d6d7396b6bdba10c6d166203143febcb02008d2a5f794f3d461",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/719/719f0261a19f4425a4beb9ddf47d5e9a.xlsx?response-content-disposition=attachment%3B%20filename%3DAttach%2B4.%2BPrice%2BSchedule%2B-%2BSports%2BOfficiating%2Band%2BScorekeeping%2BServices%2BIDIQ.xlsx&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=82d2af250cd223d82e39345d2546205c5865d00711ada7f6323e3bd196683eea"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "SCOPE OF WORK",
+          "Statement of Work"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "idiq",
+            "officiating",
+            "scorekeeping",
+            "sports"
+          ],
+          "hits": [
+            "idiq",
+            "officiating",
+            "scorekeeping",
+            "sports"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "7f7b3c1773578c0989ce879dc7775a979e919115ffe6500b54dd128e9a01ce76",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 26,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 1,
         "candidate_id": "US-SAM:89a61edcb14e409086436577320da427",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -4235,26 +5186,89 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 5,
-      "hot_ready_at": "2026-08-17T11:55:15.497767+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 18,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 5,
+        "candidate_id": "US-SAM:8f73b2ade3ff49408f20614050b25011",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:8f73b2ade3ff49408f20614050b25011",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 1457357,
+        "documents_indexed": 56,
+        "documents_with_text": 37,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/1b3/1b39ba2045024214981e6922df55047d.pdf?response-content-disposition=attachment%3B%20filename%3DAmendment%2B00001.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115455Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=041c20937256b8d8f1c4ed8a72e355c8e0513dbf0bbec2b29456c3f5141251a7",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/eac/eac9ef5f55c04dddb85131c331df2268.pdf?response-content-disposition=attachment%3B%20filename%3D2.2.1%2BSolicitation%2BDOTS%2BVIPR%2B-%2B70FB7026R00000014.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=bb08cbc9985925a1b92df7eb673d3175862a935711e99b5c1f2cc40986b7a70e",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/0de/0de3fbada2044ecdb5ed5d97ed6ab4f6.pdf?response-content-disposition=attachment%3B%20filename%3D2.2.1%2BAttachment%2BI%2B-%2BDOTS%2BVIPR%2BPWS.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=eec671e734c08ddbf06b9883c1e67639793ae1247be9ffee81277f6ef24107df",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/284/284401ff42ce4e7ab976ded0d145cdef.xlsx?response-content-disposition=attachment%3B%20filename%3D2.2.1%2BAttachment%2BII%2B-%2BPricing%2BSheet.xlsx&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=c3b07e548865affd0e6f0d7d0756c2d386eeef2e96498bc8547d5572c934490b",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/e7e/e7e3e596933f471db95aff00dfc4b265.pdf?response-content-disposition=attachment%3B%20filename%3D2.2.1%2BAttachment%2BIII%2B-%2BPast%2BPerformance%2BQuestionnaire%2B%2528PPQ%2529.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=d27f641e26148ff5187d8547a443af09340db47883e8bf575bc2367539f26cd7",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/67d/67d9e4fa0bb348cbb29cee3ea2827ec4.pdf?response-content-disposition=attachment%3B%20filename%3D2.2.1%2BAttachment%2BIV%2B-%2BDOTS%2BVIPR%2BQASP.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=783446b65c8402a7c134d61af90b201e23c44ea3b66a1a5ebab4b2203f9490b7"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "Request for Proposal",
+          "evaluation criteria",
+          "PRICING SCHEDULE",
+          "deadline for submission"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "disaster",
+            "islands",
+            "overseas",
+            "puerto",
+            "rico",
+            "transportation",
+            "virgin"
+          ],
+          "hits": [
+            "disaster",
+            "islands",
+            "overseas",
+            "puerto",
+            "rico",
+            "transportation",
+            "virgin"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "8021c053df7dbb5bd654d2d67eedd27fbc0005c5c4fffb565c7e7ac62c95ffdf",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 18,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 5,
         "candidate_id": "US-SAM:8f73b2ade3ff49408f20614050b25011",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -4662,26 +5676,121 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 4,
-      "hot_ready_at": "2026-08-17T11:54:49.331184+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 18,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 4,
+        "candidate_id": "TED:560501-2026",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "TED:560501-2026",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 3081932,
+        "documents_indexed": 335,
+        "documents_with_text": 220,
+        "source_urls": [
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/address/Aufforderungsschreiben+Offenes+Verfahren+VgV.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/address/Hinweisblatt+f%25C3%25BCr+Ausschreibungen.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/address/Information+nach+EU-Datenschutz-Grundverordnung+%2528DSGVO%2529.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/serviceDescription/Fensternische+Flur+OG+2.jpg",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/serviceDescription/Geb%25C3%25A4udeteile+Hort+u+TH.png",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/serviceDescription/Holzverkleidung+H+150+cm.jpg",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/serviceDescription/Holzverkleidung+von+oben.jpg",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/serviceDescription/LVStadt+K%25C3%25B6nigs+Wusterhausen.xlsx",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/234+Erkl%25C3%25A4rung+der+Arbeits_Bietergemeinschaft.docx",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/236+Verpflichtungserkl%25C3%25A4rung+anderer+Unternehmen.docx",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Angebotsschreiben.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/CSX-59-Eigenerklaerung-Informationen-zum-Bieter.docx",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Eigenerkl%25C3%25A4rung+Ausschluss+Offenes+Verfahren+VgV.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Eigenerkl%25C3%25A4rung+Betriebliche+Haftpflichtversicherung.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Eigenerkl%25C3%25A4rung+Umsatz+Unternehmensform+und+Registerauszug.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Eigenerkl%25C3%25A4rung+zu+5.+EU+Sanktionspaket+RUS+Sanktionen.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/ERK+Stadt+K%25C3%25B6nigs+Wusterhausen.xlsx",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Erkl%25C3%25A4rung+Qualit%25C3%25A4tsmanagement+und+Reinigungstechnik.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Leistungs%25C3%25BCbersicht+Nachunternehmer+Optional.xlsx",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Referenzliste+Vorlage.xlsx",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Vereinbarung+Mindestanforderungen+BbgVergG+NU+Verleiher.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/filledByCompany/Vereinbarung+Mindestanforderungen+BbgVergG.pdf",
+          "https://vergabemarktplatz.brandenburg.de/VMPSatellite/public/company/project/CXP9YHWHZN1/de/documents/contractCondition/5.1+Erg%25C3%25A4nzende+Vergabebedingung+BbgVergG.pdf"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [
+          "Information_20nach_20EU-Datenschutz-Grundverordnung_20_28DSGVO_29.pdf"
+        ],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "Leistungsbeschreibung",
+          "Vergabeunterlagen",
+          "Zuschlagskriterien",
+          "Eignungskriterien",
+          "Angebotsfrist",
+          "Preisblatt",
+          "Vertragsbedingungen"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "accommodation",
+            "building",
+            "cleaning",
+            "germany",
+            "glasreinigung",
+            "grund",
+            "grundschule",
+            "hort",
+            "königs",
+            "stadt",
+            "unterhalts",
+            "window",
+            "wusterhausen",
+            "zeesen"
+          ],
+          "hits": [
+            "glasreinigung",
+            "grund",
+            "grundschule",
+            "hort",
+            "königs",
+            "stadt",
+            "unterhalts",
+            "window",
+            "wusterhausen",
+            "zeesen"
+          ],
+          "ratio": 0.7143
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "78a8839fba10e92f49389013f9151900663d3a8417c599612ec624edfeb740ff",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 18,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 4,
         "candidate_id": "TED:560501-2026",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -5099,26 +6208,76 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 5,
-      "hot_ready_at": "2026-08-17T11:55:15.497767+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 18,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 5,
+        "candidate_id": "US-SAM:d85c956e3c594e9ca19b30e5012a0234",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:d85c956e3c594e9ca19b30e5012a0234",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 285232,
+        "documents_indexed": 6,
+        "documents_with_text": 6,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/5c8/5c81df1cf84d465991852c28395ec3ea.pdf?response-content-disposition=attachment%3B%20filename%3DAmendment%2B0004%2B-%2BSPRDL125R0117.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=d2b5d15233e1f5996877dfeb80b33225ae5d8cd6d6783358384f4f7d3d89fa2a",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/ff6/ff6fb114802f4d1bba1ef7f774286cd8.pdf?response-content-disposition=attachment%3B%20filename%3DAmendment%2B0003%2B-%2BSPRDL125R0117.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=b84b36dadf31492caed065bf6d609ac33c0ccb0703d1a2fcfc7dfc2915d109b4",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/958/95889a4b18ef40f48838bad66804c8bd.pdf?response-content-disposition=attachment%3B%20filename%3DAmendment%2B0001%2B-%2BSPRDL125R0117.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=5bfcb9faa65e3aee70544b5d4d2c9f4026d80adbe5accc51245f1c80bbdafd5b",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/9a9/9a93f18e12e54d64a13b1fdc42d8a9f1.pdf?response-content-disposition=attachment%3B%20filename%3DAK16655724_A.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=c0b4bfbbe4280424369913aebf75b8b916e6ce8cfba3768a4566f805e7e4e077",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/56e/56e054ad6c0a455988e1b80c68e9b27c.pdf?response-content-disposition=attachment%3B%20filename%3DSPRDL125R0117.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115456Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=ba7c7fca44baba8fde7ea318386d7990473ccfd28d7211bfe46f9f535b617e2f"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "request for proposal",
+          "technical specifications"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "diesel",
+            "engine"
+          ],
+          "hits": [
+            "diesel",
+            "engine"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "06d113fa5a5ef5238db509f308013fb61771438cfaf0d0d0ac3b7da4cd88baf2",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 18,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 5,
         "candidate_id": "US-SAM:d85c956e3c594e9ca19b30e5012a0234",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -5427,26 +6586,83 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 1,
-      "hot_ready_at": "2026-08-17T11:52:15.874105+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 17,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 1,
+        "candidate_id": "US-SAM:4efa2f4446754f0dbe9be983e35f457c",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:4efa2f4446754f0dbe9be983e35f457c",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 287875,
+        "documents_indexed": 9,
+        "documents_with_text": 9,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/696/696493205ad048a6adcdcdc2624f05e5.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B6%2B-%2BNMR%2BCG%2BRecon_CnxnPlans.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=65c640eb47e18b85454246dcb8bcd9aa972e534793cc4558070dfe26275a9113",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/c9a/c9ac4a576e614589921aea4c0a2d6daa.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B1%2B-%2BNMR%2BCG%2BRecon_Specifications.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=f554c6e51b0b3fc563d957469569c06fa446e3312042339e30bd40d85498f1ea",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/cfb/cfb1fa986b38494f9119819e0fb97fc8.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B9-%2BPast%2BPerformance%2BQuestionnaire.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=dc652ed05274389e69b086f1cf30c2ac37e3761f1525d9dd66574e7e430b8e1f",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/db7/db73bc0b63e44dbb9db9ca7934352eff.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B4-%2BNMR%2BCulverts_FSSS.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=c589ea54e47e248f2c34c0fef0843c90404617c02379a13685de4589edec6485",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/ccb/ccbfb6f9bc0f4184a045ec4d74545ec2.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B3-%2BNMR%2BCG%2BRecon_SOI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115017Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=ae1fc6f74f5d70f26e31d665dbcb3dbd977746be17f7eaa26c7d3ee36fb6a079",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/5b1/5b1f800f7d5f4ccaab26a1d07e6c8470.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B7-%2BWage%2BDetermination%2BBuilding.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115017Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=b1ab9e4998b7302ab908c64af9140fb008df558254494d3804e0cd3b2c468968",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/5a9/5a915a41921c41808d3cd9f64eb7ec35.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B8-%2BWage%2BDetermination%2BHighway.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115017Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=bd39a1550f0f0e0e6fe83b91350d975d29cd4a72570f855d6a1b8c33d58d4fd2",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/e2b/e2b70b9b954d418daad45f994dda943b.pdf?response-content-disposition=attachment%3B%20filename%3DC04_Attachment%2B2-%2BNMR%2BCulverts_SOI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115017Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=430d31131b90415ce933fa23e54861aab1015f9968071c588b2b09ae8c01127a"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "SCOPE OF WORK",
+          "Statement of Work"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "campground",
+            "mills",
+            "north",
+            "river"
+          ],
+          "hits": [
+            "campground",
+            "mills",
+            "north",
+            "river"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "19299380faed3fc1385ec3eea3fb4d43bc07af9454871f75b9ab5d9b4a38bd87",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 17,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 1,
         "candidate_id": "US-SAM:4efa2f4446754f0dbe9be983e35f457c",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -5726,26 +6942,76 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 1,
-      "hot_ready_at": "2026-08-17T11:52:15.874105+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 17,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 1,
+        "candidate_id": "US-SAM:8348dd5c51cf4b4eb1d2dca6eeb465c4",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:8348dd5c51cf4b4eb1d2dca6eeb465c4",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 590839,
+        "documents_indexed": 47,
+        "documents_with_text": 36,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/2cb/2cb10c4a68974a109ec0a0aebd3fa9d9.docx?response-content-disposition=attachment%3B%20filename%3DSOW%2B-%2BGarage%2Bdoors.docx&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=b267616927a0348245c29a006cc9835548e1b7c812d390713ae4f23fca986cfe",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/2b3/2b3f0e31aabd41b4afe1242d8f117321.docx?response-content-disposition=attachment%3B%20filename%3DCombined%2BSynopsis%2BSolicitation_garage%2Bdoors.docx&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115016Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=349fc6b5afbdeb2b2f2cc23f4cffcc22d82bfef0d3cd90453231dbb42b9fcf7b"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "SCOPE OF WORK",
+          "Statement of Work",
+          "Evaluation Criteria"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "doors",
+            "garage",
+            "replace"
+          ],
+          "hits": [
+            "doors",
+            "garage",
+            "replace"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "80d581eae33220266bd6f3e051f031649f75efd9b475701744905aa5c9e5fb92",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 17,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 1,
         "candidate_id": "US-SAM:8348dd5c51cf4b4eb1d2dca6eeb465c4",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -6038,26 +7304,90 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 0,
-      "hot_ready_at": "2026-08-17T11:52:54.881061+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 16,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 0,
+        "candidate_id": "TED:562225-2026",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "TED:562225-2026",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 290511,
+        "documents_indexed": 38,
+        "documents_with_text": 33,
+        "source_urls": [
+          "https://vergabe.vmstart.de/NetServer/TenderingProcedureDetails?function=_DownloadTenderDocuments&documentOID=54321-SpecificationVersion-19ff43dd9b2-58d4e31df81caae5&TenderAuthority=86-2026-EU&TenderDate=1786509103374"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [
+          "Nutzungsbedingungen.pdf"
+        ],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "Leistungsbeschreibung",
+          "Vergabeunterlagen",
+          "Zuschlagskriterien",
+          "Angebotsfrist",
+          "Vertragsbedingungen"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "bodenbelagsarbeiten",
+            "carl",
+            "covering",
+            "floor",
+            "germany",
+            "kita",
+            "laying",
+            "neubau",
+            "straße",
+            "villinger",
+            "work"
+          ],
+          "hits": [
+            "bodenbelagsarbeiten",
+            "carl",
+            "kita",
+            "neubau",
+            "straße",
+            "villinger"
+          ],
+          "ratio": 0.5455
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "514a4021289bedfffd0b9e3aebeb4e29771169bcb7a59a339c8209fc2fa90419",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 16,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 0,
         "candidate_id": "TED:562225-2026",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -6207,26 +7537,76 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 3,
-      "hot_ready_at": "2026-08-17T11:54:32.973402+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 13,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 3,
+        "candidate_id": "US-SAM:b27d13258a7544dd89b05ccb6c71c511",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:b27d13258a7544dd89b05ccb6c71c511",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 12521,
+        "documents_indexed": 3,
+        "documents_with_text": 3,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/e48/e485e58d80cd40b38f030e07d0800246.pdf?response-content-disposition=attachment%3B%20filename%3D19VE3026Q0009%2B-%2BQA.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=446d828d5757d07fde7cfa5a73140014795cfa10b37c499104862a970e71f2c0",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/7e5/7e545c95fcf74982a03e1bc92526217a.pdf?response-content-disposition=attachment%3B%20filename%3D19VE3026Q0009%2B-%2BRFQ%2B-%2BBatteries%2Bfor%2BChancery%2BMain%2BUPS.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=b470baf3b4afd08e481b2a137cb96f8434f715380f816900468df91296fce2c1"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "batteries",
+            "caracas",
+            "chancery",
+            "embassy",
+            "main"
+          ],
+          "hits": [
+            "batteries",
+            "caracas",
+            "chancery",
+            "embassy",
+            "main"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "00e00993285027ab0fb7b752a1d9129ae2c4be3486ba3bff60cc3acf3076dc3c",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 13,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 3,
         "candidate_id": "US-SAM:b27d13258a7544dd89b05ccb6c71c511",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -6298,26 +7678,77 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 5,
-      "hot_ready_at": "2026-08-17T11:55:15.497767+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 8,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 5,
+        "candidate_id": "US-SAM:6dc90e64d1f1491386fafca311afcf3c",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:6dc90e64d1f1491386fafca311afcf3c",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 2022,
+        "documents_indexed": 2,
+        "documents_with_text": 2,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/15c/15c6ed2b6ac74eb1b92681069c438709.pdf?response-content-disposition=attachment%3B%20filename%3DA16_LifeTech_FY26_Single_Source_Justification_signed_1.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115455Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=3a24532ab453fbe7d03b7755aac28ff4ab67eb7302654c1c69cb05f86c17afc3"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "agreement",
+            "instrument",
+            "justification",
+            "life",
+            "sole",
+            "source",
+            "technologies"
+          ],
+          "hits": [
+            "agreement",
+            "justification",
+            "life",
+            "sole",
+            "source"
+          ],
+          "ratio": 0.7143
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "114305dc8fdaefa6d2f8d13e814f59f64f569c146f75f377ac2aabcdc0a938ee",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 8,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 5,
         "candidate_id": "US-SAM:6dc90e64d1f1491386fafca311afcf3c",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -6393,26 +7824,71 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 4,
-      "hot_ready_at": "2026-08-17T11:54:49.331184+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 7,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 4,
+        "candidate_id": "GR-KHMDHS:26PROC019626855",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "GR-KHMDHS:26PROC019626855",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 26442,
+        "documents_indexed": 1,
+        "documents_with_text": 1,
+        "source_urls": [
+          "https://cerpp.eprocurement.gov.gr/khmdhs-opendata/notice/attachment/26PROC019626855"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "10626",
+            "2026",
+            "supplies"
+          ],
+          "hits": [
+            "10626",
+            "2026",
+            "supplies"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "0772323f3c7ac8ef68ac264fbe24a1065aadf5176030016884f859ff5fde6c92",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 7,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 4,
         "candidate_id": "GR-KHMDHS:26PROC019626855",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -6728,7 +8204,7 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 3,
-      "hot_ready_at": "2026-08-17T11:54:32.973402+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": -40,
       "spm_fit_band": "LOW",
@@ -6736,20 +8212,81 @@
       "spm_friction_signals": [
         "top-secret-clearance"
       ],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 3,
+        "candidate_id": "US-SAM:7c54e0f8c26446e9a7d0cb7ea14e8f59",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:7c54e0f8c26446e9a7d0cb7ea14e8f59",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 174520,
+        "documents_indexed": 12,
+        "documents_with_text": 12,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/326/326b54b3dc8f4c85a01daf8d8149f45f.pdf?response-content-disposition=attachment%3B%20filename%3DQuestions%2Band%2BAnswers%2B-%2BFA860126Q0111.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=6324ee21a11fbf1db5858ff8db9adc8a21f47c1cfd71bf174737b14675b3767c",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/623/6235654a841f491d9414978c7f152cd5.pdf?response-content-disposition=attachment%3B%20filename%3D01-Att%2BE-CS%2BEngineer%2BDrawing%2BRequirements%2B-Attachment%2BE%2BCoverSheet-fillable-add%2BCS%2Bdrawings.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=c8cf6f83230ed7fb40eed19122047ecd2e6338d40ee2ba7734f90dc98cda28b8",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/2bf/2bf73252bc064f7ba9e77a839e741578.pdf?response-content-disposition=attachment%3B%20filename%3D01_Att%2BC%2B-%2BG11_Wright_Patterson_AFB_IFS_Telecommunications.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=d91ad9561e1c96405a119470a8e1b9ebcc667012915a344345fd16b3310994a0",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/820/8203e5661e0848ad8e07e667c41cf6dc.pdf?response-content-disposition=attachment%3B%20filename%3D01_Att%2BB-Telecommunication%2BRequirements%2Bfrom%2B88%2BABW.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115321Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=9a4727922b645d1a7117ddd03d3925e5bf8bf4b9963b91a950765931410c88b5",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/d58/d58ad37e384c48a98d4660d8b8a0a17b.pdf?response-content-disposition=attachment%3B%20filename%3D01a-%2BAtt%2BA%2BCarpet%2BProgram%2BPurchase%2Bwithin%2B%2BFurniture%2BContract%2BPackage.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115321Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=a80ea209cf0031e05d5989326882b819dcb20ebb0e8bf32ba48e7f4f42909e95",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/ab4/ab4c7e224d094be58fb3eda31c2fb6e4.pdf?response-content-disposition=attachment%3B%20filename%3D05b-CTS-ALL-F30001%2BWorkstation%2BExpansion%2BMAX%2BOut%2B2026TP096.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115321Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=1ba55f1ecadc61e7bc7e4dc1f29a77a9d69d8d6e0c38355620c1391528eefd13",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/444/444cac75cbc44966bb9d1fbe35deb984.pdf?response-content-disposition=attachment%3B%20filename%3D05a-PLNS-ALL-F30001%2BWorkstation%2BExpansion%2BMAX%2BOut%2B2026TP096.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115321Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=0aca4cbeea28da040e5ead964def4b8cd0d56fa8f150f6d213dcdf4022e9b513",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/ed0/ed0df1ff09e34d81ab1a25962962b928.pdf?response-content-disposition=attachment%3B%20filename%3DAttachment%2B4.%2BSSJ_F30001%2BWorkstations_Redacted.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115321Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=70f2afa59f21b4d30fbe0e32f7cd93c1a3c2eafa972c0121802ab8141c3b9cca",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/e33/e33f10f8d02f401584163b980c9a99db.pdf?response-content-disposition=attachment%3B%20filename%3DAttachment%2B3.%2B%2BReps%2Band%2BCerts.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115321Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=150a3ae5a167d18468c263125e245ab84c6b4ce3dda366a02f4c6bd0d52d5d79",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/a91/a9119270ba8a4881890b47fab044c77e.pdf?response-content-disposition=attachment%3B%20filename%3DAttachment%2B2.%2BSolicitation%2B-%2BFA860126Q0111-Draft.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115321Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=fa225dbdd3dc50500de43a782977983d95949d48187f229c34053888520ff5df",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/eda/eda7fb30c59543e987b2ec213ab025c8.pdf?response-content-disposition=attachment%3B%20filename%3DAttachment%2B1-SOW%2BF30001%2BWorkstation%2BExpansion%2BMAX%2BOut%2B2026TP096.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115322Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=d960f907451c41f33d462506cefbd05f145091c02eeb3d7a66749770f62614c0"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "request for proposal",
+          "Scope of Work",
+          "Statement of Work"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "2026tp096",
+            "expansion",
+            "f30001",
+            "workstation"
+          ],
+          "hits": [
+            "2026tp096",
+            "expansion",
+            "f30001",
+            "workstation"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "db4bf3f2ee40e341f14a03d1c4f6744a13fad56c6e9a3acb2b3dcbf14c10f9c1",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 1,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 3,
         "candidate_id": "US-SAM:7c54e0f8c26446e9a7d0cb7ea14e8f59",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
       }
     },
     {
@@ -6996,7 +8533,7 @@
       },
       "source_dce_run_id": 32026769574,
       "source_shard": 3,
-      "hot_ready_at": "2026-08-17T11:54:32.973402+00:00",
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": -28,
       "spm_fit_band": "LOW",
@@ -7007,30 +8544,286 @@
         "security-clearance",
         "24x7-operations"
       ],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 3,
+        "candidate_id": "US-SAM:66c0845aa8c24f648762ec03ba06be73",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:66c0845aa8c24f648762ec03ba06be73",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 95671,
+        "documents_indexed": 4,
+        "documents_with_text": 4,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/532/532147b4761d4b11865231a7cb095a85.pdf?response-content-disposition=attachment%3B%20filename%3DC2%2B26Q5732%2BCombined%2BSynopsis%2BSolicitation.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=1c6fccff93972a05747511fda0dabc560101bfe529cdfa574000c29eb9fd07a6",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/3c0/3c03fe6b95cb40afa5d3a43a5be9d884.pdf?response-content-disposition=attachment%3B%20filename%3DA5%2B26Q5732%2BPerformance%2BWork%2BStatement%2B500kW%2BDG.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=f86bd8483b02f72d9852da4eedeccdbf2a251b75f7b19210d8d9d8264e45b23e",
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/4c6/4c6786f0519743cfbfa11046a98ab4fe.pdf?response-content-disposition=attachment%3B%20filename%3DAttachment%2B2%2BContractor%2BBadging%2Band%2BAccess.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=f4d8b06590466d41458ea54b3af320b6e00a8f95381104e31c225f4f1681fa62"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "Statement of Work",
+          "pricing schedule"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "500kw",
+            "diesel",
+            "generator",
+            "lease"
+          ],
+          "hits": [
+            "500kw",
+            "diesel",
+            "generator",
+            "lease"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "8021331ef1e88fe22aecaad2615632e3f281e080ffcdf27481aed9df7ba56247",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 1,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32026769574,
         "shard": 3,
         "candidate_id": "US-SAM:66c0845aa8c24f648762ec03ba06be73",
-        "release_tag": null
+        "release_tag": "dce-harvest-32026769574"
+      }
+    },
+    {
+      "candidate_id": "CA:87054",
+      "title": "ADVANCE PROCUREMENT NOTICE - NORAD NORTHERN BASING INFRASTRUCTURE",
+      "buyer": null,
+      "portal": "CA_CANADABUYS",
+      "notice_url": "https://www.merx.com/public/solicitations/3914690261/abstract?language=EN",
+      "deadline": "2026-08-31T13:00:00+00:00",
+      "estimated_value": null,
+      "currency": "CAD",
+      "preliminary_score": 49,
+      "priority_score": 49,
+      "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+      "gate_readiness": false,
+      "deadline_authority": {},
+      "deadline_authority_status": "MISSING",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 0,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32026769574,
+      "source_shard": 2,
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 6,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "upstream_classification": "YELLOW",
+      "review_stage": "DCE_AUTHENTICITY",
+      "dce_authenticity_review_required": true,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 2,
+        "candidate_id": "CA:87054",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "CA:87054",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DCE_CONTENT_UNVERIFIED",
+        "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "gate_readiness": false,
+        "text_chars": 16607,
+        "documents_indexed": 2,
+        "documents_with_text": 2,
+        "source_urls": [
+          "https://www.dcc-cdc.gc.ca/documents/Website-Privacy-Policy.pdf"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "advance",
+            "basing",
+            "infrastructure",
+            "norad",
+            "northern",
+            "notice"
+          ],
+          "hits": [
+            "notice"
+          ],
+          "ratio": 0.1667
+        },
+        "reasons": [
+          "download_succeeded_but_authoritative_dce_content_not_proven"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "499c21b299de6fcb5e3c555e56536cb04d9c53f8d9ab30992ee5f46c397546a9",
+      "recommended_gpt_action": "GPT_WEB_VERIFY_DCE_AUTHENTICITY",
+      "gpt_priority_score": 6,
+      "upstream_signal": "YELLOW",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 2,
+        "candidate_id": "CA:87054",
+        "release_tag": "dce-harvest-32026769574"
+      }
+    },
+    {
+      "candidate_id": "US-SAM:676bfc12f2fd4cb0925f35a1ab5315ec",
+      "title": "RTI Lifecycle Furniture Replacement",
+      "buyer": "DEPT OF DEFENSE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/opp/676bfc12f2fd4cb0925f35a1ab5315ec/view",
+      "deadline": "2026-09-14T13:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 49,
+      "priority_score": 49,
+      "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+      "gate_readiness": false,
+      "deadline_authority": {},
+      "deadline_authority_status": "MISSING",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 0,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32026769574,
+      "source_shard": 3,
+      "hot_ready_at": "2026-08-17T11:55:44.837668+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 6,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "upstream_classification": "YELLOW",
+      "review_stage": "DCE_AUTHENTICITY",
+      "dce_authenticity_review_required": true,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 3,
+        "candidate_id": "US-SAM:676bfc12f2fd4cb0925f35a1ab5315ec",
+        "release_tag": "dce-harvest-32026769574"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "candidate_id": "US-SAM:676bfc12f2fd4cb0925f35a1ab5315ec",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DCE_CONTENT_UNVERIFIED",
+        "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "gate_readiness": false,
+        "text_chars": 42599,
+        "documents_indexed": 13,
+        "documents_with_text": 11,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/f8a/f8ab000ebb5146a3a3a4878bdd582b2a.xlsx?response-content-disposition=attachment%3B%20filename%3DMaster%2BMaterial%2BListing.xlsx&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260817T115320Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260817%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=030867d37f4a24c27762f9c6afd01faa0e12f16f26d67173b31e8b68799071ec"
+        ],
+        "all_source_files_notice_only": false,
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "furniture",
+            "lifecycle",
+            "replacement"
+          ],
+          "hits": [
+            "furniture"
+          ],
+          "ratio": 0.3333
+        },
+        "reasons": [
+          "download_succeeded_but_authoritative_dce_content_not_proven"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence."
+      },
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "ea7077aa7a083d65e46d13d0fc688f8c18094ace138036dfddeeb4adbf6331cf",
+      "recommended_gpt_action": "GPT_WEB_VERIFY_DCE_AUTHENTICITY",
+      "gpt_priority_score": 6,
+      "upstream_signal": "YELLOW",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32026769574,
+        "shard": 3,
+        "candidate_id": "US-SAM:676bfc12f2fd4cb0925f35a1ab5315ec",
+        "release_tag": "dce-harvest-32026769574"
       }
     }
   ],
   "counts": {
-    "pending_gpt_web_review": 12,
-    "reviewed_ticks_total": 11,
-    "excluded_already_reviewed": 0,
+    "pending_gpt_web_review": 14,
+    "reviewed_ticks_total": 165,
+    "excluded_already_reviewed": 140,
     "excluded_already_in_final_bank": 0,
     "pending_by_stage": {
-      "BUSINESS_GATES": 12
+      "BUSINESS_GATES": 12,
+      "DCE_AUTHENTICITY": 2
     }
   },
   "review_contract": "This file is only GPT Web work. BUSINESS_GATES rows have gate-ready DCE. DCE_AUTHENTICITY rows require GPT Web to verify retrieved candidate material first. Nothing in this inbox is a final verdict.",
