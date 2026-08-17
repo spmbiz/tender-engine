@@ -1,11 +1,78 @@
 {
   "schema": "GPT_REVIEW_HOT_V3",
-  "updated_at": "2026-08-17T08:02:15.586293+00:00",
+  "updated_at": "2026-08-17T08:02:17.803942+00:00",
   "latest_dce_run_id": 32008365410,
-  "latest_shard": 4,
-  "generation_reset": true,
-  "count": 0,
-  "items": [],
+  "latest_shard": 1,
+  "generation_reset": false,
+  "count": 1,
+  "items": [
+    {
+      "candidate_id": "WORLD-BANK:OP00018429",
+      "title": "PNG: Enhanced Legal Administration of Petroleum License Database Management System",
+      "buyer": null,
+      "portal": "WORLD_BANK",
+      "notice_url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00018429",
+      "deadline": null,
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 54,
+      "priority_score": 54,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": null,
+        "notice_deadline_date": null,
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 1,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [
+          {
+            "text": "amily:&quot;Times New Roman&quot;,&quot;serif&quot;; letter-spacing:-.1pt\">&nbsp;</span></p> <p class=\"MsoNormal\"><span lang=\"EN-US\" style=\"font-size:12.0pt;mso-bidi-font-size:10.0pt;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;; letter-spacing:-.1pt\">This project to be implemented by the Department of Petroleum and Energy aims to enhance the Government's regulatory capacity. The items to be procured under this project are described in general below.&nbsp; For each contract to be financed by the Grant, the different procurement methods or consultant selection methods, the need for pre-qualification, estimated costs, prior review requirements, and time frame are agreed between the Borrower and the Bank in the Procurement Plan.<o:p></o:p></span></p> <p class=\"MsoNormal\"><span lang=\"EN-US\" style=\"font-size:12.0pt;mso-bidi-font-size:10.0pt;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;; letter-spacing:-.1pt\">&nbsp;</span></p> <p class=\"MsoNormal\"><span lang=\"EN-US\" style=\"font-size:12.0pt;mso-bidi-font-size:10.0pt;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;; letter-spacing:-.1pt\">Procurement of Goods: Goods procured under thisproject would include a Digital Registry System. Goods packages of more than&nbsp;&nbsp; US$200,000 equivalent will be procured foll",
+            "source": null,
+            "match": "requirements"
+          }
+        ],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32008365410,
+      "source_shard": 1,
+      "hot_ready_at": "2026-08-17T08:02:17.541042+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 7,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    }
+  ],
   "ranking_contract": "Recall-first discovery; post-DCE SPM-fit reranking only. Approximately 80% priority lane + 20% evidence-quality exploration lane. No candidate is declared eligible by this rank.",
   "instruction": "Review SPM_PRIORITY HOT/GOOD items first, then exploration. These are authoritative DCE evidence packs, not final verdicts. Unknown is never PASS."
 }
