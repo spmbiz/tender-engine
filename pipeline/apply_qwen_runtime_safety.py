@@ -51,8 +51,63 @@ def main() -> None:
     new_arg = """            --blocked-state latest-controller-state.json \\\n            --attempt-ledger latest-attempt-ledger.jsonl \\\n            --out qwen-live-selection.jsonl \\\n"""
     text = replace_once(text, old_arg, new_arg, 'selector attempt-ledger argument')
 
+    # Generated queue files are mutable by design. Rebasing a commit that writes
+    # them against another concurrently-updated queue creates deterministic merge
+    # conflicts. Preserve the generated artifacts outside the worktree, reset to
+    # the latest main, then re-materialize and commit on top. On a push race, repeat
+    # from the new main instead of rebasing generated state.
+    old_persist = '''      - name: Persist current Qwen DCE selection for DCE Fanout V2
+        if: steps.selection.outputs.count != '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p queues control/qwen_live
+          cp qwen-live-selection.jsonl queues/qwen_live_selection_latest.jsonl
+          cp qwen-live-selection.summary.json control/qwen_live/selection_summary.json
+          cp publish/qwen-classification-merge-summary-latest.json control/qwen_live/classification_summary.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add queues/qwen_live_selection_latest.jsonl control/qwen_live/
+          git commit -m "qwen: publish live semantic DCE lane ${GITHUB_RUN_ID}" || true
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((attempt * 4))"
+          done
+          exit 1
+'''
+    new_persist = '''      - name: Persist current Qwen DCE selection for DCE Fanout V2
+        if: steps.selection.outputs.count != '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp qwen-live-selection.jsonl /tmp/qwen-live-selection.jsonl
+          cp qwen-live-selection.summary.json /tmp/qwen-live-selection.summary.json
+          cp publish/qwen-classification-merge-summary-latest.json /tmp/qwen-classification-summary.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p queues control/qwen_live
+            cp /tmp/qwen-live-selection.jsonl queues/qwen_live_selection_latest.jsonl
+            cp /tmp/qwen-live-selection.summary.json control/qwen_live/selection_summary.json
+            cp /tmp/qwen-classification-summary.json control/qwen_live/classification_summary.json
+            git add queues/qwen_live_selection_latest.jsonl control/qwen_live/
+            if git diff --cached --quiet; then
+              echo 'Semantic DCE queue already current.'
+              exit 0
+            fi
+            git commit -m "qwen: publish live semantic DCE lane ${GITHUB_RUN_ID}"
+            if git push origin HEAD:main; then exit 0; fi
+            sleep "$((attempt * 3))"
+          done
+          exit 1
+'''
+    text = replace_once(text, old_persist, new_persist, 'race-safe generated queue publication')
+
     path.write_text(text, encoding='utf-8')
-    print('Qwen runtime safety applied: non-preemptive concurrency, 48-row passes, fresh attempt ledger.')
+    print('Qwen runtime safety applied: non-preemptive concurrency, 48-row passes, fresh attempt ledger, race-safe queue publication.')
 
 
 if __name__ == '__main__':
