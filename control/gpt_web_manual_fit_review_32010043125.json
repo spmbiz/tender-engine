@@ -1,0 +1,82 @@
+{
+  "schema": "GPT_WEB_MANUAL_FIT_REVIEW_V1",
+  "reviewed_at_utc": "2026-08-17T08:27:00Z",
+  "source_qwen_state_run": "31959798665",
+  "source_dce_run": "32010043125",
+  "review_scope": "The 10 QWEN_FIT candidates selected into qwen-primary. Qwen semantic FIT is treated as a recall/routing signal only; DCE and GPT Web review remain authoritative for business actionability.",
+  "counts": {
+    "reviewed": 10,
+    "green_strict": 0,
+    "review_bidable": 2,
+    "watch_pretender": 1,
+    "no": 7
+  },
+  "items": [
+    {
+      "candidate_id": "US-SAM:0cef0925d75c415a9ff45ebf13f4571f",
+      "title": "F--FY26 BMDO ROADSIDE FUELBREAK HERBICIDE",
+      "gpt_web_verdict": "NO_SCOPE",
+      "reason": "Roadside fuelbreak herbicide / vegetation-management work, not a digital/creative/software delivery. The notice is also a Total Small Business Set Aside. Qwen FIT is a false positive."
+    },
+    {
+      "candidate_id": "WORLD-BANK:OP00000783",
+      "title": "Romania Integrated Nutrient Pollution Control Project",
+      "gpt_web_verdict": "WATCH_PRETENDER",
+      "reason": "General Procurement Notice / pre-tender radar rather than a specific actionable contract. Keep for downstream sub-procurement discovery, but do not count as GREEN."
+    },
+    {
+      "candidate_id": "US-SAM:02f5284aa0f74aef8826456c9895e895",
+      "title": "F--Soils Sampling, Sequoia and Kings NPs",
+      "gpt_web_verdict": "NO_SCOPE_NO_COMPETE",
+      "reason": "Soils sampling field work and the notice states intent to award sole source. Not a relevant SPM delivery and not a normal open competition."
+    },
+    {
+      "candidate_id": "IE:8857214",
+      "title": "Request for Tender for Roof Repairs at An Grianan Adult Education College, Termonfeckin, Co. Louth",
+      "gpt_web_verdict": "NO_SCOPE",
+      "reason": "Roof repair construction works. Substantive DCE exists but the underlying scope is outside the digital/creative/software business. Qwen FIT is a false positive."
+    },
+    {
+      "candidate_id": "IE:8698483",
+      "title": "Provision of Media Buying Planning Services and Creative Strategic Services for the Mental Health Commission",
+      "gpt_web_verdict": "REVIEW_BIDABLE_LOT2",
+      "reason": "Lot 2 Strategic & Creative Services is genuinely aligned: campaign strategy, creative concepts, copy/content/assets, digital/social/online video and integrated creative delivery. The DCE is substantive. Do not promote to strict GREEN yet because bidder-side agency capacity, portfolio/experience and the material insurance requirements still need to be checked against the actual bidder setup."
+    },
+    {
+      "candidate_id": "US-SAM:b77a85bd6fc74ad1b50db1bca7382290",
+      "title": "AXLE ASSEMBLY AUTOMATION",
+      "gpt_web_verdict": "NO_CLOSED_AWARD",
+      "reason": "Industrial axle-assembly automation and the source record is an Award Notice, not an open digital-services opportunity. Qwen FIT is a false positive."
+    },
+    {
+      "candidate_id": "TED:564513-2026",
+      "title": "France - Motor vehicles - Acquisition de vehicules d'occasions de types fourgons",
+      "gpt_web_verdict": "NO_SCOPE",
+      "reason": "Procurement of used vans. Not a digital/creative/software service. Qwen FIT is a false positive."
+    },
+    {
+      "candidate_id": "TED:565066-2026",
+      "title": "Czechia - Archaeological services - D0 518 Ruzyne - Suchdol - Doplnujici casti zakladni studie archeologickych rizik",
+      "gpt_web_verdict": "NO_SCOPE",
+      "reason": "Specialist archaeological services. Not a lean digital/creative/software opportunity. Qwen FIT is a false positive."
+    },
+    {
+      "candidate_id": "US-SAM:59d7eede519b46d091104f7bd1af90ea",
+      "title": "HH-60W Degraded Visual Environment System (DVES) - FA8552-26-R-B001",
+      "gpt_web_verdict": "NO_SCOPE_DEFENSE_HARDWARE",
+      "reason": "Air Force helicopter DVE hardware/system engineering, integration, testing, installation and deployment. This is major aerospace/defense systems work, not the target lean service lane."
+    },
+    {
+      "candidate_id": "US-SAM:3ab2d010c38d46809c8a3f1bff03d3e8",
+      "title": "U.S. Army Contracting Command - Detroit Arsenal Strategic Services Branch Commercial Solutions Opening (CSO)",
+      "gpt_web_verdict": "REVIEW_STRONG_RADAR",
+      "reason": "This one is a real thematic hit: the notice explicitly includes IT hardware/software/services, museum exhibit design, modeling and simulation, transcription services and other support services, and says traditional and non-traditional defense contractors may receive awards. It is an umbrella CSO rather than one concrete task, so eligibility, foreign-bidder constraints, security/export-control implications and the actual submission vehicle still require DCE-level review before GREEN."
+    }
+  ],
+  "policy": {
+    "qwen_fit_is_final_green": false,
+    "gpt_web_can_reject_obvious_semantic_false_positives": true,
+    "dce_required_before_strict_green_when_material_gates_are_unknown": true,
+    "preserve_false_positives_for_audit": true
+  }
+}
