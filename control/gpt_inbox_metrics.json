@@ -1,28 +1,28 @@
 {
   "schema": "GPT_INBOX_HEALTH_V1",
-  "updated_at": "2026-08-17T20:12:57.035182+00:00",
+  "updated_at": "2026-08-17T20:14:50.872267+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V2",
   "latest_source_dce_run_id": 32064225479,
   "counts": {
-    "pending_gpt_web_review": 26,
+    "pending_gpt_web_review": 36,
     "reviewed_ticks_total": 171,
     "excluded_already_reviewed": 0,
     "excluded_already_in_final_bank": 0,
     "pending_by_stage": {
-      "BUSINESS_GATES": 24,
-      "DCE_AUTHENTICITY": 2
+      "BUSINESS_GATES": 33,
+      "DCE_AUTHENTICITY": 3
     }
   },
-  "review_bank_count": 27,
+  "review_bank_count": 38,
   "review_bank_schema": "GPT_REVIEW_HOT_V4",
   "recovery_metrics": {
-    "shard_files_scanned": 15,
-    "adjudication_rows_scanned": 84,
-    "model_review_rows_seen": 27,
-    "dce_authenticity_rows_seen": 3,
+    "shard_files_scanned": 19,
+    "adjudication_rows_scanned": 120,
+    "model_review_rows_seen": 37,
+    "dce_authenticity_rows_seen": 4,
     "scope_auto_rejected": 0,
     "scope_auto_reject_reason_counts": {},
-    "persistent_unique_pending_surface": 27
+    "persistent_unique_pending_surface": 38
   },
   "healthy": true,
   "contract": "Small health sidecar only; canonical work remains control/gpt_supergreen_inbox.json."
