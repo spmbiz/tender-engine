@@ -258,7 +258,7 @@ def main() -> None:
         if workflow_active(QWEN_WORKFLOW):
             report["decision"] = "QWEN_ACTIVE_WAIT"
         else:
-            dispatch(QWEN_WORKFLOW, {"per_shard": "48", "auto_continue": "true", "dce_limit": "160"})
+            dispatch(QWEN_WORKFLOW, {"per_shard": "192", "auto_continue": "true", "dce_limit": "160"})
             report["dispatched"] = True
 
     print(json.dumps(report, indent=2, sort_keys=True))
