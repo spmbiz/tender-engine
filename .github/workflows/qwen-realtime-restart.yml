@@ -1,129 +1,25 @@
-name: Qwen Realtime Restart
+name: Qwen Realtime Restart (Legacy Disabled)
 
+# Legacy one-shot repair retained only as an audit marker.
+# The live path is now owned by:
+# - qwen-live-classification.yml
+# - qwen-live-conveyor.yml
+# - qwen-live-recovery-drainer.yml
+#
+# Do not cancel active semantic passes or rewrite the live workflow from here.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/qwen-realtime-restart.yml'
-      - 'pipeline/global_admission.py'
 
 permissions:
-  actions: write
-  contents: write
-
-concurrency:
-  group: qwen-realtime-restart
-  cancel-in-progress: true
+  contents: read
 
 jobs:
-  restart:
+  retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Repair conflict-prone Qwen latest-pointer publication
-        shell: bash
+      - name: Explain retired legacy repair
         run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('.github/workflows/qwen-live-classification.yml')
-          s=p.read_text(encoding='utf-8')
-          s=s.replace("        default: '240'", "        default: '16'", 1)
-          start_marker='      - name: Persist current Qwen DCE selection for DCE Fanout V2\n'
-          end_marker='      - name: Dispatch Qwen-ranked DCE work when DCE fleet is free\n'
-          start=s.index(start_marker)
-          end=s.index(end_marker,start)
-          lines=[
-            '      - name: Persist current Qwen DCE selection for DCE Fanout V2',
-            "        if: steps.selection.outputs.count != '0'",
-            '        shell: bash',
-            '        run: |',
-            '          set -euo pipefail',
-            '          publish_tmp="$(mktemp -d)"',
-            '          cp qwen-live-selection.jsonl "$publish_tmp/selection.jsonl"',
-            '          cp qwen-live-selection.summary.json "$publish_tmp/selection_summary.json"',
-            '          cp publish/qwen-classification-merge-summary-latest.json "$publish_tmp/classification_summary.json"',
-            '          RUN_ID="$GITHUB_RUN_ID" python - "$publish_tmp/selection_summary.json" <<\'PYMETA\'',
-            '          import json, os, sys',
-            '          p=sys.argv[1]',
-            '          d=json.load(open(p,encoding="utf-8"))',
-            '          d["publisher_run_id"]=int(os.environ["RUN_ID"])',
-            '          with open(p,"w",encoding="utf-8") as f:',
-            '              json.dump(d,f,indent=2,ensure_ascii=False)',
-            '              f.write("\\n")',
-            '          PYMETA',
-            "          git config user.name 'github-actions[bot]'",
-            "          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'",
-            '          for attempt in 1 2 3 4 5 6 7 8 9 10; do',
-            '            git fetch origin main',
-            '            current_run="$(git show origin/main:control/qwen_live/selection_summary.json 2>/dev/null | python -c \'import json,sys; d=json.load(sys.stdin); print(int(d.get("publisher_run_id") or 0))\' 2>/dev/null || echo 0)"',
-            '            if [[ "$current_run" =~ ^[0-9]+$ ]] && [ "$current_run" -gt "$GITHUB_RUN_ID" ]; then',
-            '              echo "A newer Qwen publisher already won: current=$current_run this=$GITHUB_RUN_ID"',
-            '              exit 0',
-            '            fi',
-            '            git reset --hard origin/main',
-            '            mkdir -p queues control/qwen_live',
-            '            cp "$publish_tmp/selection.jsonl" queues/qwen_live_selection_latest.jsonl',
-            '            cp "$publish_tmp/selection_summary.json" control/qwen_live/selection_summary.json',
-            '            cp "$publish_tmp/classification_summary.json" control/qwen_live/classification_summary.json',
-            '            git add queues/qwen_live_selection_latest.jsonl control/qwen_live/selection_summary.json control/qwen_live/classification_summary.json',
-            '            if git diff --cached --quiet; then',
-            "              echo 'Qwen live selection already current.'",
-            '              exit 0',
-            '            fi',
-            '            git commit -m "qwen: publish live semantic DCE lane ${GITHUB_RUN_ID}"',
-            '            if git push origin HEAD:main; then',
-            '              echo "Published Qwen live selection without rebase conflicts on attempt $attempt"',
-            '              exit 0',
-            '            fi',
-            '            sleep "$((attempt * 2))"',
-            '          done',
-            "          echo 'Could not publish Qwen latest pointer after 10 compare-and-retry attempts' >&2",
-            '          exit 1',
-            '',
-          ]
-          s=s[:start]+'\n'.join(lines)+s[end:]
-          p.write_text(s,encoding='utf-8')
-          PY
-          git diff --check
-          git config user.name 'tender-engine-bot'
-          git config user.email 'tender-engine-bot@users.noreply.github.com'
-          git add .github/workflows/qwen-live-classification.yml
-          if git diff --cached --quiet; then
-            echo 'Qwen workflow already repaired.'
-          else
-            git commit -m 'qwen: conflict-free realtime latest-pointer publish'
-            pushed=0
-            for attempt in 1 2 3 4 5; do
-              if git pull --rebase origin main && git push origin HEAD:main; then pushed=1; break; fi
-              git rebase --abort >/dev/null 2>&1 || true
-              sleep "$((attempt * 2))"
-            done
-            [ "$pushed" = 1 ] || exit 1
-          fi
-
-      - name: Restart tiny continuous Qwen lane on repaired workflow
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          sleep 3
-          for rid in $(gh run list --workflow qwen-live-classification.yml --limit 10 --json databaseId,status --jq '.[] | select(.status=="in_progress" or .status=="queued") | .databaseId'); do
-            echo "Cancelling superseded Qwen pass $rid"
-            gh run cancel "$rid" || true
-          done
-          for i in $(seq 1 45); do
-            active="$(gh run list --workflow qwen-live-classification.yml --limit 10 --json status --jq '[.[] | select(.status=="in_progress" or .status=="queued")] | length')"
-            [ "$active" = 0 ] && break
-            sleep 2
-          done
-          gh workflow run qwen-live-classification.yml --ref main \
-            -f per_shard=16 \
-            -f auto_continue=true \
-            -f dce_limit=160
-          echo 'Realtime 16-row Qwen pass dispatched on conflict-free publisher.'
+          echo 'LEGACY_RESTART_RETIRED'
+          echo 'No Qwen run was cancelled and no live workflow was modified.'
+          echo 'Continuous classification/recovery owns self-healing now.'
