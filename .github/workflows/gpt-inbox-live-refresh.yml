@@ -18,7 +18,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: gpt-inbox-live-refresh
+  group: ${{ github.event_name == 'workflow_dispatch' && github.actor == 'github-actions[bot]' && format('gpt-inbox-noop-{0}', github.run_id) || 'gpt-inbox-live-refresh' }}
   cancel-in-progress: true
 
 jobs:
