@@ -8,7 +8,7 @@ sys.path.insert(0, str(ROOT / "pipeline"))
 from freshness_conveyor_watchdog import StageState, decide
 from build_qwen_shadow_shards import freshness_rank
 from build_qwen_dce_selection import freshness_rank as dce_freshness_rank
-from materialize_dce_selection import build_candidate_index, canonical_candidate_id
+from materialize_dce_selection import build_candidate_index, canonical_candidate_id, resolve_candidate
 
 
 def test_watchdog_repairs_stages_in_dependency_order():
@@ -55,5 +55,22 @@ def test_qwen_to_dce_candidate_identity_is_case_insensitive():
     candidates = [{"candidate_id": "UK_PCS_OCDS:ocds-r6ebe6-0000839484", "title": "Example"}]
     indexed = build_candidate_index(candidates)
     qwen_id = "uk_pcs_ocds:ocds-r6ebe6-0000839484"
-    assert canonical_candidate_id(qwen_id) in indexed
-    assert indexed[canonical_candidate_id(qwen_id)]["candidate_id"] == candidates[0]["candidate_id"]
+    matches = indexed[canonical_candidate_id(qwen_id)]
+    assert len(matches) == 1
+    assert matches[0]["candidate_id"] == candidates[0]["candidate_id"]
+
+
+def test_qwen_ocid_resolves_release_level_discovery_candidate():
+    candidates = [{
+        "candidate_id": "UK_PCS_OCDS:release-2026-08-17-123",
+        "source": "UK_PCS_OCDS",
+        "ocid": "ocds-r6ebe6-0000839484",
+        "title": "Digital communications support",
+        "buyer": "Example Council",
+        "deadline": "2026-08-30T12:00:00+00:00",
+    }]
+    indexed = build_candidate_index(candidates)
+    selection = {"candidate_id": "uk_pcs_ocds:ocds-r6ebe6-0000839484", "qwen": {}}
+    resolved, reason = resolve_candidate(selection, indexed)
+    assert resolved is candidates[0]
+    assert reason == "source_alias"
