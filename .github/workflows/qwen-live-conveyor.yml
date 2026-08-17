@@ -276,13 +276,16 @@ jobs:
           }
 
           # Refresh unseen selection immediately, then guarantee a tiny Qwen pass is
-          # always alive. workflow_run gives immediate continuity; */5 is fallback.
+          # always alive. A rolling conveyor polls through classifier completion;
+          # the 5-minute schedule restarts the poller if a runner disappears.
           refresh_selection
           ensure_qwen_running
 
-          # Stay below the five-minute watchdog cadence so scheduled fallback never
-          # has to cancel a healthy long polling loop.
-          for cycle in $(seq 1 8); do
+          # Keep a poller alive for nine minutes. Scheduled executions replace this
+          # one every five minutes (cancel-in-progress=true), so there is always a
+          # fresh watcher spanning a long CPU classification pass. Completed shard
+          # artifacts are therefore ingested within ~30 seconds, not five minutes.
+          for cycle in $(seq 1 18); do
             rid="$(gh run list --workflow qwen-live-classification.yml --limit 8 --json databaseId,status,createdAt --jq '[.[] | select(.status=="in_progress" or .status=="completed")] | sort_by(.createdAt) | reverse | .[0].databaseId // empty')"
             if [[ "$rid" =~ ^[0-9]+$ ]] && ensure_run_input "$rid"; then
               source_run="$(source_run_for_input "$rid" || true)"
@@ -304,8 +307,6 @@ jobs:
                   set -e
                   if [ "$rc" -eq 0 ]; then
                     mark_names "$rid" /tmp/new-qwen-artifacts.txt
-                    # The previous implementation called pull --rebase with this
-                    # marker dirty, self-crashing every live cycle. Persist it first.
                     push_marker_checkpoint
                     refresh_selection
                   elif [ "$rc" -eq 2 ]; then
@@ -317,6 +318,7 @@ jobs:
                 fi
               fi
             fi
+            ensure_qwen_running
             sleep 30
           done
 
