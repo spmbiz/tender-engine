@@ -1,30 +1,31 @@
 {
-  "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_V2",
-  "generated_at_utc": "2026-08-17T00:20:48+00:00",
+  "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_V3",
+  "generated_at_utc": "2026-08-17T00:29:35+00:00",
   "source_run": "31959798665",
   "state_rows": 7702,
   "ledger_rows": 46023,
   "snapshot_rows": 46023,
   "blocked_ids": 14780,
-  "valid_exact_hash_current": 6110,
-  "eligible_keep_for_dce": 5567,
+  "durable_attempted_exact_versions_ignored": 29,
+  "valid_exact_hash_current_unattempted": 6081,
+  "eligible_keep_for_dce": 5542,
   "stale_hash_ignored": 0,
   "missing_snapshot": 0,
   "expired_ignored": 74,
   "selected": 160,
   "selection_decisions": {
-    "FIT": 46,
-    "MAYBE": 107,
+    "FIT": 28,
+    "MAYBE": 125,
     "REJECT_OBVIOUS": 7
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
-    "qwen-primary": 46,
+    "qwen-primary": 28,
     "qwen-open-world-explore": 32,
     "qwen-reject-audit": 8,
-    "qwen-elastic": 74
+    "qwen-elastic": 92
   },
   "policy": {
     "keep_is_not_fit": true,
@@ -32,6 +33,7 @@
     "dce_eligible_required_for_primary_and_explore": true,
     "reject_audit_preserved": true,
     "exact_material_hash_required": true,
+    "durable_dce_attempts_excluded_before_ranking": true,
     "deadline_unverified_caps_strong_priority": true
   }
 }
