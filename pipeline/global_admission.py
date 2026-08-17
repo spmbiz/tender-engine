@@ -18,7 +18,7 @@ DEFAULT_POLICY = {
 
 
 def _request(url: str):
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.6"})
+    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/1.7"})
     tok = os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")
     if tok:
         req.add_header("Authorization", f"Bearer {tok}")
@@ -96,7 +96,6 @@ def _fair_target(total: int, demand: int, cfg: dict) -> int:
 
 
 def _controller_preauthorized() -> bool:
-    """True when the live controller already admitted this DCE wave."""
     flag = str(os.getenv("DCE_ADMISSION_PREAUTHORIZED") or "").strip().lower()
     if flag in {"1", "true", "yes"}:
         return True
@@ -109,7 +108,6 @@ def _controller_preauthorized() -> bool:
 
 
 def _workflow_selection_path() -> str:
-    """Best-effort workflow_dispatch selection path without requiring YAML plumbing."""
     explicit = str(os.getenv("DCE_SELECTION_PATH") or "").strip()
     if explicit:
         return explicit
@@ -127,7 +125,6 @@ def _workflow_selection_path() -> str:
 
 
 def _spm_curated_fast_lane() -> bool:
-    """Only the tiny GPT-curated rescue manifest gets bounded free-slot priority."""
     flag = str(os.getenv("DCE_SPM_CURATED_FAST_LANE") or "").strip().lower()
     if flag in {"1", "true", "yes"}:
         return True
@@ -135,32 +132,23 @@ def _spm_curated_fast_lane() -> bool:
 
 
 def _qwen_live_streaming_lane() -> bool:
-    """True for the rolling exact-unseen Qwen→DCE conveyor.
+    """True for both sides of the continuous Qwen→DCE conveyor.
 
-    This lane is not speculative bulk work: every row has already passed semantic
-    notice triage and the durable exact-version anti-repeat barrier. Letting it use
-    a few currently idle physical slots prevents the user-facing DCE inbox from
-    freezing merely because fair-share headroom is reserved for sibling workloads
-    that have not actually occupied those runners yet.
+    The DCE selector path identifies the downstream exact-unseen lane. The
+    GITHUB_WORKFLOW check identifies the upstream Qwen notice-classifier itself,
+    which otherwise could deadlock behind the DCE workers it is supposed to keep
+    fed. Both may borrow only currently idle physical slots and never preempt.
     """
     flag = str(os.getenv("DCE_QWEN_LIVE_STREAMING_LANE") or "").strip().lower()
     if flag in {"1", "true", "yes"}:
         return True
-    return "qwen_live_selection" in _workflow_selection_path().lower()
+    if "qwen_live_selection" in _workflow_selection_path().lower():
+        return True
+    workflow = str(os.getenv("GITHUB_WORKFLOW") or "").strip().lower()
+    return "qwen live notice classification" in workflow
 
 
 def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
-    """Admission-control new Tender runners without preempting running jobs.
-
-    Actual in-progress jobs consume capacity. Queued jobs are demand/backlog and
-    never consume a slot in this local admission calculation. Sibling workloads
-    with durable demand normally receive fair-target headroom before Tender
-    borrows idle capacity.
-
-    Two latency-sensitive DCE lanes may borrow a bounded number of *currently
-    free* physical slots: the GPT-curated rescue lane and the rolling exact-unseen
-    Qwen lane. Neither kills running sibling work or exceeds account capacity.
-    """
     requested = max(0, int(requested))
     if _controller_preauthorized():
         allowed = min(requested, 20)
@@ -213,12 +201,19 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
             cap = 3
             reason = "GPT-curated SPM DCE shortlist receives bounded latency priority"
         else:
-            lane = "qwen-live-unseen"
+            workflow = str(os.getenv("GITHUB_WORKFLOW") or "").strip().lower()
+            if "qwen live notice classification" in workflow:
+                lane = "qwen-live-classifier"
+                cap_default = 3
+                reason = "Qwen notice classification continuously feeds the exact-unseen DCE conveyor and may use a bounded slice of currently idle physical slots"
+            else:
+                lane = "qwen-live-unseen"
+                cap_default = 5
+                reason = "rolling Qwen exact-unseen DCE conveyor may borrow idle physical slots so the live inbox never waits behind unoccupied sibling reservations"
             try:
-                cap = max(1, min(8, int(os.getenv("DCE_QWEN_LIVE_FAST_LANE_CAP") or 5)))
+                cap = max(1, min(8, int(os.getenv("DCE_QWEN_LIVE_FAST_LANE_CAP") or cap_default)))
             except Exception:
-                cap = 5
-            reason = "rolling Qwen exact-unseen DCE conveyor may borrow idle physical slots so the live inbox never waits behind unoccupied sibling reservations"
+                cap = cap_default
         allowed = min(requested, cap, physical_free, tender_room)
         return allowed, {
             "mode": f"{lane}-free-slot-fast-lane",
@@ -233,6 +228,7 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
             "existing_tender_active": existing_tender_active,
             "tender_room": tender_room,
             "selection_path": _workflow_selection_path(),
+            "workflow": os.getenv("GITHUB_WORKFLOW") or "",
             "preemption": "none; only currently free physical slots are consumed",
             "reason": reason,
         }
