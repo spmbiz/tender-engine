@@ -32,11 +32,31 @@ def norm(value: object) -> str:
     return re.sub(r"[^a-z0-9]+", " ", s).strip()
 
 
+def canonical_candidate_id(value: object) -> str:
+    """Normalize cross-stage candidate identity without changing stored IDs.
+
+    Portal normalizers historically varied in source-prefix casing (for example
+    UK_PCS_OCDS:... versus uk_pcs_ocds:...). Qwen/ledger identity is casefolded,
+    so DCE materialization must use the same rule or semantically selected rows can
+    disappear even though the exact canonical notice is present in the harvest.
+    """
+    return str(value or "").strip().casefold()
+
+
 def identity(rec: dict) -> tuple[str, tuple[str, str] | None]:
-    cid = str(rec.get("candidate_id") or "").strip().casefold()
+    cid = canonical_candidate_id(rec.get("candidate_id"))
     title = norm(rec.get("title"))
     buyer = norm(rec.get("buyer"))
     return cid, ((title, buyer) if title and buyer else None)
+
+
+def build_candidate_index(candidates: list[dict]) -> dict[str, dict]:
+    out: dict[str, dict] = {}
+    for rec in candidates:
+        cid = canonical_candidate_id(rec.get("candidate_id"))
+        if cid and cid not in out:
+            out[cid] = rec
+    return out
 
 
 def load_selection(path: Path) -> list[dict]:
@@ -89,16 +109,13 @@ def main() -> None:
     ap.add_argument("--candidates", required=True)
     ap.add_argument("--selection", required=True)
     ap.add_argument("--out", required=True)
-    # Historical queues are not durable attempt state. Passing --exclude-queue is
-    # still supported for one-off compatibility jobs, but autonomous DCE must rely
-    # on the exact-version attempt ledger so valid cooldown retries can re-enter.
     ap.add_argument("--exclude-queue", default="")
     ap.add_argument("--attempt-ledger", default="control/dce_attempt_ledger.jsonl")
     args = ap.parse_args()
 
     candidates = load_jsonl(Path(args.candidates))
     selection = load_selection(Path(args.selection))
-    by_id = {str(r.get("candidate_id")): r for r in candidates if r.get("candidate_id")}
+    by_id = build_candidate_index(candidates)
 
     exclude_rows = load_jsonl(Path(args.exclude_queue)) if args.exclude_queue else []
     excluded_ids: set[str] = set()
@@ -124,17 +141,16 @@ def main() -> None:
 
     for sel in selection:
         cid = str(sel.get("candidate_id") or "").strip()
-        if not cid:
+        cid_key = canonical_candidate_id(cid)
+        if not cid_key:
             continue
-        if cid in seen:
+        if cid_key in seen:
             duplicate_selection.append(cid)
             continue
-        seen.add(cid)
+        seen.add(cid_key)
 
-        base = by_id.get(cid)
+        base = by_id.get(cid_key)
         if not base:
-            # The live Qwen queue can contain a few rows from a different/newer
-            # canonical snapshot. Report and skip them; never abort the batch.
             missing.append(cid)
             continue
 
@@ -148,6 +164,7 @@ def main() -> None:
             "selection_reason",
             "selection_bucket",
             "selection_fit_class",
+            "selection_freshness",
             "qwen",
         ):
             if key in sel:
@@ -157,8 +174,8 @@ def main() -> None:
             excluded_attempted.append(cid)
             continue
 
-        cid_key, tb_key = identity(base)
-        if cid_key in excluded_ids or (tb_key and tb_key in excluded_tb):
+        base_cid_key, tb_key = identity(base)
+        if base_cid_key in excluded_ids or (tb_key and tb_key in excluded_tb):
             excluded_existing.append(cid)
             continue
         if tb_key and tb_key in seen_tb:
