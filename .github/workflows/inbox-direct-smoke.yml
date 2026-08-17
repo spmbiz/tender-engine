@@ -1,0 +1,49 @@
+name: Inbox Direct Publish Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/publish_supergreen_hot.py'
+      - '.github/workflows/inbox-direct-smoke.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: inbox-direct-publish-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Exercise direct inbox publication without waiting for a second runner
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check -q requests
+          : > /tmp/empty-review.jsonl
+          python pipeline/publish_supergreen_hot.py \
+            --review /tmp/empty-review.jsonl \
+            --run-id 31984835101 \
+            --shard 999 \
+            --repo '${{ github.repository }}' \
+            --out /tmp/direct-inbox-smoke.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/direct-inbox-smoke.json'))
+          assert x.get('inbox',{}).get('published') is True, x
+          assert not x.get('inbox_error'), x
+          print(json.dumps({'direct_inbox': True, 'attempt': x['inbox']['attempt'], 'path': x['inbox']['path']}, indent=2))
+          PY
