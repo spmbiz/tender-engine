@@ -7,6 +7,7 @@ sys.path.insert(0, str(ROOT / "pipeline"))
 
 from freshness_conveyor_watchdog import StageState, decide
 from build_qwen_shadow_shards import freshness_rank
+from build_qwen_dce_selection import freshness_rank as dce_freshness_rank
 
 
 def test_watchdog_repairs_stages_in_dependency_order():
@@ -35,3 +36,11 @@ def test_recent_notice_stays_fresh_after_next_ledger_generation():
         "first_seen_at": (now - timedelta(hours=23, minutes=59)).isoformat(),
     }
     assert freshness_rank(row, now=now, fresh_hours=24) == 1
+
+
+def test_dce_shortlist_preserves_same_freshness_order():
+    now = datetime(2026, 8, 17, 20, 0, tzinfo=timezone.utc)
+    assert dce_freshness_rank({"ledger_event": "NEW"}, now=now) == 0
+    assert dce_freshness_rank({"ledger_event": "UPDATED"}, now=now) == 0
+    assert dce_freshness_rank({"ledger_event": "UNCHANGED", "first_seen_at": (now - timedelta(hours=3)).isoformat()}, now=now) == 1
+    assert dce_freshness_rank({"ledger_event": "UNCHANGED", "first_seen_at": (now - timedelta(days=2)).isoformat()}, now=now) == 2
