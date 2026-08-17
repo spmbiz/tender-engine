@@ -50,11 +50,6 @@ jobs:
               --ledger control/dce_attempt_ledger.jsonl
           }
 
-          # Hard anti-repeat barrier based on exact candidate version identity, not
-          # monotonically increasing workflow IDs. A later successful run can be a
-          # duplicate transition wave and must not block the pipeline forever merely
-          # because its run number is newer than the run that first ledgered those
-          # exact candidate versions.
           latest_durable=''
           mapfile -t successful < <(gh run list --workflow dce-fanout-v2.yml --status success --limit 20 --json databaseId,createdAt --jq 'sort_by(.createdAt) | reverse | .[].databaseId')
           for rid in "${successful[@]}"; do
@@ -151,11 +146,22 @@ jobs:
           if [ "$jobs" -gt "$max_jobs" ]; then jobs="$max_jobs"; fi
           if [ "$jobs" -lt 1 ]; then exit 0; fi
 
+          dce_parallel="$(DCE_SELECTION_PATH="$path" python - <<'PYADMIT'
+          from pipeline.global_admission import dynamic_tender_parallel
+          allowed,_=dynamic_tender_parallel(60)
+          print(allowed)
+          PYADMIT
+          )"
+          if [ "${dce_parallel:-0}" -le 0 ]; then
+            echo "No shared Tender capacity available; persisted unseen DCE work remains queued for the next drainer tick."
+            exit 0
+          fi
+
           gh workflow run dce-fanout-v2.yml --ref main \
             -f selection_path="$path" \
             -f source_discovery_run="$source_run" \
             -f max_jobs="$jobs" \
-            -f max_parallel=24 \
+            -f max_parallel="$dce_parallel" \
             -f max_shards=80 \
             -f jobs_per_shard=0
-          echo "Dispatched $jobs unseen candidate versions from $path (rows=$rows unseen=$unseen source=$source_run policy=$reason max_parallel=24)."
+          echo "Dispatched $jobs unseen candidate versions from $path (rows=$rows unseen=$unseen source=$source_run policy=$reason shared_tender_parallel=$dce_parallel)."
