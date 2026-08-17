@@ -1,0 +1,48 @@
+name: Apply Qwen Runtime Safety
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/apply_qwen_runtime_safety.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-qwen-runtime-safety
+  cancel-in-progress: true
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Patch Qwen runtime without preempting active semantic work
+        run: python pipeline/apply_qwen_runtime_safety.py
+      - name: Persist patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add .github/workflows/qwen-live-classification.yml
+          if git diff --cached --quiet; then
+            echo 'Qwen runtime safety already applied.'
+            exit 0
+          fi
+          git commit -m 'qwen: make live semantic passes non-preemptive and low-latency'
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((attempt * 3))"
+          done
+          exit 1
