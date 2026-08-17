@@ -6,13 +6,13 @@ on:
       per_shard:
         description: Maximum notices classified by each worker in this pass
         required: false
-        default: '240'
+        default: '48'
       auto_continue:
-        description: Continue bounded passes while valid unclassified notices remain
+        description: Retained for compatibility; recovery drainer owns continuation
         required: false
         default: 'true'
       dce_limit:
-        description: Maximum Qwen-ranked candidates exposed to DCE in this pass
+        description: Retained for compatibility; recovery drainer owns DCE handoff
         required: false
         default: '160'
   workflow_run:
@@ -27,6 +27,7 @@ on:
       - 'pipeline/global_admission.py'
       - 'pipeline/apply_qwen_state_to_ledger.py'
       - 'pipeline/build_qwen_dce_selection.py'
+      - 'pipeline/build_qwen_shadow_shards.py'
       - 'pipeline/merge_qwen_classification_state.py'
       - 'pipeline/qwen_notice_batch_selfheal.py'
       - 'pipeline/qwen_notice_post_guard.py'
@@ -38,8 +39,9 @@ permissions:
 
 concurrency:
   group: qwen-live-notice-classification-${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success' && format('noop-{0}', github.run_id) || 'active' }}
-  # Only real active passes share the live group. Non-success workflow_run no-ops get a unique group and cannot replace a pending real pass.
-  cancel-in-progress: ${{ github.event_name == 'push' }}
+  # Never preempt a semantic pass because code or generated state changed on main.
+  # A later trigger queues behind the active generation and picks up the newest code.
+  cancel-in-progress: false
 
 env:
   QWEN_WORKERS_REQUESTED: '60'
@@ -112,11 +114,11 @@ jobs:
           fi
 
       - id: plan
-        name: Admit fair-share capacity, filter exact hashes and create lossless worker shards
+        name: Prioritize fresh notices, admit fair-share capacity and create bounded shards
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          REQUESTED_PER_SHARD: ${{ github.event.inputs.per_shard || '240' }}
+          REQUESTED_PER_SHARD: ${{ github.event.inputs.per_shard || '48' }}
         run: |
           set -euo pipefail
           source_run="$LEDGER_SOURCE_RUN"
@@ -126,6 +128,7 @@ jobs:
           PY
           )"
           [ "$manifest_run" = "$source_run" ] || { echo "Ledger/snapshot generation mismatch: ledger=$source_run snapshot=$manifest_run" >&2; exit 1; }
+
           python pipeline/merge_qwen_classification_state.py \
             --ledger input/notice-intelligence-ledger-latest.jsonl.gz \
             --classification-queue input/notice-classification-queue-latest.jsonl.gz \
@@ -134,6 +137,7 @@ jobs:
             --state-out previous/qwen-state-current.jsonl.gz \
             --queue-out input/qwen-work-queue.jsonl.gz \
             --summary-out input/qwen-prefilter-summary.json
+
           remaining="$(python - <<'PY'
           import json
           print(json.load(open('input/qwen-prefilter-summary.json'))['remaining_classification_queue'])
@@ -141,8 +145,8 @@ jobs:
           )"
           per_shard="$(python - <<'PY'
           import os
-          try: n=int(os.environ.get('REQUESTED_PER_SHARD') or 240)
-          except Exception: n=240
+          try: n=int(os.environ.get('REQUESTED_PER_SHARD') or 48)
+          except Exception: n=48
           print(max(16,min(480,n)))
           PY
           )"
@@ -177,7 +181,7 @@ jobs:
           print(json.dumps({'include':[{'shard':i,'shard_count_padded':padded} for i in range(n)]},separators=(',',':')))
           PY
           )"
-          batch_size="$(python - <<'PYBATCH'
+          batch_size="$(python - <<'PY'
           import json
           from pathlib import Path
           fallback=8
@@ -193,7 +197,7 @@ jobs:
           else:
               n=fallback
           print(max(1,min(32,n)))
-          PYBATCH
+          PY
           )"
           echo "batch_size=$batch_size" >> "$GITHUB_OUTPUT"
           echo "source_run=$source_run" >> "$GITHUB_OUTPUT"
@@ -201,7 +205,7 @@ jobs:
           echo "per_shard=$per_shard" >> "$GITHUB_OUTPUT"
           echo "allowed_workers=$allowed" >> "$GITHUB_OUTPUT"
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
-          cat input/qwen-capacity-admission.json
+          cat input/qwen-live-shard-manifest.json
 
       - name: Upload immutable input transport for this pass
         uses: actions/upload-artifact@v4
@@ -218,10 +222,8 @@ jobs:
         run: |
           echo "Source discovery: ${{ steps.plan.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Exact-hash queue remaining before this pass: ${{ steps.plan.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Workers requested from shared Tender pool: $QWEN_WORKERS_REQUESTED; workers admitted: ${{ steps.plan.outputs.allowed_workers }}; max notices/worker: ${{ steps.plan.outputs.per_shard }}; batch size: ${{ steps.plan.outputs.batch_size }}" >> "$GITHUB_STEP_SUMMARY"
-          echo '```json' >> "$GITHUB_STEP_SUMMARY"
-          cat input/qwen-capacity-admission.json >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "Workers admitted: ${{ steps.plan.outputs.allowed_workers }}; max notices/worker: ${{ steps.plan.outputs.per_shard }}; batch size: ${{ steps.plan.outputs.batch_size }}" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Recovery drainer owns durable Qwen→DCE publication and continuation after this workflow completes.' >> "$GITHUB_STEP_SUMMARY"
 
   classify:
     needs: plan
@@ -369,8 +371,6 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -378,6 +378,7 @@ jobs:
         with:
           name: qwen-live-input-${{ github.run_id }}
           path: work
+
       - name: Download all completed shard outputs
         if: needs.plan.outputs.remaining != '0' && needs.plan.outputs.allowed_workers != '0'
         uses: actions/download-artifact@v4
@@ -414,7 +415,7 @@ jobs:
               f.write(f"remaining={after}\naccepted={accepted}\nstate_rows={s['state_rows_after_merge']}\n")
           PY
 
-      - name: Publish durable state with immutable and stable pointers
+      - name: Publish durable Qwen state
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -426,6 +427,7 @@ jobs:
             --title "Qwen classification state ${source_run}/${GITHUB_RUN_ID}" \
             --notes 'Shadow-safe semantic notice classification. Exact material hash required; DCE remains authoritative; no notice is deleted.'
           gh release upload "$immutable" publish/* --clobber
+
           stable=qwen-classification-state-latest
           gh release view "$stable" >/dev/null 2>&1 || gh release create "$stable" --target main \
             --title 'Qwen Classification State — LATEST' \
@@ -434,97 +436,6 @@ jobs:
             --notes "source_run=${source_run} run=${GITHUB_RUN_ID} state_rows=${{ steps.merge.outputs.state_rows }} remaining=${{ steps.merge.outputs.remaining }} accepted_this_pass=${{ steps.merge.outputs.accepted }} admitted_workers=${{ needs.plan.outputs.allowed_workers }}"
           gh release upload "$stable" publish/* --clobber
 
-      - id: selection
-        name: Build direct Qwen semantic DCE lane outside legacy keyword gate
-        shell: bash
-        env:
-          REQUESTED_DCE_LIMIT: ${{ github.event.inputs.dce_limit || '160' }}
-        run: |
-          set -euo pipefail
-          git fetch origin main
-          git show origin/main:control/controller_state_checkpoint.json > latest-controller-state.json 2>/dev/null || printf '{}\n' > latest-controller-state.json
-          limit="$(python - <<'PY'
-          import os
-          try:n=int(os.environ.get('REQUESTED_DCE_LIMIT') or 160)
-          except Exception:n=160
-          print(max(32,min(320,n)))
-          PY
-          )"
-          python pipeline/build_qwen_dce_selection.py \
-            --state publish/qwen-classification-state-latest.jsonl.gz \
-            --ledger work/input/notice-intelligence-ledger-latest.jsonl.gz \
-            --snapshot work/input/live-open-tenders-latest.jsonl.gz \
-            --blocked-state latest-controller-state.json \
-            --out qwen-live-selection.jsonl \
-            --summary qwen-live-selection.summary.json \
-            --source-run '${{ needs.plan.outputs.source_run }}' \
-            --limit "$limit"
-          count="$(python -c "import json;print(json.load(open('qwen-live-selection.summary.json'))['selected'])")"
-          echo "count=$count" >> "$GITHUB_OUTPUT"
-
-      - name: Persist current Qwen DCE selection for DCE Fanout V2
-        if: steps.selection.outputs.count != '0'
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p queues control/qwen_live
-          cp qwen-live-selection.jsonl queues/qwen_live_selection_latest.jsonl
-          cp qwen-live-selection.summary.json control/qwen_live/selection_summary.json
-          cp publish/qwen-classification-merge-summary-latest.json control/qwen_live/classification_summary.json
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add queues/qwen_live_selection_latest.jsonl control/qwen_live/
-          git commit -m "qwen: publish live semantic DCE lane ${GITHUB_RUN_ID}" || true
-          for attempt in 1 2 3 4 5; do
-            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
-            git rebase --abort >/dev/null 2>&1 || true
-            sleep "$((attempt * 4))"
-          done
-          exit 1
-
-      - name: Dispatch Qwen-ranked DCE work when DCE fleet is free
-        if: steps.selection.outputs.count != '0'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          active="$(gh run list --workflow dce-fanout-v2.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
-          if [ "$active" -gt 0 ]; then
-            echo "DCE fleet busy ($active active/queued); semantic queue is persisted and will remain available."
-            exit 0
-          fi
-          jobs='${{ steps.selection.outputs.count }}'
-          if [ "$jobs" -gt 120 ]; then jobs=120; fi
-          dce_parallel="$(DCE_SELECTION_PATH=queues/qwen_live_selection_latest.jsonl python - <<'PYADMIT'
-          from pipeline.global_admission import dynamic_tender_parallel
-          allowed,_=dynamic_tender_parallel(60)
-          print(allowed)
-          PYADMIT
-          )"
-          if [ "${dce_parallel:-0}" -le 0 ]; then
-            echo "No shared Tender capacity available for DCE; persisted queue will be picked up by the drainer."
-            exit 0
-          fi
-          gh workflow run dce-fanout-v2.yml --ref main \
-            -f selection_path=queues/qwen_live_selection_latest.jsonl \
-            -f source_discovery_run='${{ needs.plan.outputs.source_run }}' \
-            -f max_jobs="$jobs" \
-            -f max_parallel="$dce_parallel" \
-            -f jobs_per_shard=0
-          echo "Dispatched Qwen semantic DCE lane: candidates=$jobs source=${{ needs.plan.outputs.source_run }} shared_tender_parallel=$dce_parallel."
-
-      - name: Continue bounded backfill only after real accepted progress
-        if: steps.merge.outputs.remaining != '0' && steps.merge.outputs.accepted != '0' && (github.event.inputs.auto_continue || 'true') == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh workflow run qwen-live-classification.yml --ref main \
-            -f per_shard='${{ needs.plan.outputs.per_shard }}' \
-            -f auto_continue=true \
-            -f dce_limit='${{ github.event.inputs.dce_limit || '160' }}'
-          echo "Queued next bounded Qwen pass; remaining=${{ steps.merge.outputs.remaining }}"
-
       - name: End-to-end summary
         if: always()
         shell: bash
@@ -532,9 +443,8 @@ jobs:
           echo "### Qwen live mainline" >> "$GITHUB_STEP_SUMMARY"
           echo "- source discovery: ${{ needs.plan.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- queue before pass: ${{ needs.plan.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- workers requested/admitted from shared Tender pool: $QWEN_WORKERS_REQUESTED/${{ needs.plan.outputs.allowed_workers }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- accepted this pass: ${{ steps.merge.outputs.accepted }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- remaining exact-hash classification queue: ${{ steps.merge.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- remaining exact-hash queue: ${{ steps.merge.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- cumulative classified state rows: ${{ steps.merge.outputs.state_rows }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Qwen-ranked DCE candidates published: ${{ steps.selection.outputs.count }}" >> "$GITHUB_STEP_SUMMARY"
-          echo '- safety: notice ranking only; no destructive rejection; DCE remains authoritative.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Qwen→DCE persistence, DCE dispatch and continuation are delegated to Qwen Live Recovery Drainer.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- safety: no semantic result is a final bid verdict; authoritative DCE remains the truth gate.' >> "$GITHUB_STEP_SUMMARY"
