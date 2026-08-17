@@ -1,25 +1,29 @@
-name: Qwen Realtime Restart (Legacy Disabled)
+name: Qwen Realtime Restart (Legacy Drain No-op)
 
-# Legacy one-shot repair retained only as an audit marker.
-# The live path is now owned by:
-# - qwen-live-classification.yml
-# - qwen-live-conveyor.yml
-# - qwen-live-recovery-drainer.yml
-#
-# Do not cancel active semantic passes or rewrite the live workflow from here.
+# One harmless push-triggered run uses the legacy concurrency group to evict any
+# previously queued/in-progress legacy repair created before retirement. It never
+# cancels Qwen classification and never rewrites a live workflow.
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qwen-realtime-restart.yml'
 
 permissions:
   contents: read
+
+concurrency:
+  group: qwen-realtime-restart
+  cancel-in-progress: true
 
 jobs:
   retired:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - name: Explain retired legacy repair
+      - name: Drain legacy concurrency group safely
         run: |
-          echo 'LEGACY_RESTART_RETIRED'
-          echo 'No Qwen run was cancelled and no live workflow was modified.'
-          echo 'Continuous classification/recovery owns self-healing now.'
+          echo 'LEGACY_RESTART_DRAIN_NOOP'
+          echo 'No Qwen classification run is cancelled.'
+          echo 'No live workflow is modified.'
