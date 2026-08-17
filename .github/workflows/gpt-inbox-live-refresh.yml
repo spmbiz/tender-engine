@@ -2,6 +2,9 @@ name: GPT Inbox Live Refresh
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["DCE Fanout V2"]
+    types: [completed]
   push:
     branches: [main]
     paths:
@@ -24,7 +27,8 @@ concurrency:
 jobs:
   refresh:
     # DCE shards already publish the inbox directly. Their legacy bot dispatch is a
-    # zero-runner no-op; GPT Web tick pushes and explicit human dispatches do refresh.
+    # zero-runner no-op. GPT Web tick pushes, post-DCE completion and explicit human
+    # dispatches rebuild from current main using the durable review ledger.
     if: github.event_name != 'workflow_dispatch' || github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 5
