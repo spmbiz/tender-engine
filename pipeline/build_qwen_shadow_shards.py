@@ -13,11 +13,11 @@ from typing import Any
 
 SCHEMA='QWEN_SHADOW_INPUT_V1'
 MANIFEST_SCHEMA='QWEN_SHADOW_SHARD_MANIFEST_V3'
-# Keep live passes short enough to persist useful classifications regularly.
-# The workflow may request a larger shard for throughput, but repeated bounded
-# passes are safer operationally than holding hundreds of classifications in a
-# single runner until the very end of a long job.
-DEFAULT_OPERATIONAL_MAX_ROWS_PER_SHARD=80
+# Production currently requests 192 rows/worker and the classifier has a 7,800 s
+# self-heal budget inside a 150 minute job timeout. Keep the operational clamp
+# aligned with that advertised production bound; if the workflow is raised again,
+# the A/B regression harness must be updated/prove the new bound before rollout.
+DEFAULT_OPERATIONAL_MAX_ROWS_PER_SHARD=192
 DEFAULT_FRESH_HOURS=24
 
 
