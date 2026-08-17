@@ -22,11 +22,21 @@ permissions:
   contents: write
 
 concurrency:
-  group: gpt-inbox-live-refresh
+  # Bot shard dispatches are isolated so they can never cancel a real push/tick or
+  # post-DCE recovery. Only sampled bot dispatches allocate a runner below.
+  group: ${{ github.event_name == 'workflow_dispatch' && github.actor == 'github-actions[bot]' && format('gpt-inbox-bot-{0}', github.run_id) || 'gpt-inbox-live-refresh' }}
   cancel-in-progress: true
 
 jobs:
   refresh:
+    # DCE shards dispatch this after every hot publish. Run only ~20% of those bot
+    # dispatches; push/tick/post-DCE/human runs always execute. This avoids both the
+    # old zero-runner starvation and a runner storm.
+    if: >-
+      github.event_name != 'workflow_dispatch' ||
+      github.actor != 'github-actions[bot]' ||
+      endsWith(format('{0}', github.run_number), '0') ||
+      endsWith(format('{0}', github.run_number), '5')
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
