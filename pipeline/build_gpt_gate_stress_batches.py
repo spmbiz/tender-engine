@@ -2,18 +2,15 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import shutil
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from build_gpt_web_read_batches import GATES, clip
+from build_gpt_web_read_batches import clip
 from rebuild_gpt_review_bank_from_release import load_jsonl, run_and_shard
 
-# Keep the exhaustive surface small enough for the conversation assistant to read
-# every candidate. These are evidence snippets only; no verdict is emitted here.
 STRESS_GATES = (
     "entity_geography",
     "turnover_financial",
@@ -49,10 +46,23 @@ def key(value: Any) -> str:
     return str(value or "").strip().casefold()
 
 
-def gate_evidence(row: dict[str, Any], chars: int = 360) -> dict[str, dict[str, Any]]:
+def raw_gate_map(row: dict[str, Any]) -> dict[str, Any]:
     raw = row.get("evidence_by_gate") or row.get("gate_evidence_candidates") or {}
-    if not isinstance(raw, dict):
-        return {}
+    return raw if isinstance(raw, dict) else {}
+
+
+def first_gate_text(row: dict[str, Any], gate: str, chars: int = 320) -> str:
+    vals = raw_gate_map(row).get(gate)
+    if not isinstance(vals, list) or not vals:
+        return ""
+    item = vals[0]
+    if isinstance(item, dict):
+        return clip(item.get("text") or item.get("snippet") or item.get("context"), chars)
+    return clip(item, chars)
+
+
+def gate_evidence(row: dict[str, Any], chars: int = 360) -> dict[str, dict[str, Any]]:
+    raw = raw_gate_map(row)
     out: dict[str, dict[str, Any]] = {}
     for gate in STRESS_GATES:
         vals = raw.get(gate)
@@ -143,12 +153,37 @@ def candidate_payload(index_row: dict[str, Any], raw: dict[str, Any] | None, run
     }
 
 
+def triage_payload(full: dict[str, Any]) -> dict[str, Any]:
+    ev = full.get("gate_evidence") if isinstance(full.get("gate_evidence"), dict) else {}
+    def t(gate: str) -> str:
+        item = ev.get(gate) if isinstance(ev.get(gate), dict) else {}
+        return clip(item.get("text"), 300)
+    return {
+        "candidate_id": full.get("candidate_id"),
+        "title": full.get("title"),
+        "buyer": full.get("buyer"),
+        "portal": full.get("portal"),
+        "deadline": full.get("deadline"),
+        "estimated_value": full.get("estimated_value"),
+        "currency": full.get("currency"),
+        "spm_fit_band": full.get("spm_fit_band"),
+        "spm_fit_reasons": full.get("spm_fit_reasons") or [],
+        "spm_friction_signals": full.get("spm_friction_signals") or [],
+        "scope_dce": t("deliverables_scope"),
+        "term_value_dce": t("term_value"),
+        "raw_dce_row_found": bool(full.get("raw_dce_row_found")),
+        "deep_batch_hint": full.get("_deep_batch_hint"),
+        "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
+    }
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--index", default="control/gpt_review_index.json")
     ap.add_argument("--release-root", required=True)
     ap.add_argument("--out-dir", default="control/gpt_gate_stress_batches")
     ap.add_argument("--batch-size", type=int, default=10)
+    ap.add_argument("--triage-batch-size", type=int, default=50)
     args = ap.parse_args()
 
     index = load(Path(args.index))
@@ -177,8 +212,6 @@ def main() -> None:
             if k not in targets:
                 continue
             target_run = int(targets[k].get("source_dce_run_id") or 0)
-            # Prefer the exact DCE generation recorded by the durable review index;
-            # otherwise use the newest retrieved version as a transparent fallback.
             exact = int(bool(target_run and run_id == target_run))
             rank = (exact, int(run_id or 0), int(shard or 0))
             cur = raw_best.get(k)
@@ -194,12 +227,14 @@ def main() -> None:
         else:
             payloads.append(candidate_payload(idx_row, None, None, None))
 
-    # Preserve the durable index ordering. It is a mechanical ordering only; the
-    # assistant still adjudicates every emitted candidate.
     order = {key(cid(row)): i for i, row in enumerate(gates)}
     payloads.sort(key=lambda x: order.get(key(x.get("candidate_id")), 10**9))
 
     batch_size = max(1, min(20, int(args.batch_size)))
+    triage_batch_size = max(10, min(75, int(args.triage_batch_size)))
+    for i, row in enumerate(payloads):
+        row["_deep_batch_hint"] = f"batch-{i // batch_size:03d}.json"
+
     out_dir = Path(args.out_dir)
     if out_dir.exists():
         shutil.rmtree(out_dir)
@@ -218,16 +253,35 @@ def main() -> None:
             "end_rank": start + len(chunk),
             "count": len(chunk),
             "items": chunk,
-            "instruction": "Exhaustive BUSINESS_GATES stress surface. Assistant must adjudicate every item; generator never emits GREEN/YELLOW/RED.",
+            "instruction": "Deep evidence for exhaustive BUSINESS_GATES stress review. Assistant adjudicates; generator never emits GREEN/YELLOW/RED.",
         }
         (out_dir / name).write_text(json.dumps(body, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         files.append({"file": name, "start_rank": start + 1, "end_rank": start + len(chunk), "count": len(chunk)})
+
+    triage_rows = [triage_payload(x) for x in payloads]
+    triage_files = []
+    for start in range(0, len(triage_rows), triage_batch_size):
+        chunk = triage_rows[start:start + triage_batch_size]
+        idx = start // triage_batch_size
+        name = f"triage-{idx:03d}.json"
+        body = {
+            "schema": "GPT_GATE_STRESS_TRIAGE_V1",
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "batch_index": idx,
+            "start_rank": start + 1,
+            "end_rank": start + len(chunk),
+            "count": len(chunk),
+            "items": chunk,
+            "instruction": "Assistant-only exhaustive first read. Scope triage is not a verdict; promising/ambiguous rows must be opened in deep_batch_hint before adjudication.",
+        }
+        (out_dir / name).write_text(json.dumps(body, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        triage_files.append({"file": name, "start_rank": start + 1, "end_rank": start + len(chunk), "count": len(chunk)})
 
     raw_missing = [x["candidate_id"] for x in payloads if not x.get("raw_dce_row_found")]
     bands = Counter(str(x.get("spm_fit_band") or "UNKNOWN") for x in payloads)
     runs = sorted({int(x.get("source_dce_run_id") or 0) for x in gates if int(x.get("source_dce_run_id") or 0)}, reverse=True)
     manifest = {
-        "schema": "GPT_GATE_STRESS_MANIFEST_V1",
+        "schema": "GPT_GATE_STRESS_MANIFEST_V2",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "source_index_schema": index.get("schema"),
         "source_index_count": int(index.get("count") or len(source_items)),
@@ -242,9 +296,12 @@ def main() -> None:
         "shard_files_scanned": len(shard_files),
         "adjudication_rows_scanned": scanned_rows,
         "by_spm_fit_band": dict(bands),
-        "batch_size": batch_size,
-        "batch_count": len(files),
-        "files": files,
+        "deep_batch_size": batch_size,
+        "deep_batch_count": len(files),
+        "deep_files": files,
+        "triage_batch_size": triage_batch_size,
+        "triage_batch_count": len(triage_files),
+        "triage_files": triage_files,
         "conservation_pass": len(payloads) == len(targets) == len(gates) and not duplicate_target_ids and not raw_missing,
         "contract": "Mechanical exhaustive DCE evidence surface only. No automated verdict. Conservation must pass before assistant stress adjudication is trusted.",
     }
