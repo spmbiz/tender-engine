@@ -1,0 +1,48 @@
+name: DCE Evidence Regression
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/dce_evidence_quality.py'
+      - 'pipeline/extract_corpus.py'
+      - 'pipeline/docling_deep_parser.py'
+      - 'tests/test_dce_evidence_quality.py'
+      - 'tests/test_dce_evidence_provenance.py'
+      - 'tests/test_extract_corpus_docling_import.py'
+      - '.github/workflows/dce-evidence-regression.yml'
+      - 'control/dce_evidence_regression_trigger.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dce-evidence-regression
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install narrow test dependencies
+        run: python -m pip install --disable-pip-version-check -q pytest pypdf
+      - name: Compile evidence and extraction modules
+        run: |
+          python -m py_compile \
+            pipeline/dce_evidence_quality.py \
+            pipeline/extract_corpus.py \
+            pipeline/docling_deep_parser.py
+      - name: Run evidence-quality regression suite
+        run: |
+          python -m pytest -q \
+            tests/test_dce_evidence_quality.py \
+            tests/test_dce_evidence_provenance.py \
+            tests/test_extract_corpus_docling_import.py
