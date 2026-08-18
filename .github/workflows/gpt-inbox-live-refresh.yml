@@ -19,6 +19,7 @@ on:
       - 'pipeline/gpt_web_tick.py'
       - 'pipeline/rebuild_gpt_review_bank_from_release.py'
       - 'pipeline/build_gpt_review_index.py'
+      - 'pipeline/build_gpt_web_read_batches.py'
       - '.github/workflows/gpt-inbox-live-refresh.yml'
 
 permissions:
@@ -56,10 +57,6 @@ jobs:
           set -euo pipefail
           rm -rf /tmp/dce-review-recovery
           mkdir -p /tmp/dce-review-recovery
-
-          # Bootstrap broadly once so the 160-item rich window cannot erase older
-          # unreviewed DCEs. Afterwards the compact persistent index carries history
-          # and only a small recent release window needs to be re-read.
           history=10
           if [ ! -s control/gpt_review_index.json ]; then
             history=50
@@ -117,12 +114,21 @@ jobs:
               --out control/gpt_supergreen_inbox.json \
               --max-items 160
 
+            # Mechanical output only: ten DCE-backed candidates per small file so
+            # the conversation assistant can read/adjudicate them directly. This
+            # never emits a verdict and is not an autonomous GPT worker.
+            python pipeline/build_gpt_web_read_batches.py \
+              --inbox control/gpt_supergreen_inbox.json \
+              --out-dir control/gpt_web_read_batches \
+              --batch-size 10
+
             python - <<'PY'
           import json
           from datetime import datetime, timezone
           inbox=json.load(open('control/gpt_supergreen_inbox.json',encoding='utf-8'))
           review=json.load(open('control/gpt_review_hot.json',encoding='utf-8'))
           index=json.load(open('control/gpt_review_index.json',encoding='utf-8'))
+          manifest=json.load(open('control/gpt_web_read_batches/manifest.json',encoding='utf-8'))
           idx_counts=index.get('counts') or {}
           payload={
             'schema':'GPT_INBOX_HEALTH_V2',
@@ -136,22 +142,25 @@ jobs:
             'review_index_counts':idx_counts,
             'true_pending_before_hot_cap':int(idx_counts.get('pending_total_uncapped') or 0),
             'overflow_beyond_hot_160':int(idx_counts.get('overflow_beyond_hot_160') or 0),
+            'assistant_read_batch_count':int(manifest.get('batch_count') or 0),
+            'assistant_read_batch_size':int(manifest.get('batch_size') or 0),
             'recovery_metrics':review.get('recovery_metrics') or {},
             'index_recovery':index.get('recovery') or {},
             'healthy':inbox.get('schema')=='GPT_WEB_REVIEW_INBOX_V2' and int(index.get('count') or 0)>0,
-            'contract':'Health sidecar exposes true uncapped GPT review backlog. control/gpt_supergreen_inbox.json remains the rich hot window; control/gpt_review_index.json preserves every unreviewed locator.',
+            'contract':'Health sidecar exposes true uncapped GPT review backlog. Rich review files are mechanical read surfaces; GPT Web adjudicator is the assistant in the conversation.',
           }
           open('control/gpt_inbox_metrics.json','w',encoding='utf-8').write(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
           print(json.dumps(payload,indent=2))
           PY
 
             git add control/gpt_review_index.json control/gpt_review_hot.json control/gpt_supergreen_inbox.json control/gpt_inbox_metrics.json
+            git add -A control/gpt_web_read_batches
             if git diff --cached --quiet; then
-              echo 'Persistent review index, rich bank and inbox already current.'
+              echo 'Persistent review index, rich bank, batches and inbox already current.'
               exit 0
             fi
 
-            git commit -m "inbox: recover uncapped GPT Web queue ${GITHUB_RUN_ID}"
+            git commit -m "inbox: recover GPT Web queue and read batches ${GITHUB_RUN_ID}"
             if git push origin HEAD:main; then
               exit 0
             fi
