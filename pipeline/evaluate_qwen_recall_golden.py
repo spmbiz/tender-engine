@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Any
 
 RANK = {"REJECT_OBVIOUS": 0, "MAYBE": 1, "FIT": 2, "STRONG_FIT": 3}
+DEFAULT_MIN_CASES = 500
+DEFAULT_MIN_POSITIVES = 100
 
 
 def load_jsonl(path: Path) -> dict[str, dict[str, Any]]:
@@ -29,7 +31,13 @@ def normalized_fields(row: dict[str, Any]) -> tuple[str, str]:
     return classification, mode
 
 
-def evaluate(golden: dict[str, Any], rows: dict[str, dict[str, Any]]) -> dict[str, Any]:
+def evaluate(
+    golden: dict[str, Any],
+    rows: dict[str, dict[str, Any]],
+    *,
+    min_cases: int = DEFAULT_MIN_CASES,
+    min_positives: int = DEFAULT_MIN_POSITIVES,
+) -> dict[str, Any]:
     cases_out: list[dict[str, Any]] = []
     failures: list[str] = []
     warnings: list[str] = []
@@ -116,19 +124,31 @@ def evaluate(golden: dict[str, Any], rows: dict[str, dict[str, Any]]) -> dict[st
         })
 
     recall = positive_retained / positive_total if positive_total else None
+    case_count = len(golden.get("cases", []))
+    corpus_failures = []
+    if case_count < max(1, int(min_cases)):
+        corpus_failures.append(f"insufficient_truth_cases:{case_count}<{int(min_cases)}")
+    if positive_total < max(1, int(min_positives)):
+        corpus_failures.append(f"insufficient_positive_recall_cases:{positive_total}<{int(min_positives)}")
+    all_failures = failures + corpus_failures
+    gate = "PASS" if not all_failures and recall == 1.0 else "BLOCK"
     return {
-        "schema": "QWEN_RECALL_GOLDEN_REPORT_V3",
+        "schema": "QWEN_RECALL_GOLDEN_REPORT_V4_CORPUS_GATE",
         "golden_schema": golden.get("schema"),
-        "case_count": len(golden.get("cases", [])),
+        "case_count": case_count,
         "cases_passed": sum(1 for c in cases_out if c["passed"]),
         "cases_failed": sum(1 for c in cases_out if not c["passed"]),
         "known_positive_recall": recall,
         "known_positive_retained": positive_retained,
         "known_positive_total": positive_total,
+        "minimum_truth_cases_required": int(min_cases),
+        "minimum_positive_recall_cases_required": int(min_positives),
+        "corpus_ready": not corpus_failures,
         "quality_warning_count": len(warnings),
         "quality_warnings": warnings,
-        "scale_out_gate": "PASS" if not failures and recall == 1.0 else "BLOCK",
-        "failures": failures,
+        "scale_out_gate": gate,
+        "failures": all_failures,
+        "policy": "A tiny perfect benchmark cannot unlock destructive or high-trust filtering. Scale-out PASS requires the configured substantial DCE/GPT-grounded corpus and zero known-positive recall misses.",
         "cases": cases_out,
     }
 
@@ -138,9 +158,11 @@ def main() -> None:
     ap.add_argument("--golden", required=True)
     ap.add_argument("--results", required=True)
     ap.add_argument("--report", required=True)
+    ap.add_argument("--min-cases", type=int, default=DEFAULT_MIN_CASES)
+    ap.add_argument("--min-positives", type=int, default=DEFAULT_MIN_POSITIVES)
     args = ap.parse_args()
     golden = json.loads(Path(args.golden).read_text(encoding="utf-8"))
-    report = evaluate(golden, load_jsonl(Path(args.results)))
+    report = evaluate(golden, load_jsonl(Path(args.results)), min_cases=args.min_cases, min_positives=args.min_positives)
     Path(args.report).write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(json.dumps(report, indent=2, ensure_ascii=False))
     if report["scale_out_gate"] != "PASS":
