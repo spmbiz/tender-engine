@@ -174,8 +174,8 @@ def main():
     ap.add_argument('--dispatch-state')
     ap.add_argument('--attempt-ledger', default='control/dce_attempt_ledger.jsonl')
     ap.add_argument('--limit', type=int, default=160)
-    ap.add_argument('--explore-share', type=float, default=.20)
-    ap.add_argument('--reject-audit-share', type=float, default=.05)
+    ap.add_argument('--explore-share', type=float, default=.30)
+    ap.add_argument('--reject-audit-share', type=float, default=.20)
     args = ap.parse_args()
 
     ledger = {cid(x): x for x in read_jsonl(Path(args.ledger)) if cid(x)}
@@ -233,15 +233,26 @@ def main():
         and bool(x[3].get('dce_eligible', True))
     ]
     primary = [x for x in eligible if str(x[3].get('classification') or '').upper() in {'STRONG_FIT', 'FIT'}]
-    exploratory = [
-        x for x in eligible
-        if str(x[3].get('classification') or '').upper() == 'MAYBE' or x[3].get('novelty_or_unusual_flag')
-    ]
-    rejects = [
+    review_worthy_rejects = [
         x for x in valid
         if str(x[3].get('classification') or '').upper() == 'REJECT_OBVIOUS'
-        or str(x[3].get('survival_decision') or '').upper() == 'DROP'
-        or not bool(x[3].get('dce_eligible', True))
+        and str(x[3].get('survival_decision') or 'KEEP').upper() == 'KEEP'
+        and bool(x[3].get('novelty_or_unusual_flag') or x[3].get('needs_gpt_review'))
+    ]
+    exploratory = [
+        x for x in eligible
+        if str(x[3].get('classification') or '').upper() == 'MAYBE'
+        or x[3].get('novelty_or_unusual_flag')
+        or x[3].get('needs_gpt_review')
+    ] + review_worthy_rejects
+    review_worthy_ids = {x[2] for x in review_worthy_rejects}
+    rejects = [
+        x for x in valid
+        if x[2] not in review_worthy_ids and (
+            str(x[3].get('classification') or '').upper() == 'REJECT_OBVIOUS'
+            or str(x[3].get('survival_decision') or '').upper() == 'DROP'
+            or not bool(x[3].get('dce_eligible', True))
+        )
     ]
 
     rn = max(0, min(args.limit, round(args.limit * max(0, min(.25, args.reject_audit_share)))))
@@ -289,6 +300,7 @@ def main():
                 'lean_attractiveness': s.get('lean_attractiveness'),
                 'delivery_mode': s.get('delivery_mode'),
                 'friction_flags': s.get('friction_flags') or [],
+                'novelty_or_unusual_flag': s.get('novelty_or_unusual_flag'),
                 'needs_gpt_review': s.get('needs_gpt_review'),
             },
         })
@@ -298,7 +310,7 @@ def main():
     op.write_text(''.join(json.dumps(x, ensure_ascii=False, separators=(',', ':')) + '\n' for x in rows), encoding='utf-8')
 
     summary = {
-        'schema': 'QWEN_LIVE_DCE_SELECTION_SUMMARY_V4',
+        'schema': 'QWEN_LIVE_DCE_SELECTION_SUMMARY_V5_RECALL_GUARD',
         'generated_at_utc': now.replace(microsecond=0).isoformat(),
         'source_run': str(args.source_run),
         'state_rows': len(state_rows),
@@ -308,6 +320,7 @@ def main():
         'durable_attempted_exact_versions_ignored': attempted,
         'valid_exact_hash_current_unattempted': len(valid),
         'eligible_keep_for_dce': len(eligible),
+        'review_worthy_rejects_promoted_to_explore': len(review_worthy_rejects),
         'stale_hash_ignored': stale,
         'missing_snapshot': missing,
         'expired_ignored': expired,
@@ -319,13 +332,15 @@ def main():
         'policy': {
             'keep_is_not_fit': True,
             'drop_is_retained_in_state_but_not_primary_dce': True,
-            'dce_eligible_required_for_primary_and_explore': True,
+            'dce_eligible_required_for_primary': True,
+            'review_worthy_reject_can_bypass_dce_eligible_for_audit': True,
             'reject_audit_preserved': True,
             'exact_material_hash_required': True,
             'durable_dce_attempts_excluded_before_ranking': True,
             'deadline_unverified_caps_strong_priority': True,
             'freshness_preempts_backfill_within_dce_lanes': True,
             'freshness_is_not_eligibility_truth': True,
+            'qwen_benchmark_blocked_recall_defaults': {'explore_share': args.explore_share, 'reject_audit_share': args.reject_audit_share},
         },
     }
     Path(args.summary).write_text(json.dumps(summary, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
