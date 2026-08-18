@@ -1,30 +1,29 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import re
-import time
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urljoin
 
-import requests
 from bs4 import BeautifulSoup
+from playwright.async_api import async_playwright
 
 OUT = Path(os.getenv("DISCOVERY_OUT", "discovery/global/UNGM_PUBLIC"))
 OUT.mkdir(parents=True, exist_ok=True)
 BASE = "https://www.ungm.org"
 LIST_URL = BASE + "/Public/Notice"
-SEARCH_URL = BASE + "/Public/Notice/Search"
+SEARCH_PATH = "/Public/Notice/Search"
 NOW = datetime.now(timezone.utc)
 PAGE_SIZE = 15
 MAX_PAGES = max(1, int(os.getenv("UNGM_MAX_PAGES", "2000")))
-REQUEST_RETRIES = max(1, int(os.getenv("UNGM_REQUEST_RETRIES", "5")))
-PAGE_DELAY_SECONDS = max(0.0, float(os.getenv("UNGM_PAGE_DELAY_SECONDS", "0.08")))
+WAIT_MS = max(200, int(os.getenv("UNGM_PAGE_WAIT_MS", "350")))
 NOTICE_RE = re.compile(r"/Public/Notice/(\d+)(?:\b|/|\?)", re.I)
 DATE_RE = re.compile(r"\b(\d{1,2}-[A-Za-z]{3}-20\d{2}|\d{1,2}/\d{1,2}/20\d{2}|20\d{2}-\d{2}-\d{2})\b")
-TOTAL_RE = re.compile(r"(?:Displaying\s+results\s+\d+\s+to\s+\d+\s+of|noticeSearchTotal[^\d]{0,30})([\d,]+)", re.I)
-UA = "Tender-Engine/6.8 (+public procurement research; UNGM public notice search)"
+TOTAL_RE = re.compile(r"Displaying\s+results\s+\d+\s+to\s+\d+\s+of\s+([\d,]+)", re.I)
+UA = "Tender-Engine/6.9 (+public procurement research; UNGM public browser-session search)"
 
 
 def clean(value):
@@ -38,9 +37,9 @@ def parse_date(value):
             return datetime.strptime(text, fmt).replace(tzinfo=timezone.utc)
         except Exception:
             pass
-    m = DATE_RE.search(text)
-    if m and m.group(1) != text:
-        return parse_date(m.group(1))
+    match = DATE_RE.search(text)
+    if match and match.group(1) != text:
+        return parse_date(match.group(1))
     return None
 
 
@@ -50,10 +49,10 @@ def write_jsonl(path: Path, rows):
             fh.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
-def payload(page_index: int) -> dict:
-    # This is the same public JSON contract used by the UNGM Procurement
-    # Opportunities grid. DeadlineFrom=today reproduces the site's active/open
-    # semantics without requiring a login or the authenticated Notice API.
+def search_payload(page_index: int) -> dict:
+    # This mirrors the public Procurement Opportunities grid contract. The
+    # browser page itself performs this same-origin POST. DeadlineFrom=today
+    # makes the live/open scope explicit instead of relying on UI defaults.
     return {
         "PageIndex": page_index,
         "PageSize": PAGE_SIZE,
@@ -79,92 +78,97 @@ def payload(page_index: int) -> dict:
     }
 
 
-def post_page(session: requests.Session, page_index: int) -> requests.Response:
-    last = None
-    for attempt in range(REQUEST_RETRIES):
-        try:
-            r = session.post(SEARCH_URL, json=payload(page_index), timeout=60)
-            last = r
-            if r.status_code in {408, 425, 429} or r.status_code >= 500:
-                if attempt + 1 < REQUEST_RETRIES:
-                    time.sleep(min(16, 2 ** attempt))
-                    continue
-            r.raise_for_status()
-            return r
-        except Exception:
-            if attempt + 1 >= REQUEST_RETRIES:
-                raise
-            time.sleep(min(16, 2 ** attempt))
-    if last is not None:
-        last.raise_for_status()
-    raise RuntimeError(f"UNGM public search page {page_index} failed")
+def unwrap_fragment(raw: str) -> str:
+    text = raw or ""
+    stripped = text.strip()
+    if not stripped:
+        return ""
+    try:
+        obj = json.loads(stripped)
+    except Exception:
+        return text
+    if isinstance(obj, str):
+        return obj
+    if isinstance(obj, dict):
+        for key in ("html", "Html", "result", "Result", "content", "Content", "data", "Data"):
+            value = obj.get(key)
+            if isinstance(value, str):
+                return value
+    return text
 
 
-def extract_total(html: str) -> int | None:
-    text = clean(BeautifulSoup(html, "html.parser").get_text(" ", strip=True))
-    m = TOTAL_RE.search(text)
-    if m:
-        try:
-            return int(m.group(1).replace(",", ""))
-        except Exception:
-            return None
-    # Some renders keep the count in a dedicated element without the label text.
-    soup = BeautifulSoup(html, "html.parser")
-    node = soup.find(id=re.compile(r"noticeSearchTotal", re.I))
-    if node:
-        m = re.search(r"[\d,]+", clean(node.get_text(" ", strip=True)))
-        if m:
-            try:
-                return int(m.group(0).replace(",", ""))
-            except Exception:
-                pass
-    return None
+def extract_total(text: str) -> int | None:
+    plain = clean(BeautifulSoup(text or "", "html.parser").get_text(" ", strip=True))
+    match = TOTAL_RE.search(plain)
+    if not match:
+        return None
+    try:
+        return int(match.group(1).replace(",", ""))
+    except Exception:
+        return None
 
 
-def parse_rows(html: str, page_index: int) -> list[dict]:
-    soup = BeautifulSoup(html, "html.parser")
+def parse_rows(fragment: str, page_index: int) -> list[dict]:
+    soup = BeautifulSoup(fragment, "html.parser")
     nodes = soup.select(".tableRow")
+    if not nodes:
+        # Defensive fallback for minor class-name changes: any row containing an
+        # official notice link is eligible for parsing.
+        nodes = [a.find_parent(["tr", "div"]) for a in soup.select("a[href*='/Public/Notice/']")]
+        nodes = [n for n in nodes if n is not None]
+
     rows = []
     seen = set()
     for node in nodes:
-        notice_id = clean(node.get("data-noticeid"))
+        notice_id = clean(node.get("data-noticeid")) if hasattr(node, "get") else ""
         href = ""
         title = ""
-        for a in node.select("a[href]"):
-            candidate_href = clean(a.get("href"))
-            m = NOTICE_RE.search(candidate_href)
-            if m:
-                notice_id = notice_id or m.group(1)
-                href = candidate_href
-                title = clean(a.get_text(" ", strip=True)) or title
-                break
+        for anchor in node.select("a[href]"):
+            candidate_href = clean(anchor.get("href"))
+            match = NOTICE_RE.search(candidate_href)
+            if not match:
+                continue
+            notice_id = notice_id or match.group(1)
+            href = candidate_href
+            title = clean(anchor.get_text(" ", strip=True)) or title
+            break
         if not notice_id or notice_id in seen:
             continue
         seen.add(notice_id)
-        cells = [clean(x.get_text(" ", strip=True)) for x in node.select(".tableCell")]
+
+        cells = [clean(cell.get_text(" ", strip=True)) for cell in node.select(".tableCell, td")]
         row_text = clean(node.get_text(" ", strip=True))
-
-        # Current UNGM grid order is: utility/title, deadline, published,
-        # organization, opportunity type, reference, beneficiary country.
-        # Keep row-text fallbacks so a cosmetic extra column does not drop data.
-        if not title:
-            title = cells[1] if len(cells) > 1 else row_text[:700]
-        deadline = parse_date(cells[2]) if len(cells) > 2 else None
-        published = parse_date(cells[3]) if len(cells) > 3 else None
-        buyer = cells[4] if len(cells) > 4 else None
-        opportunity_type = cells[5] if len(cells) > 5 else None
-        reference = cells[6] if len(cells) > 6 else None
-        country = cells[7] if len(cells) > 7 else None
-
+        # Current UNGM grid order observed on the public page is title/utility,
+        # deadline, published, organization, opportunity type, reference,
+        # beneficiary country. Fall back to row dates if a cosmetic column is
+        # inserted.
+        deadline = None
+        published = None
+        buyer = None
+        opportunity_type = None
+        reference = None
+        country = None
+        if cells:
+            for cell in cells:
+                d = parse_date(cell)
+                if d and deadline is None:
+                    deadline = d
+                elif d and published is None:
+                    published = d
+            non_dates = [c for c in cells if c and parse_date(c) is None]
+            # Prefer explicit text later, so these are intentionally conservative.
+            if len(non_dates) >= 4:
+                buyer = non_dates[-4]
+                opportunity_type = non_dates[-3]
+                reference = non_dates[-2]
+                country = non_dates[-1]
         if deadline is None:
             dates = [parse_date(m.group(1)) for m in DATE_RE.finditer(row_text)]
             dates = [d for d in dates if d]
             if dates:
-                # Public search is constrained by DeadlineFrom=today. The first
-                # date in result rows is the deadline in the current UNGM grid.
                 deadline = dates[0]
-                if len(dates) > 1 and published is None:
-                    published = dates[1]
+                published = published or (dates[1] if len(dates) > 1 else None)
+
         if deadline and deadline < NOW.replace(hour=0, minute=0, second=0, microsecond=0):
             continue
 
@@ -191,16 +195,16 @@ def parse_rows(html: str, page_index: int) -> list[dict]:
     return rows
 
 
-def persist(records, *, pages_fetched, total_reported, exhausted, errors, telemetry):
-    rows = sorted(records.values(), key=lambda r: (r.get("deadline") or "9999", r["candidate_id"]))
+def persist(records, *, pages_fetched: int, total_reported: int | None, exhausted: bool, errors: list, telemetry: dict):
+    rows = sorted(records.values(), key=lambda row: (row.get("deadline") or "9999", row["candidate_id"]))
     write_jsonl(OUT / "raw.jsonl", rows)
     write_jsonl(OUT / "current.jsonl", rows)
-    count_ok = total_reported is None or len(rows) >= total_reported
-    complete = bool(exhausted and not errors and rows and count_ok)
+    count_proof = total_reported is None or len(rows) >= total_reported
+    complete = bool(exhausted and not errors and rows and count_proof)
     stats = {
         "source": "UNGM_PUBLIC",
         "portal": "UNGM",
-        "listing_contract": "UNGM_PUBLIC_SEARCH_POST_V3",
+        "listing_contract": "UNGM_PUBLIC_BROWSER_SESSION_SEARCH_V4",
         "raw_materialized": len(rows),
         "current_materialized": len(rows),
         "pages_fetched": pages_fetched,
@@ -215,63 +219,106 @@ def persist(records, *, pages_fetched, total_reported, exhausted, errors, teleme
         "telemetry": telemetry,
         "generated_at": NOW.isoformat(),
         "source_url": LIST_URL,
-        "search_url": SEARCH_URL,
-        "semantics": "Uses UNGM's public Procurement Opportunities POST search contract with DeadlineFrom=today and PageIndex/PageSize. Traversal is complete only after the first empty result page; an observed total, when exposed, must also be satisfied.",
+        "search_path": SEARCH_PATH,
+        "semantics": "UNGM public landing is opened in a real browser session, then the page performs same-origin public POST searches with PageIndex/PageSize and DeadlineFrom=today. This avoids treating browser-bot session requirements as an API failure. Traversal is complete only after the first empty search page; any exposed total must also be satisfied.",
     }
     (OUT / "stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
     return stats
 
 
-def main():
-    session = requests.Session()
-    session.headers.update({
-        "User-Agent": UA,
-        "Accept": "text/html, */*; q=0.01",
-        "Content-Type": "application/json; charset=UTF-8",
-        "X-Requested-With": "XMLHttpRequest",
-        "Referer": LIST_URL,
-    })
-    # Establish public session/cookies before using the grid endpoint.
-    errors = []
-    telemetry = {"list_url": LIST_URL, "search_url": SEARCH_URL, "deadline_from": payload(0)["DeadlineFrom"], "pages": []}
-    try:
-        landing = session.get(LIST_URL, timeout=60)
-        telemetry["landing_status"] = landing.status_code
-        landing.raise_for_status()
-    except Exception as exc:
-        errors.append({"type": "LANDING_REQUEST_FAILED", "error": repr(exc)})
+async def browser_search(page, page_index: int) -> tuple[int, str, str]:
+    result = await page.evaluate(
+        """async ({path, payload}) => {
+          const response = await fetch(path, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Accept': 'text/html, */*; q=0.01',
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(payload)
+          });
+          return {
+            status: response.status,
+            contentType: response.headers.get('content-type') || '',
+            text: await response.text()
+          };
+        }""",
+        {"path": SEARCH_PATH, "payload": search_payload(page_index)},
+    )
+    return int(result.get("status") or 0), str(result.get("contentType") or ""), str(result.get("text") or "")
 
+
+async def main():
     records = {}
+    errors = []
     pages_fetched = 0
     exhausted = False
     total_reported = None
-    if not errors:
-        for page_index in range(MAX_PAGES):
+    telemetry = {
+        "list_url": LIST_URL,
+        "search_path": SEARCH_PATH,
+        "deadline_from": search_payload(0)["DeadlineFrom"],
+        "pages": [],
+    }
+
+    try:
+        async with async_playwright() as pw:
+            chrome = os.getenv("CHROME_BIN") or None
+            browser = await pw.chromium.launch(headless=True, executable_path=chrome)
+            page = await browser.new_page(viewport={"width": 1440, "height": 1000}, user_agent=UA)
+            response = await page.goto(LIST_URL, wait_until="domcontentloaded", timeout=90000)
+            telemetry["landing_status"] = response.status if response else None
+            if response and response.status >= 400:
+                errors.append({"type": "LANDING_HTTP_ERROR", "status": response.status})
+            await page.wait_for_timeout(WAIT_MS)
             try:
-                r = post_page(session, page_index)
-            except Exception as exc:
-                errors.append({"type": "PUBLIC_SEARCH_REQUEST_FAILED", "page_index": page_index, "error": repr(exc)})
-                break
-            pages_fetched += 1
-            if total_reported is None:
-                total_reported = extract_total(r.text)
-            page_rows = parse_rows(r.text, page_index)
-            telemetry["pages"].append({"page_index": page_index, "rows": len(page_rows), "bytes": len(r.content), "status": r.status_code})
-            if not page_rows:
-                exhausted = True
-                telemetry["exhaustion_proof"] = "FIRST_EMPTY_PUBLIC_SEARCH_PAGE"
-                break
-            before = len(records)
-            for row in page_rows:
-                records[row["candidate_id"]] = row
-            if len(records) == before:
-                errors.append({"type": "REPEATED_RESULT_SET", "page_index": page_index, "materialized": len(records)})
-                break
-            persist(records, pages_fetched=pages_fetched, total_reported=total_reported, exhausted=False, errors=errors, telemetry=telemetry)
-            if PAGE_DELAY_SECONDS:
-                time.sleep(PAGE_DELAY_SECONDS)
-        else:
-            errors.append({"type": "HARD_PAGE_CAP_REACHED", "max_pages": MAX_PAGES})
+                landing_text = clean(await page.locator("body").inner_text())
+                total_reported = extract_total(landing_text)
+            except Exception:
+                landing_text = ""
+
+            if not errors:
+                for page_index in range(MAX_PAGES):
+                    try:
+                        status, content_type, raw = await browser_search(page, page_index)
+                    except Exception as exc:
+                        errors.append({"type": "PUBLIC_SEARCH_BROWSER_FETCH_FAILED", "page_index": page_index, "error": repr(exc)})
+                        break
+                    pages_fetched += 1
+                    fragment = unwrap_fragment(raw)
+                    if total_reported is None:
+                        total_reported = extract_total(fragment)
+                    page_rows = parse_rows(fragment, page_index)
+                    telemetry["pages"].append({
+                        "page_index": page_index,
+                        "rows": len(page_rows),
+                        "status": status,
+                        "content_type": content_type,
+                        "bytes": len(raw.encode("utf-8", errors="ignore")),
+                    })
+                    if status >= 400:
+                        errors.append({"type": "PUBLIC_SEARCH_HTTP_ERROR", "page_index": page_index, "status": status})
+                        break
+                    if not page_rows:
+                        exhausted = True
+                        telemetry["exhaustion_proof"] = "FIRST_EMPTY_SAME_ORIGIN_SEARCH_PAGE"
+                        break
+                    before = len(records)
+                    for row in page_rows:
+                        records[row["candidate_id"]] = row
+                    if len(records) == before:
+                        errors.append({"type": "REPEATED_RESULT_SET", "page_index": page_index, "materialized": len(records)})
+                        break
+                    persist(records, pages_fetched=pages_fetched, total_reported=total_reported, exhausted=False, errors=errors, telemetry=telemetry)
+                    if WAIT_MS:
+                        await page.wait_for_timeout(WAIT_MS)
+                else:
+                    errors.append({"type": "HARD_PAGE_CAP_REACHED", "max_pages": MAX_PAGES})
+            await browser.close()
+    except Exception as exc:
+        errors.append({"type": "UNGM_BROWSER_SESSION_ERROR", "error": repr(exc)})
 
     stats = persist(records, pages_fetched=pages_fetched, total_reported=total_reported, exhausted=exhausted, errors=errors, telemetry=telemetry)
     print(json.dumps(stats, ensure_ascii=False, indent=2))
@@ -280,4 +327,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
