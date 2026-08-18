@@ -1,53 +1,83 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32089273287,
-  "total_inbox_rows": 159,
-  "dce_authenticity_rows": 136,
+  "latest_source_dce_run_id": 32093332367,
+  "total_inbox_rows": 160,
+  "dce_authenticity_rows": 137,
   "portal_counts": {
-    "GR_KHMDHS": 55,
-    "ES_PLACSP": 36,
-    "ZA_ETENDERS": 34,
-    "GENERIC_PUBLIC_PAGE": 11
+    "ES_PLACSP": 48,
+    "ZA_ETENDERS": 27,
+    "IRELAND_ETENDERS": 21,
+    "GR_KHMDHS": 20,
+    "EE_RHR": 9,
+    "SCOTLAND_PCS": 6,
+    "GENERIC_PUBLIC_PAGE": 6
   },
   "status_counts": {
-    "UNKNOWN_RETRIEVED_DOCUMENT": 128,
-    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 8
+    "UNKNOWN_RETRIEVED_DOCUMENT": 132,
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 5
   },
   "reason_counts": {
-    "NON_AUTHORITATIVE": 136
+    "NON_AUTHORITATIVE": 134,
+    "AUTH_REQUIRED": 3
   },
   "method_counts": {},
   "recovery_opportunities": [
     {
-      "portal": "GR_KHMDHS",
-      "blocked": 55,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 55
-      }
-    },
-    {
       "portal": "ES_PLACSP",
-      "blocked": 36,
+      "blocked": 48,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 36
+        "NON_AUTHORITATIVE": 48
       }
     },
     {
       "portal": "ZA_ETENDERS",
-      "blocked": 34,
+      "blocked": 27,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 34
+        "NON_AUTHORITATIVE": 26,
+        "AUTH_REQUIRED": 1
+      }
+    },
+    {
+      "portal": "IRELAND_ETENDERS",
+      "blocked": 21,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 19,
+        "AUTH_REQUIRED": 2
+      }
+    },
+    {
+      "portal": "GR_KHMDHS",
+      "blocked": 20,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 20
+      }
+    },
+    {
+      "portal": "EE_RHR",
+      "blocked": 9,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 9
       }
     },
     {
       "portal": "GENERIC_PUBLIC_PAGE",
-      "blocked": 11,
+      "blocked": 6,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 11
+        "NON_AUTHORITATIVE": 6
+      }
+    },
+    {
+      "portal": "SCOTLAND_PCS",
+      "blocked": 6,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 6
       }
     }
   ],
@@ -62,36 +92,62 @@
         "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-164943"
       },
       {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164854-2026-08-07",
-        "portal": "ZA_ETENDERS",
-        "title": "PROJ-ICT-136",
-        "buyer": "Eastern Cape - East London Industrial Development Zone Corporation",
+        "candidate_id": "IE:8771483",
+        "portal": "IRELAND_ETENDERS",
+        "title": "2026/07 - The provision of Psychotherapy and Counselling Services and Clinical Psychologists to LMETB schools and centres",
+        "buyer": "Louth and Meath Education and Training Board 1384",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-164854"
+        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8771483"
       },
       {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165832-2026-08-17",
-        "portal": "ZA_ETENDERS",
-        "title": "RFB 3264/ 2026",
-        "buyer": "State Information Technology Agency",
+        "candidate_id": "UK_PCS_OCDS:rls-22-JUL560622",
+        "portal": "SCOTLAND_PCS",
+        "title": "Oakley Core and Cluster 1",
+        "buyer": "Fife Council",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165832"
+        "notice_url": "https://api.publiccontractsscotland.gov.uk/v1/Notice?id=ocds-r6ebe6-0000823640"
       },
       {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165653-2026-08-14",
-        "portal": "GENERIC_PUBLIC_PAGE",
-        "title": "180/2026",
-        "buyer": "Kouga Municipality",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165653"
+        "candidate_id": "IE:8838515",
+        "portal": "IRELAND_ETENDERS",
+        "title": "P20861 OEJU Tender for a short term hotel operator at existing Dublin airport Maldron hotel",
+        "buyer": "daa plc",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8838515"
       },
       {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165805-2026-08-17",
-        "portal": "ZA_ETENDERS",
-        "title": "RFQ2026/072/6175/NYDA",
-        "buyer": "National Youth Development Agency",
+        "candidate_id": "IE:8737998",
+        "portal": "IRELAND_ETENDERS",
+        "title": "A secure, EU-hosted, cloud-based Aviation Regulation Content - Document Management System (ARC-DMS). The ARC-DMS shall support controlled aviation document lifecycle management, regulatory requirement",
+        "buyer": "The Irish Air Navigation Service",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165805"
+        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8737998"
+      }
+    ],
+    "AUTH_REQUIRED": [
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164931-2026-08-07",
+        "portal": "ZA_ETENDERS",
+        "title": "TE/2026/06/2200/6894-RFP",
+        "buyer": "Transnet SOC Ltd",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-164931"
+      },
+      {
+        "candidate_id": "IE:8645131",
+        "portal": "IRELAND_ETENDERS",
+        "title": "Design, Construction and Delivery of Cherry Orchard (Affordable for Sale) Housing Development (Pro405)",
+        "buyer": "The Land Development Agency",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8645131"
+      },
+      {
+        "candidate_id": "IE:8784211",
+        "portal": "IRELAND_ETENDERS",
+        "title": "Construction of MUGA for Coolaney/Mullinabreena GAA Club at Achonry",
+        "buyer": "Coolaney/Mullinabreena GAA club",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8784211"
       }
     ]
   },
