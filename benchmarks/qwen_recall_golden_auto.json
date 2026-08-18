@@ -1,0 +1,1419 @@
+{
+  "schema": "QWEN_RECALL_CALIBRATION_CORPUS_V1",
+  "generated_at": "2026-08-18T22:30:05+00:00",
+  "case_count": 30,
+  "positive_recall_cases": 29,
+  "frozen_input_cases": 30,
+  "missing_input_candidate_ids": [
+    "DE-DOE:224c8e0b-518e-4e73-9d21-9eda8db13c19:01",
+    "IE:8623183",
+    "IE:8670172",
+    "PL-BZP:08def84e-fb8f-254e-962b-1200016e42b5",
+    "US-SAM:d5c30c0b355d4a81ab4e4e2a16acbfc2"
+  ],
+  "targets": {
+    "minimum_cases": 500,
+    "minimum_positive_recall_cases": 100
+  },
+  "ready_for_destructive_filter_calibration": false,
+  "policy": "Only DCE/GPT adjudicated YELLOW/GREEN or explicit manual controls become semantic truth. RED DCE verdicts are not auto-labelled as notice-level rejects because bidder/gate failures may be invisible at notice stage. Frozen notice inputs preserve historical calibration after expiry.",
+  "cases": [
+    {
+      "candidate_id": "IE:8853905",
+      "label": "DCE/GPT positive (YELLOW): IE:8853905",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 58,
+        "why": "High-value immersive-learning scope, but DCE is PQQ/reference driven and requires major insurance levels including EUR 13m employer, EUR 6.5m public/product and EUR 3m professional indemnity. Partner-heavy.",
+        "action": "PARTNER_WITH_EXISTING_IMMERSIVE_LEARNING_PLATFORM_VENDOR",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "IE:8853905",
+        "material_fields_hash": "abb0fdb263e4dd9680ccb0bbcb35ed9608174b3022f97702788c58429ed16853",
+        "notice": {
+          "candidate_id": "IE:8853905",
+          "source_family": "IE",
+          "source": "IRELAND_ETENDERS",
+          "country": null,
+          "buyer": "Atlantic Technological University",
+          "title": "369-26 Single Party Framework Agreement for Veterinary Clinical Skills, Simulation and Immersive Learning Platform for Atlantic Technological University",
+          "description": "51 369-26 Single Party Framework Agreement for Veterinary Clinical Skills, Simulation and Immersive Learning Platform for Atlantic Technological University 8853905 Atlantic Technological University 18/08/2026 03:02:50 17/09/2026 12:00:00 Competitive with negotiation Tender Submission 1",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": "EUR",
+          "publication_date": null,
+          "deadline": "2026-09-17T12:00:00+01:00",
+          "deadline_utc": "2026-09-17T11:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": null,
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8853905"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "IE:8860090",
+      "label": "DCE/GPT positive (YELLOW): IE:8860090",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 79,
+        "why": "National eTenders lane of the same EUR 350k Accessibility Audit Platform. Authoritative DCE deadline is 18 September 2026 at noon. Same unresolved mandatory selection gates as the TED lane.",
+        "action": "DEEP_VERIFY_FINANCIAL_REFERENCE_AND_INSURANCE_THRESHOLDS_THEN_BID",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "IE:8860090",
+        "material_fields_hash": "469ec48d0f0ed1f2d05e349d613695cf20231da3da62c36cadc0156863f1792b",
+        "notice": {
+          "candidate_id": "IE:8860090",
+          "source_family": "IE",
+          "source": "IRELAND_ETENDERS",
+          "country": null,
+          "buyer": "Department of Housing Local Government and Heritage",
+          "title": "Website and App Accessibility Audit Solution",
+          "description": "34 Website and App Accessibility Audit Solution 8860090 Department of Housing Local Government and Heritage 18/08/2026 03:13:21 18/09/2026 12:00:00 Open Tender Submission 350,000.00 1",
+          "cpv_or_category": null,
+          "estimated_value": 350000.0,
+          "currency": "EUR",
+          "publication_date": null,
+          "deadline": "2026-09-18T12:00:00+01:00",
+          "deadline_utc": "2026-09-18T11:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": null,
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8860090"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:556867-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:556867-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 72,
+        "why": "Substantive modernization of multiple environmental systems with REST APIs, data publication, security/accessibility standards and buyer-provided VMware infrastructure. Strong software lane; local technical/reference partner prudent.",
+        "action": "FIND_POLISH_SOFTWARE_PARTNER_AND_VERIFY_REFERENCE_THRESHOLDS",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:556867-2026",
+        "material_fields_hash": "8a08f1887cdeb76759028cc7798867ee50cd00584ad439f696182a1bc9602f38",
+        "notice": {
+          "candidate_id": "TED:556867-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "Generalna Dyrekcja Ochrony Środowiska",
+          "title": "Poland – Facilities management services for computer systems development – Modernizacja systemów związanych z realizacją zadań z zakresu ochrony środowiska wraz z implementacją API i udostępnieniem danych.",
+          "description": "Przedmiotem zamówienia jest: 1) modernizacja systemów związanych z realizacją zadań z zakresu ochrony przyrody i środowiska; 2) implementacja i udostępnienie interfejsów API dla Systemów Generalnej Dyrekcji Ochrony Środowiska wraz z integracją z portalem \"dane.gov.pl\", w celu publikacji danych; 3) przeprowadzenie szkoleń dla wskazanych pracowników Zamawiającego oraz wykonania dokumentacji powykonawczej. Opis przedmiotu zamówienia wraz z Projektowanymi postanowienia umowy w sprawie zamówienia publicznego, które zostaną wprowadzone do umowy o zamówienie publiczne stanowią załącznik nr 1 oraz 2 do Specyfikacja Warunków Zamówienia.",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-11+02:00",
+          "deadline": "2026-09-15T02:00:00+00:00",
+          "deadline_utc": "2026-09-15T02:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/556867-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:560598-2026",
+      "label": "Physical microscopes: retain for broker/resell but not strong direct-digital",
+      "truth_kind": "MANUAL_POLICY_CONTROL",
+      "expected": {
+        "max_rank": "FIT",
+        "allowed_modes": [
+          "BROKER_RESELL",
+          "SUBCONTRACTABLE",
+          "MIXED",
+          "UNCLEAR"
+        ],
+        "must_not_reject": true
+      },
+      "adjudication": null,
+      "input_envelope": {
+        "canonical_notice_id": "TED:560598-2026",
+        "material_fields_hash": "803015a286366febf97f0dcc88429d487d405e5b2d6c956b95600e236f47bb50",
+        "notice": {
+          "candidate_id": "TED:560598-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "ASL BA",
+          "title": "Italy – Microscopes – Procedura aperta microscopia",
+          "description": "Procedura aperta telematica, ai sensi degli artt. 25 e 71 del D. Lgs. n. 36/2023 e ss.mm.ii., per l’affidamento della fornitura in regime di acquisto, comprensiva di installazione a perfetta regola d’arte, messa in esercizio, collaudo e servizio di manutenzione e assistenza tecnica full risk, di strumenti di microscopia chirurgica , da collocare presso vari presidi dell’ASL Bari",
+          "cpv_or_category": null,
+          "estimated_value": 2061680.0,
+          "currency": "EUR",
+          "publication_date": "2026-08-13+02:00",
+          "deadline": "2026-09-14T12:00:00+02:00",
+          "deadline_utc": "2026-09-14T10:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/560598-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:564078-2026",
+      "label": "Heavy HVAC onsite: partnerable, not direct-digital strong",
+      "truth_kind": "MANUAL_POLICY_CONTROL",
+      "expected": {
+        "max_rank": "FIT",
+        "allowed_modes": [
+          "SUBCONTRACTABLE",
+          "MIXED",
+          "UNCLEAR"
+        ],
+        "must_not_reject": true
+      },
+      "adjudication": null,
+      "input_envelope": {
+        "canonical_notice_id": "TED:564078-2026",
+        "material_fields_hash": "7c304116e2ab2468d2b416732fbd4de2d1a52fb3d5edd03db2ff984870d050a3",
+        "notice": {
+          "candidate_id": "TED:564078-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "LA-Regio Kliniken gKU AdöR des Landkreises und der Stadt Landshut Standort Klinik Landshut-Mitte",
+          "title": "Germany – Heating, ventilation and air-conditioning installation work – Heizungsanlagen",
+          "description": "Die Leistung umfasst die vollständige, betriebsbereite Errichtung der Heizungsanlage im Bettenhaus E2 (BA2) einschließlich Rohrleitungsnetz in Edelstahl-Pressrohr- und Stahlrohrausführung, Armaturen, Wärmedämmung, Brandschutzmaßnahmen, Heizkörperanlagen sowie aller erforderlichen Befestigungs-, Anschluss-, Prüf- und Nebenleistungen. Ebenfalls Bestandteil sind die Lieferung, Montage, Einbringung und Inbetriebnahme sämtlicher Anlagenteile einschließlich der erforderlichen Koordination mit den übrigen Gewerken.",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-14+02:00",
+          "deadline": "2026-09-24T02:00:00+00:00",
+          "deadline_utc": "2026-09-24T02:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/564078-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:569364-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:569364-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 70,
+        "why": "EUR 200k ERP implementation/support. DCE explicitly encourages SMEs to form relationships with other SMEs/larger enterprises and requires migration, testing, cutover, API, training and knowledge-transfer deliverables. Strong partnerable opportunity with a Unit4 implementer.",
+        "action": "CONTACT_UNIT4_IMPLEMENTATION_PARTNER_NOW",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:569364-2026",
+        "material_fields_hash": "ac5af78f140fd76b1f329911d1a9c094e322e69387284361a181e693486c31c0",
+        "notice": {
+          "candidate_id": "TED:569364-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "Merchants Quay Ireland CLG",
+          "title": "Ireland – Computer support and consultancy services – Merchant Quay Ireland- Request for Tenders for The Provision of Unit4 ERP Implementation, Hypercare And Application Support Services.",
+          "description": "MQI intends to appoint a single Tenderer to deliver: – implementation of the Unit4 ERP finance solution; – associated implementation services; – post go-live hypercare; and – ongoing application management, advisory and configuration support services following implementation. Tenderers should note that core Unit4 SaaS platform support, incident management and product support will continue to be provided by Unit4 under the relevant Unit4 support arrangements.",
+          "cpv_or_category": null,
+          "estimated_value": 200000.0,
+          "currency": "EUR",
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-08-21T12:00:00+01:00",
+          "deadline_utc": "2026-08-21T11:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/569364-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:569366-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:569366-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 45,
+        "why": "Large licensing opportunity but entirely dependent on Oracle channel eligibility and economics. Keep as a commercial partner play rather than a software-delivery GREEN.",
+        "action": "ORACLE_CHANNEL_AND_MARGIN_CHECK",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818-part2.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:569366-2026",
+        "material_fields_hash": "ca2e7fc33947a804689dd5ad339132474aacdec9890eb0cb7fbab605199a3159",
+        "notice": {
+          "candidate_id": "TED:569366-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "Service public de wallonie",
+          "title": "Belgium – Database software package – 2026M025_Oracle - Marché public (accord-cadre) de fournitures relatif à la gestion de logiciels, licences, matériels et services de consultance liés aux bases de données Oracle des services publics wallons",
+          "description": "Marché public (accord-cadre) de fournitures relatif à la gestion de logiciels, licences, matériels et services de consultance liés aux bases de données Oracle des services publics wallons. a. Généralités Le présent marché est un accord-cadre au sens de l’article 2, 35° de la loi relative aux marchés publics (ci-après « la loi ») et est un marché mixte, à considérer comme un marché de fournitures au sens de l’article 2, 19° de la loi (voy. pour plus de précisions, le point c ci-dessous), dont l’objet vise à la gestion de logiciels, licences, matériels et services de consultance liés aux bases de données Oracle du Service public de Wallonie. Le présent accord-cadre est mono-attributaire. Dans le cadre du présent marché, le pouvoir adjudicateur agit en tant que centrale d’achat au sens de l’article 2, 6°, a), de la loi. Ces services relèvent du code CPV : 48611000-4 – Logiciels de bases de données. b. Postes du marché Les fournitures et services sont répartis en 4 postes, décrits plus précisément dans la Partie 2 ci-dessous « Clauses techniques » : - Poste 1 : Acquisition et maintenance de licences et souscriptions pour les bases de données Oracle -- Poste 1.1 : acquisition de licences et souscriptions -- Poste 1.2 : maintenance de licences et souscriptions - Poste 2 : Acquisition, location et maintenance de matériel Oracle -- Poste 2.1 : Acquisition et location de matériel Oracle -- Poste 2.2 : maintenance de matériel Oracle - Poste 3 : Consultance pour les produits et services Oracle - Poste 4 : Accès aux formations pour les produits et services Oracle. c. Qualification de la nature de l’accord-cadre Le présent marché revêt un caractère mixte au sens de l'article 20, alinéa 2, de la loi et doit être qualifié de marché de fournitures au sens de l’article 2, 19° de la loi. En effet, l’accord-cadre porte sur plusieurs catégories d’acquisitions, principalement orientées vers la fourniture de biens et de logiciels : - La fourniture de logiciels et licences Oracle, nécessaires à la gestion des bases de données du Service public de Wallonie. Ces éléments constituent l’objet principal du marché. - L’acquisition éventuelle de matériels liés à ces bases de données, tels que serveurs ou équipements spécifiques, qui s’inscrivent dans la même logique de fourniture. - Les services de consultance associés, destinés à l’installation, la configuration et l’optimisation des solutions Oracle, ainsi que la formation, relevant de la catégorie des services. Ces prestations, bien que présentes, demeurent accessoires par rapport à la fourniture des logiciels et matériels. Conformément au principe accessorium sequitur principale (l’accessoire suit le principal), et compte tenu de la prépondérance des fournitures dans l’objet du marché, celui-ci doit être appréhendé sous la qualification juridique de marché de fournitures.",
+          "cpv_or_category": null,
+          "estimated_value": 6247490.91,
+          "currency": "EUR",
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-08-24T02:00:00+00:00",
+          "deadline_utc": "2026-08-24T02:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/569366-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:569485-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:569485-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 62,
+        "why": "Real software maintenance and development scope around an existing Jitsi environment. This is technically partnerable but specialist operations, references and service-level capability are not yet proven for SPM.",
+        "action": "FIND_JITSI_SPECIALIST_PARTNER_AND_VERIFY_SLA_REFERENCES",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818-part2.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:569485-2026",
+        "material_fields_hash": "2fe7142058a5c4a4c05d0b7286836af90772f575fb4d74c1ab4aff0e66925a64",
+        "notice": {
+          "candidate_id": "TED:569485-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "Landesbetrieb Information und Technik NRW",
+          "title": "Germany – IT services: consulting, software development, Internet and support – Rahmenvertrag für Wartung, Support und Weiterentwicklung der bei IT.NRW bestehenden Jitsi-Umgebung",
+          "description": "Rahmenvertrag für Wartung, Support sowie Weiterentwicklung einer bestehenden Jitsi-Umgebung einschließlich des dazugehörigen Managementsystems",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-09-09T23:59:59+02:00",
+          "deadline_utc": "2026-09-09T21:59:59+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/569485-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:570031-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:570031-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 60,
+        "why": "Real enterprise CLM implementation/support with integrations to ERP, procurement/finance, IAM, DMS, e-signature and CRM. Strong software fit but enterprise-product, security and implementation evidence make it a vendor/partner route rather than lean-direct.",
+        "action": "IDENTIFY_CLM_VENDOR_OR_IMPLEMENTATION_PARTNER",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818-part2.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:570031-2026",
+        "material_fields_hash": "9cac69ec07b0e360b168caeb7c0c6dd729f0c14adf8e996975ca26aca66b1d84",
+        "notice": {
+          "candidate_id": "TED:570031-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "An Post_391",
+          "title": "Ireland – Software implementation services – 0050 - The Provision and Implementation of a Contract Lifecycle Management System",
+          "description": "AN POST invites suitably qualified economic operators to participate in a competition for the provision and implementation of a Contract Lifecycle Management (CLM) system. The requirement is expected to include the supply of a CLM technology solution together with associated services for configuration, customisation, integration, data migration, testing, training, transition, support and ongoing optimisation. The CLM solution is expected to support contract request and intake management, contract drafting, clause and template management, workflow and approval routing, negotiation and version control, electronic signature integration, contract repository and metadata management, obligation, milestone and renewal management, supplier and stakeholder access, reporting and management information, audit trails and integration with relevant enterprise systems.",
+          "cpv_or_category": null,
+          "estimated_value": 0.0,
+          "currency": "EUR",
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-09-04T12:00:00+01:00",
+          "deadline_utc": "2026-09-04T11:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "neg-w-call",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/570031-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:570312-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:570312-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 50,
+        "why": "High-value licensing/support opportunity, but it is channel-dependent. SPM should treat it as a resale play only after an authorized partner and viable margin are secured.",
+        "action": "RESELLER_CHANNEL_CHECK_BEFORE_ANY_BID_WORK",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818-part2.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:570312-2026",
+        "material_fields_hash": "d7986e42c9457ac12f97e61e9473cc82136fe798120126d885b050777f936069",
+        "notice": {
+          "candidate_id": "TED:570312-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "Malta Information Technology Agency (MITA)",
+          "title": "Malta – Subscription services – Provision of VMware Subscription Licenses - T074/26",
+          "description": "Through this CfT, MITA will procure VMware subscription licenses for a period of three years. Level 1, 2, and 3 support must be provided directly by Broadcom. This Call for Tenders is being published as a competitive call that will be considered as a negotiated procedure (in accordance with Article 154(1)(b)(ii) of the Public Procurement Regulations).",
+          "cpv_or_category": null,
+          "estimated_value": 4616064.0,
+          "currency": "EUR",
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-09-17T02:00:00+00:00",
+          "deadline_utc": "2026-09-17T02:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/570312-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:570412-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:570412-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 74,
+        "why": "Straight printing of communication supports. Strong middleman/print-broker lane with long runway, but compact gate extraction is insufficient to declare GREEN before volumes, samples/references and delivery requirements are checked.",
+        "action": "PRIORITY_PRINT_BROKER_DEEP_DCE_AND_PRICE_SHOP",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:570412-2026",
+        "material_fields_hash": "4eeb698d1c19b95e51f1a4655e8804d8e951d66722f261e10feba45c30a8cc8f",
+        "notice": {
+          "candidate_id": "TED:570412-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "Communauté de Communes de Beaucaire (30)",
+          "title": "France – Printing and related services – Impression des supports de communication de la Communauté de Communes Beaucaire Terre d'Argence",
+          "description": "Impression des supports de communication de la Communauté de Communes Beaucaire Terre d'Argence",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-10-19T02:00:00+00:00",
+          "deadline_utc": "2026-10-19T02:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/570412-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:570451-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:570451-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 61,
+        "why": "EUR 850k enterprise platform is a real software opportunity, but it is a PQQ with audited accounts/turnover history and only up to five pre-qualified applicants proceeding to tender. Better as consortium/product-vendor route.",
+        "action": "IDENTIFY_INTERNAL_COMMS_PLATFORM_PARTNER_AND_PQQ_REFERENCE_HOLDER",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:570451-2026",
+        "material_fields_hash": "f54629ebf130c8d75e8304591599abead3a7fd49d0190fed44a8cb017b7a5d05",
+        "notice": {
+          "candidate_id": "TED:570451-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "Iarnród Eireann-Irish Rail",
+          "title": "Ireland – IT services: consulting, software development, Internet and support – 9191 INTERNAL COMMUNICATIONS PLATFORM",
+          "description": "Iarnród Éireann (IÉ) seeks an established and proven high availability mobile-first internal communications platform, delivered as a fully managed SaaS service, to support a geographically dispersed workforce of approximately 5,200–8,000 employees. The solution must be cloud-hosted within the EEA/UK, integrate with Microsoft 365 and enterprise identity systems, support secure authentication, and comply with applicable Irish and EU legislative and regulatory requirements, including data protection, AI, privacy and information security obligations. Suppliers must demonstrate experience delivering, operating, and supporting similar employee communications platforms at comparable scale, including implementation, integration, training, ongoing support, and service management. The solution should support effective employee communications, engagement, audience targeting, and a consistent branded user experience across mobile and web channels. This procurement will establish a long-term contract for the provision, configuration, operation, maintenance, and support of the platform. Suppliers must provide a managed service offering including implementation, configuration, training, support, service management, and documented service levels.",
+          "cpv_or_category": null,
+          "estimated_value": 850000.0,
+          "currency": "EUR",
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-09-04T12:00:00+01:00",
+          "deadline_utc": "2026-09-04T11:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "neg-w-call",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/570451-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:570642-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:570642-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 52,
+        "why": "Vendor-specific Citrix hardware/licensing plus 60 months support. DCE requires three references including one university/public-sector reference, SAP-on-NetScaler experience, employee profiles and certification evidence. Reseller/integrator route only.",
+        "action": "RESELLER_PARTNER_ONLY",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:570642-2026",
+        "material_fields_hash": "c915e6422f4479221984fd4271fd18ac7673b3b2c36b3784d67208800c582a9e",
+        "notice": {
+          "candidate_id": "TED:570642-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "Technische Universität Darmstadt",
+          "title": "Germany – Security software package – Erneuerung Citrix NetScaler (Web Application Firewall) im SAP-Kontext",
+          "description": "Die Technische Universität Darmstadt betreibt zur Absicherung und Lastverteilung ihrer SAP-Webanwendungen ein hochverfügbares Paar Citrix-NetScaler-Appliances (MPX-Serie) an getrennten Standorten. Die Systeme arbeiten im HA-Verbund (High Availability, Primary/Secondary) und stellen u. a. Reverse-Proxy-, SSL-Offloading-, Load-Balancing- und Web-Application-Firewall-Funktionen für die webbasierten SAP-Dienste (u. a. SAP Fiori, SAP Web Dispatcher) bereit.",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-09-04T23:59:59+02:00",
+          "deadline_utc": "2026-09-04T21:59:59+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/570642-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:570846-2026",
+      "label": "DCE/GPT positive (GREEN): TED:570846-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "GREEN",
+        "final_score": 86,
+        "why": "This is a live, authoritative and unusually strong SPM-fit ICT maintenance opportunity. The DCE resolves the true tender deadline to 18 September 2026 at 17:00, while 11 September is only the query deadline. The contract is capped at EUR 80k, the turnover selection criterion is explicitly N/A, no numeric minimum prior-reference or named-certification threshold was identified, and consortium/subcontracting is permitted. The work directly covers a Go backend, web dashboard and Flutter mobile app with maintenance, security, bug-fixing, compatibility and testing. Bidder-specific insurance, tax and delivery-capacity evidence prevent FINAL_SUPER_GREEN but do not constitute an established hard blocker to GREEN.",
+        "action": "REVIEW_AND_PREPARE_BID_NOW_CONFIRM_INSURANCE_AND_GO_FLUTTER_CAPACITY",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-dce-adjudication-32123828524-waters-of-life.json",
+        "adjudication_schema": null
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:570846-2026",
+        "material_fields_hash": "bfc3ee660693e70495affc294e8bfea7ccf91e455d365d9ae8f846b18150c647",
+        "notice": {
+          "candidate_id": "TED:570846-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "Department of Housing Local Government and Heritage",
+          "title": "Ireland – Computer support services – ICT services for the Operation and Maintenance of the Waters of LIFE Web Portal and Smart Phone Application",
+          "description": "The project uses a bespoke smart phone app and web portal to capture, manage and report data related to implementation of the programme. The system consists of a centralized Go-based backend, a Web-based management dashboard, and a Flutter mobile application optimized for field use and offline data collection. The Waters of LIFE is seeking tenders for the operation and maintenance of the system for the remaining duration of the project",
+          "cpv_or_category": null,
+          "estimated_value": 80000.0,
+          "currency": "EUR",
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-09-11T17:00:00+01:00",
+          "deadline_utc": "2026-09-11T16:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/570846-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:571314-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:571314-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 68,
+        "why": "Direct software scope for SPW, but DCE requires recent qualifying references with a minimum level of EUR 100k excl. VAT per mission and integration with WISKI REST, GESTIA IAM/OIDC-OAuth and SPW infrastructure. Partnerable, not lean-direct on present bidder evidence.",
+        "action": "PARTNER_WITH_HYDROLOGY_GIS_VENDOR_AND_REFERENCE_HOLDER",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:571314-2026",
+        "material_fields_hash": "e6e05d6f243208d206098d69841ff2115e270be2bfd5bada2affeb5dc4ca0e34",
+        "notice": {
+          "candidate_id": "TED:571314-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "Service public de wallonie",
+          "title": "Belgium – Mapping software development services – Développement d’un outil de prévision et de notification de risques de crues soudaines par ruissellement",
+          "description": "Poste 1 - Développement et mise à disposition d’une application de prévision et de notification de risques de crues soudaines par ruissellement (flash floods) avec envoi automatique de notifications par email et SMS à ses utilisateurs. 2. Poste 2 - Support de cette application, ce qui comprend à minima la maintenance corrective, préventive et évolutive, avec définition d’un SLA de services détaillés. 3. Poste 3 - Formation et accompagnement des utilisateurs.",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-09-08T02:00:00+00:00",
+          "deadline_utc": "2026-09-08T02:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/571314-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:571338-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:571338-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 60,
+        "why": "Genuine portal development/support procurement, but bidder financial and reference evidence remains unresolved and the deadline is very close. Not safe to call GREEN without those gates.",
+        "action": "ONLY_BID_IF_REFERENCE_AND_FINANCIAL_GATES_CAN_BE_PROVEN_IMMEDIATELY",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818-part2.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:571338-2026",
+        "material_fields_hash": "c824ab9a5bfd8da49f48cfd620e6ff33186341b0462b1765ee878e334f9c9292",
+        "notice": {
+          "candidate_id": "TED:571338-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "Landesamt für Umwelt",
+          "title": "Germany – IT services: consulting, software development, Internet and support – ISGA-Portal Weiterentwicklung und Support",
+          "description": "Das Landesamt für Umwelt (LfU) (nachfolgend AG genannt) beabsichtigt, im Rahmen eines offenen Verfahrens eine Rahmenvereinbarung auf Grundlage des EVB-IT Erstellungsvertrages abzuschließen. Gegenstand der Rahmenvereinbarung sind die Anpassung, Weiterentwicklung und Betriebsunterstützung des Informationssystems der Gewerbeaufsicht (ISGA) in Rheinland-Pfalz. Die zu vergebenden Leistungen umfassen insbesondere die fortlaufende Weiterentwicklung bestehender Funktionalitäten, die Konzeptionsunterstützung für neue Funktionen und Module, die Anpassung an geänderte rechtliche und fachliche Anforderungen, die Sicherstellung der Betriebsfähigkeit sowie die Unterstützung bei Betrieb und Pflege dieses Fachverfahrens.",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-08-19T23:59:59+02:00",
+          "deadline_utc": "2026-08-19T21:59:59+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/571338-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:571373-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:571373-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 58,
+        "why": "TED lane of the same ATU immersive-learning procurement already identified through the national eTenders lane. High-value and relevant but PQQ/reference/insurance heavy, so partner-only on present evidence.",
+        "action": "DEDUPE_WITH_IE_8853905_AND_PARTNER_WITH_EXISTING_PLATFORM_VENDOR",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818-part2.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:571373-2026",
+        "material_fields_hash": "ef419c62a1fb8507341342f5ab2032bd6f27473c179ffbf28038637e8883aed7",
+        "notice": {
+          "candidate_id": "TED:571373-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "Atlantic Technological University",
+          "title": "Ireland – Software supply services – 369-26 Single Party Framework Agreement for Veterinary Clinical Skills, Simulation and Immersive Learning Platform for Atlantic Technological University",
+          "description": "The Contracting Authority intends to establish a Single Party Framework Agreement, using the Competitive Procedure with Negotiation, for the supply and support of a cloud-based Veterinary Clinical Skills, Simulation and Immersive Learning Platform. The contract includes a Software-as-a-Service (SaaS) solution, associated hardware and audiovisual equipment, recording technologies, installation, integration, maintenance, and support services to support veterinary education, training, and research activities. Please refer to the attached documentation for further information.",
+          "cpv_or_category": null,
+          "estimated_value": 1500000.0,
+          "currency": "EUR",
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-09-07T12:00:00+01:00",
+          "deadline_utc": "2026-09-07T11:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "neg-w-call",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/571373-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:571625-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:571625-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 68,
+        "why": "EUR 425k European Commission pilot is digitally aligned and geographically attractive. Domain expertise, data sources, pilot methodology and qualification thresholds need deeper verification before GREEN.",
+        "action": "DEEP_REVIEW_AND_IDENTIFY_TRACEABILITY_DATA_PARTNER",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:571625-2026",
+        "material_fields_hash": "84abd9e8ff9796de1fbd751da6729f30e11cb868ae99d334256c1d1e74b4b252",
+        "notice": {
+          "candidate_id": "TED:571625-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "European Commission, DG GROW - Internal Market, Industry, Entrepreneurship and SMEs",
+          "title": "Belgium – Database services – Supply chain traceability services and forced labour risk detection pilots",
+          "description": "Open procedure to sign 2 contracts via multiple sourcing, both for a duration of 3 years, to pilot the use of supply chain traceability and forced labour risk identification services from different companies. The contracts will allow the Commission departments to use and pilot services from different providers.",
+          "cpv_or_category": null,
+          "estimated_value": 425000.0,
+          "currency": "EUR",
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-09-18T23:59:59+02:00",
+          "deadline_utc": "2026-09-18T21:59:59+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/571625-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:571964-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:571964-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 79,
+        "why": "EUR 350k hosted Website and App Accessibility Audit Platform is a strong SPM-fit open procedure. DCE resolves the true deadline to 18 September 2026 at noon, but extracted selection evidence does not expose exact financial/reference thresholds, so missing gates cannot be treated as PASS.",
+        "action": "DEEP_VERIFY_FINANCIAL_REFERENCE_AND_INSURANCE_THRESHOLDS_THEN_BID",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:571964-2026",
+        "material_fields_hash": "66d4aa444b3e9d437c43839db7fa0db2e4679a83e7190be7db5dc24a73484abf",
+        "notice": {
+          "candidate_id": "TED:571964-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "Department of Housing Local Government and Heritage",
+          "title": "Ireland – IT services: consulting, software development, Internet and support – Website and App Accessibility Audit Solution",
+          "description": "The provision of a hosted accessibility audit platform that can be used across the Contracting Authority to carry out regular accessibility checks across its portfolio of websites in an efficient effective manner. An Independent Portal is required to ensure quality accessibility audits are facilitated in an efficient, auditable manner by Departmental staff once Contractor provides training.",
+          "cpv_or_category": null,
+          "estimated_value": 350000.0,
+          "currency": "EUR",
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-09-08T12:00:00+01:00",
+          "deadline_utc": "2026-09-08T11:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/571964-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:571982-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:571982-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 48,
+        "why": "Potentially simple licensing resale, but profitability and eligibility depend on an authorized channel and supplier pricing. Keep as reseller investigation, not a direct GREEN.",
+        "action": "CHECK_AUTHORIZED_GITLAB_RESELLERS_AND_MARGIN",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818-part2.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:571982-2026",
+        "material_fields_hash": "65073dae0ae015ca9244e4a67a940c8930f5274f49071bdead109889d552aeaf",
+        "notice": {
+          "candidate_id": "TED:571982-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "Police Fédérale",
+          "title": "Belgium – Software package and information systems – accord-cadre pluriannuel (4 ans) de fournitures pour l’acquisition et le continuation des licences «GitLab Enterprise Premium – Self Managed On-Premise » au profit de la Direction de l’information policière et des moyens ICT",
+          "description": "accord-cadre pluriannuel (4 ans) de fournitures pour l’acquisition et le continuation des licences «GitLab Enterprise Premium – Self Managed On-Premise » au profit de la Direction de l’information policière et des moyens ICT Poste 1 : Licence Gitlab Enterprise Premium - Self Managed On-Premise",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-09-28T02:00:00+00:00",
+          "deadline_utc": "2026-09-28T02:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/571982-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:572152-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:572152-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 58,
+        "why": "Real enterprise FMIS implementation opportunity in Belgium. It fits a software-vendor/integrator strategy, but current evidence does not support a lean SPM-direct bid.",
+        "action": "FIND_FMIS_VENDOR_PARTNER_AND_VERIFY_SELECTION_GATES",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818-part2.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:572152-2026",
+        "material_fields_hash": "c514f559bbe24981896a59f5966e863f38f119c956d76ed370a0a70061afbd7f",
+        "notice": {
+          "candidate_id": "TED:572152-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "Erasmushogeschool Brussel",
+          "title": "Belgium – Software package and information systems – Raamovereenkomst implementatie van een Facility Management Informatie systeem",
+          "description": "De Erasmushogeschool Brussel, ondersteunende dienst Infrastructuur en Facilitair Beheer, heeft de intentie om binnenkort over te gaan tot het afsluiten van een raamovereenkomst om een Facility Management Informatie Systeem (FMIS) te implementeren, men name om het facilitair beheer en de interne dienstverlening te optimaliseren.",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-09-25T02:00:00+00:00",
+          "deadline_utc": "2026-09-25T02:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/572152-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:572169-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:572169-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 43,
+        "why": "Potential reseller/support lane, but authorization and local service requirements remain decisive. No direct SPM capability should be inferred.",
+        "action": "PARTNER_OR_RESELLER_ONLY",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818-part2.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:572169-2026",
+        "material_fields_hash": "426db786e80eb95003a8a56878d2a7144b5b3479211be2cfcf4ece992ef7e1b0",
+        "notice": {
+          "candidate_id": "TED:572169-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": null,
+          "buyer": "1 BAZA LOTNICTWA TRANSPORTOWEGO",
+          "title": "Poland – Software-related services – Przedłużenie programu wsparcia eksploatacji urządzeń LKL i OKL",
+          "description": "Przedłużenie programu wsparcia eksploatacji urządzeń LKL i OKL",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-18+02:00",
+          "deadline": "2026-08-28T02:00:00+00:00",
+          "deadline_utc": "2026-08-28T02:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/572169-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "US-SAM:3e996363f3f840c3b4bd786b9cdb985d",
+      "label": "Aviation Security Officer personal-services control",
+      "truth_kind": "MANUAL_POLICY_CONTROL",
+      "expected": {
+        "allowed_ranks": [
+          "REJECT_OBVIOUS",
+          "MAYBE"
+        ]
+      },
+      "adjudication": null,
+      "input_envelope": {
+        "canonical_notice_id": "US-SAM:3e996363f3f840c3b4bd786b9cdb985d",
+        "material_fields_hash": "7c28220bc869b27b10f13637f7aff48413e0387e9e5417c1411cadfd6f62b5e8",
+        "notice": {
+          "candidate_id": "US-SAM:3e996363f3f840c3b4bd786b9cdb985d",
+          "source_family": "US_SAM",
+          "source": "US_SAM_BULK",
+          "country": null,
+          "buyer": "JUSTICE, DEPARTMENT OF",
+          "title": "Aviation Security Officer - Personal Services Contract",
+          "description": "The United States Marshals Service (USMS) was granted the authority via a class deviation memo for use of personal service contracts on 5 November 2004 from the Department of Justice, The Assistant Attorney General for Administration. The ninety-four (94)D istricts and Justice Prisoner Alien Transportation Systems (JPATS) recruit potential personal service employees through this an open posting on sams.gov (in lieu of previous bulletin board postings. The open recruitment runs the duration of the contract period of performance and recruitement is for INDIVIDUALS who meet the qualifications of the statement of work (SOW). Security companies are not authorized under the class deviation memo. Please do not apply.",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-01-07T00:00:00+00:00",
+          "deadline": "2030-07-01T14:00:00+00:00",
+          "deadline_utc": "2030-07-01T14:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": null,
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://sam.gov/opp/3e996363f3f840c3b4bd786b9cdb985d/view"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "US-SAM:54764ad67d6d4cd9a6bfc5cc06eeb26f",
+      "label": "DCE/GPT positive (YELLOW): US-SAM:54764ad67d6d4cd9a6bfc5cc06eeb26f",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 67,
+        "why": "Communications/outreach scope is commercially brokerable, but execution includes local physical media, community relationships and distribution. A local field partner and US federal eligibility are essential.",
+        "action": "BROKER_ONLY_WITH_HONDURAS_FIELD_PARTNER_AND_SAM_ROUTE",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818-part2.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "US-SAM:54764ad67d6d4cd9a6bfc5cc06eeb26f",
+        "material_fields_hash": "76d24de5699cdfefe345bf4101462eede3407175392ae42a547a6976be80a578",
+        "notice": {
+          "candidate_id": "US-SAM:54764ad67d6d4cd9a6bfc5cc06eeb26f",
+          "source_family": "US_SAM",
+          "source": "US_SAM_BULK",
+          "country": null,
+          "buyer": "STATE, DEPARTMENT OF",
+          "title": "TEGUC-Physical Messaging Campaign Development and Execution",
+          "description": "The United States Embassy in Tegucigalpa is issuing this Request for Proposal (RFP) for Physical Messaging Campaign Development and Execution. The Contractor shall complete all work, including furnishing all labor, material, transportation, equipment, and services, required under this contract to conduct Physical Messaging Campaign Development and Execution to publicize safe, official repatriation mechanisms in target communities across Honduras. The price listed below shall include all labor, materials, overhead, and profit. In consideration of satisfactory performance of all scheduled services required under this contract, the Government will pay the Contractor a firm-fixed price for performing the following Physical Messaging Campaign. The Government may award the contract based on the initial offer without discussion. The resultant contract will be a firm-fixed-price type contract. This is a combined synopsis/solicitation for commercial products or commercial services prepared in accordance with the format in subpart 12.6, as supplemented with additional information included in this notice. This announcement constitutes the only solicitation.",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-17T00:00:00+00:00",
+          "deadline": "2026-09-03T16:00:00+00:00",
+          "deadline_utc": "2026-09-03T16:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": null,
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://sam.gov/opp/54764ad67d6d4cd9a6bfc5cc06eeb26f/view"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "US-SAM:5bae2dec64c84bf0b728d64be977d6d7",
+      "label": "DCE/GPT positive (YELLOW): US-SAM:5bae2dec64c84bf0b728d64be977d6d7",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 34,
+        "why": "Not a native SPM service, but unlike the other hot items it is potentially brokerable commodity supply. Keep only as a supplier/middleman investigation, not as a GREEN bid.",
+        "action": "BROKER_ONLY_IF_SUPPLIER_AND_COMPLIANCE_ROUTE_FOUND",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-dce-adjudication-31988581735.json",
+        "adjudication_schema": null
+      },
+      "input_envelope": {
+        "canonical_notice_id": "US-SAM:5bae2dec64c84bf0b728d64be977d6d7",
+        "material_fields_hash": "3245aa4e781a1af9c8e72d455164a11820496b6cb565602f65d67a9748576009",
+        "notice": {
+          "candidate_id": "US-SAM:5bae2dec64c84bf0b728d64be977d6d7",
+          "source_family": "US_SAM",
+          "source": "US_SAM_BULK",
+          "country": null,
+          "buyer": "DEPT OF DEFENSE",
+          "title": "BPA - Pipe, Hose & Tubing PSC 4710, 4720, 4730",
+          "description": "Naval Surface Warfare Center Indian Head Division (NSWC IHD), located in Indian Head, Maryland, is interested in establishing Blanket Purchase Agreements (BPAs) with companies that provide standard commercial supplies and services at competitive prices in Classification: PSC/FSC Code 4710, NAICS 332510, PIPE, TUBE AND RIGID TUBING PSC/FSC Code 4720, NAICS 332510, HOSE AND FLEXIBLE TUBING PSC/FSC Code 4730, NAICS 332510, FITTINGS - HOSE PIPE & TUBE BPA Calls will not exceed the Simplified Acquisition Threshold and Offerors will compete at the call level. Interested companies must (have/include): Cover sheet with the official company name, cage code, and point of contact including name, phone number, and email address. Documentation addressing the capabilities and expertise. Complete and return a price list, if applicable. BPA's will be awarded on the basis of positive Past Performance. Interested vendors should provide a minimum of three Past Performance References (attached). The Past Performance references shall include name of the business/organization, address, and contract /order number, and award amount, point of contact, telephone number and description of the item. The Past Performance will be evaluated based upon Customer Satisfaction, Timeliness, Technical Success, Program Management, and Quality. The government reserves the right to use additional references if available. An active account in the Procurement Integrated Enterprise Environment (PIEE formerly WAWF) at https://pieef.eb.mil to enter invoices and receiving reports, or credit card as a method of payment. An active account in System for Award Management (SAM https://www.sam.gov) Important Notes: *This is a small business set-aside. If you possess a GSA contract, please note your GSA contract number in your response. *Vendors who are found to have technical and past performance merit will be issued a Master BPA to be able to bid on future requirements. *Price lists and catalog prices can be provided as they may help with direct award under the $10k threshold. UPATED 9/30/2024 The Government is updating the required submission deadlines and changing the award dates. The following is the new guidelines: The Government intends to issue Master BPAs on a 6-month rotation through June 2029. To be considered for a June award, Interested Vendors should provide documentation and references to my email rebecca.m.collins17.civ@us.navy.mil no later than 30 April. For a December award, interested vendors should provide documentation and references by email to rebecca.m.collins17.civ@us.navy.mil no later than 31 October. PREVIOUS DATES *The Government intends to issue Master BPAs on 6 month rotation through February 2029. To be considered for a February award, interested vendors should provide documentation and references by email to rebecca.m.collins17.civ@us.navy.mil no later than 31 December. For an August award, interested vendors should provide documentation and references by email to rebecca.m.collins17.civ@us.navy.mil no later than 30 June. *The Government reserves the right to consider past performance information available from other sources, including, but not limited to, information in the Contractor Performance Assessment Reporting System (CPARS), the Past Performance Information Retrieval System (PPIRS https://www.ppirs.gov), and the Federal Awardee Performance and Integrity Information System (FAPIIS). The Points of Contact for this request are: Rebecca Collins � rebecca.m.collins17.civ@us.navy.mil Brandi Sorzano � brandi.l.sorzano.civ@us.navy.mil TPOC/TAS � (Michelle Ellerbe) � michelle.r.ellerbe.civ@us.navy.mil **Attachments** All announcements should include 3 Past Performance Reference. (Sheet attached).",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-02-18T00:00:00+00:00",
+          "deadline": "2028-11-11T05:00:00+00:00",
+          "deadline_utc": "2028-11-11T05:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": null,
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://sam.gov/opp/5bae2dec64c84bf0b728d64be977d6d7/view"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "US-SAM:6534d1ca38cc4c00a13f07aa1f9680df",
+      "label": "DCE/GPT positive (YELLOW): US-SAM:6534d1ca38cc4c00a13f07aa1f9680df",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 55,
+        "why": "The DCE calls for a pre-existing MES compatible with specified additive-manufacturing equipment, including API/emulator/support capability. This is a software resale/integration opportunity only if a compliant commercial product partner is found.",
+        "action": "PRODUCT_RESELLER_INTEGRATOR_SEARCH_ONLY",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818-part2.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "US-SAM:6534d1ca38cc4c00a13f07aa1f9680df",
+        "material_fields_hash": "272f712d1372a35537017cad3927880bba9a7c7bc536914571e9d5ad99c24a05",
+        "notice": {
+          "candidate_id": "US-SAM:6534d1ca38cc4c00a13f07aa1f9680df",
+          "source_family": "US_SAM",
+          "source": "US_SAM_BULK",
+          "country": null,
+          "buyer": "COMMERCE, DEPARTMENT OF",
+          "title": "Manufacturing Execution System Development",
+          "description": "This is a request for a Firm Fixed Price quotation for commercial products. This solicitation is issued in accordance with the Revolutionary FAR Overhaul (RFO) Part 12 - Acquisition of Commercial Products and Commercial Services as supplemented with additional information included in this notice. This solicitation is a Request for Quotation (RFQ). The solicitation document and incorporated provisions and clauses are those in effect through the RFO. The associated North American Industrial Classification System (NAICS) code for this procurement is 541511 - Custom Computer Programming Services. The small business size standard is $34.0 Million. This is an unrestricted competition. Both small businesses and other than small businesses under the applicable size standard are eligible to respond. DESCRIPTION OF REQUIREMENTS Background The National Institute of Standards and Technology (NIST) Engineering Laboratory (EL) supports the advancement of Additive Manufacturing (AM). As AM transitions from prototyping to industrial production, the seamless integration of AM machines with enterprise software specifically Manufacturing Execution Systems (MES) is the primary enabler for increasing throughput and addressing scalability issues. However, the standards are missing for interoperable AM and MES integration. The research team at the System Integration Division has a research objective to develop a neutral information model that can be standardized for AM and MES integration. As part of the efforts to develop standard information model to integrate AM and MES systems, the Information Modeling and Testing group will conduct a six-month benchmarking study to compare (a) a standards-based AM-MES integration approach using a neutral information model and validation, versus (b) an AI-assisted point-to-point integration approach using Large Language Model (LLM)-driven documentation ingestion and code generation, and (c) test the performance and efforts using existing NIST-owned AM machines, including EOS 290 and Renishaw RenAM500. The goal is to quantify effort, reliability, and semantic accuracy, and to produce a practical roadmap for AM-MES interoperability. Objectives II. PURPOSE The purpose of this acquisition is to obtain contractor support for developing custom MES software, conducting the integration of their MES with NIST�s EOS 290 and Renishaw RenAM500, using both neutral model-based methods and AI-assisted methods, and quantifying the integration performance and efforts. Scope of Work Please see the attached Statement of Work Document. PERIOD OF PERFORMANCE / DELIVERY REQUIREMENTS The period of performance shall be from October 1, 2026, through March 31, 2026. CONTRACT TYPE & PAYMENT TERMS A firm fixed price purchase order is anticipated. APPLICABLE PROVISIONS AND CLAUSES Please see the attached document for applicable provisions and clauses. Addendum to FAR 52.212-1, Instructions to Offerors � Commercial Products and Commercial Services (DEVIATION April 2026): QUESTION AND ANSWER PERIOD CAR 1352.215-73 INQUIRIES (APR 2010): Quoters must submit all questions concerning this solicitation in writing electronically to Mr. Collin Randall, Contract Specialist, at Collin.Randall@nist.gov and Ms. Lauren Roller, Contract Officer, at lauren.roller@nist.gov Questions must be received by or before Monday August 24, 2026, at 12:00 PM ET. Any responses to questions will be made in writing, without identification of the questioner, and will be included in an amendment to the solicitation. Even if provided in other form, only the question responses included in the amendment to the solicitation will govern performance of the contract. (End of Provision) DUE DATE FOR QUOTATIONS All quotations must be submitted via email to Mr. Collin Randall, Contract Specialist, at Collin.Randall@nist.gov and Ms. Lauren Roller, Contract Officer, at lauren.roller@nist.gov. Submission must be received not later than Monday August 31, 2026, at 12:00 PM ET. Note: Quoters must have an active registration at www.SAM.gov at time of offer submission to be considered for award. �ID Assigned� is not acceptable; registration must be �Active.� Please reference the RFQ number in the subject line of all email communications. Quotations shall not be deemed received by the Government unless the quotation is received in the e-mail inboxes set forth above by the required date and time. Quotations which do not reference the RFQ number in the subject line of email communications may not be considered for award. INSTRUCTIONS TO QUOTERS Quotations shall be submitted electronically via email and shall consist of two volumes as detailed below. Each quotation volume shall include the Quoter�s name, System for Award Management Unique Entity Identifier (UEI) number, and point of contact information in a cover page, header/footer, or other easily identified location. The Quoter�s quotation shall be clearly divided into the following distinct volumes: Volume I � Technical Quotation Volume II � Price Quotation Volume I: Technical Response The Quoter shall submit one (1) copy of their technical response electronically via E-mail to the Contract Specialist and Contracting Officer identified above. The technical response shall not exceed five (5) single-spaced, single sided pages. Text shall be no less than 12-point font in read-only Microsoft Word or searchable Adobe PDF format. The technical quotation shall address the following: Technical approach to performing each of the required tasks Confirmation of the quoter�s ability to meet the required period of performance. Volume II: Price Quotation The quoter shall submit one (1) copy of their price quotation electronically via E-mail to the Contract Specialist and Contracting Officer identified above. The price quotation shall address, at minimum, the following information: The solicitation number The name, phone number, and email address of the quoter's/contractor�s point of contact; Unique Entity Identifier # for quoter's/contractor�s active SAM.Gov registration. A firm fixed price for The required services. Please also provide a breakdown of pricing, including level of effort and labor hours as applicable, to assist NIST in evaluating the quoted pricing. Any applicable discount terms. FAR 52.212-2 Evaluation- Commercial Products and Commercial Services (DEVIATION Jan 2026) Evaluation factors. The Government will award a contract resulting from this solicitation to the responsible Quoter whose quotation, conforming to the solicitation, is the lowest price technically acceptable quotation. The Government intends to award a single firm fixed price purchase order (PO) from this solicitation utilizing FAR part 12 of the Revolutionary FAR Overhaul. The Government reserves the right not to award a PO and to make an award based solely upon initial quotes. Basis for Award: This requirement will be evaluated using the trade-off best value method. Award will be made to the Quoter who submits the quotation determined to offer best value to the Government amongst competitive quotations. The following factors, listed in descending order of importance, will be used to evaluate quotations. (1) Technical Capability: The Government will evaluate quotations for understanding of requirements and for appropriateness and expected effectiveness and efficiency of the quoted technical approach for achieving the Statement of Work requirements. (2) Schedule: The Government will evaluate the degree to which the quotation meets or exceeds the schedule requirements. Meeting requirements will be evaluated as �satisfactory.� An expedited schedule may be evaluated more favorably. (3) Price: Pricing will be evaluated but not rated. The Government will evaluate quoted pricing for fairness and reasonableness in the current marketplace. A quoter's failure to address any factor may be considered indicative of the quoter's lack of understanding of the Government's requirements and may result in the quote",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-17T00:00:00+00:00",
+          "deadline": "2026-08-31T16:00:00+00:00",
+          "deadline_utc": "2026-08-31T16:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": null,
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://sam.gov/opp/6534d1ca38cc4c00a13f07aa1f9680df/view"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "US-SAM:6c69d2cd760a40c08bfd29a4d4218b25",
+      "label": "Regulated methylphenidate: visible but never strong/easy from notice metadata",
+      "truth_kind": "MANUAL_POLICY_CONTROL",
+      "expected": {
+        "exact_rank": "MAYBE",
+        "allowed_modes": [
+          "BROKER_RESELL",
+          "UNCLEAR"
+        ],
+        "must_not_reject": true
+      },
+      "adjudication": null,
+      "input_envelope": {
+        "canonical_notice_id": "US-SAM:6c69d2cd760a40c08bfd29a4d4218b25",
+        "material_fields_hash": "42397e0b2cc94e2b95bdfb21e8ba7d62f887bf7a72c16dee90c8088c02e7340f",
+        "notice": {
+          "candidate_id": "US-SAM:6c69d2cd760a40c08bfd29a4d4218b25",
+          "source_family": "US_SAM",
+          "source": "US_SAM_BULK",
+          "country": null,
+          "buyer": "DEPT OF DEFENSE",
+          "title": "Methylphenidate HCL IR",
+          "description": "Methylphenidate Award",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2024-10-01T00:00:00+00:00",
+          "deadline": "2029-09-26T00:00:00+00:00",
+          "deadline_utc": "2029-09-26T00:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": null,
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://sam.gov/opp/6c69d2cd760a40c08bfd29a4d4218b25/view"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "US-SAM:ff9d55d6a268428081b54dc02f5bf2c1",
+      "label": "DCE/GPT positive (YELLOW): US-SAM:ff9d55d6a268428081b54dc02f5bf2c1",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 75,
+        "why": "DHS CSO directly targets AI procurement modernization, including procurement news monitoring, sentiment, alerts and lifecycle visibility. Strategically excellent fit with the tender engine, but federal registration, cybersecurity and business-viability requirements are material.",
+        "action": "HIGH_PRIORITY_REVIEW_SPM_PRODUCTIZE_TENDER_ENGINE_CAPABILITY",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "US-SAM:ff9d55d6a268428081b54dc02f5bf2c1",
+        "material_fields_hash": "b9eb352e1c07d65d8fa476aa1e73723402bcf02761180d3dc62c66d4de18ce4e",
+        "notice": {
+          "candidate_id": "US-SAM:ff9d55d6a268428081b54dc02f5bf2c1",
+          "source_family": "US_SAM",
+          "source": "US_SAM_BULK",
+          "country": null,
+          "buyer": "HOMELAND SECURITY, DEPARTMENT OF",
+          "title": "AI TECHNOLOGIES FOR PROCUREMENT MODERNIZATION COMMERCIAL SOLUTIONS OPENING (CSO)",
+          "description": "The U.S. Department of Homeland Security (DHS) Office of Procurement Operations on behalf of the Office of the Chief Procurement Officer (OCPO) Procurement Innovation Lab (PIL) is issuing the subject General Solicitation for DHS and all its Components to rapidly procure commercially available, AI Technologies and solutions for Procurement Modernization to improve the federal procurement process. This capability will be procured using the Commercial Solutions Opening (CSO) authority to enable rapid acquisition of innovative, field-ready AI technologies and solutions that address evolving procurement modernization. The CSO is a merit-based solution selection strategy for DHS to acquire innovative commercial items through the use of general solicitation competitive procedures and the award of a contract. \"Innovative\", within the meaning of this statute, is any new technology, process, or method, including research and development, or any new application of an existing technology, process, or method. \"Commercial item\" has the same meaning as commercial item under Federal Acquisition Regulation (FAR) 2.101, which includes certain commercial services. The CSO General Solicitation aims to identify new ideas, approaches, tools, and partnerships that can help the Department address critical challenges and accelerate transformation across its AI procurement enterprise. This General Solicitation provides a flexible mechanism to solicit, evaluate, and fund exploratory and applied work that does not fit neatly into traditional acquisition frameworks, but that has the potential to improve DHS�s ability to acquire, oversee, and operate within procurement. This procurement is limited to innovative commercial products relevant to the Focus Area outlined in the solicitation. Within the meaning of the statute, innovative is defined as, �Any new technology, process, or method, including research and development, or any new application of an existing technology, process, or method.� Proposals will be evaluated on their individual merits rather than on a comparative basis. Besides the criterion described in the solicitation, the concept paper responses must clearly demonstrate how the commercial item is offered in an innovative manner. The concept papers will be evaluated against the evaluation criteria. Each concept paper submitted may be evaluated against the evaluation criteria separately and need not be evaluated against other concept paper responses submitted by other Offerors. More than one concept paper may be accepted. The Government reserves the right to request interview-style oral presentations or additional written information, if applicable, from one or more Offerors. The Department anticipates that different technologies may address different focus areas and that a portfolio of complementary capabilities may be required to advance the Department�s OT strategy. Industry is invited to respond to this initial General Solicitation addressing the first Focus Area Topic � AI technology. This CSO General Solicitation will stay open for a period of 12 months. The Department intends to use this CSOP to identify, evaluate, and deploy commercial technologies that advance one or more of the Department�s AI Technologies and solutions. Potential Submitters are hereby advised of the following: 1. It is within the Government�s discretion to accept more than one solution for a contract award resulting from this CSO Solicitation. 2. All costs of preparing and submitting solution videos, written submission, and additional presentations/demonstrations related to this CSO Solicitation are the responsibility of the submitting entity and not eligible for funding or reimbursement by the Government. 3. The evaluation will include an assessment of whether the proposed commercial product or service is innovative within the meaning of the statute. Submission and proposals are evaluated on individual merit rather than on a comparative basis, and the Government has considerable latitude in determining which of the submitted proposals it will fund. 4. To be eligible for award, Companies must be registered in the System for Award Management (SAM.gov) prior to DHS making a CSO contract award. The first Focus Area Topic under this CSO is AI technology. The government is currently accepting proposals from Offerors that can meet the AI technologies and solutions outlined in the attached General Solicitation. Submissions must be received prior to Wednesday, August 26, 2026 at 10:00 a.m. eastern time. Responses shall be submitted electronically to the following: Mariah.Watt@hq.dhs.gov and Tracy.Miller@hq.dhs.gov. The subject line of the e-mail must be titled �70RDA126R00000009 � AI Technologies for Procurement Modernization.� Note: The Government will review responses as they are submitted and may award at any time. All questions regarding this solicitation shall be submitted in writing (via email) to Mariah.Watt@hq.dhs.gov and Tracy.Miller@hq.dhs.gov by Wednesday, August 19, 2026 at 10:00 a.m. eastern time.",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-17T00:00:00+00:00",
+          "deadline": "2026-08-26T14:00:00+00:00",
+          "deadline_utc": "2026-08-26T14:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": null,
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://sam.gov/opp/ff9d55d6a268428081b54dc02f5bf2c1/view"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165372-2026-08-13",
+      "label": "DCE/GPT positive (YELLOW): ZA_ETENDERS_OCDS:ocds-9t57fa-165372-2026-08-13",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 72,
+        "why": "Actual DCE is a six-month SAHRC Brand Strategist engagement covering research/survey, brand strategy, repositioning, messaging and social-media monitoring/management. Excellent creative/AI-assisted scope, but bidder track record remains a gate.",
+        "action": "VERIFY_REFERENCE_REQUIREMENTS_AND_USE_SENIOR_BRAND_STRATEGIST_PARTNER",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165372-2026-08-13",
+        "material_fields_hash": "5113449d08f739bf96280685d54dec509cdbdca0ca34c21241e36e3757703802",
+        "notice": {
+          "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165372-2026-08-13",
+          "source_family": "ZA_ETENDERS_OCDS",
+          "source": "ZA_ETENDERS_OCDS",
+          "country": null,
+          "buyer": "South African Human Rights Commission",
+          "title": "RFP-HO-06-2026",
+          "description": "Appointment of a suitably qualified Brand Strategist who will render brand management services for the Commission for a period of 6 months.",
+          "cpv_or_category": null,
+          "estimated_value": 0.0,
+          "currency": "ZAR",
+          "publication_date": "2026-08-13T00:00:00+00:00",
+          "deadline": "2026-08-25T11:00:00+00:00",
+          "deadline_utc": "2026-08-25T11:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165372",
+            "https://www.etenders.gov.za/home/Download?blobName=66c00539-dad7-4807-aca8-5cf2529f681f.pdf&downloadedFileName=RFP-HO-06-2026%20%20-%20Brand%20Strategist.pdf"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165449-2026-08-13",
+      "label": "DCE/GPT positive (YELLOW): ZA_ETENDERS_OCDS:ocds-9t57fa-165449-2026-08-13",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 76,
+        "why": "Hidden gem: DCE explicitly asks for design, layout and printing of the five-year report. Directly brokerable with AI/design plus print subcontractor. Main friction is South African administration and apparent physical quotation-box submission in Pretoria.",
+        "action": "PRIORITY_BROKER_PLAY_FIND_SA_PRINTER_AND_LOCAL_SUBMISSION_ROUTE",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-full-queue-20260818.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165449-2026-08-13",
+        "material_fields_hash": "2ae296ad43f59f37970ca611528da69aae06ecf040c113909a2fc36ffa6aa8e7",
+        "notice": {
+          "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165449-2026-08-13",
+          "source_family": "ZA_ETENDERS_OCDS",
+          "source": "ZA_ETENDERS_OCDS",
+          "country": null,
+          "buyer": "National - Department of Agriculture",
+          "title": "5/2/1/1 2026-2027/151",
+          "description": "APPOINTMENT OF A SERVICE PROVIDER TO DESIGN, LAYOUT AND PRINTING OF THE FIVE-YEAR REPORT (2019/20-2023/24) ON THE NATIONAL POLICY ON EXTENSION AND ADVISORY SERVICES AT THE DEPARTMENT OF AGRICULTURE: DIRECTORATE: NATIONAL EXTENSION REFORM.",
+          "cpv_or_category": null,
+          "estimated_value": 0.0,
+          "currency": "ZAR",
+          "publication_date": "2026-08-13T00:00:00+00:00",
+          "deadline": "2026-08-21T11:00:00+00:00",
+          "deadline_utc": "2026-08-21T11:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165449",
+            "https://www.etenders.gov.za/home/Download?blobName=35aca32d-844e-42c8-a24d-3dc3029407a2.pdf&downloadedFileName=5-2-1-1-2026-2027-151.pdf"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    }
+  ]
+}
