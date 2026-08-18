@@ -1,10 +1,10 @@
 {
   "schema": "GPT_REVIEW_HOT_V3",
-  "updated_at": "2026-08-18T06:32:03.951514+00:00",
+  "updated_at": "2026-08-18T06:32:08.168425+00:00",
   "latest_dce_run_id": 32106912628,
-  "latest_shard": 14,
+  "latest_shard": 8,
   "generation_reset": false,
-  "count": 5,
+  "count": 7,
   "items": [
     {
       "candidate_id": "TED:559457-2026",
@@ -1449,6 +1449,108 @@
       "review_lane": "SPM_PRIORITY"
     },
     {
+      "candidate_id": "PL-BZP:08def491-2f64-9e35-962b-120001272a07",
+      "title": "Zakup i dostawa pelletu dla Gminy Obsza",
+      "buyer": "GMINA OBSZA",
+      "portal": "PL_EZAMOWIENIA",
+      "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08def491-2f64-9e35-962b-120001272a07",
+      "deadline": "2026-08-19T08:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 60,
+      "priority_score": 60,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-19T08:00:00+00:00",
+        "notice_deadline_date": "2026-08-19",
+        "authoritative_submission_date": "2026-08-19",
+        "submission_deadline_candidates": [
+          "2026-08-19"
+        ],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [
+          "2005-02-17",
+          "2019-09-11",
+          "2026-08-19"
+        ],
+        "labelled_evidence": [
+          {
+            "date": "2026-08-19",
+            "match": "19.08.2026",
+            "label": "SUBMISSION",
+            "keyword": "Termin składania ofert",
+            "distance": 2,
+            "context": "osobistym. \n \n \nRozdział 14 \nSKŁADANIE I OTWARCIE OFERT \n14.1. Wykonawca składa ofertę za pomocą Platformy e -Zamówienia dostępnej \npod adresem: https://ezamowienia.gov.pl  \n14.2. Termin składania ofert: 19.08.2026 r., godz. 10:00 \n14.3. Termin otwarcia ofert: 19.08.2026 r., godz. 10:30 \n14.4. Oferta może być złożona tylko do upływu terminu składania ofert. \n14.5. Wykonawca może przed upływem terminu składania ofert wycofać ofertę. \nWykonawca wycofuje ofertę w zakładce „Oferty/wnioski” używając przycisku \n„Wy"
+          }
+        ],
+        "evidence": [
+          {
+            "date": "2019-09-11",
+            "match": "11 września 2019",
+            "context": "jących zwrot wadium zgodnie z ustawą Prawo zamówień \npublicznych. \nd) zobowiązanie gwaranta do zapłaty kwoty gwarancji na pierwsze pisemne \nżądanie Zamawiającego w przypadkach określonych w art. 98 ust. 6 ustawy z \ndnia 11 września 2019 r. – Prawo zamówień publicznych. \n12.5. W przypadku wnoszenia wadium w formie innej niż pieniężna, Zamawiający \nwymaga oryginału dokumentu wadialnego (gwarancji lub poręczenia).  \n12.6. Wadium musi zabezpieczać ofertę p"
+          },
+          {
+            "date": "2005-02-17",
+            "match": "17 lutego 2005",
+            "context": "d rygorem nieważności , w formie elektronicznej lub w \npostaci elektronicznej opatrzonej podpisem zaufanym lub podpisem \nosobistym w formatach danych określonych w przepisach wydanych na \npodstawie art. 18 ustawy z dnia 17 lutego 2005 r. o informatyzacji działalności \npodmiotów realizujących zadania publiczne (Dz. U. z 2021 r. poz. 2070 ze zm.), z \nzastrzeżeniem formatów, o których mowa  w art. 66 ust. 1 usta\ne przez Wykonawcę podjęcia niezbędnych \nd"
+          },
+          {
+            "date": "2026-08-19",
+            "match": "19.08.2026",
+            "context": "ym lub podpisem osobistym. \n \n \nRozdział 14 \nSKŁADANIE I OTWARCIE OFERT \n14.1. Wykonawca składa ofertę za pomocą Platformy e -Zamówienia dostępnej \npod adresem: https://ezamowienia.gov.pl  \n14.2. Termin składania ofert: 19.08.2026 r., godz. 10:00 \n14.3. Termin otwarcia ofert: 19.08.2026 r., godz. 10:30 \n14.4. Oferta może być złożona tylko do upływu terminu składania ofert. \n14.5. Wykonawca może przed upływem terminu składania ofert wycofać ofertę"
+          },
+          {
+            "date": "2026-08-19",
+            "match": "19.08.2026",
+            "context": "OTWARCIE OFERT \n14.1. Wykonawca składa ofertę za pomocą Platformy e -Zamówienia dostępnej \npod adresem: https://ezamowienia.gov.pl  \n14.2. Termin składania ofert: 19.08.2026 r., godz. 10:00 \n14.3. Termin otwarcia ofert: 19.08.2026 r., godz. 10:30 \n14.4. Oferta może być złożona tylko do upływu terminu składania ofert. \n14.5. Wykonawca może przed upływem terminu składania ofert wycofać ofertę. \nWykonawca wycofuje ofertę w zakładce „Oferty/wnioski” "
+          }
+        ],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 2,
+          "unique_contexts": 2
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 1,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [
+          {
+            "text": "iający nie skorzysta z prawa opcji lub skorzysta z niego jedynie w części (w przypadku łagodnej sytuacji pogodowej). 4.3. Warunki cenowe (cena jednostkowa za 1 tonę pelletu dla danej lokalizacji) w odniesieniu do dostaw realizowanych w ramach prawa opcji będą tożsame z warunkami określonymi dla zamówienia gwarantowanego. 4.4. Parametry techniczne: 1) średnica: 6 – 8 mm, 2) długość: 3 – 40 mm, 3) gęstość: 1,0 – 1,4 kg/dm³ lub ≥ 600 kg/m³, 4) wilgotność: max. do 10 %, 5) zawartość popiołu: max. do 0,7 %. 4.5. Wykonawca zobowiązany jest przedstawić do każdej dostarczonej partii pelletu certyfikat zgodności z odpowiednimi normami: EN ISO 17225-2:2021, ENplus- A1, lub równoważny. 4.6. Wykonawca dostarcza pellet sukcesywnie według zleceń Zamawiającego. 4.7. Zamawiający wyznacza termin do 5 dni kalendarzowych na realizację dostawy danej partii pelletu, liczony od dnia następującego po dniu przesłania zgłoszenia zapotrzebowania (zamówienia cząstkowego) przez Zamawiającego. Zgłoszenia będą wysyłane drogą elektroniczną na adres e-mail Wykonawcy podany w ofercie. 4.8. W cenie oferty należy uwzględnić koszt rozładunku dla wszystkich lokalizacji i podania pelletu do zsypu (Szkoła Podstawowa w Zamchu, załącznik nr 6, 4.9. Faktury VAT za realizację dostaw będą wystawiane raz w mies",
+            "source": null,
+            "match": "ISO 17225"
+          }
+        ],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32106912628,
+      "source_shard": 8,
+      "hot_ready_at": "2026-08-18T06:32:07.795123+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 8,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
       "candidate_id": "PL-BZP:08def79d-6560-c604-962b-120001dacfed",
       "title": "Dostawa sprzętu i innych rozwiązań cyberbezpieczeństwa -cyberbezpieczne wodociągi",
       "buyer": "Gmina Kotuń",
@@ -1624,6 +1726,151 @@
       "hot_ready_at": "2026-08-18T06:31:50.354415+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 8,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
+      "candidate_id": "PL-BZP:08def3af-d4e3-b576-962b-12000158cc55",
+      "title": "Ścinka i profilowanie poboczy oraz odmulenie i profilowanie rowów przydrożnych w ciągach dróg woj, admin. przez ZDW w Łodzi w 2026 roku z podziałem na części i prawem opcji",
+      "buyer": "ZARZĄD DRÓG WOJEWÓDZKICH W ŁODZI",
+      "portal": "PL_EZAMOWIENIA",
+      "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08def3af-d4e3-b576-962b-12000158cc55",
+      "deadline": "2026-08-25T08:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 60,
+      "priority_score": 60,
+      "content_quality": "MIXED_SUBSTANTIVE_AND_GUIDE",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-25T08:00:00+00:00",
+        "notice_deadline_date": "2026-08-25",
+        "authoritative_submission_date": "2026-08-25",
+        "submission_deadline_candidates": [
+          "2026-08-25"
+        ],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [
+          "2026-08-06",
+          "2026-08-25",
+          "2026-09-23",
+          "2026-11-30"
+        ],
+        "labelled_evidence": [
+          {
+            "date": "2026-08-25",
+            "match": "2026-08-25",
+            "label": "SUBMISSION",
+            "keyword": "Termin składania ofert",
+            "distance": 3,
+            "context": "e wymagania związane z realizacją zamówienia:\nw zakresie zatrudnienia na podstawie stosunku pracy, w okolicznościach, o których mowa w art. 95 ustawy\nSEKCJA VIII – PROCEDURA\n8.1.) Termin składania ofert: \n2026-08-25 10:00\n8.2.) Miejsce składania ofert: \nhttps://zdwlodz.eb2b.com.pl\n8.3.) Termin otwarcia ofert: \n2026-08-25 10:15\n8.4.) Termin związania ofertą: \ndo 2026-09-23\nSEKCJA IX – POZOSTAŁE INFORMACJE\n1. Zamawiający wymaga, aby zamówienie zostało zrealizowane:\nzamówienie podstawowe maksymalnie w terminie do"
+          },
+          {
+            "date": "2026-08-25",
+            "match": "2026-08-25",
+            "label": "SUBMISSION",
+            "keyword": "Termin składania ofert",
+            "distance": 2,
+            "context": "wymagania związane z realizacją zamówienia:\n\nw zakresie zatrudnienia na podstawie stosunku pracy, w okolicznościach, o których mowa w art. 95 ustawy\n\nSEKCJA VIII – PROCEDURA\n8.1.) Termin składania ofert: 2026-08-25 10:00\n8.2.) Miejsce składania ofert: https://zdwlodz.eb2b.com.pl\n8.3.) Termin otwarcia ofert: 2026-08-25 10:15\n8.4.) Termin związania ofertą: do 2026-09-23\nSEKCJA IX – POZOSTAŁE INFORMACJE\n1. Zamawiający wymaga, aby zamówienie zostało zrealizowane:\nzamówienie podstawowe maksymalnie w terminie do 12"
+          }
+        ],
+        "evidence": [
+          {
+            "date": "2026-08-25",
+            "match": "2026-08-25",
+            "context": "duje następujące wymagania związane z realizacją zamówienia:\nw zakresie zatrudnienia na podstawie stosunku pracy, w okolicznościach, o których mowa w art. 95 ustawy\nSEKCJA VIII – PROCEDURA\n8.1.) Termin składania ofert: \n2026-08-25 10:00\n8.2.) Miejsce składania ofert: \nhttps://zdwlodz.eb2b.com.pl\n8.3.) Termin otwarcia ofert: \n2026-08-25 10:15\n8.4.) Termin związania ofertą: \ndo 2026-09-23\nSEKCJA IX – POZOSTAŁE INFORMACJE\n1. Zamawiający wymaga, aby "
+          },
+          {
+            "date": "2026-08-25",
+            "match": "2026-08-25",
+            "context": "pracy, w okolicznościach, o których mowa w art. 95 ustawy\nSEKCJA VIII – PROCEDURA\n8.1.) Termin składania ofert: \n2026-08-25 10:00\n8.2.) Miejsce składania ofert: \nhttps://zdwlodz.eb2b.com.pl\n8.3.) Termin otwarcia ofert: \n2026-08-25 10:15\n8.4.) Termin związania ofertą: \ndo 2026-09-23\nSEKCJA IX – POZOSTAŁE INFORMACJE\n1. Zamawiający wymaga, aby zamówienie zostało zrealizowane:\nzamówienie podstawowe maksymalnie w terminie do 12 tygodni od daty zawarci"
+          },
+          {
+            "date": "2026-09-23",
+            "match": "2026-09-23",
+            "context": "stawy\nSEKCJA VIII – PROCEDURA\n8.1.) Termin składania ofert: \n2026-08-25 10:00\n8.2.) Miejsce składania ofert: \nhttps://zdwlodz.eb2b.com.pl\n8.3.) Termin otwarcia ofert: \n2026-08-25 10:15\n8.4.) Termin związania ofertą: \ndo 2026-09-23\nSEKCJA IX – POZOSTAŁE INFORMACJE\n1. Zamawiający wymaga, aby zamówienie zostało zrealizowane:\nzamówienie podstawowe maksymalnie w terminie do 12 tygodni od daty zawarcia umowy (w zależności od złożonej oferty)\nopcja do d"
+          },
+          {
+            "date": "2026-11-30",
+            "match": "30.11.2026",
+            "context": "CJA IX – POZOSTAŁE INFORMACJE\n1. Zamawiający wymaga, aby zamówienie zostało zrealizowane:\nzamówienie podstawowe maksymalnie w terminie do 12 tygodni od daty zawarcia umowy (w zależności od złożonej oferty)\nopcja do dnia 30.11.2026 r.\nW związku z koniecznością realizacji niniejszego zamówienia w 2026 r. zachodzi konieczność określenia terminu jego\nzakończenia na dzień 30.11.2026 r.\n2. Wykonawca, którego oferta zostanie uznana za najkorzystniejszą,"
+          },
+          {
+            "date": "2026-11-30",
+            "match": "30.11.2026",
+            "context": "d daty zawarcia umowy (w zależności od złożonej oferty)\nopcja do dnia 30.11.2026 r.\nW związku z koniecznością realizacji niniejszego zamówienia w 2026 r. zachodzi konieczność określenia terminu jego\nzakończenia na dzień 30.11.2026 r.\n2. Wykonawca, którego oferta zostanie uznana za najkorzystniejszą, zobowiązany jest do wniesienia przed zawarciem\numowy zabezpieczenia należytego wykonania umowy na kwotę stanowiącą 5 % zaoferowanej ceny oferty.\nOgło"
+          },
+          {
+            "date": "2026-08-06",
+            "match": "2026-08-06",
+            "context": "stanie uznana za najkorzystniejszą, zobowiązany jest do wniesienia przed zawarciem\numowy zabezpieczenia należytego wykonania umowy na kwotę stanowiącą 5 % zaoferowanej ceny oferty.\nOgłoszenie nr 2026/BZP 00381307 z dnia 2026-08-06\n2026-08-06 Biuletyn Zamówień Publicznych\nOgłoszenie o zamówieniu - Zamówienie udzielane jest w trybie podstawowym na podstawie: art. 275 pkt 1 ustawy - Roboty budowlane\n\n===== FILE: files/portal_page.txt =====\nSzczegóły"
+          },
+          {
+            "date": "2026-08-06",
+            "match": "2026-08-06",
+            "context": "na za najkorzystniejszą, zobowiązany jest do wniesienia przed zawarciem\numowy zabezpieczenia należytego wykonania umowy na kwotę stanowiącą 5 % zaoferowanej ceny oferty.\nOgłoszenie nr 2026/BZP 00381307 z dnia 2026-08-06\n2026-08-06 Biuletyn Zamówień Publicznych\nOgłoszenie o zamówieniu - Zamówienie udzielane jest w trybie podstawowym na podstawie: art. 275 pkt 1 ustawy - Roboty budowlane\n\n===== FILE: files/portal_page.txt =====\nSzczegóły ogłoszenia"
+          },
+          {
+            "date": "2026-08-25",
+            "match": "2026-08-25",
+            "context": "uje następujące wymagania związane z realizacją zamówienia:\n\nw zakresie zatrudnienia na podstawie stosunku pracy, w okolicznościach, o których mowa w art. 95 ustawy\n\nSEKCJA VIII – PROCEDURA\n8.1.) Termin składania ofert: 2026-08-25 10:00\n8.2.) Miejsce składania ofert: https://zdwlodz.eb2b.com.pl\n8.3.) Termin otwarcia ofert: 2026-08-25 10:15\n8.4.) Termin związania ofertą: do 2026-09-23\nSEKCJA IX – POZOSTAŁE INFORMACJE\n1. Zamawiający wymaga, aby zam"
+          },
+          {
+            "date": "2026-08-25",
+            "match": "2026-08-25",
+            "context": "u pracy, w okolicznościach, o których mowa w art. 95 ustawy\n\nSEKCJA VIII – PROCEDURA\n8.1.) Termin składania ofert: 2026-08-25 10:00\n8.2.) Miejsce składania ofert: https://zdwlodz.eb2b.com.pl\n8.3.) Termin otwarcia ofert: 2026-08-25 10:15\n8.4.) Termin związania ofertą: do 2026-09-23\nSEKCJA IX – POZOSTAŁE INFORMACJE\n1. Zamawiający wymaga, aby zamówienie zostało zrealizowane:\nzamówienie podstawowe maksymalnie w terminie do 12 tygodni od daty zawarcia"
+          },
+          {
+            "date": "2026-09-23",
+            "match": "2026-09-23",
+            "context": "5 ustawy\n\nSEKCJA VIII – PROCEDURA\n8.1.) Termin składania ofert: 2026-08-25 10:00\n8.2.) Miejsce składania ofert: https://zdwlodz.eb2b.com.pl\n8.3.) Termin otwarcia ofert: 2026-08-25 10:15\n8.4.) Termin związania ofertą: do 2026-09-23\nSEKCJA IX – POZOSTAŁE INFORMACJE\n1. Zamawiający wymaga, aby zamówienie zostało zrealizowane:\nzamówienie podstawowe maksymalnie w terminie do 12 tygodni od daty zawarcia umowy (w zależności od złożonej oferty)\nopcja do d"
+          },
+          {
+            "date": "2026-11-30",
+            "match": "30.11.2026",
+            "context": "CJA IX – POZOSTAŁE INFORMACJE\n1. Zamawiający wymaga, aby zamówienie zostało zrealizowane:\nzamówienie podstawowe maksymalnie w terminie do 12 tygodni od daty zawarcia umowy (w zależności od złożonej oferty)\nopcja do dnia 30.11.2026 r.\nW związku z koniecznością realizacji niniejszego zamówienia w 2026 r. zachodzi konieczność określenia terminu jego zakończenia na dzień 30.11.2026 r.\n2. Wykonawca, którego oferta zostanie uznana za najkorzystniejszą,"
+          },
+          {
+            "date": "2026-11-30",
+            "match": "30.11.2026",
+            "context": "d daty zawarcia umowy (w zależności od złożonej oferty)\nopcja do dnia 30.11.2026 r.\nW związku z koniecznością realizacji niniejszego zamówienia w 2026 r. zachodzi konieczność określenia terminu jego zakończenia na dzień 30.11.2026 r.\n2. Wykonawca, którego oferta zostanie uznana za najkorzystniejszą, zobowiązany jest do wniesienia przed zawarciem umowy zabezpieczenia należytego wykonania umowy na kwotę stanowiącą 5 % zaoferowanej ceny oferty.\nStro"
+          }
+        ],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 4,
+          "unique_contexts": 4
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 0,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32106912628,
+      "source_shard": 8,
+      "hot_ready_at": "2026-08-18T06:32:07.795123+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 7,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
