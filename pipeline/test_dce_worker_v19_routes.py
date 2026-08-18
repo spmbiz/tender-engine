@@ -29,8 +29,9 @@ def main() -> None:
         {"index": 2, "text": "Szerződés.docx", "aria": "", "title": "", "visible": True, "disabled": False},
         {"index": 3, "text": "Bejelentkezés", "aria": "", "title": "", "visible": True, "disabled": False},
         {"index": 4, "text": "Áttekintés", "aria": "", "title": "", "visible": True, "disabled": False},
+        {"index": 5, "text": "KD_Bérházfelújítás_2025 .docx", "aria": "", "title": "", "visible": True, "disabled": False},
     ]
-    assert v19._safe_ekr_control_indices(controls) == [0, 1, 2]
+    assert v19._safe_ekr_control_indices(controls) == [5, 2, 1, 0]
     assert v19.EKR_API_DOWNLOAD_RE.search(
         "https://ekr.gov.hu/api/publikus/kozbeszerzesi-hirdetmenyek/123/dokumentum-letoltes"
     )
@@ -88,7 +89,7 @@ def main() -> None:
             v19.adapter_hu_ekr_v19(detail_only, Path(td), manifest)
         assert events == ["http"], events
         assert manifest["status"] == "DOWNLOADED_PUBLIC"
-        print({"hu_ekr_detail_only": "targeted_network", "explicit_routes": "legacy_preserved", "safe_controls": 3, "status": "ok"})
+        print({"hu_ekr_detail_only": "targeted_network", "explicit_routes": "legacy_preserved", "safe_controls": 4, "procurement_doc_first": True, "status": "ok"})
     finally:
         v19._bounded_http_probe = old_http
         v19._bounded_browser_download = old_browser
