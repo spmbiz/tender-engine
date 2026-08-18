@@ -1,0 +1,65 @@
+name: Apply P0 Recall Hardening Once
+
+on:
+  push:
+    branches: [agent/recall-hardening-p0]
+    paths:
+      - '.github/workflows/apply-recall-hardening-p0-once.yml'
+      - 'tools/apply_recall_hardening_p0.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-p0-recall-hardening-once
+  cancel-in-progress: false
+
+jobs:
+  apply-test-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/recall-hardening-p0
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check -q pytest requests
+      - name: Apply bounded recall hardening patch
+        run: python tools/apply_recall_hardening_p0.py
+      - name: Compile changed Python
+        run: |
+          python -m py_compile \
+            pipeline/discover_ted.py \
+            pipeline/build_live_world_snapshot.py \
+            pipeline/build_qwen_dce_selection_coded.py
+      - name: Run recall and funnel regression tests
+        run: |
+          python -m pytest -q \
+            tests/test_live_universe_contract.py \
+            tests/test_snapshot_carry_forward.py \
+            tests/test_ted_checkpoint.py \
+            tests/test_recall_workflow_contract.py \
+            tests/test_procurement_code_and_review_index.py
+      - name: Remove one-time patch machinery and commit verified patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm tools/apply_recall_hardening_p0.py .github/workflows/apply-recall-hardening-p0-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            pipeline/discover_ted.py \
+            pipeline/build_live_world_snapshot.py \
+            pipeline/build_qwen_dce_selection_coded.py \
+            .github/workflows/supergreen-discovery-v2.yml \
+            .github/workflows/live-world-snapshot.yml \
+            tests/test_snapshot_carry_forward.py \
+            tests/test_ted_checkpoint.py \
+            tests/test_recall_workflow_contract.py
+          git commit -m 'tenders: harden live recall against source regressions'
+          git push origin HEAD:agent/recall-hardening-p0
