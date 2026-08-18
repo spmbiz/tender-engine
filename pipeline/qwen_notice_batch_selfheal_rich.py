@@ -11,11 +11,11 @@ RICH_PROMPT_VERSION = "qwen-batch-high-recall-business-fit-v3-rich"
 # Keep the workflow's classifier-version contract stable; prompt-version is the
 # semantic migration key and is enforced by the state merger below.
 RICH_CLASSIFIER_VERSION = "qwen3-4b-q4km-batch-selfheal-v1"
-MIN_CONTEXT_CHARS = max(900, int(os.getenv("QWEN_RICH_MIN_CONTEXT_CHARS", "1600")))
+MIN_CONTEXT_CHARS = max(1200, int(os.getenv("QWEN_RICH_MIN_CONTEXT_CHARS", "2200")))
 MAX_FIELD_CHARS = max(120, int(os.getenv("QWEN_RICH_FIELD_CHARS", "320")))
 
 
-def compact_text(value, limit: int) -> str:
+def compact_text(value, limit: int, *, preserve_tail: bool = False) -> str:
     if value in (None, "", [], {}):
         return ""
     if isinstance(value, (dict, list)):
@@ -26,6 +26,12 @@ def compact_text(value, limit: int) -> str:
     else:
         text = str(value)
     text = " ".join(text.split())
+    if len(text) <= limit:
+        return text
+    if preserve_tail and limit >= 240:
+        head = max(120, int(limit * 0.65))
+        tail = max(80, limit - head - 3)
+        return text[:head] + " … " + text[-tail:]
     return text[:limit]
 
 
@@ -33,21 +39,27 @@ def rich_description(row, requested_chars: int) -> str:
     n = base.notice(row)
     budget = max(MIN_CONTEXT_CHARS, int(requested_chars or 0))
     parts = []
-    primary = compact_text(n.get("description"), max(500, budget // 2))
+    primary = compact_text(n.get("description"), max(700, budget // 2), preserve_tail=True)
     if primary:
         parts.append("DESC: " + primary)
+    # Eligibility/subcontracting are recall-critical: they can turn a generic
+    # title into a feasible broker/partner opportunity, or reveal the opposite.
     for label, key in (
-        ("LOTS", "lots"),
         ("ELIGIBILITY", "notice_eligibility"),
-        ("AWARD", "award_criteria"),
         ("SUBCONTRACT", "subcontracting"),
+        ("LOTS", "lots"),
+        ("AWARD", "award_criteria"),
     ):
-        value = compact_text(n.get(key), MAX_FIELD_CHARS)
+        value = compact_text(n.get(key), MAX_FIELD_CHARS, preserve_tail=True)
         if value:
             parts.append(label + ": " + value)
     text = " | ".join(parts)
     if len(text) > budget:
-        text = text[:budget] + "…"
+        # Preserve the tail of the complete evidence bundle too; otherwise the
+        # last gate field is systematically sacrificed on long notices.
+        head = max(700, int(budget * 0.72))
+        tail = max(300, budget - head - 3)
+        text = text[:head] + " … " + text[-tail:]
     return text
 
 
