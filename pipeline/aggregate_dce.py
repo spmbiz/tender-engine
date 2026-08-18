@@ -58,7 +58,10 @@ def legacy_content_quality(raw_status: str, files: list[dict]) -> tuple[str, str
 
 
 def resolve_evidence(raw_status: str, files: list[dict], evidence: dict) -> tuple[str, str, bool]:
-    if isinstance(evidence, dict) and evidence.get("contract") == "DCE_EVIDENCE_QUALITY_V1":
+    if isinstance(evidence, dict) and str(evidence.get("contract") or "").upper() in {
+        "DCE_EVIDENCE_QUALITY_V1",
+        "DCE_EVIDENCE_QUALITY_V2",
+    }:
         return (
             str(evidence.get("derived_status") or raw_status),
             str(evidence.get("content_quality") or "UNKNOWN"),
