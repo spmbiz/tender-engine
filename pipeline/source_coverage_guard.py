@@ -21,7 +21,7 @@ STRICT_NONZERO_SOURCES={
     "AU_AUSTENDER","CYPRUS_EPPS","MALTA_EPPS","LUX_PMP","SI_EJN","SK_UVO","EE_RHR",
     "WORLD_BANK_PROCUREMENT","ZA_ETENDERS_OCDS","UK_PCS_OCDS","UK_FTS_OCDS","LT_CVP_API","UNGM_PUBLIC",
 }
-STRICT_EXHAUSTION_SOURCES={"TED","LT_CVP_API","AU_AUSTENDER","CYPRUS_EPPS","MALTA_EPPS","UNGM_PUBLIC"}
+STRICT_EXHAUSTION_SOURCES={"TED","LT_CVP_API","AU_AUSTENDER","CYPRUS_EPPS","MALTA_EPPS","UNGM_PUBLIC","UK_PCS_OCDS"}
 EXTERNAL_REQUIRED_LANES=[]
 
 def required_sharded(mode):
@@ -75,7 +75,7 @@ def main():
         if h["status"]!="OK":degraded.append(name)
     external_present={x.strip().upper() for x in args.external_present.split(",") if x.strip()};external_missing=[x for x in EXTERNAL_REQUIRED_LANES if x.upper() not in external_present]
     clean=not missing and not degraded and not external_missing;status="WORLD_COMPLETE" if clean else "PARTIAL_WORLD_COVERAGE"
-    payload={"contract":"SOURCE_COVERAGE_GUARD_V6_INTERNAL_UNGM_LIVE_CAPABILITY","discovery_mode":args.mode,"coverage_status":status,"worldwide_claim_allowed":clean,"expected_materialized_packs":len(expected_packs),"present_materialized_packs":len(expected_packs)-len(missing),"missing_packs":missing,"degraded_packs":degraded,"external_required_lanes":EXTERNAL_REQUIRED_LANES,"external_present_lanes":sorted(external_present),"external_missing_lanes":external_missing,"strict_exhaustion_sources":sorted(STRICT_EXHAUSTION_SOURCES),"pack_health":health,"semantics":"WORLD_COMPLETE means every configured live-candidate-capable lane materialized cleanly and every adapter with an exhaustion contract proved full traversal. Archive-only lanes, source caps, runtime budgets, request failures or missing exhaustion proof keep coverage PARTIAL. UNGM is now measured as an internal public live lane rather than an assumed external lane. This still does not mean every procurement authority on Earth is configured."}
+    payload={"contract":"SOURCE_COVERAGE_GUARD_V7_CURRENT_REGISTRY_EXHAUSTION","discovery_mode":args.mode,"coverage_status":status,"worldwide_claim_allowed":clean,"expected_materialized_packs":len(expected_packs),"present_materialized_packs":len(expected_packs)-len(missing),"missing_packs":missing,"degraded_packs":degraded,"external_required_lanes":EXTERNAL_REQUIRED_LANES,"external_present_lanes":sorted(external_present),"external_missing_lanes":external_missing,"strict_exhaustion_sources":sorted(STRICT_EXHAUSTION_SOURCES),"pack_health":health,"semantics":"WORLD_COMPLETE means every configured live-candidate-capable lane materialized cleanly and every adapter with an exhaustion contract proved full traversal. Archive-only lanes, source caps, runtime budgets, request failures or missing exhaustion proof keep coverage PARTIAL. UNGM and PCS Current Opportunities are measured as internal public live lanes with explicit exhaustion contracts. This still does not mean every procurement authority on Earth is configured."}
     out=Path(args.out);out.parent.mkdir(parents=True,exist_ok=True);out.write_text(json.dumps(payload,indent=2,ensure_ascii=False),encoding="utf-8");print(json.dumps(payload,indent=2,ensure_ascii=False))
     if args.strict and not clean:raise SystemExit(3)
 if __name__=="__main__":main()
