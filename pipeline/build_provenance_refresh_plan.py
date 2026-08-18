@@ -38,7 +38,6 @@ def needs_refresh(row: dict) -> bool:
                     source=item.get('source') or item.get('path') or item.get('file')
                     if not source or not item.get('source_sha256'):
                         return True
-    # No provenance metrics and no attributable evidence: refresh conservatively.
     return not bool(eq.get('all_compact_snippets_document_attributed') or eq.get('all_review_snippets_attributed'))
 
 
@@ -60,6 +59,7 @@ def main():
         if not loc:
             loc=row.get('evidence_locator') if isinstance(row.get('evidence_locator'),dict) else {}
         run=loc.get('dce_run_id') or row.get('source_dce_run_id')
+        shard=loc.get('shard') if loc.get('shard') is not None else row.get('source_shard')
         if not str(run or '').isdigit():
             continue
         cid=str(row.get('candidate_id') or '').strip()
@@ -68,6 +68,8 @@ def main():
         candidates.append({
             'candidate_id':cid,
             'dce_run_id':int(run),
+            'source_shard':int(shard) if str(shard if shard is not None else '').isdigit() else None,
+            'workflow_artifact_name':f'candidate-{int(shard)}' if str(shard if shard is not None else '').isdigit() else None,
             'release_tag':loc.get('release_tag') or f'dce-harvest-{run}',
             'archive_name':f'candidate-{slugify(cid)}.tar.gz',
             'spm_fit_band':band,
@@ -90,14 +92,14 @@ def main():
         picked={r['candidate_id'] for r in group}
         remaining=[r for r in remaining if r['candidate_id'] not in picked]
     payload={
-        'schema':'DCE_PROVENANCE_REFRESH_PLAN_V2',
+        'schema':'DCE_PROVENANCE_REFRESH_PLAN_V3_WORKFLOW_ARTIFACT_FIRST',
         'source_inbox_updated_at':inbox.get('updated_at'),
         'eligible_legacy_reviews':len(candidates),
         'selected':len(selected),
         'release_count':len(selected_releases),
         'release_tags':selected_releases,
         'items':selected,
-        'policy':'HOT/GOOD/MAYBE legacy evidence only; max release downloads bound cost. Re-extraction uses immutable canonical DCE packs and never changes procurement facts or final verdicts.',
+        'policy':'HOT/GOOD/MAYBE legacy evidence only. Exact workflow shard artifact is preferred because it contains the original worker output; immutable canonical release bundle is fallback. No procurement fact or verdict is changed.',
     }
     out=Path(args.out);out.parent.mkdir(parents=True,exist_ok=True);out.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps({k:payload[k] for k in ('eligible_legacy_reviews','selected','release_count','release_tags')},indent=2))
