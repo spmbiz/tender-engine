@@ -23,10 +23,13 @@ on:
       - 'pipeline/extract_corpus.py'
       - 'pipeline/extract_gates.py'
       - 'pipeline/auto_adjudicate_dce.py'
+      - 'pipeline/build_authenticity_retry_router.py'
+      - 'pipeline/mark_authenticity_retry_dispatched.py'
       - '.github/workflows/gpt-inbox-live-refresh.yml'
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: ${{ github.event_name == 'workflow_dispatch' && github.actor == 'github-actions[bot]' && format('gpt-inbox-bot-{0}', github.run_id) || 'gpt-inbox-live-refresh' }}
@@ -40,7 +43,7 @@ jobs:
       endsWith(format('{0}', github.run_number), '0') ||
       endsWith(format('{0}', github.run_number), '5')
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 24
     steps:
       - uses: actions/checkout@v4
         with:
@@ -119,6 +122,7 @@ jobs:
 
             python pipeline/build_gpt_web_read_batches.py \
               --inbox control/gpt_supergreen_inbox.json \
+              --provenance-overrides control/gpt_provenance_overrides.json \
               --out-dir control/gpt_web_read_batches \
               --batch-size 10
 
@@ -132,7 +136,7 @@ jobs:
           idx_counts=index.get('counts') or {}
           inbox_schema=str(inbox.get('schema') or '')
           payload={
-            'schema':'GPT_INBOX_HEALTH_V3_FAIR_SHARE',
+            'schema':'GPT_INBOX_HEALTH_V4_FAIR_SHARE_PROVENANCE',
             'updated_at':datetime.now(timezone.utc).isoformat(),
             'inbox_schema':inbox_schema,
             'latest_source_dce_run_id':inbox.get('latest_source_dce_run_id'),
@@ -148,10 +152,11 @@ jobs:
             'assistant_read_batch_count':int(manifest.get('batch_count') or 0),
             'assistant_read_batch_size':int(manifest.get('batch_size') or 0),
             'assistant_read_batch_schema':manifest.get('schema'),
+            'provenance_overrides_applied_in_window':int(manifest.get('provenance_overrides_applied_in_window') or 0),
             'recovery_metrics':review.get('recovery_metrics') or {},
             'index_recovery':index.get('recovery') or {},
             'healthy':inbox_schema in {'GPT_WEB_REVIEW_INBOX_V2','GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE'} and int(index.get('count') or 0)>0,
-            'contract':'Health sidecar exposes the true uncapped GPT review backlog plus visible-window fair-share. Rich review batches preserve document provenance where available; GPT Web adjudicator remains the assistant in the conversation.',
+            'contract':'Health sidecar exposes the true uncapped GPT review backlog plus fair-share and read-surface provenance. GPT Web adjudicator remains the assistant; exact-ID authenticity retries are separately cooldown-limited below.',
           }
           open('control/gpt_inbox_metrics.json','w',encoding='utf-8').write(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
           print(json.dumps(payload,indent=2))
@@ -161,14 +166,112 @@ jobs:
             git add -A control/gpt_web_read_batches
             if git diff --cached --quiet; then
               echo 'Persistent review index, rich bank, batches and inbox already current.'
-              exit 0
+              break
             fi
 
             git commit -m "inbox: recover GPT Web queue and read batches ${GITHUB_RUN_ID}"
             if git push origin HEAD:main; then
-              exit 0
+              break
+            fi
+            if [ "$n" -eq 6 ]; then
+              echo 'Failed to persist recovered GPT inbox after retries.' >&2
+              exit 1
             fi
             sleep "$((n * 2))"
           done
-          echo 'Failed to persist recovered GPT inbox after retries.' >&2
-          exit 1
+
+      - name: Dispatch only cooldown-safe authenticity retries from the live inbox
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+
+          python pipeline/build_authenticity_retry_router.py \
+            --inbox control/gpt_supergreen_inbox.json \
+            --state control/authenticity_retry_router_state.json \
+            --plan control/authenticity_retry_router_plan.json \
+            --limit-per-source 12 \
+            --max-attempts 2 \
+            --cooldown-days 7
+
+          total="$(python - <<'PY'
+          import json
+          x=json.load(open('control/authenticity_retry_router_plan.json',encoding='utf-8'))
+          print(sum(int(v or 0) for v in (x.get('selected_counts') or {}).values()))
+          PY
+          )"
+          if [ "$total" -eq 0 ]; then
+            echo 'No cooldown-safe supported authenticity retries.'
+            exit 0
+          fi
+
+          source_run="$(python - <<'PY'
+          import json
+          x=json.load(open('control/live_snapshot_latest.json',encoding='utf-8'))
+          print(x.get('source_discovery_run') or '')
+          PY
+          )"
+          [[ "$source_run" =~ ^[0-9]+$ ]] || { echo "Invalid live discovery run: $source_run" >&2; exit 1; }
+
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add control/authenticity_retry_router_plan.json \
+            queues/ireland_auth_retry_router.jsonl \
+            queues/za_auth_retry_router.jsonl \
+            queues/estonia_auth_retry_router.jsonl
+          if ! git diff --cached --quiet; then
+            git commit -m "retry: materialize stateful authenticity queues ${GITHUB_RUN_ID}"
+            for i in 1 2 3 4 5; do
+              git pull --rebase origin main && git push origin HEAD:main && break
+              git rebase --abort >/dev/null 2>&1 || true
+              [ "$i" -eq 5 ] && exit 1
+              sleep "$((i*3))"
+            done
+          fi
+
+          success=()
+          dispatch_failed=0
+          while IFS=$'\t' read -r source queue count; do
+            [ "$count" -gt 0 ] || continue
+            if gh workflow run dce-fanout-v2.yml --ref main \
+              -f selection_path="$queue" \
+              -f source_discovery_run="$source_run" \
+              -f max_jobs="$count" \
+              -f max_parallel='8' \
+              -f max_shards='32' \
+              -f jobs_per_shard='1'; then
+              success+=("$source")
+            else
+              echo "Authenticity retry dispatch failed source=$source queue=$queue" >&2
+              dispatch_failed=1
+            fi
+          done < <(python - <<'PY'
+          import json
+          x=json.load(open('control/authenticity_retry_router_plan.json',encoding='utf-8'))
+          for source,count in (x.get('selected_counts') or {}).items():
+              print(f"{source}\t{(x.get('queue_paths') or {}).get(source,'')}\t{int(count or 0)}")
+          PY
+          )
+
+          if [ "${#success[@]}" -gt 0 ]; then
+            joined="$(IFS=,; echo "${success[*]}")"
+            git pull --rebase origin main || true
+            python pipeline/mark_authenticity_retry_dispatched.py \
+              --plan control/authenticity_retry_router_plan.json \
+              --state control/authenticity_retry_router_state.json \
+              --sources "$joined"
+            git add control/authenticity_retry_router_state.json
+            if ! git diff --cached --quiet; then
+              git commit -m "retry: persist authenticity cooldown state ${GITHUB_RUN_ID}"
+              for i in 1 2 3 4 5; do
+                git pull --rebase origin main && git push origin HEAD:main && break
+                git rebase --abort >/dev/null 2>&1 || true
+                [ "$i" -eq 5 ] && exit 1
+                sleep "$((i*3))"
+              done
+            fi
+          fi
+          [ "$dispatch_failed" -eq 0 ] || exit 1
