@@ -1,35 +1,36 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-18T23:49:08+00:00",
-  "source_run": "32192589684",
+  "generated_at_utc": "2026-08-18T23:56:58+00:00",
+  "source_run": "32176496082",
   "state_rows": 7669,
-  "ledger_rows": 100729,
-  "snapshot_rows": 100729,
-  "blocked_ids": 23848,
-  "durable_attempted_exact_versions_ignored": 170,
-  "valid_exact_hash_current_unattempted": 714,
-  "eligible_keep_for_dce": 619,
-  "review_worthy_rejects_promoted_to_explore": 89,
-  "stale_hash_ignored": 1039,
+  "ledger_rows": 99264,
+  "snapshot_rows": 99264,
+  "blocked_ids": 24008,
+  "durable_attempted_exact_versions_ignored": 39,
+  "valid_exact_hash_current_unattempted": 1724,
+  "eligible_keep_for_dce": 1594,
+  "review_worthy_rejects_promoted_to_explore": 112,
+  "stale_hash_ignored": 0,
   "missing_snapshot": 0,
   "expired_ignored": 0,
   "selected": 160,
   "selection_decisions": {
-    "MAYBE": 148,
-    "FIT": 6,
-    "REJECT_OBVIOUS": 6
+    "MAYBE": 140,
+    "FIT": 5,
+    "REJECT_OBVIOUS": 15
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
     "qwen-explore-coded": 48,
-    "qwen-reject-audit-coded": 6,
-    "qwen-elastic-coded": 106
+    "qwen-reject-audit-coded": 15,
+    "qwen-elastic-coded": 97
   },
   "selection_freshness": {
-    "recent_unseen_carryover": 158,
-    "historical_backfill": 2
+    "material_new_or_updated": 145,
+    "recent_unseen_carryover": 4,
+    "historical_backfill": 11
   },
   "policy": {
     "keep_is_not_fit": true,
@@ -53,23 +54,23 @@
       "reason": "Qwen runtime is still benchmark-blocked; spend more DCE capacity auditing MAYBE/REJECT paths to measure false negatives."
     }
   },
-  "base_candidate_pool": 625,
+  "base_candidate_pool": 640,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
     "FIT": 6,
-    "MAYBE": 613,
-    "REJECT_OBVIOUS": 6
+    "MAYBE": 619,
+    "REJECT_OBVIOUS": 15
   },
   "candidate_pool_lanes": {
     "qwen-primary": 6,
     "qwen-open-world-explore": 192,
-    "qwen-reject-audit": 6,
-    "qwen-elastic": 421
+    "qwen-reject-audit": 18,
+    "qwen-elastic": 424
   },
   "code_prior": {
-    "positive_code_rows_in_pool": 10,
-    "noncore_code_contradictions_in_pool": 292,
-    "positive_code_rows_selected": 7,
+    "positive_code_rows_in_pool": 17,
+    "noncore_code_contradictions_in_pool": 377,
+    "positive_code_rows_selected": 6,
     "noncore_code_contradictions_selected": 10,
     "policy": "priority_only_never_drop_never_eligibility",
     "candidate_pool_multiplier": 4
