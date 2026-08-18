@@ -46,7 +46,7 @@ def persist(records, *, pages, total_reported, exhausted, errors, warnings, tele
     stats = {
         "source": "UK_PCS_OCDS",
         "portal": "PUBLIC_CONTRACTS_SCOTLAND",
-        "listing_contract": "PCS_CURRENT_OPPORTUNITIES_BROWSER_V1",
+        "listing_contract": "PCS_CURRENT_OPPORTUNITIES_BROWSER_V2",
         "raw_materialized": len(rows),
         "current_materialized": len(current),
         "pages_fetched": pages,
@@ -60,20 +60,25 @@ def persist(records, *, pages, total_reported, exhausted, errors, warnings, tele
         "telemetry": telemetry,
         "generated_at": NOW.isoformat(),
         "source_url": URL,
-        "semantics": "The official PCS Current Opportunities filter is used. Only notices open for tender are traversed; coverage credit requires pagination exhaustion and a non-empty current set.",
+        "semantics": "The official PCS Current Opportunities filter is used. Native and Telerik/custom Notice Type controls are supported. Only notices open for tender are traversed; coverage credit requires pagination exhaustion and a non-empty current set.",
     }
     (OUT / "stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
     return stats
 
 
 async def select_current_opportunities(page, telemetry, errors):
+    option_debug = []
+    # 1) Native HTML select.
     selects = page.locator("select")
     for idx in range(await selects.count()):
         sel = selects.nth(idx)
         options = sel.locator("option")
+        texts = []
         for oi in range(await options.count()):
             option = options.nth(oi)
             text = clean(await option.inner_text())
+            if text:
+                texts.append(text)
             if "current opportunities" not in text.lower():
                 continue
             value = await option.get_attribute("value")
@@ -83,13 +88,82 @@ async def select_current_opportunities(page, telemetry, errors):
                 else:
                     await sel.select_option(label=text)
                 await page.wait_for_timeout(PAGE_WAIT_MS)
+                telemetry["current_filter_mode"] = "NATIVE_SELECT"
                 telemetry["current_filter_option"] = text
                 telemetry["current_filter_select_index"] = idx
                 return True
             except Exception as exc:
-                errors.append({"type": "CURRENT_FILTER_SELECT_ERROR", "error": repr(exc)})
+                errors.append({"type": "CURRENT_FILTER_SELECT_ERROR", "mode": "NATIVE_SELECT", "error": repr(exc)})
                 return False
-    errors.append({"type": "CURRENT_FILTER_NOT_FOUND"})
+        if texts:
+            option_debug.append({"select_index": idx, "options": texts[:30]})
+
+    # 2) PCS uses Telerik/custom controls on some renders. Find likely Notice
+    # Type comboboxes, open them, then click the exact popup option.
+    controls = page.locator(
+        "[id*='NoticeType' i], [name*='NoticeType' i], [aria-label*='Notice Type' i], "
+        "[title*='Notice Type' i], [role='combobox']"
+    )
+    control_debug = []
+    for idx in range(min(await controls.count(), 40)):
+        node = controls.nth(idx)
+        try:
+            visible = await node.is_visible()
+        except Exception:
+            visible = False
+        try:
+            meta = await node.evaluate("el => ({tag:el.tagName,id:el.id||'',name:el.getAttribute('name')||'',cls:el.className||'',aria:el.getAttribute('aria-label')||''})")
+            control_debug.append(meta)
+        except Exception:
+            meta = {}
+        if not visible:
+            continue
+        try:
+            await node.click(timeout=2500)
+        except Exception:
+            try:
+                parent = node.locator("xpath=ancestor-or-self::*[contains(@class,'RadComboBox')][1]")
+                if await parent.count():
+                    await parent.click(timeout=2500)
+                else:
+                    continue
+            except Exception:
+                continue
+        await page.wait_for_timeout(300)
+        popups = page.locator("li.rcbItem, li.rcbHovered, .rcbList li, [role='option']")
+        for oi in range(min(await popups.count(), 200)):
+            opt = popups.nth(oi)
+            try:
+                text = clean(await opt.inner_text())
+                if "current opportunities" in text.lower() and await opt.is_visible():
+                    await opt.click(timeout=3000)
+                    await page.wait_for_timeout(PAGE_WAIT_MS)
+                    telemetry["current_filter_mode"] = "CUSTOM_COMBOBOX"
+                    telemetry["current_filter_option"] = text
+                    telemetry["current_filter_control"] = meta
+                    return True
+            except Exception:
+                continue
+
+    # 3) Exact visible option fallback. This deliberately does not match the help
+    # text "Current Opportunities - Notices open for tender".
+    exact = page.get_by_text(re.compile(r"^\s*Current Opportunities\s*$", re.I))
+    for i in range(min(await exact.count(), 20)):
+        candidate = exact.nth(i)
+        try:
+            if not await candidate.is_visible():
+                continue
+            await candidate.click(timeout=3000)
+            await page.wait_for_timeout(PAGE_WAIT_MS)
+            telemetry["current_filter_mode"] = "VISIBLE_EXACT_TEXT"
+            telemetry["current_filter_option"] = clean(await candidate.inner_text())
+            return True
+        except Exception:
+            continue
+
+    telemetry["select_options_debug"] = option_debug
+    telemetry["notice_type_controls_debug"] = control_debug[:40]
+    errors.append({"type": "CURRENT_FILTER_NOT_FOUND", "native_selects_seen": len(option_debug), "candidate_controls_seen": len(control_debug)})
     return False
 
 
@@ -146,8 +220,6 @@ async def parse_current_page(page, records, telemetry):
             continue
         deadline = parse_deadline(deadline_m.group(1) if deadline_m and deadline_m.group(1) else "")
         notice_type = clean(type_m.group(1) if type_m else "")
-        # Current Opportunities should contain open notices. Deadline is an extra
-        # fail-closed check where PCS exposes it; missing deadlines remain explicit.
         if deadline and deadline < NOW:
             continue
         links = tr.locator("a[href]")
@@ -170,6 +242,7 @@ async def parse_current_page(page, records, telemetry):
             "ocid": ocid or None,
             "title": title or text[:500],
             "buyer": clean(buyer_m.group(1) if buyer_m else "") or None,
+            "country": "GB",
             "deadline": deadline.isoformat() if deadline else None,
             "current": True,
             "currentness_evidence": "PCS_CURRENT_OPPORTUNITIES_OFFICIAL_FILTER",
@@ -271,8 +344,6 @@ async def main():
                     break
                 target = (current_page or pages) + 1
                 if not await advance(page, target, signature):
-                    # If PCS does not expose another page and the current page is
-                    # the only page, that is a valid exhaustion proof.
                     if not total_pages or total_pages <= pages:
                         exhausted = True
                     else:
