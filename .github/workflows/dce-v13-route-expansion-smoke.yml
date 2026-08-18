@@ -104,11 +104,21 @@ jobs:
           incomplete=[r for r in rows if r['status'] in {None,'STARTED','WORKER_ERROR'}]
           if incomplete:
               raise SystemExit(f'incomplete worker results: {incomplete}')
-          # These two pages currently publish explicit non-public access semantics.
-          # Fail if the resolver silently treats them as ordinary unresolved pages.
-          for cid in ('V13:SE-EAVROP','V13:PT-ACINGOV'):
-              if by_id[cid]['status'] not in {'INTEREST_RECORDING_REQUIRED','AUTH_REQUIRED','CAPTCHA_REQUIRED'}:
-                  raise SystemExit(f'barrier classification regressed for {cid}: {by_id[cid]}')
+          barrier={'INTEREST_RECORDING_REQUIRED','AUTH_REQUIRED','CAPTCHA_REQUIRED'}
+          # E-Avrop is a live source whose access semantics can change. A real
+          # public download with at least one file is stronger evidence than the
+          # historical barrier expectation; otherwise it must still classify as
+          # an explicit barrier instead of a generic unresolved page.
+          eav=by_id['V13:SE-EAVROP']
+          if eav['status']=='DOWNLOADED_PUBLIC':
+              if eav['files'] <= 0:
+                  raise SystemExit(f'public E-Avrop result has no files: {eav}')
+          elif eav['status'] not in barrier:
+              raise SystemExit(f'E-Avrop access classification regressed: {eav}')
+          # ACINGOV remains an explicit non-public-access probe in this corpus.
+          acingov=by_id['V13:PT-ACINGOV']
+          if acingov['status'] not in barrier:
+              raise SystemExit(f'barrier classification regressed for V13:PT-ACINGOV: {acingov}')
           if not any(r['files'] > 0 for r in rows):
               print('WARNING: no live download in this time-sensitive smoke corpus; route diagnostics still preserved')
           Path('v13-route-smoke-summary.json').write_text(json.dumps(rows, indent=2, ensure_ascii=False), encoding='utf-8')
