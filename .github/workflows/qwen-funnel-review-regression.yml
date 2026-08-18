@@ -8,6 +8,8 @@ on:
       - 'pipeline/procurement_code_prior.py'
       - 'pipeline/qwen_funnel_audit.py'
       - 'pipeline/build_gpt_review_index.py'
+      - 'pipeline/build_qwen_dce_selection.py'
+      - 'pipeline/build_qwen_dce_selection_base.py'
       - 'pipeline/build_qwen_dce_selection_coded.py'
       - 'tests/test_procurement_code_and_review_index.py'
       - '.github/workflows/qwen-funnel-review-regression.yml'
@@ -36,7 +38,7 @@ jobs:
   live-funnel-audit:
     needs: deterministic-tests
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
         with:
@@ -67,6 +69,71 @@ jobs:
             --dir audit --clobber
           mv "audit/live-open-tenders-${source_run}.jsonl.gz" audit/snapshot.jsonl.gz
           echo "SOURCE_RUN=$source_run" >> "$GITHUB_ENV"
+
+      - name: Test scheduler A/B — frozen selector vs coded selector on identical live state
+        shell: bash
+        run: |
+          set -euo pipefail
+          common=(
+            --state audit/qwen-classification-state-latest.jsonl.gz
+            --ledger audit/ledger.jsonl.gz
+            --snapshot audit/snapshot.jsonl.gz
+            --blocked-state control/controller_state_checkpoint.json
+            --review-backlog control/gpt_review_backlog.json
+            --dispatch-state control/qwen_live/dispatch_state.json
+            --attempt-ledger control/dce_attempt_ledger.jsonl
+            --source-run "$SOURCE_RUN"
+            --explore-share .20
+            --reject-audit-share .05
+          )
+          python pipeline/build_qwen_dce_selection_base.py "${common[@]}" \
+            --limit 160 --out audit/base160.jsonl --summary audit/base160-summary.json
+          python pipeline/build_qwen_dce_selection_coded.py "${common[@]}" \
+            --limit 160 --candidate-pool-multiplier 1 \
+            --out audit/coded160-samepool.jsonl --summary audit/coded160-samepool-summary.json
+          python pipeline/build_qwen_dce_selection_base.py "${common[@]}" \
+            --limit 640 --out audit/base640.jsonl --summary audit/base640-summary.json
+          python pipeline/build_qwen_dce_selection_coded.py "${common[@]}" \
+            --limit 160 --candidate-pool-multiplier 4 \
+            --out audit/coded160-prod.jsonl --summary audit/coded160-prod-summary.json
+
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          def rows(p):
+              return [json.loads(x) for x in Path(p).read_text().splitlines() if x.strip()]
+          b160=rows('audit/base160.jsonl')
+          c160=rows('audit/coded160-samepool.jsonl')
+          b640=rows('audit/base640.jsonl')
+          prod=rows('audit/coded160-prod.jsonl')
+          def ids(xs): return [str(x.get('candidate_id') or '') for x in xs]
+          sb160=set(ids(b160)); sc160=set(ids(c160)); sb640=set(ids(b640)); sp=set(ids(prod))
+          assert len(b160)==160 and len(c160)==160, (len(b160),len(c160))
+          assert sb160==sc160, {'lost':sorted(sb160-sc160)[:20],'invented':sorted(sc160-sb160)[:20]}
+          assert len(prod)==160 and sp <= sb640, {'outside_frozen_pool':sorted(sp-sb640)[:20]}
+          base_by={x['candidate_id']:x for x in b640}
+          for x in prod:
+              old=base_by[x['candidate_id']]
+              assert (x.get('qwen') or {}).get('classification') == (old.get('qwen') or {}).get('classification')
+              assert (x.get('qwen') or {}).get('survival_decision') == (old.get('qwen') or {}).get('survival_decision')
+              assert (x.get('qwen') or {}).get('dce_eligible') == (old.get('qwen') or {}).get('dce_eligible')
+          report={
+              'schema':'CODED_DCE_SCHEDULER_AB_V1',
+              'source_run':__import__('os').environ['SOURCE_RUN'],
+              'same_pool_id_conservation':True,
+              'same_pool_rows':len(c160),
+              'production_rows':len(prod),
+              'production_subset_of_frozen_4x_pool':True,
+              'production_changed_ids_vs_base160':len(sp ^ sb160),
+              'qwen_classification_mutations':0,
+              'keep_drop_mutations':0,
+              'dce_eligible_mutations':0,
+              'coded_summary':json.load(open('audit/coded160-prod-summary.json')),
+          }
+          Path('audit/coded-scheduler-ab.json').write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+
       - name: Build exact-hash live funnel audit
         run: |
           python pipeline/qwen_funnel_audit.py \
@@ -85,14 +152,17 @@ jobs:
           assert sum(int(v) for v in (d.get('decision_counts') or {}).values()) == int(d['state_current_exact_hash_rows']), d
           print(json.dumps({
               'fit_coverage':d.get('fit_coverage'),
-              'fit_funnel':d.get('fit_funnel'),
+              'decision_funnel':d.get('decision_funnel'),
               'code_prior_audit':d.get('code_prior_audit'),
           },indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
           name: qwen-funnel-audit-${{ github.run_id }}
-          path: audit/qwen-funnel-audit.json
+          path: |
+            audit/qwen-funnel-audit.json
+            audit/coded-scheduler-ab.json
+            audit/coded160-prod-summary.json
           retention-days: 14
       - name: Persist latest live funnel audit transactionally
         env:
@@ -100,13 +170,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          path='control/qwen_live/funnel_audit.json'
-          content="$(base64 -w0 audit/qwen-funnel-audit.json)"
-          for n in 1 2 3 4 5; do
-            sha="$(gh api "repos/$GITHUB_REPOSITORY/contents/$path?ref=main" --jq '.sha' 2>/dev/null || true)"
-            args=(--method PUT "repos/$GITHUB_REPOSITORY/contents/$path" -f message="audit: persist Qwen funnel ${GITHUB_RUN_ID}" -f content="$content" -f branch=main)
-            [ -n "$sha" ] && args+=(-f sha="$sha")
-            if gh api "${args[@]}" >/dev/null; then exit 0; fi
-            sleep "$((n*2))"
+          for pair in \
+            'control/qwen_live/funnel_audit.json:audit/qwen-funnel-audit.json' \
+            'control/qwen_live/coded_scheduler_ab.json:audit/coded-scheduler-ab.json'; do
+            path="${pair%%:*}"; file="${pair#*:}"
+            content="$(base64 -w0 "$file")"
+            ok=0
+            for n in 1 2 3 4 5; do
+              sha="$(gh api "repos/$GITHUB_REPOSITORY/contents/$path?ref=main" --jq '.sha' 2>/dev/null || true)"
+              args=(--method PUT "repos/$GITHUB_REPOSITORY/contents/$path" -f message="audit: persist Qwen scheduler/funnel ${GITHUB_RUN_ID}" -f content="$content" -f branch=main)
+              [ -n "$sha" ] && args+=(-f sha="$sha")
+              if gh api "${args[@]}" >/dev/null; then ok=1; break; fi
+              sleep "$((n*2))"
+            done
+            [ "$ok" = 1 ] || exit 1
           done
-          exit 1
