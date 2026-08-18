@@ -21,8 +21,6 @@ STRICT_NONZERO_SOURCES={
     "CYPRUS_EPPS","MALTA_EPPS","LUX_PMP","SI_EJN","SK_UVO","EE_RHR",
     "WORLD_BANK_PROCUREMENT","ZA_ETENDERS_OCDS","UK_PCS_OCDS","UK_FTS_OCDS","LT_CVP_API",
 }
-# These adapters expose a machine-verifiable exhaustion contract. They must not
-# be called complete unless they prove traversal reached source exhaustion.
 STRICT_EXHAUSTION_SOURCES={"TED","LT_CVP_API"}
 EXTERNAL_REQUIRED_LANES=["UNGM_PUBLIC"]
 
@@ -47,6 +45,8 @@ def stats_health(pack_dir):
         if obj.get("truncated_by_page_cap"):bad.append({"path":str(path),"reason":"TRUNCATED_BY_PAGE_CAP"})
         if obj.get("truncated_by_runtime_budget"):bad.append({"path":str(path),"reason":"TRUNCATED_BY_RUNTIME_BUDGET"})
         source=str(obj.get("source") or "").upper()
+        if obj.get("live_candidate_capable") is False or obj.get("live_coverage_credit_allowed") is False:
+            bad.append({"path":str(path),"reason":"NOT_LIVE_CANDIDATE_SOURCE","source":source or "UNKNOWN"})
         if source in STRICT_NONZERO_SOURCES and obj.get("current_materialized") is not None and int(obj.get("current_materialized") or 0)==0:
             bad.append({"path":str(path),"reason":"ZERO_CURRENT_MATERIALIZED","source":source})
         if source in STRICT_EXHAUSTION_SOURCES:
@@ -75,7 +75,7 @@ def main():
         if h["status"]!="OK":degraded.append(name)
     external_present={x.strip().upper() for x in args.external_present.split(",") if x.strip()};external_missing=[x for x in EXTERNAL_REQUIRED_LANES if x.upper() not in external_present]
     clean=not missing and not degraded and not external_missing;status="WORLD_COMPLETE" if clean else "PARTIAL_WORLD_COVERAGE"
-    payload={"contract":"SOURCE_COVERAGE_GUARD_V4_EXHAUSTION","discovery_mode":args.mode,"coverage_status":status,"worldwide_claim_allowed":clean,"expected_materialized_packs":len(expected_packs),"present_materialized_packs":len(expected_packs)-len(missing),"missing_packs":missing,"degraded_packs":degraded,"external_required_lanes":EXTERNAL_REQUIRED_LANES,"external_present_lanes":sorted(external_present),"external_missing_lanes":external_missing,"strict_exhaustion_sources":sorted(STRICT_EXHAUSTION_SOURCES),"pack_health":health,"semantics":"WORLD_COMPLETE means every configured lane materialized cleanly and every adapter with an exhaustion contract proved full traversal. A source cap, runtime budget, request failure, missing exhaustion proof, or required external lane keeps coverage PARTIAL. This still does not mean every procurement authority on Earth is configured."}
+    payload={"contract":"SOURCE_COVERAGE_GUARD_V5_LIVE_CAPABILITY_EXHAUSTION","discovery_mode":args.mode,"coverage_status":status,"worldwide_claim_allowed":clean,"expected_materialized_packs":len(expected_packs),"present_materialized_packs":len(expected_packs)-len(missing),"missing_packs":missing,"degraded_packs":degraded,"external_required_lanes":EXTERNAL_REQUIRED_LANES,"external_present_lanes":sorted(external_present),"external_missing_lanes":external_missing,"strict_exhaustion_sources":sorted(STRICT_EXHAUSTION_SOURCES),"pack_health":health,"semantics":"WORLD_COMPLETE means every configured live-candidate-capable lane materialized cleanly and every adapter with an exhaustion contract proved full traversal. Archive-only lanes, source caps, runtime budgets, request failures, missing exhaustion proof, or required external lanes keep coverage PARTIAL. This still does not mean every procurement authority on Earth is configured."}
     out=Path(args.out);out.parent.mkdir(parents=True,exist_ok=True);out.write_text(json.dumps(payload,indent=2,ensure_ascii=False),encoding="utf-8");print(json.dumps(payload,indent=2,ensure_ascii=False))
     if args.strict and not clean:raise SystemExit(3)
 if __name__=="__main__":main()
