@@ -1,0 +1,77 @@
+name: GPT Live Review Batch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/gpt_supergreen_inbox.json'
+      - 'control/final_supergreen_bank.json'
+      - 'control/gpt_web_review_ledger.json'
+      - 'pipeline/build_live_business_review_batch.py'
+      - '.github/workflows/gpt-live-review-batch.yml'
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gpt-live-review-batch
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build compact live final-review batch
+        run: |
+          python pipeline/build_live_business_review_batch.py \
+            --inbox control/gpt_supergreen_inbox.json \
+            --final-bank control/final_supergreen_bank.json \
+            --ledger control/gpt_web_review_ledger.json \
+            --out control/gpt_live_review_batch.json \
+            --max-items 30
+      - name: Fail closed if compact surface contains verdicts
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('control/gpt_live_review_batch.json',encoding='utf-8'))
+          assert p.get('schema') == 'GPT_LIVE_BUSINESS_REVIEW_BATCH_V1', p
+          for x in p.get('items') or []:
+              assert x.get('finality') == 'COMPACT_REVIEW_INPUT_NOT_A_VERDICT', x
+              assert 'classification' not in x and 'verdict' not in x, x
+          print({'selected':p.get('selected'),'unreviewed_gate_ready_total':p.get('unreviewed_gate_ready_total'),'top':[x.get('candidate_id') for x in (p.get('items') or [])[:5]]})
+          PY
+      - name: Persist compact surface transactionally
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp control/gpt_live_review_batch.json /tmp/gpt_live_review_batch.json
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          for n in 1 2 3 4 5 6; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/gpt_live_review_batch.json control/gpt_live_review_batch.json
+            git add control/gpt_live_review_batch.json
+            if git diff --cached --quiet; then
+              echo 'Compact final-review surface already current.'
+              exit 0
+            fi
+            git commit -m "review: refresh live BUSINESS_GATES batch ${GITHUB_RUN_ID}"
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            sleep "$((n*2))"
+          done
+          exit 1
