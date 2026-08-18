@@ -1,0 +1,121 @@
+{
+  "schema": "AUTHENTICITY_RETRY_ROUTER_PLAN_V1",
+  "generated_at": "2026-08-18T22:52:51.302545+00:00",
+  "selected_counts": {
+    "IRELAND": 0,
+    "ZA_ETENDERS": 12,
+    "ESTONIA": 0
+  },
+  "selected": {
+    "IRELAND": [],
+    "ZA_ETENDERS": [
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164913-2026-08-07",
+        "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
+        "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
+        "prior_attempts": 0,
+        "source_dce_run_id": 32179607313
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165287-2026-08-11",
+        "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
+        "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
+        "prior_attempts": 0,
+        "source_dce_run_id": 32169502902
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165142-2026-08-07",
+        "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
+        "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
+        "prior_attempts": 0,
+        "source_dce_run_id": 32169502902
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164989-2026-08-07",
+        "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
+        "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
+        "prior_attempts": 0,
+        "source_dce_run_id": 32166961956
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165953-2026-08-18",
+        "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
+        "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
+        "prior_attempts": 0,
+        "source_dce_run_id": 32166961956
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164958-2026-08-07",
+        "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
+        "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
+        "prior_attempts": 0,
+        "source_dce_run_id": 32179607313
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165436-2026-08-13",
+        "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
+        "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
+        "prior_attempts": 0,
+        "source_dce_run_id": 32179607313
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165928-2026-08-18",
+        "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
+        "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
+        "prior_attempts": 0,
+        "source_dce_run_id": 32171785141
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165688-2026-08-14",
+        "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
+        "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
+        "prior_attempts": 0,
+        "source_dce_run_id": 32171785141
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165400-2026-08-12",
+        "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
+        "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
+        "prior_attempts": 0,
+        "source_dce_run_id": 32169502902
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165571-2026-08-14",
+        "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
+        "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
+        "prior_attempts": 0,
+        "source_dce_run_id": 32169502902
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165905-2026-08-18",
+        "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
+        "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
+        "prior_attempts": 0,
+        "source_dce_run_id": 32184680934
+      }
+    ],
+    "ESTONIA": []
+  },
+  "queue_paths": {
+    "IRELAND": "queues/ireland_auth_retry_router.jsonl",
+    "ZA_ETENDERS": "queues/za_auth_retry_router.jsonl",
+    "ESTONIA": "queues/estonia_auth_retry_router.jsonl"
+  },
+  "blocked": {
+    "cooldown": 0,
+    "attempt_cap": 0,
+    "unsupported": 6
+  },
+  "policy": {
+    "supported_sources": [
+      "IRELAND",
+      "ZA_ETENDERS",
+      "ESTONIA"
+    ],
+    "max_attempts": 2,
+    "cooldown_days": 7,
+    "exact_candidate_ids_only": true,
+    "creates_green": false,
+    "unknown_never_pass": true
+  }
+}
