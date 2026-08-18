@@ -26,9 +26,6 @@ def clip(value: Any, chars: int = 520) -> str:
 def display_text(item: dict[str, Any]) -> str:
     raw = str(item.get("text") or item.get("snippet") or item.get("context") or "")
     if item.get("raw_machine_format"):
-        # Display-only cleanup. The artifact remains authoritative and addressable
-        # by source/hash; stripping markup here prevents raw Word/XML tags from
-        # crowding the small GPT read surface.
         raw = html.unescape(re.sub(r"<[^>]{1,240}>", " ", raw))
     return clip(raw)
 
@@ -82,6 +79,47 @@ def evidence(row: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
     return out
 
 
+def source_run(row: dict[str, Any]) -> int | None:
+    for value in (
+        row.get("source_dce_run_id"),
+        (row.get("artifact_locator") or {}).get("dce_run_id") if isinstance(row.get("artifact_locator"), dict) else None,
+        (row.get("evidence_locator") or {}).get("dce_run_id") if isinstance(row.get("evidence_locator"), dict) else None,
+    ):
+        if str(value or "").isdigit():
+            return int(value)
+    return None
+
+
+def apply_provenance_override(row: dict[str, Any], overrides: dict[str, Any]) -> dict[str, Any]:
+    candidate = str(row.get("candidate_id") or "").strip()
+    override = overrides.get(candidate)
+    if not isinstance(override, dict):
+        return row
+    current_run = source_run(row)
+    override_run = override.get("source_dce_run_id")
+    if current_run is None or not str(override_run or "").isdigit() or current_run != int(override_run):
+        return row
+    refreshed = dict(row)
+    if isinstance(override.get("evidence_by_gate"), dict):
+        refreshed["evidence_by_gate"] = override["evidence_by_gate"]
+        refreshed["gate_evidence_candidates"] = override["evidence_by_gate"]
+        refreshed["evidence_gate_coverage"] = sum(1 for vals in override["evidence_by_gate"].values() if isinstance(vals, list) and vals)
+    if isinstance(override.get("evidence_quality_summary"), dict):
+        refreshed["evidence_quality_summary"] = override["evidence_quality_summary"]
+    if isinstance(override.get("evidence_provenance_summary"), dict):
+        refreshed["evidence_provenance_summary"] = override["evidence_provenance_summary"]
+    refreshed["provenance_override"] = {
+        "applied": True,
+        "refreshed_at": override.get("refreshed_at"),
+        "source_dce_run_id": int(override_run),
+        "release_tag": override.get("release_tag"),
+        "archive_name": override.get("archive_name"),
+        "bundle_asset": override.get("bundle_asset"),
+        "policy": "Evidence provenance/presentation refresh only; ranking and procurement verdict are unchanged.",
+    }
+    return refreshed
+
+
 def compact(row: dict[str, Any]) -> dict[str, Any]:
     da = row.get("deadline_authority") if isinstance(row.get("deadline_authority"), dict) else {}
     eq = row.get("evidence_quality_summary") if isinstance(row.get("evidence_quality_summary"), dict) else {}
@@ -128,6 +166,7 @@ def compact(row: dict[str, Any]) -> dict[str, Any]:
             "all_compact_snippets_document_attributed": bool(snippets and attributed == len(snippets)),
         },
         "evidence": ev,
+        "provenance_override": row.get("provenance_override"),
         "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
         "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
     }
@@ -136,13 +175,20 @@ def compact(row: dict[str, Any]) -> dict[str, Any]:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--inbox", default="control/gpt_supergreen_inbox.json")
+    ap.add_argument("--provenance-overrides", default="control/gpt_provenance_overrides.json")
     ap.add_argument("--out-dir", default="control/gpt_web_read_batches")
     ap.add_argument("--batch-size", type=int, default=10)
     args = ap.parse_args()
 
     inbox = load(Path(args.inbox))
-    rows = inbox.get("review_queue") or inbox.get("pending_final_review") or []
-    rows = [compact(x) for x in rows if isinstance(x, dict) and x.get("candidate_id")]
+    override_doc = load(Path(args.provenance_overrides))
+    overrides = override_doc.get("overrides") if isinstance(override_doc.get("overrides"), dict) else {}
+    raw_rows = inbox.get("review_queue") or inbox.get("pending_final_review") or []
+    rows = [
+        compact(apply_provenance_override(x, overrides))
+        for x in raw_rows
+        if isinstance(x, dict) and x.get("candidate_id")
+    ]
     batch_size = max(1, min(25, int(args.batch_size)))
     out_dir = Path(args.out_dir)
     if out_dir.exists():
@@ -150,12 +196,13 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     files = []
+    applied = sum(1 for row in rows if isinstance(row.get("provenance_override"), dict) and row["provenance_override"].get("applied"))
     for start in range(0, len(rows), batch_size):
         chunk = rows[start : start + batch_size]
         idx = start // batch_size
         name = f"batch-{idx:03d}.json"
         payload = {
-            "schema": "GPT_WEB_READ_BATCH_V2_PROVENANCE",
+            "schema": "GPT_WEB_READ_BATCH_V3_PROVENANCE_REFRESH",
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "source_inbox_updated_at": inbox.get("updated_at"),
             "latest_source_dce_run_id": inbox.get("latest_source_dce_run_id"),
@@ -164,21 +211,23 @@ def main() -> None:
             "end_rank": start + len(chunk),
             "count": len(chunk),
             "items": chunk,
-            "instruction": "Assistant adjudicates these DCE-backed candidates. Compact snippets with provenance_strength LEGACY_UNATTRIBUTED/LEGACY_PATH_ONLY are not sufficient to resolve a mandatory gate; follow artifact_locator. Unknown is never PASS and this file never emits a final verdict automatically.",
+            "instruction": "Assistant adjudicates these DCE-backed candidates. Exact candidate/run provenance overrides may enrich legacy DCE from immutable canonical packs without changing ranking. Compact snippets still lacking path+SHA are navigation evidence only; follow artifact_locator. Unknown is never PASS.",
         }
         (out_dir / name).write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         files.append({"file": name, "start_rank": start + 1, "end_rank": start + len(chunk), "count": len(chunk)})
 
     manifest = {
-        "schema": "GPT_WEB_READ_BATCH_MANIFEST_V2_PROVENANCE",
+        "schema": "GPT_WEB_READ_BATCH_MANIFEST_V3_PROVENANCE_REFRESH",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "source_inbox_updated_at": inbox.get("updated_at"),
         "latest_source_dce_run_id": inbox.get("latest_source_dce_run_id"),
         "rich_window_count": len(rows),
+        "provenance_override_count_available": len(overrides),
+        "provenance_overrides_applied_in_window": applied,
         "batch_size": batch_size,
         "batch_count": len(files),
         "files": files,
-        "contract": "Mechanical split/compaction only. New DCE snippets retain exact document provenance. Legacy unattributed snippets force artifact lookup before gate resolution. GPT Web adjudicator is the assistant, not a repository worker.",
+        "contract": "Mechanical split/compaction only. New DCE snippets retain exact document provenance; exact candidate+source-run historical overrides may restore provenance from immutable canonical DCE packs. Neither mechanism changes ranking, eligibility or final verdict.",
     }
     (out_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(manifest, ensure_ascii=False, indent=2))
