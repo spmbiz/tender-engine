@@ -3,16 +3,22 @@ name: Apply Live National Lanes
 on:
   push:
     branches: [main]
-    paths: ['control/national_expansion_patch_trigger.txt']
+    paths:
+      - 'control/national_expansion_patch_trigger.txt'
+      - 'control/recall_hardening_p0_trigger.txt'
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: apply-live-national-lanes-and-recall-hardening
+  cancel-in-progress: false
+
 jobs:
   patch-and-validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,36 +26,67 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - name: Apply idempotent patch
+      - name: Install validation dependencies
+        run: python -m pip install --disable-pip-version-check -q pytest requests pyyaml
+      - name: Preserve existing national-lane patch behavior
         run: python pipeline/patch_live_national_lanes.py
+      - name: Apply P0 recall hardening
+        run: python tools/apply_recall_hardening_p0.py
       - name: Validate Python and workflow YAML
         run: |
-          python -m py_compile pipeline/discover_si_ejn_browser.py pipeline/discover_sk_uvo.py pipeline/discover_ee_rhr.py pipeline/dce_worker_v6.py pipeline/source_coverage_guard.py
-          python -m pip install --disable-pip-version-check -q pyyaml
+          python -m py_compile \
+            pipeline/discover_si_ejn_browser.py \
+            pipeline/discover_sk_uvo.py \
+            pipeline/discover_ee_rhr.py \
+            pipeline/dce_worker_v6.py \
+            pipeline/source_coverage_guard.py \
+            pipeline/discover_ted.py \
+            pipeline/build_live_world_snapshot.py \
+            pipeline/build_qwen_dce_selection_coded.py
           python - <<'PY'
           import yaml
           from pathlib import Path
-          p=Path('.github/workflows/supergreen-discovery-v2.yml')
-          x=yaml.safe_load(p.read_text())
-          assert isinstance(x,dict) and 'jobs' in x
-          body=p.read_text()
+          for rel in ('.github/workflows/supergreen-discovery-v2.yml','.github/workflows/live-world-snapshot.yml'):
+              p=Path(rel)
+              x=yaml.safe_load(p.read_text(encoding='utf-8'))
+              assert isinstance(x,dict) and 'jobs' in x, rel
+          body=Path('.github/workflows/supergreen-discovery-v2.yml').read_text(encoding='utf-8')
           for token in ('SI_EJN','SK_UVO','EE_RHR','discover_si_ejn_browser.py','discover_sk_uvo.py','discover_ee_rhr.py'):
               assert token in body, token
           print('workflow patch validation OK')
           PY
-      - name: Commit only if changed
+      - name: Run recall and funnel regression suite
+        run: |
+          python -m pytest -q \
+            tests/test_live_universe_contract.py \
+            tests/test_snapshot_carry_forward.py \
+            tests/test_ted_checkpoint.py \
+            tests/test_recall_workflow_contract.py \
+            tests/test_procurement_code_and_review_index.py
+      - name: Commit only verified operational changes
         shell: bash
         run: |
           set -euo pipefail
-          if git diff --quiet -- .github/workflows/supergreen-discovery-v2.yml; then
-            echo 'Already patched'; exit 0
+          paths=(
+            .github/workflows/supergreen-discovery-v2.yml
+            .github/workflows/live-world-snapshot.yml
+            pipeline/discover_ted.py
+            pipeline/build_live_world_snapshot.py
+            pipeline/build_qwen_dce_selection_coded.py
+            tests/test_snapshot_carry_forward.py
+            tests/test_ted_checkpoint.py
+            tests/test_recall_workflow_contract.py
+          )
+          if git diff --quiet -- "${paths[@]}"; then
+            echo 'Recall hardening already applied'; exit 0
           fi
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add .github/workflows/supergreen-discovery-v2.yml
-          git commit -m 'discovery: activate Slovenia Slovakia and Estonia national live lanes'
-          for i in 1 2 3; do
+          git add "${paths[@]}"
+          git commit -m 'tenders: harden live recall against source regressions'
+          for i in 1 2 3 4 5; do
             git pull --rebase origin main && git push origin HEAD:main && exit 0
-            sleep $((i*2))
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
           done
           exit 1
