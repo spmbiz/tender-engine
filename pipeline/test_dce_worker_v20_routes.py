@@ -11,7 +11,10 @@ import dce_worker_v20 as v20
 
 def _zip_bytes() -> bytes:
     buf = io.BytesIO()
-    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+    # Keep the fixture deliberately >1 KiB after ZIP encoding so it exercises the
+    # resolver's fail-closed minimum-payload threshold instead of accidentally
+    # testing fallback behavior because a repeated byte string compresses tiny.
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_STORED) as z:
         z.writestr("ITT.pdf", b"%PDF-1.4\n" + b"x" * 1500)
     return buf.getvalue()
 
