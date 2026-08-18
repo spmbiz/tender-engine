@@ -1,15 +1,37 @@
 {
   "schema": "GPT_INBOX_HEALTH_V2",
-  "updated_at": "2026-08-18T22:36:14.440261+00:00",
-  "inbox_schema": "GPT_WEB_REVIEW_INBOX_V2",
+  "updated_at": "2026-08-18T22:37:16.310716+00:00",
+  "inbox_schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
   "latest_source_dce_run_id": 32190330115,
   "counts": {
     "pending_gpt_web_review": 160,
     "reviewed_ticks_total": 182,
     "excluded_already_reviewed": 0,
     "excluded_already_in_final_bank": 0,
+    "pending_before_visible_cap": 251,
     "pending_by_stage": {
-      "BUSINESS_GATES": 160
+      "BUSINESS_GATES": 140,
+      "DCE_AUTHENTICITY": 20
+    },
+    "pending_by_inbox_lane": {
+      "GPT_PRIORITY": 120,
+      "DCE_AUTHENTICITY_REPAIR": 20,
+      "LOW_PORTAL_SURVEILLANCE": 20
+    },
+    "pending_by_fit_band": {
+      "HOT": 6,
+      "GOOD": 70,
+      "MAYBE": 55,
+      "LOW": 29
+    },
+    "pending_by_portal": {
+      "IRELAND_ETENDERS": 10,
+      "TED": 56,
+      "ZA_ETENDERS": 48,
+      "US_SAM": 42,
+      "GENERIC_PUBLIC_PAGE": 1,
+      "SCOTLAND_PCS": 2,
+      "WORLD_BANK": 1
     }
   },
   "review_bank_count": 160,
@@ -54,6 +76,6 @@
     "authenticity_rows_seen_this_refresh": 0,
     "source_runs_seen_this_refresh": []
   },
-  "healthy": true,
+  "healthy": false,
   "contract": "Health sidecar exposes true uncapped GPT review backlog. Rich review files are mechanical read surfaces; GPT Web adjudicator is the assistant in the conversation."
 }
