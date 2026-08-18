@@ -124,12 +124,28 @@ jobs:
             --dce-run-id "$DCE_RUN_ID" \
             --source-run-id "$SOURCE_RUN" | tee ledger-update.json
 
+          # An unresolved source-scoped terminal skip is deliberately left retryable.
+          # It must not discard already materialized successful attempts from this run.
+          set +e
           python pipeline/dce_attempt_ledger.py update-terminal-skips \
             --selection "$SELECTION" \
             --summary "$SUMMARY" \
             --ledger control/dce_attempt_ledger.jsonl \
             --dce-run-id "$DCE_RUN_ID" \
-            --source-run-id "$SOURCE_RUN" | tee ledger-skips.json
+            --source-run-id "$SOURCE_RUN" > ledger-skips.json 2> ledger-skips.err
+          skip_rc=$?
+          set -e
+          if [ "$skip_rc" -ne 0 ]; then
+            if grep -q '^terminal skip rows could not be resolved safely:' ledger-skips.err; then
+              cat ledger-skips.err >&2
+              printf '%s\n' '{"added":0,"unresolved_terminal_skips_left_retryable":true}' > ledger-skips.json
+            else
+              cat ledger-skips.err >&2
+              exit "$skip_rc"
+            fi
+          else
+            cat ledger-skips.json
+          fi
 
           added="$(python - <<'PY'
           import json
