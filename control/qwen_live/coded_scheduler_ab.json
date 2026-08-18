@@ -10,8 +10,8 @@
   "keep_drop_mutations": 0,
   "dce_eligible_mutations": 0,
   "coded_summary": {
-    "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V1",
-    "generated_at_utc": "2026-08-18T15:11:45+00:00",
+    "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
+    "generated_at_utc": "2026-08-18T15:16:57+00:00",
     "source_run": "32120769848",
     "state_rows": 5968,
     "ledger_rows": 43371,
@@ -25,20 +25,20 @@
     "expired_ignored": 7,
     "selected": 160,
     "selection_decisions": {
-      "MAYBE": 610,
-      "REJECT_OBVIOUS": 30
+      "MAYBE": 152,
+      "REJECT_OBVIOUS": 8
     },
     "selection_survival": {
-      "KEEP": 640
+      "KEEP": 160
     },
     "selection_lanes": {
-      "qwen-open-world-explore": 128,
-      "qwen-reject-audit": 32,
-      "qwen-elastic": 480
+      "qwen-explore-coded": 32,
+      "qwen-reject-audit-coded": 8,
+      "qwen-elastic-coded": 120
     },
     "selection_freshness": {
       "material_new_or_updated": 151,
-      "recent_unseen_carryover": 489
+      "recent_unseen_carryover": 9
     },
     "policy": {
       "keep_is_not_fit": true,
@@ -54,14 +54,20 @@
     },
     "base_candidate_pool": 640,
     "requested_final_limit": 160,
-    "coded_selection_lanes": {
-      "qwen-explore-coded": 32,
-      "qwen-reject-audit-coded": 8,
-      "qwen-elastic-coded": 120
+    "candidate_pool_decisions": {
+      "MAYBE": 610,
+      "REJECT_OBVIOUS": 30
+    },
+    "candidate_pool_lanes": {
+      "qwen-open-world-explore": 128,
+      "qwen-reject-audit": 32,
+      "qwen-elastic": 480
     },
     "code_prior": {
       "positive_code_rows_in_pool": 0,
       "noncore_code_contradictions_in_pool": 52,
+      "positive_code_rows_selected": 0,
+      "noncore_code_contradictions_selected": 43,
       "policy": "priority_only_never_drop_never_eligibility",
       "candidate_pool_multiplier": 4
     }
