@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths:
       - 'benchmarks/ted-bt15-pareto-trigger.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'benchmarks/ted-bt15-pareto-trigger.json'
   workflow_dispatch:
 
 permissions:
@@ -49,7 +53,8 @@ jobs:
             --max-notices "${{ steps.cfg.outputs.max_notices }}" \
             --out benchmarks/ted-bt15-pareto-latest.json
 
-      - name: Commit compact benchmark result
+      - name: Commit compact benchmark result on main push only
+        if: github.event_name == 'push'
         shell: bash
         run: |
           set -euo pipefail
