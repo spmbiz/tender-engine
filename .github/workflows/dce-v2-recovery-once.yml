@@ -1,0 +1,179 @@
+name: DCE Evidence V2 Recovery Once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/dce_aggregate_v2_replay_latest.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: dce-evidence-v2-recovery-once
+  cancel-in-progress: false
+
+env:
+  TARGET_DCE_RUN: '32098369885'
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Refuse recovery unless real replay passed
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          p=json.load(open('control/dce_aggregate_v2_replay_latest.json',encoding='utf-8'))
+          assert p.get('status') == 'PASS', p
+          assert int(p.get('source_dce_run_id') or 0) == 32098369885, p
+          assert int(p.get('gate_ready') or 0) == 6, p
+          assert int(p.get('content_unverified') or -1) == 0, p
+          print('Recovery gate PASS')
+          PY
+      - name: Recover all available immutable shard handoffs without redownloading portals
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf recovery-transport recovery-root recovery-aggregate recovery-adjudication
+          mkdir -p recovery-transport recovery-root
+          mapfile -t names < <(
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${TARGET_DCE_RUN}/artifacts?per_page=100" \
+              --jq '.artifacts[] | select(.expired==false and (.name | startswith("dce-shard-"))) | .name' | sort -V
+          )
+          [ "${#names[@]}" -gt 0 ] || { echo 'No durable shard artifacts available'; exit 1; }
+          for name in "${names[@]}"; do
+            mkdir -p "recovery-transport/$name"
+            gh run download "$TARGET_DCE_RUN" -n "$name" -D "recovery-transport/$name"
+          done
+          count=0
+          while IFS= read -r archive; do
+            shard="$(basename "$archive" .tar.gz)"
+            mkdir -p "recovery-root/$shard"
+            tar -xzf "$archive" -C "recovery-root/$shard"
+            count=$((count+1))
+          done < <(find recovery-transport -type f -name 'handoff-shard-*.tar.gz' | sort -V)
+          [ "$count" -gt 0 ] || { echo 'No handoff archives recovered'; exit 1; }
+          evidence="$(find recovery-root -type f -name evidence_quality.json | wc -l)"
+          echo "Recovered shard handoffs=$count evidence_records=$evidence"
+          [ "$evidence" -ge 6 ]
+      - name: Re-aggregate durable evidence and rebuild API-free adjudication
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/aggregate_dce.py --root recovery-root --out recovery-aggregate
+          DCE_FAST_ROOT=recovery-root python pipeline/auto_adjudicate_dce.py \
+            --queue recovery-aggregate/deep_review_queue.jsonl \
+            --out recovery-adjudication \
+            --max-model-reviews 0
+          python pipeline/final_verdict_guard.py --review recovery-adjudication/adjudication.jsonl
+          python - <<'PY'
+          import json
+          a=json.load(open('recovery-aggregate/summary.json'))
+          j=json.load(open('recovery-adjudication/summary.json'))
+          assert int(a.get('gate_ready_substantive_dce') or 0) > 0, a
+          assert int(j.get('review_required') or 0) > 0, j
+          assert int(j.get('final_supergreen') or 0) == 0, j
+          print(json.dumps({'aggregate':a,'adjudication':j},indent=2))
+          PY
+      - name: Publish corrected recovery adjudication as an additional immutable-source verdict asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp recovery-adjudication/adjudication.jsonl fast-adjudication-shard-999.jsonl
+          cp recovery-adjudication/summary.json fast-adjudication-summary-shard-999.json
+          gh release upload "dce-harvest-${TARGET_DCE_RUN}" \
+            fast-adjudication-shard-999.jsonl \
+            fast-adjudication-summary-shard-999.json --clobber
+      - name: Rebuild persistent GPT review bank and inbox from latest releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/dce-review-recovery
+          mkdir -p /tmp/dce-review-recovery
+          mapfile -t tags < <(
+            gh release list --limit 50 --json tagName \
+              --jq '.[] | select(.tagName | startswith("dce-harvest-")) | .tagName' | head -n 5
+          )
+          for tag in "${tags[@]}"; do
+            run_id="${tag#dce-harvest-}"
+            mkdir -p "/tmp/dce-review-recovery/$run_id"
+            gh release download "$tag" --pattern 'fast-adjudication-shard-*.jsonl' \
+              --dir "/tmp/dce-review-recovery/$run_id" || true
+          done
+
+          git fetch origin main
+          git reset --hard origin/main
+          python pipeline/rebuild_gpt_review_bank_from_release.py \
+            --release-root /tmp/dce-review-recovery \
+            --existing control/gpt_review_hot.json \
+            --out control/gpt_review_hot.json \
+            --max-items 160
+          python pipeline/refresh_gpt_inbox_live.py \
+            --existing control/gpt_supergreen_inbox.json \
+            --final-bank control/final_supergreen_bank.json \
+            --hot-green control/supergreen_hot.json \
+            --hot-review control/gpt_review_hot.json \
+            --review-ledger control/gpt_web_review_ledger.json \
+            --out control/gpt_supergreen_inbox.json \
+            --max-items 160
+          python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          inbox=json.load(open('control/gpt_supergreen_inbox.json',encoding='utf-8'))
+          review=json.load(open('control/gpt_review_hot.json',encoding='utf-8'))
+          counts=inbox.get('counts') or {}
+          stages=counts.get('pending_by_stage') or {}
+          assert int(stages.get('BUSINESS_GATES') or 0) > 23, stages
+          payload={
+            'schema':'GPT_INBOX_HEALTH_V1',
+            'updated_at':datetime.now(timezone.utc).isoformat(),
+            'inbox_schema':inbox.get('schema'),
+            'latest_source_dce_run_id':inbox.get('latest_source_dce_run_id'),
+            'counts':counts,
+            'review_bank_count':review.get('count'),
+            'review_bank_schema':review.get('schema'),
+            'recovery_metrics':review.get('recovery_metrics') or {},
+            'healthy':inbox.get('schema')=='GPT_WEB_REVIEW_INBOX_V2' and int(counts.get('pending_gpt_web_review') or 0)>0,
+            'recovered_from_dce_run':int('${TARGET_DCE_RUN}'),
+            'contract':'Evidence V2 recovery from already durable DCE artifacts; no portal refetch and no automatic final verdict.',
+          }
+          open('control/gpt_inbox_metrics.json','w',encoding='utf-8').write(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(payload,indent=2))
+          PY
+      - name: Persist upgraded review surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add control/gpt_review_hot.json control/gpt_supergreen_inbox.json control/gpt_inbox_metrics.json
+          if git diff --cached --quiet; then
+            echo 'Review surface already current.'
+            exit 0
+          fi
+          git commit -m "inbox: recover evidence V2 business gates ${GITHUB_RUN_ID}"
+          for n in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((n*2))"
+          done
+          exit 1
