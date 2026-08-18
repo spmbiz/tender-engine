@@ -91,6 +91,8 @@ LEGACY_ALIASES = {
     "deliverables_scope": "deliverables_scope",
 }
 
+RAW_MACHINE_EXTS = {".xml", ".html", ".htm", ".json"}
+
 
 def load_json(path: Path, default=None):
     try:
@@ -129,6 +131,55 @@ def extract_categories(text: str) -> dict:
     return {**canonical, **aliases}
 
 
+def _document_for_span(start: int, end: int, docs: list[dict]) -> dict | None:
+    best = None
+    best_overlap = 0
+    for doc in docs:
+        try:
+            ds = int(doc.get("corpus_start"))
+            de = int(doc.get("corpus_end"))
+        except Exception:
+            continue
+        overlap = max(0, min(end, de) - max(start, ds))
+        if overlap > best_overlap:
+            best = doc
+            best_overlap = overlap
+    return best
+
+
+def _annotate_categories(categories: dict, docs: list[dict]) -> dict[str, int]:
+    attributed = 0
+    unattributed = 0
+    machine_format = 0
+    # Aliases point to the same list objects. Mutate canonical lists once.
+    for gate in CANONICAL_PATTERNS:
+        for item in categories.get(gate) or []:
+            if not isinstance(item, dict):
+                continue
+            doc = _document_for_span(int(item.get("start") or 0), int(item.get("end") or 0), docs)
+            if not doc:
+                item["source"] = None
+                item["provenance_strength"] = "UNATTRIBUTED_CORPUS"
+                unattributed += 1
+                continue
+            source_path = str(doc.get("path") or doc.get("name") or "") or None
+            suffix = Path(source_path or "").suffix.casefold()
+            item.update({
+                "source": source_path,
+                "source_url": doc.get("source_url"),
+                "source_sha256": doc.get("sha256"),
+                "source_kind": doc.get("kind"),
+                "source_provenance_match": doc.get("source_provenance_match"),
+                "source_corpus_start": doc.get("corpus_start"),
+                "source_corpus_end": doc.get("corpus_end"),
+                "raw_machine_format": suffix in RAW_MACHINE_EXTS,
+                "provenance_strength": "SOURCE_URL_ATTRIBUTED" if doc.get("source_url") else "DOCUMENT_HASH_ATTRIBUTED",
+            })
+            attributed += 1
+            machine_format += int(suffix in RAW_MACHINE_EXTS)
+    return {"attributed": attributed, "unattributed": unattributed, "raw_machine_format": machine_format}
+
+
 def process(root: Path):
     corpus_path = root / "corpus.txt"
     if not corpus_path.exists():
@@ -136,9 +187,12 @@ def process(root: Path):
     text = corpus_path.read_text(encoding="utf-8", errors="replace")
     evidence = load_json(root / "evidence_quality.json", {})
     gate_ready = bool(evidence.get("gate_readiness")) if evidence else None
+    docs_raw = load_json(root / "document_index.json", [])
+    docs = docs_raw if isinstance(docs_raw, list) else []
 
     if evidence and not gate_ready:
         gates = empty_categories()
+        provenance = {"attributed": 0, "unattributed": 0, "raw_machine_format": 0}
         result = {
             "candidate_id": None,
             "corpus_chars": len(text),
@@ -149,10 +203,13 @@ def process(root: Path):
             "canonical_gate_names": list(CANONICAL_PATTERNS),
             "categories": gates,
             "evidence_counts": {k: 0 for k in gates},
+            "document_index_available": bool(docs),
+            "snippet_provenance": provenance,
             "warning": "Mandatory-gate extraction blocked because authoritative DCE content was not proven. Do not infer eligibility from this corpus.",
         }
     else:
         gates = extract_categories(text)
+        provenance = _annotate_categories(gates, docs)
         result = {
             "candidate_id": None,
             "corpus_chars": len(text),
@@ -163,7 +220,9 @@ def process(root: Path):
             "canonical_gate_names": list(CANONICAL_PATTERNS),
             "categories": gates,
             "evidence_counts": {k: len(v) for k, v in gates.items()},
-            "warning": "These are retrieval snippets, not eligibility verdicts. GPT/human review must resolve every canonical mandatory gate explicitly with authoritative evidence.",
+            "document_index_available": bool(docs),
+            "snippet_provenance": provenance,
+            "warning": "These are retrieval snippets, not eligibility verdicts. Each attributed snippet carries its exact extracted document path/hash and, where available, original source URL. GPT/human review must still resolve every mandatory gate explicitly.",
         }
 
     candidate_path = root / "candidate.json"
@@ -174,7 +233,15 @@ def process(root: Path):
         except Exception:
             pass
     (root / "gate_snippets.json").write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
-    return {"root": str(root), "candidate_id": result.get("candidate_id"), "gate_readiness": result.get("gate_readiness"), "skipped": result.get("skipped_due_to_evidence_quality"), "canonical_gate_names": result.get("canonical_gate_names"), "evidence_counts": result["evidence_counts"]}
+    return {
+        "root": str(root),
+        "candidate_id": result.get("candidate_id"),
+        "gate_readiness": result.get("gate_readiness"),
+        "skipped": result.get("skipped_due_to_evidence_quality"),
+        "canonical_gate_names": result.get("canonical_gate_names"),
+        "evidence_counts": result["evidence_counts"],
+        "snippet_provenance": result.get("snippet_provenance"),
+    }
 
 
 def main():
@@ -204,7 +271,16 @@ def main():
                     results.append(rec)
 
     results.sort(key=lambda r: r.get("root", ""))
-    print(json.dumps({"workers": workers, "candidates": len(roots), "gate_ready": sum(1 for r in results if r.get("gate_readiness")), "skipped_unverified": sum(1 for r in results if r.get("skipped")), "canonical_gate_names": list(CANONICAL_PATTERNS), "results": results}, indent=2, ensure_ascii=False))
+    print(json.dumps({
+        "workers": workers,
+        "candidates": len(roots),
+        "gate_ready": sum(1 for r in results if r.get("gate_readiness")),
+        "skipped_unverified": sum(1 for r in results if r.get("skipped")),
+        "attributed_snippets": sum(int((r.get("snippet_provenance") or {}).get("attributed") or 0) for r in results),
+        "unattributed_snippets": sum(int((r.get("snippet_provenance") or {}).get("unattributed") or 0) for r in results),
+        "canonical_gate_names": list(CANONICAL_PATTERNS),
+        "results": results,
+    }, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":
