@@ -47,13 +47,33 @@ def compact_review_evidence(row: dict, per_gate: int = 4, chars: int = 1800) -> 
                     or item.get("document_path")
                 )
                 match = item.get("match")
+                provenance = {
+                    "source_url": item.get("source_url"),
+                    "source_sha256": item.get("source_sha256"),
+                    "source_kind": item.get("source_kind"),
+                    "source_provenance_match": item.get("source_provenance_match"),
+                    "provenance_strength": item.get("provenance_strength"),
+                    "raw_machine_format": bool(item.get("raw_machine_format")),
+                    "corpus_start": item.get("start"),
+                    "corpus_end": item.get("end"),
+                }
             else:
                 text = str(item or "")
                 source = None
                 match = None
+                provenance = {
+                    "source_url": None,
+                    "source_sha256": None,
+                    "source_kind": None,
+                    "source_provenance_match": None,
+                    "provenance_strength": "UNATTRIBUTED_LEGACY_SNIPPET",
+                    "raw_machine_format": False,
+                    "corpus_start": None,
+                    "corpus_end": None,
+                }
             text = " ".join(text.split())[:chars]
             if text:
-                record = {"text": text, "source": source}
+                record = {"text": text, "source": source, **provenance}
                 if match not in (None, ""):
                     record["match"] = match
                 out.append(record)
@@ -89,6 +109,14 @@ def fallback_record(row: dict, reason: str, classification: str = "MODEL_REVIEW_
     except Exception:
         prelim = 0
     evidence = compact_review_evidence(row)
+    attributed = sum(
+        1 for vals in evidence.values() for item in vals
+        if isinstance(item, dict) and item.get("source") and item.get("source_sha256")
+    )
+    unattributed = sum(
+        1 for vals in evidence.values() for item in vals
+        if isinstance(item, dict) and not item.get("source")
+    )
     return {
         "candidate_id": row.get("candidate_id"),
         "title": row.get("title"),
@@ -108,6 +136,11 @@ def fallback_record(row: dict, reason: str, classification: str = "MODEL_REVIEW_
         "content_quality": row.get("content_quality"),
         "gate_readiness": bool(row.get("gate_readiness")),
         "evidence_quality": row.get("evidence_quality") or {},
+        "evidence_provenance_summary": {
+            "attributed_snippets": attributed,
+            "unattributed_snippets": unattributed,
+            "all_review_snippets_attributed": bool(attributed and not unattributed),
+        },
         "authority_conflicts": row.get("authority_conflicts") or {},
         "gate_evidence_candidates": evidence,
         "gates": {
@@ -125,7 +158,6 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--queue", required=True)
     ap.add_argument("--out", required=True)
-    # Kept for workflow compatibility. Remote model calls were deliberately removed.
     ap.add_argument("--max-model-reviews", type=int, default=0)
     ap.add_argument("--model-concurrency", type=int, default=0)
     ap.add_argument("--model-retries", type=int, default=0)
@@ -199,7 +231,11 @@ def main() -> None:
             for r in review_required
             if r.get("gate_readiness") and any(r.get("gate_evidence_candidates", {}).values())
         ),
-        "guard_contract": "GitHub never promotes FINAL_SUPER_GREEN. GPT Web must adjudicate authoritative gates; missing evidence remains UNKNOWN.",
+        "review_snippet_provenance": {
+            "attributed": sum(int((r.get("evidence_provenance_summary") or {}).get("attributed_snippets") or 0) for r in records),
+            "unattributed": sum(int((r.get("evidence_provenance_summary") or {}).get("unattributed_snippets") or 0) for r in records),
+        },
+        "guard_contract": "GitHub never promotes FINAL_SUPER_GREEN. GPT Web must adjudicate authoritative gates; missing evidence remains UNKNOWN. Every new gate snippet carries extracted-document provenance where the DCE corpus index can attribute it.",
     }
     (out / "summary.json").write_text(
         json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8"
