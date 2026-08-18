@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/pipeline-ab-regression.yml'
       - 'pipeline/pipeline_ab_regression.py'
+      - 'pipeline/pipeline_ab_regression_v2.py'
       - 'pipeline/global_admission.py'
       - 'pipeline/build_qwen_shadow_shards.py'
       - 'pipeline/materialize_dce_selection.py'
@@ -69,7 +70,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python current/pipeline/pipeline_ab_regression.py \
+          PYTHONPATH=current/pipeline python current/pipeline/pipeline_ab_regression_v2.py \
             --current current \
             --baseline baseline \
             --live-queue live/notice-classification-queue-latest.jsonl.gz \
