@@ -10,6 +10,7 @@ on:
 permissions:
   contents: write
 
+# Trigger focused evidence-contract repair after workflow registration.
 concurrency:
   group: fix-aggregate-evidence-v2-once
   cancel-in-progress: false
