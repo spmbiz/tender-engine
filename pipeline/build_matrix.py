@@ -14,11 +14,15 @@ from pathlib import Path
 # GENERIC_PUBLIC_PAGE is browser-capable by design: it tries HTTP first and then
 # a JS-rendered page when static anchors are absent. Keeping it in the HTTP lane
 # silently disabled that fallback on shards without Playwright.
+#
+# ES_PLACSP deliberately is NOT here from v15 onward. Its official Atom feed
+# exposes canonical Legal/Technical/Additional document links, so the dedicated
+# resolver is HTTP/XML-only and should use the higher-throughput HTTP shard lane.
 BROWSER_PORTALS = {
     "TED", "IRELAND_ETENDERS", "FR_PLACE", "LUX_PMP", "SCOTLAND_PCS",
     "CA_CANADABUYS", "QC_SEAO", "DE_DOE", "FR_BOAMP", "NZ_GETS", "AU_AUSTENDER",
     "NL_TENDERNED", "NL_TENDERNED_RSS", "CH_SIMAP", "LV_IUB",
-    "NO_DOFFIN", "PL_EZAMOWIENIA", "PL_BZP", "GR_KHMDHS", "ES_PLACSP", "FI_HILMA",
+    "NO_DOFFIN", "PL_EZAMOWIENIA", "PL_BZP", "GR_KHMDHS", "FI_HILMA",
     "PT_BASE_OPEN", "PT_BASE", "DK_UDBUD", "DK_UDBUD_PUBLIC", "CZ_ZAKAZKY_GOV", "CZ_NIPEZ",
     "CYPRUS_EPPS", "LITHUANIA_EPPS", "MALTA_EPPS",
     "SI_EJN", "SK_UVO", "EE_RHR", "BELGIUM_PUBLIC", "HU_EKR", "RO_SEAP",
@@ -51,7 +55,7 @@ BROWSER_PORTALS = {
 SUPPORTED = BROWSER_PORTALS | {
     "US_SAM", "US_SAM_BULK",
     "UNGM", "DIRECT_HTTP", "UK_CONTRACTS_FINDER", "TED_PUBLIC_PAGE_FAST",
-    "WORLD_BANK",
+    "WORLD_BANK", "ES_PLACSP",
 }
 
 # Discovery/provider identifiers are provenance, not necessarily DCE adapter
