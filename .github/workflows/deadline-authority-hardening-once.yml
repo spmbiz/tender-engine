@@ -10,6 +10,7 @@ on:
 permissions:
   contents: write
 
+# Trigger after workflow registration.
 concurrency:
   group: deadline-authority-hardening-once
   cancel-in-progress: false
