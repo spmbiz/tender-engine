@@ -1,0 +1,668 @@
+{
+  "schema": "GPT_GATE_STRESS_MANIFEST_V2",
+  "generated_at": "2026-08-18T16:03:54.328471+00:00",
+  "source_index_schema": "GPT_REVIEW_INDEX_V2",
+  "source_index_count": 1281,
+  "business_gates_in_index": 842,
+  "unique_business_gate_ids": 842,
+  "duplicate_target_ids": [],
+  "emitted_candidates": 842,
+  "raw_dce_rows_recovered": 842,
+  "raw_dce_rows_missing": 0,
+  "missing_candidate_ids": [],
+  "release_runs_required": [
+    32150412154,
+    32149659207,
+    32147698042,
+    32145247355,
+    32142349314,
+    32141305381,
+    32139057985,
+    32137345232,
+    32136570899,
+    32132558029,
+    32129565430,
+    32123828524,
+    32121936886,
+    32119818976,
+    32118646120,
+    32117037699,
+    32115727618,
+    32113219271,
+    32111866806,
+    32111031021,
+    32109532180,
+    32106912628,
+    32104269293
+  ],
+  "shard_files_scanned": 490,
+  "adjudication_rows_scanned": 3384,
+  "by_spm_fit_band": {
+    "HOT": 1,
+    "GOOD": 18,
+    "MAYBE": 72,
+    "LOW": 751
+  },
+  "deep_batch_size": 10,
+  "deep_batch_count": 85,
+  "deep_files": [
+    {
+      "file": "batch-000.json",
+      "start_rank": 1,
+      "end_rank": 10,
+      "count": 10
+    },
+    {
+      "file": "batch-001.json",
+      "start_rank": 11,
+      "end_rank": 20,
+      "count": 10
+    },
+    {
+      "file": "batch-002.json",
+      "start_rank": 21,
+      "end_rank": 30,
+      "count": 10
+    },
+    {
+      "file": "batch-003.json",
+      "start_rank": 31,
+      "end_rank": 40,
+      "count": 10
+    },
+    {
+      "file": "batch-004.json",
+      "start_rank": 41,
+      "end_rank": 50,
+      "count": 10
+    },
+    {
+      "file": "batch-005.json",
+      "start_rank": 51,
+      "end_rank": 60,
+      "count": 10
+    },
+    {
+      "file": "batch-006.json",
+      "start_rank": 61,
+      "end_rank": 70,
+      "count": 10
+    },
+    {
+      "file": "batch-007.json",
+      "start_rank": 71,
+      "end_rank": 80,
+      "count": 10
+    },
+    {
+      "file": "batch-008.json",
+      "start_rank": 81,
+      "end_rank": 90,
+      "count": 10
+    },
+    {
+      "file": "batch-009.json",
+      "start_rank": 91,
+      "end_rank": 100,
+      "count": 10
+    },
+    {
+      "file": "batch-010.json",
+      "start_rank": 101,
+      "end_rank": 110,
+      "count": 10
+    },
+    {
+      "file": "batch-011.json",
+      "start_rank": 111,
+      "end_rank": 120,
+      "count": 10
+    },
+    {
+      "file": "batch-012.json",
+      "start_rank": 121,
+      "end_rank": 130,
+      "count": 10
+    },
+    {
+      "file": "batch-013.json",
+      "start_rank": 131,
+      "end_rank": 140,
+      "count": 10
+    },
+    {
+      "file": "batch-014.json",
+      "start_rank": 141,
+      "end_rank": 150,
+      "count": 10
+    },
+    {
+      "file": "batch-015.json",
+      "start_rank": 151,
+      "end_rank": 160,
+      "count": 10
+    },
+    {
+      "file": "batch-016.json",
+      "start_rank": 161,
+      "end_rank": 170,
+      "count": 10
+    },
+    {
+      "file": "batch-017.json",
+      "start_rank": 171,
+      "end_rank": 180,
+      "count": 10
+    },
+    {
+      "file": "batch-018.json",
+      "start_rank": 181,
+      "end_rank": 190,
+      "count": 10
+    },
+    {
+      "file": "batch-019.json",
+      "start_rank": 191,
+      "end_rank": 200,
+      "count": 10
+    },
+    {
+      "file": "batch-020.json",
+      "start_rank": 201,
+      "end_rank": 210,
+      "count": 10
+    },
+    {
+      "file": "batch-021.json",
+      "start_rank": 211,
+      "end_rank": 220,
+      "count": 10
+    },
+    {
+      "file": "batch-022.json",
+      "start_rank": 221,
+      "end_rank": 230,
+      "count": 10
+    },
+    {
+      "file": "batch-023.json",
+      "start_rank": 231,
+      "end_rank": 240,
+      "count": 10
+    },
+    {
+      "file": "batch-024.json",
+      "start_rank": 241,
+      "end_rank": 250,
+      "count": 10
+    },
+    {
+      "file": "batch-025.json",
+      "start_rank": 251,
+      "end_rank": 260,
+      "count": 10
+    },
+    {
+      "file": "batch-026.json",
+      "start_rank": 261,
+      "end_rank": 270,
+      "count": 10
+    },
+    {
+      "file": "batch-027.json",
+      "start_rank": 271,
+      "end_rank": 280,
+      "count": 10
+    },
+    {
+      "file": "batch-028.json",
+      "start_rank": 281,
+      "end_rank": 290,
+      "count": 10
+    },
+    {
+      "file": "batch-029.json",
+      "start_rank": 291,
+      "end_rank": 300,
+      "count": 10
+    },
+    {
+      "file": "batch-030.json",
+      "start_rank": 301,
+      "end_rank": 310,
+      "count": 10
+    },
+    {
+      "file": "batch-031.json",
+      "start_rank": 311,
+      "end_rank": 320,
+      "count": 10
+    },
+    {
+      "file": "batch-032.json",
+      "start_rank": 321,
+      "end_rank": 330,
+      "count": 10
+    },
+    {
+      "file": "batch-033.json",
+      "start_rank": 331,
+      "end_rank": 340,
+      "count": 10
+    },
+    {
+      "file": "batch-034.json",
+      "start_rank": 341,
+      "end_rank": 350,
+      "count": 10
+    },
+    {
+      "file": "batch-035.json",
+      "start_rank": 351,
+      "end_rank": 360,
+      "count": 10
+    },
+    {
+      "file": "batch-036.json",
+      "start_rank": 361,
+      "end_rank": 370,
+      "count": 10
+    },
+    {
+      "file": "batch-037.json",
+      "start_rank": 371,
+      "end_rank": 380,
+      "count": 10
+    },
+    {
+      "file": "batch-038.json",
+      "start_rank": 381,
+      "end_rank": 390,
+      "count": 10
+    },
+    {
+      "file": "batch-039.json",
+      "start_rank": 391,
+      "end_rank": 400,
+      "count": 10
+    },
+    {
+      "file": "batch-040.json",
+      "start_rank": 401,
+      "end_rank": 410,
+      "count": 10
+    },
+    {
+      "file": "batch-041.json",
+      "start_rank": 411,
+      "end_rank": 420,
+      "count": 10
+    },
+    {
+      "file": "batch-042.json",
+      "start_rank": 421,
+      "end_rank": 430,
+      "count": 10
+    },
+    {
+      "file": "batch-043.json",
+      "start_rank": 431,
+      "end_rank": 440,
+      "count": 10
+    },
+    {
+      "file": "batch-044.json",
+      "start_rank": 441,
+      "end_rank": 450,
+      "count": 10
+    },
+    {
+      "file": "batch-045.json",
+      "start_rank": 451,
+      "end_rank": 460,
+      "count": 10
+    },
+    {
+      "file": "batch-046.json",
+      "start_rank": 461,
+      "end_rank": 470,
+      "count": 10
+    },
+    {
+      "file": "batch-047.json",
+      "start_rank": 471,
+      "end_rank": 480,
+      "count": 10
+    },
+    {
+      "file": "batch-048.json",
+      "start_rank": 481,
+      "end_rank": 490,
+      "count": 10
+    },
+    {
+      "file": "batch-049.json",
+      "start_rank": 491,
+      "end_rank": 500,
+      "count": 10
+    },
+    {
+      "file": "batch-050.json",
+      "start_rank": 501,
+      "end_rank": 510,
+      "count": 10
+    },
+    {
+      "file": "batch-051.json",
+      "start_rank": 511,
+      "end_rank": 520,
+      "count": 10
+    },
+    {
+      "file": "batch-052.json",
+      "start_rank": 521,
+      "end_rank": 530,
+      "count": 10
+    },
+    {
+      "file": "batch-053.json",
+      "start_rank": 531,
+      "end_rank": 540,
+      "count": 10
+    },
+    {
+      "file": "batch-054.json",
+      "start_rank": 541,
+      "end_rank": 550,
+      "count": 10
+    },
+    {
+      "file": "batch-055.json",
+      "start_rank": 551,
+      "end_rank": 560,
+      "count": 10
+    },
+    {
+      "file": "batch-056.json",
+      "start_rank": 561,
+      "end_rank": 570,
+      "count": 10
+    },
+    {
+      "file": "batch-057.json",
+      "start_rank": 571,
+      "end_rank": 580,
+      "count": 10
+    },
+    {
+      "file": "batch-058.json",
+      "start_rank": 581,
+      "end_rank": 590,
+      "count": 10
+    },
+    {
+      "file": "batch-059.json",
+      "start_rank": 591,
+      "end_rank": 600,
+      "count": 10
+    },
+    {
+      "file": "batch-060.json",
+      "start_rank": 601,
+      "end_rank": 610,
+      "count": 10
+    },
+    {
+      "file": "batch-061.json",
+      "start_rank": 611,
+      "end_rank": 620,
+      "count": 10
+    },
+    {
+      "file": "batch-062.json",
+      "start_rank": 621,
+      "end_rank": 630,
+      "count": 10
+    },
+    {
+      "file": "batch-063.json",
+      "start_rank": 631,
+      "end_rank": 640,
+      "count": 10
+    },
+    {
+      "file": "batch-064.json",
+      "start_rank": 641,
+      "end_rank": 650,
+      "count": 10
+    },
+    {
+      "file": "batch-065.json",
+      "start_rank": 651,
+      "end_rank": 660,
+      "count": 10
+    },
+    {
+      "file": "batch-066.json",
+      "start_rank": 661,
+      "end_rank": 670,
+      "count": 10
+    },
+    {
+      "file": "batch-067.json",
+      "start_rank": 671,
+      "end_rank": 680,
+      "count": 10
+    },
+    {
+      "file": "batch-068.json",
+      "start_rank": 681,
+      "end_rank": 690,
+      "count": 10
+    },
+    {
+      "file": "batch-069.json",
+      "start_rank": 691,
+      "end_rank": 700,
+      "count": 10
+    },
+    {
+      "file": "batch-070.json",
+      "start_rank": 701,
+      "end_rank": 710,
+      "count": 10
+    },
+    {
+      "file": "batch-071.json",
+      "start_rank": 711,
+      "end_rank": 720,
+      "count": 10
+    },
+    {
+      "file": "batch-072.json",
+      "start_rank": 721,
+      "end_rank": 730,
+      "count": 10
+    },
+    {
+      "file": "batch-073.json",
+      "start_rank": 731,
+      "end_rank": 740,
+      "count": 10
+    },
+    {
+      "file": "batch-074.json",
+      "start_rank": 741,
+      "end_rank": 750,
+      "count": 10
+    },
+    {
+      "file": "batch-075.json",
+      "start_rank": 751,
+      "end_rank": 760,
+      "count": 10
+    },
+    {
+      "file": "batch-076.json",
+      "start_rank": 761,
+      "end_rank": 770,
+      "count": 10
+    },
+    {
+      "file": "batch-077.json",
+      "start_rank": 771,
+      "end_rank": 780,
+      "count": 10
+    },
+    {
+      "file": "batch-078.json",
+      "start_rank": 781,
+      "end_rank": 790,
+      "count": 10
+    },
+    {
+      "file": "batch-079.json",
+      "start_rank": 791,
+      "end_rank": 800,
+      "count": 10
+    },
+    {
+      "file": "batch-080.json",
+      "start_rank": 801,
+      "end_rank": 810,
+      "count": 10
+    },
+    {
+      "file": "batch-081.json",
+      "start_rank": 811,
+      "end_rank": 820,
+      "count": 10
+    },
+    {
+      "file": "batch-082.json",
+      "start_rank": 821,
+      "end_rank": 830,
+      "count": 10
+    },
+    {
+      "file": "batch-083.json",
+      "start_rank": 831,
+      "end_rank": 840,
+      "count": 10
+    },
+    {
+      "file": "batch-084.json",
+      "start_rank": 841,
+      "end_rank": 842,
+      "count": 2
+    }
+  ],
+  "triage_batch_size": 50,
+  "triage_batch_count": 17,
+  "triage_files": [
+    {
+      "file": "triage-000.json",
+      "start_rank": 1,
+      "end_rank": 50,
+      "count": 50
+    },
+    {
+      "file": "triage-001.json",
+      "start_rank": 51,
+      "end_rank": 100,
+      "count": 50
+    },
+    {
+      "file": "triage-002.json",
+      "start_rank": 101,
+      "end_rank": 150,
+      "count": 50
+    },
+    {
+      "file": "triage-003.json",
+      "start_rank": 151,
+      "end_rank": 200,
+      "count": 50
+    },
+    {
+      "file": "triage-004.json",
+      "start_rank": 201,
+      "end_rank": 250,
+      "count": 50
+    },
+    {
+      "file": "triage-005.json",
+      "start_rank": 251,
+      "end_rank": 300,
+      "count": 50
+    },
+    {
+      "file": "triage-006.json",
+      "start_rank": 301,
+      "end_rank": 350,
+      "count": 50
+    },
+    {
+      "file": "triage-007.json",
+      "start_rank": 351,
+      "end_rank": 400,
+      "count": 50
+    },
+    {
+      "file": "triage-008.json",
+      "start_rank": 401,
+      "end_rank": 450,
+      "count": 50
+    },
+    {
+      "file": "triage-009.json",
+      "start_rank": 451,
+      "end_rank": 500,
+      "count": 50
+    },
+    {
+      "file": "triage-010.json",
+      "start_rank": 501,
+      "end_rank": 550,
+      "count": 50
+    },
+    {
+      "file": "triage-011.json",
+      "start_rank": 551,
+      "end_rank": 600,
+      "count": 50
+    },
+    {
+      "file": "triage-012.json",
+      "start_rank": 601,
+      "end_rank": 650,
+      "count": 50
+    },
+    {
+      "file": "triage-013.json",
+      "start_rank": 651,
+      "end_rank": 700,
+      "count": 50
+    },
+    {
+      "file": "triage-014.json",
+      "start_rank": 701,
+      "end_rank": 750,
+      "count": 50
+    },
+    {
+      "file": "triage-015.json",
+      "start_rank": 751,
+      "end_rank": 800,
+      "count": 50
+    },
+    {
+      "file": "triage-016.json",
+      "start_rank": 801,
+      "end_rank": 842,
+      "count": 42
+    }
+  ],
+  "conservation_pass": true,
+  "contract": "Mechanical exhaustive DCE evidence surface only. No automated verdict. Conservation must pass before assistant stress adjudication is trusted."
+}
