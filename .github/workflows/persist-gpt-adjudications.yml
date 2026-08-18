@@ -8,6 +8,7 @@ on:
       - 'control/adjudications/*.json'
       - 'pipeline/merge_gpt_adjudications_into_final_bank.py'
       - 'pipeline/gpt_web_tick.py'
+      - 'pipeline/build_gpt_review_index.py'
       - '.github/workflows/persist-gpt-adjudications.yml'
 
 permissions:
@@ -29,12 +30,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Merge verdicts, advance real review ledger, and consume inbox transactionally
+      - name: Merge verdicts, advance real review ledger, prune index, and consume inbox transactionally
         shell: bash
         env:
           # refresh_gpt_inbox_live.py prefers remote main when GitHub tokens are
           # present. This transaction must instead consume the ledger it just wrote
-          # locally, then publish bank+ledger+inbox together.
+          # locally, then publish bank+ledger+index+inbox together.
           GH_TOKEN: ''
           GITHUB_TOKEN: ''
         run: |
@@ -76,8 +77,19 @@ jobs:
           print(json.dumps({'persisted_adjudication_files_ticked':applied},indent=2))
           PY
 
+            # Prune already-adjudicated/ticked rows from the uncapped compact index
+            # without needing to re-download DCE releases. The next DCE refresh adds
+            # new reviewables back from immutable release evidence.
+            mkdir -p /tmp/no-new-dce-releases
+            python pipeline/build_gpt_review_index.py \
+              --release-root /tmp/no-new-dce-releases \
+              --existing control/gpt_review_index.json \
+              --final-bank control/final_supergreen_bank.json \
+              --review-ledger control/gpt_web_review_ledger.json \
+              --out control/gpt_review_index.json
+
             # With tokens deliberately blank this reads the just-updated local ledger,
-            # so a real verdict disappears from the work queue in the same commit.
+            # so a real verdict disappears from the rich work queue in the same commit.
             python pipeline/refresh_gpt_inbox_live.py \
               --existing control/gpt_supergreen_inbox.json \
               --final-bank control/final_supergreen_bank.json \
@@ -94,9 +106,13 @@ jobs:
           review={}
           try: review=json.load(open('control/gpt_review_hot.json',encoding='utf-8'))
           except Exception: pass
+          index={}
+          try: index=json.load(open('control/gpt_review_index.json',encoding='utf-8'))
+          except Exception: pass
           ledger=json.load(open('control/gpt_web_review_ledger.json',encoding='utf-8'))
           counts=dict(inbox.get('counts') or {})
           counts['reviewed_ticks_total']=len(ledger.get('ticks') or {})
+          idx_counts=index.get('counts') or {}
           payload={
             'schema':'GPT_INBOX_HEALTH_V1',
             'updated_at':datetime.now(timezone.utc).isoformat(),
@@ -105,9 +121,13 @@ jobs:
             'counts':counts,
             'review_bank_count':review.get('count'),
             'review_bank_schema':review.get('schema'),
+            'review_index_count':int(index.get('count') or 0),
+            'review_index_counts':idx_counts,
+            'true_pending_before_hot_cap':int(idx_counts.get('pending_total_uncapped') or 0),
+            'overflow_beyond_hot_160':int(idx_counts.get('overflow_beyond_hot_160') or 0),
             'recovery_metrics':review.get('recovery_metrics') or {},
             'healthy':inbox.get('schema')=='GPT_WEB_REVIEW_INBOX_V2',
-            'contract':'Small health sidecar; reviewed_ticks_total is derived from durable real adjudication ticks, never from scheduler wakes.',
+            'contract':'Health sidecar; reviewed_ticks_total is derived from durable real adjudication ticks. The uncapped index is pruned atomically with every persisted GPT Web verdict.',
           }
           open('control/gpt_inbox_metrics.json','w',encoding='utf-8').write(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
           print(json.dumps(payload,indent=2))
@@ -116,15 +136,16 @@ jobs:
             git add \
               control/final_supergreen_bank.json \
               control/gpt_web_review_ledger.json \
+              control/gpt_review_index.json \
               control/gpt_supergreen_inbox.json \
               control/gpt_inbox_metrics.json
 
             if git diff --cached --quiet; then
-              echo 'Final bank, ledger and inbox already agree.'
+              echo 'Final bank, ledger, review index and inbox already agree.'
               exit 0
             fi
 
-            git commit -m 'gpt: persist verdicts ticks and consume inbox atomically'
+            git commit -m 'gpt: persist verdicts ticks index and inbox atomically'
             if git push origin HEAD:main; then
               exit 0
             fi
