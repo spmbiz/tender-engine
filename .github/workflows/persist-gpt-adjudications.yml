@@ -7,6 +7,8 @@ on:
     paths:
       - 'control/adjudications/*.json'
       - 'pipeline/merge_gpt_adjudications_into_final_bank.py'
+      - 'pipeline/gpt_web_tick.py'
+      - '.github/workflows/persist-gpt-adjudications.yml'
 
 permissions:
   contents: write
@@ -18,7 +20,7 @@ concurrency:
 jobs:
   persist:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,27 +29,106 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Merge GPT Web adjudications into durable final bank
-        run: python pipeline/merge_gpt_adjudications_into_final_bank.py
-      - name: Refresh GPT inbox after durable resolution
-        run: python pipeline/refresh_gpt_inbox_live.py
-      - name: Persist final bank and refreshed inbox
+      - name: Merge verdicts, advance real review ledger, and consume inbox transactionally
         shell: bash
+        env:
+          # refresh_gpt_inbox_live.py prefers remote main when GitHub tokens are
+          # present. This transaction must instead consume the ledger it just wrote
+          # locally, then publish bank+ledger+inbox together.
+          GH_TOKEN: ''
+          GITHUB_TOKEN: ''
         run: |
           set -euo pipefail
           git config user.name 'tender-engine-bot'
           git config user.email 'tender-engine-bot@users.noreply.github.com'
-          git add control/final_supergreen_bank.json control/gpt_supergreen_inbox.json
-          if git diff --cached --quiet; then
-            echo 'No durable adjudication delta.'
-            exit 0
-          fi
-          git commit -m 'gpt: persist final adjudications and consume inbox'
+
           for attempt in 1 2 3 4 5 6; do
-            if git pull --rebase origin main && git push origin HEAD:main; then
+            git fetch origin main
+            git reset --hard origin/main
+
+            python pipeline/merge_gpt_adjudications_into_final_bank.py
+
+            python - <<'PY'
+          import json
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          applied=[]
+          for p in sorted(Path('control/adjudications').glob('*.json')):
+              try:
+                  obj=json.loads(p.read_text(encoding='utf-8'))
+              except Exception:
+                  continue
+              if not isinstance(obj,dict) or obj.get('persist_to_final_bank') is not True:
+                  continue
+              results=[x for x in (obj.get('results') or []) if isinstance(x,dict) and x.get('candidate_id')]
+              if not results:
+                  continue
+              subprocess.run([
+                  sys.executable,
+                  'pipeline/gpt_web_tick.py',
+                  '--reviews', str(p),
+                  '--ledger', 'control/gpt_web_review_ledger.json',
+                  '--pass-id', f'persisted-adjudication:{p.stem}',
+              ], check=True)
+              applied.append({'file':str(p),'results':len(results)})
+          print(json.dumps({'persisted_adjudication_files_ticked':applied},indent=2))
+          PY
+
+            # With tokens deliberately blank this reads the just-updated local ledger,
+            # so a real verdict disappears from the work queue in the same commit.
+            python pipeline/refresh_gpt_inbox_live.py \
+              --existing control/gpt_supergreen_inbox.json \
+              --final-bank control/final_supergreen_bank.json \
+              --hot-green control/supergreen_hot.json \
+              --hot-review control/gpt_review_hot.json \
+              --review-ledger control/gpt_web_review_ledger.json \
+              --out control/gpt_supergreen_inbox.json \
+              --max-items 160
+
+            python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          inbox=json.load(open('control/gpt_supergreen_inbox.json',encoding='utf-8'))
+          review={}
+          try: review=json.load(open('control/gpt_review_hot.json',encoding='utf-8'))
+          except Exception: pass
+          ledger=json.load(open('control/gpt_web_review_ledger.json',encoding='utf-8'))
+          counts=dict(inbox.get('counts') or {})
+          counts['reviewed_ticks_total']=len(ledger.get('ticks') or {})
+          payload={
+            'schema':'GPT_INBOX_HEALTH_V1',
+            'updated_at':datetime.now(timezone.utc).isoformat(),
+            'inbox_schema':inbox.get('schema'),
+            'latest_source_dce_run_id':inbox.get('latest_source_dce_run_id'),
+            'counts':counts,
+            'review_bank_count':review.get('count'),
+            'review_bank_schema':review.get('schema'),
+            'recovery_metrics':review.get('recovery_metrics') or {},
+            'healthy':inbox.get('schema')=='GPT_WEB_REVIEW_INBOX_V2',
+            'contract':'Small health sidecar; reviewed_ticks_total is derived from durable real adjudication ticks, never from scheduler wakes.',
+          }
+          open('control/gpt_inbox_metrics.json','w',encoding='utf-8').write(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(payload,indent=2))
+          PY
+
+            git add \
+              control/final_supergreen_bank.json \
+              control/gpt_web_review_ledger.json \
+              control/gpt_supergreen_inbox.json \
+              control/gpt_inbox_metrics.json
+
+            if git diff --cached --quiet; then
+              echo 'Final bank, ledger and inbox already agree.'
               exit 0
             fi
-            git rebase --abort >/dev/null 2>&1 || true
+
+            git commit -m 'gpt: persist verdicts ticks and consume inbox atomically'
+            if git push origin HEAD:main; then
+              exit 0
+            fi
             sleep "$((attempt * 3))"
           done
+          echo 'Failed to persist adjudication transaction after retries.' >&2
           exit 1
