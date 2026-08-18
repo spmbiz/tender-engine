@@ -1,0 +1,50 @@
+name: Apply Discovery Concurrency Guard
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/discovery_concurrency_guard_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q pyyaml
+      - run: python tools/apply_discovery_concurrency_guard.py
+      - run: |
+          python - <<'PY'
+          import yaml
+          from pathlib import Path
+          p=Path('.github/workflows/supergreen-discovery-v2.yml')
+          x=yaml.safe_load(p.read_text(encoding='utf-8'))
+          c=x.get('concurrency') or {}
+          assert c.get('group') == 'supergreen-discovery-v2-global'
+          assert c.get('cancel-in-progress') is False
+          print('discovery concurrency guard YAML OK')
+          PY
+      - shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .github/workflows/supergreen-discovery-v2.yml
+          git diff --cached --quiet && exit 0
+          git commit -m 'discovery: serialize full-world harvest generations'
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
