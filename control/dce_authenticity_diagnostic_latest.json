@@ -1,58 +1,82 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32081860247,
-  "total_inbox_rows": 114,
-  "dce_authenticity_rows": 49,
+  "latest_source_dce_run_id": 32089273287,
+  "total_inbox_rows": 159,
+  "dce_authenticity_rows": 136,
   "portal_counts": {
-    "GR_KHMDHS": 22,
-    "GENERIC_PUBLIC_PAGE": 18,
-    "TED": 7,
-    "PL_EZAMOWIENIA": 2
+    "GR_KHMDHS": 55,
+    "ES_PLACSP": 36,
+    "ZA_ETENDERS": 34,
+    "GENERIC_PUBLIC_PAGE": 11
   },
   "status_counts": {
-    "UNKNOWN_RETRIEVED_DOCUMENT": 38,
-    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 11
+    "UNKNOWN_RETRIEVED_DOCUMENT": 128,
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 8
   },
   "reason_counts": {
-    "NON_AUTHORITATIVE": 49
+    "NON_AUTHORITATIVE": 136
   },
   "method_counts": {},
   "recovery_opportunities": [
     {
       "portal": "GR_KHMDHS",
-      "blocked": 22,
+      "blocked": 55,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 22
+        "NON_AUTHORITATIVE": 55
+      }
+    },
+    {
+      "portal": "ES_PLACSP",
+      "blocked": 36,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 36
+      }
+    },
+    {
+      "portal": "ZA_ETENDERS",
+      "blocked": 34,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 34
       }
     },
     {
       "portal": "GENERIC_PUBLIC_PAGE",
-      "blocked": 18,
+      "blocked": 11,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 18
-      }
-    },
-    {
-      "portal": "TED",
-      "blocked": 7,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 7
-      }
-    },
-    {
-      "portal": "PL_EZAMOWIENIA",
-      "blocked": 2,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 2
+        "NON_AUTHORITATIVE": 11
       }
     }
   ],
   "samples_by_reason": {
     "NON_AUTHORITATIVE": [
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164943-2026-08-07",
+        "portal": "ZA_ETENDERS",
+        "title": "MICT/SETA/TRAV/06/2026",
+        "buyer": "Media, Information and Communication Technologies Sector Education and training Authority (MICT SETA)",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-164943"
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164854-2026-08-07",
+        "portal": "ZA_ETENDERS",
+        "title": "PROJ-ICT-136",
+        "buyer": "Eastern Cape - East London Industrial Development Zone Corporation",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-164854"
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165832-2026-08-17",
+        "portal": "ZA_ETENDERS",
+        "title": "RFB 3264/ 2026",
+        "buyer": "State Information Technology Agency",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165832"
+      },
       {
         "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165653-2026-08-14",
         "portal": "GENERIC_PUBLIC_PAGE",
@@ -62,36 +86,12 @@
         "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165653"
       },
       {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165524-2026-08-13",
-        "portal": "GENERIC_PUBLIC_PAGE",
-        "title": "181/2026",
-        "buyer": "Kouga Municipality",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165524"
-      },
-      {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165484-2026-08-13",
-        "portal": "GENERIC_PUBLIC_PAGE",
-        "title": "VCW27/001",
-        "buyer": "Vaal Central Water",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165484"
-      },
-      {
-        "candidate_id": "TED:568940-2026",
-        "portal": "TED",
-        "title": "Germany – Firefighting vehicles – FTZ - GWL u GWLK",
-        "buyer": "Landkreis Oldenburg",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ted.europa.eu/en/notice/-/detail/568940-2026"
-      },
-      {
-        "candidate_id": "TED:568397-2026",
-        "portal": "TED",
-        "title": "Germany – Installation of doors and windows and related components – Glaserarbeiten (Holz-Alufenster) (VE 08)",
-        "buyer": "Gemeinde Rosengarten",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ted.europa.eu/en/notice/-/detail/568397-2026"
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165805-2026-08-17",
+        "portal": "ZA_ETENDERS",
+        "title": "RFQ2026/072/6175/NYDA",
+        "buyer": "National Youth Development Agency",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165805"
       }
     ]
   },
