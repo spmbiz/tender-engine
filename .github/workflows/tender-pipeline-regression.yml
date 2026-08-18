@@ -13,6 +13,9 @@ on:
       - '.github/workflows/qwen-live-recovery-drainer.yml'
       - '.github/workflows/qwen-live-conveyor.yml'
       - '.github/workflows/qwen-batch-autotune-selfheal.yml'
+      - '.github/workflows/gpt-live-review-batch.yml'
+      - '.github/workflows/persist-gpt-adjudications.yml'
+      - '.github/workflows/gpt-inbox-live-refresh.yml'
       - '.github/workflows/tender-pipeline-regression.yml'
   workflow_dispatch:
 
@@ -46,6 +49,9 @@ jobs:
             Path('.github/workflows/qwen-live-recovery-drainer.yml'),
             Path('.github/workflows/qwen-live-conveyor.yml'),
             Path('.github/workflows/qwen-batch-autotune-selfheal.yml'),
+            Path('.github/workflows/gpt-live-review-batch.yml'),
+            Path('.github/workflows/persist-gpt-adjudications.yml'),
+            Path('.github/workflows/gpt-inbox-live-refresh.yml'),
             Path('.github/workflows/tender-pipeline-regression.yml'),
           ]
           for p in files:
