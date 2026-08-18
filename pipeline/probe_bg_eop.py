@@ -5,12 +5,25 @@ import json
 import os
 import re
 from pathlib import Path
-from urllib.parse import urlparse
 
+import requests
 from playwright.sync_api import sync_playwright
 
 
-INTEREST_RE = re.compile(r"api|download|file|document|export|tender|procedure|public|today|attachment|requirement|version", re.I)
+INTEREST_RE = re.compile(r"api|download|file|document|export|tender|procedure|public|today|attachment|requirement|version|signed", re.I)
+SERVICE_JS = "https://service.eop.bg/NX1Service.svc/js"
+SERVICE_METHOD_RE = re.compile(
+    r"(?:GetPublishedTenderExportsByTenderId|GetPublishedTenderDetails|GetDocument|DownloadDocument|"
+    r"GetSigned|SignedUrl|Download|DocumentById|GetPublicTenderRequirements|RequirementBox)",
+    re.I,
+)
+
+
+def _safe_headers(headers: dict) -> dict:
+    # Public request metadata only. Never persist auth/session secrets if a portal
+    # later adds them; they are irrelevant to the anonymous adapter contract.
+    keep = {"content-type", "accept", "origin", "referer", "x-requested-with"}
+    return {str(k): str(v)[:1000] for k, v in (headers or {}).items() if str(k).casefold() in keep}
 
 
 def main():
@@ -23,6 +36,14 @@ def main():
     responses = []
     json_bodies = []
     console = []
+
+    service_js = ""
+    try:
+        rr = requests.get(SERVICE_JS, timeout=30, headers={"User-Agent": "Tender-Engine/EOP-Probe"})
+        if rr.ok:
+            service_js = rr.text[:8_000_000]
+    except Exception:
+        service_js = ""
 
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=True, executable_path=chrome, args=["--no-sandbox", "--disable-dev-shm-usage"])
@@ -40,11 +61,18 @@ def main():
                 req = resp.request
                 headers = resp.headers or {}
                 ct = str(headers.get("content-type") or "")
+                post_data = None
+                try:
+                    post_data = req.post_data
+                except Exception:
+                    pass
                 row = {
                     "url": str(resp.url),
                     "status": int(resp.status),
                     "resource_type": str(req.resource_type),
                     "method": str(req.method),
+                    "request_post_data": (post_data[:100_000] if isinstance(post_data, str) else None),
+                    "request_headers": _safe_headers(req.headers or {}),
                     "content_type": ct[:250],
                     "content_disposition": str(headers.get("content-disposition") or "")[:500],
                 }
@@ -85,8 +113,17 @@ def main():
 
         controls = []
         try:
-            controls = page.locator("button, [role='button']").evaluate_all(
-                "els => els.map(e => ({text:(e.innerText||e.textContent||'').trim(), aria:e.getAttribute('aria-label')||'', title:e.getAttribute('title')||''})).filter(x => x.text||x.aria||x.title)"
+            controls = page.locator("button, [role='button'], a, [tabindex], [class*='download'], [class*='document']").evaluate_all(
+                """els => els.map((e,index) => ({
+                    index,
+                    tag:e.tagName,
+                    text:(e.innerText||e.textContent||'').trim(),
+                    aria:e.getAttribute('aria-label')||'',
+                    title:e.getAttribute('title')||'',
+                    href:e.href||'',
+                    cls:e.className||'',
+                    data:Object.fromEntries(Array.from(e.attributes||[]).filter(a=>a.name.startsWith('data-')).map(a=>[a.name,a.value]))
+                })).filter(x => x.text||x.aria||x.title||x.href)"""
             )
         except Exception:
             pass
@@ -97,33 +134,36 @@ def main():
         except Exception:
             pass
 
-        storage = {}
-        for name, expr in {
-            "localStorage": "Object.fromEntries(Object.entries(localStorage))",
-            "sessionStorage": "Object.fromEntries(Object.entries(sessionStorage))",
-        }.items():
-            try:
-                storage[name] = page.evaluate(expr)
-            except Exception as exc:
-                storage[name] = {"error": repr(exc)}
-
         scripts = []
         try:
             scripts = page.locator("script[src]").evaluate_all("els => els.map(e => e.src).filter(Boolean)")
         except Exception:
             pass
 
+        service_method_snippets = []
+        if service_js:
+            for m in SERVICE_METHOD_RE.finditer(service_js):
+                a = max(0, m.start() - 700)
+                b = min(len(service_js), m.end() + 1800)
+                snippet = service_js[a:b]
+                if snippet not in service_method_snippets:
+                    service_method_snippets.append(snippet)
+                if len(service_method_snippets) >= 100:
+                    break
+
         result = {
             "url": args.url,
             "resolved_url": page.url,
             "body_text": body[:500_000],
-            "anchors": anchors[:1000],
-            "controls": controls[:1000],
-            "responses": responses[:5000],
-            "json_bodies": json_bodies[:1000],
-            "performance_urls": performance_urls[:5000],
-            "storage": storage,
+            "anchors": anchors[:1500],
+            "controls": controls[:2000],
+            "responses": responses[:6000],
+            "json_bodies": json_bodies[:1200],
+            "performance_urls": performance_urls[:6000],
             "scripts": scripts[:500],
+            "service_js_url": SERVICE_JS,
+            "service_js_chars": len(service_js),
+            "service_method_snippets": service_method_snippets,
             "console": console[:500],
         }
         browser.close()
@@ -135,7 +175,7 @@ def main():
     seen = set()
     for row in responses:
         url = row.get("url") or ""
-        key = (url, row.get("status"), row.get("resource_type"))
+        key = (url, row.get("status"), row.get("resource_type"), row.get("request_post_data"))
         if key in seen:
             continue
         seen.add(key)
@@ -148,8 +188,9 @@ def main():
         "json_bodies": len(json_bodies),
         "anchors": len(anchors),
         "controls": len(controls),
+        "service_js_chars": len(service_js),
         "interesting": interesting[:300],
-        "scripts": scripts[:80],
+        "service_method_snippets": service_method_snippets[:30],
     }, ensure_ascii=False, indent=2))
 
 
