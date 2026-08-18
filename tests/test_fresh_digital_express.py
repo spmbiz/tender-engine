@@ -67,6 +67,15 @@ def test_obvious_physical_not_promoted_by_description_boilerplate(tmp_path):
     assert summary["counts"]["skip_not_express_core"] == 1
 
 
+def test_preliminary_market_consultation_never_enters_express(tmp_path):
+    r = row("IE:pmc", title="Preliminary Market Consultation - Digital Marketing Expertise")
+    out, summary = run_build([r], tmp_path)
+    assert out == []
+    assert summary["counts"]["skip_obvious_non_bid"] == 1
+    assert summary["safety"]["obvious_non_bid_notices_excluded_from_express_only"] is True
+    assert summary["safety"]["semantic_qwen_lane_remains_independent"] is True
+
+
 def test_exact_material_version_attempted_is_skipped(tmp_path):
     attempts = [{
         "candidate_id": "IE:1",
