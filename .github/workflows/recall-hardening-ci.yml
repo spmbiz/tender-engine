@@ -27,12 +27,18 @@ on:
       - 'pipeline/rebuild_gpt_review_bank_from_release.py'
       - 'pipeline/refresh_gpt_inbox_live.py'
       - 'pipeline/build_gpt_web_read_batches.py'
+      - 'pipeline/build_provenance_refresh_plan.py'
+      - 'pipeline/refresh_dce_provenance_from_releases.py'
+      - 'pipeline/build_authenticity_retry_router.py'
+      - 'pipeline/mark_authenticity_retry_dispatched.py'
       - '.github/workflows/supergreen-discovery-v2.yml'
       - '.github/workflows/gpt-inbox-live-refresh.yml'
+      - '.github/workflows/gpt-provenance-refresh.yml'
       - '.github/workflows/recall-hardening-ci.yml'
       - 'tests/test_open_world_lane_contracts.py'
       - 'tests/test_gate_snippet_document_provenance.py'
       - 'tests/test_gpt_review_fair_share.py'
+      - 'tests/test_authenticity_retry_router.py'
 
 permissions:
   contents: read
@@ -72,7 +78,11 @@ jobs:
             pipeline/auto_adjudicate_dce.py \
             pipeline/rebuild_gpt_review_bank_from_release.py \
             pipeline/refresh_gpt_inbox_live.py \
-            pipeline/build_gpt_web_read_batches.py
+            pipeline/build_gpt_web_read_batches.py \
+            pipeline/build_provenance_refresh_plan.py \
+            pipeline/refresh_dce_provenance_from_releases.py \
+            pipeline/build_authenticity_retry_router.py \
+            pipeline/mark_authenticity_retry_dispatched.py
       - name: Validate recall-critical workflow YAML
         run: |
           python - <<'PY'
@@ -84,13 +94,14 @@ jobs:
               '.github/workflows/qwen-live-classification.yml',
               '.github/workflows/qwen-calibration-corpus.yml',
               '.github/workflows/gpt-inbox-live-refresh.yml',
+              '.github/workflows/gpt-provenance-refresh.yml',
               '.github/workflows/recall-hardening-ci.yml',
           ):
               obj=yaml.safe_load(Path(rel).read_text(encoding='utf-8'))
               assert isinstance(obj,dict) and ('jobs' in obj), rel
           print('workflow YAML OK')
           PY
-      - name: Run recall, provenance and review-window regression suite
+      - name: Run recall, provenance, retry and review-window regression suite
         run: |
           python -m pytest -q \
             tests/test_live_universe_contract.py \
@@ -100,4 +111,5 @@ jobs:
             tests/test_procurement_code_and_review_index.py \
             tests/test_open_world_lane_contracts.py \
             tests/test_gate_snippet_document_provenance.py \
-            tests/test_gpt_review_fair_share.py
+            tests/test_gpt_review_fair_share.py \
+            tests/test_authenticity_retry_router.py
