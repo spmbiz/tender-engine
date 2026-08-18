@@ -1,0 +1,62 @@
+name: DCE Authenticity Backlog Diagnostic
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '7,37 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/analyze_dce_authenticity_backlog.py'
+      - '.github/workflows/dce-authenticity-diagnostic.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dce-authenticity-diagnostic
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Analyze current authenticity backlog only
+        run: |
+          set -euo pipefail
+          python -m py_compile pipeline/analyze_dce_authenticity_backlog.py
+          test -s control/gpt_supergreen_inbox.json
+          python pipeline/analyze_dce_authenticity_backlog.py \
+            --inbox control/gpt_supergreen_inbox.json \
+            --out dce-authenticity-diagnostic.json \
+            --top 20
+      - name: Persist small diagnostic transactionally
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          path='control/dce_authenticity_diagnostic_latest.json'
+          content="$(base64 -w0 dce-authenticity-diagnostic.json)"
+          for attempt in 1 2 3 4 5 6; do
+            sha="$(gh api "repos/$REPO/contents/$path?ref=main" --jq '.sha' 2>/dev/null || true)"
+            args=(--method PUT "repos/$REPO/contents/$path" -f message="diag: persist DCE authenticity backlog $RUN_ID" -f content="$content" -f branch=main)
+            [ -n "$sha" ] && args+=(-f sha="$sha")
+            if gh api "${args[@]}" >/dev/null; then exit 0; fi
+            sleep "$((attempt*2))"
+          done
+          exit 1
+      - name: Summary
+        run: |
+          echo '### DCE authenticity backlog' >> "$GITHUB_STEP_SUMMARY"
+          cat dce-authenticity-diagnostic.json >> "$GITHUB_STEP_SUMMARY"
