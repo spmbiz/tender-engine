@@ -1,0 +1,45 @@
+name: Apply UNGM Default Browser UA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/ungm_default_ua_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python tools/apply_ungm_default_ua.py
+      - run: |
+          python -m py_compile pipeline/discover_ungm_public.py
+          python - <<'PY'
+          from pathlib import Path
+          text=Path('pipeline/discover_ungm_public.py').read_text(encoding='utf-8')
+          assert 'new_page(viewport={"width": 1440, "height": 1000})' in text
+          assert 'user_agent=UA' not in text
+          PY
+      - shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add pipeline/discover_ungm_public.py
+          git diff --cached --quiet && exit 0
+          git commit -m 'discovery: keep default Chrome UA for UNGM public session'
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
