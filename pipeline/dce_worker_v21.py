@@ -13,7 +13,7 @@ import dce_worker_v13 as v13
 import dce_worker_v20 as v20  # registers the complete validated V20 stack
 
 
-NEN_DETAIL_RE = re.compile(r"(?P<prefix>/verejne-zakazky/detail-zakazky/(?P<id>N\d{3}-\d{2}-V\d{9}))", re.I)
+NEN_DETAIL_RE = re.compile(r"(?P<prefix>/verejne-zakazky/detail-zakazky/(?P<id>N\d{3}-\d{2}-V\d{6,12}))", re.I)
 NEN_DOWNLOAD_ALL_RE = re.compile(r"(?:st[aá]hnout\s+v[sš]echny\s+p[řr][ií]lohy|download\s+all\s+attachments)", re.I)
 NEN_FILE_RE = re.compile(r"\.(?:pdf|zip|docx?|xlsx?|xls|pptx?|csv|7z|rar|rtf|xml|cer)(?:$|[?#])", re.I)
 
