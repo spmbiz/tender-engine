@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install probe dependencies
-        run: python -m pip install --disable-pip-version-check -q 'playwright>=1.46,<2'
+        run: python -m pip install --disable-pip-version-check -q requests 'playwright>=1.46,<2'
       - name: Reuse runner Chromium
         shell: bash
         run: |
@@ -43,7 +43,7 @@ jobs:
           python - <<'PY'
           import json,re
           d=json.load(open('bg-eop-probe.json',encoding='utf-8'))
-          rx=re.compile(r'api|download|file|document|export|tender|procedure|public|today|attachment|requirement|version',re.I)
+          rx=re.compile(r'api|download|file|document|export|tender|procedure|public|today|attachment|requirement|version|signed',re.I)
           print('--- BODY SAMPLE ---')
           print((d.get('body_text') or '')[:12000])
           print('--- JSON/XHR/FETCH ---')
@@ -51,11 +51,14 @@ jobs:
               u=str(x.get('url') or '')
               if rx.search(u) or x.get('resource_type') in {'xhr','fetch'}:
                   body=str(x.get('body') or '')
-                  print(json.dumps({k:x.get(k) for k in ('url','status','resource_type','method','content_type')},ensure_ascii=False))
+                  print(json.dumps({k:x.get(k) for k in ('url','status','resource_type','method','request_post_data','request_headers','content_type')},ensure_ascii=False))
                   print(body[:5000])
-          print('--- ANCHORS ---')
-          for x in d.get('anchors') or []:
-              if rx.search(str(x.get('href') or '')+' '+str(x.get('text') or '')):
+          print('--- SERVICE METHODS ---')
+          for x in d.get('service_method_snippets') or []:
+              print(x[:5000])
+          print('--- CONTROLS ---')
+          for x in d.get('controls') or []:
+              if rx.search(' '.join(str(x.get(k) or '') for k in ('href','text','aria','title','cls'))):
                   print(json.dumps(x,ensure_ascii=False))
           PY
       - uses: actions/upload-artifact@v4
