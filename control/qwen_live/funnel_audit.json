@@ -1,6 +1,6 @@
 {
-  "schema": "QWEN_DCE_FUNNEL_AUDIT_V1",
-  "generated_at": "2026-08-18T15:03:09.562643+00:00",
+  "schema": "QWEN_DCE_FUNNEL_AUDIT_V2",
+  "generated_at": "2026-08-18T15:04:58.738497+00:00",
   "state_current_exact_hash_rows": 5968,
   "ledger_rows": 43371,
   "snapshot_rows": 43371,
@@ -28,6 +28,47 @@
     "retry_cooldown": 0,
     "in_gpt_inbox": 91,
     "in_final_bank": 10
+  },
+  "decision_funnel": {
+    "FIT": {
+      "current": 190,
+      "keep": 190,
+      "dce_eligible": 190,
+      "dce_attempted_exact_version": 162,
+      "controller_processed": 188,
+      "retry_cooldown": 0,
+      "in_gpt_inbox": 11,
+      "in_final_bank": 0,
+      "unattempted_unprocessed": 0,
+      "positive_procurement_code": 2,
+      "noncore_cpv_contradiction": 13
+    },
+    "MAYBE": {
+      "current": 5439,
+      "keep": 5439,
+      "dce_eligible": 5406,
+      "dce_attempted_exact_version": 4079,
+      "controller_processed": 4530,
+      "retry_cooldown": 0,
+      "in_gpt_inbox": 77,
+      "in_final_bank": 10,
+      "unattempted_unprocessed": 874,
+      "noncore_cpv_contradiction": 430,
+      "positive_procurement_code": 44
+    },
+    "REJECT_OBVIOUS": {
+      "current": 339,
+      "keep": 330,
+      "dce_eligible": 0,
+      "dce_attempted_exact_version": 271,
+      "controller_processed": 276,
+      "retry_cooldown": 0,
+      "in_gpt_inbox": 3,
+      "in_final_bank": 0,
+      "unattempted_unprocessed": 54,
+      "noncore_cpv_contradiction": 19,
+      "positive_procurement_code": 2
+    }
   },
   "fit_funnel": {
     "qwen_fit_current": 190,
@@ -358,6 +399,8 @@
       "candidate_id": "DE-DOE:414e3e5e-f046-4f92-9d19-435794df567c:01",
       "title": "Rahmenvertrag Konzeptionierung und Durchführung des überfachlichen Seminarangebots (Q-Seminare) im BLB NRW",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "BROKER_RESELL",
+      "lean_attractiveness": "UNKNOWN",
       "codes": {
         "delta": 7,
         "positive": [
@@ -371,12 +414,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "DE-DOE:7ad138c8-4306-4856-8fb2-1dcf6400b6a1:01",
       "title": "RV Bearbeitung/Digitalisierung von Posteingängen für das Feststellungsverfahren im Schwerbehindertenrecht",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 8,
         "positive": [
@@ -390,12 +437,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": true
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "DK-UDBUD:7f499979-9ffb-41bc-92bf-0b6823d89bb2:01",
       "title": "Udbud af kontrakt vedrørende levering, drift, vedligeholdelse, support og videreudvikling af et internetbaseret bookingsystem til Forsvarets Puljekøretøjer",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 12,
         "positive": [
@@ -409,12 +460,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "DK-UDBUD:8dacdef7-a230-451e-a4ac-8f6a40790f3d:01",
       "title": "Dynamisk indkøbssystem om oversættelsesydelser",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 14,
         "positive": [
@@ -428,12 +483,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "EE-RHR:1017a836-95d3-4786-8d31-145ec719a72e",
       "title": "Tarkvaraarendus koos hooldustööde, tehnilise toe ja arendusressursi hankimisega",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 12,
         "positive": [
@@ -447,12 +506,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "EE-RHR:13767add-294c-4a45-8d35-6a44ce7681a4",
       "title": "Tallinna valgustuspunktipõhise juhtimissüsteemi soetamine ja paigaldus",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "SUBCONTRACTABLE",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 12,
         "positive": [
@@ -470,12 +533,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": true
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "EE-RHR:5d3f7d33-0f6f-4d64-9785-2c69a1ed5809",
       "title": "TTJA menetlusprotsesside ärianalüüs",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 12,
         "positive": [
@@ -489,12 +556,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "EE-RHR:91f1fa1f-8f7b-43af-806b-0d41b0814ca1",
       "title": "Kommunikatsioonimaterjalide loomise, kujundamise ja teostamise teenus Eesti Töötukassale",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "UNCLEAR",
+      "lean_attractiveness": "UNKNOWN",
       "codes": {
         "delta": 14,
         "positive": [
@@ -508,12 +579,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": true
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "EE-RHR:9f7cb364-43b0-4f7e-a548-96cb47777bcf",
       "title": "Eesti Elektrijaama 5. energiaploki katla rekonstrueerimise ja Narva linna kaugküttevõrguga ühendamise projektijuhtimise teenuse osutamine",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 12,
         "positive": [
@@ -528,12 +603,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": true
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "EE-RHR:b1a3b7a9-1fc7-4d8c-8feb-6ba3afc63308",
       "title": "Turba tn 2 rajatise kasutusse andmine mootorsõidukijuhi õppesõidu teenuse korraldamiseks",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "BROKER_RESELL",
+      "lean_attractiveness": "MEDIUM",
       "codes": {
         "delta": 7,
         "positive": [
@@ -548,12 +627,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": true
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "EE-RHR:e1de8fff-996b-42e0-bc62-7734d298b644",
       "title": "Kirjastamis- ja trükiteenus",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 16,
         "positive": [
@@ -568,12 +651,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "EE-RHR:e96c0aa9-9562-4cf8-8c33-893f715ed3a5",
       "title": "EMSUKA ja murrete tööriistade raamhange",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "SUBCONTRACTABLE",
+      "lean_attractiveness": "LOW",
       "codes": {
         "delta": 16,
         "positive": [
@@ -587,12 +674,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "EE-RHR:ed74ffeb-d1ed-4e09-b9e4-28345951f992",
       "title": "Kehtna valla infolehe Valla Vaatleja väljaandja leidmine perioodiks 2027–2029",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 16,
         "positive": [
@@ -606,12 +697,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": true
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "EE-RHR:f6db4f2f-8467-4465-83ec-96f5677864d0",
       "title": "Rohefoori 2. etapp: põllumajanduse esmatootjate kestlikkuse hindamise tarkvaralahenduse väljatöötamine ja digitaalse tööriista prototüübi katsetamine (Riigikantselei)",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "BROKER_RESELL",
+      "lean_attractiveness": "UNKNOWN",
       "codes": {
         "delta": 12,
         "positive": [
@@ -626,12 +721,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": true
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "LT-CVP:1036847",
       "title": "27907 (25207) SAP licencijos ir jų palaikymo paslaugos (seno CVP IS Nr. 713398)",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 12,
         "positive": [
@@ -646,12 +745,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "LT-CVP:195498",
       "title": "Programinės įrangos palaikymo paslaugų centralizuotas viešasis pirkimas per VRS CPO, siekiant sukurti dinaminę pirkimo sistemą (PPR-927) (seno CVPIS Nr. 697161)",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "BROKER_RESELL",
+      "lean_attractiveness": "MEDIUM",
       "codes": {
         "delta": 12,
         "positive": [
@@ -665,12 +768,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "LT-CVP:299226",
       "title": "Informacinių sistemų kūrimo ir vystymo komandų paslaugos DPS (seno CVP IS Nr. 580190)",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 12,
         "positive": [
@@ -684,12 +791,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "LT-CVP:668860",
       "title": "702686 - Mokymų paslaugos (NEGALIOJANTIS)",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "BROKER_RESELL",
+      "lean_attractiveness": "UNKNOWN",
       "codes": {
         "delta": 7,
         "positive": [
@@ -708,12 +819,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "LT-CVP:682960",
       "title": "(VPP-3526) Nr.711971 Informacinių technologijų specialistų paslaugos kvalifikacijos vertinimo sistema",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 16,
         "positive": [
@@ -727,12 +842,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "LT-CVP:75893",
       "title": "Interneto ryšio paslaugų užsakymai per CPO LT elektroninį katalogą (seno CVP IS Nr. 727888).",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "BROKER_RESELL",
+      "lean_attractiveness": "LOW",
       "codes": {
         "delta": 10,
         "positive": [
@@ -746,12 +865,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "NO-DOFFIN:2026-113030",
       "title": "2. gangsutlysning Adressebasert befolkningsvarsling til Nittedal kommune, og opsjon på gruppe- og kollegavarslingssystem",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "BROKER_RESELL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 10,
         "positive": [
@@ -773,12 +896,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "NO-DOFFIN:2026-113046",
       "title": "Trinn 1 - Prekvalifisering til Rammeavtale reklame, kampanjer og grafisk design",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "BROKER_RESELL",
+      "lean_attractiveness": "UNKNOWN",
       "codes": {
         "delta": 16,
         "positive": [
@@ -816,12 +943,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "NO-DOFFIN:2026-113091",
       "title": "Avtale om konsulentbistand i tilknytning til prosjekt-og systemtjenester",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "BROKER_RESELL",
+      "lean_attractiveness": "UNKNOWN",
       "codes": {
         "delta": 12,
         "positive": [
@@ -838,12 +969,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "NO-DOFFIN:2026-113094",
       "title": "Kontraktstildeling - Kommunikasjonsrådgiver i 50 % til SAMT-BU - DPS",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 12,
         "positive": [
@@ -875,12 +1010,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "NO-DOFFIN:2026-113096",
       "title": "Anskaffelse av prosjektstyringsverktøy",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 12,
         "positive": [
@@ -907,12 +1046,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "NO-DOFFIN:2026-113108",
       "title": "Fagsystem til Iris Salten IKS",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "BROKER_RESELL",
+      "lean_attractiveness": "MEDIUM",
       "codes": {
         "delta": 12,
         "positive": [
@@ -941,12 +1084,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "NO-DOFFIN:2026-113132",
       "title": "RA-26-003-GR-Velferdsteknologi - Gjøvikregionen og Hadeland",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 12,
         "positive": [
@@ -969,12 +1116,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "PL-BZP:08defc3b-a997-1e36-962b-1200014af5c1",
       "title": "Kompleksowa organizacja 1-dniowej konferencji „The Future is data. Przyszłość to dane”",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 16,
         "positive": [
@@ -998,12 +1149,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "PL-BZP:08defc4a-6ab0-d44f-962b-12000115bd59",
       "title": "Dostawa i wdrożenie infrastruktury, systemów oraz narzędzi cyberbezpieczeństwa IT/OT, wraz z wirtualizacją, backupem, monitoringiem, ochroną sieci dla Zakładu Komunalnego Sp. z o.o. w Jasieniu",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 12,
         "positive": [
@@ -1021,12 +1176,16 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     },
     {
       "candidate_id": "PL-BZP:08defc4f-1343-27f7-962b-12000115be1b",
       "title": "SZP/243-250/2026 Szkolenie z projektowania usług z wykorzystaniem metodyki Design Thinking w ramach projektu StayOnTrack–Razem Przeciw Rezygnacji z Edukacji realizowanego przez Politechnikę Wrocławską",
       "qwen_classification": "MAYBE",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "lean_attractiveness": "HIGH",
       "codes": {
         "delta": 7,
         "positive": [
@@ -1040,7 +1199,9 @@
         "contradiction": false,
         "rule": "priority_only_never_drop_never_eligibility"
       },
-      "attempted": false
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
     }
   ],
   "safety": {
