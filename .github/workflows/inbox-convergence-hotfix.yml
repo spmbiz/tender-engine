@@ -5,12 +5,16 @@ on:
     branches: [agent/inbox-convergence-hotfix]
     paths:
       - '.github/workflows/inbox-convergence-hotfix.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/inbox-convergence-hotfix.yml'
 
 permissions:
   contents: write
 
 concurrency:
-  group: inbox-convergence-hotfix
+  group: inbox-convergence-hotfix-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -114,6 +118,7 @@ jobs:
           python -m pip install --disable-pip-version-check -q pytest requests
           pytest -q tests/test_inbox_convergence.py
       - name: Commit validated patch on hotfix branch
+        if: github.event_name == 'push'
         shell: bash
         run: |
           set -euo pipefail
