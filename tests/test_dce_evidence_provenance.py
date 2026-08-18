@@ -11,7 +11,7 @@ sys.path.insert(0, str(ROOT / "pipeline"))
 from dce_evidence_quality import classify_candidate
 
 
-def make_case(*, candidate_id: str, notice_id: str, source_url: str, corpus: str, portal: str = "GR_KHMDHS"):
+def make_case(*, candidate_id: str, notice_id: str, source_url: str, corpus: str, portal: str = "GR_KHMDHS", extra_candidate: dict | None = None, extra_manifest: dict | None = None):
     td = tempfile.TemporaryDirectory()
     root = Path(td.name)
     candidate = {
@@ -21,6 +21,8 @@ def make_case(*, candidate_id: str, notice_id: str, source_url: str, corpus: str
         "source": portal,
         "title": "ΔΟΚΙΜΑΣΤΙΚΗ ΔΙΑΚΗΡΥΞΗ",
     }
+    if extra_candidate:
+        candidate.update(extra_candidate)
     manifest = {
         "candidate_id": candidate_id,
         "status": "DOWNLOADED_PUBLIC",
@@ -31,6 +33,8 @@ def make_case(*, candidate_id: str, notice_id: str, source_url: str, corpus: str
             "content_type": "application/pdf",
         }],
     }
+    if extra_manifest:
+        manifest.update(extra_manifest)
     (root / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
     (root / "candidate.json").write_text(json.dumps(candidate), encoding="utf-8")
     (root / "document_index.json").write_text(json.dumps([{
@@ -122,5 +126,160 @@ def test_non_greek_same_path_shape_never_passes():
     try:
         x = classify_candidate(root)
         assert x["official_khmdhs_provenance"]["matched"] is False
+    finally:
+        td.cleanup()
+
+
+def test_exact_official_placsp_atom_document_is_gate_ready():
+    source_url = "https://contrataciondelsectorpublico.gob.es/wps/wcm/connect/official/GetDocumentsById?id=ABC"
+    td, root = make_case(
+        candidate_id="ES-PLACSP:official-entry-123",
+        notice_id="official-entry-123",
+        source_url=source_url,
+        corpus="DOCUMENTO ESPECIFICO DEL EXPEDIENTE " * 250,
+        portal="ES_PLACSP",
+        extra_manifest={
+            "placsp_atom_resolution": {
+                "document_urls": [source_url],
+                "match_method": "contract_folder_id",
+                "contract_folder_id": "123/2026",
+            },
+            "dce_method_attempts": [{
+                "method": "ES_PLACSP_OFFICIAL_ATOM_V17",
+                "outcome": "ENTRY_FOUND",
+            }],
+        },
+    )
+    try:
+        x = classify_candidate(root)
+        assert x["official_placsp_provenance"]["matched"] is True
+        assert x["gate_readiness"] is True
+        assert "exact_official_placsp_matched_entry_document_provenance" in x["reasons"]
+    finally:
+        td.cleanup()
+
+
+def test_placsp_unlisted_download_never_passes_official_provenance():
+    downloaded = "https://contrataciondelsectorpublico.gob.es/wps/wcm/connect/other.pdf"
+    official = "https://contrataciondelsectorpublico.gob.es/wps/wcm/connect/official/GetDocumentsById?id=ABC"
+    td, root = make_case(
+        candidate_id="ES-PLACSP:official-entry-123",
+        notice_id="official-entry-123",
+        source_url=downloaded,
+        corpus="GENERIC DOCUMENT TEXT " * 250,
+        portal="ES_PLACSP",
+        extra_manifest={
+            "placsp_atom_resolution": {"document_urls": [official], "match_method": "contract_folder_id"},
+            "dce_method_attempts": [{"method": "ES_PLACSP_OFFICIAL_ATOM_V17", "outcome": "ENTRY_FOUND"}],
+        },
+    )
+    try:
+        x = classify_candidate(root)
+        assert x["official_placsp_provenance"]["matched"] is False
+        assert x["gate_readiness"] is False
+    finally:
+        td.cleanup()
+
+
+def test_exact_za_ocds_typed_tender_document_is_gate_ready():
+    ocid = "ocds-9t57fa-165832"
+    source_url = "https://www.etenders.gov.za/home/Download/?blobName=rfb3264.pdf"
+    td, root = make_case(
+        candidate_id=f"ZA_ETENDERS_OCDS:{ocid}-2026-08-17",
+        notice_id=f"{ocid}-2026-08-17",
+        source_url=source_url,
+        corpus="SOUTH AFRICAN PROCUREMENT DOCUMENT " * 250,
+        portal="ZA_ETENDERS",
+        extra_candidate={"ocid": ocid, "procedure_id": ocid},
+        extra_manifest={
+            "dce_method_attempts": [
+                {
+                    "method": "ZA_OCDS_RELEASE_API_V16",
+                    "outcome": "RELEASE_FOUND",
+                    "resolved_url": f"https://ocds-api.etenders.gov.za/api/OCDSReleases/release/{ocid}",
+                },
+                {
+                    "method": "ZA_OCDS_DOCUMENT_V16",
+                    "outcome": "DOWNLOADED",
+                    "url": source_url,
+                    "document_type": "biddingDocuments",
+                    "title": "Bid document",
+                },
+            ]
+        },
+    )
+    try:
+        x = classify_candidate(root)
+        assert x["official_za_ocds_provenance"]["matched"] is True
+        assert x["gate_readiness"] is True
+        assert "exact_official_za_ocds_typed_tender_document_provenance" in x["reasons"]
+    finally:
+        td.cleanup()
+
+
+def test_za_ocds_tender_notice_type_does_not_unlock_gates():
+    ocid = "ocds-9t57fa-165832"
+    source_url = "https://www.etenders.gov.za/home/Download/?blobName=notice.pdf"
+    td, root = make_case(
+        candidate_id=f"ZA_ETENDERS_OCDS:{ocid}-2026-08-17",
+        notice_id=f"{ocid}-2026-08-17",
+        source_url=source_url,
+        corpus="GENERIC PUBLICATION NOTICE TEXT " * 250,
+        portal="ZA_ETENDERS",
+        extra_candidate={"ocid": ocid},
+        extra_manifest={
+            "dce_method_attempts": [
+                {
+                    "method": "ZA_OCDS_RELEASE_API_V16",
+                    "outcome": "RELEASE_FOUND",
+                    "resolved_url": f"https://ocds-api.etenders.gov.za/api/OCDSReleases/release/{ocid}",
+                },
+                {
+                    "method": "ZA_OCDS_DOCUMENT_V16",
+                    "outcome": "DOWNLOADED",
+                    "url": source_url,
+                    "document_type": "tenderNotice",
+                },
+            ]
+        },
+    )
+    try:
+        x = classify_candidate(root)
+        assert x["official_za_ocds_provenance"]["matched"] is False
+        assert x["gate_readiness"] is False
+    finally:
+        td.cleanup()
+
+
+def test_za_ocds_wrong_release_ocid_does_not_unlock_gates():
+    ocid = "ocds-9t57fa-165832"
+    source_url = "https://www.etenders.gov.za/home/Download/?blobName=rfb3264.pdf"
+    td, root = make_case(
+        candidate_id=f"ZA_ETENDERS_OCDS:{ocid}-2026-08-17",
+        notice_id=f"{ocid}-2026-08-17",
+        source_url=source_url,
+        corpus="GENERIC DOCUMENT TEXT " * 250,
+        portal="ZA_ETENDERS",
+        extra_candidate={"ocid": ocid},
+        extra_manifest={
+            "dce_method_attempts": [
+                {
+                    "method": "ZA_OCDS_RELEASE_API_V16",
+                    "outcome": "RELEASE_FOUND",
+                    "resolved_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-DIFFERENT",
+                },
+                {
+                    "method": "ZA_OCDS_DOCUMENT_V16",
+                    "outcome": "DOWNLOADED",
+                    "url": source_url,
+                    "document_type": "biddingDocuments",
+                },
+            ]
+        },
+    )
+    try:
+        x = classify_candidate(root)
+        assert x["official_za_ocds_provenance"]["matched"] is False
+        assert x["gate_readiness"] is False
     finally:
         td.cleanup()
