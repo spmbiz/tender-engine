@@ -1,0 +1,279 @@
+name: DCE Country Empirical Validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run:
+        description: Optional canonical discovery run; blank uses current Qwen source
+        required: false
+        default: ''
+      per_country:
+        description: Recent real tender candidates per jurisdiction
+        required: false
+        default: '12'
+      countries:
+        description: Comma-separated jurisdiction codes; blank uses validator defaults
+        required: false
+        default: ''
+  push:
+    branches: [main]
+    paths:
+      - 'benchmarks/dce-country-validation-trigger.json'
+      - 'pipeline/dce_country_benchmark.py'
+      - '.github/workflows/dce-country-validation.yml'
+
+permissions:
+  contents: read
+
+env:
+  DEFAULT_PER_COUNTRY: '12'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      source_run: ${{ steps.source.outputs.source_run }}
+      sampled_total: ${{ steps.matrix.outputs.sampled_total }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - id: source
+        name: Resolve canonical wide-read source
+        env:
+          INPUT_SOURCE_RUN: ${{ github.event.inputs.source_run || '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_run="$INPUT_SOURCE_RUN"
+          if ! [[ "$source_run" =~ ^[0-9]+$ ]]; then
+            source_run="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('queues/qwen_live_selection_latest.jsonl')
+          for line in p.read_text(encoding='utf-8',errors='replace').splitlines():
+              if not line.strip():
+                  continue
+              row=json.loads(line)
+              rid=row.get('wide_read_run_id') or row.get('source_discovery_run') or row.get('source_run')
+              if rid is not None:
+                  print(rid)
+                  break
+          PY
+          )"
+          fi
+          [[ "$source_run" =~ ^[0-9]+$ ]] || { echo 'Cannot resolve canonical discovery run' >&2; exit 1; }
+          echo "source_run=$source_run" >> "$GITHUB_OUTPUT"
+          echo "Canonical source run: $source_run"
+      - name: Recover canonical current candidate corpus
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ steps.source.outputs.source_run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="discovery-harvest-${SOURCE_RUN}"
+          mkdir -p source-release source-wide
+          assets="$(gh release view "$tag" --json assets --jq '.assets[].name')"
+          repaired="supergreen-wide-read-${SOURCE_RUN}-repaired.tar.gz"
+          normal="supergreen-wide-read-${SOURCE_RUN}.tar.gz"
+          if grep -Fxq "$repaired" <<< "$assets"; then
+            asset="$repaired"
+          elif grep -Fxq "$normal" <<< "$assets"; then
+            asset="$normal"
+          else
+            echo "No canonical wide-read asset in $tag" >&2
+            exit 1
+          fi
+          gh release download "$tag" --pattern "$asset" --dir source-release
+          tar -xzf "source-release/$asset" -C source-wide
+          candidates="$(find source-wide -type f -name current_candidates.jsonl -print -quit)"
+          test -n "$candidates"
+          test -s "$candidates"
+          cp "$candidates" source-current-candidates.jsonl
+          echo "Canonical candidates: $(wc -l < source-current-candidates.jsonl)"
+      - name: Select recent real candidates per jurisdiction
+        env:
+          INPUT_PER_COUNTRY: ${{ github.event.inputs.per_country || '' }}
+          INPUT_COUNTRIES: ${{ github.event.inputs.countries || '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          per_country="${INPUT_PER_COUNTRY:-$DEFAULT_PER_COUNTRY}"
+          [[ "$per_country" =~ ^[0-9]+$ ]] || per_country="$DEFAULT_PER_COUNTRY"
+          if [ -n "$INPUT_COUNTRIES" ]; then
+            python pipeline/dce_country_benchmark.py sample \
+              --candidates source-current-candidates.jsonl \
+              --out-dir benchmark-input \
+              --per-country "$per_country" \
+              --countries "$INPUT_COUNTRIES"
+          else
+            python pipeline/dce_country_benchmark.py sample \
+              --candidates source-current-candidates.jsonl \
+              --out-dir benchmark-input \
+              --per-country "$per_country"
+          fi
+      - name: Materialize exact DCE worker queues without attempt-ledger bias
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p benchmark-input/queues
+          : > /tmp/empty-dce-ledger.jsonl
+          for selection in benchmark-input/selections/*.jsonl; do
+            [ -s "$selection" ] || continue
+            country="$(basename "$selection" .jsonl)"
+            python pipeline/materialize_dce_selection.py \
+              --candidates source-current-candidates.jsonl \
+              --selection "$selection" \
+              --out "benchmark-input/queues/${country}.jsonl" \
+              --attempt-ledger /tmp/empty-dce-ledger.jsonl
+          done
+      - id: matrix
+        name: Freeze executable country matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY' > /tmp/matrix.env
+          import glob,json,os
+          include=[]
+          total=0
+          for p in sorted(glob.glob('benchmark-input/queues/*.jsonl')):
+              n=sum(1 for line in open(p,encoding='utf-8',errors='replace') if line.strip())
+              if n < 1:
+                  continue
+              country=os.path.basename(p)[:-6]
+              include.append({'country':country,'count':n})
+              total += n
+          matrix=json.dumps({'include':include},separators=(',',':'))
+          print('matrix='+matrix)
+          print('sampled_total='+str(total))
+          print('countries='+str(len(include)))
+          PY
+          cat /tmp/matrix.env
+          grep '^matrix=' /tmp/matrix.env >> "$GITHUB_OUTPUT"
+          grep '^sampled_total=' /tmp/matrix.env >> "$GITHUB_OUTPUT"
+          echo "### Country benchmark sample" >> "$GITHUB_STEP_SUMMARY"
+          cat benchmark-input/inventory.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dce-country-benchmark-input-${{ github.run_id }}
+          path: benchmark-input/
+          retention-days: 7
+          if-no-files-found: error
+          compression-level: 6
+
+  country:
+    name: country-${{ matrix.country }}-${{ matrix.count }}cases
+    needs: prepare
+    if: needs.prepare.outputs.sampled_total != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 32
+    strategy:
+      fail-fast: false
+      max-parallel: 18
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: dce-country-benchmark-input-${{ github.run_id }}
+          path: benchmark-input
+      - name: Install resolver dependencies
+        run: python -m pip install --disable-pip-version-check -q requests pypdf python-docx openpyxl python-pptx 'playwright>=1.46,<2'
+      - name: Reuse runner Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Exercise current V20 resolver on frozen country sample
+        env:
+          COUNTRY: ${{ matrix.country }}
+          COUNT: ${{ matrix.count }}
+          DCE_BROWSER_INLINE_RETRIES: '0'
+          DCE_HTTP_INLINE_RETRIES: '0'
+          DCE_BROWSER_FAST_TIMEOUT_SECONDS: '125'
+          DCE_HTTP_FAST_TIMEOUT_SECONDS: '90'
+        shell: bash
+        run: |
+          set -euo pipefail
+          queue="benchmark-input/queues/${COUNTRY}.jsonl"
+          test -s "$queue"
+          lines="$(seq -s, 1 "$COUNT")"
+          python pipeline/dce_batch_worker.py \
+            --queue "$queue" \
+            --lines "$lines" \
+            --out country-out \
+            --concurrency 3 \
+            --http-concurrency 8 \
+            --placsp-concurrency 4 \
+            --http-probe-concurrency 12 \
+            --http-probe-timeout-seconds 5 \
+            --retries 0 \
+            --timeout-seconds 125
+      - name: Summarize empirical country result
+        env:
+          COUNTRY: ${{ matrix.country }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p country-summary
+          python pipeline/dce_country_benchmark.py summarize-country \
+            --country "$COUNTRY" \
+            --queue "benchmark-input/queues/${COUNTRY}.jsonl" \
+            --out country-out \
+            --summary country-summary/country-summary.json
+          cat country-summary/country-summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dce-country-${{ matrix.country }}-${{ github.run_id }}
+          path: |
+            country-summary/
+            country-out/batch_results.json
+            country-out/batch_summary.json
+            country-out/http_probe_summary.json
+            country-out/**/manifest.json
+          retention-days: 7
+          if-no-files-found: warn
+          compression-level: 6
+
+  aggregate:
+    needs: [prepare, country]
+    if: always() && needs.prepare.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dce-country-*-${{ github.run_id }}
+          path: country-results
+      - name: Aggregate country scorecard
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/dce_country_benchmark.py aggregate \
+            --inputs country-results \
+            --out-dir final-report
+          cat final-report/REPORT.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dce-country-validation-report-${{ github.run_id }}
+          path: final-report/
+          retention-days: 14
+          if-no-files-found: error
+          compression-level: 6
