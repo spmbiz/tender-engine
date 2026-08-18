@@ -1,0 +1,77 @@
+name: GPT Gate Stress Catalog
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/gpt-gate-stress-catalog.yml'
+      - 'control/gpt_gate_catalog_trigger.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gpt-gate-stress-catalog
+  cancel-in-progress: true
+
+jobs:
+  catalog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - name: Build one-line-per-gate catalog from conserved stress surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import glob, json, re
+          from pathlib import Path
+          root=Path('control/gpt_gate_stress_batches')
+          manifest=json.load(open(root/'manifest.json',encoding='utf-8'))
+          if not manifest.get('conservation_pass'):
+              raise SystemExit('refusing catalog: source stress surface is not conserved')
+          expected=int(manifest.get('business_gates_in_index') or 0)
+          rows=[]
+          for path in sorted(glob.glob(str(root/'triage-*.json'))):
+              data=json.load(open(path,encoding='utf-8'))
+              rows.extend(x for x in data.get('items',[]) if isinstance(x,dict))
+          if len(rows)!=expected:
+              raise SystemExit(f'catalog conservation fail rows={len(rows)} expected={expected}')
+          ids=[str(x.get('candidate_id') or '').strip().casefold() for x in rows]
+          if len(ids)!=len(set(ids)):
+              raise SystemExit('catalog duplicate candidate ids')
+          def clean(v, limit):
+              s=re.sub(r'\s+',' ',str(v or '')).strip().replace('\t',' ')
+              return s[:limit]
+          out=['rank\tcandidate_id\ttitle\tbuyer\tdeadline\tvalue\tcurrency\tband\treasons\tscope_dce\tterm_value_dce\tdeep_batch']
+          for i,x in enumerate(rows,1):
+              fields=[
+                  i,clean(x.get('candidate_id'),180),clean(x.get('title'),260),clean(x.get('buyer'),180),clean(x.get('deadline'),80),
+                  clean(x.get('estimated_value'),40),clean(x.get('currency'),20),clean(x.get('spm_fit_band'),30),
+                  clean(','.join(str(y) for y in (x.get('spm_fit_reasons') or [])),160),clean(x.get('scope_dce'),500),
+                  clean(x.get('term_value_dce'),300),clean(x.get('deep_batch_hint'),40)
+              ]
+              out.append('\t'.join(map(str,fields)))
+          (root/'catalog.tsv').write_text('\n'.join(out)+'\n',encoding='utf-8')
+          print(f'catalog rows={len(rows)} conservation=true')
+          PY
+      - name: Persist catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add control/gpt_gate_stress_batches/catalog.tsv
+          git diff --cached --quiet && exit 0
+          git commit -m "stress: persist gate catalog ${GITHUB_RUN_ID}"
+          for n in 1 2 3; do
+            git push origin HEAD:main && exit 0
+            git pull --rebase origin main
+            sleep "$n"
+          done
+          exit 1
