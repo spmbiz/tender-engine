@@ -1,0 +1,104 @@
+{
+  "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
+  "latest_source_dce_run_id": 32081860247,
+  "total_inbox_rows": 114,
+  "dce_authenticity_rows": 49,
+  "portal_counts": {
+    "GR_KHMDHS": 22,
+    "GENERIC_PUBLIC_PAGE": 18,
+    "TED": 7,
+    "PL_EZAMOWIENIA": 2
+  },
+  "status_counts": {
+    "UNKNOWN_RETRIEVED_DOCUMENT": 38,
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 11
+  },
+  "reason_counts": {
+    "NON_AUTHORITATIVE": 49
+  },
+  "method_counts": {},
+  "recovery_opportunities": [
+    {
+      "portal": "GR_KHMDHS",
+      "blocked": 22,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 22
+      }
+    },
+    {
+      "portal": "GENERIC_PUBLIC_PAGE",
+      "blocked": 18,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 18
+      }
+    },
+    {
+      "portal": "TED",
+      "blocked": 7,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 7
+      }
+    },
+    {
+      "portal": "PL_EZAMOWIENIA",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
+      }
+    }
+  ],
+  "samples_by_reason": {
+    "NON_AUTHORITATIVE": [
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165653-2026-08-14",
+        "portal": "GENERIC_PUBLIC_PAGE",
+        "title": "180/2026",
+        "buyer": "Kouga Municipality",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165653"
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165524-2026-08-13",
+        "portal": "GENERIC_PUBLIC_PAGE",
+        "title": "181/2026",
+        "buyer": "Kouga Municipality",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165524"
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165484-2026-08-13",
+        "portal": "GENERIC_PUBLIC_PAGE",
+        "title": "VCW27/001",
+        "buyer": "Vaal Central Water",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165484"
+      },
+      {
+        "candidate_id": "TED:568940-2026",
+        "portal": "TED",
+        "title": "Germany – Firefighting vehicles – FTZ - GWL u GWLK",
+        "buyer": "Landkreis Oldenburg",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ted.europa.eu/en/notice/-/detail/568940-2026"
+      },
+      {
+        "candidate_id": "TED:568397-2026",
+        "portal": "TED",
+        "title": "Germany – Installation of doors and windows and related components – Glaserarbeiten (Holz-Alufenster) (VE 08)",
+        "buyer": "Gemeinde Rosengarten",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ted.europa.eu/en/notice/-/detail/568397-2026"
+      }
+    ]
+  },
+  "safety": {
+    "diagnostic_only": true,
+    "mutates_inbox": false,
+    "creates_green": false,
+    "unknown_never_pass": true
+  }
+}
