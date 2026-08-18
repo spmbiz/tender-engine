@@ -1,15 +1,15 @@
 {
   "schema": "DCE_ROLLBACK_AB_DURABLE_EVIDENCE_V1",
-  "generated_at": "2026-08-18T03:56:43.782133+00:00",
+  "generated_at": "2026-08-18T05:07:01.385253+00:00",
   "status": "PASS",
   "errors": [],
   "source_workflow": {
     "name": "DCE Rollback A/B V15",
-    "run_id": "32097094865",
+    "run_id": "32101169978",
     "conclusion": "success",
-    "head_sha": "f86aadf4b8af2ce117d9add634331153dafb4987",
+    "head_sha": "20546677c7e37f6e979ea9c2dce060ebe06346e6",
     "head_branch": "main",
-    "created_at": "2026-08-18T03:53:20Z"
+    "created_at": "2026-08-18T04:59:38Z"
   },
   "rollback_report": {
     "candidate_count": 20,
@@ -17,44 +17,63 @@
     "baseline_results": 20,
     "current_results": 20,
     "hard_regression_count": 0,
-    "warning_count": 6,
-    "improvement_count": 5,
+    "warning_count": 7,
+    "improvement_count": 0,
     "baseline_statuses": {
       "NO_PUBLIC_FILE": 6,
+      "DOWNLOADED_PUBLIC": 7,
+      "AUTH_REQUIRED": 4,
+      "ROUTE_INCOMPLETE": 2,
+      "GENERIC_PUBLIC_PAGE_UNRESOLVED": 1
+    },
+    "current_statuses": {
+      "ERROR_RETRYABLE": 6,
       "DOWNLOADED_PUBLIC": 7,
       "AUTH_REQUIRED": 3,
       "ROUTE_INCOMPLETE": 2,
       "GENERIC_PUBLIC_PAGE_UNRESOLVED": 2
     },
-    "current_statuses": {
-      "ERROR_RETRYABLE": 1,
-      "DOWNLOADED_PUBLIC": 12,
-      "AUTH_REQUIRED": 3,
-      "ROUTE_INCOMPLETE": 2,
-      "GENERIC_PUBLIC_PAGE_UNRESOLVED": 2
-    },
-    "baseline_wall_candidate_seconds": 205.592,
-    "current_wall_candidate_seconds": 203.115,
+    "baseline_wall_candidate_seconds": 751.078,
+    "current_wall_candidate_seconds": 233.349,
     "hard_regressions": [],
     "warnings": [
+      {
+        "candidate_id": "DE-DOE:0e1404be-041c-456d-8bfb-420f14e07c3f:01",
+        "baseline": {
+          "status": "AUTH_REQUIRED",
+          "files": 0,
+          "elapsed_seconds": 9.139,
+          "returncode": 0
+        },
+        "current": {
+          "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
+          "files": 0,
+          "elapsed_seconds": 9.457,
+          "returncode": 0
+        },
+        "hard_regressions": [],
+        "warnings": [
+          "status_changed:AUTH_REQUIRED->GENERIC_PUBLIC_PAGE_UNRESOLVED"
+        ],
+        "improvements": []
+      },
       {
         "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20248545",
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 2.367,
+          "elapsed_seconds": 98.522,
           "returncode": 0
         },
         "current": {
           "status": "ERROR_RETRYABLE",
           "files": 0,
-          "elapsed_seconds": 29.705,
+          "elapsed_seconds": 26.31,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
           "status_changed:NO_PUBLIC_FILE->ERROR_RETRYABLE",
-          "latency_regression:2.367s->29.705s",
           "current_retryable_error"
         ],
         "improvements": []
@@ -64,251 +83,121 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.834,
+          "elapsed_seconds": 91.694,
           "returncode": 0
         },
         "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 8,
-          "elapsed_seconds": 9.049,
+          "status": "ERROR_RETRYABLE",
+          "files": 0,
+          "elapsed_seconds": 15.638,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
-          "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
+          "status_changed:NO_PUBLIC_FILE->ERROR_RETRYABLE",
+          "current_retryable_error"
         ],
-        "improvements": [
-          "new_public_download",
-          "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ]
+        "improvements": []
       },
       {
         "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20292133",
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 2.493,
+          "elapsed_seconds": 98.505,
           "returncode": 0
         },
         "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 4,
-          "elapsed_seconds": 13.825,
+          "status": "ERROR_RETRYABLE",
+          "files": 0,
+          "elapsed_seconds": 21.137,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
-          "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
+          "status_changed:NO_PUBLIC_FILE->ERROR_RETRYABLE",
+          "current_retryable_error"
         ],
-        "improvements": [
-          "new_public_download",
-          "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ]
+        "improvements": []
       },
       {
         "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20305317",
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.944,
+          "elapsed_seconds": 91.809,
           "returncode": 0
         },
         "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 2,
-          "elapsed_seconds": 15.769,
+          "status": "ERROR_RETRYABLE",
+          "files": 0,
+          "elapsed_seconds": 15.548,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
-          "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
+          "status_changed:NO_PUBLIC_FILE->ERROR_RETRYABLE",
+          "current_retryable_error"
         ],
-        "improvements": [
-          "new_public_download",
-          "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ]
+        "improvements": []
       },
       {
         "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20305340",
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 4.583,
+          "elapsed_seconds": 98.515,
           "returncode": 0
         },
         "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 5,
-          "elapsed_seconds": 31.901,
+          "status": "ERROR_RETRYABLE",
+          "files": 0,
+          "elapsed_seconds": 15.991,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
-          "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC",
-          "latency_regression:4.583s->31.901s"
+          "status_changed:NO_PUBLIC_FILE->ERROR_RETRYABLE",
+          "current_retryable_error"
         ],
-        "improvements": [
-          "new_public_download",
-          "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ]
+        "improvements": []
       },
       {
         "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20305470",
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.729,
+          "elapsed_seconds": 91.618,
           "returncode": 0
         },
         "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 8,
-          "elapsed_seconds": 36.542,
+          "status": "ERROR_RETRYABLE",
+          "files": 0,
+          "elapsed_seconds": 15.614,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
-          "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC",
-          "latency_regression:1.729s->36.542s"
+          "status_changed:NO_PUBLIC_FILE->ERROR_RETRYABLE",
+          "current_retryable_error"
         ],
-        "improvements": [
-          "new_public_download",
-          "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ]
+        "improvements": []
       }
     ],
-    "improvements": [
-      {
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20256061",
-        "baseline": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 1.834,
-          "returncode": 0
-        },
-        "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 8,
-          "elapsed_seconds": 9.049,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [
-          "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ],
-        "improvements": [
-          "new_public_download",
-          "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ]
-      },
-      {
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20292133",
-        "baseline": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 2.493,
-          "returncode": 0
-        },
-        "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 4,
-          "elapsed_seconds": 13.825,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [
-          "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ],
-        "improvements": [
-          "new_public_download",
-          "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ]
-      },
-      {
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20305317",
-        "baseline": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 1.944,
-          "returncode": 0
-        },
-        "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 2,
-          "elapsed_seconds": 15.769,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [
-          "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ],
-        "improvements": [
-          "new_public_download",
-          "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ]
-      },
-      {
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20305340",
-        "baseline": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 4.583,
-          "returncode": 0
-        },
-        "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 5,
-          "elapsed_seconds": 31.901,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [
-          "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC",
-          "latency_regression:4.583s->31.901s"
-        ],
-        "improvements": [
-          "new_public_download",
-          "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ]
-      },
-      {
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20305470",
-        "baseline": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 1.729,
-          "returncode": 0
-        },
-        "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 8,
-          "elapsed_seconds": 36.542,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [
-          "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC",
-          "latency_regression:1.729s->36.542s"
-        ],
-        "improvements": [
-          "new_public_download",
-          "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ]
-      }
-    ],
+    "improvements": [],
     "rows": [
       {
         "candidate_id": "CH-SIMAP:4d192fb4-104f-4db3-89b6-bb73cb9ba03f",
         "baseline": {
           "status": "AUTH_REQUIRED",
           "files": 0,
-          "elapsed_seconds": 10.015,
+          "elapsed_seconds": 9.236,
           "returncode": 0
         },
         "current": {
           "status": "AUTH_REQUIRED",
           "files": 0,
-          "elapsed_seconds": 10.076,
+          "elapsed_seconds": 9.193,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -318,19 +207,21 @@
       {
         "candidate_id": "DE-DOE:0e1404be-041c-456d-8bfb-420f14e07c3f:01",
         "baseline": {
-          "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
+          "status": "AUTH_REQUIRED",
           "files": 0,
-          "elapsed_seconds": 10.393,
+          "elapsed_seconds": 9.139,
           "returncode": 0
         },
         "current": {
           "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
           "files": 0,
-          "elapsed_seconds": 10.01,
+          "elapsed_seconds": 9.457,
           "returncode": 0
         },
         "hard_regressions": [],
-        "warnings": [],
+        "warnings": [
+          "status_changed:AUTH_REQUIRED->GENERIC_PUBLIC_PAGE_UNRESOLVED"
+        ],
         "improvements": []
       },
       {
@@ -338,13 +229,13 @@
         "baseline": {
           "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
           "files": 0,
-          "elapsed_seconds": 9.879,
+          "elapsed_seconds": 9.146,
           "returncode": 0
         },
         "current": {
           "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
           "files": 0,
-          "elapsed_seconds": 10.319,
+          "elapsed_seconds": 9.682,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -356,19 +247,18 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 2.367,
+          "elapsed_seconds": 98.522,
           "returncode": 0
         },
         "current": {
           "status": "ERROR_RETRYABLE",
           "files": 0,
-          "elapsed_seconds": 29.705,
+          "elapsed_seconds": 26.31,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
           "status_changed:NO_PUBLIC_FILE->ERROR_RETRYABLE",
-          "latency_regression:2.367s->29.705s",
           "current_retryable_error"
         ],
         "improvements": []
@@ -378,130 +268,118 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.834,
+          "elapsed_seconds": 91.694,
           "returncode": 0
         },
         "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 8,
-          "elapsed_seconds": 9.049,
+          "status": "ERROR_RETRYABLE",
+          "files": 0,
+          "elapsed_seconds": 15.638,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
-          "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
+          "status_changed:NO_PUBLIC_FILE->ERROR_RETRYABLE",
+          "current_retryable_error"
         ],
-        "improvements": [
-          "new_public_download",
-          "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ]
+        "improvements": []
       },
       {
         "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20292133",
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 2.493,
+          "elapsed_seconds": 98.505,
           "returncode": 0
         },
         "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 4,
-          "elapsed_seconds": 13.825,
+          "status": "ERROR_RETRYABLE",
+          "files": 0,
+          "elapsed_seconds": 21.137,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
-          "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
+          "status_changed:NO_PUBLIC_FILE->ERROR_RETRYABLE",
+          "current_retryable_error"
         ],
-        "improvements": [
-          "new_public_download",
-          "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ]
+        "improvements": []
       },
       {
         "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20305317",
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.944,
+          "elapsed_seconds": 91.809,
           "returncode": 0
         },
         "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 2,
-          "elapsed_seconds": 15.769,
+          "status": "ERROR_RETRYABLE",
+          "files": 0,
+          "elapsed_seconds": 15.548,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
-          "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
+          "status_changed:NO_PUBLIC_FILE->ERROR_RETRYABLE",
+          "current_retryable_error"
         ],
-        "improvements": [
-          "new_public_download",
-          "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ]
+        "improvements": []
       },
       {
         "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20305340",
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 4.583,
+          "elapsed_seconds": 98.515,
           "returncode": 0
         },
         "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 5,
-          "elapsed_seconds": 31.901,
+          "status": "ERROR_RETRYABLE",
+          "files": 0,
+          "elapsed_seconds": 15.991,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
-          "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC",
-          "latency_regression:4.583s->31.901s"
+          "status_changed:NO_PUBLIC_FILE->ERROR_RETRYABLE",
+          "current_retryable_error"
         ],
-        "improvements": [
-          "new_public_download",
-          "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ]
+        "improvements": []
       },
       {
         "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20305470",
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.729,
+          "elapsed_seconds": 91.618,
           "returncode": 0
         },
         "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 8,
-          "elapsed_seconds": 36.542,
+          "status": "ERROR_RETRYABLE",
+          "files": 0,
+          "elapsed_seconds": 15.614,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
-          "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC",
-          "latency_regression:1.729s->36.542s"
+          "status_changed:NO_PUBLIC_FILE->ERROR_RETRYABLE",
+          "current_retryable_error"
         ],
-        "improvements": [
-          "new_public_download",
-          "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
-        ]
+        "improvements": []
       },
       {
         "candidate_id": "GR-KHMDHS:26PROC019634474",
         "baseline": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 61.795,
+          "elapsed_seconds": 61.493,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 1.789,
+          "elapsed_seconds": 62.186,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -513,13 +391,13 @@
         "baseline": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 62.3,
+          "elapsed_seconds": 1.809,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 1.833,
+          "elapsed_seconds": 1.574,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -531,13 +409,13 @@
         "baseline": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 1.726,
+          "elapsed_seconds": 1.481,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 1.797,
+          "elapsed_seconds": 1.448,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -549,13 +427,13 @@
         "baseline": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 1.414,
+          "elapsed_seconds": 61.659,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 1.567,
+          "elapsed_seconds": 1.112,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -567,13 +445,13 @@
         "baseline": {
           "status": "AUTH_REQUIRED",
           "files": 0,
-          "elapsed_seconds": 10.041,
+          "elapsed_seconds": 8.654,
           "returncode": 0
         },
         "current": {
           "status": "AUTH_REQUIRED",
           "files": 0,
-          "elapsed_seconds": 10.885,
+          "elapsed_seconds": 8.689,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -585,13 +463,13 @@
         "baseline": {
           "status": "AUTH_REQUIRED",
           "files": 0,
-          "elapsed_seconds": 11.429,
+          "elapsed_seconds": 7.074,
           "returncode": 0
         },
         "current": {
           "status": "AUTH_REQUIRED",
           "files": 0,
-          "elapsed_seconds": 6.229,
+          "elapsed_seconds": 8.645,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -603,13 +481,13 @@
         "baseline": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 4.024,
+          "elapsed_seconds": 3.463,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 3.857,
+          "elapsed_seconds": 3.296,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -621,13 +499,13 @@
         "baseline": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 1.928,
+          "elapsed_seconds": 1.293,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 1.443,
+          "elapsed_seconds": 1.499,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -639,13 +517,13 @@
         "baseline": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 4.572,
+          "elapsed_seconds": 4.874,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 5.344,
+          "elapsed_seconds": 5.071,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -657,13 +535,13 @@
         "baseline": {
           "status": "ROUTE_INCOMPLETE",
           "files": 0,
-          "elapsed_seconds": 0.565,
+          "elapsed_seconds": 0.471,
           "returncode": 0
         },
         "current": {
           "status": "ROUTE_INCOMPLETE",
           "files": 0,
-          "elapsed_seconds": 0.581,
+          "elapsed_seconds": 0.558,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -675,13 +553,13 @@
         "baseline": {
           "status": "ROUTE_INCOMPLETE",
           "files": 0,
-          "elapsed_seconds": 0.561,
+          "elapsed_seconds": 0.623,
           "returncode": 0
         },
         "current": {
           "status": "ROUTE_INCOMPLETE",
           "files": 0,
-          "elapsed_seconds": 0.594,
+          "elapsed_seconds": 0.701,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -699,7 +577,7 @@
         "raw_portal": "CA_CANADABUYS",
         "lane": "browser_fast_lane",
         "returncode": 0,
-        "status": "DOWNLOADED_PUBLIC",
+        "status": "AUTH_REQUIRED",
         "attempt_count": 1,
         "retries": 0,
         "requested_retries": 0,
@@ -707,15 +585,15 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 2.004,
+        "elapsed_seconds": 12.889,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
-            "status": "DOWNLOADED_PUBLIC",
-            "elapsed_seconds": 2.004,
+            "status": "AUTH_REQUIRED",
+            "elapsed_seconds": 12.889,
             "rate_limited": false,
-            "stdout": "{\n  \"candidate_id\": \"EXP:CA\",\n  \"portal\": \"CA_CANADABUYS\",\n  \"raw_portal\": \"CA_CANADABUYS\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 6,\n  \"root\": \"expansion-out/EXP-CA\"\n}\n",
+            "stdout": "{\n  \"candidate_id\": \"EXP:CA\",\n  \"portal\": \"CA_CANADABUYS\",\n  \"raw_portal\": \"CA_CANADABUYS\",\n  \"status\": \"AUTH_REQUIRED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-CA\"\n}\n",
             "stderr": ""
           }
         ]
@@ -735,13 +613,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 11.977,
+        "elapsed_seconds": 19.353,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "AUTH_REQUIRED",
-            "elapsed_seconds": 11.977,
+            "elapsed_seconds": 19.353,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:NZ\",\n  \"portal\": \"NZ_GETS\",\n  \"raw_portal\": \"NZ_GETS\",\n  \"status\": \"AUTH_REQUIRED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-NZ\"\n}\n",
             "stderr": ""
@@ -763,13 +641,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 14.454,
+        "elapsed_seconds": 21.387,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-            "elapsed_seconds": 14.454,
+            "elapsed_seconds": 21.387,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:PROCONTRACT\",\n  \"portal\": \"UK_PROCONTRACT\",\n  \"raw_portal\": \"UK_PROCONTRACT\",\n  \"status\": \"GENERIC_PUBLIC_PAGE_UNRESOLVED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-PROCONTRACT\"\n}\n",
             "stderr": ""
@@ -791,13 +669,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 5.074,
+        "elapsed_seconds": 4.21,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "AUTH_REQUIRED",
-            "elapsed_seconds": 5.074,
+            "elapsed_seconds": 4.21,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:DELTA\",\n  \"portal\": \"UK_DELTA\",\n  \"raw_portal\": \"UK_DELTA\",\n  \"status\": \"AUTH_REQUIRED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-DELTA\"\n}\n",
             "stderr": ""
@@ -819,13 +697,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 5.159,
+        "elapsed_seconds": 4.553,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-            "elapsed_seconds": 5.159,
+            "elapsed_seconds": 4.553,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:INTEND\",\n  \"portal\": \"UK_INTEND\",\n  \"raw_portal\": \"UK_INTEND\",\n  \"status\": \"GENERIC_PUBLIC_PAGE_UNRESOLVED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-INTEND\"\n}\n",
             "stderr": ""
@@ -847,13 +725,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 7.708,
+        "elapsed_seconds": 7.648,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "AUTH_REQUIRED",
-            "elapsed_seconds": 7.708,
+            "elapsed_seconds": 7.648,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:JAGGAER\",\n  \"portal\": \"UK_JAGGAER\",\n  \"raw_portal\": \"UK_JAGGAER\",\n  \"status\": \"AUTH_REQUIRED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-JAGGAER\"\n}\n",
             "stderr": ""
@@ -875,13 +753,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 2.948,
+        "elapsed_seconds": 2.703,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "DOWNLOADED_PUBLIC",
-            "elapsed_seconds": 2.948,
+            "elapsed_seconds": 2.703,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:ATAMIS\",\n  \"portal\": \"UK_ATAMIS\",\n  \"raw_portal\": \"UK_ATAMIS\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 1,\n  \"root\": \"expansion-out/EXP-ATAMIS\"\n}\n",
             "stderr": ""
@@ -903,13 +781,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 39.527,
+        "elapsed_seconds": 5.099,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "DOWNLOADED_PUBLIC",
-            "elapsed_seconds": 39.527,
+            "elapsed_seconds": 5.099,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:SK\",\n  \"portal\": \"SK_UVO_PUBLIC\",\n  \"raw_portal\": \"SK_UVO_PUBLIC\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 1,\n  \"root\": \"expansion-out/EXP-SK\"\n}\n",
             "stderr": ""
@@ -931,13 +809,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 14.531,
+        "elapsed_seconds": 14.307,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-            "elapsed_seconds": 14.531,
+            "elapsed_seconds": 14.307,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:DE-NRW\",\n  \"portal\": \"DE_EVERGABE_NRW\",\n  \"raw_portal\": \"DE_EVERGABE_NRW\",\n  \"status\": \"GENERIC_PUBLIC_PAGE_UNRESOLVED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-DE-NRW\"\n}\n",
             "stderr": ""
@@ -959,13 +837,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 23.191,
+        "elapsed_seconds": 16.003,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-            "elapsed_seconds": 23.191,
+            "elapsed_seconds": 16.002,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:BG\",\n  \"portal\": \"BG_EOP_PUBLIC\",\n  \"raw_portal\": \"BG_EOP_PUBLIC\",\n  \"status\": \"GENERIC_PUBLIC_PAGE_UNRESOLVED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-BG\"\n}\n",
             "stderr": ""
@@ -987,13 +865,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 35.151,
+        "elapsed_seconds": 33.986,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "DOWNLOADED_PUBLIC",
-            "elapsed_seconds": 35.151,
+            "elapsed_seconds": 33.986,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:CAT\",\n  \"portal\": \"ES_CATALONIA_PUBLIC\",\n  \"raw_portal\": \"ES_CATALONIA_PUBLIC\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 12,\n  \"root\": \"expansion-out/EXP-CAT\"\n}\n",
             "stderr": ""
@@ -1015,13 +893,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 74.866,
+        "elapsed_seconds": 63.526,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "DOWNLOADED_PUBLIC",
-            "elapsed_seconds": 74.866,
+            "elapsed_seconds": 63.526,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:HU\",\n  \"portal\": \"HU_EKR_PUBLIC\",\n  \"raw_portal\": \"HU_EKR_PUBLIC\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 7,\n  \"root\": \"expansion-out/EXP-HU\"\n}\n",
             "stderr": ""
@@ -1032,8 +910,8 @@
     "bad": []
   },
   "artifact_paths": {
-    "rollback": "evidence/dce-rollback-ab-32097094865/ab-report/report.json",
-    "expansion": "evidence/dce-expansion-live-32097094865/expansion-summary.json"
+    "rollback": "evidence/dce-rollback-ab-32101169978/ab-report/report.json",
+    "expansion": "evidence/dce-expansion-live-32101169978/expansion-summary.json"
   },
   "gate": {
     "canonical_source_branch": "main",
