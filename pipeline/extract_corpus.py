@@ -141,14 +141,6 @@ def _native_text_yield(text: str) -> int:
 
 
 def _load_docling_adapter():
-    """Support both `python -m pipeline...` and direct `python pipeline/...py`.
-
-    DCE workers execute this file directly from the repository root, where
-    `pipeline` is not necessarily importable as a package inside child processes.
-    Falling back to the sibling module removes the observed
-    `ModuleNotFoundError("No module named 'pipeline'")` without changing parser
-    selection or any evidence semantics.
-    """
     try:
         from pipeline.docling_deep_parser import parse_with_docling, should_deep_parse
         return parse_with_docling, should_deep_parse
@@ -186,39 +178,106 @@ def _try_docling(path: Path, root: Path, kind: str, text: str) -> tuple[str, dic
     return text, deep
 
 
+def _load_manifest(root: Path) -> dict:
+    try:
+        obj = json.loads((root / "manifest.json").read_text(encoding="utf-8", errors="replace"))
+        return obj if isinstance(obj, dict) else {}
+    except Exception:
+        return {}
+
+
+def _manifest_file_indexes(manifest: dict):
+    """Map persisted file provenance without guessing across unrelated files."""
+    by_sha: dict[str, dict] = {}
+    by_name: dict[str, list[dict]] = {}
+    for row in manifest.get("files") or []:
+        if not isinstance(row, dict):
+            continue
+        sha = str(row.get("sha256") or row.get("sha") or "").strip().lower()
+        if sha:
+            by_sha[sha] = row
+        for value in (row.get("name"), row.get("filename"), row.get("path")):
+            name = Path(str(value or "")).name.casefold()
+            if name:
+                by_name.setdefault(name, []).append(row)
+    return by_sha, by_name
+
+
+def _source_provenance(path: Path, digest: str, by_sha: dict[str, dict], by_name: dict[str, list[dict]]) -> dict:
+    row = by_sha.get(digest.lower())
+    match_method = "SHA256" if row else None
+    if row is None:
+        candidates = by_name.get(path.name.casefold()) or []
+        if len(candidates) == 1:
+            row = candidates[0]
+            match_method = "UNIQUE_FILENAME"
+    row = row or {}
+    return {
+        "source_url": row.get("source_url") or row.get("url"),
+        "source_manifest_name": row.get("name") or row.get("filename") or row.get("path"),
+        "source_provenance_match": match_method,
+    }
+
+
 def process_candidate(root: Path):
     files_root = root / "files"
     if not files_root.exists():
         return None
     recursive_unpack(files_root)
+    manifest = _load_manifest(root)
+    by_sha, by_name = _manifest_file_indexes(manifest)
     docs = []
-    corpus_chunks = []
+    corpus_chunks: list[str] = []
+    corpus_cursor = 0
     for path in sorted(files_root.rglob("*")):
         if not path.is_file():
             continue
         kind, native_text = extract_text(path)
         text, deep = _try_docling(path, root, kind, native_text)
         rel = str(path.relative_to(root))
+        digest = sha256_file(path)
+        if text and len(text) > 1_500_000:
+            text = text[:1_500_000] + "\n[TRUNCATED_AT_1_500_000_CHARS]"
+
+        header = f"\n===== FILE: {rel} =====\n" if text else ""
+        if header:
+            corpus_chunks.append(header)
+            corpus_cursor += len(header)
+        text_start = corpus_cursor if text else None
+        if text:
+            corpus_chunks.append(text)
+            corpus_cursor += len(text)
+        text_end = corpus_cursor if text else None
+        if text:
+            corpus_chunks.append("\n")
+            corpus_cursor += 1
+
         rec = {
             "path": rel,
             "name": path.name,
             "size": path.stat().st_size,
-            "sha256": sha256_file(path),
+            "sha256": digest,
             "kind": kind,
             "native_text_chars": _native_text_yield(native_text),
             "text_chars": len(text),
+            "corpus_start": text_start,
+            "corpus_end": text_end,
+            **_source_provenance(path, digest, by_sha, by_name),
         }
         if deep is not None:
             rec["deep_parser"] = deep
         docs.append(rec)
-        if text:
-            if len(text) > 1_500_000:
-                text = text[:1_500_000] + "\n[TRUNCATED_AT_1_500_000_CHARS]"
-            corpus_chunks.extend([f"\n===== FILE: {rel} =====\n", text, "\n"])
+
     corpus = "".join(corpus_chunks)
     (root / "document_index.json").write_text(json.dumps(docs, indent=2, ensure_ascii=False), encoding="utf-8")
     (root / "corpus.txt").write_text(corpus, encoding="utf-8")
-    return {"root": str(root), "documents": len(docs), "corpus_chars": len(corpus)}
+    return {
+        "root": str(root),
+        "documents": len(docs),
+        "documents_with_source_url": sum(1 for d in docs if d.get("source_url")),
+        "documents_with_corpus_offsets": sum(1 for d in docs if d.get("corpus_start") is not None),
+        "corpus_chars": len(corpus),
+    }
 
 
 def main():
