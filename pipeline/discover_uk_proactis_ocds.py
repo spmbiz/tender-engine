@@ -13,7 +13,7 @@ import requests
 
 try:
     from pipeline.ocds_release_normalizer import release_awards, release_to_candidate
-except ModuleNotFoundError:  # direct `python pipeline/foo.py` execution
+except ModuleNotFoundError:
     from ocds_release_normalizer import release_awards, release_to_candidate
 
 SOURCES = {
@@ -34,7 +34,7 @@ SOURCES = {
         "pre_types": [1, 4, 52, 54],
     },
 }
-UA = "Tender-Engine/5.5 (+public procurement research; official Proactis OCDS API)"
+UA = "Tender-Engine/5.6 (+public procurement research; official Proactis OCDS API)"
 
 
 def month_pairs(count: int, now: datetime) -> list[tuple[int, int]]:
@@ -61,7 +61,7 @@ def fetch_pkg(url: str, params: dict[str, Any], allow_incomplete_tls: bool) -> t
     session.headers.update({"User-Agent": UA, "Accept": "application/json"})
     last = None
     started = time.monotonic()
-    for attempt in range(4):
+    for attempt in range(6):
         try:
             r = session.get(url, params=params, timeout=60, verify=True)
             r.raise_for_status()
@@ -76,8 +76,8 @@ def fetch_pkg(url: str, params: dict[str, Any], allow_incomplete_tls: bool) -> t
                 return (data if isinstance(data, dict) else {}), True, time.monotonic() - started
         except Exception as exc:
             last = exc
-        if attempt < 3:
-            time.sleep(min(8, 2 ** attempt))
+        if attempt < 5:
+            time.sleep(min(20, 2 ** attempt))
     raise RuntimeError(f"Proactis API failed: {last!r}")
 
 
@@ -97,7 +97,8 @@ def main() -> None:
     awards: list[dict[str, Any]] = []
     pre: list[dict[str, Any]] = []
     telemetry: list[dict[str, Any]] = []
-    errors: list[dict[str, Any]] = []
+    critical_errors: list[dict[str, Any]] = []
+    warnings: list[dict[str, Any]] = []
     tls_fallbacks = 0
 
     notice_types = cfg["contract_types"] + cfg["award_types"] + cfg["pre_types"]
@@ -123,7 +124,13 @@ def main() -> None:
                 pkg, tls_fallback, elapsed = future.result()
                 fetched.append((date_from, notice_type, pkg, tls_fallback, elapsed))
             except Exception as exc:
-                errors.append({"month": date_from, "notice_type": notice_type, "error": repr(exc)})
+                problem = {"month": date_from, "notice_type": notice_type, "error": repr(exc)}
+                if notice_type in cfg["contract_types"]:
+                    problem["impact"] = "LIVE_CONTRACT_COVERAGE"
+                    critical_errors.append(problem)
+                else:
+                    problem["impact"] = "AUXILIARY_PRE_OR_AWARD_ONLY"
+                    warnings.append(problem)
 
     for date_from, notice_type, pkg, tls_fallback, elapsed in sorted(fetched, key=lambda x: (x[0], x[1])):
         tls_fallbacks += int(tls_fallback)
@@ -174,6 +181,14 @@ def main() -> None:
     write_jsonl(out / "current.jsonl", current)
     write_jsonl(out / "awards.jsonl", awards)
     write_jsonl(out / "pre_tender.jsonl", pre)
+
+    contract_requests_planned = args.months * len(cfg["contract_types"])
+    contract_requests_failed = len(critical_errors)
+    contract_requests_succeeded = contract_requests_planned - contract_requests_failed
+    # The API is queried by publication month, not by the portal's Current
+    # Opportunities state. This is useful live discovery but not a mathematical
+    # proof that every still-open older notice was traversed.
+    bounded_publication_scope = True
     stats = {
         "source": args.source,
         "portal": cfg["portal"],
@@ -187,8 +202,17 @@ def main() -> None:
         "workers": workers,
         "requests_planned": len(tasks),
         "requests_succeeded": len(fetched),
+        "contract_requests_planned": contract_requests_planned,
+        "contract_requests_succeeded": contract_requests_succeeded,
+        "contract_requests_failed": contract_requests_failed,
+        "enumeration_mode": "BOUNDED_PUBLICATION_MONTHS",
+        "enumeration_exhausted": False,
+        "enumeration_complete": False,
+        "live_coverage_credit_allowed": False if args.source == "UK_PCS_OCDS" else None,
+        "coverage_semantics": "PCS API list queries are publication-month bounded; even zero critical API errors do not prove traversal of the portal's entire Current Opportunities universe.",
         "generated_at": now.isoformat(),
-        "errors": sorted(errors, key=lambda x: (x.get("month", ""), x.get("notice_type", 0))),
+        "errors": sorted(critical_errors, key=lambda x: (x.get("month", ""), x.get("notice_type", 0))),
+        "warnings": sorted(warnings, key=lambda x: (x.get("month", ""), x.get("notice_type", 0))),
         "telemetry": telemetry,
         "tls_fallbacks": tls_fallbacks,
         "incomplete_tls_fallback_allowed": allow_incomplete_tls,
