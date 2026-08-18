@@ -1,7 +1,11 @@
 {
   "schema": "TENDER_PIPELINE_AB_LIVE_CANARY_V2",
-  "status": "PASS",
-  "errors": [],
+  "status": "FAIL",
+  "errors": [
+    "current_row_conservation_fail",
+    "current_recall_regressed:0.0<1.0",
+    "current_golden_gate_not_pass"
+  ],
   "baseline": {
     "schema": "QWEN_RECALL_GOLDEN_REPORT_V3",
     "golden_schema": "QWEN_BATCH_RECALL_GOLDEN_SET_V1",
@@ -422,7 +426,7 @@
     "variant": "baseline",
     "fixture_sha256": "fa152b5ca447e225f4578e2df7dce468d8c38bb8ce966feb3d679e9d505b9889",
     "fixture_future_deadline": "2099-09-21T12:00:00+00:00",
-    "classification_wall_seconds": 127,
+    "classification_wall_seconds": 164,
     "output_rows": 9,
     "unique_output_ids": 9,
     "row_conservation_pass": true,
@@ -435,439 +439,32 @@
   },
   "current": {
     "schema": "QWEN_RECALL_GOLDEN_REPORT_V3",
-    "golden_schema": "QWEN_BATCH_RECALL_GOLDEN_SET_V1",
-    "case_count": 9,
-    "cases_passed": 9,
-    "cases_failed": 0,
-    "known_positive_recall": 1.0,
-    "known_positive_retained": 8,
-    "known_positive_total": 8,
-    "quality_warning_count": 0,
-    "quality_warnings": [],
-    "scale_out_gate": "PASS",
-    "failures": [],
-    "cases": [
-      {
-        "candidate_id": "IE:8670172",
-        "label": "DCE-reviewed strong digital positive: Animation and Software Development",
-        "classification": "FIT",
-        "delivery_mode": "DIRECT_DIGITAL",
-        "lean_attractiveness": "HIGH",
-        "friction_flags": [],
-        "model_classification": null,
-        "model_delivery_mode": null,
-        "passed": true,
-        "checks": [
-          {
-            "check": "must_not_reject",
-            "passed": true,
-            "actual": "FIT"
-          },
-          {
-            "check": "min_rank",
-            "expected": "FIT",
-            "actual": "FIT",
-            "passed": true
-          }
-        ],
-        "warnings": [
-          {
-            "check": "preferred_modes",
-            "expected": [
-              "DIRECT_DIGITAL",
-              "AI_ENABLED",
-              "MIXED"
-            ],
-            "actual": "DIRECT_DIGITAL",
-            "passed": true,
-            "severity": "warning"
-          }
-        ]
-      },
-      {
-        "candidate_id": "PL-BZP:08def84e-fb8f-254e-962b-1200016e42b5",
-        "label": "DCE-reviewed accessible web application",
-        "classification": "FIT",
-        "delivery_mode": "DIRECT_DIGITAL",
-        "lean_attractiveness": "HIGH",
-        "friction_flags": [],
-        "model_classification": null,
-        "model_delivery_mode": null,
-        "passed": true,
-        "checks": [
-          {
-            "check": "must_not_reject",
-            "passed": true,
-            "actual": "FIT"
-          },
-          {
-            "check": "min_rank",
-            "expected": "FIT",
-            "actual": "FIT",
-            "passed": true
-          }
-        ],
-        "warnings": [
-          {
-            "check": "preferred_modes",
-            "expected": [
-              "DIRECT_DIGITAL",
-              "AI_ENABLED",
-              "MIXED",
-              "SUBCONTRACTABLE"
-            ],
-            "actual": "DIRECT_DIGITAL",
-            "passed": true,
-            "severity": "warning"
-          }
-        ]
-      },
-      {
-        "candidate_id": "IE:8623183",
-        "label": "DCE-reviewed partnerable editorial/web-system positive",
-        "classification": "FIT",
-        "delivery_mode": "DIRECT_DIGITAL",
-        "lean_attractiveness": "HIGH",
-        "friction_flags": [],
-        "model_classification": null,
-        "model_delivery_mode": null,
-        "passed": true,
-        "checks": [
-          {
-            "check": "must_not_reject",
-            "passed": true,
-            "actual": "FIT"
-          },
-          {
-            "check": "min_rank",
-            "expected": "MAYBE",
-            "actual": "FIT",
-            "passed": true
-          }
-        ],
-        "warnings": []
-      },
-      {
-        "candidate_id": "DE-DOE:224c8e0b-518e-4e73-9d21-9eda8db13c19:01",
-        "label": "Physical truck: retain for broker recall, but not lean/direct-digital",
-        "classification": "MAYBE",
-        "delivery_mode": "BROKER_RESELL",
-        "lean_attractiveness": "MEDIUM",
-        "friction_flags": [
-          "HEAVY_EQUIPMENT"
-        ],
-        "model_classification": null,
-        "model_delivery_mode": null,
-        "passed": true,
-        "checks": [
-          {
-            "check": "must_not_reject",
-            "passed": true,
-            "actual": "MAYBE"
-          },
-          {
-            "check": "max_rank",
-            "expected": "FIT",
-            "actual": "MAYBE",
-            "passed": true
-          },
-          {
-            "check": "allowed_modes",
-            "expected": [
-              "BROKER_RESELL",
-              "SUBCONTRACTABLE",
-              "MIXED",
-              "UNCLEAR"
-            ],
-            "actual": "BROKER_RESELL",
-            "passed": true
-          },
-          {
-            "check": "allowed_lean",
-            "expected": [
-              "LOW",
-              "MEDIUM",
-              "UNKNOWN"
-            ],
-            "actual": "MEDIUM",
-            "passed": true
-          }
-        ],
-        "warnings": []
-      },
-      {
-        "candidate_id": "US-SAM:6c69d2cd760a40c08bfd29a4d4218b25",
-        "label": "Regulated methylphenidate: retain but flag regulated and low-lean",
-        "classification": "MAYBE",
-        "delivery_mode": "BROKER_RESELL",
-        "lean_attractiveness": "LOW",
-        "friction_flags": [
-          "REGULATED_GOODS"
-        ],
-        "model_classification": null,
-        "model_delivery_mode": null,
-        "passed": true,
-        "checks": [
-          {
-            "check": "must_not_reject",
-            "passed": true,
-            "actual": "MAYBE"
-          },
-          {
-            "check": "max_rank",
-            "expected": "FIT",
-            "actual": "MAYBE",
-            "passed": true
-          },
-          {
-            "check": "allowed_modes",
-            "expected": [
-              "BROKER_RESELL",
-              "SUBCONTRACTABLE",
-              "MIXED",
-              "UNCLEAR"
-            ],
-            "actual": "BROKER_RESELL",
-            "passed": true
-          },
-          {
-            "check": "allowed_lean",
-            "expected": [
-              "LOW",
-              "UNKNOWN"
-            ],
-            "actual": "LOW",
-            "passed": true
-          },
-          {
-            "check": "required_friction_any",
-            "expected": [
-              "REGULATED_GOODS"
-            ],
-            "actual": [
-              "REGULATED_GOODS"
-            ],
-            "hits": [
-              "REGULATED_GOODS"
-            ],
-            "passed": true
-          }
-        ],
-        "warnings": []
-      },
-      {
-        "candidate_id": "TED:560598-2026",
-        "label": "Physical microscopes: retain as sourcing/subcontract route, not strong direct digital",
-        "classification": "MAYBE",
-        "delivery_mode": "BROKER_RESELL",
-        "lean_attractiveness": "MEDIUM",
-        "friction_flags": [
-          "HEAVY_EQUIPMENT"
-        ],
-        "model_classification": null,
-        "model_delivery_mode": null,
-        "passed": true,
-        "checks": [
-          {
-            "check": "must_not_reject",
-            "passed": true,
-            "actual": "MAYBE"
-          },
-          {
-            "check": "max_rank",
-            "expected": "FIT",
-            "actual": "MAYBE",
-            "passed": true
-          },
-          {
-            "check": "allowed_modes",
-            "expected": [
-              "BROKER_RESELL",
-              "SUBCONTRACTABLE",
-              "MIXED",
-              "UNCLEAR"
-            ],
-            "actual": "BROKER_RESELL",
-            "passed": true
-          },
-          {
-            "check": "allowed_lean",
-            "expected": [
-              "LOW",
-              "MEDIUM",
-              "UNKNOWN"
-            ],
-            "actual": "MEDIUM",
-            "passed": true
-          }
-        ],
-        "warnings": []
-      },
-      {
-        "candidate_id": "US-SAM:d5c30c0b355d4a81ab4e4e2a16acbfc2",
-        "label": "Commercial parts: broker/resell recall control",
-        "classification": "MAYBE",
-        "delivery_mode": "BROKER_RESELL",
-        "lean_attractiveness": "MEDIUM",
-        "friction_flags": [],
-        "model_classification": null,
-        "model_delivery_mode": null,
-        "passed": true,
-        "checks": [
-          {
-            "check": "must_not_reject",
-            "passed": true,
-            "actual": "MAYBE"
-          },
-          {
-            "check": "max_rank",
-            "expected": "FIT",
-            "actual": "MAYBE",
-            "passed": true
-          },
-          {
-            "check": "allowed_modes",
-            "expected": [
-              "BROKER_RESELL",
-              "SUBCONTRACTABLE",
-              "MIXED",
-              "UNCLEAR"
-            ],
-            "actual": "BROKER_RESELL",
-            "passed": true
-          },
-          {
-            "check": "allowed_lean",
-            "expected": [
-              "LOW",
-              "MEDIUM",
-              "UNKNOWN"
-            ],
-            "actual": "MEDIUM",
-            "passed": true
-          }
-        ],
-        "warnings": []
-      },
-      {
-        "candidate_id": "TED:564078-2026",
-        "label": "HVAC installation: retain as partnerable but low/medium lean with onsite friction",
-        "classification": "MAYBE",
-        "delivery_mode": "SUBCONTRACTABLE",
-        "lean_attractiveness": "LOW",
-        "friction_flags": [
-          "ON_SITE_SPECIALIST"
-        ],
-        "model_classification": null,
-        "model_delivery_mode": null,
-        "passed": true,
-        "checks": [
-          {
-            "check": "must_not_reject",
-            "passed": true,
-            "actual": "MAYBE"
-          },
-          {
-            "check": "max_rank",
-            "expected": "FIT",
-            "actual": "MAYBE",
-            "passed": true
-          },
-          {
-            "check": "allowed_modes",
-            "expected": [
-              "SUBCONTRACTABLE",
-              "MIXED",
-              "UNCLEAR"
-            ],
-            "actual": "SUBCONTRACTABLE",
-            "passed": true
-          },
-          {
-            "check": "allowed_lean",
-            "expected": [
-              "LOW",
-              "MEDIUM",
-              "UNKNOWN"
-            ],
-            "actual": "LOW",
-            "passed": true
-          },
-          {
-            "check": "required_friction_any",
-            "expected": [
-              "ON_SITE_SPECIALIST",
-              "LICENSED_PERSONNEL",
-              "LOCAL_PRESENCE",
-              "HEAVY_EQUIPMENT"
-            ],
-            "actual": [
-              "ON_SITE_SPECIALIST"
-            ],
-            "hits": [
-              "ON_SITE_SPECIALIST"
-            ],
-            "passed": true
-          }
-        ],
-        "warnings": []
-      },
-      {
-        "candidate_id": "US-SAM:3e996363f3f840c3b4bd786b9cdb985d",
-        "label": "Aviation Security Officer personal-services control",
-        "classification": "REJECT_OBVIOUS",
-        "delivery_mode": "UNCLEAR",
-        "lean_attractiveness": "LOW",
-        "friction_flags": [
-          "LICENSED_PERSONNEL"
-        ],
-        "model_classification": null,
-        "model_delivery_mode": null,
-        "passed": true,
-        "checks": [
-          {
-            "check": "allowed_ranks",
-            "expected": [
-              "REJECT_OBVIOUS",
-              "MAYBE"
-            ],
-            "actual": "REJECT_OBVIOUS",
-            "passed": true
-          },
-          {
-            "check": "allowed_lean",
-            "expected": [
-              "LOW",
-              "UNKNOWN"
-            ],
-            "actual": "LOW",
-            "passed": true
-          }
-        ],
-        "warnings": []
-      }
+    "scale_out_gate": "BLOCK",
+    "failures": [
+      "classifier_crash"
     ],
+    "known_positive_recall": 0,
     "variant": "current",
     "fixture_sha256": "fa152b5ca447e225f4578e2df7dce468d8c38bb8ce966feb3d679e9d505b9889",
     "fixture_future_deadline": "2099-09-21T12:00:00+00:00",
-    "classification_wall_seconds": 165,
-    "output_rows": 9,
-    "unique_output_ids": 9,
-    "row_conservation_pass": true,
+    "classification_wall_seconds": 0,
+    "output_rows": 0,
+    "unique_output_ids": 0,
+    "row_conservation_pass": false,
     "parse_or_fallback_rows": 0,
     "split_events": 0,
     "singleton_fallbacks": 0,
     "failed_attempts": 0,
-    "classifier_version": "qwen3-4b-q4km-batch-selfheal-v1",
-    "prompt_version": "qwen-batch-high-recall-business-fit-v2"
+    "classifier_version": null,
+    "prompt_version": null
   },
   "comparison": {
     "fixture_sha256": "fa152b5ca447e225f4578e2df7dce468d8c38bb8ce966feb3d679e9d505b9889",
-    "known_positive_recall_delta": 0.0,
-    "classification_wall_seconds_delta": 38,
+    "known_positive_recall_delta": -1.0,
+    "classification_wall_seconds_delta": -164,
     "baseline_gate": "BLOCK",
-    "current_gate": "PASS"
+    "current_gate": "BLOCK"
   },
-  "workflow_run_id": "32100633024",
-  "head_sha": "42183fa280061555e113b3cb21ddb51137bb6f1a"
+  "workflow_run_id": "32100787839",
+  "head_sha": "ad6c73562b794dcdcfa46abed6d8d147b9878712"
 }
