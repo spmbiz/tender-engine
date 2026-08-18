@@ -81,7 +81,7 @@ def _bounded_file_fetch(url: str, out: Path, session: requests.Session) -> dict 
 def _bounded_http_probe(detail: str, out: Path, manifest: dict) -> bool:
     session = requests.Session()
     session.headers.update({
-        "User-Agent": "Tender-Engine/19.4 public procurement research",
+        "User-Agent": "Tender-Engine/19.5 public procurement research",
         "Accept": "text/html,application/xhtml+xml,application/pdf,application/zip,*/*",
     })
     try:
@@ -177,6 +177,40 @@ def _filename_from_playwright_response(resp, ordinal: int) -> str:
     return base.safe_name(name or f"ekr-network-{ordinal}.bin")
 
 
+def _dedupe_manifest_files(manifest: dict) -> int:
+    """Collapse duplicate browser-download/network-response copies by SHA-256.
+
+    Prefer the explicit EKR procedure-registry API provenance when the same bytes were
+    also captured as a native browser download from the detail page.
+    """
+    rows = [r for r in (manifest.get("files") or []) if isinstance(r, dict)]
+    chosen: dict[str, dict] = {}
+    duplicate_count = 0
+    for row in rows:
+        sha = str(row.get("sha256") or "").strip().lower()
+        key = sha or f"name:{row.get('name')}|size:{row.get('size')}"
+        current = chosen.get(key)
+        if current is None:
+            chosen[key] = row
+            continue
+        duplicate_count += 1
+        current_url = str(current.get("source_url") or "")
+        new_url = str(row.get("source_url") or "")
+        current_score = 2 if "kozbeszerzesi-eljaras-nyilvantartas" in current_url.casefold() else 1
+        new_score = 2 if "kozbeszerzesi-eljaras-nyilvantartas" in new_url.casefold() else 1
+        if new_score > current_score:
+            chosen[key] = row
+    manifest["files"] = list(chosen.values())
+    if duplicate_count:
+        manifest.setdefault("dce_method_attempts", []).append({
+            "method": "HU_EKR_SHA256_DEDUPE_V19",
+            "duplicates_removed": duplicate_count,
+            "unique_files": len(manifest["files"]),
+            "outcome": "DEDUPED",
+        })
+    return duplicate_count
+
+
 def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
     """Capture only public EKR procurement-document downloads, not notice PDFs."""
     pw = browser = context = page = None
@@ -260,8 +294,6 @@ def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
         for download in browser_downloads[:8]:
             try:
                 name = str(download.suggested_filename or "")
-                # We only click filename-like procurement controls, so native download
-                # events here inherit that DCE provenance.
                 manifest.setdefault("files", []).append(base.persist_download(out, download, page.url))
                 direct_download_meta.append({"suggested_filename": name[:300], "outcome": "PERSISTED"})
             except Exception as exc:
@@ -282,6 +314,7 @@ def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
             except Exception as exc:
                 network_meta.append({"url": url[:2000], "outcome": "BODY_UNAVAILABLE", "error": repr(exc)[:300]})
 
+        _dedupe_manifest_files(manifest)
         manifest.setdefault("dce_method_attempts", []).append({
             "method": "HU_EKR_TARGETED_DCE_NETWORK_V19",
             "url": detail,
@@ -327,6 +360,7 @@ def adapter_hu_ekr_v19(candidate: dict, out: Path, manifest: dict) -> None:
         return
 
     if _bounded_http_probe(detail, out, manifest) or _bounded_browser_download(detail, out, manifest):
+        _dedupe_manifest_files(manifest)
         manifest["status"] = "DOWNLOADED_PUBLIC"
         return
 
