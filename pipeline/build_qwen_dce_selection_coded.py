@@ -65,8 +65,11 @@ def main() -> None:
     ap.add_argument("--dispatch-state")
     ap.add_argument("--attempt-ledger", default="control/dce_attempt_ledger.jsonl")
     ap.add_argument("--limit", type=int, default=160)
-    ap.add_argument("--explore-share", type=float, default=.20)
-    ap.add_argument("--reject-audit-share", type=float, default=.05)
+    # Qwen remains benchmark-blocked. Until the golden set is large enough to
+    # establish false-negative safety, reserve substantially more DCE capacity
+    # for MAYBE/unusual rows and explicit reject audits.
+    ap.add_argument("--explore-share", type=float, default=.30)
+    ap.add_argument("--reject-audit-share", type=float, default=.20)
     ap.add_argument("--candidate-pool-multiplier", type=int, default=4)
     args = ap.parse_args()
 
@@ -186,6 +189,11 @@ def main() -> None:
             "candidate_pool_multiplier": multiplier,
         }
         summary.setdefault("policy", {})["procurement_code_prior_never_changes_keep_or_dce_eligible"] = True
+        summary["policy"]["recall_guard_until_qwen_benchmark_passes"] = {
+            "default_explore_share": float(args.explore_share),
+            "default_reject_audit_share": float(args.reject_audit_share),
+            "reason": "Qwen runtime is still benchmark-blocked; spend more DCE capacity auditing MAYBE/REJECT paths to measure false negatives.",
+        }
         Path(args.summary).write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         print(json.dumps(summary, ensure_ascii=False, indent=2))
 
