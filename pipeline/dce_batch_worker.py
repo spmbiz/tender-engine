@@ -131,6 +131,18 @@ def main():
     ap.add_argument("--lines", required=True, help="comma-separated 1-based queue lines")
     ap.add_argument("--out", default="out")
     ap.add_argument("--concurrency", type=int, default=int(os.getenv("DCE_LOCAL_CONCURRENCY", "2")))
+    ap.add_argument(
+        "--http-concurrency",
+        type=int,
+        default=int(os.getenv("DCE_HTTP_LOCAL_CONCURRENCY", "6")),
+        help="independent HTTP-lane worker limit; browser concurrency remains controlled by --concurrency",
+    )
+    ap.add_argument(
+        "--placsp-concurrency",
+        type=int,
+        default=int(os.getenv("DCE_PLACSP_LOCAL_CONCURRENCY", "3")),
+        help="bounded PLACSP subprocess concurrency; avoids shared Atom-cache lock contention while other HTTP lanes keep their own pool",
+    )
     ap.add_argument("--retries", type=int, default=int(os.getenv("DCE_ITEM_RETRIES", "1")))
     ap.add_argument("--timeout-seconds", type=int, default=int(os.getenv("DCE_ITEM_TIMEOUT_SECONDS", "150")))
     args = ap.parse_args()
@@ -139,11 +151,39 @@ def main():
     Path(args.out).mkdir(parents=True, exist_ok=True)
     results = []
     wall_start = time.monotonic()
-    with ThreadPoolExecutor(max_workers=max(1, min(args.concurrency, len(lines) or 1))) as pool:
-        futs = {
-            pool.submit(run_one, args.queue, line, args.out, max(0, args.retries), max(30, args.timeout_seconds)): line
-            for line in lines
-        }
+
+    lane_lines = {"http_fast_lane": [], "browser_fast_lane": [], "placsp_http_lane": []}
+    for line in lines:
+        candidate = load_candidate(args.queue, line)
+        portal, _ = resolve_dce_portal(candidate)
+        lane = _fast_lane_policy(candidate, max(0, args.retries), max(30, args.timeout_seconds))[2]
+        if lane == "http_fast_lane" and portal == "ES_PLACSP":
+            lane_lines["placsp_http_lane"].append(line)
+        else:
+            lane_lines[lane].append(line)
+
+    browser_workers = max(1, min(args.concurrency, len(lane_lines["browser_fast_lane"]) or 1))
+    http_workers = max(1, min(args.http_concurrency, len(lane_lines["http_fast_lane"]) or 1))
+    placsp_workers = max(1, min(args.placsp_concurrency, len(lane_lines["placsp_http_lane"]) or 1))
+    pools = []
+    futs = {}
+    try:
+        if lane_lines["browser_fast_lane"]:
+            browser_pool = ThreadPoolExecutor(max_workers=browser_workers)
+            pools.append(browser_pool)
+            for line in lane_lines["browser_fast_lane"]:
+                futs[browser_pool.submit(run_one, args.queue, line, args.out, max(0, args.retries), max(30, args.timeout_seconds))] = line
+        if lane_lines["http_fast_lane"]:
+            http_pool = ThreadPoolExecutor(max_workers=http_workers)
+            pools.append(http_pool)
+            for line in lane_lines["http_fast_lane"]:
+                futs[http_pool.submit(run_one, args.queue, line, args.out, max(0, args.retries), max(30, args.timeout_seconds))] = line
+        if lane_lines["placsp_http_lane"]:
+            placsp_pool = ThreadPoolExecutor(max_workers=placsp_workers)
+            pools.append(placsp_pool)
+            for line in lane_lines["placsp_http_lane"]:
+                futs[placsp_pool.submit(run_one, args.queue, line, args.out, max(0, args.retries), max(30, args.timeout_seconds))] = line
+
         for fut in as_completed(futs):
             try:
                 rec = fut.result()
@@ -164,6 +204,9 @@ def main():
                 }
             results.append(rec)
             print(json.dumps({k: rec[k] for k in rec if k != "attempts"}, ensure_ascii=False), flush=True)
+    finally:
+        for pool in pools:
+            pool.shutdown(wait=True)
 
     results.sort(key=lambda r: r["line"])
     Path(args.out, "batch_results.json").write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -175,8 +218,12 @@ def main():
         "retries": sum(int(r.get("retries") or 0) for r in results),
         "rate_limited": sum(1 for r in results if r.get("rate_limited")),
         "wall_seconds": round(time.monotonic() - wall_start, 3),
-        "local_concurrency": max(1, min(args.concurrency, len(lines) or 1)),
+        "local_concurrency": browser_workers,
+        "browser_concurrency": browser_workers,
+        "http_concurrency": http_workers,
+        "placsp_concurrency": placsp_workers,
         "lane_counts": dict(Counter(r.get("lane") for r in results if r.get("lane"))),
+        "scheduler_counts": {lane: len(items) for lane, items in lane_lines.items()},
     }
     Path(args.out, "batch_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(json.dumps(summary, indent=2))
