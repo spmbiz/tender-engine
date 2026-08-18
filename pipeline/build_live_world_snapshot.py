@@ -31,6 +31,20 @@ URL_KEYS = (
     "document_url", "dce_url", "buyer_url", "links", "attachments", "documents"
 )
 
+# Only deterministic jurisdiction fallbacks belong here. These sources are
+# intrinsically national portals; explicit notice evidence always wins. TED,
+# World Bank and other multi-country sources are deliberately absent.
+SOURCE_COUNTRY_FALLBACK = {
+    "IE": "IE", "UK": "GB", "UK_PCS_OCDS": "GB", "UK_FTS_OCDS": "GB",
+    "FR": "FR", "DE": "DE", "CA": "CA", "QC": "CA", "US_SAM": "US",
+    "AU": "AU", "AU_AUSTENDER": "AU", "NZ": "NZ", "PL": "PL", "DK": "DK",
+    "NL": "NL", "FI": "FI", "BE": "BE", "LU": "LU", "CY": "CY", "MT": "MT",
+    "CYPRUS_EPPS": "CY", "MALTA_EPPS": "MT", "ES_PLACSP": "ES", "PT_BASE_OPEN": "PT",
+    "GR_KHMDHS": "GR", "LV_IUB": "LV", "CH_SIMAP": "CH", "NO_DOFFIN": "NO",
+    "CZ_ZAKAZKY_GOV": "CZ", "SI_EJN": "SI", "SK_UVO": "SK", "EE_RHR": "EE",
+    "LT_CVP_API": "LT", "ZA_ETENDERS_OCDS": "ZA", "IT_ANAC_PVL": "IT",
+}
+
 
 def first(rec: dict[str, Any], keys: tuple[str, ...]) -> Any:
     for key in keys:
@@ -169,11 +183,13 @@ def make_row(rec: dict[str, Any], now: datetime) -> tuple[dict[str, Any] | None,
 
     urls: list[str] = []
     collect_urls(rec, urls, set())
+    family = source_family(rec, cid)
+    explicit_country = scalar_or_compact(first(rec, COUNTRY_KEYS), 120)
     row = {
         "candidate_id": cid,
-        "source_family": source_family(rec, cid),
+        "source_family": family,
         "source": scalar_or_compact(first(rec, SOURCE_KEYS), 300),
-        "country": scalar_or_compact(first(rec, COUNTRY_KEYS), 120),
+        "country": explicit_country or SOURCE_COUNTRY_FALLBACK.get(family),
         "buyer": scalar_or_compact(first(rec, BUYER_KEYS), 1200),
         "title": scalar_or_compact(first(rec, TITLE_KEYS), 2000),
         "description": collect_description(rec),
@@ -384,7 +400,36 @@ def main() -> None:
     }
     (out / "snapshot_manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    instructions = f"""# GPT Wide Read — Live World Snapshot\n\nSource discovery run: `{args.source_run}`  \nSnapshot rows: **{len(rows):,}**  \nGenerated: `{now.isoformat()}`\n\n## Objective\nRead the snapshot semantically. Do **not** treat keyword matches or legacy heuristic scores as business truth. Select only opportunities plausibly executable by SPM Business. For SOLO-only mode, reject anything requiring borrowed references, mandatory partner/reseller status, regulated certification, local licensed trade, forced consortium, specialist onsite team, or another entity's capacity.\n\n## Required first-pass output\nFor each tender worth DCE retrieval, return: `candidate_id`, `preliminary_score` (<=89), `reason`, `solo_fit`, and the uncertainty that requires DCE verification. Do not declare FINAL_SUPER_GREEN from notice text.\n\n## DCE request contract\nWrite `control/gpt_dce_request.json` on `main` using:\n\n```json\n{{\n  \"schema\": \"GPT_DCE_REQUEST_V1\",\n  \"source_discovery_run\": {args.source_run},\n  \"wide_read_run_id\": {args.source_run},\n  \"default_preliminary_score\": 84,\n  \"status\": \"DCE_PENDING\",\n  \"mode\": \"SOLO_LEAN\",\n  \"selection_reason\": \"GPT semantic wide-read of the complete live snapshot\",\n  \"candidate_ids\": [\"...\"]\n}}\n```\n\nA push of that file triggers the DCE fanout. DCE retrieval does not imply eligibility. Final 90+/FINAL_SUPER_GREEN still requires authoritative DCE evidence for every mandatory gate.\n"""
+    instructions = f"""# GPT Wide Read — Live World Snapshot
+
+Source discovery run: `{args.source_run}`  
+Snapshot rows: **{len(rows):,}**  
+Generated: `{now.isoformat()}`
+
+## Objective
+Read the snapshot semantically. Do **not** treat keyword matches or legacy heuristic scores as business truth. Select only opportunities plausibly executable by SPM Business. For SOLO-only mode, reject anything requiring borrowed references, mandatory partner/reseller status, regulated certification, local licensed trade, forced consortium, specialist onsite team, or another entity's capacity.
+
+## Required first-pass output
+For each tender worth DCE retrieval, return: `candidate_id`, `preliminary_score` (<=89), `reason`, `solo_fit`, and the uncertainty that requires DCE verification. Do not declare FINAL_SUPER_GREEN from notice text.
+
+## DCE request contract
+Write `control/gpt_dce_request.json` on `main` using:
+
+```json
+{{
+  \"schema\": \"GPT_DCE_REQUEST_V1\",
+  \"source_discovery_run\": {args.source_run},
+  \"wide_read_run_id\": {args.source_run},
+  \"default_preliminary_score\": 84,
+  \"status\": \"DCE_PENDING\",
+  \"mode\": \"SOLO_LEAN\",
+  \"selection_reason\": \"GPT semantic wide-read of the complete live snapshot\",
+  \"candidate_ids\": [\"...\"]
+}}
+```
+
+A push of that file triggers the DCE fanout. DCE retrieval does not imply eligibility. Final 90+/FINAL_SUPER_GREEN still requires authoritative DCE evidence for every mandatory gate.
+"""
     (out / "GPT_WIDE_READ_INSTRUCTIONS.md").write_text(instructions, encoding="utf-8")
     print(json.dumps(manifest, indent=2, ensure_ascii=False))
 
