@@ -13,6 +13,7 @@ permissions:
   contents: read
   actions: read
 
+# Real replay target: immutable pre-fix shard-0 from DCE run 32098369885.
 concurrency:
   group: dce-aggregate-v2-live-replay
   cancel-in-progress: true
