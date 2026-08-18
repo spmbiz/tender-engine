@@ -1,0 +1,110 @@
+name: Qwen Funnel + Review Regression
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/procurement_code_prior.py'
+      - 'pipeline/qwen_funnel_audit.py'
+      - 'pipeline/build_gpt_review_index.py'
+      - 'tests/test_procurement_code_and_review_index.py'
+      - '.github/workflows/qwen-funnel-review-regression.yml'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: qwen-funnel-review-regression
+  cancel-in-progress: false
+
+jobs:
+  deterministic-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q pytest requests
+      - name: Test code-prior safety and uncapped review persistence
+        run: python -m pytest -q tests/test_procurement_code_and_review_index.py
+
+  live-funnel-audit:
+    needs: deterministic-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download one coherent live Qwen generation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p audit
+          notes="$(gh release view qwen-classification-state-latest --json body --jq '.body')"
+          source_run="$(grep -oE 'source_run=[0-9]+' <<< "$notes" | head -n1 | cut -d= -f2)"
+          [[ "$source_run" =~ ^[0-9]+$ ]] || { echo 'Cannot resolve live Qwen source run' >&2; exit 1; }
+          gh release download qwen-classification-state-latest \
+            --pattern qwen-classification-state-latest.jsonl.gz \
+            --dir audit --clobber
+          gh release download "notice-intelligence-ledger-${source_run}" \
+            --pattern "notice-intelligence-ledger-${source_run}.jsonl.gz" \
+            --dir audit --clobber
+          mv "audit/notice-intelligence-ledger-${source_run}.jsonl.gz" audit/ledger.jsonl.gz
+          gh release download "live-world-snapshot-${source_run}" \
+            --pattern "live-open-tenders-${source_run}.jsonl.gz" \
+            --dir audit --clobber
+          mv "audit/live-open-tenders-${source_run}.jsonl.gz" audit/snapshot.jsonl.gz
+          echo "SOURCE_RUN=$source_run" >> "$GITHUB_ENV"
+      - name: Build exact-hash live funnel audit
+        run: |
+          python pipeline/qwen_funnel_audit.py \
+            --state audit/qwen-classification-state-latest.jsonl.gz \
+            --ledger audit/ledger.jsonl.gz \
+            --snapshot audit/snapshot.jsonl.gz \
+            --controller-state control/controller_state_checkpoint.json \
+            --attempt-ledger control/dce_attempt_ledger.jsonl \
+            --inbox control/gpt_supergreen_inbox.json \
+            --final-bank control/final_supergreen_bank.json \
+            --out audit/qwen-funnel-audit.json
+          python - <<'PY'
+          import json
+          d=json.load(open('audit/qwen-funnel-audit.json'))
+          fit=d['fit_coverage']
+          print(json.dumps(fit,indent=2))
+          # Silent disappearance is a hard regression. Explicitly unattempted /
+          # unblocked work is allowed and remains visible as backlog.
+          f=d['fit_funnel']
+          assert int(f.get('attempted_not_visible_anywhere') or 0) == 0, f
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qwen-funnel-audit-${{ github.run_id }}
+          path: audit/qwen-funnel-audit.json
+          retention-days: 14
+      - name: Persist latest live funnel audit transactionally
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          path='control/qwen_live/funnel_audit.json'
+          content="$(base64 -w0 audit/qwen-funnel-audit.json)"
+          for n in 1 2 3 4 5; do
+            sha="$(gh api "repos/$GITHUB_REPOSITORY/contents/$path?ref=main" --jq '.sha' 2>/dev/null || true)"
+            args=(--method PUT "repos/$GITHUB_REPOSITORY/contents/$path" -f message="audit: persist Qwen funnel ${GITHUB_RUN_ID}" -f content="$content" -f branch=main)
+            [ -n "$sha" ] && args+=(-f sha="$sha")
+            if gh api "${args[@]}" >/dev/null; then exit 0; fi
+            sleep "$((n*2))"
+          done
+          exit 1
