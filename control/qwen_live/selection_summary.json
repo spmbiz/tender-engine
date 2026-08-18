@@ -1,32 +1,35 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-18T18:45:22+00:00",
-  "source_run": "32166187915",
-  "state_rows": 7424,
-  "ledger_rows": 41695,
-  "snapshot_rows": 41695,
-  "blocked_ids": 22901,
-  "durable_attempted_exact_versions_ignored": 321,
-  "valid_exact_hash_current_unattempted": 984,
-  "eligible_keep_for_dce": 829,
-  "stale_hash_ignored": 438,
+  "generated_at_utc": "2026-08-18T19:02:37+00:00",
+  "source_run": "32142583593",
+  "state_rows": 8185,
+  "ledger_rows": 44053,
+  "snapshot_rows": 44053,
+  "blocked_ids": 23215,
+  "durable_attempted_exact_versions_ignored": 52,
+  "valid_exact_hash_current_unattempted": 1950,
+  "eligible_keep_for_dce": 1696,
+  "stale_hash_ignored": 0,
   "missing_snapshot": 0,
-  "expired_ignored": 0,
+  "expired_ignored": 1,
   "selected": 160,
   "selection_decisions": {
-    "MAYBE": 152,
-    "REJECT_OBVIOUS": 8
+    "FIT": 23,
+    "MAYBE": 105,
+    "REJECT_OBVIOUS": 32
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
-    "qwen-explore-coded": 32,
-    "qwen-reject-audit-coded": 8,
-    "qwen-elastic-coded": 120
+    "qwen-primary-coded": 21,
+    "qwen-explore-coded": 48,
+    "qwen-reject-audit-coded": 32,
+    "qwen-elastic-coded": 59
   },
   "selection_freshness": {
-    "recent_unseen_carryover": 160
+    "material_new_or_updated": 151,
+    "recent_unseen_carryover": 9
   },
   "policy": {
     "keep_is_not_fit": true,
@@ -38,24 +41,31 @@
     "deadline_unverified_caps_strong_priority": true,
     "freshness_preempts_backfill_within_dce_lanes": true,
     "freshness_is_not_eligibility_truth": true,
-    "procurement_code_prior_never_changes_keep_or_dce_eligible": true
+    "procurement_code_prior_never_changes_keep_or_dce_eligible": true,
+    "recall_guard_until_qwen_benchmark_passes": {
+      "default_explore_share": 0.3,
+      "default_reject_audit_share": 0.2,
+      "reason": "Qwen runtime is still benchmark-blocked; spend more DCE capacity auditing MAYBE/REJECT paths to measure false negatives."
+    }
   },
   "base_candidate_pool": 640,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "MAYBE": 609,
-    "REJECT_OBVIOUS": 31
+    "FIT": 23,
+    "MAYBE": 490,
+    "REJECT_OBVIOUS": 127
   },
   "candidate_pool_lanes": {
-    "qwen-open-world-explore": 128,
-    "qwen-reject-audit": 32,
-    "qwen-elastic": 480
+    "qwen-primary": 23,
+    "qwen-open-world-explore": 192,
+    "qwen-reject-audit": 128,
+    "qwen-elastic": 297
   },
   "code_prior": {
-    "positive_code_rows_in_pool": 0,
-    "noncore_code_contradictions_in_pool": 14,
-    "positive_code_rows_selected": 0,
-    "noncore_code_contradictions_selected": 0,
+    "positive_code_rows_in_pool": 1,
+    "noncore_code_contradictions_in_pool": 29,
+    "positive_code_rows_selected": 1,
+    "noncore_code_contradictions_selected": 2,
     "policy": "priority_only_never_drop_never_eligibility",
     "candidate_pool_multiplier": 4
   }
