@@ -12,17 +12,28 @@ import requests
 OUT = Path(os.getenv("DISCOVERY_OUT", "discovery/ted"))
 OUT.mkdir(parents=True, exist_ok=True)
 API = "https://api.ted.europa.eu/v3/notices/search"
-SCOPE = os.getenv("TED_SCOPE", "ACTIVE")
-LIMIT = min(250, int(os.getenv("TED_LIMIT", "250")))
-MAX_PAGES = int(os.getenv("TED_MAX_PAGES", "48"))
-LOOKBACK_DAYS = int(os.getenv("TED_LOOKBACK_DAYS", "10"))
+SCOPE = os.getenv("TED_SCOPE", "ACTIVE").strip().upper()
+LIMIT = min(250, max(1, int(os.getenv("TED_LIMIT", "250"))))
+LOOKBACK_DAYS = max(1, int(os.getenv("TED_LOOKBACK_DAYS", "10")))
 REQUEST_RETRIES = max(1, int(os.getenv("TED_REQUEST_RETRIES", "7")))
 BACKOFF_BASE_SECONDS = max(0.5, float(os.getenv("TED_BACKOFF_BASE_SECONDS", "3")))
 PAGE_DELAY_SECONDS = max(0.0, float(os.getenv("TED_PAGE_DELAY_SECONDS", "0.25")))
+# ACTIVE scope is itself the authoritative live-universe filter for competition
+# notices. Publication-date lookbacks are therefore disabled by default for
+# ACTIVE discovery. Set TED_ACTIVE_RECENT_ONLY=1 only for a deliberately partial
+# diagnostic run.
+ACTIVE_RECENT_ONLY = os.getenv("TED_ACTIVE_RECENT_ONLY", "0").strip().lower() in {"1", "true", "yes"}
+FULL_ACTIVE = SCOPE == "ACTIVE" and not ACTIVE_RECENT_ONLY
+# Legacy workflows may still set TED_MAX_PAGES. We intentionally ignore that
+# cap in FULL_ACTIVE mode; use TED_HARD_MAX_PAGES explicitly if an emergency
+# safety cap is required. Any hit is surfaced as incomplete coverage.
+LEGACY_MAX_PAGES = max(0, int(os.getenv("TED_MAX_PAGES", "48")))
+HARD_MAX_PAGES = max(0, int(os.getenv("TED_HARD_MAX_PAGES", "0"))) if FULL_ACTIVE else LEGACY_MAX_PAGES
 NOW = datetime.now(timezone.utc)
 START = NOW - timedelta(days=LOOKBACK_DAYS)
 START_DAY = START.date()
-DEFAULT_QUERY = f"PD = ({START:%Y%m%d} <> {NOW:%Y%m%d}) AND form-type = competition"
+RECENT_QUERY = f"PD = ({START:%Y%m%d} <> {NOW:%Y%m%d}) AND form-type = competition"
+DEFAULT_QUERY = "form-type = competition" if FULL_ACTIVE else RECENT_QUERY
 QUERY = os.getenv("TED_QUERY", DEFAULT_QUERY)
 
 FIELDS = [
@@ -32,6 +43,7 @@ FIELDS = [
     "publication-date",
     "deadline",
     "deadline-receipt-request",
+    "deadline-receipt-tender-date-lot",
     "estimated-value-proc",
     "estimated-value-cur-proc",
     "description-proc",
@@ -138,125 +150,121 @@ def retry_after_seconds(resp, attempt: int) -> float:
     return max(explicit, exponential)
 
 
-session = requests.Session()
-session.headers.update({"Content-Type": "application/json", "User-Agent": "Tender-Engine/3.0 public procurement research"})
-rows = []
-seen = set()
-token = None
-errors = []
-retry_events = []
-page_count = 0
-total_reported = None
-source_items_seen = 0
-truncated_by_page_cap = False
+def run() -> dict:
+    session = requests.Session()
+    session.headers.update({"Content-Type": "application/json", "User-Agent": "Tender-Engine/6.3 public procurement research"})
+    rows = []
+    seen = set()
+    token = None
+    errors = []
+    retry_events = []
+    page_count = 0
+    total_reported = None
+    source_items_seen = 0
+    truncated_by_page_cap = False
+    exhausted = False
 
-for page_no in range(1, MAX_PAGES + 1):
-    body = {
-        "query": QUERY,
-        "fields": FIELDS,
-        "limit": LIMIT,
-        "scope": SCOPE,
-        "checkQuerySyntax": False,
-        "paginationMode": "ITERATION",
-    }
-    if token:
-        body["iterationNextToken"] = token
+    page_no = 0
+    while True:
+        page_no += 1
+        if HARD_MAX_PAGES and page_no > HARD_MAX_PAGES:
+            truncated_by_page_cap = True
+            break
 
-    data = None
-    final_exc = None
-    final_response = None
-    for attempt in range(REQUEST_RETRIES):
-        resp = None
-        try:
-            resp = session.post(API, data=json.dumps(body), timeout=60)
-            final_response = resp
-            if resp.status_code == 429 or 500 <= resp.status_code < 600:
-                if attempt + 1 < REQUEST_RETRIES:
+        body = {
+            "query": QUERY,
+            "fields": FIELDS,
+            "limit": LIMIT,
+            "scope": SCOPE,
+            "checkQuerySyntax": False,
+            "paginationMode": "ITERATION",
+        }
+        if token:
+            body["iterationNextToken"] = token
+
+        data = None
+        final_exc = None
+        final_response = None
+        for attempt in range(REQUEST_RETRIES):
+            resp = None
+            try:
+                resp = session.post(API, data=json.dumps(body), timeout=60)
+                final_response = resp
+                if resp.status_code == 429 or 500 <= resp.status_code < 600:
+                    if attempt + 1 < REQUEST_RETRIES:
+                        wait = retry_after_seconds(resp, attempt)
+                        retry_events.append({"page": page_no, "attempt": attempt + 1, "status": resp.status_code, "wait_seconds": wait})
+                        time.sleep(wait)
+                        continue
+                resp.raise_for_status()
+                data = resp.json()
+                break
+            except Exception as exc:
+                final_exc = exc
+                status = getattr(resp, "status_code", None)
+                retryable = status in (408, 425, 429) or (isinstance(status, int) and status >= 500) or status is None
+                if retryable and attempt + 1 < REQUEST_RETRIES:
                     wait = retry_after_seconds(resp, attempt)
-                    retry_events.append({
-                        "page": page_no,
-                        "attempt": attempt + 1,
-                        "status": resp.status_code,
-                        "wait_seconds": wait,
-                    })
+                    retry_events.append({"page": page_no, "attempt": attempt + 1, "status": status, "wait_seconds": wait, "error": repr(exc)})
                     time.sleep(wait)
                     continue
-            resp.raise_for_status()
-            data = resp.json()
+                break
+
+        if data is None:
+            errors.append({
+                "page": page_no,
+                "error": repr(final_exc) if final_exc else "request_failed",
+                "status": getattr(final_response, "status_code", None),
+                "response": getattr(final_response, "text", "")[:2000] if final_response is not None else None,
+            })
             break
-        except Exception as exc:
-            final_exc = exc
-            status = getattr(resp, "status_code", None)
-            retryable = status in (408, 425, 429) or (isinstance(status, int) and status >= 500) or status is None
-            if retryable and attempt + 1 < REQUEST_RETRIES:
-                wait = retry_after_seconds(resp, attempt)
-                retry_events.append({
-                    "page": page_no,
-                    "attempt": attempt + 1,
-                    "status": status,
-                    "wait_seconds": wait,
-                    "error": repr(exc),
-                })
-                time.sleep(wait)
+
+        page_count += 1
+        total_reported = data.get("totalNoticeCount") or data.get("total") or data.get("totalCount") or total_reported
+        items = data.get("notices") or data.get("results") or data.get("items") or []
+        if not isinstance(items, list):
+            errors.append({"page": page_no, "error": "unrecognized_items_shape", "keys": list(data.keys())})
+            break
+        source_items_seen += len(items)
+
+        for item in items:
+            if not isinstance(item, dict):
                 continue
-            break
+            pub = scalar(first_field(item, "publication-number", "publicationNumber"))
+            if not pub:
+                raw = json.dumps(item, ensure_ascii=False)
+                m = re.search(r"\b\d{4,8}-20\d{2}\b", raw)
+                pub = m.group(0) if m else None
+            if not pub or str(pub) in seen:
+                continue
+            seen.add(str(pub))
 
-    if data is None:
-        errors.append({
-            "page": page_no,
-            "error": repr(final_exc) if final_exc else "request_failed",
-            "status": getattr(final_response, "status_code", None),
-            "response": getattr(final_response, "text", "")[:2000] if final_response is not None else None,
-        })
-        break
+            publication_date_raw = scalar(first_field(item, "publication-date"))
+            pday = publication_day(publication_date_raw)
+            if not FULL_ACTIVE and pday and pday < START_DAY:
+                continue
 
-    page_count += 1
-    total_reported = data.get("totalNoticeCount") or data.get("total") or data.get("totalCount") or total_reported
-    items = data.get("notices") or data.get("results") or data.get("items") or []
-    if not isinstance(items, list):
-        errors.append({"page": page_no, "error": "unrecognized_items_shape", "keys": list(data.keys())})
-        break
-    source_items_seen += len(items)
+            deadline_values = []
+            for name in ("deadline", "deadline-receipt-request", "deadline-receipt-tender-date-lot"):
+                deadline_values.extend(flatten_values(first_field(item, name)))
+            parsed_deadlines = [parse_date(v) for v in deadline_values]
+            parsed_deadlines = [d for d in parsed_deadlines if d]
+            future_deadlines = [d for d in parsed_deadlines if d >= NOW]
+            deadline = min(future_deadlines).isoformat() if future_deadlines else (max(parsed_deadlines).isoformat() if parsed_deadlines else None)
+            current = True if FULL_ACTIVE else bool(not parsed_deadlines or future_deadlines)
 
-    for item in items:
-        if not isinstance(item, dict):
-            continue
-        pub = scalar(first_field(item, "publication-number", "publicationNumber"))
-        if not pub:
-            raw = json.dumps(item, ensure_ascii=False)
-            m = re.search(r"\b\d{4,8}-20\d{2}\b", raw)
-            pub = m.group(0) if m else None
-        if not pub or str(pub) in seen:
-            continue
-        seen.add(str(pub))
+            value_raw = scalar(first_field(item, "estimated-value-proc"))
+            try:
+                value = float(value_raw) if value_raw is not None else None
+            except Exception:
+                value = None
+            currency = scalar(first_field(item, "estimated-value-cur-proc"))
+            title = scalar(first_field(item, "notice-title"))
+            buyer = scalar(first_field(item, "buyer-name"))
+            desc = scalar(first_field(item, "description-proc")) or ""
+            notice_url = f"https://ted.europa.eu/en/notice/-/detail/{pub}"
 
-        publication_date_raw = scalar(first_field(item, "publication-date"))
-        pday = publication_day(publication_date_raw)
-        if pday and pday < START_DAY:
-            continue
-
-        deadline_values = []
-        for name in ("deadline", "deadline-receipt-request", "deadline-receipt-tender-date-lot"):
-            deadline_values.extend(flatten_values(first_field(item, name)))
-        parsed_deadlines = [parse_date(v) for v in deadline_values]
-        parsed_deadlines = [d for d in parsed_deadlines if d]
-        future_deadlines = [d for d in parsed_deadlines if d >= NOW]
-        deadline = min(future_deadlines).isoformat() if future_deadlines else (max(parsed_deadlines).isoformat() if parsed_deadlines else None)
-        current = bool(not parsed_deadlines or future_deadlines)
-
-        value_raw = scalar(first_field(item, "estimated-value-proc"))
-        try:
-            value = float(value_raw) if value_raw is not None else None
-        except Exception:
-            value = None
-        currency = scalar(first_field(item, "estimated-value-cur-proc"))
-        title = scalar(first_field(item, "notice-title"))
-        buyer = scalar(first_field(item, "buyer-name"))
-        desc = scalar(first_field(item, "description-proc")) or ""
-        notice_url = f"https://ted.europa.eu/en/notice/-/detail/{pub}"
-
-        rows.append(
-            {
+            rows.append({
                 "candidate_id": f"TED:{pub}",
                 "source": "TED",
                 "portal": "TED",
@@ -265,6 +273,7 @@ for page_no in range(1, MAX_PAGES + 1):
                 "buyer": str(buyer or "") or None,
                 "deadline": deadline,
                 "current": current,
+                "currentness_evidence": "TED_ACTIVE_COMPETITION_SCOPE" if FULL_ACTIVE else "RECENT_WINDOW_PLUS_DEADLINE",
                 "has_future_deadline": bool(future_deadlines),
                 "notice_url": notice_url,
                 "estimated_value": value,
@@ -277,48 +286,64 @@ for page_no in range(1, MAX_PAGES + 1):
                 "classification_cpv": flatten_values(first_field(item, "classification-cpv")),
                 "route": {"publication_number": str(pub)},
                 "discovered_at": NOW.isoformat(),
-            }
-        )
+            })
 
-    token = data.get("iterationNextToken") or data.get("nextToken") or data.get("nextPageToken")
-    if not token or not items:
-        break
-    if PAGE_DELAY_SECONDS:
-        time.sleep(PAGE_DELAY_SECONDS)
-else:
-    if token:
-        truncated_by_page_cap = True
+        next_token = data.get("iterationNextToken") or data.get("nextToken") or data.get("nextPageToken")
+        if not next_token or not items:
+            exhausted = True
+            token = None
+            break
+        token = next_token
+        if PAGE_DELAY_SECONDS:
+            time.sleep(PAGE_DELAY_SECONDS)
 
-with (OUT / "active.jsonl").open("w", encoding="utf-8") as f:
-    for rec in rows:
-        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    with (OUT / "active.jsonl").open("w", encoding="utf-8") as f:
+        for rec in rows:
+            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
-current_rows = [r for r in rows if r.get("current")]
-with (OUT / "current.jsonl").open("w", encoding="utf-8") as f:
-    for rec in current_rows:
-        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    current_rows = [r for r in rows if r.get("current")]
+    with (OUT / "current.jsonl").open("w", encoding="utf-8") as f:
+        for rec in current_rows:
+            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
-stats = {
-    "source": "TED",
-    "scope": SCOPE,
-    "query": QUERY,
-    "lookback_days": LOOKBACK_DAYS,
-    "window_start_day": START_DAY.isoformat(),
-    "window_end_day": NOW.date().isoformat(),
-    "pages": page_count,
-    "limit": LIMIT,
-    "total_reported": total_reported,
-    "source_items_seen": source_items_seen,
-    "materialized_unique": len(rows),
-    "current_materialized": len(current_rows),
-    "future_deadline_records": sum(1 for r in rows if r.get("has_future_deadline")),
-    "truncated_by_page_cap": truncated_by_page_cap,
-    "request_retries": REQUEST_RETRIES,
-    "page_delay_seconds": PAGE_DELAY_SECONDS,
-    "retry_events": retry_events,
-    "rate_limit_events": sum(1 for x in retry_events if x.get("status") == 429),
-    "errors": errors,
-    "generated_at": NOW.isoformat(),
-}
-(OUT / "stats.json").write_text(json.dumps(stats, indent=2, ensure_ascii=False), encoding="utf-8")
-print(json.dumps(stats, indent=2, ensure_ascii=False))
+    enumeration_complete = bool(exhausted and not errors and not truncated_by_page_cap)
+    if total_reported is not None:
+        try:
+            enumeration_complete = enumeration_complete and source_items_seen >= int(total_reported)
+        except Exception:
+            pass
+
+    stats = {
+        "source": "TED",
+        "scope": SCOPE,
+        "enumeration_mode": "FULL_ACTIVE_COMPETITION" if FULL_ACTIVE else "RECENT_PUBLICATION_WINDOW",
+        "query": QUERY,
+        "lookback_days": None if FULL_ACTIVE else LOOKBACK_DAYS,
+        "window_start_day": None if FULL_ACTIVE else START_DAY.isoformat(),
+        "window_end_day": NOW.date().isoformat(),
+        "pages": page_count,
+        "limit": LIMIT,
+        "hard_max_pages": HARD_MAX_PAGES,
+        "total_reported": total_reported,
+        "source_items_seen": source_items_seen,
+        "materialized_unique": len(rows),
+        "current_materialized": len(current_rows),
+        "future_deadline_records": sum(1 for r in rows if r.get("has_future_deadline")),
+        "enumeration_exhausted": exhausted,
+        "enumeration_complete": enumeration_complete,
+        "truncated_by_page_cap": truncated_by_page_cap,
+        "request_retries": REQUEST_RETRIES,
+        "page_delay_seconds": PAGE_DELAY_SECONDS,
+        "retry_events": retry_events,
+        "rate_limit_events": sum(1 for x in retry_events if x.get("status") == 429),
+        "errors": errors,
+        "generated_at": NOW.isoformat(),
+        "semantics": "FULL_ACTIVE_COMPETITION enumerates TED ACTIVE-scope competition notices to iteration-token exhaustion; no publication-date lookback is applied. A hard page cap, request error, or reported-count mismatch makes enumeration_complete false.",
+    }
+    (OUT / "stats.json").write_text(json.dumps(stats, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(json.dumps(stats, indent=2, ensure_ascii=False))
+    return stats
+
+
+if __name__ == "__main__":
+    run()

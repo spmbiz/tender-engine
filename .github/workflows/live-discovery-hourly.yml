@@ -1,0 +1,34 @@
+name: Live Tender Delta — Hourly Trigger
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: live-tender-hourly-dispatch
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Dispatch delta traversal unless one is already active
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          workflow='supergreen-discovery-v2.yml'
+          active="$(gh run list --workflow "$workflow" --limit 30 --json status --jq '[.[] | select(.status == "queued" or .status == "in_progress" or .status == "waiting" or .status == "requested")] | length')"
+          if [ "$active" -gt 0 ]; then
+            echo "Discovery already active; skipping overlapping hourly dispatch."
+            exit 0
+          fi
+          gh workflow run "$workflow" --ref main -f mode=delta
+          echo "Dispatched exhaustive live delta traversal."
