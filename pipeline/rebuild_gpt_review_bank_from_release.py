@@ -15,6 +15,7 @@ from publish_supergreen_hot import (
     item_key,
     review_sort,
 )
+from review_procedure_identity import review_row_quality, strong_procedure_aliases
 
 KNOWN_NON_DCE_QUALITY = {
     "ACCESS_GUIDE_ONLY",
@@ -65,12 +66,6 @@ def run_and_shard(path: Path) -> tuple[int, int]:
 
 
 def reviewable_authenticity(row: dict[str, Any]) -> bool:
-    """Allow GPT Web to inspect retrieved material without pretending it is gate-ready.
-
-    This is a review-surface decision only. It never upgrades evidence quality and it
-    never authorizes finalization. Known portal guides / notice-only / empty extracts
-    stay out of the inbox.
-    """
     quality = str(row.get("content_quality") or "").upper()
     evidence = row.get("evidence_quality") or {}
     if not isinstance(evidence, dict):
@@ -120,6 +115,44 @@ def _count_scope_reject(result: dict[str, Any], reason_counts: dict[str, int]) -
     for reason in result.get("reason_codes") or []:
         key = str(reason)
         reason_counts[key] = reason_counts.get(key, 0) + 1
+
+
+def collapse_strong_aliases(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], int]:
+    """Collapse only rows sharing an explicit stable procedure alias.
+
+    This intentionally does not use title/buyer/deadline fuzzy matching.
+    """
+    kept: dict[str, dict[str, Any]] = {}
+    alias_owner: dict[str, str] = {}
+    collapsed = 0
+    for row in rows:
+        candidate = str(row.get("candidate_id") or "").strip().casefold()
+        if not candidate:
+            continue
+        aliases = set(strong_procedure_aliases(row))
+        owners = {alias_owner[a] for a in aliases if a in alias_owner and alias_owner[a] in kept}
+        if not owners:
+            out = dict(row)
+            out["procedure_aliases"] = sorted(aliases)
+            kept[candidate] = out
+            for a in aliases:
+                alias_owner[a] = candidate
+            continue
+        candidates = [(candidate, row)] + [(k, kept[k]) for k in owners if k in kept]
+        _, winner = max(candidates, key=lambda kv: review_row_quality(kv[1]))
+        union = set(aliases)
+        for k in owners:
+            old = kept.pop(k, None)
+            if old:
+                union.update(strong_procedure_aliases(old))
+        winner = dict(winner)
+        winner["procedure_aliases"] = sorted(union)
+        wk = str(winner.get("candidate_id") or candidate).strip().casefold()
+        kept[wk] = winner
+        for a in union:
+            alias_owner[a] = wk
+        collapsed += 1
+    return list(kept.values()), collapsed
 
 
 def main() -> None:
@@ -195,16 +228,14 @@ def main() -> None:
             model_review_rows += int(is_gate_review)
             authenticity_rows += int(is_auth_review)
 
-    all_items = list(merged.values())
-    # Rank the whole recovered universe by review usefulness first. Source recency
-    # is only a tiebreaker; it must never evict a stronger older unreviewed DCE.
+    all_items, cross_portal_collapses = collapse_strong_aliases(list(merged.values()))
     all_items.sort(key=lambda r: (review_sort(r), source_version(r)[0]), reverse=True)
     uncapped_unique_pending = len(all_items)
     items = all_items[: max(0, args.max_items)]
 
     latest_run = max([as_int(existing.get("latest_dce_run_id"))] + list(source_runs) + [0])
     payload = {
-        "schema": "GPT_REVIEW_HOT_V5",
+        "schema": "GPT_REVIEW_HOT_V6",
         "updated_at": now,
         "latest_dce_run_id": latest_run or None,
         "generation_reset": False,
@@ -218,11 +249,12 @@ def main() -> None:
             "dce_authenticity_rows_seen": authenticity_rows,
             "scope_auto_rejected": scope_auto_rejected,
             "scope_auto_reject_reason_counts": scope_reason_counts,
+            "cross_portal_duplicates_collapsed": cross_portal_collapses,
             "uncapped_unique_pending_before_hot_window": uncapped_unique_pending,
             "rich_hot_window_count": len(items),
             "overflow_beyond_hot_window": max(0, uncapped_unique_pending - len(items)),
         },
-        "ranking_contract": "Persistent GPT Web rich hot window. Global review usefulness is ranked before the cap; source-run recency is only a tiebreaker. The uncapped compact directory is control/gpt_review_index.json. BUSINESS_GATES rows have gate-ready DCE; DCE_AUTHENTICITY rows still require DCE relevance verification. Ranking is never eligibility truth.",
+        "ranking_contract": "Persistent GPT Web rich hot window. Global review usefulness is ranked before the cap. Strong cross-portal dedupe uses only explicit stable national-procedure aliases, never fuzzy titles. The uncapped compact directory is control/gpt_review_index.json.",
         "instruction": "GPT Web reviews this rich window directly. For overflow, consult control/gpt_review_index.json and follow artifact_locator to the authoritative DCE run/shard. Unknown is never PASS.",
     }
     Path(args.out).write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
