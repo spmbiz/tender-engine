@@ -8,7 +8,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-SCHEMA = "QWEN_NOTICE_POST_GUARD_V2"
+SCHEMA = "QWEN_NOTICE_POST_GUARD_V3"
 PERSONAL_SERVICE = re.compile(r"\bpersonal services? contract\b", re.I)
 LICENSED_ROLE = re.compile(r"\b(security officer|licensed|certified professional|physician|nurse|engineer of record)\b", re.I)
 EQUIPMENT_RISK = re.compile(
@@ -78,30 +78,55 @@ def guard(row: dict[str, Any]) -> dict[str, Any]:
             actions.append("equipment_lean_cap_medium")
         out["needs_gpt_review"] = True
 
-    # Qwen is only a high-recall router. A model REJECT is never allowed to erase
-    # an obvious core scope when the deterministic survival layer said KEEP.
     classification = str(out.get("classification") or "").upper()
     survival = str(out.get("survival_decision") or "KEEP").upper()
     hard = bool(set(str(x).upper() for x in flags) & HARD_FRICTION)
+    lean = str(out.get("lean_attractiveness") or "").upper()
+    route = str(out.get("delivery_mode") or "").upper()
+    core = bool(CORE_RECALL.search(text))
+
+    # Qwen is only a high-recall router. A model REJECT is never allowed to erase
+    # an obvious core scope when the deterministic survival layer said KEEP.
     if classification == "REJECT_OBVIOUS" and survival == "KEEP" and not hard:
-        if CORE_RECALL.search(text):
+        if core:
             out["classification"] = "FIT"
-            if str(out.get("lean_attractiveness") or "").upper() in {"LOW", "UNKNOWN", ""}:
+            if lean in {"LOW", "UNKNOWN", ""}:
                 out["lean_attractiveness"] = "MEDIUM"
-            if str(out.get("delivery_mode") or "").upper() in {"", "UNCLEAR"}:
+            if route in {"", "UNCLEAR"}:
                 out["delivery_mode"] = "DIRECT_DIGITAL"
             out["needs_gpt_review"] = True
             out["dce_eligible"] = True
             actions.append("high_recall_core_reject_rescued_to_fit")
         elif BROKERABLE_GOODS.search(text):
             out["classification"] = "MAYBE"
-            if str(out.get("lean_attractiveness") or "").upper() not in {"LOW", "MEDIUM"}:
+            if lean not in {"LOW", "MEDIUM"}:
                 out["lean_attractiveness"] = "MEDIUM"
-            if str(out.get("delivery_mode") or "").upper() in {"", "UNCLEAR", "DIRECT_DIGITAL"}:
+            if route in {"", "UNCLEAR", "DIRECT_DIGITAL"}:
                 out["delivery_mode"] = "BROKER_RESELL"
             out["needs_gpt_review"] = True
             out["dce_eligible"] = True
             actions.append("high_recall_brokerable_reject_rescued_to_maybe")
+
+    # A narrower upgrade covers cases where the model already preserved an
+    # obvious direct-digital opportunity as MAYBE. Require all three independent
+    # notice-level confidence signals (core wording + HIGH lean + DIRECT_DIGITAL),
+    # KEEP survival, and no hard friction. This only changes DCE routing priority;
+    # it still cannot create a final GREEN or prove any mandatory eligibility gate.
+    classification = str(out.get("classification") or "").upper()
+    lean = str(out.get("lean_attractiveness") or "").upper()
+    route = str(out.get("delivery_mode") or "").upper()
+    if (
+        classification == "MAYBE"
+        and survival == "KEEP"
+        and not hard
+        and core
+        and lean == "HIGH"
+        and route == "DIRECT_DIGITAL"
+    ):
+        out["classification"] = "FIT"
+        out["needs_gpt_review"] = True
+        out["dce_eligible"] = True
+        actions.append("high_recall_core_high_direct_maybe_promoted_to_fit")
 
     out["friction_flags"] = flags
     out["post_guard_schema"] = SCHEMA
@@ -134,7 +159,7 @@ def main() -> None:
         encoding="utf-8",
     )
     summary = {
-        "schema": "QWEN_NOTICE_POST_GUARD_SUMMARY_V2",
+        "schema": "QWEN_NOTICE_POST_GUARD_SUMMARY_V3",
         "input_rows": len(rows),
         "output_rows": len(rows),
         "rows_changed": changed,
@@ -146,6 +171,7 @@ def main() -> None:
             "risk_flags_are_dce_truth": False,
             "automatic_final_rejection_enabled": False,
             "reject_rescue_requires_survival_keep": True,
+            "maybe_to_fit_requires_core_high_direct_keep": True,
             "rescued_rows_still_require_dce_for_truth": True,
         },
     }
