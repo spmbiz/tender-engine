@@ -1,11 +1,20 @@
 {
-  "schema": "QWEN_BATCH_RUNTIME_CONFIG_V1",
+  "schema": "QWEN_BATCH_RUNTIME_CONFIG_V2_CALIBRATION_GATE",
   "status": "BLOCKED",
   "champion": null,
+  "calibration_gate": {
+    "required_prompt_version": "qwen-batch-high-recall-business-fit-v3-rich",
+    "minimum_truth_cases": 500,
+    "minimum_positive_recall_cases": 100,
+    "required_known_positive_recall": 1.0,
+    "automatic_unblock_allowed": false
+  },
   "safety": {
     "shadow_only": true,
     "automatic_rejection_enabled": false,
     "failed_batch_recursively_splits": true,
-    "dce_required_for_final_supergreen": true
+    "dce_required_for_final_supergreen": true,
+    "rejects_with_novelty_or_gpt_review_are_exploration_candidates": true,
+    "notice_level_semantics_never_override_authoritative_dce": true
   }
 }
