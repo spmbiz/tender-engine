@@ -16,7 +16,7 @@ _OLD_HU_PUBLIC = base.ADAPTERS.get("HU_EKR_PUBLIC")
 _OLD_HU = base.ADAPTERS.get("HU_EKR")
 
 FILE_RE = re.compile(r"\.(?:pdf|zip|docx?|xlsx?|xls|pptx?|csv|7z|rar)(?:$|[?#])", re.I)
-DOWNLOAD_RE = re.compile(r"download|letölt|dokument|attachment|file", re.I)
+DOWNLOAD_RE = re.compile(r"download|letölt|attachment|export|(?:^|[/_-])file(?:[/_.?=&-]|$)", re.I)
 DOC_SECTION_RE = re.compile(r"Közbeszerzési dokumentáció|Kijelölt dokumentumok letöltése|Download selected documents", re.I)
 BUTTON_RE = re.compile(r"Kijelölt dokumentumok letöltése|Download selected documents", re.I)
 
@@ -50,14 +50,30 @@ def _explicit_document_routes(candidate: dict) -> list[str]:
     return list(dict.fromkeys(urls))
 
 
+def _bounded_file_fetch(url: str, out: Path, session: requests.Session) -> dict | None:
+    try:
+        response = session.get(url, timeout=(4, 6), allow_redirects=True)
+        if response.ok and response.content and base.looks_like_file(response):
+            return base.persist_bytes(
+                out,
+                base.filename_from_response(response, "ekr-download.bin"),
+                response.content,
+                response.url,
+                response.headers.get("content-type"),
+            )
+    except Exception:
+        return None
+    return None
+
+
 def _bounded_http_probe(detail: str, out: Path, manifest: dict) -> bool:
     session = requests.Session()
     session.headers.update({
-        "User-Agent": "Tender-Engine/19.0 public procurement research",
+        "User-Agent": "Tender-Engine/19.1 public procurement research",
         "Accept": "text/html,application/xhtml+xml,application/pdf,application/zip,*/*",
     })
     try:
-        response = session.get(detail, timeout=(5, 10), allow_redirects=True)
+        response = session.get(detail, timeout=(4, 8), allow_redirects=True)
         ct = (response.headers.get("content-type") or "").lower()
         if response.ok and response.content and base.looks_like_file(response):
             manifest.setdefault("files", []).append(
@@ -87,10 +103,10 @@ def _bounded_http_probe(detail: str, out: Path, manifest: dict) -> bool:
                 continue
             if FILE_RE.search(absolute) or DOWNLOAD_RE.search(absolute):
                 candidates.append(absolute)
-        candidates = list(dict.fromkeys(candidates))[:12]
+        candidates = list(dict.fromkeys(candidates))[:3]
         downloaded = 0
         for url in candidates:
-            rec = base.direct_download(url, out, session)
+            rec = _bounded_file_fetch(url, out, session)
             if rec:
                 manifest.setdefault("files", []).append(rec)
                 downloaded += 1
@@ -115,10 +131,10 @@ def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
     try:
         pw, browser, context = v2.optimized_browser_context()
         page = context.new_page()
-        page.goto(detail, wait_until="domcontentloaded", timeout=35000)
-        page.wait_for_timeout(1000)
+        page.goto(detail, wait_until="domcontentloaded", timeout=30000)
+        page.wait_for_timeout(800)
         try:
-            body = page.locator("body").inner_text(timeout=7000)
+            body = page.locator("body").inner_text(timeout=5000)
             (out / "portal_page.txt").write_text(body[:800_000], encoding="utf-8")
         except Exception:
             body = ""
@@ -130,9 +146,6 @@ def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
             })
             return False
 
-        # EKR can render many checkboxes. Clicking each through Playwright can consume
-        # minutes. One DOM-side pass fires the native click event for every visible,
-        # enabled checkbox and returns the selected count.
         try:
             selected = int(page.locator("input[type='checkbox']").evaluate_all(
                 """els => { let n=0; for (const el of els) { const s=getComputedStyle(el); const r=el.getBoundingClientRect(); const visible=s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0; if (visible && !el.disabled) { if (!el.checked) el.click(); if (el.checked) n++; } } return n; }"""
@@ -146,15 +159,15 @@ def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
             })
             return False
 
-        page.wait_for_timeout(500)
+        page.wait_for_timeout(400)
         controls = page.locator("button, [role='button'], a").filter(has_text=BUTTON_RE)
-        for i in range(min(controls.count(), 8)):
+        for i in range(min(controls.count(), 2)):
             node = controls.nth(i)
             try:
                 if not node.is_visible():
                     continue
-                with page.expect_download(timeout=20000) as dl_info:
-                    node.click(force=True, timeout=5000)
+                with page.expect_download(timeout=15000) as dl_info:
+                    node.click(force=True, timeout=4000)
                 manifest.setdefault("files", []).append(base.persist_download(out, dl_info.value, page.url))
                 manifest.setdefault("dce_method_attempts", []).append({
                     "method": "HU_EKR_BOUNDED_SELECTED_DOCUMENTS_V19", "url": detail,
@@ -190,9 +203,6 @@ def adapter_hu_ekr_v19(candidate: dict, out: Path, manifest: dict) -> None:
     manifest.setdefault("files", [])
     manifest.setdefault("dce_method_attempts", [])
 
-    # Preserve the prior validated resolver whenever discovery already supplied an
-    # explicit documents route. V19 only replaces the pathological detail-only EKR
-    # case that repeatedly dies at the outer worker timeout without a manifest.
     if _explicit_document_routes(candidate):
         fallback = _OLD_HU_PUBLIC or _OLD_HU
         if fallback:
@@ -216,8 +226,6 @@ def adapter_hu_ekr_v19(candidate: dict, out: Path, manifest: dict) -> None:
     if state in {"AUTH_REQUIRED", "CAPTCHA_REQUIRED", "INTEREST_RECORDING_REQUIRED"}:
         manifest["status"] = state
     else:
-        # Fail closed and retryable: unlike the old path, this always leaves a
-        # durable manifest rather than being externally killed after 150-170s.
         manifest["status"] = "ERROR_RETRYABLE"
         manifest["error"] = "HU_EKR_DETAIL_ONLY_BOUNDED_V19_EXHAUSTED"
 
