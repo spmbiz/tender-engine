@@ -18,6 +18,8 @@ from pathlib import Path
 # ES_PLACSP deliberately is NOT here from v15 onward. Its official Atom feed
 # exposes canonical Legal/Technical/Additional document links, so the dedicated
 # resolver is HTTP/XML-only and should use the higher-throughput HTTP shard lane.
+# ZA_ETENDERS/ZA_ETENDERS_OCDS are also HTTP-only from v16: discovery and exact
+# DCE recovery both use South Africa National Treasury's public OCDS API.
 BROWSER_PORTALS = {
     "TED", "IRELAND_ETENDERS", "FR_PLACE", "LUX_PMP", "SCOTLAND_PCS",
     "CA_CANADABUYS", "QC_SEAO", "DE_DOE", "FR_BOAMP", "NZ_GETS", "AU_AUSTENDER",
@@ -55,7 +57,7 @@ BROWSER_PORTALS = {
 SUPPORTED = BROWSER_PORTALS | {
     "US_SAM", "US_SAM_BULK",
     "UNGM", "DIRECT_HTTP", "UK_CONTRACTS_FINDER", "TED_PUBLIC_PAGE_FAST",
-    "WORLD_BANK", "ES_PLACSP",
+    "WORLD_BANK", "ES_PLACSP", "ZA_ETENDERS", "ZA_ETENDERS_OCDS",
 }
 
 # Discovery/provider identifiers are provenance, not necessarily DCE adapter
