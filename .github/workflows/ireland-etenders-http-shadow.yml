@@ -10,6 +10,7 @@ on:
 permissions:
   contents: write
 
+# Shadow-only trigger. Production resolver remains browser-capable until PASS + rollback A/B.
 concurrency:
   group: ireland-etenders-http-shadow
   cancel-in-progress: true
