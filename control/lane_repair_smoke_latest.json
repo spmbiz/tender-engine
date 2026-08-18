@@ -1,16 +1,17 @@
 {
   "schema": "RECALL_LANE_SMOKE_SUMMARY_V1",
-  "generated_at": "2026-08-18T23:45:07.355401+00:00",
+  "generated_at": "2026-08-18T23:51:52.993696+00:00",
   "counts": {
-    "FAIL": 3,
-    "RECALL_ONLY": 3
+    "FAIL": 2,
+    "RECALL_ONLY": 3,
+    "PASS_FULL": 1
   },
   "all_sources_full": false,
   "results": [
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "AU_AUSTENDER",
-      "checked_at": "2026-08-18T23:42:21.100918+00:00",
+      "checked_at": "2026-08-18T23:48:13.179330+00:00",
       "primary_exit_code": 0,
       "fallback_exit_code": null,
       "verdict": "FAIL",
@@ -38,7 +39,7 @@
         "enumeration_complete": false,
         "live_candidate_capable": true,
         "live_coverage_credit_allowed": false,
-        "generated_at": "2026-08-18T23:41:54.564362+00:00",
+        "generated_at": "2026-08-18T23:48:03.095019+00:00",
         "errors": [
           {
             "type": "PUBLIC_SOURCE_HTTP_BLOCK",
@@ -71,7 +72,7 @@
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "CYPRUS_EPPS",
-      "checked_at": "2026-08-18T23:42:29.563393+00:00",
+      "checked_at": "2026-08-18T23:48:41.262630+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": 0,
       "verdict": "RECALL_ONLY",
@@ -217,14 +218,14 @@
             "current_rows": 11
           }
         ],
-        "generated_at": "2026-08-19T02:41:53.273063+03:00",
+        "generated_at": "2026-08-19T02:48:06.071576+03:00",
         "semantics": "Published Notices is recall reconstruction only. Its Submission Date is explicitly NOT treated as the bid deadline. The authoritative tender deadline is resolved from the public CfT workspace via resourceId; recent unresolved notices remain UNKNOWN rather than being assumed expired. Cyprus uses only verified public authority seeds."
       }
     },
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "IT_ANAC_DELTA",
-      "checked_at": "2026-08-18T23:42:36.635878+00:00",
+      "checked_at": "2026-08-18T23:48:48.927529+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": null,
       "verdict": "FAIL",
@@ -270,7 +271,7 @@
             "cutoff_reached": false
           }
         ],
-        "generated_at": "2026-08-18T23:41:54.049920+00:00",
+        "generated_at": "2026-08-18T23:48:06.358455+00:00",
         "source_url": "https://pubblicitalegale.anticorruzione.it/bandi",
         "semantics": "Direct official PVL /bandi listing repairs live recall without the fragile advanced-search UI. It remains publication-window reconstruction, so it never claims exhaustive current-universe coverage."
       }
@@ -278,7 +279,7 @@
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "MALTA_EPPS",
-      "checked_at": "2026-08-18T23:43:27.078902+00:00",
+      "checked_at": "2026-08-18T23:49:46.892265+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": 0,
       "verdict": "RECALL_ONLY",
@@ -331,31 +332,31 @@
             "current_rows": 431
           }
         ],
-        "generated_at": "2026-08-19T01:41:52.075398+02:00",
+        "generated_at": "2026-08-19T01:48:08.638939+02:00",
         "semantics": "Published Notices is recall reconstruction only. Its Submission Date is explicitly NOT treated as the bid deadline. The authoritative tender deadline is resolved from the public CfT workspace via resourceId; recent unresolved notices remain UNKNOWN rather than being assumed expired. Cyprus uses only verified public authority seeds."
       }
     },
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "UK_PCS_OCDS",
-      "checked_at": "2026-08-18T23:43:14.733619+00:00",
+      "checked_at": "2026-08-18T23:49:08.525875+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": null,
       "verdict": "RECALL_ONLY",
       "current_materialized": 10,
       "enumeration_complete": false,
       "live_coverage_credit_allowed": false,
-      "errors": [],
-      "warnings": [
+      "errors": [
         {
-          "type": "REPEATED_PAGE_SIGNATURE",
-          "page": 2
+          "type": "PCS_BROWSER_ERROR",
+          "error": "TimeoutError('Locator.inner_text: Timeout 30000ms exceeded.\\nCall log:\\n  - waiting for locator(\"select\").nth(2).locator(\"option\").nth(1332)\\n')"
         }
       ],
+      "warnings": [],
       "stats": {
         "source": "UK_PCS_OCDS",
         "portal": "PUBLIC_CONTRACTS_SCOTLAND",
-        "listing_contract": "PCS_CURRENT_OPPORTUNITIES_BROWSER_V3",
+        "listing_contract": "PCS_CURRENT_OPPORTUNITIES_BROWSER_V4_POSTBACK",
         "raw_materialized": 10,
         "current_materialized": 10,
         "pages_fetched": 1,
@@ -364,20 +365,28 @@
         "enumeration_complete": false,
         "live_candidate_capable": true,
         "live_coverage_credit_allowed": false,
-        "errors": [],
-        "warnings": [
+        "errors": [
           {
-            "type": "REPEATED_PAGE_SIGNATURE",
-            "page": 2
+            "type": "PCS_BROWSER_ERROR",
+            "error": "TimeoutError('Locator.inner_text: Timeout 30000ms exceeded.\\nCall log:\\n  - waiting for locator(\"select\").nth(2).locator(\"option\").nth(1332)\\n')"
           }
         ],
+        "warnings": [],
         "telemetry": {
           "url": "https://www.publiccontractsscotland.gov.uk/search/Search_MainPage.aspx",
           "http_status": 200,
           "current_filter_mode": "NATIVE_SELECT",
           "current_filter_option": "Current Opportunity",
           "current_filter_select_index": 0,
-          "search_submitted": false,
+          "search_submitted": "CONTROL_CLICK",
+          "search_control": {
+            "tag": "A",
+            "id": "ctl00_maincontent_btnSearch",
+            "name": "",
+            "value": "",
+            "type": "",
+            "text": "Search Notices"
+          },
           "pages": [
             {
               "page": 1,
@@ -386,7 +395,7 @@
             }
           ]
         },
-        "generated_at": "2026-08-18T23:41:55.092422+00:00",
+        "generated_at": "2026-08-18T23:48:03.255035+00:00",
         "source_url": "https://www.publiccontractsscotland.gov.uk/search/Search_MainPage.aspx",
         "semantics": "The official PCS Current Opportunity/Opportunities filter is used. Native and Telerik/custom Notice Type controls are supported. Only notices open for tender are traversed; coverage credit requires pagination exhaustion and a non-empty current set."
       }
@@ -394,48 +403,929 @@
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "UNGM_PUBLIC",
-      "checked_at": "2026-08-18T23:42:00.062722+00:00",
-      "primary_exit_code": 3,
+      "checked_at": "2026-08-18T23:50:10.785400+00:00",
+      "primary_exit_code": 0,
       "fallback_exit_code": null,
-      "verdict": "FAIL",
-      "current_materialized": 0,
-      "enumeration_complete": false,
-      "live_coverage_credit_allowed": false,
-      "errors": [
-        {
-          "type": "LANDING_HTTP_ERROR",
-          "status": 403
-        }
-      ],
+      "verdict": "PASS_FULL",
+      "current_materialized": 1852,
+      "enumeration_complete": true,
+      "live_coverage_credit_allowed": true,
+      "errors": [],
       "warnings": [],
       "stats": {
         "source": "UNGM_PUBLIC",
         "portal": "UNGM",
         "listing_contract": "UNGM_PUBLIC_BROWSER_SESSION_SEARCH_V4",
-        "raw_materialized": 0,
-        "current_materialized": 0,
-        "pages_fetched": 0,
+        "raw_materialized": 1852,
+        "current_materialized": 1852,
+        "pages_fetched": 127,
         "page_size": 15,
         "total_reported": null,
-        "enumeration_exhausted": false,
-        "enumeration_complete": false,
+        "enumeration_exhausted": true,
+        "enumeration_complete": true,
         "live_candidate_capable": true,
-        "live_coverage_credit_allowed": false,
-        "errors": [
-          {
-            "type": "LANDING_HTTP_ERROR",
-            "status": 403
-          }
-        ],
+        "live_coverage_credit_allowed": true,
+        "errors": [],
         "warnings": [],
         "telemetry": {
           "list_url": "https://www.ungm.org/Public/Notice",
           "search_path": "/Public/Notice/Search",
           "deadline_from": "18-Aug-2026",
-          "pages": [],
-          "landing_status": 403
+          "pages": [
+            {
+              "page_index": 0,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94629
+            },
+            {
+              "page_index": 1,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95059
+            },
+            {
+              "page_index": 2,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95458
+            },
+            {
+              "page_index": 3,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 96470
+            },
+            {
+              "page_index": 4,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 96047
+            },
+            {
+              "page_index": 5,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95948
+            },
+            {
+              "page_index": 6,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94811
+            },
+            {
+              "page_index": 7,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94526
+            },
+            {
+              "page_index": 8,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94519
+            },
+            {
+              "page_index": 9,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94843
+            },
+            {
+              "page_index": 10,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94466
+            },
+            {
+              "page_index": 11,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94585
+            },
+            {
+              "page_index": 12,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94715
+            },
+            {
+              "page_index": 13,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94625
+            },
+            {
+              "page_index": 14,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95076
+            },
+            {
+              "page_index": 15,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94792
+            },
+            {
+              "page_index": 16,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94495
+            },
+            {
+              "page_index": 17,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95065
+            },
+            {
+              "page_index": 18,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94548
+            },
+            {
+              "page_index": 19,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94788
+            },
+            {
+              "page_index": 20,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94804
+            },
+            {
+              "page_index": 21,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95353
+            },
+            {
+              "page_index": 22,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95348
+            },
+            {
+              "page_index": 23,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95070
+            },
+            {
+              "page_index": 24,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 96071
+            },
+            {
+              "page_index": 25,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94532
+            },
+            {
+              "page_index": 26,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94705
+            },
+            {
+              "page_index": 27,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94737
+            },
+            {
+              "page_index": 28,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94811
+            },
+            {
+              "page_index": 29,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95044
+            },
+            {
+              "page_index": 30,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94888
+            },
+            {
+              "page_index": 31,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94930
+            },
+            {
+              "page_index": 32,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95195
+            },
+            {
+              "page_index": 33,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95013
+            },
+            {
+              "page_index": 34,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95089
+            },
+            {
+              "page_index": 35,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94645
+            },
+            {
+              "page_index": 36,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94941
+            },
+            {
+              "page_index": 37,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94706
+            },
+            {
+              "page_index": 38,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94462
+            },
+            {
+              "page_index": 39,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94926
+            },
+            {
+              "page_index": 40,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95107
+            },
+            {
+              "page_index": 41,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94903
+            },
+            {
+              "page_index": 42,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95895
+            },
+            {
+              "page_index": 43,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 96115
+            },
+            {
+              "page_index": 44,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95638
+            },
+            {
+              "page_index": 45,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95003
+            },
+            {
+              "page_index": 46,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95064
+            },
+            {
+              "page_index": 47,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94485
+            },
+            {
+              "page_index": 48,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94632
+            },
+            {
+              "page_index": 49,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94709
+            },
+            {
+              "page_index": 50,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95119
+            },
+            {
+              "page_index": 51,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95109
+            },
+            {
+              "page_index": 52,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94810
+            },
+            {
+              "page_index": 53,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 97003
+            },
+            {
+              "page_index": 54,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95528
+            },
+            {
+              "page_index": 55,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95123
+            },
+            {
+              "page_index": 56,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94813
+            },
+            {
+              "page_index": 57,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94644
+            },
+            {
+              "page_index": 58,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94734
+            },
+            {
+              "page_index": 59,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94504
+            },
+            {
+              "page_index": 60,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 97176
+            },
+            {
+              "page_index": 61,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95490
+            },
+            {
+              "page_index": 62,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95743
+            },
+            {
+              "page_index": 63,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94646
+            },
+            {
+              "page_index": 64,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94539
+            },
+            {
+              "page_index": 65,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95294
+            },
+            {
+              "page_index": 66,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94826
+            },
+            {
+              "page_index": 67,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94940
+            },
+            {
+              "page_index": 68,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95113
+            },
+            {
+              "page_index": 69,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95673
+            },
+            {
+              "page_index": 70,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 96856
+            },
+            {
+              "page_index": 71,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94327
+            },
+            {
+              "page_index": 72,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94771
+            },
+            {
+              "page_index": 73,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94407
+            },
+            {
+              "page_index": 74,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94639
+            },
+            {
+              "page_index": 75,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95162
+            },
+            {
+              "page_index": 76,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95231
+            },
+            {
+              "page_index": 77,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95383
+            },
+            {
+              "page_index": 78,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95112
+            },
+            {
+              "page_index": 79,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94869
+            },
+            {
+              "page_index": 80,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94574
+            },
+            {
+              "page_index": 81,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94642
+            },
+            {
+              "page_index": 82,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94851
+            },
+            {
+              "page_index": 83,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 96042
+            },
+            {
+              "page_index": 84,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95954
+            },
+            {
+              "page_index": 85,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94640
+            },
+            {
+              "page_index": 86,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94691
+            },
+            {
+              "page_index": 87,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95791
+            },
+            {
+              "page_index": 88,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95755
+            },
+            {
+              "page_index": 89,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94531
+            },
+            {
+              "page_index": 90,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94733
+            },
+            {
+              "page_index": 91,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94541
+            },
+            {
+              "page_index": 92,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95023
+            },
+            {
+              "page_index": 93,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95893
+            },
+            {
+              "page_index": 94,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94874
+            },
+            {
+              "page_index": 95,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95047
+            },
+            {
+              "page_index": 96,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95138
+            },
+            {
+              "page_index": 97,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95621
+            },
+            {
+              "page_index": 98,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94991
+            },
+            {
+              "page_index": 99,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94667
+            },
+            {
+              "page_index": 100,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95280
+            },
+            {
+              "page_index": 101,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94897
+            },
+            {
+              "page_index": 102,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94608
+            },
+            {
+              "page_index": 103,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95635
+            },
+            {
+              "page_index": 104,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94838
+            },
+            {
+              "page_index": 105,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95886
+            },
+            {
+              "page_index": 106,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94952
+            },
+            {
+              "page_index": 107,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95239
+            },
+            {
+              "page_index": 108,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 96485
+            },
+            {
+              "page_index": 109,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95324
+            },
+            {
+              "page_index": 110,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95864
+            },
+            {
+              "page_index": 111,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95899
+            },
+            {
+              "page_index": 112,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95614
+            },
+            {
+              "page_index": 113,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94857
+            },
+            {
+              "page_index": 114,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95906
+            },
+            {
+              "page_index": 115,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94782
+            },
+            {
+              "page_index": 116,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95779
+            },
+            {
+              "page_index": 117,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 96699
+            },
+            {
+              "page_index": 118,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 96164
+            },
+            {
+              "page_index": 119,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95293
+            },
+            {
+              "page_index": 120,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95960
+            },
+            {
+              "page_index": 121,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 95560
+            },
+            {
+              "page_index": 122,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94982
+            },
+            {
+              "page_index": 123,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94834
+            },
+            {
+              "page_index": 124,
+              "rows": 15,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 94872
+            },
+            {
+              "page_index": 125,
+              "rows": 7,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 44241
+            },
+            {
+              "page_index": 126,
+              "rows": 0,
+              "status": 200,
+              "content_type": "text/html; charset=utf-8",
+              "bytes": 416
+            }
+          ],
+          "landing_status": 200,
+          "exhaustion_proof": "FIRST_EMPTY_SAME_ORIGIN_SEARCH_PAGE"
         },
-        "generated_at": "2026-08-18T23:41:52.514814+00:00",
+        "generated_at": "2026-08-18T23:48:06.432521+00:00",
         "source_url": "https://www.ungm.org/Public/Notice",
         "search_path": "/Public/Notice/Search",
         "semantics": "UNGM public landing is opened in a real browser session, then the page performs same-origin public POST searches with PageIndex/PageSize and DeadlineFrom=today. This avoids treating browser-bot session requirements as an API failure. Traversal is complete only after the first empty search page; any exposed total must also be satisfied."
