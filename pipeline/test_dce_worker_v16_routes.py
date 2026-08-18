@@ -28,6 +28,18 @@ def main() -> None:
         "portal": "ZA_ETENDERS_OCDS",
     }
     assert _za_ocid(legacy) == "ocds-9t57fa-165805"
+    legacy_portal, legacy_raw = resolve_dce_portal(legacy)
+    assert legacy_portal == "ZA_ETENDERS_OCDS", (legacy_portal, legacy_raw)
+
+    source_only = {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165805-2026-08-17",
+        "source": "ZA_ETENDERS_OCDS",
+        "ocid": "ocds-9t57fa-165805",
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165805",
+        "route": {"document_urls": []},
+    }
+    source_portal, source_raw = resolve_dce_portal(source_only)
+    assert source_portal == "ZA_ETENDERS_OCDS", (source_portal, source_raw)
 
     release = {
         "tender": {
@@ -54,7 +66,15 @@ def main() -> None:
     docs = docs_from_release(release)
     assert [d["id"] for d in docs] == ["spec", "plan"], docs
     assert docs[0]["url"].startswith("https://www.etenders.gov.za/")
-    print({"za_http_portals": 2, "ocid": _za_ocid(candidate), "docs": len(docs), "status": "ok"})
+    print(
+        {
+            "za_http_portals": 2,
+            "ocid": _za_ocid(candidate),
+            "docs": len(docs),
+            "legacy_source_only": source_portal,
+            "status": "ok",
+        }
+    )
 
 
 if __name__ == "__main__":
