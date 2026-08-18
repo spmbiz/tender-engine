@@ -18,6 +18,7 @@ on:
       - 'pipeline/refresh_gpt_inbox_live.py'
       - 'pipeline/gpt_web_tick.py'
       - 'pipeline/rebuild_gpt_review_bank_from_release.py'
+      - 'pipeline/build_gpt_review_index.py'
       - '.github/workflows/gpt-inbox-live-refresh.yml'
 
 permissions:
@@ -35,7 +36,7 @@ jobs:
       endsWith(format('{0}', github.run_number), '0') ||
       endsWith(format('{0}', github.run_number), '5')
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,7 +48,7 @@ jobs:
       - name: Install recovery dependency
         run: python -m pip install --disable-pip-version-check -q requests
 
-      - name: Recover recent immutable DCE shard verdicts
+      - name: Recover immutable DCE shard verdicts
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -55,10 +56,18 @@ jobs:
           set -euo pipefail
           rm -rf /tmp/dce-review-recovery
           mkdir -p /tmp/dce-review-recovery
+
+          # Bootstrap broadly once so the 160-item rich window cannot erase older
+          # unreviewed DCEs. Afterwards the compact persistent index carries history
+          # and only a small recent release window needs to be re-read.
+          history=10
+          if [ ! -s control/gpt_review_index.json ]; then
+            history=50
+          fi
           mapfile -t tags < <(
-            gh release list --limit 50 --json tagName \
+            gh release list --limit 100 --json tagName \
               --jq '.[] | select(.tagName | startswith("dce-harvest-")) | .tagName' \
-              | head -n 5
+              | head -n "$history"
           )
           if [ "${#tags[@]}" -eq 0 ]; then
             echo 'No DCE releases found.'
@@ -71,9 +80,9 @@ jobs:
               --pattern 'fast-adjudication-shard-*.jsonl' \
               --dir "/tmp/dce-review-recovery/$run_id" || true
           done
-          find /tmp/dce-review-recovery -type f -name 'fast-adjudication-shard-*.jsonl' | wc -l
+          echo "Recovered releases=${#tags[@]} shard_files=$(find /tmp/dce-review-recovery -type f -name 'fast-adjudication-shard-*.jsonl' | wc -l)"
 
-      - name: Rebuild persistent review bank and GPT Web inbox transactionally
+      - name: Rebuild uncapped index, rich review bank and GPT Web inbox transactionally
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -85,6 +94,13 @@ jobs:
           for n in 1 2 3 4 5 6; do
             git fetch origin main
             git reset --hard origin/main
+
+            python pipeline/build_gpt_review_index.py \
+              --release-root /tmp/dce-review-recovery \
+              --existing control/gpt_review_index.json \
+              --final-bank control/final_supergreen_bank.json \
+              --review-ledger control/gpt_web_review_ledger.json \
+              --out control/gpt_review_index.json
 
             python pipeline/rebuild_gpt_review_bank_from_release.py \
               --release-root /tmp/dce-review-recovery \
@@ -99,36 +115,43 @@ jobs:
               --hot-review control/gpt_review_hot.json \
               --review-ledger control/gpt_web_review_ledger.json \
               --out control/gpt_supergreen_inbox.json \
-              --max-items 100
+              --max-items 160
 
             python - <<'PY'
           import json
           from datetime import datetime, timezone
           inbox=json.load(open('control/gpt_supergreen_inbox.json',encoding='utf-8'))
           review=json.load(open('control/gpt_review_hot.json',encoding='utf-8'))
+          index=json.load(open('control/gpt_review_index.json',encoding='utf-8'))
+          idx_counts=index.get('counts') or {}
           payload={
-            'schema':'GPT_INBOX_HEALTH_V1',
+            'schema':'GPT_INBOX_HEALTH_V2',
             'updated_at':datetime.now(timezone.utc).isoformat(),
             'inbox_schema':inbox.get('schema'),
             'latest_source_dce_run_id':inbox.get('latest_source_dce_run_id'),
             'counts':inbox.get('counts') or {},
             'review_bank_count':review.get('count'),
             'review_bank_schema':review.get('schema'),
+            'review_index_count':int(index.get('count') or 0),
+            'review_index_counts':idx_counts,
+            'true_pending_before_hot_cap':int(idx_counts.get('pending_total_uncapped') or 0),
+            'overflow_beyond_hot_160':int(idx_counts.get('overflow_beyond_hot_160') or 0),
             'recovery_metrics':review.get('recovery_metrics') or {},
-            'healthy':inbox.get('schema')=='GPT_WEB_REVIEW_INBOX_V2' and int((inbox.get('counts') or {}).get('pending_gpt_web_review') or 0)>0,
-            'contract':'Small health sidecar only; canonical work remains control/gpt_supergreen_inbox.json.',
+            'index_recovery':index.get('recovery') or {},
+            'healthy':inbox.get('schema')=='GPT_WEB_REVIEW_INBOX_V2' and int(index.get('count') or 0)>0,
+            'contract':'Health sidecar exposes true uncapped GPT review backlog. control/gpt_supergreen_inbox.json remains the rich hot window; control/gpt_review_index.json preserves every unreviewed locator.',
           }
           open('control/gpt_inbox_metrics.json','w',encoding='utf-8').write(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
           print(json.dumps(payload,indent=2))
           PY
 
-            git add control/gpt_review_hot.json control/gpt_supergreen_inbox.json control/gpt_inbox_metrics.json
+            git add control/gpt_review_index.json control/gpt_review_hot.json control/gpt_supergreen_inbox.json control/gpt_inbox_metrics.json
             if git diff --cached --quiet; then
-              echo 'Persistent review bank and inbox already current.'
+              echo 'Persistent review index, rich bank and inbox already current.'
               exit 0
             fi
 
-            git commit -m "inbox: recover persistent GPT Web queue ${GITHUB_RUN_ID}"
+            git commit -m "inbox: recover uncapped GPT Web queue ${GITHUB_RUN_ID}"
             if git push origin HEAD:main; then
               exit 0
             fi
