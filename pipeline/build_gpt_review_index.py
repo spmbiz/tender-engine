@@ -7,9 +7,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from publish_supergreen_hot import compact_review, deadline_open, ensure_review_rank, item_key, review_sort
-from rebuild_gpt_review_bank_from_release import load_json, load_jsonl, reviewable_authenticity, run_and_shard, source_version
+from publish_supergreen_hot import compact_review, deadline_open, ensure_review_rank, review_sort
+from rebuild_gpt_review_bank_from_release import load_json, load_jsonl, reviewable_authenticity, run_and_shard
 from refresh_gpt_inbox_live import is_reviewed, ledger_ticks
+from review_procedure_identity import review_row_quality, strong_procedure_aliases
 
 
 def candidate_key(row: dict[str, Any]) -> str:
@@ -20,6 +21,7 @@ def compact_index_row(row: dict[str, Any]) -> dict[str, Any]:
     """Keep enough metadata to locate/re-rank every reviewable DCE without huge evidence blobs."""
     ranked = ensure_review_rank(row)
     locator = ranked.get("artifact_locator") if isinstance(ranked.get("artifact_locator"), dict) else {}
+    aliases = strong_procedure_aliases(ranked)
     return {
         "candidate_id": ranked.get("candidate_id"),
         "title": ranked.get("title"),
@@ -42,6 +44,7 @@ def compact_index_row(row: dict[str, Any]) -> dict[str, Any]:
         "spm_friction_signals": ranked.get("spm_friction_signals") or [],
         "source_dce_run_id": ranked.get("source_dce_run_id"),
         "source_shard": ranked.get("source_shard"),
+        "procedure_aliases": aliases,
         "artifact_locator": {
             "dce_run_id": ranked.get("source_dce_run_id") or locator.get("dce_run_id"),
             "shard": ranked.get("source_shard") if ranked.get("source_shard") is not None else locator.get("shard"),
@@ -71,12 +74,50 @@ def main() -> None:
     }
 
     merged: dict[str, dict[str, Any]] = {}
+    alias_owner: dict[str, str] = {}
+    cross_portal_collapses = 0
+
+    def add_indexed(indexed: dict[str, Any]) -> None:
+        nonlocal cross_portal_collapses
+        ck = candidate_key(indexed)
+        if not ck:
+            return
+        aliases = set(str(x) for x in (indexed.get("procedure_aliases") or []) if str(x))
+        owners = {alias_owner[a] for a in aliases if a in alias_owner and alias_owner[a] in merged}
+        if ck in merged:
+            owners.add(ck)
+        if not owners:
+            merged[ck] = indexed
+            for a in aliases:
+                alias_owner[a] = ck
+            return
+
+        candidates = [(ck, indexed)] + [(k, merged[k]) for k in sorted(owners) if k in merged and k != ck]
+        winner_key, winner = max(candidates, key=lambda kv: review_row_quality(kv[1]))
+        union_aliases = set(aliases)
+        old_candidate_ids = set()
+        for k in owners:
+            old = merged.get(k)
+            if old:
+                union_aliases.update(str(x) for x in (old.get("procedure_aliases") or []) if str(x))
+                old_candidate_ids.add(candidate_key(old))
+        if old_candidate_ids and ck not in old_candidate_ids:
+            cross_portal_collapses += 1
+        for k in owners:
+            merged.pop(k, None)
+        winner = dict(winner)
+        winner["procedure_aliases"] = sorted(union_aliases)
+        winner_key = candidate_key(winner) or winner_key
+        merged[winner_key] = winner
+        for a in union_aliases:
+            alias_owner[a] = winner_key
+
     for row in existing.get("items") or []:
         if not isinstance(row, dict) or not candidate_key(row) or not deadline_open(row):
             continue
         if candidate_key(row) in final_ids or is_reviewed(row, ticks):
             continue
-        merged[candidate_key(row)] = compact_index_row(row)
+        add_indexed(compact_index_row(row))
 
     scanned = 0
     gate_rows = 0
@@ -105,22 +146,19 @@ def main() -> None:
                 "candidate_id": raw.get("candidate_id"),
                 "release_tag": f"dce-harvest-{run_id}" if run_id else None,
             }
+            # Preserve only metadata needed to derive strong national-procedure aliases.
+            compact["evidence_quality_summary"] = raw.get("evidence_quality") or {}
             k = candidate_key(compact)
             if not k or k in final_ids or is_reviewed(compact, ticks) or not deadline_open(compact):
                 continue
-            indexed = compact_index_row(compact)
-            cur = merged.get(k)
-            if cur is None or source_version(indexed) >= source_version(cur):
-                merged[k] = indexed
+            add_indexed(compact_index_row(compact))
 
     items = list(merged.values())
-    # Quality/actability first. Newer generation is only a tiebreaker; it must not
-    # evict a stronger older unreviewed DCE from the user-facing review universe.
     items.sort(key=lambda r: (review_sort(r), int(r.get("source_dce_run_id") or 0)), reverse=True)
     stage_counts = Counter(str(x.get("review_stage") or "UNKNOWN") for x in items)
     band_counts = Counter(str(x.get("spm_fit_band") or "UNKNOWN") for x in items)
     payload = {
-        "schema": "GPT_REVIEW_INDEX_V1",
+        "schema": "GPT_REVIEW_INDEX_V2",
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "count": len(items),
         "items": items,
@@ -130,6 +168,7 @@ def main() -> None:
             "by_spm_fit_band": dict(band_counts),
             "rich_hot_window_target": 160,
             "overflow_beyond_hot_160": max(0, len(items) - 160),
+            "cross_portal_duplicates_collapsed": cross_portal_collapses,
         },
         "recovery": {
             "shard_files_scanned_this_refresh": len(shard_files),
@@ -138,7 +177,7 @@ def main() -> None:
             "authenticity_rows_seen_this_refresh": auth_rows,
             "source_runs_seen_this_refresh": sorted(source_runs, reverse=True),
         },
-        "contract": "Uncapped durable directory of GPT Web work. Compact metadata only; authoritative evidence remains in the referenced DCE release/shard. Presence here is never a GREEN verdict.",
+        "contract": "Uncapped durable directory of GPT Web work. Strong cross-portal dedupe uses only explicit stable procedure aliases recovered from authoritative source URLs; no fuzzy title/buyer merge. Presence here is never a GREEN verdict.",
     }
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     Path(args.out).write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
