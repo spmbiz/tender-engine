@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from urllib.parse import urlparse
 
 import requests
 
@@ -12,7 +11,7 @@ import dce_worker_v5 as v5
 import dce_worker_v17 as v17  # register the complete validated v17 stack first
 
 GR_FAST_CONNECT_TIMEOUT = max(2, min(10, int(os.getenv("GR_DCE_FAST_CONNECT_TIMEOUT", "4"))))
-GR_FAST_READ_TIMEOUT = max(5, min(30, int(os.getenv("GR_DCE_FAST_READ_TIMEOUT", "12"))))
+GR_FAST_READ_TIMEOUT = max(3, min(30, int(os.getenv("GR_DCE_FAST_READ_TIMEOUT", "4"))))
 
 
 def _canonical_gr_url(candidate: dict) -> str | None:
