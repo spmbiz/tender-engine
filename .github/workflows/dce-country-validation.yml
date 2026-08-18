@@ -23,7 +23,7 @@ on:
       - '.github/workflows/dce-country-validation.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   DEFAULT_PER_COUNTRY: '12'
@@ -255,6 +255,8 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -277,3 +279,34 @@ jobs:
           retention-days: 14
           if-no-files-found: error
           compression-level: 6
+      - name: Publish latest scorecard on isolated results branch
+        env:
+          RUN_ID: ${{ github.run_id }}
+          SOURCE_RUN: ${{ needs.prepare.outputs.source_run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/dce-country-publish
+          mkdir -p /tmp/dce-country-publish/latest
+          cp final-report/REPORT.md final-report/report.json final-report/report.csv /tmp/dce-country-publish/latest/
+          inventory="$(find country-results -type f -name inventory.json -print -quit || true)"
+          if [ -n "$inventory" ]; then cp "$inventory" /tmp/dce-country-publish/latest/inventory.json; fi
+          printf '{"benchmark_run_id":"%s","source_discovery_run":"%s","head_sha":"%s"}\n' "$RUN_ID" "$SOURCE_RUN" "$GITHUB_SHA" > /tmp/dce-country-publish/latest/provenance.json
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          if git ls-remote --exit-code --heads origin benchmark/dce-country-results >/dev/null 2>&1; then
+            git fetch origin benchmark/dce-country-results
+            git checkout -B benchmark/dce-country-results origin/benchmark/dce-country-results
+          else
+            git checkout -B benchmark/dce-country-results
+          fi
+          rm -rf benchmarks/dce-country-validation/latest
+          mkdir -p benchmarks/dce-country-validation/latest
+          cp -a /tmp/dce-country-publish/latest/. benchmarks/dce-country-validation/latest/
+          git add benchmarks/dce-country-validation/latest
+          if git diff --cached --quiet; then
+            echo 'Country benchmark result unchanged.'
+          else
+            git commit -m "benchmark: DCE country validation ${RUN_ID}"
+            git push origin HEAD:benchmark/dce-country-results
+          fi
