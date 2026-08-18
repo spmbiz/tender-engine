@@ -20,8 +20,7 @@ FILE_RE = re.compile(r"\.(?:pdf|zip|docx?|xlsx?|xls|pptx?|csv|7z|rar)(?:$|[?#])"
 DOWNLOAD_RE = re.compile(r"download|letölt|attachment|export|(?:^|[/_-])file(?:[/_.?=&-]|$)", re.I)
 EKR_API_DOWNLOAD_RE = re.compile(r"/api/publikus/.*/dokumentum-letoltes(?:/|$|[?#])", re.I)
 EKR_SAFE_CONTROL_RE = re.compile(
-    r"EKR\s*PDF\s*letöltés|Kijelölt dokumentumok letöltése|Download selected documents|"
-    r"\.(?:pdf|zip|docx?|xlsx?|xls|pptx?|csv|7z|rar)(?:\s|$)",
+    r"EKR\s*PDF\s*letöltés|\.(?:pdf|zip|docx?|xlsx?|xls|pptx?|csv|7z|rar)(?:\s|$)",
     re.I,
 )
 
@@ -74,7 +73,7 @@ def _bounded_file_fetch(url: str, out: Path, session: requests.Session) -> dict 
 def _bounded_http_probe(detail: str, out: Path, manifest: dict) -> bool:
     session = requests.Session()
     session.headers.update({
-        "User-Agent": "Tender-Engine/19.2 public procurement research",
+        "User-Agent": "Tender-Engine/19.3 public procurement research",
         "Accept": "text/html,application/xhtml+xml,application/pdf,application/zip,*/*",
     })
     try:
@@ -130,21 +129,41 @@ def _bounded_http_probe(detail: str, out: Path, manifest: dict) -> bool:
         return False
 
 
+def _control_priority(hay: str) -> int:
+    h = str(hay or "")
+    folded = h.casefold()
+    if "kd_" in folded or "közbeszerzési dokumentáció" in folded:
+        return 100
+    if re.search(r"\.docx?(?:\s|$)", h, re.I):
+        return 90
+    if re.search(r"\.(?:zip|7z|rar)(?:\s|$)", h, re.I):
+        return 80
+    if re.search(r"\.(?:xlsx?|pptx?|csv)(?:\s|$)", h, re.I):
+        return 70
+    if re.search(r"\.pdf(?:\s|$)", h, re.I):
+        return 60
+    if re.search(r"EKR\s*PDF\s*letöltés", h, re.I):
+        return 50
+    return 0
+
+
 def _safe_ekr_control_indices(items: list[dict]) -> list[int]:
-    chosen: list[int] = []
+    chosen: list[tuple[int, int]] = []
     for item in items or []:
         if not isinstance(item, dict) or not item.get("visible") or item.get("disabled"):
             continue
         hay = " ".join(str(item.get(k) or "") for k in ("text", "aria", "title")).strip()
         if not hay or v11.BLOCK_CONTROL_RE.search(hay) or not EKR_SAFE_CONTROL_RE.search(hay):
             continue
+        priority = _control_priority(hay)
+        if priority <= 0:
+            continue
         try:
-            chosen.append(int(item.get("index")))
+            chosen.append((priority, int(item.get("index"))))
         except Exception:
             continue
-        if len(chosen) >= 10:
-            break
-    return chosen
+    chosen.sort(key=lambda row: (-row[0], row[1]))
+    return [index for _, index in chosen[:6]]
 
 
 def _filename_from_playwright_response(resp, ordinal: int) -> str:
@@ -166,16 +185,17 @@ def _filename_from_playwright_response(resp, ordinal: int) -> str:
 
 
 def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
-    """Target the exact EKR public-file behavior seen in successful V18 runs.
+    """Target the exact public EKR file behavior observed in successful V18 runs.
 
-    V18's occasional success came from public EKR file controls plus first-party
-    `/dokumentum-letoltes` network responses, not from a generic selected-documents
-    button. This keeps that successful path without V11's broad control/page crawl.
+    We wait for the asynchronous procedure/document controls, then capture both native
+    browser downloads and first-party `/dokumentum-letoltes` XHR bodies. Controls are
+    enumerated once, ranked toward procurement docs, and capped to keep the path bounded.
     """
     pw = browser = context = page = None
-    body = ""
     network_responses: dict[str, object] = {}
+    browser_downloads: list[object] = []
     control_outcomes: list[dict] = []
+    document_surface_ready = False
     try:
         pw, browser, context = v2.optimized_browser_context()
         page = context.new_page()
@@ -194,19 +214,30 @@ def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
             except Exception:
                 pass
 
+        def on_download(download):
+            try:
+                browser_downloads.append(download)
+            except Exception:
+                pass
+
         page.on("response", on_response)
+        page.on("download", on_download)
         page.goto(detail, wait_until="domcontentloaded", timeout=35000)
-        page.wait_for_timeout(1200)
+        page.wait_for_timeout(800)
         try:
-            page.wait_for_load_state("networkidle", timeout=5000)
+            page.wait_for_function(
+                """() => { const t=(document.body && document.body.innerText)||''; return t.includes('KÖZBESZERZÉSI DOKUMENTÁCIÓ') || t.includes('EKR PDF letöltés') || /\\.(zip|docx?|pdf)(?:\\s|$)/i.test(t); }""",
+                timeout=25000,
+            )
+            document_surface_ready = True
         except Exception:
-            pass
+            document_surface_ready = False
         try:
-            body = page.locator("body").inner_text(timeout=5000)
+            body = page.locator("body").inner_text(timeout=3000)
             if body:
                 (out / "portal_page.txt").write_text(body[:800_000], encoding="utf-8")
         except Exception:
-            body = ""
+            pass
 
         controls = page.locator("button, [role='button'], a")
         try:
@@ -226,16 +257,27 @@ def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
             except Exception:
                 pass
             try:
-                with page.expect_download(timeout=5000) as dl_info:
-                    node.click(force=True, timeout=3000)
-                manifest.setdefault("files", []).append(base.persist_download(out, dl_info.value, page.url))
-                control_outcomes.append({"text": hay, "outcome": "DOWNLOADED"})
+                node.click(force=True, timeout=2500)
+                control_outcomes.append({"text": hay, "outcome": "CLICKED"})
             except Exception as exc:
-                control_outcomes.append({"text": hay, "outcome": "NO_DIRECT_DOWNLOAD", "error": repr(exc)[:240]})
+                control_outcomes.append({"text": hay, "outcome": "CLICK_FAILED", "error": repr(exc)[:240]})
             try:
-                page.wait_for_timeout(150)
+                page.wait_for_timeout(650)
             except Exception:
                 pass
+
+        try:
+            page.wait_for_timeout(1500)
+        except Exception:
+            pass
+
+        direct_download_meta: list[dict] = []
+        for download in browser_downloads[:8]:
+            try:
+                manifest.setdefault("files", []).append(base.persist_download(out, download, page.url))
+                direct_download_meta.append({"suggested_filename": str(download.suggested_filename or "")[:300], "outcome": "PERSISTED"})
+            except Exception as exc:
+                direct_download_meta.append({"outcome": "PERSIST_FAILED", "error": repr(exc)[:300]})
 
         network_meta: list[dict] = []
         for ordinal, (url, resp) in enumerate(list(network_responses.items())[:8], start=1):
@@ -255,8 +297,10 @@ def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
         manifest.setdefault("dce_method_attempts", []).append({
             "method": "HU_EKR_TARGETED_NETWORK_V19",
             "url": detail,
+            "document_surface_ready": document_surface_ready,
             "safe_control_count": len(indices),
             "safe_controls": control_outcomes,
+            "browser_downloads": direct_download_meta,
             "network_files": network_meta,
             "downloaded": len(manifest.get("files") or []),
             "outcome": "DOWNLOADED" if manifest.get("files") else "NO_FILE",
