@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -78,6 +78,7 @@ def main() -> None:
     modes = Counter()
     fit_funnel = Counter()
     all_funnel = Counter()
+    decision_funnel: dict[str, Counter] = defaultdict(Counter)
     code_stats = Counter()
     contradiction_examples: list[dict[str, Any]] = []
     positive_maybe_examples: list[dict[str, Any]] = []
@@ -110,6 +111,17 @@ def main() -> None:
         all_funnel["in_gpt_inbox"] += int(in_inbox)
         all_funnel["in_final_bank"] += int(in_final)
 
+        df = decision_funnel[decision]
+        df["current"] += 1
+        df["keep"] += int(keep == "KEEP")
+        df["dce_eligible"] += int(dce_eligible)
+        df["dce_attempted_exact_version"] += int(attempted)
+        df["controller_processed"] += int(is_processed)
+        df["retry_cooldown"] += int(is_cooldown)
+        df["in_gpt_inbox"] += int(in_inbox)
+        df["in_final_bank"] += int(in_final)
+        df["unattempted_unprocessed"] += int(not attempted and not is_processed and not is_cooldown)
+
         is_fit = decision in {"STRONG_FIT", "FIT"} and keep == "KEEP" and dce_eligible
         if is_fit:
             fit_funnel["qwen_fit_current"] += 1
@@ -128,8 +140,10 @@ def main() -> None:
         prior = code_priority(snap)
         if prior["positive"]:
             code_stats["positive_code"] += 1
+            decision_funnel[decision]["positive_procurement_code"] += 1
         if prior["contradiction"]:
             code_stats["noncore_cpv_contradiction"] += 1
+            decision_funnel[decision]["noncore_cpv_contradiction"] += 1
             if is_fit and len(contradiction_examples) < 30:
                 contradiction_examples.append({
                     "candidate_id": c,
@@ -146,8 +160,12 @@ def main() -> None:
                 "candidate_id": c,
                 "title": snap.get("title") or (snap.get("notice") or {}).get("title"),
                 "qwen_classification": decision,
+                "delivery_mode": row.get("delivery_mode"),
+                "lean_attractiveness": row.get("lean_attractiveness"),
                 "codes": prior,
                 "attempted": attempted,
+                "processed": is_processed,
+                "in_inbox": in_inbox,
             })
 
     fit_total = int(fit_funnel.get("qwen_fit_current", 0))
@@ -170,7 +188,7 @@ def main() -> None:
     )
 
     payload = {
-        "schema": "QWEN_DCE_FUNNEL_AUDIT_V1",
+        "schema": "QWEN_DCE_FUNNEL_AUDIT_V2",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "state_current_exact_hash_rows": len(state_rows),
         "ledger_rows": len(ledger),
@@ -179,6 +197,7 @@ def main() -> None:
         "survival_counts": dict(survival),
         "delivery_mode_counts": dict(modes),
         "all_current_qwen_funnel": dict(all_funnel),
+        "decision_funnel": {k: dict(v) for k, v in decision_funnel.items()},
         "fit_funnel": dict(fit_funnel),
         "fit_coverage": {
             "qwen_fit_current": fit_total,
