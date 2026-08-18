@@ -1,16 +1,21 @@
 {
   "schema": "LIVE_WORLD_SNAPSHOT_POINTER_V2",
-  "source_discovery_run": 32166187915,
-  "generated_at": "2026-08-18T19:08:43.781002+00:00",
-  "snapshot_rows": 41483,
-  "current_materialized_rows": 41483,
-  "carried_forward_rows": 0,
-  "carried_forward_by_source": {},
-  "open_state_counts": {
-    "OPEN_CONFIRMED_BY_DEADLINE": 35384,
-    "OPEN_UNVERIFIED_NO_PARSEABLE_DEADLINE": 6099
+  "source_discovery_run": 32174760230,
+  "generated_at": "2026-08-18T19:44:37.821451+00:00",
+  "snapshot_rows": 97433,
+  "current_materialized_rows": 96782,
+  "carried_forward_rows": 651,
+  "carried_forward_by_source": {
+    "ES_PLACSP": 559,
+    "UK_PCS_OCDS": 62,
+    "DK": 26,
+    "CZ_ZAKAZKY_GOV": 4
   },
-  "packet_count": 83,
+  "open_state_counts": {
+    "OPEN_CONFIRMED_BY_DEADLINE": 83986,
+    "OPEN_UNVERIFIED_NO_PARSEABLE_DEADLINE": 13447
+  },
+  "packet_count": 195,
   "coverage_status": "PARTIAL_WORLD_COVERAGE",
   "failed_sources": [
     "UNGM_PUBLIC",
@@ -19,15 +24,14 @@
     "discovery-global-it-anac-delta",
     "discovery-global-lt-cvp-api",
     "discovery-global-malta-epps",
-    "discovery-global-uk-pcs-ocds",
-    "discovery-ted"
+    "discovery-global-uk-pcs-ocds"
   ],
   "world_exhaustive_claim_allowed": false,
   "direct_read_branch": "live-snapshot",
   "packet_path_template": "gpt-packets/packet-XXXX.jsonl",
   "coverage_path": "discovery_coverage.json",
   "stable_release_tag": "live-world-snapshot-latest",
-  "immutable_release_tag": "live-world-snapshot-32166187915",
+  "immutable_release_tag": "live-world-snapshot-32174760230",
   "dce_request_path": "control/gpt_dce_request.json",
   "rule": "GPT selects candidate IDs semantically; GitHub retrieves DCE only after selection. Coverage gaps stay explicit even when prior still-live rows are carried forward for recall. No notice-only FINAL_SUPER_GREEN."
 }
