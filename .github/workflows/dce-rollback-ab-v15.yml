@@ -111,15 +111,17 @@ jobs:
           else
             python -m playwright install --with-deps chromium
           fi
-      - name: Recover exact durable canonical queue
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Recover exact durable canonical queue without GitHub API quota
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p source
-          gh release download "$SOURCE_RELEASE" -R "$GITHUB_REPOSITORY" --pattern "$SOURCE_QUEUE" --dir source
+          asset_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${SOURCE_RELEASE}/${SOURCE_QUEUE}"
+          curl --fail --location --silent --show-error \
+            --retry 5 --retry-all-errors --retry-delay 2 \
+            --output "source/$SOURCE_QUEUE" "$asset_url"
           test -s "source/$SOURCE_QUEUE"
+          echo "source_bytes=$(wc -c < "source/$SOURCE_QUEUE")"
       - name: Materialize byte-identical fixed A/B corpus from canonical queue
         shell: bash
         run: |
