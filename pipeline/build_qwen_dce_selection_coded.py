@@ -167,14 +167,21 @@ def main() -> None:
         )
         base = json.loads(base_summary.read_text(encoding="utf-8"))
         summary = dict(base)
-        summary["schema"] = "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V1"
+        summary["schema"] = "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2"
         summary["base_candidate_pool"] = len(rows)
         summary["requested_final_limit"] = limit
         summary["selected"] = len(chosen)
-        summary["coded_selection_lanes"] = dict(Counter(str(x.get("selection_bucket") or "UNKNOWN") for x in chosen))
+        summary["selection_decisions"] = dict(Counter(str((x.get("qwen") or {}).get("classification") or "UNKNOWN") for x in chosen))
+        summary["selection_survival"] = dict(Counter(str((x.get("qwen") or {}).get("survival_decision") or "UNKNOWN") for x in chosen))
+        summary["selection_lanes"] = dict(Counter(str(x.get("selection_bucket") or "UNKNOWN") for x in chosen))
+        summary["selection_freshness"] = dict(Counter(str(x.get("selection_freshness") or "UNKNOWN") for x in chosen))
+        summary["candidate_pool_decisions"] = dict(Counter(str((x.get("qwen") or {}).get("classification") or "UNKNOWN") for x in rows))
+        summary["candidate_pool_lanes"] = dict(Counter(str(x.get("selection_bucket") or "UNKNOWN") for x in rows))
         summary["code_prior"] = {
             "positive_code_rows_in_pool": positives,
             "noncore_code_contradictions_in_pool": contradictions,
+            "positive_code_rows_selected": sum(bool((x.get("procurement_code_prior") or {}).get("positive")) for x in chosen),
+            "noncore_code_contradictions_selected": sum(bool((x.get("procurement_code_prior") or {}).get("contradiction")) for x in chosen),
             "policy": "priority_only_never_drop_never_eligibility",
             "candidate_pool_multiplier": multiplier,
         }
