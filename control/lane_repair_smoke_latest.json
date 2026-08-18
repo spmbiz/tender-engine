@@ -1,6 +1,6 @@
 {
   "schema": "RECALL_LANE_SMOKE_SUMMARY_V1",
-  "generated_at": "2026-08-18T23:22:41.920600+00:00",
+  "generated_at": "2026-08-18T23:26:08.795782+00:00",
   "counts": {
     "FAIL": 3,
     "RECALL_ONLY": 2,
@@ -11,7 +11,7 @@
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "AU_AUSTENDER",
-      "checked_at": "2026-08-18T23:19:43.335501+00:00",
+      "checked_at": "2026-08-18T23:23:06.087692+00:00",
       "primary_exit_code": 0,
       "fallback_exit_code": null,
       "verdict": "FAIL",
@@ -39,7 +39,7 @@
         "enumeration_complete": false,
         "live_candidate_capable": true,
         "live_coverage_credit_allowed": false,
-        "generated_at": "2026-08-18T23:19:31.583426+00:00",
+        "generated_at": "2026-08-18T23:23:01.855495+00:00",
         "errors": [
           {
             "type": "PUBLIC_SOURCE_HTTP_BLOCK",
@@ -72,7 +72,7 @@
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "CYPRUS_EPPS",
-      "checked_at": "2026-08-18T23:19:38.228507+00:00",
+      "checked_at": "2026-08-18T23:23:08.302191+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": 3,
       "verdict": "FAIL",
@@ -83,7 +83,7 @@
       "warnings": [
         {
           "type": "PUBLISHED_NOTICES_RECALL_FALLBACK",
-          "pages": 20,
+          "pages": 19,
           "lookback_days": 240,
           "cutoff_reached": true,
           "detail_calls": 0,
@@ -94,10 +94,12 @@
       "stats": {
         "source": "CYPRUS_EPPS",
         "base_url": "https://www.eprocurement.gov.cy",
-        "listing_contract": "EPPS_PUBLISHED_NOTICES_RECALL_FALLBACK_V2",
+        "listing_contract": "EPPS_PUBLISHED_NOTICES_RECALL_FALLBACK_V3",
         "current_materialized": 0,
         "raw_materialized": 0,
-        "published_fallback_pages": 20,
+        "published_fallback_pages": 19,
+        "competition_rows_seen": 110,
+        "competition_rows_with_resource_id": 110,
         "deadline_parsed": 0,
         "enumeration_exhausted": false,
         "enumeration_complete": false,
@@ -107,7 +109,7 @@
         "warnings": [
           {
             "type": "PUBLISHED_NOTICES_RECALL_FALLBACK",
-            "pages": 20,
+            "pages": 19,
             "lookback_days": 240,
             "cutoff_reached": true,
             "detail_calls": 0,
@@ -122,7 +124,8 @@
               "1508"
             ],
             "pages": 2,
-            "cutoff_reached": false
+            "cutoff_reached": false,
+            "current_rows": 0
           },
           {
             "authority": [
@@ -130,7 +133,8 @@
               "1039"
             ],
             "pages": 2,
-            "cutoff_reached": false
+            "cutoff_reached": false,
+            "current_rows": 0
           },
           {
             "authority": [
@@ -138,15 +142,17 @@
               "1760"
             ],
             "pages": 2,
-            "cutoff_reached": false
+            "cutoff_reached": false,
+            "current_rows": 0
           },
           {
             "authority": [
               "1429",
               "1445"
             ],
-            "pages": 2,
-            "cutoff_reached": false
+            "pages": 1,
+            "cutoff_reached": true,
+            "current_rows": 0
           },
           {
             "authority": [
@@ -154,7 +160,8 @@
               "1038"
             ],
             "pages": 2,
-            "cutoff_reached": false
+            "cutoff_reached": false,
+            "current_rows": 0
           },
           {
             "authority": [
@@ -162,7 +169,8 @@
               "1767"
             ],
             "pages": 2,
-            "cutoff_reached": false
+            "cutoff_reached": false,
+            "current_rows": 0
           },
           {
             "authority": [
@@ -170,7 +178,8 @@
               "1048"
             ],
             "pages": 2,
-            "cutoff_reached": true
+            "cutoff_reached": true,
+            "current_rows": 0
           },
           {
             "authority": [
@@ -178,7 +187,8 @@
               "1037"
             ],
             "pages": 1,
-            "cutoff_reached": true
+            "cutoff_reached": true,
+            "current_rows": 0
           },
           {
             "authority": [
@@ -186,7 +196,8 @@
               "1456"
             ],
             "pages": 1,
-            "cutoff_reached": true
+            "cutoff_reached": true,
+            "current_rows": 0
           },
           {
             "authority": [
@@ -194,7 +205,8 @@
               "1459"
             ],
             "pages": 2,
-            "cutoff_reached": false
+            "cutoff_reached": false,
+            "current_rows": 0
           },
           {
             "authority": [
@@ -202,17 +214,18 @@
               "113948"
             ],
             "pages": 2,
-            "cutoff_reached": false
+            "cutoff_reached": false,
+            "current_rows": 0
           }
         ],
-        "generated_at": "2026-08-19T02:19:33.351479+03:00",
-        "semantics": "Official Published Notices repairs recall when Current Opportunities is gated or empty. Malta resolves public CfT workspaces from resourceId for authoritative deadlines. Cyprus may use only previously observed official authority/orgGroup pairs. This remains recall reconstruction, never proof of full current-opportunity exhaustion."
+        "generated_at": "2026-08-19T02:23:04.448452+03:00",
+        "semantics": "Official Published Notices repairs recall when Current Opportunities is gated or empty. Row classification uses complete table-row text so checkbox/header offsets cannot suppress contract notices. Cyprus uses only verified public authority seeds and table submission dates; Malta resolves public CfT workspaces. This remains recall reconstruction, never proof of full current-opportunity exhaustion."
       }
     },
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "IT_ANAC_DELTA",
-      "checked_at": "2026-08-18T23:20:21.892330+00:00",
+      "checked_at": "2026-08-18T23:23:45.426316+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": null,
       "verdict": "FAIL",
@@ -258,7 +271,7 @@
             "cutoff_reached": false
           }
         ],
-        "generated_at": "2026-08-18T23:19:40.539736+00:00",
+        "generated_at": "2026-08-18T23:23:01.801779+00:00",
         "source_url": "https://pubblicitalegale.anticorruzione.it/bandi",
         "semantics": "Direct official PVL /bandi listing repairs live recall without the fragile advanced-search UI. It remains publication-window reconstruction, so it never claims exhaustive current-universe coverage."
       }
@@ -266,7 +279,7 @@
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "MALTA_EPPS",
-      "checked_at": "2026-08-18T23:21:01.234683+00:00",
+      "checked_at": "2026-08-18T23:24:30.565147+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": 0,
       "verdict": "RECALL_ONLY",
@@ -288,10 +301,12 @@
       "stats": {
         "source": "MALTA_EPPS",
         "base_url": "https://www.etenders.gov.mt",
-        "listing_contract": "EPPS_PUBLISHED_NOTICES_RECALL_FALLBACK_V2",
+        "listing_contract": "EPPS_PUBLISHED_NOTICES_RECALL_FALLBACK_V3",
         "current_materialized": 357,
         "raw_materialized": 357,
         "published_fallback_pages": 80,
+        "competition_rows_seen": 434,
+        "competition_rows_with_resource_id": 434,
         "deadline_parsed": 90,
         "enumeration_exhausted": false,
         "enumeration_complete": false,
@@ -313,17 +328,18 @@
           {
             "authority": null,
             "pages": 80,
-            "cutoff_reached": false
+            "cutoff_reached": false,
+            "current_rows": 431
           }
         ],
-        "generated_at": "2026-08-19T01:19:31.913713+02:00",
-        "semantics": "Official Published Notices repairs recall when Current Opportunities is gated or empty. Malta resolves public CfT workspaces from resourceId for authoritative deadlines. Cyprus may use only previously observed official authority/orgGroup pairs. This remains recall reconstruction, never proof of full current-opportunity exhaustion."
+        "generated_at": "2026-08-19T01:23:03.142843+02:00",
+        "semantics": "Official Published Notices repairs recall when Current Opportunities is gated or empty. Row classification uses complete table-row text so checkbox/header offsets cannot suppress contract notices. Cyprus uses only verified public authority seeds and table submission dates; Malta resolves public CfT workspaces. This remains recall reconstruction, never proof of full current-opportunity exhaustion."
       }
     },
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "UK_PCS_OCDS",
-      "checked_at": "2026-08-18T23:20:38.944868+00:00",
+      "checked_at": "2026-08-18T23:24:29.113971+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": null,
       "verdict": "RECALL_ONLY",
@@ -375,7 +391,7 @@
             }
           ]
         },
-        "generated_at": "2026-08-18T23:19:32.079830+00:00",
+        "generated_at": "2026-08-18T23:23:02.963077+00:00",
         "source_url": "https://www.publiccontractsscotland.gov.uk/search/Search_MainPage.aspx",
         "semantics": "The official PCS Current Opportunity/Opportunities filter is used. Native and Telerik/custom Notice Type controls are supported. Only notices open for tender are traversed; coverage credit requires pagination exhaustion and a non-empty current set."
       }
@@ -383,7 +399,7 @@
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "UNGM_PUBLIC",
-      "checked_at": "2026-08-18T23:19:42.106858+00:00",
+      "checked_at": "2026-08-18T23:23:17.561381+00:00",
       "primary_exit_code": 0,
       "fallback_exit_code": null,
       "verdict": "PASS_FULL",
@@ -416,7 +432,7 @@
             }
           ]
         },
-        "generated_at": "2026-08-18T23:19:29.037052+00:00",
+        "generated_at": "2026-08-18T23:23:02.956207+00:00",
         "source_url": "https://www.ungm.org/Public/Notice",
         "semantics": "UNGM public Procurement Opportunities is read with Only currently active enabled. Coverage credit requires exhaustive pagination of the public result set; no authenticated UNGM API is assumed."
       }
