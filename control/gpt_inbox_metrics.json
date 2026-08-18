@@ -1,28 +1,28 @@
 {
   "schema": "GPT_INBOX_HEALTH_V1",
-  "updated_at": "2026-08-18T01:56:06.485643+00:00",
+  "updated_at": "2026-08-18T02:00:44.274854+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V2",
   "latest_source_dce_run_id": 32089273287,
   "counts": {
-    "pending_gpt_web_review": 156,
+    "pending_gpt_web_review": 159,
     "reviewed_ticks_total": 171,
     "excluded_already_reviewed": 0,
     "excluded_already_in_final_bank": 0,
     "pending_by_stage": {
-      "BUSINESS_GATES": 36,
-      "DCE_AUTHENTICITY": 120
+      "BUSINESS_GATES": 23,
+      "DCE_AUTHENTICITY": 136
     }
   },
-  "review_bank_count": 158,
+  "review_bank_count": 160,
   "review_bank_schema": "GPT_REVIEW_HOT_V4",
   "recovery_metrics": {
-    "shard_files_scanned": 97,
-    "adjudication_rows_scanned": 601,
+    "shard_files_scanned": 102,
+    "adjudication_rows_scanned": 644,
     "model_review_rows_seen": 38,
-    "dce_authenticity_rows_seen": 120,
+    "dce_authenticity_rows_seen": 143,
     "scope_auto_rejected": 0,
     "scope_auto_reject_reason_counts": {},
-    "persistent_unique_pending_surface": 158
+    "persistent_unique_pending_surface": 160
   },
   "healthy": true,
   "contract": "Small health sidecar only; canonical work remains control/gpt_supergreen_inbox.json."
