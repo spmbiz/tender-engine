@@ -10,8 +10,9 @@ from pathlib import Path
 from typing import Any, Iterable
 
 STATE_SCHEMA = "NOTICE_CLASSIFICATION_STATE_V1"
-SUMMARY_SCHEMA = "NOTICE_CLASSIFICATION_STATE_MERGE_SUMMARY_V1"
+SUMMARY_SCHEMA = "NOTICE_CLASSIFICATION_STATE_MERGE_SUMMARY_V2_PROMPT_LOCK"
 BUSINESS_CALIBRATION_VERSION = "spm-business-fit-v2"
+REQUIRED_PROMPT_VERSION = "qwen-batch-high-recall-business-fit-v3-rich"
 
 
 def now_utc() -> str:
@@ -56,6 +57,16 @@ def material_hash(row: dict[str, Any]) -> str:
     return str(row.get("input_material_fields_hash") or row.get("material_fields_hash") or "").strip()
 
 
+def semantic_contract_matches(row: dict[str, Any], target_version: str) -> bool:
+    if target_version and str(row.get("classifier_version") or "").strip() != target_version:
+        return False
+    if str(row.get("classifier_prompt_version") or "").strip() != REQUIRED_PROMPT_VERSION:
+        return False
+    if str(row.get("business_calibration_version") or "") != BUSINESS_CALIBRATION_VERSION:
+        return False
+    return True
+
+
 def is_valid_result(row: dict[str, Any], expected_hash: str, target_version: str) -> tuple[bool, str]:
     if not cid(row):
         return False, "missing_id"
@@ -69,6 +80,8 @@ def is_valid_result(row: dict[str, Any], expected_hash: str, target_version: str
         return False, "missing_classifier_version"
     if target_version and version != target_version:
         return False, "wrong_classifier_version"
+    if str(row.get("classifier_prompt_version") or "").strip() != REQUIRED_PROMPT_VERSION:
+        return False, "wrong_classifier_prompt_version"
     if str(row.get("business_calibration_version") or "") != BUSINESS_CALIBRATION_VERSION:
         return False, "wrong_business_calibration_version"
     if row.get("parse_error"):
@@ -123,7 +136,9 @@ def merge(
 
     state: dict[str, dict[str, Any]] = {}
     stats = Counter()
-    # Carry forward only state that is still exact for current material + target classifier.
+    # Carry forward only state that is exact for current material and for the
+    # current semantic contract. A prompt/context migration must re-read notices
+    # even when their procurement text itself did not change.
     for row in previous_state_rows:
         candidate = cid(row)
         if not candidate or candidate not in current_hash:
@@ -134,6 +149,9 @@ def merge(
             continue
         if target_version and str(row.get("classifier_version") or "") != target_version:
             stats["previous_wrong_version_dropped"] += 1
+            continue
+        if str(row.get("classifier_prompt_version") or "") != REQUIRED_PROMPT_VERSION:
+            stats["previous_wrong_prompt_dropped"] += 1
             continue
         if str(row.get("business_calibration_version") or "") != BUSINESS_CALIBRATION_VERSION:
             stats["previous_wrong_business_calibration_dropped"] += 1
@@ -164,7 +182,7 @@ def merge(
         queue_seen.add(candidate)
         h = str(envelope.get("material_fields_hash") or material_hash(envelope) or "").strip()
         state_row = state.get(candidate)
-        if state_row and h and material_hash(state_row) == h and str(state_row.get("classifier_version") or "") == target_version and str(state_row.get("business_calibration_version") or "") == BUSINESS_CALIBRATION_VERSION:
+        if state_row and h and material_hash(state_row) == h and semantic_contract_matches(state_row, target_version):
             stats["queue_already_classified"] += 1
             continue
         filtered_queue.append(envelope)
@@ -175,6 +193,7 @@ def merge(
         "schema": SUMMARY_SCHEMA,
         "generated_at": accepted_at,
         "target_classifier_version": target_version,
+        "required_classifier_prompt_version": REQUIRED_PROMPT_VERSION,
         "ledger_notices": len(current_hash),
         "previous_state_rows": len(previous_state_rows),
         "result_rows_seen": sum(len(x) for x in result_groups),
@@ -186,6 +205,8 @@ def merge(
         "rejected_result_reasons": dict(sorted(reject_reasons.items())),
         "safety": {
             "exact_material_hash_required": True,
+            "exact_prompt_version_required": True,
+            "thin_context_state_invalidated": True,
             "parse_or_fallback_result_marks_classified": False,
             "wrong_classifier_version_marks_classified": False,
             "stale_result_can_overwrite_updated_notice": False,
