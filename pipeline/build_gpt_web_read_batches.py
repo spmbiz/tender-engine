@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import re
 import shutil
@@ -20,6 +21,16 @@ GATES = (
 def clip(value: Any, chars: int = 520) -> str:
     text = re.sub(r"\s+", " ", str(value or "")).strip()
     return text if len(text) <= chars else text[: chars - 1] + "…"
+
+
+def display_text(item: dict[str, Any]) -> str:
+    raw = str(item.get("text") or item.get("snippet") or item.get("context") or "")
+    if item.get("raw_machine_format"):
+        # Display-only cleanup. The artifact remains authoritative and addressable
+        # by source/hash; stripping markup here prevents raw Word/XML tags from
+        # crowding the small GPT read surface.
+        raw = html.unescape(re.sub(r"<[^>]{1,240}>", " ", raw))
+    return clip(raw)
 
 
 def load(path: Path) -> dict[str, Any]:
@@ -42,11 +53,30 @@ def evidence(row: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
         kept = []
         for item in vals[:2]:
             if isinstance(item, dict):
-                text = clip(item.get("text") or item.get("snippet") or item.get("context"))
+                text = display_text(item)
                 if text:
-                    kept.append({"text": text, "source": item.get("source") or item.get("file") or item.get("path")})
+                    source = item.get("source") or item.get("file") or item.get("path")
+                    kept.append({
+                        "text": text,
+                        "source": source,
+                        "source_url": item.get("source_url"),
+                        "source_sha256": item.get("source_sha256"),
+                        "source_kind": item.get("source_kind"),
+                        "provenance_strength": item.get("provenance_strength") or ("LEGACY_UNATTRIBUTED" if not source else "LEGACY_PATH_ONLY"),
+                        "raw_machine_format": bool(item.get("raw_machine_format")),
+                        "artifact_lookup_required": not bool(source and item.get("source_sha256")),
+                    })
             elif str(item or "").strip():
-                kept.append({"text": clip(item), "source": None})
+                kept.append({
+                    "text": clip(item),
+                    "source": None,
+                    "source_url": None,
+                    "source_sha256": None,
+                    "source_kind": None,
+                    "provenance_strength": "LEGACY_UNATTRIBUTED",
+                    "raw_machine_format": False,
+                    "artifact_lookup_required": True,
+                })
         if kept:
             out[gate] = kept
     return out
@@ -56,6 +86,10 @@ def compact(row: dict[str, Any]) -> dict[str, Any]:
     da = row.get("deadline_authority") if isinstance(row.get("deadline_authority"), dict) else {}
     eq = row.get("evidence_quality_summary") if isinstance(row.get("evidence_quality_summary"), dict) else {}
     locator = row.get("artifact_locator") if isinstance(row.get("artifact_locator"), dict) else {}
+    ev = evidence(row)
+    snippets = [item for vals in ev.values() for item in vals if isinstance(item, dict)]
+    attributed = sum(1 for item in snippets if item.get("source") and item.get("source_sha256"))
+    legacy_unattributed = sum(1 for item in snippets if item.get("artifact_lookup_required"))
     return {
         "candidate_id": row.get("candidate_id"),
         "title": row.get("title"),
@@ -89,8 +123,12 @@ def compact(row: dict[str, Any]) -> dict[str, Any]:
             "raw_status": eq.get("raw_status"),
             "documents_with_text": eq.get("documents_with_text"),
             "text_chars": eq.get("text_chars"),
+            "attributed_compact_snippets": attributed,
+            "artifact_lookup_required_snippets": legacy_unattributed,
+            "all_compact_snippets_document_attributed": bool(snippets and attributed == len(snippets)),
         },
-        "evidence": evidence(row),
+        "evidence": ev,
+        "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
         "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
     }
 
@@ -117,7 +155,7 @@ def main() -> None:
         idx = start // batch_size
         name = f"batch-{idx:03d}.json"
         payload = {
-            "schema": "GPT_WEB_READ_BATCH_V1",
+            "schema": "GPT_WEB_READ_BATCH_V2_PROVENANCE",
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "source_inbox_updated_at": inbox.get("updated_at"),
             "latest_source_dce_run_id": inbox.get("latest_source_dce_run_id"),
@@ -126,13 +164,13 @@ def main() -> None:
             "end_rank": start + len(chunk),
             "count": len(chunk),
             "items": chunk,
-            "instruction": "Assistant reads and adjudicates these DCE-backed candidates. This file never emits GREEN/YELLOW/RED automatically. Follow artifact_locator when compact evidence is insufficient. Unknown is never PASS.",
+            "instruction": "Assistant adjudicates these DCE-backed candidates. Compact snippets with provenance_strength LEGACY_UNATTRIBUTED/LEGACY_PATH_ONLY are not sufficient to resolve a mandatory gate; follow artifact_locator. Unknown is never PASS and this file never emits a final verdict automatically.",
         }
         (out_dir / name).write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         files.append({"file": name, "start_rank": start + 1, "end_rank": start + len(chunk), "count": len(chunk)})
 
     manifest = {
-        "schema": "GPT_WEB_READ_BATCH_MANIFEST_V1",
+        "schema": "GPT_WEB_READ_BATCH_MANIFEST_V2_PROVENANCE",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "source_inbox_updated_at": inbox.get("updated_at"),
         "latest_source_dce_run_id": inbox.get("latest_source_dce_run_id"),
@@ -140,7 +178,7 @@ def main() -> None:
         "batch_size": batch_size,
         "batch_count": len(files),
         "files": files,
-        "contract": "Mechanical split/compaction only. GPT Web adjudicator is the assistant in the conversation, not a repository worker.",
+        "contract": "Mechanical split/compaction only. New DCE snippets retain exact document provenance. Legacy unattributed snippets force artifact lookup before gate resolution. GPT Web adjudicator is the assistant, not a repository worker.",
     }
     (out_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(manifest, ensure_ascii=False, indent=2))
