@@ -78,7 +78,7 @@ def main() -> None:
         base_summary = Path(td) / "base-summary.json"
         cmd = [
             sys.executable,
-            str(Path(__file__).with_name("build_qwen_dce_selection.py")),
+            str(Path(__file__).with_name("build_qwen_dce_selection_base.py")),
             "--state", args.state,
             "--ledger", args.ledger,
             "--snapshot", args.snapshot,
