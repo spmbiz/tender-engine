@@ -1,6 +1,6 @@
 {
   "schema": "RECALL_LANE_SMOKE_SUMMARY_V1",
-  "generated_at": "2026-08-18T23:06:19.680787+00:00",
+  "generated_at": "2026-08-18T23:15:03.813725+00:00",
   "counts": {
     "FAIL": 4,
     "RECALL_ONLY": 1,
@@ -11,7 +11,7 @@
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "AU_AUSTENDER",
-      "checked_at": "2026-08-18T22:59:38.525665+00:00",
+      "checked_at": "2026-08-18T23:12:00.473212+00:00",
       "primary_exit_code": 0,
       "fallback_exit_code": null,
       "verdict": "FAIL",
@@ -39,7 +39,7 @@
         "enumeration_complete": false,
         "live_candidate_capable": true,
         "live_coverage_credit_allowed": false,
-        "generated_at": "2026-08-18T22:59:29.717898+00:00",
+        "generated_at": "2026-08-18T23:11:54.328133+00:00",
         "errors": [
           {
             "type": "PUBLIC_SOURCE_HTTP_BLOCK",
@@ -72,7 +72,7 @@
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "CYPRUS_EPPS",
-      "checked_at": "2026-08-18T22:59:37.009070+00:00",
+      "checked_at": "2026-08-18T23:12:18.852076+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": 3,
       "verdict": "FAIL",
@@ -113,14 +113,14 @@
             "coverage_credit": false
           }
         ],
-        "generated_at": "2026-08-19T01:59:13.103482+03:00",
+        "generated_at": "2026-08-19T02:11:58.108159+03:00",
         "semantics": "Official Published Notices repairs recall when Current Opportunities is gated or empty. It is publication-window reconstruction, not proof of full current-opportunity exhaustion."
       }
     },
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "IT_ANAC_DELTA",
-      "checked_at": "2026-08-18T22:59:40.582089+00:00",
+      "checked_at": "2026-08-18T23:12:36.779298+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": null,
       "verdict": "FAIL",
@@ -129,23 +129,25 @@
       "live_coverage_credit_allowed": false,
       "errors": [
         {
-          "type": "PVL_RESULT_LINKS_NOT_MATERIALIZED"
+          "type": "PVL_BANDI_LINKS_NOT_MATERIALIZED"
         }
       ],
       "warnings": [
         {
           "type": "BOUNDED_PUBLICATION_WINDOW_NOT_FULL_CURRENT_UNIVERSE",
-          "lookback_days": 730
+          "lookback_days": 730,
+          "cutoff_reached": false
         }
       ],
       "stats": {
         "source": "IT_ANAC_PVL",
         "portal": "ANAC_PVL",
-        "listing_contract": "ANAC_PVL_PUBLIC_TENDER_WINDOW_V1",
+        "listing_contract": "ANAC_PVL_BANDI_DIRECT_WINDOW_V2",
         "raw_materialized": 0,
         "current_materialized": 0,
         "search_pages_fetched": 0,
         "search_pagination_exhausted": false,
+        "cutoff_reached": false,
         "detail_errors": 0,
         "publication_lookback_days": 730,
         "enumeration_exhausted": false,
@@ -154,23 +156,25 @@
         "live_coverage_credit_allowed": false,
         "errors": [
           {
-            "type": "PVL_RESULT_LINKS_NOT_MATERIALIZED"
+            "type": "PVL_BANDI_LINKS_NOT_MATERIALIZED"
           }
         ],
         "warnings": [
           {
             "type": "BOUNDED_PUBLICATION_WINDOW_NOT_FULL_CURRENT_UNIVERSE",
-            "lookback_days": 730
+            "lookback_days": 730,
+            "cutoff_reached": false
           }
         ],
-        "generated_at": "2026-08-18T22:59:06.051160+00:00",
-        "source_url": "https://pubblicitalegale.anticorruzione.it/ricerca-generica"
+        "generated_at": "2026-08-18T23:11:57.017009+00:00",
+        "source_url": "https://pubblicitalegale.anticorruzione.it/bandi",
+        "semantics": "Direct official PVL /bandi listing repairs live recall without the fragile advanced-search UI. It remains publication-window reconstruction, so it never claims exhaustive current-universe coverage."
       }
     },
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "MALTA_EPPS",
-      "checked_at": "2026-08-18T23:01:00.619607+00:00",
+      "checked_at": "2026-08-18T23:13:28.467501+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": 0,
       "verdict": "RECALL_ONLY",
@@ -211,14 +215,14 @@
             "coverage_credit": false
           }
         ],
-        "generated_at": "2026-08-19T00:59:21.534225+02:00",
+        "generated_at": "2026-08-19T01:11:58.775816+02:00",
         "semantics": "Official Published Notices repairs recall when Current Opportunities is gated or empty. It is publication-window reconstruction, not proof of full current-opportunity exhaustion."
       }
     },
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "UK_PCS_OCDS",
-      "checked_at": "2026-08-18T23:00:15.983809+00:00",
+      "checked_at": "2026-08-18T23:12:49.533206+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": null,
       "verdict": "FAIL",
@@ -227,14 +231,16 @@
       "live_coverage_credit_allowed": false,
       "errors": [
         {
-          "type": "CURRENT_FILTER_NOT_FOUND"
+          "type": "CURRENT_FILTER_NOT_FOUND",
+          "native_selects_seen": 4,
+          "candidate_controls_seen": 0
         }
       ],
       "warnings": [],
       "stats": {
         "source": "UK_PCS_OCDS",
         "portal": "PUBLIC_CONTRACTS_SCOTLAND",
-        "listing_contract": "PCS_CURRENT_OPPORTUNITIES_BROWSER_V1",
+        "listing_contract": "PCS_CURRENT_OPPORTUNITIES_BROWSER_V2",
         "raw_materialized": 0,
         "current_materialized": 0,
         "pages_fetched": 0,
@@ -245,23 +251,122 @@
         "live_coverage_credit_allowed": false,
         "errors": [
           {
-            "type": "CURRENT_FILTER_NOT_FOUND"
+            "type": "CURRENT_FILTER_NOT_FOUND",
+            "native_selects_seen": 4,
+            "candidate_controls_seen": 0
           }
         ],
         "warnings": [],
         "telemetry": {
           "url": "https://www.publiccontractsscotland.gov.uk/search/Search_MainPage.aspx",
-          "http_status": 200
+          "http_status": 200,
+          "select_options_debug": [
+            {
+              "select_index": 0,
+              "options": [
+                "- All Notices",
+                "Current Opportunity",
+                "Future Opportunity",
+                "Contract Results",
+                "Recent Notices"
+              ]
+            },
+            {
+              "select_index": 1,
+              "options": [
+                "- All locations",
+                "All Scotland",
+                "... Highlands and Islands",
+                "... Aberdeen & North-East",
+                "... Tayside, Central & Fife",
+                "... Glasgow & Strathclyde",
+                "... Edinburgh & Lothians",
+                "... Scotland South",
+                "... Outside Scotland"
+              ]
+            },
+            {
+              "select_index": 2,
+              "options": [
+                "Page 1",
+                "Page 2",
+                "Page 3",
+                "Page 4",
+                "Page 5",
+                "Page 6",
+                "Page 7",
+                "Page 8",
+                "Page 9",
+                "Page 10",
+                "Page 11",
+                "Page 12",
+                "Page 13",
+                "Page 14",
+                "Page 15",
+                "Page 16",
+                "Page 17",
+                "Page 18",
+                "Page 19",
+                "Page 20",
+                "Page 21",
+                "Page 22",
+                "Page 23",
+                "Page 24",
+                "Page 25",
+                "Page 26",
+                "Page 27",
+                "Page 28",
+                "Page 29",
+                "Page 30"
+              ]
+            },
+            {
+              "select_index": 3,
+              "options": [
+                "Page 1",
+                "Page 2",
+                "Page 3",
+                "Page 4",
+                "Page 5",
+                "Page 6",
+                "Page 7",
+                "Page 8",
+                "Page 9",
+                "Page 10",
+                "Page 11",
+                "Page 12",
+                "Page 13",
+                "Page 14",
+                "Page 15",
+                "Page 16",
+                "Page 17",
+                "Page 18",
+                "Page 19",
+                "Page 20",
+                "Page 21",
+                "Page 22",
+                "Page 23",
+                "Page 24",
+                "Page 25",
+                "Page 26",
+                "Page 27",
+                "Page 28",
+                "Page 29",
+                "Page 30"
+              ]
+            }
+          ],
+          "notice_type_controls_debug": []
         },
-        "generated_at": "2026-08-18T22:59:07.754282+00:00",
+        "generated_at": "2026-08-18T23:11:54.644170+00:00",
         "source_url": "https://www.publiccontractsscotland.gov.uk/search/Search_MainPage.aspx",
-        "semantics": "The official PCS Current Opportunities filter is used. Only notices open for tender are traversed; coverage credit requires pagination exhaustion and a non-empty current set."
+        "semantics": "The official PCS Current Opportunities filter is used. Native and Telerik/custom Notice Type controls are supported. Only notices open for tender are traversed; coverage credit requires pagination exhaustion and a non-empty current set."
       }
     },
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "UNGM_PUBLIC",
-      "checked_at": "2026-08-18T22:59:59.541928+00:00",
+      "checked_at": "2026-08-18T23:12:01.618532+00:00",
       "primary_exit_code": 0,
       "fallback_exit_code": null,
       "verdict": "PASS_FULL",
@@ -294,7 +399,7 @@
             }
           ]
         },
-        "generated_at": "2026-08-18T22:59:42.666320+00:00",
+        "generated_at": "2026-08-18T23:11:54.146570+00:00",
         "source_url": "https://www.ungm.org/Public/Notice",
         "semantics": "UNGM public Procurement Opportunities is read with Only currently active enabled. Coverage credit requires exhaustive pagination of the public result set; no authenticated UNGM API is assumed."
       }
