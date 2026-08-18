@@ -23,6 +23,18 @@ def main() -> None:
     assert v19._explicit_document_routes(detail_only) == []
     assert len(v19._explicit_document_routes(explicit)) == 1
 
+    controls = [
+        {"index": 0, "text": "EKR PDF letöltés", "aria": "", "title": "", "visible": True, "disabled": False},
+        {"index": 1, "text": "5_rész.zip", "aria": "", "title": "", "visible": True, "disabled": False},
+        {"index": 2, "text": "Szerződés.docx", "aria": "", "title": "", "visible": True, "disabled": False},
+        {"index": 3, "text": "Bejelentkezés", "aria": "", "title": "", "visible": True, "disabled": False},
+        {"index": 4, "text": "Áttekintés", "aria": "", "title": "", "visible": True, "disabled": False},
+    ]
+    assert v19._safe_ekr_control_indices(controls) == [0, 1, 2]
+    assert v19.EKR_API_DOWNLOAD_RE.search(
+        "https://ekr.gov.hu/api/publikus/kozbeszerzesi-hirdetmenyek/123/dokumentum-letoltes"
+    )
+
     old_http = v19._bounded_http_probe
     old_browser = v19._bounded_browser_download
     old_public = v19._OLD_HU_PUBLIC
@@ -53,7 +65,7 @@ def main() -> None:
             v19.adapter_hu_ekr_v19(detail_only, Path(td), manifest)
         assert events == ["http", "browser"], events
         assert manifest["status"] == "ERROR_RETRYABLE", manifest
-        assert manifest["error"] == "HU_EKR_DETAIL_ONLY_BOUNDED_V19_EXHAUSTED"
+        assert manifest["error"] == "HU_EKR_DETAIL_ONLY_TARGETED_V19_EXHAUSTED"
 
         events.clear()
         with TemporaryDirectory() as td:
@@ -76,7 +88,7 @@ def main() -> None:
             v19.adapter_hu_ekr_v19(detail_only, Path(td), manifest)
         assert events == ["http"], events
         assert manifest["status"] == "DOWNLOADED_PUBLIC"
-        print({"hu_ekr_detail_only": "bounded", "explicit_routes": "legacy_preserved", "status": "ok"})
+        print({"hu_ekr_detail_only": "targeted_network", "explicit_routes": "legacy_preserved", "safe_controls": 3, "status": "ok"})
     finally:
         v19._bounded_http_probe = old_http
         v19._bounded_browser_download = old_browser
