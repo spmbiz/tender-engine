@@ -29,6 +29,28 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Mark stress run started
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          p={
+            'schema':'GPT_GATE_STRESS_STATUS_V1',
+            'run_id':int(os.environ['GITHUB_RUN_ID']),
+            'status':'RUNNING',
+            'started_at':datetime.now(timezone.utc).isoformat(),
+            'head_sha':os.environ.get('GITHUB_SHA'),
+          }
+          open('control/gpt_gate_stress_status.json','w',encoding='utf-8').write(json.dumps(p,indent=2)+'\n')
+          PY
+          git add control/gpt_gate_stress_status.json
+          git commit -m "stress: mark gate review running ${GITHUB_RUN_ID}" || true
+          git push origin HEAD:main || true
+
       - name: Recover every DCE generation referenced by current BUSINESS_GATES
         env:
           GH_TOKEN: ${{ github.token }}
@@ -64,7 +86,8 @@ jobs:
             --index control/gpt_review_index.json \
             --release-root /tmp/gpt-gate-stress-releases \
             --out-dir control/gpt_gate_stress_batches \
-            --batch-size 10
+            --batch-size 10 \
+            --triage-batch-size 50
 
       - name: Persist stress surface
         shell: bash
@@ -86,3 +109,41 @@ jobs:
             sleep "$((n * 2))"
           done
           exit 1
+
+      - name: Persist terminal stress status
+        if: always()
+        shell: bash
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set +e
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git fetch origin main
+          git reset --hard origin/main
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          status=str(os.environ.get('JOB_STATUS') or 'unknown').upper()
+          p={
+            'schema':'GPT_GATE_STRESS_STATUS_V1',
+            'run_id':int(os.environ['GITHUB_RUN_ID']),
+            'status':status,
+            'finished_at':datetime.now(timezone.utc).isoformat(),
+            'head_sha':os.environ.get('GITHUB_SHA'),
+          }
+          try:
+              m=json.load(open('control/gpt_gate_stress_batches/manifest.json',encoding='utf-8'))
+              p['manifest']={
+                'business_gates_in_index':m.get('business_gates_in_index'),
+                'emitted_candidates':m.get('emitted_candidates'),
+                'raw_dce_rows_missing':m.get('raw_dce_rows_missing'),
+                'conservation_pass':m.get('conservation_pass'),
+              }
+          except Exception:
+              pass
+          open('control/gpt_gate_stress_status.json','w',encoding='utf-8').write(json.dumps(p,indent=2)+'\n')
+          PY
+          git add control/gpt_gate_stress_status.json
+          git commit -m "stress: mark gate review ${JOB_STATUS} ${GITHUB_RUN_ID}" || exit 0
+          git push origin HEAD:main || true
