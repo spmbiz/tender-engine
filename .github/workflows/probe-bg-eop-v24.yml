@@ -1,0 +1,67 @@
+name: Probe BG EOP V24
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pipeline/probe_bg_eop.py'
+      - '.github/workflows/probe-bg-eop-v24.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install probe dependencies
+        run: python -m pip install --disable-pip-version-check -q 'playwright>=1.46,<2'
+      - name: Reuse runner Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Probe current public EOP notice network
+        run: |
+          python pipeline/probe_bg_eop.py \
+            --url 'https://app.eop.bg/today/597088' \
+            --out bg-eop-probe.json
+      - name: Print high-signal JSON URLs
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,re
+          d=json.load(open('bg-eop-probe.json',encoding='utf-8'))
+          rx=re.compile(r'api|download|file|document|export|tender|procedure|public|today|attachment|requirement|version',re.I)
+          print('--- BODY SAMPLE ---')
+          print((d.get('body_text') or '')[:12000])
+          print('--- JSON/XHR/FETCH ---')
+          for x in d.get('json_bodies') or []:
+              u=str(x.get('url') or '')
+              if rx.search(u) or x.get('resource_type') in {'xhr','fetch'}:
+                  body=str(x.get('body') or '')
+                  print(json.dumps({k:x.get(k) for k in ('url','status','resource_type','method','content_type')},ensure_ascii=False))
+                  print(body[:5000])
+          print('--- ANCHORS ---')
+          for x in d.get('anchors') or []:
+              if rx.search(str(x.get('href') or '')+' '+str(x.get('text') or '')):
+                  print(json.dumps(x,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bg-eop-v24-probe-${{ github.run_id }}
+          path: bg-eop-probe.json
+          retention-days: 3
+          if-no-files-found: warn
