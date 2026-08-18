@@ -1,0 +1,88 @@
+name: GPT Gate Stress Surface
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/build_gpt_gate_stress_batches.py'
+      - '.github/workflows/gpt-gate-stress-surface.yml'
+      - 'control/gpt_gate_stress_trigger.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gpt-gate-stress-surface
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Recover every DCE generation referenced by current BUSINESS_GATES
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/gpt-gate-stress-releases
+          mkdir -p /tmp/gpt-gate-stress-releases
+          python - <<'PY' >/tmp/gate-runs.txt
+          import json
+          p=json.load(open('control/gpt_review_index.json',encoding='utf-8'))
+          rows=[x for x in p.get('items',[]) if isinstance(x,dict) and str(x.get('review_stage') or '').upper()=='BUSINESS_GATES' and bool(x.get('gate_readiness'))]
+          runs=sorted({int(x.get('source_dce_run_id') or 0) for x in rows if int(x.get('source_dce_run_id') or 0)})
+          if not rows:
+              raise SystemExit('No BUSINESS_GATES rows in durable review index')
+          for r in runs:
+              print(r)
+          PY
+          echo "Required DCE generations: $(wc -l </tmp/gate-runs.txt)"
+          while read -r run_id; do
+            [ -n "$run_id" ] || continue
+            mkdir -p "/tmp/gpt-gate-stress-releases/$run_id"
+            gh release download "dce-harvest-$run_id" \
+              --pattern 'fast-adjudication-shard-*.jsonl' \
+              --dir "/tmp/gpt-gate-stress-releases/$run_id"
+          done </tmp/gate-runs.txt
+          echo "Recovered shard files: $(find /tmp/gpt-gate-stress-releases -type f -name 'fast-adjudication-shard-*.jsonl' | wc -l)"
+
+      - name: Build exhaustive evidence surface and enforce conservation
+        run: |
+          set -euo pipefail
+          python pipeline/build_gpt_gate_stress_batches.py \
+            --index control/gpt_review_index.json \
+            --release-root /tmp/gpt-gate-stress-releases \
+            --out-dir control/gpt_gate_stress_batches \
+            --batch-size 10
+
+      - name: Persist stress surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add -A control/gpt_gate_stress_batches
+          if git diff --cached --quiet; then
+            echo 'Stress surface already current.'
+            exit 0
+          fi
+          git commit -m "stress: persist exhaustive gate surface ${GITHUB_RUN_ID}"
+          for n in 1 2 3 4; do
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            git pull --rebase origin main
+            sleep "$((n * 2))"
+          done
+          exit 1
