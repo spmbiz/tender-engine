@@ -1,0 +1,71 @@
+name: DCE Aggregate V2 Live Replay
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/aggregate_dce.py'
+      - 'tests/test_aggregate_dce_evidence_contract.py'
+      - '.github/workflows/dce-aggregate-v2-live-replay.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: dce-aggregate-v2-live-replay
+  cancel-in-progress: true
+
+jobs:
+  replay-real-shard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run contract unit regression
+        run: python -m pytest -q tests/test_aggregate_dce_evidence_contract.py
+      - name: Recover real immutable DCE shard artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p replay-transport replay-root
+          gh run download 32098369885 -n dce-shard-0 -D replay-transport
+          test -s replay-transport/handoff-shard-0.tar.gz
+          tar -xzf replay-transport/handoff-shard-0.tar.gz -C replay-root
+          test "$(find replay-root -type f -name evidence_quality.json | wc -l)" -eq 6
+      - name: Replay current aggregate on pre-fix real shard
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/aggregate_dce.py --root replay-root --out replay-aggregate
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path('replay-aggregate/summary.json').read_text())
+          assert s['candidates'] == 6, s
+          assert s['gate_ready_substantive_dce'] == 6, s
+          assert s['content_unverified'] == 0, s
+          rows=[json.loads(x) for x in Path('replay-aggregate/deep_review_queue.jsonl').read_text().splitlines() if x.strip()]
+          by={r['candidate_id']:r for r in rows}
+          bord=by['IE:8825829']
+          assert bord['content_quality'] == 'SUBSTANTIVE_DCE_PRESENT', bord
+          assert bord['gate_readiness'] is True, bord
+          assert bord['candidate_document_relevance']['proven'] is True, bord
+          print(json.dumps({
+            'status':'PASS',
+            'real_candidates':s['candidates'],
+            'gate_ready':s['gate_ready_substantive_dce'],
+            'content_unverified':s['content_unverified'],
+            'bord_bia_quality':bord['content_quality'],
+            'bord_bia_gate_ready':bord['gate_readiness'],
+            'bord_bia_relevance':bord['candidate_document_relevance']['status'],
+          },indent=2))
+          PY
