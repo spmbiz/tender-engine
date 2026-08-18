@@ -1,0 +1,171 @@
+name: DCE Previous Main A/B
+
+on:
+  workflow_dispatch:
+    inputs:
+      baseline_ref:
+        description: Optional previous-good ref; defaults to main for manual runs
+        required: false
+        default: main
+  pull_request:
+    paths:
+      - 'pipeline/dce_worker_v*.py'
+      - 'pipeline/dce_batch_worker.py'
+      - 'pipeline/build_matrix.py'
+      - 'pipeline/placsp_atom.py'
+      - 'pipeline/discover_es_placsp_atom.py'
+      - 'pipeline/test_dce_worker_v*_routes.py'
+      - 'pipeline/test_placsp_atom_v*.py'
+      - 'benchmarks/dce_ab_fixed_20260818.ids'
+      - '.github/workflows/dce-previous-main-ab.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dce-previous-main-ab-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SOURCE_RELEASE: dce-harvest-32081860247
+  SOURCE_QUEUE: dce-candidate-queue-32081860247.jsonl
+
+jobs:
+  previous-main-ab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout proposed resolver
+        uses: actions/checkout@v4
+        with:
+          path: current
+      - name: Resolve immediate previous-good ref
+        id: previous
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          MANUAL_REF: ${{ inputs.baseline_ref }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "pull_request" ] && [ -n "$PR_BASE_SHA" ]; then
+            ref="$PR_BASE_SHA"
+          else
+            ref="${MANUAL_REF:-main}"
+          fi
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+          echo "Immediate previous-good ref: $ref"
+      - name: Checkout immediate previous-good resolver
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.previous.outputs.ref }}
+          path: previous
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install identical runtime dependencies once
+        run: python -m pip install --disable-pip-version-check -q requests pypdf python-docx openpyxl python-pptx 'playwright>=1.46,<2'
+      - name: Reuse runner Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Recover exact durable canonical queue without GitHub API quota
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p source
+          asset_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${SOURCE_RELEASE}/${SOURCE_QUEUE}"
+          curl --fail --location --silent --show-error \
+            --retry 5 --retry-all-errors --retry-delay 2 \
+            --output "source/$SOURCE_QUEUE" "$asset_url"
+          test -s "source/$SOURCE_QUEUE"
+      - name: Materialize byte-identical fixed corpus for both versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          ids=[x.strip() for x in Path('current/benchmarks/dce_ab_fixed_20260818.ids').read_text().splitlines() if x.strip()]
+          wanted=set(ids); found={}
+          source=Path('source/dce-candidate-queue-32081860247.jsonl')
+          for raw in source.read_text(encoding='utf-8').splitlines():
+              if not raw.strip(): continue
+              row=json.loads(raw)
+              cid=str(row.get('candidate_id') or '')
+              if cid in wanted: found[cid]=raw
+          missing=[cid for cid in ids if cid not in found]
+          if missing: raise SystemExit(f'missing fixed A/B candidates: {missing}')
+          payload='\n'.join(found[cid] for cid in ids)+'\n'
+          assert len(payload.splitlines()) == len(ids) == 20
+          Path('ab-queue.jsonl').write_text(payload,encoding='utf-8')
+          print({'fixed_candidates':len(ids),'bytes':len(payload.encode())})
+          PY
+          mkdir -p current/generated previous/generated
+          cp ab-queue.jsonl current/generated/dce_ab_queue.jsonl
+          cp ab-queue.jsonl previous/generated/dce_ab_queue.jsonl
+          cmp current/generated/dce_ab_queue.jsonl previous/generated/dce_ab_queue.jsonl
+      - name: Run immediate previous-good pipeline
+        working-directory: previous
+        env:
+          DCE_BROWSER_INLINE_RETRIES: '0'
+          DCE_HTTP_INLINE_RETRIES: '0'
+          DCE_BROWSER_FAST_TIMEOUT_SECONDS: '125'
+          DCE_HTTP_FAST_TIMEOUT_SECONDS: '90'
+        run: >-
+          python pipeline/dce_batch_worker.py
+          --queue generated/dce_ab_queue.jsonl
+          --lines '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20'
+          --out ../ab-previous
+          --concurrency 3
+          --retries 0
+          --timeout-seconds 125
+      - name: Run proposed pipeline on identical corpus
+        working-directory: current
+        env:
+          DCE_BROWSER_INLINE_RETRIES: '0'
+          DCE_HTTP_INLINE_RETRIES: '0'
+          DCE_BROWSER_FAST_TIMEOUT_SECONDS: '125'
+          DCE_HTTP_FAST_TIMEOUT_SECONDS: '90'
+        run: >-
+          python pipeline/dce_batch_worker.py
+          --queue generated/dce_ab_queue.jsonl
+          --lines '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20'
+          --out ../ab-current
+          --concurrency 3
+          --retries 0
+          --timeout-seconds 125
+      - name: Fail closed on regression versus immediate previous main
+        run: >-
+          python current/pipeline/compare_dce_ab.py
+          --baseline-dir ab-previous
+          --current-dir ab-current
+          --out previous-main-report
+          --expected-candidates 20
+          --fail-on-regression
+      - name: Publish comparison summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f previous-main-report/REPORT.md ]; then cat previous-main-report/REPORT.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dce-previous-main-ab-${{ github.run_id }}
+          path: |
+            ab-queue.jsonl
+            previous-main-report/
+            ab-previous/batch_results.json
+            ab-previous/batch_summary.json
+            ab-previous/**/manifest.json
+            ab-current/batch_results.json
+            ab-current/batch_summary.json
+            ab-current/**/manifest.json
+          retention-days: 7
+          if-no-files-found: warn
