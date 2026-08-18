@@ -1,0 +1,63 @@
+name: Contracts Finder Published Attachment Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'benchmarks/contracts-finder-attachment-probe-trigger.json'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests 'playwright>=1.46,<2'
+      - shell: bash
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
+      - name: Probe recent published attachment URLs from empirical UK corpus
+        shell: bash
+        run: |
+          python pipeline/probe_contracts_finder_attachments.py \
+            --browser \
+            --out contracts-finder-probe.json \
+            --url 'https://www.contractsfinder.service.gov.uk/Notice/Attachment/84717bf5-ad7a-4ffb-a69b-5f71f2e14c55' \
+            --url 'https://www.contractsfinder.service.gov.uk/Notice/Attachment/be5e7898-fcaa-403b-81a0-a3189d20f16b' \
+            --url 'https://www.contractsfinder.service.gov.uk/Notice/Attachment/93b96a72-1271-4749-93c1-59922b0179e0'
+      - name: Summarize transport mechanism
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('contracts-finder-probe.json'))
+          rows=[]
+          for x in r.get('http',[]):
+              rows.append({
+                'id':x.get('id'),
+                'filename':(x.get('metadata') or {}).get('filename'),
+                'mime':(x.get('metadata') or {}).get('mime_type'),
+                'metadata_status':(x.get('metadata_http') or {}).get('status'),
+                'attachment_status':(x.get('attachment_http') or {}).get('status'),
+                'attachment_type':(x.get('attachment_http') or {}).get('content_type'),
+                'attachment_disposition':(x.get('attachment_http') or {}).get('content_disposition'),
+                'attachment_magic':(x.get('attachment_http') or {}).get('magic'),
+              })
+          browser=[{'url':x.get('url'),'download':x.get('download'),'filename':x.get('suggested_filename'),'magic':x.get('magic'),'error':x.get('error')} for x in r.get('browser',[])]
+          print(json.dumps({'http':rows,'browser':browser},indent=2))
+          if not any((x.get('metadata_http') or {}).get('status') == 200 for x in r.get('http',[])):
+              raise SystemExit('Published attachment metadata unavailable on all samples')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: contracts-finder-attachment-probe-${{ github.run_id }}
+          path: contracts-finder-probe.json
+          retention-days: 5
