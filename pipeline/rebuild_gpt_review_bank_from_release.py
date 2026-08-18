@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -155,6 +157,117 @@ def collapse_strong_aliases(rows: list[dict[str, Any]]) -> tuple[list[dict[str, 
     return list(kept.values()), collapsed
 
 
+def _portal(row: dict[str, Any]) -> str:
+    return str(row.get("portal") or row.get("source") or "UNKNOWN").strip().upper() or "UNKNOWN"
+
+
+def _band(row: dict[str, Any]) -> str:
+    return str(row.get("spm_fit_band") or "UNKNOWN").strip().upper() or "UNKNOWN"
+
+
+def _stage(row: dict[str, Any]) -> str:
+    return str(row.get("review_stage") or "BUSINESS_GATES").strip().upper()
+
+
+def _stable_candidate_hash(row: dict[str, Any]) -> str:
+    return hashlib.sha256(str(row.get("candidate_id") or "").encode()).hexdigest()
+
+
+def _diverse_pick(rows: list[dict[str, Any]], n: int, chosen: set[str]) -> list[dict[str, Any]]:
+    """Round-robin by portal, preserving usefulness inside each portal.
+
+    This is selection for a visible review window only. It never removes rows from
+    the durable uncapped index and never changes eligibility or final verdicts.
+    """
+    if n <= 0:
+        return []
+    groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        k = item_key(row)
+        if k and k not in chosen:
+            groups[_portal(row)].append(row)
+    for portal in groups:
+        groups[portal].sort(key=lambda r: (review_sort(r), source_version(r)[0], _stable_candidate_hash(r)), reverse=True)
+    portals = sorted(groups, key=lambda p: (-len(groups[p]), p))
+    out: list[dict[str, Any]] = []
+    while portals and len(out) < n:
+        next_portals = []
+        for portal in portals:
+            bucket = groups[portal]
+            while bucket and item_key(bucket[0]) in chosen:
+                bucket.pop(0)
+            if not bucket:
+                continue
+            row = bucket.pop(0)
+            k = item_key(row)
+            chosen.add(k)
+            out.append(row)
+            if bucket:
+                next_portals.append(portal)
+            if len(out) >= n:
+                break
+        portals = next_portals
+    return out
+
+
+def select_hot_window(all_items: list[dict[str, Any]], max_items: int) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    if max_items <= 0:
+        return [], {"priority_target": 0, "authenticity_target": 0, "low_surveillance_target": 0}
+
+    # 75% obvious business priority, 12.5% DCE-authenticity repair, 12.5% LOW
+    # surveillance. The two surveillance lanes are portal-diverse so one huge
+    # source cannot monopolize the review surface. Elastic fill preserves capacity
+    # when a lane has fewer candidates.
+    auth_target = max(1, int(round(max_items * 0.125)))
+    low_target = max(1, int(round(max_items * 0.125)))
+    priority_target = max(0, max_items - auth_target - low_target)
+
+    chosen: set[str] = set()
+    priority_pool = [r for r in all_items if _stage(r) != "DCE_AUTHENTICITY" and _band(r) != "LOW"]
+    priority_pool.sort(key=lambda r: (review_sort(r), source_version(r)[0]), reverse=True)
+    priority = []
+    for row in priority_pool:
+        if len(priority) >= priority_target:
+            break
+        k = item_key(row)
+        if not k or k in chosen:
+            continue
+        chosen.add(k)
+        out = dict(row)
+        out["review_lane"] = "SPM_PRIORITY"
+        priority.append(out)
+
+    auth_pool = [r for r in all_items if _stage(r) == "DCE_AUTHENTICITY"]
+    auth = _diverse_pick(auth_pool, auth_target, chosen)
+    auth = [dict(r, review_lane="DCE_AUTHENTICITY_REPAIR") for r in auth]
+
+    low_pool = [r for r in all_items if _band(r) == "LOW" and _stage(r) != "DCE_AUTHENTICITY"]
+    low = _diverse_pick(low_pool, low_target, chosen)
+    low = [dict(r, review_lane="LOW_PORTAL_SURVEILLANCE") for r in low]
+
+    items = priority + auth + low
+    if len(items) < max_items:
+        for row in all_items:
+            if len(items) >= max_items:
+                break
+            k = item_key(row)
+            if not k or k in chosen:
+                continue
+            chosen.add(k)
+            items.append(dict(row, review_lane="ELASTIC_FILL"))
+
+    metrics = {
+        "priority_target": priority_target,
+        "authenticity_target": auth_target,
+        "low_surveillance_target": low_target,
+        "selected_by_lane": dict(Counter(str(r.get("review_lane") or "UNKNOWN") for r in items)),
+        "selected_by_band": dict(Counter(_band(r) for r in items)),
+        "selected_by_stage": dict(Counter(_stage(r) for r in items)),
+        "selected_by_portal": dict(Counter(_portal(r) for r in items)),
+    }
+    return items, metrics
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--release-root", required=True)
@@ -217,6 +330,7 @@ def main() -> None:
                 "release_tag": f"dce-harvest-{run_id}" if run_id else None,
             }
             compact["evidence_quality_summary"] = raw.get("evidence_quality") or {}
+            compact["evidence_provenance_summary"] = raw.get("evidence_provenance_summary") or {}
             compact = ensure_review_rank(compact)
             if not deadline_open(compact):
                 continue
@@ -231,17 +345,18 @@ def main() -> None:
     all_items, cross_portal_collapses = collapse_strong_aliases(list(merged.values()))
     all_items.sort(key=lambda r: (review_sort(r), source_version(r)[0]), reverse=True)
     uncapped_unique_pending = len(all_items)
-    items = all_items[: max(0, args.max_items)]
+    items, window_metrics = select_hot_window(all_items, max(0, args.max_items))
 
     latest_run = max([as_int(existing.get("latest_dce_run_id"))] + list(source_runs) + [0])
     payload = {
-        "schema": "GPT_REVIEW_HOT_V6",
+        "schema": "GPT_REVIEW_HOT_V7_FAIR_SHARE",
         "updated_at": now,
         "latest_dce_run_id": latest_run or None,
         "generation_reset": False,
         "count": len(items),
         "items": items,
         "source_runs_recovered": sorted(source_runs, reverse=True),
+        "window_selection": window_metrics,
         "recovery_metrics": {
             "shard_files_scanned": len(shard_files),
             "adjudication_rows_scanned": scanned_rows,
@@ -254,11 +369,11 @@ def main() -> None:
             "rich_hot_window_count": len(items),
             "overflow_beyond_hot_window": max(0, uncapped_unique_pending - len(items)),
         },
-        "ranking_contract": "Persistent GPT Web rich hot window. Global review usefulness is ranked before the cap. Strong cross-portal dedupe uses only explicit stable national-procedure aliases, never fuzzy titles. The uncapped compact directory is control/gpt_review_index.json.",
-        "instruction": "GPT Web reviews this rich window directly. For overflow, consult control/gpt_review_index.json and follow artifact_locator to the authoritative DCE run/shard. Unknown is never PASS.",
+        "ranking_contract": "Persistent GPT Web hot window with non-destructive fair-share. 75% business priority, 12.5% DCE-authenticity repair, 12.5% portal-diverse LOW surveillance, followed by elastic fill. Strong cross-portal dedupe uses only explicit stable procedure aliases; the uncapped durable directory remains control/gpt_review_index.json.",
+        "instruction": "Review SPM_PRIORITY first, then DCE_AUTHENTICITY_REPAIR, while preserving LOW_PORTAL_SURVEILLANCE as false-negative monitoring. Follow artifact_locator for compact evidence when provenance is insufficient. Unknown is never PASS.",
     }
     Path(args.out).write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(json.dumps(payload["recovery_metrics"], ensure_ascii=False))
+    print(json.dumps({**payload["recovery_metrics"], "window_selection": window_metrics}, ensure_ascii=False))
 
 
 if __name__ == "__main__":
