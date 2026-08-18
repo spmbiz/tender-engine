@@ -53,8 +53,11 @@ jobs:
           from pathlib import Path
           s=json.loads(Path('replay-aggregate/summary.json').read_text())
           assert s['candidates'] == 6, s
-          assert s['gate_ready_substantive_dce'] == 6, s
+          # Evidence V2 must no longer fall through to the legacy unknown-document
+          # bucket. Candidate-specific relevance remains a separate stricter guard.
           assert s['content_unverified'] == 0, s
+          assert s['gate_ready_substantive_dce'] == 3, s
+          assert s['candidate_relevance_unproven'] == 3, s
           rows=[json.loads(x) for x in Path('replay-aggregate/deep_review_queue.jsonl').read_text().splitlines() if x.strip()]
           by={r['candidate_id']:r for r in rows}
           bord=by['IE:8825829']
@@ -70,6 +73,7 @@ jobs:
             'status':'PASS',
             'real_candidates':s['candidates'],
             'gate_ready':s['gate_ready_substantive_dce'],
+            'candidate_relevance_unproven':s['candidate_relevance_unproven'],
             'content_unverified':s['content_unverified'],
             'bord_bia':{
               'candidate_id':'IE:8825829',
@@ -77,7 +81,7 @@ jobs:
               'gate_ready':bord['gate_readiness'],
               'relevance':bord['candidate_document_relevance']['status'],
             },
-            'safety':'Evidence V1/V2 only; unknown future contracts remain legacy-blocked by unit regression.',
+            'safety':'Evidence V1/V2 only; unknown future contracts remain legacy-blocked; candidate-specific relevance guard remains active.',
           }
           Path('control/dce_aggregate_v2_replay_latest.json').write_text(json.dumps(report,indent=2)+'\n')
           print(json.dumps(report,indent=2))
