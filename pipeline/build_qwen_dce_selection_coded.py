@@ -71,7 +71,8 @@ def main() -> None:
     args = ap.parse_args()
 
     limit = max(1, int(args.limit))
-    pool_limit = max(limit, min(2000, limit * max(2, int(args.candidate_pool_multiplier))))
+    multiplier = max(1, int(args.candidate_pool_multiplier))
+    pool_limit = max(limit, min(2000, limit * multiplier))
 
     with tempfile.TemporaryDirectory(prefix="qwen-coded-selection-") as td:
         pool = Path(td) / "pool.jsonl"
@@ -124,8 +125,6 @@ def main() -> None:
             elif decision == "REJECT_OBVIOUS":
                 reject.append(row)
             else:
-                # Includes Qwen MAYBE and code-contradicted FIT. Contradiction only
-                # changes scheduling; it never mutates Qwen, KEEP or dce_eligible.
                 explore.append(row)
 
         for arr in (primary, explore, reject):
@@ -158,8 +157,6 @@ def main() -> None:
         take(primary, pn, "qwen-primary-coded")
         take(explore, en, "qwen-explore-coded")
         take(reject, rn, "qwen-reject-audit-coded")
-        # Elastic fill from the entire candidate pool ensures demoted FITs remain
-        # reachable and cannot be silently discarded by the code prior.
         elastic = sorted(rows, key=priority_key)
         take(elastic, limit - len(chosen), "qwen-elastic-coded")
 
@@ -179,7 +176,7 @@ def main() -> None:
             "positive_code_rows_in_pool": positives,
             "noncore_code_contradictions_in_pool": contradictions,
             "policy": "priority_only_never_drop_never_eligibility",
-            "candidate_pool_multiplier": max(2, int(args.candidate_pool_multiplier)),
+            "candidate_pool_multiplier": multiplier,
         }
         summary.setdefault("policy", {})["procurement_code_prior_never_changes_keep_or_dce_eligible"] = True
         Path(args.summary).write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
