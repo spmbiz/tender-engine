@@ -30,8 +30,6 @@ jobs:
           python -m py_compile pipeline/dce_worker_v22.py pipeline/dce_batch_worker.py
           python pipeline/test_dce_worker_v22_routes.py
       - name: Freeze fresh BOAMP candidates from canonical wide-read
-        env:
-          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
@@ -48,11 +46,16 @@ jobs:
           [[ "$rid" =~ ^[0-9]+$ ]] || exit 1
           tag="discovery-harvest-${rid}"
           mkdir -p source-release source-wide fr-sample/queues
-          assets="$(gh release view "$tag" --json assets --jq '.assets[].name')"
           repaired="supergreen-wide-read-${rid}-repaired.tar.gz"
           normal="supergreen-wide-read-${rid}.tar.gz"
-          if grep -Fxq "$repaired" <<< "$assets"; then asset="$repaired"; else asset="$normal"; fi
-          gh release download "$tag" --pattern "$asset" --dir source-release
+          base="https://github.com/${GITHUB_REPOSITORY}/releases/download/${tag}"
+          asset="$repaired"
+          if ! curl -fL --retry 3 --retry-delay 2 --connect-timeout 15 --max-time 180 "$base/$repaired" -o "source-release/$repaired"; then
+            rm -f "source-release/$repaired"
+            asset="$normal"
+            curl -fL --retry 3 --retry-delay 2 --connect-timeout 15 --max-time 180 "$base/$normal" -o "source-release/$normal"
+          fi
+          test -s "source-release/$asset"
           tar -xzf "source-release/$asset" -C source-wide
           candidates="$(find source-wide -type f -name current_candidates.jsonl -print -quit)"
           test -s "$candidates"
@@ -132,4 +135,5 @@ jobs:
             current-quality/summary.json
             baseline/**/manifest.json
             current/**/manifest.json
+            current/**/boamp_record_v22.json
           retention-days: 5
