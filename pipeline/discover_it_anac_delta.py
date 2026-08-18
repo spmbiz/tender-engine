@@ -23,6 +23,18 @@ def clean(v):
     return " ".join(str(v or "").split())
 
 
+def base_truth():
+    return {
+        "source": "IT_ANAC_DELTA",
+        "lane": "ARCHIVE_LIFECYCLE_DELTA",
+        "live_candidate_capable": False,
+        "live_coverage_credit_allowed": False,
+        "coverage_semantics": "This ANAC CIG delta adapter is lifecycle/archive intelligence only. It cannot satisfy live-open-tender Italy coverage and must remain a coverage gap until a true current-opportunity source is wired.",
+        "official_url": OFFICIAL_PAGE,
+        "api_url": API,
+    }
+
+
 def persist_degraded(error_type: str, detail: str, status_code=None):
     (OUT / "current.jsonl").write_text("", encoding="utf-8")
     (OUT / "resource_inventory.json").write_text(
@@ -32,15 +44,12 @@ def persist_degraded(error_type: str, detail: str, status_code=None):
     if status_code is not None:
         err["status_code"] = status_code
     stats = {
-        "source": "IT_ANAC_DELTA",
+        **base_truth(),
         "raw_materialized": 0,
         "current_materialized": 0,
-        "lane": "ARCHIVE_LIFECYCLE_DELTA",
         "degraded": True,
         "generated_at": NOW.isoformat(),
         "errors": [err],
-        "official_url": OFFICIAL_PAGE,
-        "api_url": API,
         "note": "Archive/lifecycle intelligence lane only; never promoted into the live open-bid candidate feed.",
     }
     (OUT / "stats.json").write_text(json.dumps(stats, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -133,15 +142,12 @@ def main():
     # This dataset is lifecycle/archive intelligence, never a live open-bid feed.
     (OUT / "current.jsonl").write_text("", encoding="utf-8")
     stats = {
-        "source": "IT_ANAC_DELTA",
+        **base_truth(),
         "raw_materialized": len(rows),
         "current_materialized": 0,
-        "lane": "ARCHIVE_LIFECYCLE_DELTA",
         "degraded": False,
         "generated_at": NOW.isoformat(),
         "errors": [],
-        "official_url": OFFICIAL_PAGE,
-        "api_url": API,
         "package_id": pkg.get("id"),
         "package_title": pkg.get("title"),
         "metadata_modified": pkg.get("metadata_modified"),
