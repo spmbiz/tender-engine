@@ -1,33 +1,17 @@
-name: Qwen Emergency Cancel Migration
+name: Qwen Emergency Cancel Migration — Retired
 
+# Historical emergency helper retained as a no-op only.
+# Stale-run recovery is owned by the stage-aware production watchdog.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/qwen-emergency-cancel-migration.yml'
+  workflow_dispatch:
 
 permissions:
-  actions: write
   contents: read
 
 jobs:
-  cancel:
+  retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
     steps:
-      - name: Cancel unsafe migration run
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-          RUN_ID: '31925387845'
-        shell: bash
-        run: |
-          set -euo pipefail
-          gh api -X POST "repos/${REPO}/actions/runs/${RUN_ID}/cancel" >/dev/null || true
-          for i in $(seq 1 30); do
-            state="$(gh api "repos/${REPO}/actions/runs/${RUN_ID}" --jq '.status + "|" + (.conclusion // "")')"
-            echo "$state"
-            [[ "$state" == completed* ]] && exit 0
-            sleep 2
-          done
-          gh api -X POST "repos/${REPO}/actions/runs/${RUN_ID}/force-cancel" >/dev/null || true
+      - run: |
+          echo 'Retired emergency migration: no-op.'
+          echo 'The stage-aware watchdog is the only automatic stale-run canceller.'
