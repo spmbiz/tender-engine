@@ -29,6 +29,40 @@ def load_json(path: Path | None) -> dict[str, Any]:
         return {}
 
 
+def load_live_current_inbox(path: Path) -> dict[str, Any]:
+    """Prefer the current canonical main-branch inbox over a stale shard snapshot.
+
+    DCE shards run concurrently and may have materialized their local ``--existing``
+    file before a recovery/refresh job restored a much larger persistent queue. A
+    late shard must rebase on the live canonical inbox before rebuilding; otherwise
+    an optimistic GitHub PUT retry can legally overwrite the newer queue with its
+    stale payload. Local tests and non-Actions usage fall back to the supplied file.
+    """
+    repo = str(os.getenv('GITHUB_REPOSITORY') or '').strip()
+    token = str(os.getenv('GH_TOKEN') or os.getenv('GITHUB_TOKEN') or '').strip()
+    if repo and token:
+        ref = str(os.getenv('GPT_INBOX_LIVE_REF') or 'main').strip() or 'main'
+        url = f'https://api.github.com/repos/{repo}/contents/control/gpt_supergreen_inbox.json?ref={ref}'
+        req = urllib.request.Request(
+            url,
+            headers={
+                'Authorization': f'Bearer {token}',
+                'Accept': 'application/vnd.github.raw+json',
+                'X-GitHub-Api-Version': '2022-11-28',
+                'User-Agent': 'tender-gpt-inbox/1.1',
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                raw = resp.read().decode('utf-8', errors='replace').strip()
+            obj = json.loads(raw) if raw else {}
+            if isinstance(obj, dict):
+                return obj
+        except Exception:
+            pass
+    return load_json(path)
+
+
 def load_live_review_ledger(path: Path) -> dict[str, Any]:
     """Prefer the current main-branch ledger when running inside Actions.
 
@@ -214,7 +248,7 @@ def main() -> None:
     ap.add_argument('--max-items', type=int, default=MIN_PERSISTENT_INBOX_ITEMS)
     args = ap.parse_args()
 
-    existing = load_json(Path(args.existing))
+    existing = load_live_current_inbox(Path(args.existing))
     final_bank = load_json(Path(args.final_bank))
     hot_green = load_json(Path(args.hot_green))
     hot_review = load_json(Path(args.hot_review))
