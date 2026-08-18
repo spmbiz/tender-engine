@@ -18,8 +18,8 @@ from pathlib import Path
 # ES_PLACSP deliberately is NOT here from v15 onward. Its official Atom feed
 # exposes canonical Legal/Technical/Additional document links, so the dedicated
 # resolver is HTTP/XML-only and should use the higher-throughput HTTP shard lane.
-# ZA_ETENDERS/ZA_ETENDERS_OCDS are HTTP-only from v16: discovery and exact DCE
-# recovery both use South Africa National Treasury's public OCDS API.
+# ZA_ETENDERS/ZA_ETENDERS_OCDS are also HTTP-only from v16: discovery and exact
+# DCE recovery both use South Africa National Treasury's public OCDS API.
 BROWSER_PORTALS = {
     "TED", "IRELAND_ETENDERS", "FR_PLACE", "LUX_PMP", "SCOTLAND_PCS",
     "CA_CANADABUYS", "QC_SEAO", "DE_DOE", "FR_BOAMP", "NZ_GETS", "AU_AUSTENDER",
@@ -31,6 +31,9 @@ BROWSER_PORTALS = {
     "AT_OGD", "BG_AOP", "HR_EOJN", "SE_PUBLIC", "IS_RIKISKAUP",
     "DE_DTVP", "FR_AWS", "BE_EPROC", "DE_EVERGABE",
     "GENERIC_EPPS", "GENERIC_PUBLIC_PAGE",
+    # v11-v13 named TED downstream families. These are browser-capable because the
+    # public documents are frequently rendered by JS or exposed behind a safe
+    # documents tab even when direct HTTP is attempted first by the worker.
     "EU_FUNDING_TENDERS", "BE_EPROC_V11", "MERCELL_S2C", "MERCELL_PUBLIC",
     "VORTAL_PUBLIC", "EU_SUPPLY_PUBLIC", "SE_CLIRA", "SE_EAVROP", "SE_TENDSIGN",
     "SE_KOMMERSANNONS", "NO_ARTIFIK", "BG_EOP_PUBLIC", "RO_SEAP_PUBLIC",
@@ -47,6 +50,8 @@ BROWSER_PORTALS = {
     "IT_EPAL", "NL_TENDERNED_PUBLIC", "CH_SIMAP_PUBLIC", "DE_BI_MEDIEN",
     "ES_LAJUNTA", "DE_EVERGABE_DE", "DE_LWL", "THREEP_CLOUD", "PL_BIP_SLASKIE",
     "COMDIA_PUBLIC", "FR_E_MARCHESPUBLICS", "NETSERVER_PUBLIC",
+    # v14 UK/NZ eSender families. The worker attempts anonymous public files first,
+    # then reports the legitimate login/register-interest barrier without bypassing it.
     "UK_PROCONTRACT", "UK_ATAMIS", "UK_DELTA", "UK_INTEND", "UK_JAGGAER", "NZ_TENDERLINK",
 }
 SUPPORTED = BROWSER_PORTALS | {
@@ -55,11 +60,18 @@ SUPPORTED = BROWSER_PORTALS | {
     "WORLD_BANK", "ES_PLACSP", "ZA_ETENDERS", "ZA_ETENDERS_OCDS",
 }
 
+# Discovery/provider identifiers are provenance, not necessarily DCE adapter
+# identifiers. This map translates only the resolver view; the original portal,
+# source and selection_portal fields remain untouched in the candidate record.
 PORTAL_ALIASES = {
+    # Public Contracts Scotland OCDS/open-data lane -> dedicated PCS resolver.
     "PUBLIC_CONTRACTS_SCOTLAND": "SCOTLAND_PCS",
     "UK_PCS_OCDS": "SCOTLAND_PCS",
     "PCS_OCDS": "SCOTLAND_PCS",
+    # World Bank has an official unauthenticated procurement-notice API and does
+    # not need the fragile projects.worldbank.org browser page.
     "WORLD_BANK_PROCUREMENT": "WORLD_BANK",
+    # These public web lanes still use the guarded generic public-page cascade.
     "UK_FIND_A_TENDER": "GENERIC_PUBLIC_PAGE",
     "UK_FTS_OCDS": "GENERIC_PUBLIC_PAGE",
     "LT_CVP_IS": "GENERIC_PUBLIC_PAGE",
@@ -68,6 +80,7 @@ PORTAL_ALIASES = {
 
 
 def _portal_token(value: object) -> str:
+    """Normalize display/provider spellings without destroying provenance."""
     s = str(value or "").strip().upper()
     if not s:
         return ""
@@ -75,6 +88,12 @@ def _portal_token(value: object) -> str:
 
 
 def candidate_has_public_route(candidate: dict) -> bool:
+    """Whether the record contains an actual public notice/document route.
+
+    Provider API bookkeeping endpoints are intentionally not enough. A record-only
+    API row with no public document/notice landing page must not consume a browser
+    shard just because `route.api_endpoint` starts with https://.
+    """
     if str(candidate.get("notice_url") or "").startswith(("http://", "https://")):
         return True
     route = candidate.get("route") or {}
@@ -108,6 +127,14 @@ def _explicit_record_only_without_dce(candidate: dict) -> bool:
 
 
 def resolve_dce_portal(candidate: dict) -> tuple[str, str]:
+    """Return (resolver_portal, raw_portal) for a live candidate.
+
+    We inspect every provenance field instead of trusting the first non-empty one:
+    wide-read records can carry a human/display portal while the selection manifest
+    carries the stable provider key. Known aliases win. If no adapter name is
+    recognized but a real public notice/document URL exists, use the guarded generic
+    public-page resolver. Explicit API-record-only rows are not fabricated into DCE.
+    """
     raw_values = [
         candidate.get("resolver_portal"),
         candidate.get("portal"),
