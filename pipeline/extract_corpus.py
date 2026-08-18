@@ -11,6 +11,9 @@ import zipfile
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
+ARCHIVE_EXTS = {".zip", ".7z", ".tar", ".gz", ".tgz"}
+OOXML_EXTS = {".docx", ".xlsx", ".xlsm", ".pptx"}
+
 
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
@@ -48,6 +51,13 @@ def unpack_archive(path: Path) -> Path | None:
 
 
 def recursive_unpack(files_root: Path, max_rounds: int = 5):
+    """Expand procurement archives but keep OOXML packages intact.
+
+    DOCX/XLSX/PPTX are ZIP containers internally, but their XML members are not
+    independent procurement documents. Unpacking them polluted the DCE corpus
+    with Word/Office XML and produced misleading gate snippets. Dedicated OOXML
+    extractors below already expose their user-visible content.
+    """
     seen = set()
     for _ in range(max_rounds):
         changed = False
@@ -55,7 +65,10 @@ def recursive_unpack(files_root: Path, max_rounds: int = 5):
             if not p.is_file() or p in seen:
                 continue
             seen.add(p)
-            if p.suffix.lower() in {".zip", ".7z", ".tar", ".gz", ".tgz"} or zipfile.is_zipfile(p):
+            ext = p.suffix.lower()
+            if ext in OOXML_EXTS:
+                continue
+            if ext in ARCHIVE_EXTS or (not ext and zipfile.is_zipfile(p)):
                 out = unpack_archive(p)
                 if out:
                     changed = True
