@@ -40,6 +40,7 @@ FIELDS = [
     "publication-number",
     "notice-title",
     "buyer-name",
+    "buyer-country",
     "publication-date",
     "deadline",
     "deadline-receipt-request",
@@ -314,6 +315,7 @@ def run() -> dict:
             currency = scalar(first_field(item, "estimated-value-cur-proc"))
             title = scalar(first_field(item, "notice-title"))
             buyer = scalar(first_field(item, "buyer-name"))
+            buyer_country = scalar(first_field(item, "buyer-country"))
             desc = scalar(first_field(item, "description-proc")) or ""
             notice_url = f"https://ted.europa.eu/en/notice/-/detail/{pub}"
 
@@ -324,6 +326,7 @@ def run() -> dict:
                 "publication_number": str(pub),
                 "title": str(title or ""),
                 "buyer": str(buyer or "") or None,
+                "country": str(buyer_country or "") or None,
                 "deadline": deadline,
                 "current": current,
                 "currentness_evidence": "TED_ACTIVE_COMPETITION_SCOPE" if FULL_ACTIVE else "RECENT_WINDOW_PLUS_DEADLINE",
