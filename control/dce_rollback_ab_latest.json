@@ -1,428 +1,19 @@
 {
   "schema": "DCE_ROLLBACK_AB_DURABLE_EVIDENCE_V1",
-  "generated_at": "2026-08-18T00:15:34.164270+00:00",
-  "status": "PASS",
-  "errors": [],
+  "generated_at": "2026-08-18T00:16:21.551002+00:00",
+  "status": "FAIL",
+  "errors": [
+    "rollback_report_missing",
+    "source_workflow_conclusion:cancelled"
+  ],
   "source_workflow": {
     "name": "DCE Rollback A/B V15",
-    "run_id": "32083571465",
-    "conclusion": "success",
-    "head_sha": "ec084b586f7c52f009fb563663e3eb40a77d8dbc",
-    "created_at": "2026-08-18T00:12:03Z"
+    "run_id": "32083595602",
+    "conclusion": "cancelled",
+    "head_sha": "336390d442ef59d9b3b19683c6df98163050a01f",
+    "created_at": "2026-08-18T00:12:25Z"
   },
-  "rollback_report": {
-    "candidate_count": 20,
-    "expected_candidates": 20,
-    "baseline_results": 20,
-    "current_results": 20,
-    "hard_regression_count": 0,
-    "warning_count": 1,
-    "improvement_count": 0,
-    "baseline_statuses": {
-      "NO_PUBLIC_FILE": 6,
-      "DOWNLOADED_PUBLIC": 7,
-      "AUTH_REQUIRED": 3,
-      "ROUTE_INCOMPLETE": 2,
-      "GENERIC_PUBLIC_PAGE_UNRESOLVED": 2
-    },
-    "current_statuses": {
-      "NO_PUBLIC_FILE": 6,
-      "DOWNLOADED_PUBLIC": 7,
-      "AUTH_REQUIRED": 3,
-      "ROUTE_INCOMPLETE": 2,
-      "GENERIC_PUBLIC_PAGE_UNRESOLVED": 2
-    },
-    "baseline_wall_candidate_seconds": 226.932,
-    "current_wall_candidate_seconds": 207.016,
-    "hard_regressions": [],
-    "warnings": [
-      {
-        "candidate_id": "GR-KHMDHS:26PROC019638158",
-        "baseline": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 1.529,
-          "returncode": 0
-        },
-        "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 62.4,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [
-          "latency_regression:1.529s->62.400s"
-        ],
-        "improvements": []
-      }
-    ],
-    "improvements": [],
-    "rows": [
-      {
-        "candidate_id": "CH-SIMAP:4d192fb4-104f-4db3-89b6-bb73cb9ba03f",
-        "baseline": {
-          "status": "AUTH_REQUIRED",
-          "files": 0,
-          "elapsed_seconds": 9.99,
-          "returncode": 0
-        },
-        "current": {
-          "status": "AUTH_REQUIRED",
-          "files": 0,
-          "elapsed_seconds": 9.81,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "DE-DOE:0e1404be-041c-456d-8bfb-420f14e07c3f:01",
-        "baseline": {
-          "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-          "files": 0,
-          "elapsed_seconds": 9.718,
-          "returncode": 0
-        },
-        "current": {
-          "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-          "files": 0,
-          "elapsed_seconds": 9.494,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "DE-DOE:cf6b8e61-295d-44cf-aa60-2b4b9ef4bf76:1",
-        "baseline": {
-          "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-          "files": 0,
-          "elapsed_seconds": 9.452,
-          "returncode": 0
-        },
-        "current": {
-          "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-          "files": 0,
-          "elapsed_seconds": 9.525,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20248545",
-        "baseline": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 10.823,
-          "returncode": 0
-        },
-        "current": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 3.713,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20256061",
-        "baseline": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 3.471,
-          "returncode": 0
-        },
-        "current": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 3.754,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20292133",
-        "baseline": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 10.746,
-          "returncode": 0
-        },
-        "current": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 3.72,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20305317",
-        "baseline": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 3.884,
-          "returncode": 0
-        },
-        "current": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 3.414,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20305340",
-        "baseline": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 10.897,
-          "returncode": 0
-        },
-        "current": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 3.903,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20305470",
-        "baseline": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 3.775,
-          "returncode": 0
-        },
-        "current": {
-          "status": "NO_PUBLIC_FILE",
-          "files": 0,
-          "elapsed_seconds": 3.38,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "GR-KHMDHS:26PROC019634474",
-        "baseline": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 61.958,
-          "returncode": 0
-        },
-        "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 62.597,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "GR-KHMDHS:26PROC019635233",
-        "baseline": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 62.133,
-          "returncode": 0
-        },
-        "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 1.618,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "GR-KHMDHS:26PROC019636618",
-        "baseline": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 1.836,
-          "returncode": 0
-        },
-        "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 1.461,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "GR-KHMDHS:26PROC019638158",
-        "baseline": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 1.529,
-          "returncode": 0
-        },
-        "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 62.4,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [
-          "latency_regression:1.529s->62.400s"
-        ],
-        "improvements": []
-      },
-      {
-        "candidate_id": "NO-DOFFIN:2026-112981",
-        "baseline": {
-          "status": "AUTH_REQUIRED",
-          "files": 0,
-          "elapsed_seconds": 9.576,
-          "returncode": 0
-        },
-        "current": {
-          "status": "AUTH_REQUIRED",
-          "files": 0,
-          "elapsed_seconds": 9.099,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "UK_PCS_OCDS:rls-7-AUG562276",
-        "baseline": {
-          "status": "AUTH_REQUIRED",
-          "files": 0,
-          "elapsed_seconds": 6.351,
-          "returncode": 0
-        },
-        "current": {
-          "status": "AUTH_REQUIRED",
-          "files": 0,
-          "elapsed_seconds": 6.188,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164862-2026-08-07",
-        "baseline": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 3.599,
-          "returncode": 0
-        },
-        "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 4.375,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165112-2026-08-07",
-        "baseline": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 1.475,
-          "returncode": 0
-        },
-        "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 2.015,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165199-2026-08-11",
-        "baseline": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 4.615,
-          "returncode": 0
-        },
-        "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 5.474,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "uk_pcs_ocds:ocds-r6ebe6-0000808308",
-        "baseline": {
-          "status": "ROUTE_INCOMPLETE",
-          "files": 0,
-          "elapsed_seconds": 0.557,
-          "returncode": 0
-        },
-        "current": {
-          "status": "ROUTE_INCOMPLETE",
-          "files": 0,
-          "elapsed_seconds": 0.545,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      },
-      {
-        "candidate_id": "uk_pcs_ocds:ocds-r6ebe6-0000832455",
-        "baseline": {
-          "status": "ROUTE_INCOMPLETE",
-          "files": 0,
-          "elapsed_seconds": 0.547,
-          "returncode": 0
-        },
-        "current": {
-          "status": "ROUTE_INCOMPLETE",
-          "files": 0,
-          "elapsed_seconds": 0.531,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [],
-        "improvements": []
-      }
-    ]
-  },
+  "rollback_report": null,
   "expansion_summary": {
     "rows": [
       {
@@ -440,13 +31,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 2.466,
+        "elapsed_seconds": 1.465,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "DOWNLOADED_PUBLIC",
-            "elapsed_seconds": 2.466,
+            "elapsed_seconds": 1.465,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:CA\",\n  \"portal\": \"CA_CANADABUYS\",\n  \"raw_portal\": \"CA_CANADABUYS\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 6,\n  \"root\": \"expansion-out/EXP-CA\"\n}\n",
             "stderr": ""
@@ -468,13 +59,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 16.809,
+        "elapsed_seconds": 18.278,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "AUTH_REQUIRED",
-            "elapsed_seconds": 16.809,
+            "elapsed_seconds": 18.278,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:NZ\",\n  \"portal\": \"NZ_GETS\",\n  \"raw_portal\": \"NZ_GETS\",\n  \"status\": \"AUTH_REQUIRED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-NZ\"\n}\n",
             "stderr": ""
@@ -496,13 +87,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 18.89,
+        "elapsed_seconds": 19.934,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-            "elapsed_seconds": 18.89,
+            "elapsed_seconds": 19.934,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:PROCONTRACT\",\n  \"portal\": \"UK_PROCONTRACT\",\n  \"raw_portal\": \"UK_PROCONTRACT\",\n  \"status\": \"GENERIC_PUBLIC_PAGE_UNRESOLVED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-PROCONTRACT\"\n}\n",
             "stderr": ""
@@ -524,13 +115,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 8.153,
+        "elapsed_seconds": 9.534,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "AUTH_REQUIRED",
-            "elapsed_seconds": 8.153,
+            "elapsed_seconds": 9.534,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:DELTA\",\n  \"portal\": \"UK_DELTA\",\n  \"raw_portal\": \"UK_DELTA\",\n  \"status\": \"AUTH_REQUIRED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-DELTA\"\n}\n",
             "stderr": ""
@@ -552,13 +143,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 5.695,
+        "elapsed_seconds": 6.56,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-            "elapsed_seconds": 5.695,
+            "elapsed_seconds": 6.56,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:INTEND\",\n  \"portal\": \"UK_INTEND\",\n  \"raw_portal\": \"UK_INTEND\",\n  \"status\": \"GENERIC_PUBLIC_PAGE_UNRESOLVED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-INTEND\"\n}\n",
             "stderr": ""
@@ -580,13 +171,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 7.576,
+        "elapsed_seconds": 9.519,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "AUTH_REQUIRED",
-            "elapsed_seconds": 7.576,
+            "elapsed_seconds": 9.519,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:JAGGAER\",\n  \"portal\": \"UK_JAGGAER\",\n  \"raw_portal\": \"UK_JAGGAER\",\n  \"status\": \"AUTH_REQUIRED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-JAGGAER\"\n}\n",
             "stderr": ""
@@ -608,13 +199,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 2.467,
+        "elapsed_seconds": 2.761,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "DOWNLOADED_PUBLIC",
-            "elapsed_seconds": 2.467,
+            "elapsed_seconds": 2.761,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:ATAMIS\",\n  \"portal\": \"UK_ATAMIS\",\n  \"raw_portal\": \"UK_ATAMIS\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 1,\n  \"root\": \"expansion-out/EXP-ATAMIS\"\n}\n",
             "stderr": ""
@@ -636,13 +227,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 34.513,
+        "elapsed_seconds": 89.896,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "DOWNLOADED_PUBLIC",
-            "elapsed_seconds": 34.513,
+            "elapsed_seconds": 89.896,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:SK\",\n  \"portal\": \"SK_UVO_PUBLIC\",\n  \"raw_portal\": \"SK_UVO_PUBLIC\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 1,\n  \"root\": \"expansion-out/EXP-SK\"\n}\n",
             "stderr": ""
@@ -664,13 +255,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 14.109,
+        "elapsed_seconds": 16.4,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-            "elapsed_seconds": 14.109,
+            "elapsed_seconds": 16.4,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:DE-NRW\",\n  \"portal\": \"DE_EVERGABE_NRW\",\n  \"raw_portal\": \"DE_EVERGABE_NRW\",\n  \"status\": \"GENERIC_PUBLIC_PAGE_UNRESOLVED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-DE-NRW\"\n}\n",
             "stderr": ""
@@ -692,13 +283,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 15.291,
+        "elapsed_seconds": 25.769,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-            "elapsed_seconds": 15.29,
+            "elapsed_seconds": 25.769,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:BG\",\n  \"portal\": \"BG_EOP_PUBLIC\",\n  \"raw_portal\": \"BG_EOP_PUBLIC\",\n  \"status\": \"GENERIC_PUBLIC_PAGE_UNRESOLVED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-BG\"\n}\n",
             "stderr": ""
@@ -720,15 +311,15 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 33.974,
+        "elapsed_seconds": 32.313,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "DOWNLOADED_PUBLIC",
-            "elapsed_seconds": 33.974,
+            "elapsed_seconds": 32.313,
             "rate_limited": false,
-            "stdout": "{\n  \"candidate_id\": \"EXP:CAT\",\n  \"portal\": \"ES_CATALONIA_PUBLIC\",\n  \"raw_portal\": \"ES_CATALONIA_PUBLIC\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 12,\n  \"root\": \"expansion-out/EXP-CAT\"\n}\n",
+            "stdout": "{\n  \"candidate_id\": \"EXP:CAT\",\n  \"portal\": \"ES_CATALONIA_PUBLIC\",\n  \"raw_portal\": \"ES_CATALONIA_PUBLIC\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 13,\n  \"root\": \"expansion-out/EXP-CAT\"\n}\n",
             "stderr": ""
           }
         ]
@@ -748,15 +339,15 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 47.987,
+        "elapsed_seconds": 93.377,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "DOWNLOADED_PUBLIC",
-            "elapsed_seconds": 47.987,
+            "elapsed_seconds": 93.377,
             "rate_limited": false,
-            "stdout": "{\n  \"candidate_id\": \"EXP:HU\",\n  \"portal\": \"HU_EKR_PUBLIC\",\n  \"raw_portal\": \"HU_EKR_PUBLIC\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 6,\n  \"root\": \"expansion-out/EXP-HU\"\n}\n",
+            "stdout": "{\n  \"candidate_id\": \"EXP:HU\",\n  \"portal\": \"HU_EKR_PUBLIC\",\n  \"raw_portal\": \"HU_EKR_PUBLIC\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 8,\n  \"root\": \"expansion-out/EXP-HU\"\n}\n",
             "stderr": ""
           }
         ]
@@ -765,13 +356,13 @@
     "bad": []
   },
   "artifact_paths": {
-    "rollback": "evidence/dce-rollback-ab-32083571465/ab-report/report.json",
-    "expansion": "evidence/dce-expansion-live-32083571465/expansion-summary.json"
+    "rollback": null,
+    "expansion": "evidence/dce-expansion-live-32083595602/expansion-summary.json"
   },
   "gate": {
     "current_may_not_lose_baseline_downloaded_public": true,
     "hard_regression_count": 0,
     "expansion_bad_route_count": 0,
-    "safe_to_keep_current_resolver": true
+    "safe_to_keep_current_resolver": false
   }
 }
