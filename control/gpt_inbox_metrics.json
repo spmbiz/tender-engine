@@ -1,6 +1,6 @@
 {
   "schema": "GPT_INBOX_HEALTH_V2",
-  "updated_at": "2026-08-18T15:04:54.557555+00:00",
+  "updated_at": "2026-08-18T15:12:06.701443+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V2",
   "latest_source_dce_run_id": 32150412154,
   "counts": {
@@ -32,6 +32,8 @@
   },
   "true_pending_before_hot_cap": 1292,
   "overflow_beyond_hot_160": 1132,
+  "assistant_read_batch_count": 16,
+  "assistant_read_batch_size": 10,
   "recovery_metrics": {
     "shard_files_scanned": 162,
     "adjudication_rows_scanned": 1327,
@@ -62,5 +64,5 @@
     ]
   },
   "healthy": true,
-  "contract": "Health sidecar exposes true uncapped GPT review backlog. control/gpt_supergreen_inbox.json remains the rich hot window; control/gpt_review_index.json preserves every unreviewed locator."
+  "contract": "Health sidecar exposes true uncapped GPT review backlog. Rich review files are mechanical read surfaces; GPT Web adjudicator is the assistant in the conversation."
 }
