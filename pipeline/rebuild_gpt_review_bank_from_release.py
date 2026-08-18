@@ -195,13 +195,16 @@ def main() -> None:
             model_review_rows += int(is_gate_review)
             authenticity_rows += int(is_auth_review)
 
-    items = list(merged.values())
-    items.sort(key=lambda r: (source_version(r)[0], review_sort(r)), reverse=True)
-    items = items[: max(0, args.max_items)]
+    all_items = list(merged.values())
+    # Rank the whole recovered universe by review usefulness first. Source recency
+    # is only a tiebreaker; it must never evict a stronger older unreviewed DCE.
+    all_items.sort(key=lambda r: (review_sort(r), source_version(r)[0]), reverse=True)
+    uncapped_unique_pending = len(all_items)
+    items = all_items[: max(0, args.max_items)]
 
     latest_run = max([as_int(existing.get("latest_dce_run_id"))] + list(source_runs) + [0])
     payload = {
-        "schema": "GPT_REVIEW_HOT_V4",
+        "schema": "GPT_REVIEW_HOT_V5",
         "updated_at": now,
         "latest_dce_run_id": latest_run or None,
         "generation_reset": False,
@@ -215,10 +218,12 @@ def main() -> None:
             "dce_authenticity_rows_seen": authenticity_rows,
             "scope_auto_rejected": scope_auto_rejected,
             "scope_auto_reject_reason_counts": scope_reason_counts,
-            "persistent_unique_pending_surface": len(items),
+            "uncapped_unique_pending_before_hot_window": uncapped_unique_pending,
+            "rich_hot_window_count": len(items),
+            "overflow_beyond_hot_window": max(0, uncapped_unique_pending - len(items)),
         },
-        "ranking_contract": "Persistent GPT Web review bank. DCE generations never clear unreviewed candidates. BUSINESS_GATES rows have gate-ready DCE; DCE_AUTHENTICITY rows are inspectable retrieved documents that still require GPT Web to verify DCE relevance. Deterministic post-DCE scope rejects remove only unambiguous non-broker physical works/services; digital, mixed, ambiguous and supply/brokerable rows survive. Neither lane is a final verdict.",
-        "instruction": "Review HOT/GOOD business-fit rows first. DCE_AUTHENTICITY must first verify that retrieved documents are candidate-specific authoritative procurement material. Unknown is never PASS and finalization remains forbidden until mandatory gates and deadline authority are resolved.",
+        "ranking_contract": "Persistent GPT Web rich hot window. Global review usefulness is ranked before the cap; source-run recency is only a tiebreaker. The uncapped compact directory is control/gpt_review_index.json. BUSINESS_GATES rows have gate-ready DCE; DCE_AUTHENTICITY rows still require DCE relevance verification. Ranking is never eligibility truth.",
+        "instruction": "GPT Web reviews this rich window directly. For overflow, consult control/gpt_review_index.json and follow artifact_locator to the authoritative DCE run/shard. Unknown is never PASS.",
     }
     Path(args.out).write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(json.dumps(payload["recovery_metrics"], ensure_ascii=False))
