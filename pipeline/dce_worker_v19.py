@@ -18,9 +18,17 @@ _OLD_HU = base.ADAPTERS.get("HU_EKR")
 
 FILE_RE = re.compile(r"\.(?:pdf|zip|docx?|xlsx?|xls|pptx?|csv|7z|rar)(?:$|[?#])", re.I)
 DOWNLOAD_RE = re.compile(r"download|letölt|attachment|export|(?:^|[/_-])file(?:[/_.?=&-]|$)", re.I)
-EKR_API_DOWNLOAD_RE = re.compile(r"/api/publikus/.*/dokumentum-letoltes(?:/|$|[?#])", re.I)
+# True procurement-document endpoint observed in successful V18 runs. Deliberately
+# excludes `/kozbeszerzesi-hirdetmenyek/.../dokumentum-letoltes`, which is an
+# announcement/notice PDF and must not satisfy the DCE gate.
+EKR_API_DOWNLOAD_RE = re.compile(
+    r"/api/publikus/kozbeszerzesi-eljaras-nyilvantartas/[^/?#]+/dokumentum-letoltes/[^/?#]+(?:$|[?#])",
+    re.I,
+)
+# Only real filename-like public document controls. `EKR PDF letöltés` is a notice
+# control and is intentionally excluded from DCE success.
 EKR_SAFE_CONTROL_RE = re.compile(
-    r"EKR\s*PDF\s*letöltés|\.(?:pdf|zip|docx?|xlsx?|xls|pptx?|csv|7z|rar)(?:\s|$)",
+    r"\.(?:pdf|zip|docx?|xlsx?|xls|pptx?|csv|7z|rar)(?:\s|$)",
     re.I,
 )
 
@@ -73,29 +81,12 @@ def _bounded_file_fetch(url: str, out: Path, session: requests.Session) -> dict 
 def _bounded_http_probe(detail: str, out: Path, manifest: dict) -> bool:
     session = requests.Session()
     session.headers.update({
-        "User-Agent": "Tender-Engine/19.3 public procurement research",
+        "User-Agent": "Tender-Engine/19.4 public procurement research",
         "Accept": "text/html,application/xhtml+xml,application/pdf,application/zip,*/*",
     })
     try:
         response = session.get(detail, timeout=(4, 8), allow_redirects=True)
         ct = (response.headers.get("content-type") or "").lower()
-        if response.ok and response.content and base.looks_like_file(response):
-            manifest.setdefault("files", []).append(
-                base.persist_bytes(
-                    out,
-                    base.filename_from_response(response, "ekr-download.bin"),
-                    response.content,
-                    response.url,
-                    response.headers.get("content-type"),
-                )
-            )
-            manifest.setdefault("dce_method_attempts", []).append({
-                "method": "HU_EKR_BOUNDED_HTTP_V19", "url": detail,
-                "resolved_url": response.url, "http_status": response.status_code,
-                "outcome": "DOWNLOADED",
-            })
-            return True
-
         raw = html.unescape(response.text if "html" in ct or "text/" in ct else "")
         candidates: list[str] = []
         for href in re.findall(r"href\s*=\s*[\"']([^\"']+)[\"']", raw, re.I):
@@ -104,6 +95,10 @@ def _bounded_http_probe(detail: str, out: Path, manifest: dict) -> bool:
                 continue
             host = (urlparse(absolute).hostname or "").casefold()
             if host != "ekr.gov.hu" and not host.endswith(".ekr.gov.hu"):
+                continue
+            # Static EKR notice PDFs are not DCE. Only explicit procedure-registry
+            # document paths are eligible for the fast static pass.
+            if "kozbeszerzesi-eljaras-nyilvantartas" not in absolute.casefold():
                 continue
             if FILE_RE.search(absolute) or DOWNLOAD_RE.search(absolute):
                 candidates.append(absolute)
@@ -118,7 +113,7 @@ def _bounded_http_probe(detail: str, out: Path, manifest: dict) -> bool:
             "method": "HU_EKR_BOUNDED_HTTP_V19", "url": detail,
             "resolved_url": response.url, "http_status": response.status_code,
             "candidate_urls": candidates, "downloaded": downloaded,
-            "outcome": "DOWNLOADED" if downloaded else "NO_FILE",
+            "outcome": "DOWNLOADED" if downloaded else "NO_DCE_FILE",
         })
         return downloaded > 0
     except Exception as exc:
@@ -142,8 +137,6 @@ def _control_priority(hay: str) -> int:
         return 70
     if re.search(r"\.pdf(?:\s|$)", h, re.I):
         return 60
-    if re.search(r"EKR\s*PDF\s*letöltés", h, re.I):
-        return 50
     return 0
 
 
@@ -185,12 +178,7 @@ def _filename_from_playwright_response(resp, ordinal: int) -> str:
 
 
 def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
-    """Target the exact public EKR file behavior observed in successful V18 runs.
-
-    We wait for the asynchronous procedure/document controls, then capture both native
-    browser downloads and first-party `/dokumentum-letoltes` XHR bodies. Controls are
-    enumerated once, ranked toward procurement docs, and capped to keep the path bounded.
-    """
+    """Capture only public EKR procurement-document downloads, not notice PDFs."""
     pw = browser = context = page = None
     network_responses: dict[str, object] = {}
     browser_downloads: list[object] = []
@@ -206,10 +194,7 @@ def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
                 host = (urlparse(url).hostname or "").casefold()
                 if host != "ekr.gov.hu" and not host.endswith(".ekr.gov.hu"):
                     return
-                headers = resp.headers or {}
-                ct = str(headers.get("content-type") or "").casefold()
-                cd = str(headers.get("content-disposition") or "").casefold()
-                if EKR_API_DOWNLOAD_RE.search(url) or "attachment" in cd or any(x in ct for x in ("application/pdf", "application/zip", "application/octet-stream")):
+                if EKR_API_DOWNLOAD_RE.search(url):
                     network_responses.setdefault(url, resp)
             except Exception:
                 pass
@@ -226,7 +211,7 @@ def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
         page.wait_for_timeout(800)
         try:
             page.wait_for_function(
-                """() => { const t=(document.body && document.body.innerText)||''; return t.includes('KÖZBESZERZÉSI DOKUMENTÁCIÓ') || t.includes('EKR PDF letöltés') || /\\.(zip|docx?|pdf)(?:\\s|$)/i.test(t); }""",
+                """() => { const t=(document.body && document.body.innerText)||''; return t.includes('KÖZBESZERZÉSI DOKUMENTÁCIÓ') || /\\.(zip|docx?|xlsx?|xls|pptx?|csv|7z|rar)(?:\\s|$)/i.test(t); }""",
                 timeout=25000,
             )
             document_surface_ready = True
@@ -246,7 +231,7 @@ def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
             )
         except Exception:
             items = []
-        indices = _safe_ekr_control_indices(items or [])
+        indices = _safe_ekr_control_indices(items or []) if document_surface_ready else []
 
         for index in indices:
             node = controls.nth(index)
@@ -274,8 +259,11 @@ def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
         direct_download_meta: list[dict] = []
         for download in browser_downloads[:8]:
             try:
+                name = str(download.suggested_filename or "")
+                # We only click filename-like procurement controls, so native download
+                # events here inherit that DCE provenance.
                 manifest.setdefault("files", []).append(base.persist_download(out, download, page.url))
-                direct_download_meta.append({"suggested_filename": str(download.suggested_filename or "")[:300], "outcome": "PERSISTED"})
+                direct_download_meta.append({"suggested_filename": name[:300], "outcome": "PERSISTED"})
             except Exception as exc:
                 direct_download_meta.append({"outcome": "PERSIST_FAILED", "error": repr(exc)[:300]})
 
@@ -295,7 +283,7 @@ def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
                 network_meta.append({"url": url[:2000], "outcome": "BODY_UNAVAILABLE", "error": repr(exc)[:300]})
 
         manifest.setdefault("dce_method_attempts", []).append({
-            "method": "HU_EKR_TARGETED_NETWORK_V19",
+            "method": "HU_EKR_TARGETED_DCE_NETWORK_V19",
             "url": detail,
             "document_surface_ready": document_surface_ready,
             "safe_control_count": len(indices),
@@ -303,12 +291,12 @@ def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
             "browser_downloads": direct_download_meta,
             "network_files": network_meta,
             "downloaded": len(manifest.get("files") or []),
-            "outcome": "DOWNLOADED" if manifest.get("files") else "NO_FILE",
+            "outcome": "DOWNLOADED_DCE" if manifest.get("files") else "NO_DCE_FILE",
         })
         return bool(manifest.get("files"))
     except Exception as exc:
         manifest.setdefault("dce_method_attempts", []).append({
-            "method": "HU_EKR_TARGETED_NETWORK_V19", "url": detail,
+            "method": "HU_EKR_TARGETED_DCE_NETWORK_V19", "url": detail,
             "outcome": "ERROR", "error": repr(exc)[:700],
         })
         return False
@@ -352,7 +340,7 @@ def adapter_hu_ekr_v19(candidate: dict, out: Path, manifest: dict) -> None:
         manifest["status"] = state
     else:
         manifest["status"] = "ERROR_RETRYABLE"
-        manifest["error"] = "HU_EKR_DETAIL_ONLY_TARGETED_V19_EXHAUSTED"
+        manifest["error"] = "HU_EKR_DETAIL_ONLY_DCE_TARGETED_V19_EXHAUSTED"
 
 
 base.ADAPTERS["HU_EKR_PUBLIC"] = adapter_hu_ekr_v19
