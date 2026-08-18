@@ -1,0 +1,79 @@
+name: Qwen Post-Guard Regression
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/qwen_notice_post_guard.py'
+      - 'tests/test_qwen_post_guard_recall.py'
+      - '.github/workflows/qwen-post-guard-regression.yml'
+      - 'control/qwen_post_guard_regression_trigger.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: qwen-post-guard-regression
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q pytest
+      - id: test
+        continue-on-error: true
+        run: |
+          python -m py_compile pipeline/qwen_notice_post_guard.py
+          python -m pytest -q tests/test_qwen_post_guard_recall.py
+      - name: Persist gate result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          HEAD_SHA: ${{ github.sha }}
+          OUTCOME: ${{ steps.test.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import datetime as dt,json,os
+          d={
+            'schema':'QWEN_POST_GUARD_REGRESSION_V1',
+            'generated_at':dt.datetime.now(dt.timezone.utc).isoformat(),
+            'workflow_run_id':os.environ['RUN_ID'],
+            'head_sha':os.environ['HEAD_SHA'],
+            'status':'PASS' if os.environ['OUTCOME']=='success' else 'FAIL',
+            'guards':{
+              'exact_context_id_only':True,
+              'fuzzy_context_join_disabled':True,
+              'duplicate_context_fails_closed':True,
+              'survival_drop_never_rescued':True,
+              'hard_friction_never_rescued':True,
+              'final_green_not_created_here':True,
+            },
+          }
+          open('result.json','w').write(json.dumps(d,indent=2)+'\n')
+          PY
+          path='control/qwen_post_guard_regression_latest.json'
+          content="$(base64 -w0 result.json)"
+          for n in 1 2 3 4 5 6; do
+            sha="$(gh api "repos/$REPO/contents/$path?ref=main" --jq '.sha' 2>/dev/null || true)"
+            args=(--method PUT "repos/$REPO/contents/$path" -f message="ci: persist Qwen post-guard regression $RUN_ID" -f content="$content" -f branch=main)
+            [ -n "$sha" ] && args+=(-f sha="$sha")
+            gh api "${args[@]}" >/dev/null && exit 0
+            sleep "$((n*2))"
+          done
+          exit 1
+      - name: Fail closed
+        if: steps.test.outcome != 'success'
+        run: exit 1
