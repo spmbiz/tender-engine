@@ -19,7 +19,9 @@ OUT.mkdir(parents=True, exist_ok=True)
 NOW = datetime.now(timezone.utc)
 LIST_URL = "https://www.tenders.gov.au/?event=public.ATM.list"
 RSS_URL = "https://www.tenders.gov.au/public_data/rss/rss.xml"
-UA = "Tender-Engine/6.3 (+public procurement research; official AusTender current ATM feed)"
+BRIDGE_URL = os.getenv("AUSTENDER_BRIDGE_URL", "").strip()
+BRIDGE_TRUSTED = os.getenv("AUSTENDER_BRIDGE_TRUSTED", "0").strip().lower() in {"1", "true", "yes"}
+UA = "Tender-Engine/6.4 (+public procurement research; official AusTender current ATM feed)"
 
 
 def clean(v):
@@ -101,17 +103,65 @@ def persist(records, telemetry, errors, warnings):
         "current_materialized": len(cur),
         "enumeration_exhausted": bool(telemetry.get("enumeration_exhausted")),
         "enumeration_complete": complete,
+        "live_candidate_capable": True,
+        "live_coverage_credit_allowed": complete,
         "generated_at": NOW.isoformat(),
         "errors": errors,
         "warnings": warnings,
         "official_url": LIST_URL,
         "official_rss_url": RSS_URL,
+        "bridge_url_configured": bool(BRIDGE_URL),
+        "bridge_trusted": BRIDGE_TRUSTED,
         "freshness_contract": "OFFICIAL_CURRENT_ATM_RSS_UPDATED_DAILY_AFTER_BUSINESS_HOURS_WHEN_RSS_PATH_USED",
         "telemetry": telemetry,
+        "semantics": "Primary truth is the official AusTender current-ATM RSS/browser scope. An optional bridge is accepted only when explicitly marked trusted and must relay the same official RSS payload; otherwise GitHub-cloud 403 remains a visible coverage failure.",
     }
     (OUT / "stats.json").write_text(json.dumps(stats, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(stats, indent=2, ensure_ascii=False))
     return stats
+
+
+def parse_rss_content(content: bytes, records: dict, telemetry: dict, warnings: list, mode: str) -> bool:
+    try:
+        root = ET.fromstring(content)
+    except Exception as exc:
+        warnings.append({"type": "RSS_PARSE_ERROR", "mode": mode, "message": repr(exc)})
+        return False
+    items = root.findall(".//item")
+    telemetry[f"{mode}_items_seen"] = len(items)
+    if not items:
+        warnings.append({"type": "RSS_ZERO_ITEMS", "mode": mode})
+        return False
+    for item in items:
+        values = {child.tag.rsplit("}", 1)[-1].lower(): clean(child.text) for child in list(item)}
+        title = values.get("title") or ""
+        link = values.get("link") or values.get("guid") or ""
+        guid = values.get("guid") or ""
+        desc_raw = values.get("description") or ""
+        desc = strip_html(desc_raw)
+        pub = pdt(values.get("pubdate"))
+        deadline = deadline_from_text(desc)
+        atm = atm_id_from(link, title, desc, guid)
+        cid = f"AU:{atm}"
+        records[cid] = {
+            "candidate_id": cid,
+            "source": "AU_AUSTENDER",
+            "portal": "AU_AUSTENDER",
+            "notice_id": atm,
+            "title": title or desc[:500],
+            "buyer": None,
+            "deadline": deadline.isoformat() if deadline else None,
+            "published": pub.isoformat() if pub else None,
+            "current": True if deadline is None else deadline >= NOW,
+            "currentness_evidence": "AUSTENDER_CURRENT_ATM_RSS_SCOPE" if deadline is None else "RSS_SCOPE_PLUS_PARSED_DEADLINE",
+            "notice_url": urljoin("https://www.tenders.gov.au/", link),
+            "description": desc,
+            "route": {"document_urls": [], "rss_transport": mode},
+            "discovered_at": NOW.isoformat(),
+        }
+    telemetry["enumeration_mode"] = mode
+    telemetry["enumeration_exhausted"] = True
+    return bool(records)
 
 
 def harvest_rss(records: dict, telemetry: dict, warnings: list) -> bool:
@@ -125,44 +175,34 @@ def harvest_rss(records: dict, telemetry: dict, warnings: list) -> bool:
         if response.status_code >= 400:
             warnings.append({"type": "RSS_HTTP_BLOCK", "status": response.status_code})
             return False
-        root = ET.fromstring(response.content)
-        items = root.findall(".//item")
-        telemetry["rss_items_seen"] = len(items)
-        if not items:
-            warnings.append({"type": "RSS_ZERO_ITEMS"})
-            return False
-        for item in items:
-            values = {child.tag.rsplit("}", 1)[-1].lower(): clean(child.text) for child in list(item)}
-            title = values.get("title") or ""
-            link = values.get("link") or values.get("guid") or ""
-            guid = values.get("guid") or ""
-            desc_raw = values.get("description") or ""
-            desc = strip_html(desc_raw)
-            pub = pdt(values.get("pubdate"))
-            deadline = deadline_from_text(desc)
-            atm = atm_id_from(link, title, desc, guid)
-            cid = f"AU:{atm}"
-            records[cid] = {
-                "candidate_id": cid,
-                "source": "AU_AUSTENDER",
-                "portal": "AU_AUSTENDER",
-                "notice_id": atm,
-                "title": title or desc[:500],
-                "buyer": None,
-                "deadline": deadline.isoformat() if deadline else None,
-                "published": pub.isoformat() if pub else None,
-                "current": True if deadline is None else deadline >= NOW,
-                "currentness_evidence": "AUSTENDER_CURRENT_ATM_RSS_SCOPE" if deadline is None else "RSS_SCOPE_PLUS_PARSED_DEADLINE",
-                "notice_url": urljoin("https://www.tenders.gov.au/", link),
-                "description": desc,
-                "route": {"document_urls": []},
-                "discovered_at": NOW.isoformat(),
-            }
-        telemetry["enumeration_mode"] = "OFFICIAL_CURRENT_ATM_RSS"
-        telemetry["enumeration_exhausted"] = True
-        return bool(records)
+        return parse_rss_content(response.content, records, telemetry, warnings, "OFFICIAL_CURRENT_ATM_RSS")
     except Exception as exc:
         warnings.append({"type": "RSS_ERROR", "message": repr(exc)})
+        return False
+
+
+def harvest_bridge(records: dict, telemetry: dict, warnings: list) -> bool:
+    if not BRIDGE_URL:
+        return False
+    if not BRIDGE_TRUSTED:
+        warnings.append({"type": "BRIDGE_CONFIGURED_BUT_NOT_TRUSTED", "url": BRIDGE_URL})
+        return False
+    try:
+        response = requests.get(
+            BRIDGE_URL,
+            timeout=60,
+            headers={"User-Agent": UA, "Accept": "application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.5"},
+        )
+        telemetry["bridge_http_status"] = response.status_code
+        if response.status_code >= 400:
+            warnings.append({"type": "BRIDGE_HTTP_ERROR", "status": response.status_code})
+            return False
+        ok = parse_rss_content(response.content, records, telemetry, warnings, "TRUSTED_OFFICIAL_RSS_BRIDGE")
+        if ok:
+            telemetry["bridge_contract"] = "caller attests this endpoint relays the official AusTender current-ATM RSS without filtering"
+        return ok
+    except Exception as exc:
+        warnings.append({"type": "BRIDGE_ERROR", "message": repr(exc)})
         return False
 
 
@@ -249,6 +289,9 @@ async def main():
     warnings = []
 
     if harvest_rss(records, telemetry, warnings):
+        persist(records, telemetry, errors, warnings)
+        return
+    if harvest_bridge(records, telemetry, warnings):
         persist(records, telemetry, errors, warnings)
         return
 
