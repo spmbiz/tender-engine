@@ -15,6 +15,7 @@ ATOM = b'''<?xml version="1.0" encoding="UTF-8"?>
 
 
 def main() -> None:
+    assert 30 <= v17.PLACSP_CACHE_TTL <= 3600
     with tempfile.TemporaryDirectory() as tmp:
         old = os.environ.get("DCE_SHARED_CACHE_DIR")
         os.environ["DCE_SHARED_CACHE_DIR"] = tmp
@@ -40,7 +41,7 @@ def main() -> None:
             else:
                 os.environ["DCE_SHARED_CACHE_DIR"] = old
     assert v15._resolve_from_atom is v17._resolve_from_atom_cached
-    print({"placsp_cache": "validated_xml_only", "shared_lock": True, "status": "ok"})
+    print({"placsp_cache": "validated_xml_only", "shared_lock": True, "ttl_seconds": v17.PLACSP_CACHE_TTL, "status": "ok"})
 
 
 if __name__ == "__main__":
