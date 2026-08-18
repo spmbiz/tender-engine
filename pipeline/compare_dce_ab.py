@@ -36,7 +36,11 @@ def _load_json(path: Path):
 def _batch(root: Path) -> dict[str, dict]:
     obj = _load_json(root / "batch_results.json")
     rows = obj if isinstance(obj, list) else []
-    return {str(r.get("candidate_id") or ""): r for r in rows if isinstance(r, dict) and r.get("candidate_id")}
+    return {
+        str(r.get("candidate_id") or ""): r
+        for r in rows
+        if isinstance(r, dict) and r.get("candidate_id")
+    }
 
 
 def _manifests(root: Path) -> dict[str, dict]:
@@ -65,6 +69,7 @@ def main() -> None:
     ap.add_argument("--baseline-dir", required=True)
     ap.add_argument("--current-dir", required=True)
     ap.add_argument("--out", default="dce-ab-report")
+    ap.add_argument("--expected-candidates", type=int, default=0)
     ap.add_argument("--fail-on-regression", action="store_true")
     args = ap.parse_args()
 
@@ -84,12 +89,22 @@ def main() -> None:
     warnings = []
     improvements = []
 
+    if args.expected_candidates and len(ids) != args.expected_candidates:
+        hard_regressions.append({
+            "candidate_id": "__CORPUS__",
+            "hard_regressions": [
+                f"candidate_count_mismatch:{len(ids)}!={args.expected_candidates}"
+            ],
+            "warnings": [],
+            "improvements": [],
+        })
+
     for cid in ids:
         br = bb.get(cid, {})
         cr = cb.get(cid, {})
         bman = bm.get(cid, {})
         cman = cm.get(cid, {})
-        bs = str(cr.get("baseline_status") or br.get("status") or bman.get("status") or "MISSING")
+        bs = str(br.get("status") or bman.get("status") or "MISSING")
         cs = str(cr.get("status") or cman.get("status") or "MISSING")
         bf = _file_count(bman)
         cf = _file_count(cman)
@@ -109,7 +124,9 @@ def main() -> None:
         if cid not in cb or cid not in cm:
             reasons.append("current_result_missing")
 
-        if (bf > 0 or bs == "DOWNLOADED_PUBLIC") and not (cf > 0 and cs == "DOWNLOADED_PUBLIC"):
+        if (bf > 0 or bs == "DOWNLOADED_PUBLIC") and not (
+            cf > 0 and cs == "DOWNLOADED_PUBLIC"
+        ):
             reasons.append("lost_downloaded_public_dce")
         if bcode in (0, None) and ccode not in (0, None):
             reasons.append(f"returncode_regressed:{bcode}->{ccode}")
@@ -136,8 +153,18 @@ def main() -> None:
 
         row = {
             "candidate_id": cid,
-            "baseline": {"status": bs, "files": bf, "elapsed_seconds": bel, "returncode": bcode},
-            "current": {"status": cs, "files": cf, "elapsed_seconds": cel, "returncode": ccode},
+            "baseline": {
+                "status": bs,
+                "files": bf,
+                "elapsed_seconds": bel,
+                "returncode": bcode,
+            },
+            "current": {
+                "status": cs,
+                "files": cf,
+                "elapsed_seconds": cel,
+                "returncode": ccode,
+            },
             "hard_regressions": reasons,
             "warnings": warn,
             "improvements": improved,
@@ -152,21 +179,32 @@ def main() -> None:
 
     summary = {
         "candidate_count": len(ids),
+        "expected_candidates": args.expected_candidates or None,
         "baseline_results": len(bb),
         "current_results": len(cb),
         "hard_regression_count": len(hard_regressions),
         "warning_count": len(warnings),
         "improvement_count": len(improvements),
-        "baseline_statuses": dict(Counter(str(r.get("status") or "MISSING") for r in bb.values())),
-        "current_statuses": dict(Counter(str(r.get("status") or "MISSING") for r in cb.values())),
-        "baseline_wall_candidate_seconds": round(sum(float(r.get("elapsed_seconds") or 0) for r in bb.values()), 3),
-        "current_wall_candidate_seconds": round(sum(float(r.get("elapsed_seconds") or 0) for r in cb.values()), 3),
+        "baseline_statuses": dict(
+            Counter(str(r.get("status") or "MISSING") for r in bb.values())
+        ),
+        "current_statuses": dict(
+            Counter(str(r.get("status") or "MISSING") for r in cb.values())
+        ),
+        "baseline_wall_candidate_seconds": round(
+            sum(float(r.get("elapsed_seconds") or 0) for r in bb.values()), 3
+        ),
+        "current_wall_candidate_seconds": round(
+            sum(float(r.get("elapsed_seconds") or 0) for r in cb.values()), 3
+        ),
         "hard_regressions": hard_regressions,
         "warnings": warnings,
         "improvements": improvements,
         "rows": rows,
     }
-    (out_dir / "report.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
+    (out_dir / "report.json").write_text(
+        json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
 
     lines = [
         "# DCE rollback A/B report",
@@ -184,24 +222,51 @@ def main() -> None:
     for row in rows:
         b = row["baseline"]
         c = row["current"]
-        verdict = "REGRESSION" if row["hard_regressions"] else ("IMPROVED" if row["improvements"] else ("WARN" if row["warnings"] else "SAME/OK"))
+        verdict = (
+            "REGRESSION"
+            if row["hard_regressions"]
+            else (
+                "IMPROVED"
+                if row["improvements"]
+                else ("WARN" if row["warnings"] else "SAME/OK")
+            )
+        )
         lines.append(
-            f"| {row['candidate_id']} | {b['status']} | {c['status']} | {b['files']}→{c['files']} | {b['elapsed_seconds']:.2f}s→{c['elapsed_seconds']:.2f}s | {verdict} |"
+            f"| {row['candidate_id']} | {b['status']} | {c['status']} | "
+            f"{b['files']}→{c['files']} | {b['elapsed_seconds']:.2f}s→"
+            f"{c['elapsed_seconds']:.2f}s | {verdict} |"
         )
     if hard_regressions:
         lines += ["", "## Hard regressions", ""]
         for row in hard_regressions:
-            lines.append(f"- **{row['candidate_id']}** — {', '.join(row['hard_regressions'])}")
+            lines.append(
+                f"- **{row['candidate_id']}** — "
+                f"{', '.join(row['hard_regressions'])}"
+            )
     if warnings:
         lines += ["", "## Warnings", ""]
         for row in warnings:
-            lines.append(f"- **{row['candidate_id']}** — {', '.join(row['warnings'])}")
+            lines.append(
+                f"- **{row['candidate_id']}** — {', '.join(row['warnings'])}"
+            )
     (out_dir / "REPORT.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-    print(json.dumps({k: summary[k] for k in (
-        "candidate_count", "hard_regression_count", "warning_count", "improvement_count",
-        "baseline_wall_candidate_seconds", "current_wall_candidate_seconds"
-    )}, indent=2))
+    print(
+        json.dumps(
+            {
+                k: summary[k]
+                for k in (
+                    "candidate_count",
+                    "hard_regression_count",
+                    "warning_count",
+                    "improvement_count",
+                    "baseline_wall_candidate_seconds",
+                    "current_wall_candidate_seconds",
+                )
+            },
+            indent=2,
+        )
+    )
     if args.fail_on_regression and hard_regressions:
         raise SystemExit(2)
 
