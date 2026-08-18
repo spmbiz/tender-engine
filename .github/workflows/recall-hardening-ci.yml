@@ -4,6 +4,26 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/discover_ted.py'
+      - 'pipeline/discover_ungm_public.py'
+      - 'pipeline/discover_uk_pcs_current.py'
+      - 'pipeline/discover_it_anac_pvl.py'
+      - 'pipeline/discover_epps_published_fallback.py'
+      - 'pipeline/discover_austender_browser.py'
+      - 'pipeline/source_coverage_guard.py'
+      - 'pipeline/build_live_world_snapshot.py'
+      - 'pipeline/qwen_notice_batch_selfheal.py'
+      - 'pipeline/qwen_notice_batch_selfheal_core.py'
+      - 'pipeline/qwen_notice_batch_selfheal_rich.py'
+      - 'pipeline/merge_qwen_classification_state.py'
+      - 'pipeline/build_qwen_calibration_corpus.py'
+      - 'pipeline/evaluate_qwen_recall_golden.py'
+      - '.github/workflows/supergreen-discovery-v2.yml'
+      - '.github/workflows/recall-hardening-ci.yml'
+      - 'tests/test_open_world_lane_contracts.py'
 
 permissions:
   contents: read
@@ -18,19 +38,38 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install validation dependencies
-        run: python -m pip install --disable-pip-version-check -q pytest requests pyyaml
+        run: python -m pip install --disable-pip-version-check -q pytest requests pyyaml beautifulsoup4 playwright
       - name: Compile recall-critical Python
         run: |
           python -m py_compile \
             pipeline/discover_ted.py \
+            pipeline/discover_ungm_public.py \
+            pipeline/discover_uk_pcs_current.py \
+            pipeline/discover_it_anac_pvl.py \
+            pipeline/discover_epps_published_fallback.py \
+            pipeline/discover_austender_browser.py \
+            pipeline/source_coverage_guard.py \
             pipeline/build_live_world_snapshot.py \
-            pipeline/build_qwen_dce_selection_coded.py
+            pipeline/build_qwen_dce_selection_base.py \
+            pipeline/build_qwen_dce_selection_coded.py \
+            pipeline/qwen_notice_batch_selfheal.py \
+            pipeline/qwen_notice_batch_selfheal_core.py \
+            pipeline/qwen_notice_batch_selfheal_rich.py \
+            pipeline/merge_qwen_classification_state.py \
+            pipeline/build_qwen_calibration_corpus.py \
+            pipeline/evaluate_qwen_recall_golden.py
       - name: Validate recall-critical workflow YAML
         run: |
           python - <<'PY'
           import yaml
           from pathlib import Path
-          for rel in ('.github/workflows/supergreen-discovery-v2.yml','.github/workflows/live-world-snapshot.yml'):
+          for rel in (
+              '.github/workflows/supergreen-discovery-v2.yml',
+              '.github/workflows/live-world-snapshot.yml',
+              '.github/workflows/qwen-live-classification.yml',
+              '.github/workflows/qwen-calibration-corpus.yml',
+              '.github/workflows/recall-hardening-ci.yml',
+          ):
               obj=yaml.safe_load(Path(rel).read_text(encoding='utf-8'))
               assert isinstance(obj,dict) and ('jobs' in obj), rel
           print('workflow YAML OK')
@@ -42,4 +81,5 @@ jobs:
             tests/test_snapshot_carry_forward.py \
             tests/test_ted_checkpoint.py \
             tests/test_recall_workflow_contract.py \
-            tests/test_procurement_code_and_review_index.py
+            tests/test_procurement_code_and_review_index.py \
+            tests/test_open_world_lane_contracts.py
