@@ -1,0 +1,139 @@
+name: DCE V22 France BOAMP Live A/B
+
+on:
+  pull_request:
+    paths:
+      - 'pipeline/dce_worker_v22.py'
+      - 'pipeline/test_dce_worker_v22_routes.py'
+      - 'pipeline/dce_batch_worker.py'
+      - '.github/workflows/dce-v22-fr-boamp-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  france-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests pypdf python-docx openpyxl python-pptx 'playwright>=1.46,<2'
+      - shell: bash
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
+      - name: Compile and unit-test France router
+        run: |
+          python -m py_compile pipeline/dce_worker_v22.py pipeline/dce_batch_worker.py
+          python pipeline/test_dce_worker_v22_routes.py
+      - name: Freeze fresh BOAMP candidates from canonical wide-read
+        shell: bash
+        run: |
+          set -euo pipefail
+          rid="$(python - <<'PY'
+          import json
+          for line in open('queues/qwen_live_selection_latest.jsonl',encoding='utf-8',errors='replace'):
+              if not line.strip(): continue
+              r=json.loads(line)
+              x=r.get('wide_read_run_id') or r.get('source_discovery_run') or r.get('source_run')
+              if x is not None:
+                  print(x); break
+          PY
+          )"
+          [[ "$rid" =~ ^[0-9]+$ ]] || exit 1
+          tag="discovery-harvest-${rid}"
+          mkdir -p source-release source-wide fr-sample/queues
+          repaired="supergreen-wide-read-${rid}-repaired.tar.gz"
+          normal="supergreen-wide-read-${rid}.tar.gz"
+          base="https://github.com/${GITHUB_REPOSITORY}/releases/download/${tag}"
+          asset="$repaired"
+          if ! curl -fL --retry 3 --retry-delay 2 --connect-timeout 15 --max-time 180 "$base/$repaired" -o "source-release/$repaired"; then
+            rm -f "source-release/$repaired"
+            asset="$normal"
+            curl -fL --retry 3 --retry-delay 2 --connect-timeout 15 --max-time 180 "$base/$normal" -o "source-release/$normal"
+          fi
+          test -s "source-release/$asset"
+          tar -xzf "source-release/$asset" -C source-wide
+          candidates="$(find source-wide -type f -name current_candidates.jsonl -print -quit)"
+          test -s "$candidates"
+          cp "$candidates" source-current-candidates.jsonl
+          python pipeline/dce_rich_portal_benchmark.py sample --candidates source-current-candidates.jsonl --out-dir fr-sample --per-country 8 --countries FR-BOAMP
+          test -s fr-sample/selections/FR-BOAMP.jsonl
+          : > /tmp/empty-ledger.jsonl
+          python pipeline/materialize_dce_selection.py --candidates source-current-candidates.jsonl --selection fr-sample/selections/FR-BOAMP.jsonl --out fr-sample/queues/FR-BOAMP.jsonl --attempt-ledger /tmp/empty-ledger.jsonl
+          test -s fr-sample/queues/FR-BOAMP.jsonl
+          wc -l fr-sample/queues/FR-BOAMP.jsonl
+      - name: Build exact V21 baseline wrapper
+        shell: bash
+        run: |
+          sed 's#pipeline/dce_worker_v22.py#pipeline/dce_worker_v21.py#g' pipeline/dce_batch_worker.py > pipeline/dce_batch_worker_v21_ab_tmp.py
+          grep -q 'dce_worker_v21.py' pipeline/dce_batch_worker_v21_ab_tmp.py
+      - name: Run V21 baseline on identical BOAMP sample
+        shell: bash
+        env: {DCE_BROWSER_INLINE_RETRIES: '0', DCE_HTTP_INLINE_RETRIES: '0'}
+        run: |
+          n="$(wc -l < fr-sample/queues/FR-BOAMP.jsonl)"
+          lines="$(seq -s, 1 "$n")"
+          python pipeline/dce_batch_worker_v21_ab_tmp.py --queue fr-sample/queues/FR-BOAMP.jsonl --lines "$lines" --out baseline --concurrency 3 --http-probe-concurrency 8 --http-probe-timeout-seconds 5 --retries 0 --timeout-seconds 125
+          python pipeline/extract_corpus.py --root baseline
+          python pipeline/dce_evidence_quality.py --root baseline
+          python pipeline/aggregate_dce.py --root baseline --out baseline-quality
+      - name: Run V22 on identical BOAMP sample
+        shell: bash
+        env: {DCE_BROWSER_INLINE_RETRIES: '0', DCE_HTTP_INLINE_RETRIES: '0'}
+        run: |
+          n="$(wc -l < fr-sample/queues/FR-BOAMP.jsonl)"
+          lines="$(seq -s, 1 "$n")"
+          python pipeline/dce_batch_worker.py --queue fr-sample/queues/FR-BOAMP.jsonl --lines "$lines" --out current --concurrency 3 --http-probe-concurrency 8 --http-probe-timeout-seconds 5 --retries 0 --timeout-seconds 125
+          python pipeline/extract_corpus.py --root current
+          python pipeline/dce_evidence_quality.py --root current
+          python pipeline/aggregate_dce.py --root current --out current-quality
+      - name: Require real France uplift and reject BOAMP notice pseudo-DCE
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          def load(p): return json.loads(Path(p).read_text(encoding='utf-8'))
+          b=load('baseline-quality/summary.json'); c=load('current-quality/summary.json')
+          base_usable=int(b.get('gate_ready_substantive_dce') or 0)
+          cur_usable=int(c.get('gate_ready_substantive_dce') or 0)
+          manifests=[]; downstream=0; boamp_file_sources=[]
+          for p in Path('current').rglob('manifest.json'):
+              m=load(p); manifests.append(m)
+              downstream += len(m.get('fr_boamp_downstream_candidates_v22') or [])
+              for f in m.get('files') or []:
+                  blob=' '.join(str(f.get(k) or '') for k in ('source_url','url','download_url','resolved_url')).lower() if isinstance(f,dict) else ''
+                  if 'boamp.fr' in blob: boamp_file_sources.append(blob[:300])
+          result={
+            'sample':len(manifests), 'baseline_usable':base_usable, 'v22_usable':cur_usable,
+            'downstream_candidates':downstream, 'boamp_file_sources':len(boamp_file_sources),
+            'baseline_transport':int(b.get('raw_downloaded_public') or 0),
+            'v22_transport':int(c.get('raw_downloaded_public') or 0),
+          }
+          print(json.dumps(result,indent=2,ensure_ascii=False))
+          Path('fr-v22-ab-summary.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
+          if downstream < 1:
+              raise SystemExit('V22 found no buyer-profile/document downstream route in fresh BOAMP sample')
+          if boamp_file_sources:
+              raise SystemExit('V22 persisted BOAMP notice material as DCE')
+          if cur_usable < base_usable:
+              raise SystemExit('V22 lost usable DCE versus V21 baseline')
+          if cur_usable < 1:
+              raise SystemExit('V22 did not prove at least one usable candidate-matched DCE on fresh BOAMP sample')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dce-v22-france-ab-${{ github.run_id }}
+          path: |
+            fr-v22-ab-summary.json
+            baseline-quality/summary.json
+            current-quality/summary.json
+            baseline/**/manifest.json
+            current/**/manifest.json
+            current/**/boamp_record_v22.json
+          retention-days: 5
