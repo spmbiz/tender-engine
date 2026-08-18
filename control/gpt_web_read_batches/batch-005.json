@@ -1,7 +1,7 @@
 {
-  "schema": "GPT_WEB_READ_BATCH_V2_PROVENANCE",
-  "generated_at": "2026-08-18T22:38:49.864360+00:00",
-  "source_inbox_updated_at": "2026-08-18T22:38:49.112304+00:00",
+  "schema": "GPT_WEB_READ_BATCH_V3_PROVENANCE_REFRESH",
+  "generated_at": "2026-08-18T22:45:52.284254+00:00",
+  "source_inbox_updated_at": "2026-08-18T22:45:51.555173+00:00",
   "latest_source_dce_run_id": 32190330115,
   "batch_index": 5,
   "start_rank": 51,
@@ -336,6 +336,7 @@
           }
         ]
       },
+      "provenance_override": null,
       "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
     },
@@ -667,6 +668,7 @@
           }
         ]
       },
+      "provenance_override": null,
       "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
     },
@@ -955,6 +957,7 @@
           }
         ]
       },
+      "provenance_override": null,
       "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
     },
@@ -1264,6 +1267,7 @@
           }
         ]
       },
+      "provenance_override": null,
       "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
     },
@@ -1552,6 +1556,7 @@
           }
         ]
       },
+      "provenance_override": null,
       "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
     },
@@ -1818,6 +1823,7 @@
           }
         ]
       },
+      "provenance_override": null,
       "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
     },
@@ -2118,6 +2124,7 @@
           }
         ]
       },
+      "provenance_override": null,
       "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
     },
@@ -2438,6 +2445,7 @@
           }
         ]
       },
+      "provenance_override": null,
       "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
     },
@@ -2726,6 +2734,7 @@
           }
         ]
       },
+      "provenance_override": null,
       "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
     },
@@ -3024,9 +3033,10 @@
           }
         ]
       },
+      "provenance_override": null,
       "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
     }
   ],
-  "instruction": "Assistant adjudicates these DCE-backed candidates. Compact snippets with provenance_strength LEGACY_UNATTRIBUTED/LEGACY_PATH_ONLY are not sufficient to resolve a mandatory gate; follow artifact_locator. Unknown is never PASS and this file never emits a final verdict automatically."
+  "instruction": "Assistant adjudicates these DCE-backed candidates. Exact candidate/run provenance overrides may enrich legacy DCE from immutable canonical packs without changing ranking. Compact snippets still lacking path+SHA are navigation evidence only; follow artifact_locator. Unknown is never PASS."
 }

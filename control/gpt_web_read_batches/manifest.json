@@ -1,9 +1,11 @@
 {
-  "schema": "GPT_WEB_READ_BATCH_MANIFEST_V2_PROVENANCE",
-  "generated_at": "2026-08-18T22:38:49.900948+00:00",
-  "source_inbox_updated_at": "2026-08-18T22:38:49.112304+00:00",
+  "schema": "GPT_WEB_READ_BATCH_MANIFEST_V3_PROVENANCE_REFRESH",
+  "generated_at": "2026-08-18T22:45:52.319715+00:00",
+  "source_inbox_updated_at": "2026-08-18T22:45:51.555173+00:00",
   "latest_source_dce_run_id": 32190330115,
   "rich_window_count": 160,
+  "provenance_override_count_available": 0,
+  "provenance_overrides_applied_in_window": 0,
   "batch_size": 10,
   "batch_count": 16,
   "files": [
@@ -104,5 +106,5 @@
       "count": 10
     }
   ],
-  "contract": "Mechanical split/compaction only. New DCE snippets retain exact document provenance. Legacy unattributed snippets force artifact lookup before gate resolution. GPT Web adjudicator is the assistant, not a repository worker."
+  "contract": "Mechanical split/compaction only. New DCE snippets retain exact document provenance; exact candidate+source-run historical overrides may restore provenance from immutable canonical DCE packs. Neither mechanism changes ranking, eligibility or final verdict."
 }
