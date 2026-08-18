@@ -34,13 +34,7 @@ def gh_repo_args() -> list[str]:
 
 
 def download_workflow_artifact(run_id: int, artifact_name: str, dest: Path) -> Path:
-    """Download one exact shard artifact from the DCE workflow run.
-
-    DCE Fanout uses the workflow run id as the durable DCE run id and uploads
-    `candidate-<shard>` after extraction/adjudication. This is the most direct
-    immutable source for legacy provenance because it survives even when the
-    aggregate canonical release bundle was not published.
-    """
+    """Download one exact immutable `dce-shard-<n>` workflow artifact."""
     if not artifact_name:
         raise RuntimeError('workflow artifact name missing')
     marker = dest / '.complete'
@@ -91,55 +85,34 @@ def safe_extract(tf: tarfile.TarFile, target: Path, members=None):
     tf.extractall(target, members=chosen)
 
 
+def stage_candidate_tar(candidate_archive: Path, root: Path) -> Path:
+    if root.exists():
+        shutil.rmtree(root)
+    root.mkdir(parents=True, exist_ok=True)
+    with tarfile.open(candidate_archive, 'r:gz') as inner:
+        safe_extract(inner, root)
+    prepare_candidate_root(root)
+    return root
+
+
 def stage_candidate_from_release(bundle_path: Path, archive_name: str, root: Path):
     root.mkdir(parents=True, exist_ok=True)
     with tarfile.open(bundle_path, 'r') as outer:
         member = outer.getmember(archive_name)
         safe_extract(outer, root, [member])
-    candidate_archive = root / archive_name
-    candidate_root = root / 'candidate'
-    candidate_root.mkdir(parents=True, exist_ok=True)
-    with tarfile.open(candidate_archive, 'r:gz') as inner:
-        safe_extract(inner, candidate_root)
-    prepare_candidate_root(candidate_root)
-    return candidate_root
+    return stage_candidate_tar(root / archive_name, root / 'candidate')
 
 
-def candidate_id_from_file(path: Path) -> str:
-    obj = load(path, {})
-    if not isinstance(obj, dict):
-        return ''
-    return str(obj.get('candidate_id') or obj.get('canonical_notice_id') or '').strip()
-
-
-def find_candidate_root(artifact_root: Path, candidate_id: str) -> Path | None:
-    """Locate the exact candidate directory inside one worker artifact."""
-    matches: list[Path] = []
-    for name in ('candidate.json', 'manifest.json'):
-        for path in artifact_root.rglob(name):
-            cid = candidate_id_from_file(path)
-            if cid == candidate_id:
-                matches.append(path.parent)
-    if matches:
-        # Prefer a root that already contains the worker's downloaded files.
-        matches.sort(key=lambda p: (int((p / 'files').is_dir() or (p / 'originals').is_dir()), len(p.parts)), reverse=True)
+def find_candidate_archive(artifact_root: Path, archive_name: str) -> Path | None:
+    direct = artifact_root / archive_name
+    if direct.exists() and direct.is_file():
+        return direct
+    matches = [p for p in artifact_root.rglob(archive_name) if p.is_file()]
+    if len(matches) == 1:
         return matches[0]
-
-    # Some old worker artifacts omitted candidate.json at nested level but still
-    # contained a single candidate root. Accept it only when unambiguous.
-    plausible = []
-    for manifest in artifact_root.rglob('manifest.json'):
-        parent = manifest.parent
-        if (parent / 'files').is_dir() or (parent / 'originals').is_dir() or (parent / 'corpus.txt').exists():
-            plausible.append(parent)
-    unique = []
-    seen = set()
-    for p in plausible:
-        rp = str(p.resolve())
-        if rp not in seen:
-            seen.add(rp)
-            unique.append(p)
-    return unique[0] if len(unique) == 1 else None
+    if len(matches) > 1:
+        raise RuntimeError(f'multiple exact candidate archives found inside workflow artifact: {archive_name}')
+    return None
 
 
 def prepare_candidate_root(root: Path) -> None:
@@ -181,6 +154,11 @@ def rebuild_override(root: Path, item: dict, *, transport: str, locator: dict) -
     prov = gates.get('snippet_provenance') if isinstance(gates.get('snippet_provenance'), dict) else {}
     cid = str(item.get('candidate_id') or '')
     run_id = int(item.get('dce_run_id'))
+    candidate_meta = load(root / 'candidate.json', {})
+    actual_cid = str(candidate_meta.get('candidate_id') or '').strip()
+    if actual_cid and actual_cid != cid:
+        raise RuntimeError(f'candidate archive identity mismatch expected={cid!r} actual={actual_cid!r}')
+
     override = {
         'candidate_id': cid,
         'source_dce_run_id': run_id,
@@ -193,6 +171,7 @@ def rebuild_override(root: Path, item: dict, *, transport: str, locator: dict) -
         'evidence_provenance_summary': prov,
         'document_count': len(docs) if isinstance(docs, list) else 0,
         'documents_with_source_url': sum(1 for d in docs if isinstance(d, dict) and d.get('source_url')) if isinstance(docs, list) else 0,
+        'raw_machine_documents': sum(1 for d in docs if isinstance(d, dict) and Path(str(d.get('path') or '')).suffix.casefold() in {'.xml','.html','.htm','.json'}) if isinstance(docs, list) else 0,
         'policy': 'Re-extracted only from immutable DCE worker/canonical artifacts for the exact candidate and source run. This override changes evidence provenance/presentation only; it is not a new procurement verdict.',
     }
     summary = {
@@ -202,6 +181,7 @@ def rebuild_override(root: Path, item: dict, *, transport: str, locator: dict) -
         'transport': transport,
         'attributed': int(prov.get('attributed') or 0),
         'unattributed': int(prov.get('unattributed') or 0),
+        'raw_machine_snippets': int(prov.get('raw_machine_format') or 0),
         'documents': override['document_count'],
         'documents_with_source_url': override['documents_with_source_url'],
     }
@@ -250,6 +230,7 @@ def main():
             run_id = int(item.get('dce_run_id'))
             shard = item.get('source_shard')
             artifact_name = str(item.get('workflow_artifact_name') or '')
+            archive_name = str(item.get('archive_name') or '')
             artifact_error = None
 
             # Preferred path: exact immutable worker artifact from the DCE run.
@@ -260,14 +241,21 @@ def main():
                         dest = temp / 'workflow-artifacts' / str(run_id) / artifact_name
                         artifact_cache[cache_key] = download_workflow_artifact(run_id, artifact_name, dest)
                     artifact_root = artifact_cache[cache_key]
-                    root = find_candidate_root(artifact_root, cid)
-                    if root is None:
-                        raise RuntimeError(f'exact candidate root not found inside workflow artifact {artifact_name}')
+                    candidate_archive = find_candidate_archive(artifact_root, archive_name)
+                    if candidate_archive is None:
+                        raise RuntimeError(f'exact candidate pack {archive_name!r} not found inside workflow artifact {artifact_name!r}')
+                    work = temp / 'workflow-work' / str(run_id) / str(shard) / cid.replace('/', '_').replace(':', '_')
+                    root = stage_candidate_tar(candidate_archive, work)
                     override, summary = rebuild_override(
                         root,
                         item,
                         transport='WORKFLOW_ARTIFACT',
-                        locator={'workflow_run_id': run_id, 'artifact_name': artifact_name, 'source_shard': shard},
+                        locator={
+                            'workflow_run_id': run_id,
+                            'artifact_name': artifact_name,
+                            'source_shard': shard,
+                            'candidate_archive': archive_name,
+                        },
                     )
                     overrides[cid] = override
                     refreshed.append(summary)
@@ -291,13 +279,13 @@ def main():
                 })
 
     payload = {
-        'schema': 'GPT_DCE_PROVENANCE_OVERRIDES_V2_ARTIFACT_FIRST',
+        'schema': 'GPT_DCE_PROVENANCE_OVERRIDES_V3_EXACT_SHARD_PACK',
         'updated_at': datetime.now(timezone.utc).isoformat(),
         'override_count': len(overrides),
         'refreshed_this_run': refreshed,
         'failures_this_run': failures,
         'overrides': overrides,
-        'contract': 'Persistent evidence-provenance overlay reconstructed from exact immutable DCE workflow shard artifacts first, canonical release bundles second. Overrides apply only to exact candidate+source-run and never change ranking, eligibility or verdict.',
+        'contract': 'Persistent evidence-provenance overlay reconstructed from exact immutable dce-shard-N workflow artifacts first, canonical release bundles second. The exact candidate tar identity is verified. Overrides apply only to exact candidate+source-run and never change ranking, eligibility or verdict.',
     }
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
