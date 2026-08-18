@@ -1,53 +1,53 @@
 {
   "schema": "GPT_INBOX_HEALTH_V2",
-  "updated_at": "2026-08-18T14:59:17.371653+00:00",
+  "updated_at": "2026-08-18T15:04:54.557555+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V2",
   "latest_source_dce_run_id": 32150412154,
   "counts": {
     "pending_gpt_web_review": 160,
     "reviewed_ticks_total": 182,
     "excluded_already_reviewed": 0,
-    "excluded_already_in_final_bank": 1,
+    "excluded_already_in_final_bank": 0,
     "pending_by_stage": {
       "BUSINESS_GATES": 160
     }
   },
   "review_bank_count": 160,
   "review_bank_schema": "GPT_REVIEW_HOT_V5",
-  "review_index_count": 1278,
+  "review_index_count": 1292,
   "review_index_counts": {
-    "pending_total_uncapped": 1278,
+    "pending_total_uncapped": 1292,
     "by_stage": {
-      "BUSINESS_GATES": 839,
-      "DCE_AUTHENTICITY": 439
+      "BUSINESS_GATES": 845,
+      "DCE_AUTHENTICITY": 447
     },
     "by_spm_fit_band": {
       "HOT": 1,
-      "GOOD": 33,
-      "MAYBE": 94,
-      "LOW": 1150
+      "GOOD": 19,
+      "MAYBE": 80,
+      "LOW": 1192
     },
     "rich_hot_window_target": 160,
-    "overflow_beyond_hot_160": 1118
+    "overflow_beyond_hot_160": 1132
   },
-  "true_pending_before_hot_cap": 1278,
-  "overflow_beyond_hot_160": 1118,
+  "true_pending_before_hot_cap": 1292,
+  "overflow_beyond_hot_160": 1132,
   "recovery_metrics": {
-    "shard_files_scanned": 535,
-    "adjudication_rows_scanned": 3646,
-    "model_review_rows_seen": 861,
-    "dce_authenticity_rows_seen": 477,
+    "shard_files_scanned": 162,
+    "adjudication_rows_scanned": 1327,
+    "model_review_rows_seen": 429,
+    "dce_authenticity_rows_seen": 92,
     "scope_auto_rejected": 0,
     "scope_auto_reject_reason_counts": {},
-    "uncapped_unique_pending_before_hot_window": 1281,
+    "uncapped_unique_pending_before_hot_window": 518,
     "rich_hot_window_count": 160,
-    "overflow_beyond_hot_window": 1121
+    "overflow_beyond_hot_window": 358
   },
   "index_recovery": {
-    "shard_files_scanned_this_refresh": 535,
-    "adjudication_rows_scanned_this_refresh": 3646,
-    "gate_rows_seen_this_refresh": 861,
-    "authenticity_rows_seen_this_refresh": 477,
+    "shard_files_scanned_this_refresh": 162,
+    "adjudication_rows_scanned_this_refresh": 1327,
+    "gate_rows_seen_this_refresh": 429,
+    "authenticity_rows_seen_this_refresh": 92,
     "source_runs_seen_this_refresh": [
       32150412154,
       32149659207,
@@ -58,23 +58,7 @@
       32139057985,
       32137345232,
       32136570899,
-      32132558029,
-      32129565430,
-      32123828524,
-      32121936886,
-      32119818976,
-      32118646120,
-      32117037699,
-      32115727618,
-      32113219271,
-      32111866806,
-      32111031021,
-      32109532180,
-      32106912628,
-      32104269293,
-      32098369885,
-      32097065064,
-      32093332367
+      32132558029
     ]
   },
   "healthy": true,
