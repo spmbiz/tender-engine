@@ -10,6 +10,7 @@ on:
 permissions:
   contents: write
 
+# Trigger formatting repair after first workflow registration.
 jobs:
   patch:
     runs-on: ubuntu-latest
