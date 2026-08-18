@@ -8,11 +8,12 @@ on:
       - '.github/workflows/pipeline-ab-regression.yml'
       - 'pipeline/pipeline_ab_regression.py'
       - 'pipeline/pipeline_ab_regression_v2.py'
+      - 'pipeline/pipeline_ab_regression_v3.py'
       - 'pipeline/global_admission.py'
       - 'pipeline/build_qwen_shadow_shards.py'
       - 'pipeline/materialize_dce_selection.py'
       - 'pipeline/dce_batch_worker.py'
-      - 'pipeline/dce_worker_v14.py'
+      - 'pipeline/dce_worker_v*.py'
       - 'tests/test_freshness_conveyor.py'
       - 'tests/test_global_admission_preauthorized.py'
       - 'control/pipeline_ab_trigger.json'
@@ -70,7 +71,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          PYTHONPATH=current/pipeline python current/pipeline/pipeline_ab_regression_v2.py \
+          PYTHONPATH=current/pipeline python current/pipeline/pipeline_ab_regression_v3.py \
             --current current \
             --baseline baseline \
             --live-queue live/notice-classification-queue-latest.jsonl.gz \
@@ -98,7 +99,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ ! -s pipeline-ab-report.json ]; then
-            printf '{"schema":"TENDER_PIPELINE_AB_REGRESSION_V1","status":"HARNESS_CRASH","head_sha":"%s","run_id":"%s"}\n' "$HEAD_SHA" "$RUN_ID" > pipeline-ab-report.json
+            printf '{"schema":"TENDER_PIPELINE_AB_REGRESSION_V3","status":"HARNESS_CRASH","head_sha":"%s","run_id":"%s"}\n' "$HEAD_SHA" "$RUN_ID" > pipeline-ab-report.json
           fi
           python - <<'PY'
           import json,os
@@ -111,9 +112,9 @@ jobs:
           path='control/pipeline_ab_latest.json'
           content="$(base64 -w0 pipeline-ab-report.json)"
           for attempt in 1 2 3 4 5 6; do
-            sha="$(gh api "repos/$REPO/contents/$path" --jq '.sha' 2>/dev/null || true)"
+            sha="$(gh api "repos/$REPO/contents/$path?ref=main" --jq '.sha' 2>/dev/null || true)"
             args=(--method PUT "repos/$REPO/contents/$path" -f message="ci: persist pipeline A/B result $RUN_ID" -f content="$content" -f branch=main)
-            if [ -n "$sha" ]; then args+=(-f sha="$sha"); fi
+            [ -n "$sha" ] && args+=(-f sha="$sha")
             if gh api "${args[@]}" >/dev/null; then
               echo "persisted $path"
               exit 0
