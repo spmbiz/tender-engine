@@ -1,0 +1,69 @@
+{
+  "schema": "CODED_DCE_SCHEDULER_AB_V1",
+  "source_run": "32120769848",
+  "same_pool_id_conservation": true,
+  "same_pool_rows": 160,
+  "production_rows": 160,
+  "production_subset_of_frozen_4x_pool": true,
+  "production_changed_ids_vs_base160": 14,
+  "qwen_classification_mutations": 0,
+  "keep_drop_mutations": 0,
+  "dce_eligible_mutations": 0,
+  "coded_summary": {
+    "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V1",
+    "generated_at_utc": "2026-08-18T15:11:45+00:00",
+    "source_run": "32120769848",
+    "state_rows": 5968,
+    "ledger_rows": 43371,
+    "snapshot_rows": 43371,
+    "blocked_ids": 22646,
+    "durable_attempted_exact_versions_ignored": 205,
+    "valid_exact_hash_current_unattempted": 762,
+    "eligible_keep_for_dce": 716,
+    "stale_hash_ignored": 0,
+    "missing_snapshot": 0,
+    "expired_ignored": 7,
+    "selected": 160,
+    "selection_decisions": {
+      "MAYBE": 610,
+      "REJECT_OBVIOUS": 30
+    },
+    "selection_survival": {
+      "KEEP": 640
+    },
+    "selection_lanes": {
+      "qwen-open-world-explore": 128,
+      "qwen-reject-audit": 32,
+      "qwen-elastic": 480
+    },
+    "selection_freshness": {
+      "material_new_or_updated": 151,
+      "recent_unseen_carryover": 489
+    },
+    "policy": {
+      "keep_is_not_fit": true,
+      "drop_is_retained_in_state_but_not_primary_dce": true,
+      "dce_eligible_required_for_primary_and_explore": true,
+      "reject_audit_preserved": true,
+      "exact_material_hash_required": true,
+      "durable_dce_attempts_excluded_before_ranking": true,
+      "deadline_unverified_caps_strong_priority": true,
+      "freshness_preempts_backfill_within_dce_lanes": true,
+      "freshness_is_not_eligibility_truth": true,
+      "procurement_code_prior_never_changes_keep_or_dce_eligible": true
+    },
+    "base_candidate_pool": 640,
+    "requested_final_limit": 160,
+    "coded_selection_lanes": {
+      "qwen-explore-coded": 32,
+      "qwen-reject-audit-coded": 8,
+      "qwen-elastic-coded": 120
+    },
+    "code_prior": {
+      "positive_code_rows_in_pool": 0,
+      "noncore_code_contradictions_in_pool": 52,
+      "policy": "priority_only_never_drop_never_eligibility",
+      "candidate_pool_multiplier": 4
+    }
+  }
+}
