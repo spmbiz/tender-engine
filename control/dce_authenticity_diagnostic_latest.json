@@ -1,67 +1,69 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32097065064,
+  "latest_source_dce_run_id": 32098369885,
   "total_inbox_rows": 160,
   "dce_authenticity_rows": 137,
   "portal_counts": {
-    "IRELAND_ETENDERS": 40,
-    "ES_PLACSP": 32,
-    "EE_RHR": 28,
-    "ZA_ETENDERS": 24,
-    "SCOTLAND_PCS": 7,
+    "IRELAND_ETENDERS": 53,
+    "EE_RHR": 34,
+    "ZA_ETENDERS": 23,
+    "ES_PLACSP": 18,
     "GENERIC_PUBLIC_PAGE": 4,
-    "GR_KHMDHS": 2
+    "TED": 3,
+    "SCOTLAND_PCS": 2
   },
   "status_counts": {
     "UNKNOWN_RETRIEVED_DOCUMENT": 133,
     "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 4
   },
   "reason_counts": {
-    "NON_AUTHORITATIVE": 134,
-    "AUTH_REQUIRED": 3
+    "NON_AUTHORITATIVE": 133,
+    "AUTH_REQUIRED": 3,
+    "NO_PUBLIC_FILE": 1
   },
   "method_counts": {},
   "recovery_opportunities": [
     {
+      "portal": "TED",
+      "blocked": 3,
+      "likely_public_recovery_target": 1,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2,
+        "NO_PUBLIC_FILE": 1
+      }
+    },
+    {
       "portal": "IRELAND_ETENDERS",
-      "blocked": 40,
+      "blocked": 53,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 38,
+        "NON_AUTHORITATIVE": 51,
         "AUTH_REQUIRED": 2
       }
     },
     {
-      "portal": "ES_PLACSP",
-      "blocked": 32,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 32
-      }
-    },
-    {
       "portal": "EE_RHR",
-      "blocked": 28,
+      "blocked": 34,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 28
+        "NON_AUTHORITATIVE": 34
       }
     },
     {
       "portal": "ZA_ETENDERS",
-      "blocked": 24,
+      "blocked": 23,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 23,
+        "NON_AUTHORITATIVE": 22,
         "AUTH_REQUIRED": 1
       }
     },
     {
-      "portal": "SCOTLAND_PCS",
-      "blocked": 7,
+      "portal": "ES_PLACSP",
+      "blocked": 18,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 7
+        "NON_AUTHORITATIVE": 18
       }
     },
     {
@@ -73,7 +75,7 @@
       }
     },
     {
-      "portal": "GR_KHMDHS",
+      "portal": "SCOTLAND_PCS",
       "blocked": 2,
       "likely_public_recovery_target": 0,
       "reason_counts": {
@@ -83,6 +85,22 @@
   ],
   "samples_by_reason": {
     "NON_AUTHORITATIVE": [
+      {
+        "candidate_id": "EE-RHR:008e239a-8d16-4010-84a3-908674742da2",
+        "portal": "EE_RHR",
+        "title": "Process Monitoring and Control System for Mechanical Stamping Presses",
+        "buyer": "Meconet AS",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://riigihanked.riik.ee/rhr-web/#/procurement/10592524/general-info"
+      },
+      {
+        "candidate_id": "IE:8825829",
+        "portal": "IRELAND_ETENDERS",
+        "title": "Invitation to Tender for EU Dairy Ingredients Technical Video",
+        "buyer": "Bord Bia (Irish Food Board)",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8825829"
+      },
       {
         "candidate_id": "IE:8701573",
         "portal": "IRELAND_ETENDERS",
@@ -106,22 +124,6 @@
         "buyer": "Media, Information and Communication Technologies Sector Education and training Authority (MICT SETA)",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
         "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-164943"
-      },
-      {
-        "candidate_id": "IE:8753790",
-        "portal": "IRELAND_ETENDERS",
-        "title": "Design and Delivery of an AI Upskilling Programme for Engineers",
-        "buyer": "Technology Ireland Digital Skillnet",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8753790"
-      },
-      {
-        "candidate_id": "IE:8746621",
-        "portal": "IRELAND_ETENDERS",
-        "title": "Asset Management Platform",
-        "buyer": "The Land Development Agency",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8746621"
       }
     ],
     "AUTH_REQUIRED": [
@@ -148,6 +150,16 @@
         "buyer": "Coolaney/Mullinabreena GAA club",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
         "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8784211"
+      }
+    ],
+    "NO_PUBLIC_FILE": [
+      {
+        "candidate_id": "TED:568274-2026",
+        "portal": "TED",
+        "title": "Netherlands – Road signs – Wegbebakening en bebording",
+        "buyer": "Irado",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://ted.europa.eu/en/notice/-/detail/568274-2026"
       }
     ]
   },
