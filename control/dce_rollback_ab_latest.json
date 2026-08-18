@@ -1,15 +1,15 @@
 {
   "schema": "DCE_ROLLBACK_AB_DURABLE_EVIDENCE_V1",
-  "generated_at": "2026-08-18T01:06:08.914039+00:00",
+  "generated_at": "2026-08-18T03:56:43.782133+00:00",
   "status": "PASS",
   "errors": [],
   "source_workflow": {
     "name": "DCE Rollback A/B V15",
-    "run_id": "32086709775",
+    "run_id": "32097094865",
     "conclusion": "success",
-    "head_sha": "26a79c251c9b60a7bf46c8370e41ed158031cfd0",
+    "head_sha": "f86aadf4b8af2ce117d9add634331153dafb4987",
     "head_branch": "main",
-    "created_at": "2026-08-18T01:01:35Z"
+    "created_at": "2026-08-18T03:53:20Z"
   },
   "rollback_report": {
     "candidate_count": 20,
@@ -17,24 +17,24 @@
     "baseline_results": 20,
     "current_results": 20,
     "hard_regression_count": 0,
-    "warning_count": 8,
+    "warning_count": 6,
     "improvement_count": 5,
     "baseline_statuses": {
       "NO_PUBLIC_FILE": 6,
       "DOWNLOADED_PUBLIC": 7,
-      "AUTH_REQUIRED": 4,
+      "AUTH_REQUIRED": 3,
       "ROUTE_INCOMPLETE": 2,
-      "GENERIC_PUBLIC_PAGE_UNRESOLVED": 1
+      "GENERIC_PUBLIC_PAGE_UNRESOLVED": 2
     },
     "current_statuses": {
       "ERROR_RETRYABLE": 1,
       "DOWNLOADED_PUBLIC": 12,
-      "AUTH_REQUIRED": 4,
+      "AUTH_REQUIRED": 3,
       "ROUTE_INCOMPLETE": 2,
-      "GENERIC_PUBLIC_PAGE_UNRESOLVED": 1
+      "GENERIC_PUBLIC_PAGE_UNRESOLVED": 2
     },
-    "baseline_wall_candidate_seconds": 200.073,
-    "current_wall_candidate_seconds": 419.432,
+    "baseline_wall_candidate_seconds": 205.592,
+    "current_wall_candidate_seconds": 203.115,
     "hard_regressions": [],
     "warnings": [
       {
@@ -42,19 +42,19 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.684,
+          "elapsed_seconds": 2.367,
           "returncode": 0
         },
         "current": {
           "status": "ERROR_RETRYABLE",
           "files": 0,
-          "elapsed_seconds": 22.589,
+          "elapsed_seconds": 29.705,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
           "status_changed:NO_PUBLIC_FILE->ERROR_RETRYABLE",
-          "latency_regression:1.684s->22.589s",
+          "latency_regression:2.367s->29.705s",
           "current_retryable_error"
         ],
         "improvements": []
@@ -64,13 +64,13 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.228,
+          "elapsed_seconds": 1.834,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 8,
-          "elapsed_seconds": 6.268,
+          "elapsed_seconds": 9.049,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -87,13 +87,13 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.738,
+          "elapsed_seconds": 2.493,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 4,
-          "elapsed_seconds": 11.325,
+          "elapsed_seconds": 13.825,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -110,13 +110,13 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.415,
+          "elapsed_seconds": 1.944,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 2,
-          "elapsed_seconds": 10.874,
+          "elapsed_seconds": 15.769,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -133,19 +133,19 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.581,
+          "elapsed_seconds": 4.583,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 5,
-          "elapsed_seconds": 23.539,
+          "elapsed_seconds": 31.901,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
           "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC",
-          "latency_regression:1.581s->23.539s"
+          "latency_regression:4.583s->31.901s"
         ],
         "improvements": [
           "new_public_download",
@@ -157,64 +157,24 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.315,
+          "elapsed_seconds": 1.729,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 8,
-          "elapsed_seconds": 26.922,
+          "elapsed_seconds": 36.542,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
           "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC",
-          "latency_regression:1.315s->26.922s"
+          "latency_regression:1.729s->36.542s"
         ],
         "improvements": [
           "new_public_download",
           "status_to_download:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC"
         ]
-      },
-      {
-        "candidate_id": "GR-KHMDHS:26PROC019634474",
-        "baseline": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 1.665,
-          "returncode": 0
-        },
-        "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 61.733,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [
-          "latency_regression:1.665s->61.733s"
-        ],
-        "improvements": []
-      },
-      {
-        "candidate_id": "GR-KHMDHS:26PROC019636618",
-        "baseline": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 1.68,
-          "returncode": 0
-        },
-        "current": {
-          "status": "DOWNLOADED_PUBLIC",
-          "files": 1,
-          "elapsed_seconds": 61.583,
-          "returncode": 0
-        },
-        "hard_regressions": [],
-        "warnings": [
-          "latency_regression:1.680s->61.583s"
-        ],
-        "improvements": []
       }
     ],
     "improvements": [
@@ -223,13 +183,13 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.228,
+          "elapsed_seconds": 1.834,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 8,
-          "elapsed_seconds": 6.268,
+          "elapsed_seconds": 9.049,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -246,13 +206,13 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.738,
+          "elapsed_seconds": 2.493,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 4,
-          "elapsed_seconds": 11.325,
+          "elapsed_seconds": 13.825,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -269,13 +229,13 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.415,
+          "elapsed_seconds": 1.944,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 2,
-          "elapsed_seconds": 10.874,
+          "elapsed_seconds": 15.769,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -292,19 +252,19 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.581,
+          "elapsed_seconds": 4.583,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 5,
-          "elapsed_seconds": 23.539,
+          "elapsed_seconds": 31.901,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
           "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC",
-          "latency_regression:1.581s->23.539s"
+          "latency_regression:4.583s->31.901s"
         ],
         "improvements": [
           "new_public_download",
@@ -316,19 +276,19 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.315,
+          "elapsed_seconds": 1.729,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 8,
-          "elapsed_seconds": 26.922,
+          "elapsed_seconds": 36.542,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
           "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC",
-          "latency_regression:1.315s->26.922s"
+          "latency_regression:1.729s->36.542s"
         ],
         "improvements": [
           "new_public_download",
@@ -342,13 +302,13 @@
         "baseline": {
           "status": "AUTH_REQUIRED",
           "files": 0,
-          "elapsed_seconds": 9.498,
+          "elapsed_seconds": 10.015,
           "returncode": 0
         },
         "current": {
           "status": "AUTH_REQUIRED",
           "files": 0,
-          "elapsed_seconds": 9.03,
+          "elapsed_seconds": 10.076,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -358,15 +318,15 @@
       {
         "candidate_id": "DE-DOE:0e1404be-041c-456d-8bfb-420f14e07c3f:01",
         "baseline": {
-          "status": "AUTH_REQUIRED",
+          "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
           "files": 0,
-          "elapsed_seconds": 9.076,
+          "elapsed_seconds": 10.393,
           "returncode": 0
         },
         "current": {
-          "status": "AUTH_REQUIRED",
+          "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
           "files": 0,
-          "elapsed_seconds": 9.828,
+          "elapsed_seconds": 10.01,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -378,13 +338,13 @@
         "baseline": {
           "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
           "files": 0,
-          "elapsed_seconds": 9.081,
+          "elapsed_seconds": 9.879,
           "returncode": 0
         },
         "current": {
           "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
           "files": 0,
-          "elapsed_seconds": 28.332,
+          "elapsed_seconds": 10.319,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -396,19 +356,19 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.684,
+          "elapsed_seconds": 2.367,
           "returncode": 0
         },
         "current": {
           "status": "ERROR_RETRYABLE",
           "files": 0,
-          "elapsed_seconds": 22.589,
+          "elapsed_seconds": 29.705,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
           "status_changed:NO_PUBLIC_FILE->ERROR_RETRYABLE",
-          "latency_regression:1.684s->22.589s",
+          "latency_regression:2.367s->29.705s",
           "current_retryable_error"
         ],
         "improvements": []
@@ -418,13 +378,13 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.228,
+          "elapsed_seconds": 1.834,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 8,
-          "elapsed_seconds": 6.268,
+          "elapsed_seconds": 9.049,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -441,13 +401,13 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.738,
+          "elapsed_seconds": 2.493,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 4,
-          "elapsed_seconds": 11.325,
+          "elapsed_seconds": 13.825,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -464,13 +424,13 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.415,
+          "elapsed_seconds": 1.944,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 2,
-          "elapsed_seconds": 10.874,
+          "elapsed_seconds": 15.769,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -487,19 +447,19 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.581,
+          "elapsed_seconds": 4.583,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 5,
-          "elapsed_seconds": 23.539,
+          "elapsed_seconds": 31.901,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
           "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC",
-          "latency_regression:1.581s->23.539s"
+          "latency_regression:4.583s->31.901s"
         ],
         "improvements": [
           "new_public_download",
@@ -511,19 +471,19 @@
         "baseline": {
           "status": "NO_PUBLIC_FILE",
           "files": 0,
-          "elapsed_seconds": 1.315,
+          "elapsed_seconds": 1.729,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 8,
-          "elapsed_seconds": 26.922,
+          "elapsed_seconds": 36.542,
           "returncode": 0
         },
         "hard_regressions": [],
         "warnings": [
           "status_changed:NO_PUBLIC_FILE->DOWNLOADED_PUBLIC",
-          "latency_regression:1.315s->26.922s"
+          "latency_regression:1.729s->36.542s"
         ],
         "improvements": [
           "new_public_download",
@@ -535,19 +495,17 @@
         "baseline": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 1.665,
+          "elapsed_seconds": 61.795,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 61.733,
+          "elapsed_seconds": 1.789,
           "returncode": 0
         },
         "hard_regressions": [],
-        "warnings": [
-          "latency_regression:1.665s->61.733s"
-        ],
+        "warnings": [],
         "improvements": []
       },
       {
@@ -555,13 +513,13 @@
         "baseline": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 61.941,
+          "elapsed_seconds": 62.3,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 62.221,
+          "elapsed_seconds": 1.833,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -573,19 +531,17 @@
         "baseline": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 1.68,
+          "elapsed_seconds": 1.726,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 61.583,
+          "elapsed_seconds": 1.797,
           "returncode": 0
         },
         "hard_regressions": [],
-        "warnings": [
-          "latency_regression:1.680s->61.583s"
-        ],
+        "warnings": [],
         "improvements": []
       },
       {
@@ -593,13 +549,13 @@
         "baseline": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 61.733,
+          "elapsed_seconds": 1.414,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 61.822,
+          "elapsed_seconds": 1.567,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -611,13 +567,13 @@
         "baseline": {
           "status": "AUTH_REQUIRED",
           "files": 0,
-          "elapsed_seconds": 9.33,
+          "elapsed_seconds": 10.041,
           "returncode": 0
         },
         "current": {
           "status": "AUTH_REQUIRED",
           "files": 0,
-          "elapsed_seconds": 8.037,
+          "elapsed_seconds": 10.885,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -629,13 +585,13 @@
         "baseline": {
           "status": "AUTH_REQUIRED",
           "files": 0,
-          "elapsed_seconds": 15.978,
+          "elapsed_seconds": 11.429,
           "returncode": 0
         },
         "current": {
           "status": "AUTH_REQUIRED",
           "files": 0,
-          "elapsed_seconds": 5.885,
+          "elapsed_seconds": 6.229,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -647,13 +603,13 @@
         "baseline": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 3.256,
+          "elapsed_seconds": 4.024,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 3.589,
+          "elapsed_seconds": 3.857,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -665,13 +621,13 @@
         "baseline": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 1.301,
+          "elapsed_seconds": 1.928,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 1.278,
+          "elapsed_seconds": 1.443,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -683,13 +639,13 @@
         "baseline": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 5.472,
+          "elapsed_seconds": 4.572,
           "returncode": 0
         },
         "current": {
           "status": "DOWNLOADED_PUBLIC",
           "files": 1,
-          "elapsed_seconds": 3.683,
+          "elapsed_seconds": 5.344,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -701,13 +657,13 @@
         "baseline": {
           "status": "ROUTE_INCOMPLETE",
           "files": 0,
-          "elapsed_seconds": 0.458,
+          "elapsed_seconds": 0.565,
           "returncode": 0
         },
         "current": {
           "status": "ROUTE_INCOMPLETE",
           "files": 0,
-          "elapsed_seconds": 0.451,
+          "elapsed_seconds": 0.581,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -719,13 +675,13 @@
         "baseline": {
           "status": "ROUTE_INCOMPLETE",
           "files": 0,
-          "elapsed_seconds": 0.643,
+          "elapsed_seconds": 0.561,
           "returncode": 0
         },
         "current": {
           "status": "ROUTE_INCOMPLETE",
           "files": 0,
-          "elapsed_seconds": 0.443,
+          "elapsed_seconds": 0.594,
           "returncode": 0
         },
         "hard_regressions": [],
@@ -751,13 +707,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 1.107,
+        "elapsed_seconds": 2.004,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "DOWNLOADED_PUBLIC",
-            "elapsed_seconds": 1.106,
+            "elapsed_seconds": 2.004,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:CA\",\n  \"portal\": \"CA_CANADABUYS\",\n  \"raw_portal\": \"CA_CANADABUYS\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 6,\n  \"root\": \"expansion-out/EXP-CA\"\n}\n",
             "stderr": ""
@@ -779,13 +735,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 12.625,
+        "elapsed_seconds": 11.977,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "AUTH_REQUIRED",
-            "elapsed_seconds": 12.625,
+            "elapsed_seconds": 11.977,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:NZ\",\n  \"portal\": \"NZ_GETS\",\n  \"raw_portal\": \"NZ_GETS\",\n  \"status\": \"AUTH_REQUIRED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-NZ\"\n}\n",
             "stderr": ""
@@ -807,13 +763,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 12.72,
+        "elapsed_seconds": 14.454,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-            "elapsed_seconds": 12.72,
+            "elapsed_seconds": 14.454,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:PROCONTRACT\",\n  \"portal\": \"UK_PROCONTRACT\",\n  \"raw_portal\": \"UK_PROCONTRACT\",\n  \"status\": \"GENERIC_PUBLIC_PAGE_UNRESOLVED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-PROCONTRACT\"\n}\n",
             "stderr": ""
@@ -835,13 +791,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 4.098,
+        "elapsed_seconds": 5.074,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "AUTH_REQUIRED",
-            "elapsed_seconds": 4.098,
+            "elapsed_seconds": 5.074,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:DELTA\",\n  \"portal\": \"UK_DELTA\",\n  \"raw_portal\": \"UK_DELTA\",\n  \"status\": \"AUTH_REQUIRED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-DELTA\"\n}\n",
             "stderr": ""
@@ -863,13 +819,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 6.755,
+        "elapsed_seconds": 5.159,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-            "elapsed_seconds": 6.755,
+            "elapsed_seconds": 5.159,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:INTEND\",\n  \"portal\": \"UK_INTEND\",\n  \"raw_portal\": \"UK_INTEND\",\n  \"status\": \"GENERIC_PUBLIC_PAGE_UNRESOLVED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-INTEND\"\n}\n",
             "stderr": ""
@@ -891,13 +847,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 7.016,
+        "elapsed_seconds": 7.708,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "AUTH_REQUIRED",
-            "elapsed_seconds": 7.016,
+            "elapsed_seconds": 7.708,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:JAGGAER\",\n  \"portal\": \"UK_JAGGAER\",\n  \"raw_portal\": \"UK_JAGGAER\",\n  \"status\": \"AUTH_REQUIRED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-JAGGAER\"\n}\n",
             "stderr": ""
@@ -919,13 +875,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 3.122,
+        "elapsed_seconds": 2.948,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "DOWNLOADED_PUBLIC",
-            "elapsed_seconds": 3.122,
+            "elapsed_seconds": 2.948,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:ATAMIS\",\n  \"portal\": \"UK_ATAMIS\",\n  \"raw_portal\": \"UK_ATAMIS\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 1,\n  \"root\": \"expansion-out/EXP-ATAMIS\"\n}\n",
             "stderr": ""
@@ -947,13 +903,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 31.271,
+        "elapsed_seconds": 39.527,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "DOWNLOADED_PUBLIC",
-            "elapsed_seconds": 31.27,
+            "elapsed_seconds": 39.527,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:SK\",\n  \"portal\": \"SK_UVO_PUBLIC\",\n  \"raw_portal\": \"SK_UVO_PUBLIC\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 1,\n  \"root\": \"expansion-out/EXP-SK\"\n}\n",
             "stderr": ""
@@ -975,13 +931,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 13.949,
+        "elapsed_seconds": 14.531,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-            "elapsed_seconds": 13.949,
+            "elapsed_seconds": 14.531,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:DE-NRW\",\n  \"portal\": \"DE_EVERGABE_NRW\",\n  \"raw_portal\": \"DE_EVERGABE_NRW\",\n  \"status\": \"GENERIC_PUBLIC_PAGE_UNRESOLVED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-DE-NRW\"\n}\n",
             "stderr": ""
@@ -1003,13 +959,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 19.25,
+        "elapsed_seconds": 23.191,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
-            "elapsed_seconds": 19.25,
+            "elapsed_seconds": 23.191,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:BG\",\n  \"portal\": \"BG_EOP_PUBLIC\",\n  \"raw_portal\": \"BG_EOP_PUBLIC\",\n  \"status\": \"GENERIC_PUBLIC_PAGE_UNRESOLVED\",\n  \"files\": 0,\n  \"root\": \"expansion-out/EXP-BG\"\n}\n",
             "stderr": ""
@@ -1031,13 +987,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 33.81,
+        "elapsed_seconds": 35.151,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "DOWNLOADED_PUBLIC",
-            "elapsed_seconds": 33.81,
+            "elapsed_seconds": 35.151,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:CAT\",\n  \"portal\": \"ES_CATALONIA_PUBLIC\",\n  \"raw_portal\": \"ES_CATALONIA_PUBLIC\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 12,\n  \"root\": \"expansion-out/EXP-CAT\"\n}\n",
             "stderr": ""
@@ -1059,13 +1015,13 @@
         "requested_timeout_seconds": 125,
         "effective_timeout_seconds": 125,
         "rate_limited": false,
-        "elapsed_seconds": 67.29,
+        "elapsed_seconds": 74.866,
         "attempts": [
           {
             "attempt": 1,
             "returncode": 0,
             "status": "DOWNLOADED_PUBLIC",
-            "elapsed_seconds": 67.29,
+            "elapsed_seconds": 74.866,
             "rate_limited": false,
             "stdout": "{\n  \"candidate_id\": \"EXP:HU\",\n  \"portal\": \"HU_EKR_PUBLIC\",\n  \"raw_portal\": \"HU_EKR_PUBLIC\",\n  \"status\": \"DOWNLOADED_PUBLIC\",\n  \"files\": 7,\n  \"root\": \"expansion-out/EXP-HU\"\n}\n",
             "stderr": ""
@@ -1076,8 +1032,8 @@
     "bad": []
   },
   "artifact_paths": {
-    "rollback": "evidence/dce-rollback-ab-32086709775/ab-report/report.json",
-    "expansion": "evidence/dce-expansion-live-32086709775/expansion-summary.json"
+    "rollback": "evidence/dce-rollback-ab-32097094865/ab-report/report.json",
+    "expansion": "evidence/dce-expansion-live-32097094865/expansion-summary.json"
   },
   "gate": {
     "canonical_source_branch": "main",
