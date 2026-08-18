@@ -2,13 +2,14 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 import re
 from collections import Counter
 from pathlib import Path
 from typing import Any
 
-SCHEMA = "QWEN_NOTICE_POST_GUARD_V3"
+SCHEMA = "QWEN_NOTICE_POST_GUARD_V4"
 PERSONAL_SERVICE = re.compile(r"\bpersonal services? contract\b", re.I)
 LICENSED_ROLE = re.compile(r"\b(security officer|licensed|certified professional|physician|nurse|engineer of record)\b", re.I)
 EQUIPMENT_RISK = re.compile(
@@ -16,9 +17,6 @@ EQUIPMENT_RISK = re.compile(
     r"scientific instruments?|laboratory instruments?|speciali[sz]ed equipment)\b",
     re.I,
 )
-# High-recall rescue is deliberately notice-only routing, never DCE/eligibility truth.
-# These are native/near-native SPM scopes whose model-level REJECT would be unsafe
-# because downstream DCE is the authoritative place to discover qualification gates.
 CORE_RECALL = re.compile(
     r"\b(website|web\s*site|web\s*app(?:lication)?|web\s*portal|portal development|"
     r"software development|application development|mobile app|smartphone app|"
@@ -37,20 +35,75 @@ BROKERABLE_GOODS = re.compile(
 HARD_FRICTION = {"REGULATED_GOODS", "LICENSED_PERSONNEL", "SECURITY_CLEARANCE"}
 
 
-def notice_text(row: dict[str, Any]) -> tuple[str, str]:
+def candidate_id(row: dict[str, Any]) -> str:
     n = row.get("notice") if isinstance(row.get("notice"), dict) else {}
+    return str(
+        row.get("canonical_notice_id")
+        or row.get("candidate_id")
+        or n.get("canonical_notice_id")
+        or n.get("candidate_id")
+        or n.get("notice_id")
+        or n.get("id")
+        or ""
+    ).strip()
+
+
+def _open_queue(path: Path):
+    if path.suffix == ".gz":
+        return gzip.open(path, "rt", encoding="utf-8")
+    return path.open("r", encoding="utf-8")
+
+
+def load_notice_context(path: Path | None) -> dict[str, dict[str, Any]]:
+    """Index the exact shard queue by canonical candidate identity.
+
+    No fuzzy aliases are permitted here. The post-guard may use scope text only
+    when the classifier result ID exactly matches one and only one source row.
+    Duplicate IDs fail closed because attaching the wrong notice text could
+    incorrectly change routing priority.
+    """
+    if path is None:
+        return {}
+    index: dict[str, dict[str, Any]] = {}
+    with _open_queue(path) as fh:
+        for raw in fh:
+            raw = raw.strip()
+            if not raw:
+                continue
+            row = json.loads(raw)
+            if not isinstance(row, dict):
+                continue
+            cid = candidate_id(row)
+            if not cid:
+                continue
+            if cid in index:
+                raise SystemExit(f"duplicate candidate id in post-guard queue context: {cid}")
+            index[cid] = row
+    return index
+
+
+def notice_text(row: dict[str, Any], context: dict[str, Any] | None = None) -> tuple[str, str]:
+    """Return title/scope text from the exact source context when available.
+
+    Qwen raw results intentionally contain classification fields, not the full
+    notice. Production shards created by build_qwen_shadow_shards.py are compact
+    top-level notice records, so support both nested and top-level shapes.
+    """
+    source = context if isinstance(context, dict) else row
+    n = source.get("notice") if isinstance(source.get("notice"), dict) else source
     title = str(n.get("title") or n.get("t") or "")
     desc = str(n.get("description") or n.get("d") or "")
-    return title, f"{title} {desc}"
+    category = str(n.get("cpv_or_category") or n.get("category") or "")
+    procedure = str(n.get("procedure") or "")
+    return title, " ".join(x for x in (title, desc, category, procedure) if x)
 
 
-def guard(row: dict[str, Any]) -> dict[str, Any]:
+def guard(row: dict[str, Any], notice_context: dict[str, Any] | None = None) -> dict[str, Any]:
     out = dict(row)
-    title, text = notice_text(row)
+    _title, text = notice_text(row, notice_context)
     flags = list(out.get("friction_flags") or []) if isinstance(out.get("friction_flags"), list) else []
     actions: list[str] = []
 
-    # Preserve the actual model/deterministic-pre-guard label for diagnostics.
     out.setdefault("pre_post_guard_classification", out.get("classification"))
     out.setdefault("pre_post_guard_delivery_mode", out.get("delivery_mode"))
 
@@ -85,8 +138,6 @@ def guard(row: dict[str, Any]) -> dict[str, Any]:
     route = str(out.get("delivery_mode") or "").upper()
     core = bool(CORE_RECALL.search(text))
 
-    # Qwen is only a high-recall router. A model REJECT is never allowed to erase
-    # an obvious core scope when the deterministic survival layer said KEEP.
     if classification == "REJECT_OBVIOUS" and survival == "KEEP" and not hard:
         if core:
             out["classification"] = "FIT"
@@ -107,11 +158,6 @@ def guard(row: dict[str, Any]) -> dict[str, Any]:
             out["dce_eligible"] = True
             actions.append("high_recall_brokerable_reject_rescued_to_maybe")
 
-    # A narrower upgrade covers cases where the model already preserved an
-    # obvious direct-digital opportunity as MAYBE. Require all three independent
-    # notice-level confidence signals (core wording + HIGH lean + DIRECT_DIGITAL),
-    # KEEP survival, and no hard friction. This only changes DCE routing priority;
-    # it still cannot create a final GREEN or prove any mandatory eligibility gate.
     classification = str(out.get("classification") or "").upper()
     lean = str(out.get("lean_attractiveness") or "").upper()
     route = str(out.get("delivery_mode") or "").upper()
@@ -132,25 +178,42 @@ def guard(row: dict[str, Any]) -> dict[str, Any]:
     out["post_guard_schema"] = SCHEMA
     out["post_guard_actions"] = actions
     out["post_guard_applied"] = bool(actions)
+    out["post_guard_notice_context_used"] = bool(notice_context)
     return out
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Apply generic non-destructive routing/risk guards to Qwen notice results.")
+    ap = argparse.ArgumentParser(description="Apply non-destructive routing/risk guards to Qwen notice results.")
     ap.add_argument("--input", required=True)
     ap.add_argument("--output", required=True)
     ap.add_argument("--summary", required=True)
+    ap.add_argument("--queue", help="Exact source shard/fixture used by Qwen; joined by exact candidate ID only.")
     args = ap.parse_args()
 
+    context = load_notice_context(Path(args.queue)) if args.queue else {}
     rows: list[dict[str, Any]] = []
     changed = 0
+    context_matches = 0
+    context_misses = 0
+    seen_result_ids: set[str] = set()
     with open(args.input, encoding="utf-8") as fh:
         for raw in fh:
             raw = raw.strip()
             if not raw:
                 continue
             row = json.loads(raw)
-            guarded = guard(row)
+            cid = candidate_id(row)
+            if cid:
+                if cid in seen_result_ids:
+                    raise SystemExit(f"duplicate candidate id in post-guard results: {cid}")
+                seen_result_ids.add(cid)
+            source = context.get(cid) if cid else None
+            if args.queue:
+                if source is not None:
+                    context_matches += 1
+                else:
+                    context_misses += 1
+            guarded = guard(row, source)
             changed += int(guarded.get("post_guard_applied", False))
             rows.append(guarded)
 
@@ -159,17 +222,22 @@ def main() -> None:
         encoding="utf-8",
     )
     summary = {
-        "schema": "QWEN_NOTICE_POST_GUARD_SUMMARY_V3",
+        "schema": "QWEN_NOTICE_POST_GUARD_SUMMARY_V4",
         "input_rows": len(rows),
         "output_rows": len(rows),
         "rows_changed": changed,
+        "queue_context_rows": len(context),
+        "context_matches": context_matches,
+        "context_misses": context_misses,
         "classification_counts": dict(sorted(Counter(str(x.get("classification")) for x in rows).items())),
         "action_counts": dict(sorted(Counter(a for x in rows for a in (x.get("post_guard_actions") or [])).items())),
         "safety": {
             "drops_or_deletes_rows": False,
             "raw_model_results_preserved_separately": True,
-            "risk_flags_are_dce_truth": False,
             "automatic_final_rejection_enabled": False,
+            "queue_context_join_is_exact_candidate_id_only": True,
+            "duplicate_queue_or_result_ids_fail_closed": True,
+            "context_miss_does_not_guess": True,
             "reject_rescue_requires_survival_keep": True,
             "maybe_to_fit_requires_core_high_direct_keep": True,
             "rescued_rows_still_require_dce_for_truth": True,
@@ -178,6 +246,8 @@ def main() -> None:
     Path(args.summary).write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     if summary["input_rows"] != summary["output_rows"]:
         raise SystemExit("post-guard row conservation failed")
+    if args.queue and context_misses:
+        raise SystemExit(f"post-guard exact context join failed for {context_misses} result rows")
     print(json.dumps(summary, indent=2, ensure_ascii=False))
 
 
