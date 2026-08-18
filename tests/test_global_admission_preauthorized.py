@@ -130,3 +130,35 @@ def test_existing_gws_activity_counts_as_consumed_not_double_reserved(monkeypatc
     assert report["physical_free"] == 14
     assert report["sibling_missing_reserved"] == 4
     assert report["global_room_after_protection"] == 10
+
+
+def test_repo_capacity_state_requests_up_to_100_runs_and_jobs(monkeypatch):
+    urls = []
+
+    def fake_json(url, default):
+        urls.append(url)
+        if "/actions/runs?" in url and "status=in_progress" in url:
+            return {
+                "workflow_runs": [{
+                    "id": 123,
+                    "name": "Qwen Live Notice Classification",
+                    "path": ".github/workflows/qwen-live-classification.yml",
+                    "jobs_url": "https://api.github.com/repos/walidgdg1-ai/tender-engine/actions/runs/123/jobs",
+                }]
+            }
+        if "/actions/runs?" in url:
+            return {"workflow_runs": []}
+        if "/actions/runs/123/jobs" in url:
+            return {"jobs": [{"status": "in_progress"} for _ in range(20)]}
+        return default
+
+    monkeypatch.setattr(ga, "_json", fake_json)
+    active, queued = ga._repo_capacity_state(ga.TENDER_REPO)
+    assert active["tenders"] == 20
+    assert queued["tenders"] == 0
+    assert any("status=in_progress&per_page=100" in u for u in urls)
+    assert any("/actions/runs/123/jobs?per_page=100" in u for u in urls)
+
+
+def test_per_page_preserves_existing_query_and_clamps_to_100():
+    assert ga._per_page("https://api.github.com/x/jobs?filter=latest", 1000).endswith("filter=latest&per_page=100")
