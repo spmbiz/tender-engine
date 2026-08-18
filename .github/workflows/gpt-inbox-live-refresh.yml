@@ -20,6 +20,9 @@ on:
       - 'pipeline/rebuild_gpt_review_bank_from_release.py'
       - 'pipeline/build_gpt_review_index.py'
       - 'pipeline/build_gpt_web_read_batches.py'
+      - 'pipeline/extract_corpus.py'
+      - 'pipeline/extract_gates.py'
+      - 'pipeline/auto_adjudicate_dce.py'
       - '.github/workflows/gpt-inbox-live-refresh.yml'
 
 permissions:
@@ -114,9 +117,6 @@ jobs:
               --out control/gpt_supergreen_inbox.json \
               --max-items 160
 
-            # Mechanical output only: ten DCE-backed candidates per small file so
-            # the conversation assistant can read/adjudicate them directly. This
-            # never emits a verdict and is not an autonomous GPT worker.
             python pipeline/build_gpt_web_read_batches.py \
               --inbox control/gpt_supergreen_inbox.json \
               --out-dir control/gpt_web_read_batches \
@@ -130,24 +130,28 @@ jobs:
           index=json.load(open('control/gpt_review_index.json',encoding='utf-8'))
           manifest=json.load(open('control/gpt_web_read_batches/manifest.json',encoding='utf-8'))
           idx_counts=index.get('counts') or {}
+          inbox_schema=str(inbox.get('schema') or '')
           payload={
-            'schema':'GPT_INBOX_HEALTH_V2',
+            'schema':'GPT_INBOX_HEALTH_V3_FAIR_SHARE',
             'updated_at':datetime.now(timezone.utc).isoformat(),
-            'inbox_schema':inbox.get('schema'),
+            'inbox_schema':inbox_schema,
             'latest_source_dce_run_id':inbox.get('latest_source_dce_run_id'),
             'counts':inbox.get('counts') or {},
+            'window_selection':inbox.get('window_selection') or {},
             'review_bank_count':review.get('count'),
             'review_bank_schema':review.get('schema'),
+            'review_bank_window_selection':review.get('window_selection') or {},
             'review_index_count':int(index.get('count') or 0),
             'review_index_counts':idx_counts,
             'true_pending_before_hot_cap':int(idx_counts.get('pending_total_uncapped') or 0),
             'overflow_beyond_hot_160':int(idx_counts.get('overflow_beyond_hot_160') or 0),
             'assistant_read_batch_count':int(manifest.get('batch_count') or 0),
             'assistant_read_batch_size':int(manifest.get('batch_size') or 0),
+            'assistant_read_batch_schema':manifest.get('schema'),
             'recovery_metrics':review.get('recovery_metrics') or {},
             'index_recovery':index.get('recovery') or {},
-            'healthy':inbox.get('schema')=='GPT_WEB_REVIEW_INBOX_V2' and int(index.get('count') or 0)>0,
-            'contract':'Health sidecar exposes true uncapped GPT review backlog. Rich review files are mechanical read surfaces; GPT Web adjudicator is the assistant in the conversation.',
+            'healthy':inbox_schema in {'GPT_WEB_REVIEW_INBOX_V2','GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE'} and int(index.get('count') or 0)>0,
+            'contract':'Health sidecar exposes the true uncapped GPT review backlog plus visible-window fair-share. Rich review batches preserve document provenance where available; GPT Web adjudicator remains the assistant in the conversation.',
           }
           open('control/gpt_inbox_metrics.json','w',encoding='utf-8').write(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
           print(json.dumps(payload,indent=2))
