@@ -11,6 +11,7 @@ spec.loader.exec_module(mod)
 
 VERSION = "qwen-prod-v1"
 NOW = "2026-08-16T02:20:00+00:00"
+BUSINESS_CALIBRATION_VERSION = mod.BUSINESS_CALIBRATION_VERSION
 
 
 def ledger(cid="TED:1", h="h1"):
@@ -30,6 +31,7 @@ def result(cid="TED:1", h="h1", **kw):
         "classifier_quant": "Q4_K_M",
         "classifier_prompt_version": "p1",
         "classifier_version": VERSION,
+        "business_calibration_version": BUSINESS_CALIBRATION_VERSION,
         "classification": "FIT",
         "confidence": 0.9,
         "lean_attractiveness": "HIGH",
@@ -52,6 +54,7 @@ def test_matching_hash_accepts_and_removes_from_queue():
     assert remaining == []
     assert state[0]["classification"] == "FIT"
     assert state[0]["lean_attractiveness"] == "HIGH"
+    assert state[0]["business_calibration_version"] == BUSINESS_CALIBRATION_VERSION
     assert summary["results_accepted"] == 1 if "results_accepted" in summary else summary["stats"]["results_accepted"] == 1
 
 
@@ -76,6 +79,13 @@ def test_wrong_classifier_version_remains_in_queue():
     assert summary["rejected_result_reasons"]["wrong_classifier_version"] == 1
 
 
+def test_wrong_business_calibration_version_remains_in_queue():
+    state, remaining, summary = run([ledger()], [queue()], groups=[[result(business_calibration_version="old-business-fit")]])
+    assert state == []
+    assert len(remaining) == 1
+    assert summary["rejected_result_reasons"]["wrong_business_calibration_version"] == 1
+
+
 def test_previous_valid_state_is_carried_without_new_inference():
     prev = mod.state_record(result(), NOW)
     state, remaining, summary = run([ledger()], [queue()], previous=[prev])
@@ -91,6 +101,14 @@ def test_previous_state_is_invalidated_when_material_changes():
     assert state == []
     assert len(remaining) == 1
     assert summary["stats"]["previous_stale_dropped"] == 1
+
+
+def test_previous_state_is_invalidated_when_business_calibration_changes():
+    prev = mod.state_record(result(business_calibration_version="old-business-fit"), NOW)
+    state, remaining, summary = run([ledger()], [queue()], previous=[prev])
+    assert state == []
+    assert len(remaining) == 1
+    assert summary["stats"]["previous_wrong_business_calibration_dropped"] == 1
 
 
 def test_later_result_group_replaces_same_hash_state_deterministically():
