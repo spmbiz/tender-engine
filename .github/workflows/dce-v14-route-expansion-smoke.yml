@@ -1,26 +1,25 @@
-name: DCE V14 Route Expansion Smoke
+name: DCE Route Expansion Smoke
 
 on:
   workflow_dispatch:
   pull_request:
     paths:
-      - 'pipeline/dce_worker_v11.py'
-      - 'pipeline/dce_worker_v12.py'
-      - 'pipeline/dce_worker_v13.py'
-      - 'pipeline/dce_worker_v14.py'
+      - 'pipeline/dce_worker_v*.py'
       - 'pipeline/dce_batch_worker.py'
       - 'pipeline/build_matrix.py'
-      - 'pipeline/test_dce_worker_v11_routes.py'
-      - 'pipeline/test_dce_worker_v13_routes.py'
-      - 'pipeline/test_dce_worker_v14_routes.py'
+      - 'pipeline/test_dce_worker_v*_routes.py'
+      - 'pipeline/placsp_atom.py'
+      - 'pipeline/test_placsp_atom_v*.py'
       - '.github/workflows/dce-v14-route-expansion-smoke.yml'
   push:
     branches: [main]
     paths:
-      - 'pipeline/dce_worker_v14.py'
+      - 'pipeline/dce_worker_v*.py'
       - 'pipeline/dce_batch_worker.py'
       - 'pipeline/build_matrix.py'
-      - 'pipeline/test_dce_worker_v14_routes.py'
+      - 'pipeline/test_dce_worker_v*_routes.py'
+      - 'pipeline/placsp_atom.py'
+      - 'pipeline/test_placsp_atom_v*.py'
       - '.github/workflows/dce-v14-route-expansion-smoke.yml'
 
 permissions:
@@ -47,57 +46,67 @@ jobs:
           else
             python -m playwright install --with-deps chromium
           fi
-      - name: Compile full resolver chain and mapping tests
-        run: |
-          python -m py_compile \
-            pipeline/build_matrix.py \
-            pipeline/dce_worker_v11.py \
-            pipeline/dce_worker_v12.py \
-            pipeline/dce_worker_v13.py \
-            pipeline/dce_worker_v14.py \
-            pipeline/dce_batch_worker.py
-          python pipeline/test_dce_worker_v11_routes.py
-          python pipeline/test_dce_worker_v13_routes.py
-          python pipeline/test_dce_worker_v14_routes.py
-      - name: Assert production fanout actually points at v14
+      - name: Compile active resolver chain and mapping tests
         shell: bash
         run: |
-          grep -F 'pipeline/dce_worker_v14.py' pipeline/dce_batch_worker.py
+          set -euo pipefail
+          python -m py_compile pipeline/build_matrix.py pipeline/dce_batch_worker.py
+          python - <<'PY'
+          import pathlib,re,py_compile
+          text=pathlib.Path('pipeline/dce_batch_worker.py').read_text(encoding='utf-8')
+          matches=list(dict.fromkeys(re.findall(r'["\'](pipeline/dce_worker_v\d+\.py)["\']',text)))
+          if len(matches)!=1:
+              raise SystemExit(f'expected one active worker, got {matches}')
+          worker=pathlib.Path(matches[0])
+          if not worker.is_file(): raise SystemExit(f'missing active worker {worker}')
+          py_compile.compile(str(worker),doraise=True)
+          pathlib.Path('active-worker.txt').write_text(str(worker),encoding='utf-8')
+          print({'active_worker':str(worker),'status':'compiled'})
+          PY
+          for test_file in pipeline/test_dce_worker_v*_routes.py; do
+            [ -e "$test_file" ] || continue
+            python "$test_file"
+          done
+          if [ -f pipeline/test_placsp_atom_v15.py ]; then python pipeline/test_placsp_atom_v15.py; fi
+      - name: Assert legacy expansion routes remain wired
+        shell: bash
+        run: |
           python - <<'PY'
           from pipeline.build_matrix import BROWSER_PORTALS, SUPPORTED
           required={'UK_PROCONTRACT','UK_ATAMIS','UK_DELTA','UK_INTEND','UK_JAGGAER','NZ_TENDERLINK'}
           missing=required-SUPPORTED
           assert not missing, f'missing from SUPPORTED: {sorted(missing)}'
           assert required <= BROWSER_PORTALS
-          print({'v14_matrix_routes': sorted(required), 'status':'ok'})
+          print({'protected_expansion_routes':sorted(required),'status':'ok'})
           PY
       - name: Build representative live route corpus
         shell: bash
         run: |
           mkdir -p generated
-          cat > generated/v14_route_smoke.jsonl <<'JSONL'
-          {"candidate_id":"V14:CA","portal":"CA_CANADABUYS","notice_url":"https://canadabuys.canada.ca/en/tender-opportunities/tender-notice/cb-829-24574370","route":{"detail_url":"https://canadabuys.canada.ca/en/tender-opportunities/tender-notice/cb-829-24574370"}}
-          {"candidate_id":"V14:NZ","portal":"NZ_GETS","notice_url":"https://www.gets.govt.nz/NPDC/ExternalTenderDetails.htm?id=34344329","route":{"detail_url":"https://www.gets.govt.nz/NPDC/ExternalTenderDetails.htm?id=34344329"}}
-          {"candidate_id":"V14:PROCONTRACT","portal":"UK_PROCONTRACT","notice_url":"https://procontract.due-north.com/SupplierRegistration/GridViewOpportunities","route":{"detail_url":"https://procontract.due-north.com/SupplierRegistration/GridViewOpportunities"}}
-          {"candidate_id":"V14:DELTA","portal":"UK_DELTA","notice_url":"https://www.delta-esourcing.com/delta/loginRespondToList.html","route":{"detail_url":"https://www.delta-esourcing.com/delta/loginRespondToList.html"}}
-          {"candidate_id":"V14:INTEND","portal":"UK_INTEND","notice_url":"https://ucl.in-tendhost.co.uk/ucl/aspx/FAQ","route":{"detail_url":"https://ucl.in-tendhost.co.uk/ucl/aspx/FAQ"}}
-          {"candidate_id":"V14:JAGGAER","portal":"UK_JAGGAER","notice_url":"https://ministryofjusticecommercial.ukp.app.jaggaer.com/web/login.html","route":{"detail_url":"https://ministryofjusticecommercial.ukp.app.jaggaer.com/web/login.html"}}
-          {"candidate_id":"V14:ATAMIS","portal":"UK_ATAMIS","notice_url":"https://atamis-9529.my.salesforce-sites.com/?SearchType=Projects","route":{"detail_url":"https://atamis-9529.my.salesforce-sites.com/?SearchType=Projects"}}
-          {"candidate_id":"V14:SK","portal":"SK_UVO_PUBLIC","notice_url":"https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/detail/558849","route":{"detail_url":"https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/detail/558849","documents_url":"https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/dokumenty/558849"}}
-          {"candidate_id":"V14:DE-NRW","portal":"DE_EVERGABE_NRW","notice_url":"https://www.evergabe.nrw.de/VMPSatellite/notice/CXS7YDGYT8D4LQ59/documents","route":{"detail_url":"https://www.evergabe.nrw.de/VMPSatellite/notice/CXS7YDGYT8D4LQ59/documents"}}
-          {"candidate_id":"V14:BG","portal":"BG_EOP_PUBLIC","notice_url":"https://app.eop.bg/today/584841","route":{"detail_url":"https://app.eop.bg/today/584841"}}
-          {"candidate_id":"V14:CAT","portal":"ES_CATALONIA_PUBLIC","notice_url":"https://contractaciopublica.cat/ca/detall-publicacio/04a024a4-0945-467b-9689-66fa0e0b05c0/300786198","route":{"detail_url":"https://contractaciopublica.cat/ca/detall-publicacio/04a024a4-0945-467b-9689-66fa0e0b05c0/300786198"}}
-          {"candidate_id":"V14:HU","portal":"HU_EKR_PUBLIC","notice_url":"https://ekr.gov.hu/portal/kozbeszerzes/eljarasok/EKR000199982025/reszletek","route":{"detail_url":"https://ekr.gov.hu/portal/kozbeszerzes/eljarasok/EKR000199982025/reszletek"}}
+          cat > generated/route_expansion_smoke.jsonl <<'JSONL'
+          {"candidate_id":"EXP:CA","portal":"CA_CANADABUYS","notice_url":"https://canadabuys.canada.ca/en/tender-opportunities/tender-notice/cb-829-24574370","route":{"detail_url":"https://canadabuys.canada.ca/en/tender-opportunities/tender-notice/cb-829-24574370"}}
+          {"candidate_id":"EXP:NZ","portal":"NZ_GETS","notice_url":"https://www.gets.govt.nz/NPDC/ExternalTenderDetails.htm?id=34344329","route":{"detail_url":"https://www.gets.govt.nz/NPDC/ExternalTenderDetails.htm?id=34344329"}}
+          {"candidate_id":"EXP:PROCONTRACT","portal":"UK_PROCONTRACT","notice_url":"https://procontract.due-north.com/SupplierRegistration/GridViewOpportunities","route":{"detail_url":"https://procontract.due-north.com/SupplierRegistration/GridViewOpportunities"}}
+          {"candidate_id":"EXP:DELTA","portal":"UK_DELTA","notice_url":"https://www.delta-esourcing.com/delta/loginRespondToList.html","route":{"detail_url":"https://www.delta-esourcing.com/delta/loginRespondToList.html"}}
+          {"candidate_id":"EXP:INTEND","portal":"UK_INTEND","notice_url":"https://ucl.in-tendhost.co.uk/ucl/aspx/FAQ","route":{"detail_url":"https://ucl.in-tendhost.co.uk/ucl/aspx/FAQ"}}
+          {"candidate_id":"EXP:JAGGAER","portal":"UK_JAGGAER","notice_url":"https://ministryofjusticecommercial.ukp.app.jaggaer.com/web/login.html","route":{"detail_url":"https://ministryofjusticecommercial.ukp.app.jaggaer.com/web/login.html"}}
+          {"candidate_id":"EXP:ATAMIS","portal":"UK_ATAMIS","notice_url":"https://atamis-9529.my.salesforce-sites.com/?SearchType=Projects","route":{"detail_url":"https://atamis-9529.my.salesforce-sites.com/?SearchType=Projects"}}
+          {"candidate_id":"EXP:SK","portal":"SK_UVO_PUBLIC","notice_url":"https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/detail/558849","route":{"detail_url":"https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/detail/558849","documents_url":"https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/dokumenty/558849"}}
+          {"candidate_id":"EXP:DE-NRW","portal":"DE_EVERGABE_NRW","notice_url":"https://www.evergabe.nrw.de/VMPSatellite/notice/CXS7YDGYT8D4LQ59/documents","route":{"detail_url":"https://www.evergabe.nrw.de/VMPSatellite/notice/CXS7YDGYT8D4LQ59/documents"}}
+          {"candidate_id":"EXP:BG","portal":"BG_EOP_PUBLIC","notice_url":"https://app.eop.bg/today/584841","route":{"detail_url":"https://app.eop.bg/today/584841"}}
+          {"candidate_id":"EXP:CAT","portal":"ES_CATALONIA_PUBLIC","notice_url":"https://contractaciopublica.cat/ca/detall-publicacio/04a024a4-0945-467b-9689-66fa0e0b05c0/300786198","route":{"detail_url":"https://contractaciopublica.cat/ca/detall-publicacio/04a024a4-0945-467b-9689-66fa0e0b05c0/300786198"}}
+          {"candidate_id":"EXP:HU","portal":"HU_EKR_PUBLIC","notice_url":"https://ekr.gov.hu/portal/kozbeszerzes/eljarasok/EKR000199982025/reszletek","route":{"detail_url":"https://ekr.gov.hu/portal/kozbeszerzes/eljarasok/EKR000199982025/reszletek"}}
           JSONL
-      - name: Exercise live routes without bypassing gates
+      - name: Exercise representative routes through active worker
         shell: bash
         run: |
           set -euo pipefail
+          worker="$(cat active-worker.txt)"
           mkdir -p out
           for line in $(seq 1 12); do
-            echo "=== v14 route $line ==="
-            timeout 170s python pipeline/dce_worker_v14.py \
-              --queue generated/v14_route_smoke.jsonl \
+            echo "=== route $line via $worker ==="
+            timeout 170s python "$worker" \
+              --queue generated/route_expansion_smoke.jsonl \
               --line "$line" \
               --out out || true
           done
@@ -118,20 +127,19 @@ jobs:
                   'attempts':len(m.get('dce_method_attempts') or []),
               })
           rows.sort(key=lambda r:r['candidate_id'] or '')
-          print(json.dumps(rows, indent=2, ensure_ascii=False))
-          if len(rows) < 12:
-              raise SystemExit(f'expected 12 manifests, got {len(rows)}')
-          bad=[r for r in rows if r['status'] in {None,'STARTED','WORKER_ERROR','ADAPTER_PENDING'}]
-          if bad:
-              raise SystemExit(f'incomplete/unwired v14 results: {bad}')
-          Path('v14-route-smoke-summary.json').write_text(json.dumps(rows, indent=2, ensure_ascii=False), encoding='utf-8')
+          print(json.dumps(rows,indent=2,ensure_ascii=False))
+          if len(rows)<12: raise SystemExit(f'expected 12 manifests, got {len(rows)}')
+          bad=[r for r in rows if r['status'] in {None,'STARTED','WORKER_ERROR','ADAPTER_PENDING','BATCH_EXCEPTION','UNKNOWN'}]
+          if bad: raise SystemExit(f'incomplete/unwired active-worker results: {bad}')
+          Path('route-expansion-smoke-summary.json').write_text(json.dumps(rows,indent=2,ensure_ascii=False),encoding='utf-8')
           PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: dce-v14-route-smoke-${{ github.run_id }}
+          name: dce-route-expansion-smoke-${{ github.run_id }}
           path: |
-            v14-route-smoke-summary.json
+            active-worker.txt
+            route-expansion-smoke-summary.json
             out/**/manifest.json
             out/**/portal_page*.txt
           retention-days: 3
