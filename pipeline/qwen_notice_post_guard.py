@@ -24,7 +24,8 @@ CORE_RECALL = re.compile(
     r"copywriting|editorial|proofreading|translation|transcription|printing|print services|"
     r"digitization|digitisation|scanning|e[- ]learning|training content|media monitoring|"
     r"social media|digital marketing|market research|survey services|data processing|"
-    r"data entry|workflow automation|cms|hosting|web maintenance)\b",
+    r"data entry|workflow automation|cms|hosting|web maintenance|"
+    r"aplikacj\w*\s+web(?:ow\w*)?)\b",
     re.I,
 )
 BROKERABLE_GOODS = re.compile(
