@@ -7,14 +7,15 @@ def text(rel: str) -> str:
     return (ROOT / rel).read_text(encoding="utf-8")
 
 
-def test_pcs_accepts_current_opportunity_singular_and_uses_result_signature():
+def test_pcs_accepts_current_opportunity_singular_and_posts_public_form():
     body = text("pipeline/discover_uk_pcs_current.py")
     assert "current_option" in body
     assert "opportunit(?:y|ies)" in body
     assert "Page\\s*" in body
-    assert "PCS_CURRENT_OPPORTUNITIES_BROWSER_V3" in body
+    assert "PCS_CURRENT_OPPORTUNITIES_BROWSER_V4_POSTBACK" in body
     assert "refs = tuple(re.findall" in body
-    assert "A successful select/postback is enough to continue" in body
+    assert "FORM_FALLBACK" in body
+    assert "form.submit()" in body
     assert "after != before_signature" not in body
 
 
@@ -39,5 +40,6 @@ def test_ungm_requires_empty_paged_search_proof_inside_browser_session():
     assert "FIRST_EMPTY_SAME_ORIGIN_SEARCH_PAGE" in body
     assert "browser_search" in body
     assert "total_reported" in body
+    assert "user_agent=UA" not in body
     # Missing/unknown browser UI pagination must never itself imply exhaustion.
     assert "click_next" not in body
