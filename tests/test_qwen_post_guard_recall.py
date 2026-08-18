@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import gzip
+import json
 import sys
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "pipeline"))
 
-from qwen_notice_post_guard import guard
+from qwen_notice_post_guard import guard, load_notice_context
 
 
 def base(
@@ -58,6 +62,53 @@ def test_high_lean_direct_core_maybe_is_promoted_to_fit():
     assert out["classification"] == "FIT"
     assert out["dce_eligible"] is True
     assert "high_recall_core_high_direct_maybe_promoted_to_fit" in out["post_guard_actions"]
+
+
+def test_exact_external_context_promotes_raw_result_without_embedded_notice(tmp_path: Path):
+    raw = {
+        "canonical_notice_id": "PL-BZP:abc",
+        "classification": "MAYBE",
+        "lean_attractiveness": "HIGH",
+        "delivery_mode": "DIRECT_DIGITAL",
+        "friction_flags": [],
+        "survival_decision": "KEEP",
+        "dce_eligible": True,
+    }
+    queue = tmp_path / "queue.jsonl.gz"
+    source = {
+        "candidate_id": "PL-BZP:abc",
+        "title": "Design and development of an accessible web application",
+        "description": "Responsive public web application and CMS services",
+    }
+    with gzip.open(queue, "wt", encoding="utf-8") as fh:
+        fh.write(json.dumps(source) + "\n")
+    context = load_notice_context(queue)
+    assert set(context) == {"PL-BZP:abc"}
+    out = guard(raw, context["PL-BZP:abc"])
+    assert out["classification"] == "FIT"
+    assert out["post_guard_notice_context_used"] is True
+    assert "high_recall_core_high_direct_maybe_promoted_to_fit" in out["post_guard_actions"]
+
+
+def test_context_is_exact_id_only_and_does_not_fuzzy_join(tmp_path: Path):
+    queue = tmp_path / "queue.jsonl"
+    queue.write_text(json.dumps({"candidate_id": "X:ABC", "title": "Website development"}) + "\n", encoding="utf-8")
+    context = load_notice_context(queue)
+    assert "x:abc" not in context
+    raw = base("", classification="MAYBE", lean="HIGH", route="DIRECT_DIGITAL")
+    raw.pop("notice", None)
+    raw["canonical_notice_id"] = "x:abc"
+    out = guard(raw, context.get("x:abc"))
+    assert out["classification"] == "MAYBE"
+    assert out["post_guard_notice_context_used"] is False
+
+
+def test_duplicate_queue_identity_fails_closed(tmp_path: Path):
+    queue = tmp_path / "queue.jsonl"
+    row = {"candidate_id": "X:1", "title": "Website development"}
+    queue.write_text(json.dumps(row) + "\n" + json.dumps(row) + "\n", encoding="utf-8")
+    with pytest.raises(SystemExit):
+        load_notice_context(queue)
 
 
 def test_maybe_not_promoted_when_any_confidence_leg_is_missing():
