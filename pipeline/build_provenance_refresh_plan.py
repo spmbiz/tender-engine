@@ -20,10 +20,26 @@ def load(path: Path):
 
 
 def needs_refresh(row: dict) -> bool:
-    eq=row.get('evidence_quality') if isinstance(row.get('evidence_quality'),dict) else {}
-    legacy=int(eq.get('artifact_lookup_required_snippets') or 0)
-    all_attr=bool(eq.get('all_compact_snippets_document_attributed'))
-    return legacy>0 or not all_attr
+    eq={}
+    for key in ('evidence_quality','evidence_quality_summary','evidence_provenance_summary'):
+        value=row.get(key)
+        if isinstance(value,dict): eq.update(value)
+    legacy=int(eq.get('artifact_lookup_required_snippets') or eq.get('unattributed') or eq.get('unattributed_snippets') or 0)
+    if legacy>0:
+        return True
+    if eq.get('all_compact_snippets_document_attributed') is False or eq.get('all_review_snippets_attributed') is False:
+        return True
+    evidence=row.get('evidence_by_gate') or row.get('gate_evidence_candidates') or {}
+    if isinstance(evidence,dict):
+        for vals in evidence.values():
+            if not isinstance(vals,list): continue
+            for item in vals:
+                if isinstance(item,dict) and str(item.get('text') or item.get('snippet') or '').strip():
+                    source=item.get('source') or item.get('path') or item.get('file')
+                    if not source or not item.get('source_sha256'):
+                        return True
+    # No provenance metrics and no attributable evidence: refresh conservatively.
+    return not bool(eq.get('all_compact_snippets_document_attributed') or eq.get('all_review_snippets_attributed'))
 
 
 def main():
@@ -41,6 +57,8 @@ def main():
         if band not in {'HOT','GOOD','MAYBE'} or not needs_refresh(row):
             continue
         loc=row.get('artifact_locator') if isinstance(row.get('artifact_locator'),dict) else {}
+        if not loc:
+            loc=row.get('evidence_locator') if isinstance(row.get('evidence_locator'),dict) else {}
         run=loc.get('dce_run_id') or row.get('source_dce_run_id')
         if not str(run or '').isdigit():
             continue
@@ -61,8 +79,6 @@ def main():
     for row in candidates:
         by_release[row['release_tag']].append(row)
     selected=[]; selected_releases=[]
-    # Pick the release containing the best remaining candidate, then amortize the
-    # download by taking other useful candidates from that same immutable release.
     remaining=list(candidates)
     while remaining and len(selected)<max(1,args.limit) and len(selected_releases)<max(1,args.max_releases):
         release=remaining[0]['release_tag']
@@ -74,14 +90,14 @@ def main():
         picked={r['candidate_id'] for r in group}
         remaining=[r for r in remaining if r['candidate_id'] not in picked]
     payload={
-        'schema':'DCE_PROVENANCE_REFRESH_PLAN_V1',
+        'schema':'DCE_PROVENANCE_REFRESH_PLAN_V2',
         'source_inbox_updated_at':inbox.get('updated_at'),
         'eligible_legacy_reviews':len(candidates),
         'selected':len(selected),
         'release_count':len(selected_releases),
         'release_tags':selected_releases,
         'items':selected,
-        'policy':'HOT/GOOD/MAYBE legacy evidence only; max release downloads bound cost. Re-extraction uses immutable canonical DCE packs and never changes the procurement facts or final verdict.',
+        'policy':'HOT/GOOD/MAYBE legacy evidence only; max release downloads bound cost. Re-extraction uses immutable canonical DCE packs and never changes procurement facts or final verdicts.',
     }
     out=Path(args.out);out.parent.mkdir(parents=True,exist_ok=True);out.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps({k:payload[k] for k in ('eligible_legacy_reviews','selected','release_count','release_tags')},indent=2))
