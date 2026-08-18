@@ -65,11 +65,12 @@ def main():
         cid=str(row.get('candidate_id') or '').strip()
         if not cid:
             continue
+        shard_int=int(shard) if str(shard if shard is not None else '').isdigit() else None
         candidates.append({
             'candidate_id':cid,
             'dce_run_id':int(run),
-            'source_shard':int(shard) if str(shard if shard is not None else '').isdigit() else None,
-            'workflow_artifact_name':f'candidate-{int(shard)}' if str(shard if shard is not None else '').isdigit() else None,
+            'source_shard':shard_int,
+            'workflow_artifact_name':f'dce-shard-{shard_int}' if shard_int is not None else None,
             'release_tag':loc.get('release_tag') or f'dce-harvest-{run}',
             'archive_name':f'candidate-{slugify(cid)}.tar.gz',
             'spm_fit_band':band,
@@ -92,14 +93,14 @@ def main():
         picked={r['candidate_id'] for r in group}
         remaining=[r for r in remaining if r['candidate_id'] not in picked]
     payload={
-        'schema':'DCE_PROVENANCE_REFRESH_PLAN_V3_WORKFLOW_ARTIFACT_FIRST',
+        'schema':'DCE_PROVENANCE_REFRESH_PLAN_V4_REAL_SHARD_ARTIFACT_NAME',
         'source_inbox_updated_at':inbox.get('updated_at'),
         'eligible_legacy_reviews':len(candidates),
         'selected':len(selected),
         'release_count':len(selected_releases),
         'release_tags':selected_releases,
         'items':selected,
-        'policy':'HOT/GOOD/MAYBE legacy evidence only. Exact workflow shard artifact is preferred because it contains the original worker output; immutable canonical release bundle is fallback. No procurement fact or verdict is changed.',
+        'policy':'HOT/GOOD/MAYBE legacy evidence only. Exact dce-shard-<source_shard> workflow artifact is preferred because it contains the original worker output; immutable canonical release bundle is fallback. No procurement fact or verdict is changed.',
     }
     out=Path(args.out);out.parent.mkdir(parents=True,exist_ok=True);out.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps({k:payload[k] for k in ('eligible_legacy_reviews','selected','release_count','release_tags')},indent=2))
