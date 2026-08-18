@@ -1,0 +1,132 @@
+name: DCE TED Top Hosts Smoke
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'benchmarks/ted-dce-top-hosts-trigger.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  top-hosts-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install resolver dependencies
+        run: python -m pip install --disable-pip-version-check -q requests pypdf python-docx openpyxl python-pptx 'playwright>=1.46,<2'
+
+      - name: Reuse runner Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
+
+      - name: Build one real active TED candidate per top BT-15 host
+        run: |
+          PYTHONPATH=. python pipeline/build_ted_top_host_smoke_queue.py \
+            --out generated/ted-top-hosts-smoke.jsonl \
+            --max-scan 10000 \
+            --per-host 1
+          echo '--- queue ---'
+          cat generated/ted-top-hosts-smoke.jsonl
+
+      - name: Resolve through active V21 DCE stack
+        env:
+          DCE_BROWSER_INLINE_RETRIES: '0'
+          DCE_HTTP_INLINE_RETRIES: '0'
+          DCE_BROWSER_FAST_TIMEOUT_SECONDS: '135'
+          DCE_HTTP_FAST_TIMEOUT_SECONDS: '90'
+        run: |
+          count="$(wc -l < generated/ted-top-hosts-smoke.jsonl | tr -d ' ')"
+          lines="$(seq -s, 1 "$count")"
+          python pipeline/dce_batch_worker.py \
+            --queue generated/ted-top-hosts-smoke.jsonl \
+            --lines "$lines" \
+            --out ted-top-hosts-out \
+            --concurrency 6 \
+            --http-probe-concurrency 8 \
+            --http-probe-timeout-seconds 6 \
+            --retries 0 \
+            --timeout-seconds 135
+
+      - name: Summarize real DCE outcomes by BT-15 host
+        shell: bash
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+
+          queue = {}
+          for line in Path('generated/ted-top-hosts-smoke.jsonl').read_text(encoding='utf-8').splitlines():
+              if not line.strip():
+                  continue
+              c = json.loads(line)
+              queue[c['candidate_id']] = c
+
+          rows = []
+          counts = Counter()
+          for p in Path('ted-top-hosts-out').rglob('manifest.json'):
+              m = json.loads(p.read_text(encoding='utf-8', errors='replace'))
+              cid = str(m.get('candidate_id') or '')
+              c = queue.get(cid, {})
+              status = str(m.get('status') or 'UNKNOWN')
+              counts[status] += 1
+              attempts = m.get('dce_method_attempts') or []
+              rows.append({
+                  'host': c.get('benchmark_target_host'),
+                  'candidate_id': cid,
+                  'publication_number': c.get('publication_number'),
+                  'status': status,
+                  'files': len(m.get('files') or []),
+                  'resolved_portal': m.get('resolved_portal') or m.get('portal') or m.get('portal_key'),
+                  'methods': [a.get('method') for a in attempts if isinstance(a, dict)][-12:],
+                  'ted_downstream_attempts': [
+                      {
+                          'portal': a.get('portal'),
+                          'status': a.get('status'),
+                          'url': a.get('url'),
+                      }
+                      for a in (m.get('ted_downstream_attempts') or [])
+                      if isinstance(a, dict)
+                  ],
+              })
+          rows.sort(key=lambda r: (r.get('host') or '', r.get('candidate_id') or ''))
+          result = {
+              'tested': len(rows),
+              'status_counts': dict(counts.most_common()),
+              'downloaded_public': sum(1 for r in rows if r['status'] == 'DOWNLOADED_PUBLIC' and r['files'] > 0),
+              'rows': rows,
+          }
+          print(json.dumps(result, indent=2, ensure_ascii=False))
+          Path('ted-top-hosts-summary.json').write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding='utf-8')
+          if not rows:
+              raise SystemExit('No DCE manifests produced')
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ted-top-hosts-dce-smoke-${{ github.run_id }}
+          path: |
+            ted-top-hosts-summary.json
+            ted-top-hosts-out/batch_results.json
+            ted-top-hosts-out/batch_summary.json
+            ted-top-hosts-out/http_probe_summary.json
+            ted-top-hosts-out/**/manifest.json
+          retention-days: 5
+          if-no-files-found: warn
