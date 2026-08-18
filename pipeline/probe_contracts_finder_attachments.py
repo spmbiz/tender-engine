@@ -3,10 +3,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import mimetypes
+import os
 import re
 from pathlib import Path
-from urllib.parse import urlparse
 
 import requests
 
@@ -25,7 +24,7 @@ def magic(body: bytes) -> str:
         return "ZIP_OOXML"
     if body.startswith(b"%PDF-"):
         return "PDF"
-    if body.startswith((b"\xd0\xcf\x11\xe0",)):
+    if body.startswith(b"\xd0\xcf\x11\xe0"):
         return "OLE"
     if body.startswith(b"{\rtf"):
         return "RTF"
@@ -108,9 +107,10 @@ def probe_browser(urls: list[str]) -> list[dict]:
         from playwright.sync_api import sync_playwright
     except Exception as exc:
         return [{"error": f"PLAYWRIGHT_IMPORT:{exc!r}"}]
+    chrome = os.getenv("CHROME_BIN") or None
     out = []
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=True, executable_path=None)
+        browser = pw.chromium.launch(headless=True, executable_path=chrome)
         ctx = browser.new_context(accept_downloads=True)
         page = ctx.new_page()
         for url in urls:
