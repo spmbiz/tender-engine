@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import gzip
 import json
+import re
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -14,7 +15,7 @@ from build_matrix import SUPPORTED, resolve_dce_portal
 from dce_attempt_ledger import load_attempt_index, was_attempted
 
 SCHEMA = "FRESH_DIGITAL_EXPRESS_SELECTION_V1"
-SUMMARY_SCHEMA = "FRESH_DIGITAL_EXPRESS_SUMMARY_V1"
+SUMMARY_SCHEMA = "FRESH_DIGITAL_EXPRESS_SUMMARY_V2"
 CORE_CLASSES = {
     "SPM_WEB",
     "SPM_DESIGN",
@@ -25,6 +26,16 @@ CORE_CLASSES = {
     "SPM_PRINT_MIDDLEMAN",
     "SPM_DIGITAL_TRAINING",
 }
+# Precision lane only: obvious market-sounding / informational notices must never
+# consume scarce express DCE capacity. They remain untouched in the canonical
+# Qwen/ledger universe, so this is routing suppression, not notice deletion.
+NON_BID_RX = re.compile(
+    r"\b(preliminary market consultation|prior information notice|pin\b|request for information|rfi\b|"
+    r"sources sought|market sounding|market consultation|industry day|supplier engagement|"
+    r"expression of interest only|future opportunity|contract award notice|award notice|"
+    r"notice of award|intention to award|voluntary ex ante transparency)\b",
+    re.I,
+)
 
 
 def open_text(path: Path):
@@ -78,11 +89,18 @@ def flat_notice(row: dict[str, Any]) -> dict[str, Any]:
         n.setdefault("candidate_id", cid)
     if row.get("canonical_notice_id"):
         n.setdefault("canonical_notice_id", row.get("canonical_notice_id"))
-    # Preserve source/portal fields when the ledger wrapper owns them.
-    for key in ("portal", "source", "source_family", "country", "buyer", "title", "description", "cpv_or_category", "procedure", "deadline", "deadline_utc"):
+    for key in ("portal", "source", "source_family", "country", "buyer", "title", "description", "cpv_or_category", "procedure", "notice_type", "type", "deadline", "deadline_utc"):
         if not n.get(key) and row.get(key):
             n[key] = row.get(key)
     return n
+
+
+def is_obvious_non_bid(n: dict[str, Any]) -> bool:
+    title = str(n.get("title") or "")
+    procedure = str(n.get("procedure") or "")
+    notice_type = str(n.get("notice_type") or n.get("type") or "")
+    probe = " ".join((title, procedure, notice_type))
+    return bool(NON_BID_RX.search(probe))
 
 
 def attempt_probe(row: dict[str, Any], source_run: str) -> dict[str, Any]:
@@ -131,10 +149,13 @@ def build(
             stats["skip_not_new_or_updated"] += 1
             continue
 
+        n = flat_notice(row)
+        if is_obvious_non_bid(n):
+            stats["skip_obvious_non_bid"] += 1
+            continue
+
         deadline = parse_deadline(row)
         if deadline is None:
-            # Precision/latency lane only. The Qwen lane retains notices whose bid
-            # deadline cannot yet be parsed, so this is not a recall deletion.
             stats["skip_deadline_unknown"] += 1
             continue
         seconds_left = (deadline - current).total_seconds()
@@ -142,22 +163,18 @@ def build(
             stats["skip_expired_or_too_late"] += 1
             continue
 
-        n = flat_notice(row)
         fit, fit_class, score, reasons = business_fit(n)
         if not fit or fit_class not in CORE_CLASSES or score < min_score:
             stats["skip_not_express_core"] += 1
             continue
 
-        # For this precision-biased lane, require either a title-level scope signal
-        # or a strong classification code. Description-only boilerplate stays in
-        # the semantic Qwen lane instead of consuming express DCE capacity.
         has_title_signal = "scope-signal:title" in reasons
         has_strong_code = any(r.startswith("signals:") and ("cpv:" in r or "naics:" in r) for r in reasons)
         if not (has_title_signal or has_strong_code):
             stats["skip_description_only"] += 1
             continue
 
-        portal, raw_portal = resolve_dce_portal(n)
+        portal, _raw_portal = resolve_dce_portal(n)
         if portal not in SUPPORTED:
             stats["skip_unsupported_dce_portal"] += 1
             continue
@@ -211,6 +228,7 @@ def build(
         "fit_class_counts": dict(sorted(classes.items())),
         "safety": {
             "new_or_updated_only": True,
+            "obvious_non_bid_notices_excluded_from_express_only": True,
             "requires_parseable_live_deadline": True,
             "description_only_does_not_enter_express": True,
             "supported_dce_portal_required": True,
