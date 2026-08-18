@@ -3,6 +3,7 @@ from __future__ import annotations
 import xml.etree.ElementTree as ET
 
 import placsp_atom
+from build_matrix import BROWSER_PORTALS, SUPPORTED
 
 ATOM = b'''<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"
@@ -59,7 +60,18 @@ def main() -> None:
 
     nxt = placsp_atom.next_link(root, "https://example.test/current.atom")
     assert nxt == "https://example.test/next-page.atom", nxt
-    print({"placsp_document_urls": len(urls), "extensionless": 2, "status": "ok"})
+
+    assert "ES_PLACSP" in SUPPORTED
+    assert "ES_PLACSP" not in BROWSER_PORTALS
+
+    print(
+        {
+            "placsp_document_urls": len(urls),
+            "extensionless": 2,
+            "lane": "http",
+            "status": "ok",
+        }
+    )
 
 
 if __name__ == "__main__":
