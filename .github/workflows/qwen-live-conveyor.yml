@@ -38,7 +38,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Continuously ingest finished Qwen shards and keep only unseen DCE work
+      - name: Ingest completed Qwen shards without racing the authoritative state writer
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -62,10 +62,10 @@ jobs:
             return 1
           }
 
-          push_marker_checkpoint() {
-            git add "$marker"
+          push_checkpoint() {
+            git add queues/qwen_live_selection_latest.jsonl control/qwen_live/ "$marker" 2>/dev/null || true
             if git diff --cached --quiet; then return 0; fi
-            git commit -m "qwen: checkpoint incremental shard progress ${GITHUB_RUN_ID}"
+            git commit -m "qwen: rolling unseen DCE conveyor ${GITHUB_RUN_ID}"
             for n in 1 2 3 4 5; do
               if git pull --rebase origin main && git push origin HEAD:main; then return 0; fi
               git rebase --abort >/dev/null 2>&1 || true
@@ -151,35 +151,52 @@ jobs:
           PY
           }
 
-          publish_incremental_state() {
+          # Merge completed shard artifacts locally. This function NEVER writes the
+          # stable qwen-classification-state-latest Release. The main Qwen aggregate
+          # is the only stable-state writer, eliminating asset clobber races and
+          # metadata/asset divergence. The local merged state is still used below
+          # for immediate DCE selection, preserving low latency.
+          merge_incremental_state() {
             local rid="$1" source_run="$2" names_file="$3"
             local root="conveyor-cache/run-$rid"
-            local ledger queue prev
+            local ledger queue prev current_source local_source
             ledger="$(find "$root" -type f -name 'notice-intelligence-ledger-latest.jsonl.gz' -print -quit)"
             queue="$(find "$root" -type f -name 'notice-classification-queue-latest.jsonl.gz' -print -quit)"
             [ -n "$ledger" ] && [ -n "$queue" ] || return 1
 
-            rm -rf conveyor-cache/stable conveyor-cache/results conveyor-cache/publish
+            current_source="$(stable_source_run)"
+            if [[ "$current_source" =~ ^[0-9]+$ ]] && [[ "$source_run" =~ ^[0-9]+$ ]] && [ "$current_source" -gt "$source_run" ]; then
+              echo "Skipping obsolete incremental shard: artifact source=$source_run stable source=$current_source"
+              return 2
+            fi
+
             mkdir -p conveyor-cache/stable conveyor-cache/results conveyor-cache/publish
-            if gh release view qwen-classification-state-latest >/dev/null 2>&1; then
+            local_source="$(cat conveyor-cache/publish/source_run.txt 2>/dev/null || true)"
+            if [ "$local_source" = "$source_run" ] && [ -s conveyor-cache/publish/qwen-classification-state-latest.jsonl.gz ]; then
+              prev='conveyor-cache/publish/qwen-classification-state-latest.jsonl.gz'
+            else
+              rm -rf conveyor-cache/stable conveyor-cache/publish
+              mkdir -p conveyor-cache/stable conveyor-cache/publish
               gh release download qwen-classification-state-latest \
                 --pattern qwen-classification-state-latest.jsonl.gz \
                 --dir conveyor-cache/stable --clobber || true
-            fi
-            prev='conveyor-cache/stable/qwen-classification-state-latest.jsonl.gz'
-            if [ ! -s "$prev" ]; then
-              prev="$(find "$root" -type f \( -name 'qwen-state-current.jsonl.gz' -o -name 'qwen-classification-state-latest.jsonl.gz' \) -print -quit)"
+              prev='conveyor-cache/stable/qwen-classification-state-latest.jsonl.gz'
+              if [ ! -s "$prev" ]; then
+                prev="$(find "$root" -type f \( -name 'qwen-state-current.jsonl.gz' -o -name 'qwen-classification-state-latest.jsonl.gz' \) -print -quit)"
+              fi
             fi
             [ -n "$prev" ] && [ -s "$prev" ] || return 1
 
+            rm -rf conveyor-cache/results/new
+            mkdir -p conveyor-cache/results/new
             while IFS= read -r name; do
               [ -n "$name" ] || continue
-              mkdir -p "conveyor-cache/results/$name"
-              gh run download "$rid" -n "$name" -D "conveyor-cache/results/$name"
+              mkdir -p "conveyor-cache/results/new/$name"
+              gh run download "$rid" -n "$name" -D "conveyor-cache/results/new/$name"
             done < "$names_file"
 
             result_args=()
-            while IFS= read -r f; do result_args+=(--results "$f"); done < <(find conveyor-cache/results -type f -name 'qwen-live-*-guarded.jsonl' -size +0c | sort)
+            while IFS= read -r f; do result_args+=(--results "$f"); done < <(find conveyor-cache/results/new -type f -name 'qwen-live-*-guarded.jsonl' -size +0c | sort)
             [ "${#result_args[@]}" -gt 0 ] || return 1
 
             python pipeline/merge_qwen_classification_state.py \
@@ -188,29 +205,14 @@ jobs:
               --previous-state "$prev" \
               "${result_args[@]}" \
               --target-classifier-version "$QWEN_CLASSIFIER_VERSION" \
-              --state-out conveyor-cache/publish/qwen-classification-state-latest.jsonl.gz \
+              --state-out conveyor-cache/publish/qwen-classification-state-next.jsonl.gz \
               --queue-out conveyor-cache/publish/qwen-classification-remaining-latest.jsonl.gz \
               --summary-out conveyor-cache/publish/qwen-classification-merge-summary-latest.json
-
-            current_source="$(stable_source_run)"
-            if [[ "$current_source" =~ ^[0-9]+$ ]] && [[ "$source_run" =~ ^[0-9]+$ ]] && [ "$current_source" -gt "$source_run" ]; then
-              echo "Skipping obsolete shard state publish: artifact source=$source_run stable source=$current_source"
-              return 2
-            fi
-
-            stable=qwen-classification-state-latest
-            if ! gh release view "$stable" >/dev/null 2>&1; then
-              gh release create "$stable" --target main \
-                --title 'Qwen Classification State — LATEST' \
-                --notes "source_run=$source_run incremental_from_qwen_run=$rid"
-            fi
-            gh release upload "$stable" conveyor-cache/publish/* --clobber
+            mv conveyor-cache/publish/qwen-classification-state-next.jsonl.gz conveyor-cache/publish/qwen-classification-state-latest.jsonl.gz
+            printf '%s\n' "$source_run" > conveyor-cache/publish/source_run.txt
             state_rows="$(python -c "import json;print(json.load(open('conveyor-cache/publish/qwen-classification-merge-summary-latest.json'))['state_rows_after_merge'])")"
             remaining="$(python -c "import json;print(json.load(open('conveyor-cache/publish/qwen-classification-merge-summary-latest.json'))['remaining_classification_queue'])")"
-            gh release edit "$stable" \
-              --title "Qwen Classification State — LIVE (${source_run}/${rid})" \
-              --notes "source_run=${source_run} incremental_from_qwen_run=${rid} state_rows=${state_rows} remaining=${remaining} mode=continuous_shard_merge"
-            echo "Incremental Qwen state published: qwen_run=$rid source=$source_run state=$state_rows remaining=$remaining"
+            echo "Incremental Qwen state merged locally only: qwen_run=$rid source=$source_run state=$state_rows remaining=$remaining"
             return 0
           }
 
@@ -238,9 +240,16 @@ jobs:
               --dir conveyor-cache/selection-input --clobber
             mv "conveyor-cache/selection-input/live-open-tenders-${source_run}.jsonl.gz" conveyor-cache/selection-input/live-open-tenders-latest.jsonl.gz
 
-            gh release download qwen-classification-state-latest \
-              --pattern qwen-classification-state-latest.jsonl.gz \
-              --dir conveyor-cache/selection-state --clobber
+            local_source="$(cat conveyor-cache/publish/source_run.txt 2>/dev/null || true)"
+            if [ "$local_source" = "$source_run" ] && [ -s conveyor-cache/publish/qwen-classification-state-latest.jsonl.gz ]; then
+              cp conveyor-cache/publish/qwen-classification-state-latest.jsonl.gz conveyor-cache/selection-state/qwen-classification-state-latest.jsonl.gz
+              echo "Selection uses local incremental state for source $source_run"
+            else
+              gh release download qwen-classification-state-latest \
+                --pattern qwen-classification-state-latest.jsonl.gz \
+                --dir conveyor-cache/selection-state --clobber
+              echo "Selection uses authoritative stable state for source $source_run"
+            fi
             test -s conveyor-cache/selection-state/qwen-classification-state-latest.jsonl.gz
 
             git show origin/main:control/controller_state_checkpoint.json > conveyor-cache/latest-controller-state.json 2>/dev/null || printf '{}\n' > conveyor-cache/latest-controller-state.json
@@ -254,37 +263,26 @@ jobs:
               --summary control/qwen_live/selection_summary.json \
               --source-run "$source_run" \
               --limit 160
-            cp conveyor-cache/publish/qwen-classification-merge-summary-latest.json control/qwen_live/classification_summary.json 2>/dev/null || true
+            if [ "$local_source" = "$source_run" ] && [ -s conveyor-cache/publish/qwen-classification-merge-summary-latest.json ]; then
+              cp conveyor-cache/publish/qwen-classification-merge-summary-latest.json control/qwen_live/classification_summary.json
+            fi
 
             selected="$(python -c "import json;print(json.load(open('control/qwen_live/selection_summary.json'))['selected'])")"
             attempted="$(python -c "import json;print(json.load(open('control/qwen_live/selection_summary.json')).get('durable_attempted_exact_versions_ignored',0))")"
             echo "Rolling selection refreshed: source=$source_run selected=$selected already_attempted_excluded=$attempted"
-
-            git add queues/qwen_live_selection_latest.jsonl control/qwen_live/ "$marker"
-            if ! git diff --cached --quiet; then
-              git commit -m "qwen: rolling unseen DCE conveyor ${GITHUB_RUN_ID}"
-              for n in 1 2 3 4 5; do
-                if git pull --rebase origin main && git push origin HEAD:main; then break; fi
-                git rebase --abort >/dev/null 2>&1 || true
-                [ "$n" -lt 5 ] || return 1
-                sleep "$((n * 2))"
-              done
-            fi
+            push_checkpoint
             if [ "$selected" -gt 0 ]; then
               gh workflow run dce-queue-drainer.yml --ref main
             fi
           }
 
-          # Refresh unseen selection immediately, then guarantee a high-throughput
-          # bounded Qwen pass is always alive. The 5-minute schedule restarts the
-          # poller if a runner disappears.
           refresh_selection
           ensure_qwen_running
 
-          # Keep a poller alive for nine minutes. Scheduled executions replace this
-          # one every five minutes (cancel-in-progress=true), so there is always a
-          # fresh watcher spanning a long CPU classification pass. Completed shard
-          # artifacts are therefore ingested within ~30 seconds, not five minutes.
+          # Poll completed worker artifacts. Per-request Release checkpoints are no
+          # longer required: each completed worker publishes one immutable Actions
+          # artifact, which is enough for low-latency DCE handoff and dramatically
+          # reduces GitHub API pressure.
           for cycle in $(seq 1 18); do
             rid="$(gh run list --workflow qwen-live-classification.yml --limit 8 --json databaseId,status,createdAt --jq '[.[] | select(.status=="in_progress" or .status=="completed")] | sort_by(.createdAt) | reverse | .[0].databaseId // empty')"
             if [[ "$rid" =~ ^[0-9]+$ ]] && ensure_run_input "$rid"; then
@@ -302,16 +300,15 @@ jobs:
                   echo "New completed Qwen shard artifacts detected for run $rid:"
                   cat /tmp/new-qwen-artifacts.txt
                   set +e
-                  publish_incremental_state "$rid" "$source_run" /tmp/new-qwen-artifacts.txt
+                  merge_incremental_state "$rid" "$source_run" /tmp/new-qwen-artifacts.txt
                   rc=$?
                   set -e
                   if [ "$rc" -eq 0 ]; then
                     mark_names "$rid" /tmp/new-qwen-artifacts.txt
-                    push_marker_checkpoint
                     refresh_selection
                   elif [ "$rc" -eq 2 ]; then
                     mark_names "$rid" /tmp/new-qwen-artifacts.txt
-                    push_marker_checkpoint || true
+                    push_checkpoint || true
                   else
                     echo "Incremental merge failed rc=$rc; artifact remains unmarked for retry." >&2
                   fi
