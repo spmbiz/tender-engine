@@ -57,6 +57,15 @@ STOPWORDS = {
     "tender", "contract", "public", "procurement", "provision", "creation", "development", "support",
 }
 
+ZA_TRUSTED_TENDER_DOCUMENT_TYPES = {
+    "biddingdocuments",
+    "technicalspecifications",
+    "evaluationcriteria",
+    "eligibilitycriteria",
+    "contractdraft",
+    "billofquantity",
+}
+
 
 def _load(path: Path, default):
     try:
@@ -112,19 +121,12 @@ def _candidate_notice_id(candidate: dict, manifest: dict) -> str:
     return value
 
 
+def _usable_text_docs(docs: list[dict]) -> int:
+    return sum(1 for x in docs if isinstance(x, dict) and int(x.get("text_chars") or 0) >= 200)
+
+
 def _official_khmdhs_attachment_provenance(candidate: dict, manifest: dict, source_urls: list[str], docs: list[dict]) -> dict:
-    """Prove an exact Greek KHMDHS official attachment without guessing from text.
-
-    The public KHMDHS API exposes notice attachments at the official government
-    host under `/khmdhs-opendata/notice/attachment/<notice_id>`. When the endpoint
-    ID exactly matches the candidate notice ID, the response was persisted as a
-    real file and at least one indexed document yielded text, the retrieved file
-    is authoritative candidate-specific procurement evidence even when the corpus
-    is Greek and therefore has no English/French/German marker hits.
-
-    This proves provenance only; mandatory-gate extraction may still return
-    UNKNOWN and nothing here can create a GREEN by itself.
-    """
+    """Prove an exact Greek KHMDHS official attachment without guessing from text."""
     notice_id = _candidate_notice_id(candidate, manifest)
     if not notice_id:
         return {"matched": False, "reason": "missing_notice_id"}
@@ -142,13 +144,104 @@ def _official_khmdhs_attachment_provenance(candidate: dict, manifest: dict, sour
         path = unquote(p.path or "").rstrip("/").casefold()
         if host == "cerpp.eprocurement.gov.gr" and path.endswith(expected_suffix):
             hits.append(str(raw))
-    docs_with_text = sum(1 for x in docs if isinstance(x, dict) and int(x.get("text_chars") or 0) >= 200)
+    docs_with_text = _usable_text_docs(docs)
     return {
         "matched": bool(hits) and docs_with_text > 0,
         "notice_id": notice_id,
         "matching_source_urls": hits,
         "documents_with_usable_text": docs_with_text,
         "authority": "Greek KHMDHS official government notice-attachment endpoint",
+    }
+
+
+def _official_placsp_attachment_provenance(candidate: dict, manifest: dict, source_urls: list[str], docs: list[dict]) -> dict:
+    """Prove that a persisted file came from the exact matched official PLACSP Atom entry.
+
+    The v17 resolver only records document_urls after _entry_match succeeds on an
+    official contrataciondelsectorpublico.gob.es Atom entry. We still require the
+    persisted source URL to be one of those exact document URLs and usable text.
+    """
+    portal = str(candidate.get("portal") or candidate.get("source") or "").upper()
+    cid = str(candidate.get("candidate_id") or manifest.get("candidate_id") or "").upper()
+    if portal != "ES_PLACSP" and not cid.startswith("ES-PLACSP:"):
+        return {"matched": False, "reason": "not_es_placsp"}
+    resolution = manifest.get("placsp_atom_resolution")
+    if not isinstance(resolution, dict):
+        return {"matched": False, "reason": "missing_atom_resolution"}
+    allowed = {str(x).strip() for x in (resolution.get("document_urls") or []) if str(x).strip()}
+    if not allowed:
+        return {"matched": False, "reason": "missing_official_document_urls"}
+    entry_found = any(
+        isinstance(a, dict)
+        and str(a.get("method") or "") == "ES_PLACSP_OFFICIAL_ATOM_V17"
+        and str(a.get("outcome") or "") == "ENTRY_FOUND"
+        for a in (manifest.get("dce_method_attempts") or [])
+    )
+    hits = [u for u in source_urls if u in allowed]
+    docs_with_text = _usable_text_docs(docs)
+    return {
+        "matched": entry_found and bool(hits) and docs_with_text > 0,
+        "matching_source_urls": hits,
+        "documents_with_usable_text": docs_with_text,
+        "match_method": resolution.get("match_method"),
+        "contract_folder_id": resolution.get("contract_folder_id"),
+        "authority": "Spain PLACSP official Atom matched-entry procurement document reference",
+    }
+
+
+def _za_candidate_ocid(candidate: dict, manifest: dict) -> str:
+    for value in (candidate.get("ocid"), candidate.get("procedure_id"), manifest.get("ocid")):
+        s = str(value or "").strip()
+        if s.startswith("ocds-"):
+            return s
+    cid = str(candidate.get("candidate_id") or manifest.get("candidate_id") or "")
+    m = re.search(r"(?:^|:)(ocds-[A-Za-z0-9-]+?)(?:-\d{4}-\d{2}-\d{2})?$", cid)
+    return m.group(1) if m else ""
+
+
+def _official_za_ocds_provenance(candidate: dict, manifest: dict, source_urls: list[str], docs: list[dict]) -> dict:
+    """Prove an exact South African OCDS tender-document chain, fail-closed.
+
+    A release lookup must resolve the candidate's exact OCID on the official API;
+    a persisted URL must have a successful ZA_OCDS_DOCUMENT_V16 attempt; and that
+    attempt must carry a tender-document type rather than a publication notice.
+    """
+    portal = str(candidate.get("portal") or candidate.get("source") or "").upper()
+    cid = str(candidate.get("candidate_id") or manifest.get("candidate_id") or "").upper()
+    if portal not in {"ZA_ETENDERS", "ZA_ETENDERS_OCDS"} and not cid.startswith("ZA_ETENDERS"):
+        return {"matched": False, "reason": "not_za_etenders"}
+    ocid = _za_candidate_ocid(candidate, manifest)
+    if not ocid:
+        return {"matched": False, "reason": "missing_ocid"}
+    official_release = False
+    trusted_downloads = []
+    source_set = set(source_urls)
+    expected_path = "/api/ocdsreleases/release/" + ocid.casefold()
+    for attempt in manifest.get("dce_method_attempts") or []:
+        if not isinstance(attempt, dict):
+            continue
+        method = str(attempt.get("method") or "")
+        outcome = str(attempt.get("outcome") or "")
+        if method == "ZA_OCDS_RELEASE_API_V16" and outcome == "RELEASE_FOUND":
+            try:
+                p = urlparse(str(attempt.get("resolved_url") or attempt.get("url") or ""))
+                if (p.hostname or "").casefold() == "ocds-api.etenders.gov.za" and (p.path or "").rstrip("/").casefold().endswith(expected_path):
+                    official_release = True
+            except Exception:
+                pass
+        if method == "ZA_OCDS_DOCUMENT_V16" and outcome == "DOWNLOADED":
+            dtype = str(attempt.get("document_type") or "").replace("_", "").replace("-", "").casefold()
+            url = str(attempt.get("url") or "")
+            if dtype in ZA_TRUSTED_TENDER_DOCUMENT_TYPES and url in source_set:
+                trusted_downloads.append({"url": url, "document_type": attempt.get("document_type"), "title": attempt.get("title")})
+    docs_with_text = _usable_text_docs(docs)
+    return {
+        "matched": official_release and bool(trusted_downloads) and docs_with_text > 0,
+        "ocid": ocid,
+        "official_release_match": official_release,
+        "trusted_downloads": trusted_downloads[:20],
+        "documents_with_usable_text": docs_with_text,
+        "authority": "South Africa eTenders official OCDS release and typed tender-document chain",
     }
 
 
@@ -172,6 +265,8 @@ def classify_candidate(root: Path) -> dict:
     source_urls = [str(x.get("source_url") or "") for x in manifest_files if str(x.get("source_url") or "")]
     all_source_files_notice_only = bool(source_urls) and all(_is_notice_only_source_url(u) for u in source_urls)
     khmdhs_provenance = _official_khmdhs_attachment_provenance(candidate, manifest, source_urls, docs)
+    placsp_provenance = _official_placsp_attachment_provenance(candidate, manifest, source_urls, docs)
+    za_ocds_provenance = _official_za_ocds_provenance(candidate, manifest, source_urls, docs)
 
     quality = "NOT_APPLICABLE"
     derived_status = raw_status
@@ -192,6 +287,16 @@ def classify_candidate(root: Path) -> dict:
             derived_status = "DOWNLOADED_PUBLIC"
             gate_readiness = True
             reasons.append("exact_official_khmdhs_notice_attachment_provenance_matches_candidate_id")
+        elif placsp_provenance.get("matched"):
+            quality = "SUBSTANTIVE_DCE_PRESENT"
+            derived_status = "DOWNLOADED_PUBLIC"
+            gate_readiness = True
+            reasons.append("exact_official_placsp_matched_entry_document_provenance")
+        elif za_ocds_provenance.get("matched"):
+            quality = "SUBSTANTIVE_DCE_PRESENT"
+            derived_status = "DOWNLOADED_PUBLIC"
+            gate_readiness = True
+            reasons.append("exact_official_za_ocds_typed_tender_document_provenance")
         else:
             named = [n for n in filenames if n]
             all_named_generic = bool(named) and len(generic_names) == len(named)
@@ -235,6 +340,8 @@ def classify_candidate(root: Path) -> dict:
         "source_urls": source_urls[:30],
         "all_source_files_notice_only": all_source_files_notice_only,
         "official_khmdhs_provenance": khmdhs_provenance,
+        "official_placsp_provenance": placsp_provenance,
+        "official_za_ocds_provenance": za_ocds_provenance,
         "generic_filename_hits": generic_names[:30],
         "access_guide_hits": access_hits,
         "interest_required_hits": interest_hits,
