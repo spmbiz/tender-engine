@@ -1,10 +1,10 @@
 {
   "schema": "GPT_REVIEW_HOT_V3",
-  "updated_at": "2026-08-18T11:40:24.405679+00:00",
+  "updated_at": "2026-08-18T11:41:34.077087+00:00",
   "latest_dce_run_id": 32132558029,
-  "latest_shard": 2,
+  "latest_shard": 3,
   "generation_reset": false,
-  "count": 5,
+  "count": 8,
   "items": [
     {
       "candidate_id": "US-SAM:f7294e1580cb49f699ffea7261e93d4b",
@@ -1354,6 +1354,411 @@
       "hot_ready_at": "2026-08-18T11:37:45.580740+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 9,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
+      "candidate_id": "US-SAM:4511eedd6ad3472684eeaf9a309dad72",
+      "title": "Z2LZ--528A7-25-502 Replace Trench Drains",
+      "buyer": "VETERANS AFFAIRS, DEPARTMENT OF",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/opp/4511eedd6ad3472684eeaf9a309dad72/view",
+      "deadline": "2026-09-04T17:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 28,
+      "priority_score": 28,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNLABELLED_DCE_DEADLINE_CONFLICT_REVIEW_REQUIRED",
+        "conflict": true,
+        "notice_deadline_raw": "2026-09-04T17:00:00+00:00",
+        "notice_deadline_date": "2026-09-04",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [
+          "2026-08-19"
+        ],
+        "labelled_evidence": [],
+        "evidence": [
+          {
+            "date": "2026-08-19",
+            "match": "August 19, 2026",
+            "context": "nstruction requirement. This notice is not a request for quotes, proposals, or bids, and no contract award will be made as a result of this announcement. The official solicitation is anticipated to be posted on or about August 19, 2026, on SAM.gov, at which time all solicitation documents, including the Statement of Work, drawings, specifications, and proposal submission instructions, will be made available.\nThis procurement is anticipated to be issue"
+          }
+        ],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 2,
+          "unique_contexts": 2
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNLABELLED_DCE_DEADLINE_CONFLICT_REVIEW_REQUIRED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 6,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "requirement. This notice is not a request for quotes, proposals, or bids, and no contract award will be made as a result of this announcement. The official solicitation is anticipated to be posted on or about August 19, 2026, on SAM.gov, at which time all solicitation documents, including the Statement of Work, drawings, specifications, and proposal submission instructions, will be made available. This procurement is anticipated to be issued as a 100% Service-Disabled Veteran-Owned Small Business (SDVOSB) set-aside. Eligible SDVOSBs are encouraged to submit an offer upon release of the solicitation. All prospective offerors must be currently registered in www.sam.gov , www.dnb.com (Duns and Bradstreet ) and be registered and verified as a Service Disabled Veteran Owned Small Business (SDVOSB) in https://search.certifications.sba.gov/ at the time of offer submission and before award of this procurement. The applicable NAICS Code is 237990 with a small business size standard of $45.0 million. The Magnitude of Construction for this project is between $100,000 and $250,000. Scope of Work: The project generally consists of furnishing all labor, materials, equipment, supervision, transportation, and incidentals necessary to Replace the existing trench drain and sump box in Parking Lot 1; Install",
+            "source": null,
+            "match": "registered in"
+          },
+          {
+            "text": "t></w:r><w:r w:rsidRPr=\"005D5F24\"><w:t>, 2026, on SAM.gov, at which time all solicitation documents, including the Statement of Work, drawings, specifications, and proposal submission instructions, will be made available.</w:t></w:r></w:p><w:p w:rsidR=\"005116B2\"><w:r w:rsidRPr=\"004E1FBF\"><w:t>This procurement is anticipated to be issued as a 100% Service-Disabled Veteran-Owned Small Business (SDVOSB) set-aside. Eligible SDVOSBs are encouraged to submit an offer upon release of the solicitation.</w:t></w:r><w:r><w:t xml:space=\"preserve\"> </w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t xml:space=\"preserve\">All prospective offerors must be currently registered in </w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t>www.sam.gov ,</w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t xml:space=\"preserve\"> www.dnb.com (Duns and </w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t>Bradstreet )</w:t></w:r><w:r><w:t xml:space=\"preserve\"> </w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t xml:space=\"preserve\">and be registered and verified as a </w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t>Service Disabled</w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t xml:space=\"preserve\"> Veteran Owned Small Business (SDVOSB) in </w:t></w:r><w:r><w:fldChar w:fldCharType=\"begin\" /></w:r><w:r><w:instrText xml:space=\"preserve\"> HYPERLINK \"https://search.certifications.sba",
+            "source": null,
+            "match": "registered in"
+          },
+          {
+            "text": "Rect l=\"50000\" t=\"50000\" r=\"50000\" b=\"50000\" /></a:path></a:gradFill></a:bgFillStyleLst></a:fmtScheme></a:themeElements><a:objectDefaults /><a:extraClrSchemeLst /></a:theme> ===== FILE: files/36C24226R0111_1_unpacked/word/webSettings.xml ===== ﻿<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><w:webSettings xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><w:optimizeForBrowser /><w:relyOnVML /><w:allowPNG /><w:pixelsPerInch w:val=\"19\" /></w:webSettings> ===== FILE: files/sam_http_resources.json ===== { \"notice_id\": \"4511eedd6ad3472684eeaf9a309dad72\", \"resources\": [ { \"resource_id\": \"d14ecbc07e974afaac353698cd02beef\", \"name\": \"36C24226R0111_1.docx\", \"access\": \"0\", \"deleted\": null, \"path\": \"root._embedded.opportunityAttachmentList[0].attachments[0]\" }, { \"resource_id\": \"4a72780f0144422187b1b7a32603f274\", \"name\": \"\", \"access\": \"0\", \"deleted\": null, \"path\": \"root._embedded.opportunityAttachmentList[0].attachments[1]\" } ] }",
+            "source": null,
+            "match": "eea"
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": ":space=\"preserve\"> drawings, specifications, and Statement of Work.</w:t></w:r></w:p><w:p w:rsidR=\"004E1FBF\"><w:r w:rsidRPr=\"004E1FBF\"><w:rPr><w:b /><w:bCs /></w:rPr><w:t>Project Completion</w:t></w:r><w:r><w:t>: 120</w:t></w:r><w:r w:rsidRPr=\"004E1FBF\"><w:t xml:space=\"preserve\"> Calendar Days from Notice to Proceed (NTP).</w:t></w:r></w:p><w:p w:rsidR=\"00277A9A\"><w:r w:rsidRPr=\"005116B2\"><w:t xml:space=\"preserve\">All other details and information shall be contained in the solicitation which shall be posted on www.sam.gov. The response submittal address, date and time will be included in the solicitation. </w:t></w:r></w:p><w:sectPr><w:headerReference w:type=\"default\" r:id=\"rId4\" /><w:footerReference w:type=\"default\" r:id=\"rId5\" /><w:headerReference w:type=\"first\" r:id=\"rId6\" /><w:footerReference w:type=\"first\" r:id=\"rId7\" /><w:type w:val=\"continuous\" /><w:pgSz w:w=\"12240\" w:h=\"15840\" /><w:pgMar w:top=\"1080\" w:right=\"1440\" w:bottom=\"1080\" w:left=\"1440\" w:header=\"360\" w:footer=\"360\" /><w:cols w:space=\"720\" /><w:titlePg /><w:docGrid w:linePitch=\"360\" /></w:sectPr></w:body></w:document> ===== FILE: files/36C24226R0111_1_unpacked/word/fontTable.xml ===== ﻿<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><w:fonts xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationshi",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "tatement of Work.</w:t></w:r></w:p><w:p w:rsidR=\"004E1FBF\"><w:r w:rsidRPr=\"004E1FBF\"><w:rPr><w:b /><w:bCs /></w:rPr><w:t>Project Completion</w:t></w:r><w:r><w:t>: 120</w:t></w:r><w:r w:rsidRPr=\"004E1FBF\"><w:t xml:space=\"preserve\"> Calendar Days from Notice to Proceed (NTP).</w:t></w:r></w:p><w:p w:rsidR=\"00277A9A\"><w:r w:rsidRPr=\"005116B2\"><w:t xml:space=\"preserve\">All other details and information shall be contained in the solicitation which shall be posted on www.sam.gov. The response submittal address, date and time will be included in the solicitation. </w:t></w:r></w:p><w:sectPr><w:headerReference w:type=\"default\" r:id=\"rId4\" /><w:footerReference w:type=\"default\" r:id=\"rId5\" /><w:headerReference w:type=\"first\" r:id=\"rId6\" /><w:footerReference w:type=\"first\" r:id=\"rId7\" /><w:type w:val=\"continuous\" /><w:pgSz w:w=\"12240\" w:h=\"15840\" /><w:pgMar w:top=\"1080\" w:right=\"1440\" w:bottom=\"1080\" w:left=\"1440\" w:header=\"360\" w:footer=\"360\" /><w:cols w:space=\"720\" /><w:titlePg /><w:docGrid w:linePitch=\"360\" /></w:sectPr></w:body></w:document> ===== FILE: files/36C24226R0111_1_unpacked/word/fontTable.xml ===== ﻿<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><w:fonts xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:w=\"http://schemas.openxmlformats.org/wor",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "04E1FBF\"><w:r w:rsidRPr=\"004E1FBF\"><w:rPr><w:b /><w:bCs /></w:rPr><w:t>Project Completion</w:t></w:r><w:r><w:t>: 120</w:t></w:r><w:r w:rsidRPr=\"004E1FBF\"><w:t xml:space=\"preserve\"> Calendar Days from Notice to Proceed (NTP).</w:t></w:r></w:p><w:p w:rsidR=\"00277A9A\"><w:r w:rsidRPr=\"005116B2\"><w:t xml:space=\"preserve\">All other details and information shall be contained in the solicitation which shall be posted on www.sam.gov. The response submittal address, date and time will be included in the solicitation. </w:t></w:r></w:p><w:sectPr><w:headerReference w:type=\"default\" r:id=\"rId4\" /><w:footerReference w:type=\"default\" r:id=\"rId5\" /><w:headerReference w:type=\"first\" r:id=\"rId6\" /><w:footerReference w:type=\"first\" r:id=\"rId7\" /><w:type w:val=\"continuous\" /><w:pgSz w:w=\"12240\" w:h=\"15840\" /><w:pgMar w:top=\"1080\" w:right=\"1440\" w:bottom=\"1080\" w:left=\"1440\" w:header=\"360\" w:footer=\"360\" /><w:cols w:space=\"720\" /><w:titlePg /><w:docGrid w:linePitch=\"360\" /></w:sectPr></w:body></w:document> ===== FILE: files/36C24226R0111_1_unpacked/word/fontTable.xml ===== ﻿<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><w:fonts xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><w:font w:name=\"Calibri\">",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "><w:bCs /></w:rPr><w:t>Project Completion</w:t></w:r><w:r><w:t>: 120</w:t></w:r><w:r w:rsidRPr=\"004E1FBF\"><w:t xml:space=\"preserve\"> Calendar Days from Notice to Proceed (NTP).</w:t></w:r></w:p><w:p w:rsidR=\"00277A9A\"><w:r w:rsidRPr=\"005116B2\"><w:t xml:space=\"preserve\">All other details and information shall be contained in the solicitation which shall be posted on www.sam.gov. The response submittal address, date and time will be included in the solicitation. </w:t></w:r></w:p><w:sectPr><w:headerReference w:type=\"default\" r:id=\"rId4\" /><w:footerReference w:type=\"default\" r:id=\"rId5\" /><w:headerReference w:type=\"first\" r:id=\"rId6\" /><w:footerReference w:type=\"first\" r:id=\"rId7\" /><w:type w:val=\"continuous\" /><w:pgSz w:w=\"12240\" w:h=\"15840\" /><w:pgMar w:top=\"1080\" w:right=\"1440\" w:bottom=\"1080\" w:left=\"1440\" w:header=\"360\" w:footer=\"360\" /><w:cols w:space=\"720\" /><w:titlePg /><w:docGrid w:linePitch=\"360\" /></w:sectPr></w:body></w:document> ===== FILE: files/36C24226R0111_1_unpacked/word/fontTable.xml ===== ﻿<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><w:fonts xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><w:font w:name=\"Calibri\"><w:panose1 w:val=\"020F0502020204030204\" /><w:cha",
+            "source": null,
+            "match": "Reference"
+          }
+        ],
+        "certifications_partner": [
+          {
+            "text": "anticipated to be posted on or about August 19, 2026, on SAM.gov, at which time all solicitation documents, including the Statement of Work, drawings, specifications, and proposal submission instructions, will be made available. This procurement is anticipated to be issued as a 100% Service-Disabled Veteran-Owned Small Business (SDVOSB) set-aside. Eligible SDVOSBs are encouraged to submit an offer upon release of the solicitation. All prospective offerors must be currently registered in www.sam.gov , www.dnb.com (Duns and Bradstreet ) and be registered and verified as a Service Disabled Veteran Owned Small Business (SDVOSB) in https://search.certifications.sba.gov/ at the time of offer submission and before award of this procurement. The applicable NAICS Code is 237990 with a small business size standard of $45.0 million. The Magnitude of Construction for this project is between $100,000 and $250,000. Scope of Work: The project generally consists of furnishing all labor, materials, equipment, supervision, transportation, and incidentals necessary to Replace the existing trench drain and sump box in Parking Lot 1; Install a new off-grid solar security area light, including the pole, reinforced concrete foundation, and associated components in Parking Lot 1; Replace the existing trench drain",
+            "source": null,
+            "match": "certification"
+          },
+          {
+            "text": "ntly registered in </w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t>www.sam.gov ,</w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t xml:space=\"preserve\"> www.dnb.com (Duns and </w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t>Bradstreet )</w:t></w:r><w:r><w:t xml:space=\"preserve\"> </w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t xml:space=\"preserve\">and be registered and verified as a </w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t>Service Disabled</w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t xml:space=\"preserve\"> Veteran Owned Small Business (SDVOSB) in </w:t></w:r><w:r><w:fldChar w:fldCharType=\"begin\" /></w:r><w:r><w:instrText xml:space=\"preserve\"> HYPERLINK \"https://search.certifications.sba.gov/\" </w:instrText></w:r><w:r><w:fldChar w:fldCharType=\"separate\" /></w:r><w:r w:rsidRPr=\"00737F9C\"><w:rPr><w:rStyle w:val=\"Hyperlink\" /></w:rPr><w:t>https://search.certifications.sba.gov/</w:t></w:r><w:r><w:fldChar w:fldCharType=\"end\" /></w:r><w:r><w:t xml:space=\"preserve\"> </w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t xml:space=\"preserve\">at the time of offer submission and before award of this procurement. </w:t></w:r></w:p><w:p w:rsidR=\"005116B2\"><w:r w:rsidRPr=\"004E1FBF\"><w:t>The applicable NAICS Code is 237990 with a small business size standard of $45.0 million.</w:t></w:r></w:p><w:p w:rsidR=\"004E1FBF\"><w:r w:rsidRPr=\"004E1FBF\"><w",
+            "source": null,
+            "match": "certification"
+          },
+          {
+            "text": "RPr=\"005116B2\"><w:t>Bradstreet )</w:t></w:r><w:r><w:t xml:space=\"preserve\"> </w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t xml:space=\"preserve\">and be registered and verified as a </w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t>Service Disabled</w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t xml:space=\"preserve\"> Veteran Owned Small Business (SDVOSB) in </w:t></w:r><w:r><w:fldChar w:fldCharType=\"begin\" /></w:r><w:r><w:instrText xml:space=\"preserve\"> HYPERLINK \"https://search.certifications.sba.gov/\" </w:instrText></w:r><w:r><w:fldChar w:fldCharType=\"separate\" /></w:r><w:r w:rsidRPr=\"00737F9C\"><w:rPr><w:rStyle w:val=\"Hyperlink\" /></w:rPr><w:t>https://search.certifications.sba.gov/</w:t></w:r><w:r><w:fldChar w:fldCharType=\"end\" /></w:r><w:r><w:t xml:space=\"preserve\"> </w:t></w:r><w:r w:rsidRPr=\"005116B2\"><w:t xml:space=\"preserve\">at the time of offer submission and before award of this procurement. </w:t></w:r></w:p><w:p w:rsidR=\"005116B2\"><w:r w:rsidRPr=\"004E1FBF\"><w:t>The applicable NAICS Code is 237990 with a small business size standard of $45.0 million.</w:t></w:r></w:p><w:p w:rsidR=\"004E1FBF\"><w:r w:rsidRPr=\"004E1FBF\"><w:t>The Magnitude of Construction for this project is between $100,000 and $250,000.</w:t></w:r></w:p><w:p w:rsidR=\"005D5F24\" w:rsidP=\"005D5F24\"><w:pPr><w:spacing w:before=\"240\" /></w:pP",
+            "source": null,
+            "match": "certification"
+          }
+        ],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [
+          {
+            "text": "Network Contracting Office (NCO) 2, intends to issue Solicitation 36C24226R0111 for Project 528A7-25-502 – Replace Trench Drains at the Syracuse VA Medical Center, 800 Irving Avenue, Syracuse, New York 13210. This notice is for pre-solicitation purposes only and is issued to provide advance notice of the Government's intent to solicit this construction requirement. This notice is not a request for quotes, proposals, or bids, and no contract award will be made as a result of this announcement. The official solicitation is anticipated to be posted on or about August 19, 2026, on SAM.gov, at which time all solicitation documents, including the Statement of Work, drawings, specifications, and proposal submission instructions, will be made available. This procurement is anticipated to be issued as a 100% Service-Disabled Veteran-Owned Small Business (SDVOSB) set-aside. Eligible SDVOSBs are encouraged to submit an offer upon release of the solicitation. All prospective offerors must be currently registered in www.sam.gov , www.dnb.com (Duns and Bradstreet ) and be registered and verified as a Service Disabled Veteran Owned Small Business (SDVOSB) in https://search.certifications.sba.gov/ at the time of offer submission and before award of this procurement. The applicable NAICS Code is 237990 with a",
+            "source": null,
+            "match": "Statement of Work"
+          },
+          {
+            "text": "NCO) 2, intends to issue Solicitation 36C24226R0111 for Project 528A7-25-502 – Replace Trench Drains at the Syracuse VA Medical Center, 800 Irving Avenue, Syracuse, New York 13210. This notice is for pre-solicitation purposes only and is issued to provide advance notice of the Government's intent to solicit this construction requirement. This notice is not a request for quotes, proposals, or bids, and no contract award will be made as a result of this announcement. The official solicitation is anticipated to be posted on or about August 19, 2026, on SAM.gov, at which time all solicitation documents, including the Statement of Work, drawings, specifications, and proposal submission instructions, will be made available. This procurement is anticipated to be issued as a 100% Service-Disabled Veteran-Owned Small Business (SDVOSB) set-aside. Eligible SDVOSBs are encouraged to submit an offer upon release of the solicitation. All prospective offerors must be currently registered in www.sam.gov , www.dnb.com (Duns and Bradstreet ) and be registered and verified as a Service Disabled Veteran Owned Small Business (SDVOSB) in https://search.certifications.sba.gov/ at the time of offer submission and before award of this procurement. The applicable NAICS Code is 237990 with a small business size stand",
+            "source": null,
+            "match": "specification"
+          },
+          {
+            "text": "issued as a 100% Service-Disabled Veteran-Owned Small Business (SDVOSB) set-aside. Eligible SDVOSBs are encouraged to submit an offer upon release of the solicitation. All prospective offerors must be currently registered in www.sam.gov , www.dnb.com (Duns and Bradstreet ) and be registered and verified as a Service Disabled Veteran Owned Small Business (SDVOSB) in https://search.certifications.sba.gov/ at the time of offer submission and before award of this procurement. The applicable NAICS Code is 237990 with a small business size standard of $45.0 million. The Magnitude of Construction for this project is between $100,000 and $250,000. Scope of Work: The project generally consists of furnishing all labor, materials, equipment, supervision, transportation, and incidentals necessary to Replace the existing trench drain and sump box in Parking Lot 1; Install a new off-grid solar security area light, including the pole, reinforced concrete foundation, and associated components in Parking Lot 1; Replace the existing trench drain at Building 16, including associated concrete removal, drainage modifications, and restoration; Perform asphalt crack sealing, seal coating, and pavement striping for Parking Lot 1; and Install Gate Arm Lot 1 . Work also includes excavation, demolition, reinforced co",
+            "source": null,
+            "match": "Scope of Work"
+          },
+          {
+            "text": "ox in Parking Lot 1; Install a new off-grid solar security area light, including the pole, reinforced concrete foundation, and associated components in Parking Lot 1; Replace the existing trench drain at Building 16, including associated concrete removal, drainage modifications, and restoration; Perform asphalt crack sealing, seal coating, and pavement striping for Parking Lot 1; and Install Gate Arm Lot 1 . Work also includes excavation, demolition, reinforced concrete placement, underground drainage tie-ins, site restoration, traffic control, and all other work necessary to complete the project in accordance with the solicitation drawings, specifications, and Statement of Work. Project Completion: 120 Calendar Days from Notice to Proceed (NTP). All other details and information shall be contained in the solicitation which shall be posted on www.sam.gov. The response submittal address, date and time will be included in the solicitation. SUBJECT* | 528A7-25-502 Replace Trench Drains CONTRACTING OFFICE’S ZIP CODE* | 10468-3904 SOLICITATION NUMBER* | 36C24226R0111 RESPONSE DATE/TIME/ZONE | 09-04-2026 1:00PM EASTERN TIME, NEW YORK, USA ARCHIVE | 60 DAYS AFTER THE RESPONSE DATE SET-ASIDE | SDVOSBC | SDVOSBC PRODUCT SERVICE CODE* | Z2LZ | Z2LZ NAICS CODE* | 237990 | 237990 PLACE OF PERFORMANCE",
+            "source": null,
+            "match": "specification"
+          }
+        ],
+        "sla_onsite": [],
+        "term_value": [
+          {
+            "text": "t of Veterans Affairs Network Contracting Office 2 Franklin D. Roosevelt VA Medical Center 2094 Albany Post Road Bronx NY 10468-3904 POINT OF CONTACT* | Contract Specialist Delf Saco Mizhquiri Delfo.Saco-mizhquiri@va.gov (718) 526-1000 ext 7524 AGENCY’S URL | http://www.va.gov URL DESCRIPTION | VA HOMEPAGE AGENCY CONTACT’S EMAIL ADDRESS | Delfo.Saco-mizhquiri@va.gov EMAIL DESCRIPTION | Delf Saco Mizhquiri, Contract Specialit ===== FILE: files/36C24226R0111_1_unpacked/[Content_Types].xml ===== ﻿<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\" /><Default Extension=\"xml\" ContentType=\"application/xml\" /><Override PartName=\"/docProps/app.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.extended-properties+xml\" /><Override PartName=\"/docProps/core.xml\" ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\" /><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\" /><Override PartName=\"/word/fontTable.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml\" /><",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "Albany Post Road Bronx NY 10468-3904 POINT OF CONTACT* | Contract Specialist Delf Saco Mizhquiri Delfo.Saco-mizhquiri@va.gov (718) 526-1000 ext 7524 AGENCY’S URL | http://www.va.gov URL DESCRIPTION | VA HOMEPAGE AGENCY CONTACT’S EMAIL ADDRESS | Delfo.Saco-mizhquiri@va.gov EMAIL DESCRIPTION | Delf Saco Mizhquiri, Contract Specialit ===== FILE: files/36C24226R0111_1_unpacked/[Content_Types].xml ===== ﻿<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\" /><Default Extension=\"xml\" ContentType=\"application/xml\" /><Override PartName=\"/docProps/app.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.extended-properties+xml\" /><Override PartName=\"/docProps/core.xml\" ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\" /><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\" /><Override PartName=\"/word/fontTable.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml\" /><Override PartName=\"/word/footer1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wo",
+            "source": null,
+            "match": "Extension"
+          }
+        ],
+        "award_criteria": [
+          {
+            "text": "ent1\" /></w:rPr></w:style><w:style w:type=\"character\" w:styleId=\"SubtleEmphasis\"><w:name w:val=\"Subtle Emphasis\" /><w:basedOn w:val=\"DefaultParagraphFont\" /><w:uiPriority w:val=\"19\" /><w:qFormat /><w:rsid w:val=\"00BB1BA2\" /><w:rPr><w:i /><w:iCs /><w:color w:val=\"808080\" w:themeColor=\"text1\" w:themeTint=\"7F\" /></w:rPr></w:style><w:style w:type=\"paragraph\" w:styleId=\"ListParagraph\"><w:name w:val=\"List Paragraph\" /><w:basedOn w:val=\"Normal\" /><w:uiPriority w:val=\"34\" /><w:qFormat /><w:rsid w:val=\"00BB1BA2\" /><w:pPr><w:ind w:left=\"720\" /><w:contextualSpacing /></w:pPr></w:style><w:style w:type=\"paragraph\" w:styleId=\"CommentText\"><w:name w:val=\"annotation text\" /><w:basedOn w:val=\"Normal\" /><w:link w:val=\"CommentTextChar\" /><w:uiPriority w:val=\"99\" /><w:rsid w:val=\"00BB1BA2\" /><w:pPr><w:spacing w:line=\"240\" w:lineRule=\"auto\" /></w:pPr><w:rPr><w:i /><w:color w:val=\"808080\" w:themeColor=\"background1\" w:themeShade=\"80\" /><w:szCs w:val=\"20\" /></w:rPr></w:style><w:style w:type=\"character\" w:customStyle=\"1\" w:styleId=\"CommentTextChar\"><w:name w:val=\"Comment Text Char\" /><w:basedOn w:val=\"DefaultParagraphFont\" /><w:link w:val=\"CommentText\" /><w:uiPriority w:val=\"99\" /><w:rsid w:val=\"00BB1BA2\" /><w:rPr><w:i /><w:color w:val=\"808080\" w:themeColor=\"background1\" w:themeShade=\"80\" /><w:sz w:val=\"20\" /><w",
+            "source": null,
+            "match": "notation"
+          }
+        ],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32132558029,
+      "source_shard": 3,
+      "hot_ready_at": "2026-08-18T11:41:33.594393+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 9,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
+      "candidate_id": "US-SAM:5f5391151705497cb3e983c5290b0ac5",
+      "title": "DHS FLETC GLYNCO - TSA ACADEMY RENOVATION",
+      "buyer": "HOMELAND SECURITY, DEPARTMENT OF",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/opp/5f5391151705497cb3e983c5290b0ac5/view",
+      "deadline": "2026-08-28T20:30:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 28,
+      "priority_score": 28,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-28T20:30:00+00:00",
+        "notice_deadline_date": "2026-08-28",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 1,
+          "unique_contexts": 1
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 6,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "Sex: Male Female (*Non- U.S. Citizens must complete DHS Form 11055) No Results Notes: FLETC Form 121-00-02 (4/26) Page 1 of 2 E-mail: Agency: Vendor SECTION III - To be Completed by FLETC Security NCIC Check: FBI #: ARN: Office/Cell #: State Issued: Utility Contractor Access Request End Date: Sponsor Name: E-mail: Type of Access Requested (see instruction page) 5 -Day or Less Pass Social Security #: Full Name (Last, First, Middle): Aliases Used: Residential Street Address: City, State, Zip: Driver's License #: Place of Birth (City and State or Country): Country of Citizenship (list all that apply): Home/Cell #: Results Found: Company Name (if applicable): Relation to Applicant (if Transporter): Reason for Visit: Access Request Start Date: PO Staff Transporter Proximity Badge Access Frequent Visitor SECTION II - To be Completed by Federal Sponsor Current PIV/CAC: No Yes Date of Birth: DEPARTMENT OF HOMELAND SECURITY FEDERAL LAW ENFORCEMENT TRAINING CENTERS VISITOR & VENDOR ACCESS REQUEST PRIVACY ACT STATEMENT Authority to Collect This Information: 5 U.S.C. 301; the Ho",
+            "source": null,
+            "match": "Resident"
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [
+          {
+            "text": "===== FILE: files/ATTACHMENT_1_-BID_SCHEDULE_TSA_Reno.pdf ===== TSA Renovation ATTACHMENT 1 70LGLY26QGLB00040 Bid Schedule Contractor should provide or be able to provide any requested backup data to support the above quotes if requested by the Contracting Officer. Whenever possible, contractor should strive to obtain at least three subcontractor quotes to ensure the Government is getting a fair and reasonable price for the work. These quotes should be available upon request by the Contracting Officer. Bidder Acknowledgment The offeror acknowledges that each task price includes all labor, supervision, key personnel, materials, equipment, tools, transportation, coordination, safety requirements, submittals, testing, cleanup, overhead, profit, and incidentals necessary to complete the task in accordance with the SOW and solicitation requirements. Company Name: _______________________________ UEI #: ______________________ Authorized Representative: __________________________ Title: __________________________________ Phone/Email: ________________________ Signature: _________________________________________ Date: ________________________ Task Description Price 1 ADA Ramp Installation and Modification: 2 Steel Doors and Frames Rep",
+            "source": null,
+            "match": "key personnel"
+          }
+        ],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [
+          {
+            "text": "===== FILE: files/ATTACHMENT_1_-BID_SCHEDULE_TSA_Reno.pdf ===== TSA Renovation ATTACHMENT 1 70LGLY26QGLB00040 Bid Schedule Contractor should provide or be able to provide any requested backup data to support the above quotes if requested by the Contracting Officer. Whenever possible, contractor should strive to obtain at least three subcontractor quotes to ensure the Government is getting a fair and reasonable price for the work. These quotes should be available upon request by the Contracting Officer. Bidder Acknowledgment The offeror acknowledges that each task price includes all labor, supervision, key personnel, materials, equipment, tools, transportation, coordination, safety requirements, submittals, testing, cleanup, overhead, profit, and incidentals necessary to complete the task in accordance with the SOW and solicitation requirements. Company Name: _______________________________ UEI #: ______________________ Authorized Representative: ___________________",
+            "source": null,
+            "match": "subcontract"
+          }
+        ],
+        "deliverables_scope": [
+          {
+            "text": "= TSA Renovation ATTACHMENT 1 70LGLY26QGLB00040 Bid Schedule Contractor should provide or be able to provide any requested backup data to support the above quotes if requested by the Contracting Officer. Whenever possible, contractor should strive to obtain at least three subcontractor quotes to ensure the Government is getting a fair and reasonable price for the work. These quotes should be available upon request by the Contracting Officer. Bidder Acknowledgment The offeror acknowledges that each task price includes all labor, supervision, key personnel, materials, equipment, tools, transportation, coordination, safety requirements, submittals, testing, cleanup, overhead, profit, and incidentals necessary to complete the task in accordance with the SOW and solicitation requirements. Company Name: _______________________________ UEI #: ______________________ Authorized Representative: __________________________ Title: __________________________________ Phone/Email: ________________________ Signature: _________________________________________ Date: ________________________ Task Description Price 1 ADA Ramp Installation and Modification: 2 Steel Doors and Frames Replacement: 3 Packaged Terminal Air Conditioners Replacement 4 Interior Ceiling",
+            "source": null,
+            "match": "requirements"
+          },
+          {
+            "text": "the above quotes if requested by the Contracting Officer. Whenever possible, contractor should strive to obtain at least three subcontractor quotes to ensure the Government is getting a fair and reasonable price for the work. These quotes should be available upon request by the Contracting Officer. Bidder Acknowledgment The offeror acknowledges that each task price includes all labor, supervision, key personnel, materials, equipment, tools, transportation, coordination, safety requirements, submittals, testing, cleanup, overhead, profit, and incidentals necessary to complete the task in accordance with the SOW and solicitation requirements. Company Name: _______________________________ UEI #: ______________________ Authorized Representative: __________________________ Title: __________________________________ Phone/Email: ________________________ Signature: _________________________________________ Date: ________________________ Task Description Price 1 ADA Ramp Installation and Modification: 2 Steel Doors and Frames Replacement: 3 Packaged Terminal Air Conditioners Replacement 4 Interior Ceiling Fans Installation 5 Exterior Fan Replacement: . 6 Bleacher Apron Installation: 7 Floor Repairs: 8 Drain Cleanout: Subtotal Profit Total ===== FILE:",
+            "source": null,
+            "match": "requirements"
+          },
+          {
+            "text": "erty. SECTION I - To be Completed by Applicant Visitor FLETC Surge Only Contractor -Temp (T/I) Delivery/Pick-upFrequent Vendor Surge Access: Artesia Surge Charleston Surge Glynco Surge 5-Day or Less Access: Artesia VCC Charleston VCC Cheltenham VCC Glynco VCC Proximity Access: Artesia Proximity Charleston Proximity Cheltenham Proximity Glynco Proximity Page 2 of 2 Purpose This form is used to request access to Federal Law Enforcement Training Centers (FLETC) facilities for visitors, vendors, contractors, and other authorized individuals. Please read all instructions carefully before completing the form. 5-Day or Less Access • Requirements: NCIC background check is required • Badge Issued: Paper pass. Not to exceed 5 days • Notes: This access is for visitors requesting access for five days or less. • Graduation guests should submit via e-VAR or in-person. If access is requested for more than 2X in one month, the applicant will require fingerprints for Proximity access (see below) Proximity Badge - Unescorted Access • Requirements: o NCIC background check is required. o Fingerprints are required unless the applicant has an active PIV/CAC • Badge Issued: Proximity badge • Notes: For frequent or recurring access. FLETC Surge Access • Requirements: o NCIC background check is requ",
+            "source": null,
+            "match": "Requirements"
+          },
+          {
+            "text": "is used to request access to Federal Law Enforcement Training Centers (FLETC) facilities for visitors, vendors, contractors, and other authorized individuals. Please read all instructions carefully before completing the form. 5-Day or Less Access • Requirements: NCIC background check is required • Badge Issued: Paper pass. Not to exceed 5 days • Notes: This access is for visitors requesting access for five days or less. • Graduation guests should submit via e-VAR or in-person. If access is requested for more than 2X in one month, the applicant will require fingerprints for Proximity access (see below) Proximity Badge - Unescorted Access • Requirements: o NCIC background check is required. o Fingerprints are required unless the applicant has an active PIV/CAC • Badge Issued: Proximity badge • Notes: For frequent or recurring access. FLETC Surge Access • Requirements: o NCIC background check is required o May receive a temporary proximity badge for up to 45 days o Fingerprints are required if access exceeds 45 days • Badge Issued: Determined by length of access • Notes: For surge or temporary/intermittent construction personnel Submitting Form Selecting the Correct Location to Route Completed Form Before submitting the form, use the drop-down menu to select the appropriate location based on",
+            "source": null,
+            "match": "Requirements"
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "______ Phone/Email: ________________________ Signature: _________________________________________ Date: ________________________ Task Description Price 1 ADA Ramp Installation and Modification: 2 Steel Doors and Frames Replacement: 3 Packaged Terminal Air Conditioners Replacement 4 Interior Ceiling Fans Installation 5 Exterior Fan Replacement: . 6 Bleacher Apron Installation: 7 Floor Repairs: 8 Drain Cleanout: Subtotal Profit Total ===== FILE: files/ATTACHMENT_3_-_TSA_ACADEMY_SITE_MAP.pdf ===== ATTACHMENT 3 TSA ACADEMY SITE MAP ===== FILE: files/ATTACHMENT_5_-_SITE_VISIT_INFORMATION_.pdf ===== ATTACHMENT 5 SITE VISIT INFORMATION: FLETC TSA Training Academy FEDERAL LAW ENFORCEMENT TRAINING CENTER (FLETC) GLYNCO GA LOCATION 1131 CHAPEL CROSSING ROAD GLYNCO GA 31524 SITE VISIT IS SCHEDULE FOR 10 AM ON AUGUST 11, 2026 at the TSA Academy site. The address to the Commercial gate is 424 V ogel Road Brunswick GA 31525. We will meet at the softball field at Tucson and Legislative. We shall park on the grass on the 1st base side. Inclement weather, we have dugouts or a pavilion we can use for shelter. The orange highlighter on the picture shows the parking area. The TSA Academy is a short walk from the parking area. We will have site parking",
+            "source": null,
+            "match": "SITE VISIT"
+          },
+          {
+            "text": "A Ramp Installation and Modification: 2 Steel Doors and Frames Replacement: 3 Packaged Terminal Air Conditioners Replacement 4 Interior Ceiling Fans Installation 5 Exterior Fan Replacement: . 6 Bleacher Apron Installation: 7 Floor Repairs: 8 Drain Cleanout: Subtotal Profit Total ===== FILE: files/ATTACHMENT_3_-_TSA_ACADEMY_SITE_MAP.pdf ===== ATTACHMENT 3 TSA ACADEMY SITE MAP ===== FILE: files/ATTACHMENT_5_-_SITE_VISIT_INFORMATION_.pdf ===== ATTACHMENT 5 SITE VISIT INFORMATION: FLETC TSA Training Academy FEDERAL LAW ENFORCEMENT TRAINING CENTER (FLETC) GLYNCO GA LOCATION 1131 CHAPEL CROSSING ROAD GLYNCO GA 31524 SITE VISIT IS SCHEDULE FOR 10 AM ON AUGUST 11, 2026 at the TSA Academy site. The address to the Commercial gate is 424 V ogel Road Brunswick GA 31525. We will meet at the softball field at Tucson and Legislative. We shall park on the grass on the 1st base side. Inclement weather, we have dugouts or a pavilion we can use for shelter. The orange highlighter on the picture shows the parking area. The TSA Academy is a short walk from the parking area. We will have site parking for people with disabilities. In order to access the site, Contractors MUST complete the V AR………Please fill out the applicant portion of the V AR form provided for",
+            "source": null,
+            "match": "SITE VISIT"
+          },
+          {
+            "text": "Apron Installation: 7 Floor Repairs: 8 Drain Cleanout: Subtotal Profit Total ===== FILE: files/ATTACHMENT_3_-_TSA_ACADEMY_SITE_MAP.pdf ===== ATTACHMENT 3 TSA ACADEMY SITE MAP ===== FILE: files/ATTACHMENT_5_-_SITE_VISIT_INFORMATION_.pdf ===== ATTACHMENT 5 SITE VISIT INFORMATION: FLETC TSA Training Academy FEDERAL LAW ENFORCEMENT TRAINING CENTER (FLETC) GLYNCO GA LOCATION 1131 CHAPEL CROSSING ROAD GLYNCO GA 31524 SITE VISIT IS SCHEDULE FOR 10 AM ON AUGUST 11, 2026 at the TSA Academy site. The address to the Commercial gate is 424 V ogel Road Brunswick GA 31525. We will meet at the softball field at Tucson and Legislative. We shall park on the grass on the 1st base side. Inclement weather, we have dugouts or a pavilion we can use for shelter. The orange highlighter on the picture shows the parking area. The TSA Academy is a short walk from the parking area. We will have site parking for people with disabilities. In order to access the site, Contractors MUST complete the V AR………Please fill out the applicant portion of the V AR form provided for access to the site visit. Please return V AR to Michael.hickox@fletc.dhs.gov for processing. Very important to return this V AR asap to avoid any delays accessing FLETC. Foreign nationals need 30",
+            "source": null,
+            "match": "sla"
+          },
+          {
+            "text": "R 10 AM ON AUGUST 11, 2026 at the TSA Academy site. The address to the Commercial gate is 424 V ogel Road Brunswick GA 31525. We will meet at the softball field at Tucson and Legislative. We shall park on the grass on the 1st base side. Inclement weather, we have dugouts or a pavilion we can use for shelter. The orange highlighter on the picture shows the parking area. The TSA Academy is a short walk from the parking area. We will have site parking for people with disabilities. In order to access the site, Contractors MUST complete the V AR………Please fill out the applicant portion of the V AR form provided for access to the site visit. Please return V AR to Michael.hickox@fletc.dhs.gov for processing. Very important to return this V AR asap to avoid any delays accessing FLETC. Foreign nationals need 30 days vetting period for access to FLETC. For access questions, you can reach out to: Name: Michael Hickox Phone: 912.266.0045 Emai: Michael.hickox@fletc.dhs.gov The V AR must be submitted for each attendee no later than NOON ET on August 10 th. Each attendee should have a V AR submission. Contractor is limited to no more than 3 attendees. As state above, return V AR to POC Michael.hickox@fletc.dhs.gov. Contractors are encourage to attend but it is not",
+            "source": null,
+            "match": "site visit"
+          }
+        ],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [
+          {
+            "text": "===== FILE: files/ATTACHMENT_1_-BID_SCHEDULE_TSA_Reno.pdf ===== TSA Renovation ATTACHMENT 1 70LGLY26QGLB00040 Bid Schedule Contractor should provide or be able to provide any requested backup data to support the above quotes if requested by the Contracting Officer. Whenever possible, contractor should strive to obtain at least three subcontractor quotes to ensure the Government is getting a fair and reasonable price for the work. These quotes should be available upon request by the Contracting Officer. Bidder Acknowledgment The offeror acknowledges that each task price includes all labor, supervision, key personnel, materials, equipment, tools, transportation, coordination, safety requirements, submittals, testing, cleanup, overhead, profit, and incidentals necessary to complete the task in accordance with the SOW and solicitation requirements. Company Name: _______________________________ UEI #: ______________________ Authorized Representative: __________________________ Title: __________________________________ Phone/Email: ________________________ Signature: _________________________________________ Date: ________________________ Task Description Price 1 ADA Ramp Installation and Modification: 2 Steel Doors and Frames Replacement: 3 Packaged Terminal Air Conditioners Replacement 4 Interior Ceiling Fans Installation 5 Exterior Fan Replacement: . 6 Bleacher Apron Installation: 7 Floor Repairs: 8 Drain Cleanout: Subtotal Profit Total ===== FILE: files/ATTACHMENT_3_-_TSA_ACADEMY_SITE_MAP.pdf ===== ATTACHMENT 3 TSA ACADEMY SITE MAP ===== FILE: files/ATTACHMENT_5_-_SITE_VISIT_INFORMATION_.pdf ===== ATTACHMENT 5 SITE VISIT INFORMATION: FLETC TSA Training Academy FEDERAL LAW ENFORCEMENT TRAINING CENTER (FLETC) GLYNCO GA LOCATION 1131 CHAPEL CROSSING ROAD GLYNCO GA 31524 SITE",
+            "source": null,
+            "match": "SCHEDULE_TSA_Reno.pdf =====\nTSA Renovation  ATTACHMENT 1 \n70LGLY26QGLB00040 \nBid Schedule \n \n \n \nContractor should provi"
+          }
+        ],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32132558029,
+      "source_shard": 3,
+      "hot_ready_at": "2026-08-18T11:41:33.594393+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 9,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
+      "candidate_id": "US-SAM:babca00df97b48b196596786dc8bf70f",
+      "title": "USPS IDIQ AE Services Virginia",
+      "buyer": "POSTAL SERVICE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/opp/babca00df97b48b196596786dc8bf70f/view",
+      "deadline": "2026-10-01T19:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 28,
+      "priority_score": 28,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-10-01T19:00:00+00:00",
+        "notice_deadline_date": "2026-10-01",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 5,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "ng COUPA is a web-based electronic solicitation platform. If your organization wishes to participate in this solicitation, please see the attached COUPA registration instructions. If you have any questions on the registration process, contact Chris Gaj at cgaj@usps.gov or (860) 285-7015 or James Galston at james.galston@usps.gov or (860-936-4134). Once you complete the registration process, the Postal Service will review the entry within seven (7) business days to ensure it is complete and accurate. Upon approval, you will be notified via e-mail of your log-in credentials. Once you are registered or if your company is already registered in COUPA, please contact Chris Gaj at cgaj@usps.gov or (860) 285-7015 or James Galston at james.galston@usps.gov or (860-936-4134) to request an invitation to bid. Separate electronic messages will be sent inviting you to participate in the solicitation and notifying you when the event is opened. Each organization must \"accept\" the Invitation in order to access documents in COUPA. CLOSING TIME WILL NOT BE EXTENDED DUE TO OPERATOR INABILITY WITHIN COUPA. Coupa Registration eMail In order to participate in solicitations, you must be registered in our eSourcing database: Coupa. If your company is already registered please disreg",
+            "source": null,
+            "match": "registered in"
+          },
+          {
+            "text": "your log-in credentials. Once you are registered or if your company is already registered in COUPA, please contact Chris Gaj at cgaj@usps.gov or (860) 285-7015 or James Galston at james.galston@usps.gov or (860-936-4134) to request an invitation to bid. Separate electronic messages will be sent inviting you to participate in the solicitation and notifying you when the event is opened. Each organization must \"accept\" the Invitation in order to access documents in COUPA. CLOSING TIME WILL NOT BE EXTENDED DUE TO OPERATOR INABILITY WITHIN COUPA. Coupa Registration eMail In order to participate in solicitations, you must be registered in our eSourcing database: Coupa. If your company is already registered please disregard this email. To register log on to: Sourcing Link for Suppliers: http://about.usps.com/suppliers/becoming/registration.htm The USPS Supplier Registration Guide and a Supplier FAQ document are also available at this site. Click on the Register Supplier Organization link, in the top right corner. Registration approval takes 2-3 days. List all the states that you do business in. Once you receive the approval email, please forward the email to me at: cgaj@usps.gov and I will send you an invitation to open solicitations when advertised. Primar",
+            "source": null,
+            "match": "registered in"
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "ontract type is being utilized as these are “service based” requirements requiring negotiated rates with each supplier. The team will then issue multiple IDIQ master contracts in response to the requirement needs; the master contract will state that all work issued from the contract will be Firm Fixed priced. MINIMUM REQUIREMENTS: Technical Proposal Package: 1. Cover Sheet – Point of Contact & Company Information (Company letterhead) 2. Table of Contents – (Company letterhead) 3. Executive Summary Statement (Company letterhead) 4. Pass/Fail Requirements 5. SF330 ARCHITECT-ENGINEER QUALIFICATIONS PACKAGE 6. Geographic Preference Form 7. Narrative Response to Evaluation Factors Offeror’s Package: 1. Offer & Award Sheet 2. Acknowledgment of Amendments (if applicable) 3. Provision 4-1, Standard Solicitation Provisions (Section A.9) Past Performance Information should be included in the SF330 A-E Qualifications Package. 4. Provision F-202, Key Personnel (Contract Management Purposes) 5. Provision 4-3, Representations and Certifications 6. Provision 9-1, Equal Opportunity Affirmative Action Program 7. Provision F-401, Authorized Negotiators (Negotiation Purposes) Terms & Conditions: Acknowledgement of Solicitation Amendments (if applicable)",
+            "source": null,
+            "match": "reference"
+          }
+        ],
+        "certifications_partner": [
+          {
+            "text": "n (Company letterhead) 2. Table of Contents – (Company letterhead) 3. Executive Summary Statement (Company letterhead) 4. Pass/Fail Requirements 5. SF330 ARCHITECT-ENGINEER QUALIFICATIONS PACKAGE 6. Geographic Preference Form 7. Narrative Response to Evaluation Factors Offeror’s Package: 1. Offer & Award Sheet 2. Acknowledgment of Amendments (if applicable) 3. Provision 4-1, Standard Solicitation Provisions (Section A.9) Past Performance Information should be included in the SF330 A-E Qualifications Package. 4. Provision F-202, Key Personnel (Contract Management Purposes) 5. Provision 4-3, Representations and Certifications 6. Provision 9-1, Equal Opportunity Affirmative Action Program 7. Provision F-401, Authorized Negotiators (Negotiation Purposes) Terms & Conditions: Acknowledgement of Solicitation Amendments (if applicable), Solicitation Provision F-202: Key Personnel; Provision 4-3: Representations and Certifications (Section A., B., E.); Provision 9-1: Equal Opportunity Affirmative Action Program; and Provision F-401: Authorized Negotiators. Form VETS-4212 Documentation is required. If you are not registered with Department of Labor Report System, you must register on the DOL website at: https://www.dol.gov/vets/vets4212.htm and provide p",
+            "source": null,
+            "match": "Certification"
+          },
+          {
+            "text": "Offer & Award Sheet 2. Acknowledgment of Amendments (if applicable) 3. Provision 4-1, Standard Solicitation Provisions (Section A.9) Past Performance Information should be included in the SF330 A-E Qualifications Package. 4. Provision F-202, Key Personnel (Contract Management Purposes) 5. Provision 4-3, Representations and Certifications 6. Provision 9-1, Equal Opportunity Affirmative Action Program 7. Provision F-401, Authorized Negotiators (Negotiation Purposes) Terms & Conditions: Acknowledgement of Solicitation Amendments (if applicable), Solicitation Provision F-202: Key Personnel; Provision 4-3: Representations and Certifications (Section A., B., E.); Provision 9-1: Equal Opportunity Affirmative Action Program; and Provision F-401: Authorized Negotiators. Form VETS-4212 Documentation is required. If you are not registered with Department of Labor Report System, you must register on the DOL website at: https://www.dol.gov/vets/vets4212.htm and provide proof of registration. Contractor will be responsible for coordination of all work in a manner that will not interfere with operations and coordinate all work related to this phased project with the Facility Manager or designee. The successful offeror will be bound by the Contractor's Screening Requ",
+            "source": null,
+            "match": "Certification"
+          }
+        ],
+        "staffing_team": [
+          {
+            "text": "Technical Proposal Package: 1. Cover Sheet – Point of Contact & Company Information (Company letterhead) 2. Table of Contents – (Company letterhead) 3. Executive Summary Statement (Company letterhead) 4. Pass/Fail Requirements 5. SF330 ARCHITECT-ENGINEER QUALIFICATIONS PACKAGE 6. Geographic Preference Form 7. Narrative Response to Evaluation Factors Offeror’s Package: 1. Offer & Award Sheet 2. Acknowledgment of Amendments (if applicable) 3. Provision 4-1, Standard Solicitation Provisions (Section A.9) Past Performance Information should be included in the SF330 A-E Qualifications Package. 4. Provision F-202, Key Personnel (Contract Management Purposes) 5. Provision 4-3, Representations and Certifications 6. Provision 9-1, Equal Opportunity Affirmative Action Program 7. Provision F-401, Authorized Negotiators (Negotiation Purposes) Terms & Conditions: Acknowledgement of Solicitation Amendments (if applicable), Solicitation Provision F-202: Key Personnel; Provision 4-3: Representations and Certifications (Section A., B., E.); Provision 9-1: Equal Opportunity Affirmative Action Program; and Provision F-401: Authorized Negotiators. Form VETS-4212 Documentation is required. If you are not registered with Department of Labor Report System, you must",
+            "source": null,
+            "match": "Key Personnel"
+          },
+          {
+            "text": "Evaluation Factors Offeror’s Package: 1. Offer & Award Sheet 2. Acknowledgment of Amendments (if applicable) 3. Provision 4-1, Standard Solicitation Provisions (Section A.9) Past Performance Information should be included in the SF330 A-E Qualifications Package. 4. Provision F-202, Key Personnel (Contract Management Purposes) 5. Provision 4-3, Representations and Certifications 6. Provision 9-1, Equal Opportunity Affirmative Action Program 7. Provision F-401, Authorized Negotiators (Negotiation Purposes) Terms & Conditions: Acknowledgement of Solicitation Amendments (if applicable), Solicitation Provision F-202: Key Personnel; Provision 4-3: Representations and Certifications (Section A., B., E.); Provision 9-1: Equal Opportunity Affirmative Action Program; and Provision F-401: Authorized Negotiators. Form VETS-4212 Documentation is required. If you are not registered with Department of Labor Report System, you must register on the DOL website at: https://www.dol.gov/vets/vets4212.htm and provide proof of registration. Contractor will be responsible for coordination of all work in a manner that will not interfere with operations and coordinate all work related to this phased project with the Facility Manager or designee. The successful offer",
+            "source": null,
+            "match": "Key Personnel"
+          }
+        ],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [
+          {
+            "text": "offerors whose proposal provides the combination of features that offers the best or greatest overall value. In order to fulfill recurring needs within the advertised areas, multiple IDIQ contracts will be awarded in each service area. IDIQ’s are generally used for recurring types of A-E services where procurement of these services individually by normal announcement, selection, negotiation, and award procedures would not be economical or timely. Task orders for particular projects will be negotiated and issued under the terms and conditions of the master contract. The IDIQ contract type is being utilized as these are “service based” requirements requiring negotiated rates with each supplier. The team will then issue multiple IDIQ master contracts in response to the requirement needs; the master contract will state that all work issued from the contract will be Firm Fixed priced. MINIMUM REQUIREMENTS: Technical Proposal Package: 1. Cover Sheet – Point of Contact & Company Information (Company letterhead) 2. Table of Contents – (Company letterhead) 3. Executive Summary Statement (Company letterhead) 4. Pass/Fail Requirements 5. SF330 ARCHITECT-ENGINEER QUALIFICATIONS PACKAGE 6. Geographic Preference Form 7. Narrative Response to Evaluation Factors Offer",
+            "source": null,
+            "match": "requirements"
+          },
+          {
+            "text": "or recurring types of A-E services where procurement of these services individually by normal announcement, selection, negotiation, and award procedures would not be economical or timely. Task orders for particular projects will be negotiated and issued under the terms and conditions of the master contract. The IDIQ contract type is being utilized as these are “service based” requirements requiring negotiated rates with each supplier. The team will then issue multiple IDIQ master contracts in response to the requirement needs; the master contract will state that all work issued from the contract will be Firm Fixed priced. MINIMUM REQUIREMENTS: Technical Proposal Package: 1. Cover Sheet – Point of Contact & Company Information (Company letterhead) 2. Table of Contents – (Company letterhead) 3. Executive Summary Statement (Company letterhead) 4. Pass/Fail Requirements 5. SF330 ARCHITECT-ENGINEER QUALIFICATIONS PACKAGE 6. Geographic Preference Form 7. Narrative Response to Evaluation Factors Offeror’s Package: 1. Offer & Award Sheet 2. Acknowledgment of Amendments (if applicable) 3. Provision 4-1, Standard Solicitation Provisions (Section A.9) Past Performance Information should be included in the SF330 A-E Qualifications Package. 4. Provision F-",
+            "source": null,
+            "match": "REQUIREMENTS"
+          },
+          {
+            "text": "ated and issued under the terms and conditions of the master contract. The IDIQ contract type is being utilized as these are “service based” requirements requiring negotiated rates with each supplier. The team will then issue multiple IDIQ master contracts in response to the requirement needs; the master contract will state that all work issued from the contract will be Firm Fixed priced. MINIMUM REQUIREMENTS: Technical Proposal Package: 1. Cover Sheet – Point of Contact & Company Information (Company letterhead) 2. Table of Contents – (Company letterhead) 3. Executive Summary Statement (Company letterhead) 4. Pass/Fail Requirements 5. SF330 ARCHITECT-ENGINEER QUALIFICATIONS PACKAGE 6. Geographic Preference Form 7. Narrative Response to Evaluation Factors Offeror’s Package: 1. Offer & Award Sheet 2. Acknowledgment of Amendments (if applicable) 3. Provision 4-1, Standard Solicitation Provisions (Section A.9) Past Performance Information should be included in the SF330 A-E Qualifications Package. 4. Provision F-202, Key Personnel (Contract Management Purposes) 5. Provision 4-3, Representations and Certifications 6. Provision 9-1, Equal Opportunity Affirmative Action Program 7. Provision F-401, Authorized Negotiators (Negotiation Purposes)",
+            "source": null,
+            "match": "Requirements"
+          },
+          {
+            "text": "tions (Section A., B., E.); Provision 9-1: Equal Opportunity Affirmative Action Program; and Provision F-401: Authorized Negotiators. Form VETS-4212 Documentation is required. If you are not registered with Department of Labor Report System, you must register on the DOL website at: https://www.dol.gov/vets/vets4212.htm and provide proof of registration. Contractor will be responsible for coordination of all work in a manner that will not interfere with operations and coordinate all work related to this phased project with the Facility Manager or designee. The successful offeror will be bound by the Contractor's Screening Requirements. Offerors must familiarize themselves with the requirements of Clause F-102. HOW TO PARTICIPATE IN THE OPPORTUNITY All proposals must be submitted online in USPS eSourcing COUPA (https://ebuyplus.coupahost.com/sessions/supplier_login) USPS eSourcing COUPA is a web-based electronic solicitation platform. If your organization wishes to participate in this solicitation, please see the attached COUPA registration instructions. If you have any questions on the registration process, contact Chris Gaj at cgaj@usps.gov or (860) 285-7015 or James Galston at james.galston@usps.gov or (860-936-4134). Once you complete the registratio",
+            "source": null,
+            "match": "Requirements"
+          }
+        ],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32132558029,
+      "source_shard": 3,
+      "hot_ready_at": "2026-08-18T11:41:33.594393+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 8,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
