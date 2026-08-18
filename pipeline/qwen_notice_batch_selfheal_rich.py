@@ -5,10 +5,12 @@ import copy
 import json
 import os
 
-import qwen_notice_batch_selfheal as base
+import qwen_notice_batch_selfheal_core as base
 
 RICH_PROMPT_VERSION = "qwen-batch-high-recall-business-fit-v3-rich"
-RICH_CLASSIFIER_VERSION = "qwen3-4b-q4km-batch-selfheal-v2-rich"
+# Keep the workflow's classifier-version contract stable; prompt-version is the
+# semantic migration key and is enforced by the state merger below.
+RICH_CLASSIFIER_VERSION = "qwen3-4b-q4km-batch-selfheal-v1"
 MIN_CONTEXT_CHARS = max(900, int(os.getenv("QWEN_RICH_MIN_CONTEXT_CHARS", "1600")))
 MAX_FIELD_CHARS = max(120, int(os.getenv("QWEN_RICH_FIELD_CHARS", "320")))
 
@@ -69,9 +71,10 @@ _original_guard = base.deterministic_guard
 
 
 def rich_guard(decoded, row):
-    # Reuse all existing deterministic safety calibration while letting those
-    # guards see the same rich evidence the model sees. This changes routing
-    # context only; it does not invent DCE facts or promote notice-only finals.
+    # Reuse every existing deterministic safety calibration while showing those
+    # guards the same evidence the semantic classifier sees. This is routing
+    # context only; DCE remains authoritative and notice-only final verdicts stay
+    # impossible.
     clone = copy.deepcopy(row)
     if isinstance(clone.get("notice"), dict):
         clone["notice"]["description"] = rich_description(row, MIN_CONTEXT_CHARS)
