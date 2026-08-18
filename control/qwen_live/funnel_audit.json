@@ -1,0 +1,1051 @@
+{
+  "schema": "QWEN_DCE_FUNNEL_AUDIT_V1",
+  "generated_at": "2026-08-18T15:00:06.773026+00:00",
+  "state_current_exact_hash_rows": 5968,
+  "ledger_rows": 43371,
+  "snapshot_rows": 43371,
+  "decision_counts": {
+    "FIT": 190,
+    "MAYBE": 5439,
+    "REJECT_OBVIOUS": 339
+  },
+  "survival_counts": {
+    "KEEP": 5959,
+    "DROP": 9
+  },
+  "delivery_mode_counts": {
+    "AI_ENABLED": 121,
+    "BROKER_RESELL": 1631,
+    "DIRECT_DIGITAL": 3287,
+    "SUBCONTRACTABLE": 628,
+    "UNCLEAR": 288,
+    "MIXED": 13
+  },
+  "all_current_qwen_funnel": {
+    "current_exact_hash_qwen": 5968,
+    "dce_attempted_exact_version": 4512,
+    "controller_processed": 4994,
+    "retry_cooldown": 0,
+    "in_gpt_inbox": 91,
+    "in_final_bank": 10
+  },
+  "fit_funnel": {
+    "qwen_fit_current": 190,
+    "dce_attempted_exact_version": 162,
+    "controller_processed": 188,
+    "retry_cooldown": 0,
+    "in_gpt_inbox": 11,
+    "in_final_bank": 0,
+    "processed_without_exact_attempt_record": 28,
+    "attempted_not_visible_anywhere": 2
+  },
+  "fit_coverage": {
+    "qwen_fit_current": 190,
+    "covered_by_attempt_processed_cooldown_inbox_or_final": 190,
+    "coverage_fraction": 1.0,
+    "hard_invariant": "Every current KEEP+dce_eligible STRONG_FIT/FIT must either have DCE progress evidence or remain explicitly unattempted/unblocked; no silent disappearance."
+  },
+  "code_prior_audit": {
+    "noncore_cpv_contradiction": 462,
+    "positive_code": 48
+  },
+  "qwen_fit_noncore_code_contradiction_examples": [
+    {
+      "candidate_id": "DE-DOE:ad72d1e3-fc91-4c8c-a2ca-d1529327aded:01",
+      "title": "Neubau Feuerwehrhaus der Stadt Rietberg - Sandwichfassade",
+      "qwen_classification": "FIT",
+      "delivery_mode": "AI_ENABLED",
+      "codes": {
+        "delta": -20,
+        "positive": [],
+        "negative": [
+          "cpv:45443000:construction-work"
+        ],
+        "cpv_tokens": [
+          "45443000"
+        ],
+        "naics_tokens": [],
+        "contradiction": true,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
+    },
+    {
+      "candidate_id": "NO-DOFFIN:2026-113053",
+      "title": "R02032 - kjøp av byggevarer i region Nord – Trondenes, Evenes, Ramsund og Bjerkvik",
+      "qwen_classification": "FIT",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "codes": {
+        "delta": -20,
+        "positive": [],
+        "negative": [
+          "cpv:44000000:construction-materials",
+          "cpv:44100000:construction-materials",
+          "cpv:44110000:construction-materials",
+          "cpv:44111000:construction-materials",
+          "cpv:44190000:construction-materials"
+        ],
+        "cpv_tokens": [
+          "44000000",
+          "44100000",
+          "44110000",
+          "44111000",
+          "44190000"
+        ],
+        "naics_tokens": [],
+        "contradiction": true,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
+    },
+    {
+      "candidate_id": "NO-DOFFIN:2026-113063",
+      "title": "R02035 - kjøp av byggevarer i region Nord – Helgeland",
+      "qwen_classification": "FIT",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "codes": {
+        "delta": -20,
+        "positive": [],
+        "negative": [
+          "cpv:44000000:construction-materials",
+          "cpv:44100000:construction-materials",
+          "cpv:44110000:construction-materials",
+          "cpv:44111000:construction-materials",
+          "cpv:44190000:construction-materials"
+        ],
+        "cpv_tokens": [
+          "44000000",
+          "44100000",
+          "44110000",
+          "44111000",
+          "44190000"
+        ],
+        "naics_tokens": [],
+        "contradiction": true,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
+    },
+    {
+      "candidate_id": "PL-BZP:08defcf8-ef68-ece4-962b-12000115c502",
+      "title": "DOSTAWA ZAMKNIĘTEGO SYSTEMU DO POBIERANIA KRWI",
+      "qwen_classification": "FIT",
+      "delivery_mode": "AI_ENABLED",
+      "codes": {
+        "delta": -20,
+        "positive": [],
+        "negative": [
+          "cpv:33140000:medical-pharma-personal-care"
+        ],
+        "cpv_tokens": [
+          "33140000"
+        ],
+        "naics_tokens": [],
+        "contradiction": true,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
+    },
+    {
+      "candidate_id": "PL-BZP:08defcfd-f5bb-fb31-962b-12000115c5c8",
+      "title": "Odnowa Nawierzchni DW 272 na odc. Belno - Sulnowo od km 7+155 do km 9+355 dł. 2,200 km",
+      "qwen_classification": "FIT",
+      "delivery_mode": "AI_ENABLED",
+      "codes": {
+        "delta": -20,
+        "positive": [],
+        "negative": [
+          "cpv:45233140:construction-work"
+        ],
+        "cpv_tokens": [
+          "45233140"
+        ],
+        "naics_tokens": [],
+        "contradiction": true,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
+    },
+    {
+      "candidate_id": "UK_FTS_OCDS:077928-2026",
+      "title": "Shettleston Housing Association Ltd: Repairs & Maintenance Framework 2026/27 - 2028/29",
+      "qwen_classification": "FIT",
+      "delivery_mode": "AI_ENABLED",
+      "codes": {
+        "delta": -20,
+        "positive": [],
+        "negative": [
+          "cpv:45000000:construction-work"
+        ],
+        "cpv_tokens": [
+          "45000000"
+        ],
+        "naics_tokens": [],
+        "contradiction": true,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
+    },
+    {
+      "candidate_id": "UK_PCS_OCDS:rls-10-AUG562246",
+      "title": "Structural Steelwork & Cladding Design, Manufacture & Installation Package",
+      "qwen_classification": "FIT",
+      "delivery_mode": "AI_ENABLED",
+      "codes": {
+        "delta": -20,
+        "positive": [],
+        "negative": [
+          "cpv:45223210:construction-work"
+        ],
+        "cpv_tokens": [
+          "45223210"
+        ],
+        "naics_tokens": [],
+        "contradiction": true,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false,
+      "processed": true,
+      "in_inbox": false
+    },
+    {
+      "candidate_id": "UK_PCS_OCDS:rls-15-AUG562279",
+      "title": "Sprinkler Servicing, Maintenance and Repairs",
+      "qwen_classification": "FIT",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "codes": {
+        "delta": -20,
+        "positive": [],
+        "negative": [
+          "cpv:50413200:repair-maintenance-nondigital"
+        ],
+        "cpv_tokens": [
+          "50413200"
+        ],
+        "naics_tokens": [],
+        "contradiction": true,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
+    },
+    {
+      "candidate_id": "UK_PCS_OCDS:rls-17-AUG562206",
+      "title": "NP57426 Condoms & Sexual Health Products",
+      "qwen_classification": "FIT",
+      "delivery_mode": "AI_ENABLED",
+      "codes": {
+        "delta": -20,
+        "positive": [],
+        "negative": [
+          "cpv:33140000:medical-pharma-personal-care"
+        ],
+        "cpv_tokens": [
+          "33140000"
+        ],
+        "naics_tokens": [],
+        "contradiction": true,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
+    },
+    {
+      "candidate_id": "UK_PCS_OCDS:rls-2-JUL559153",
+      "title": "St Andrew Square Public Realm Improvement Project",
+      "qwen_classification": "FIT",
+      "delivery_mode": "AI_ENABLED",
+      "codes": {
+        "delta": -20,
+        "positive": [],
+        "negative": [
+          "cpv:45000000:construction-work"
+        ],
+        "cpv_tokens": [
+          "45000000"
+        ],
+        "naics_tokens": [],
+        "contradiction": true,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
+    },
+    {
+      "candidate_id": "UK_PCS_OCDS:rls-6-AUG562473",
+      "title": "Shettleston Housing Association Ltd: Repairs & Maintenance Framework 2026/27 - 2028/29",
+      "qwen_classification": "FIT",
+      "delivery_mode": "AI_ENABLED",
+      "codes": {
+        "delta": -20,
+        "positive": [],
+        "negative": [
+          "cpv:45000000:construction-work"
+        ],
+        "cpv_tokens": [
+          "45000000"
+        ],
+        "naics_tokens": [],
+        "contradiction": true,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
+    },
+    {
+      "candidate_id": "UK_PCS_OCDS:rls-61-AUG561444",
+      "title": "EF0114 Purchase of a tracked aerial platform and trailer",
+      "qwen_classification": "FIT",
+      "delivery_mode": "DIRECT_DIGITAL",
+      "codes": {
+        "delta": -20,
+        "positive": [],
+        "negative": [
+          "cpv:34142100:transport-equipment"
+        ],
+        "cpv_tokens": [
+          "34142100"
+        ],
+        "naics_tokens": [],
+        "contradiction": true,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
+    },
+    {
+      "candidate_id": "UK_PCS_OCDS:rls-8-AUG562423",
+      "title": "Shettleston Housing Association Ltd: Repairs & Maintenance Framework 2026/27 - 2028/29",
+      "qwen_classification": "FIT",
+      "delivery_mode": "AI_ENABLED",
+      "codes": {
+        "delta": -20,
+        "positive": [],
+        "negative": [
+          "cpv:45000000:construction-work"
+        ],
+        "cpv_tokens": [
+          "45000000"
+        ],
+        "naics_tokens": [],
+        "contradiction": true,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true,
+      "processed": true,
+      "in_inbox": false
+    }
+  ],
+  "qwen_maybe_positive_code_examples": [
+    {
+      "candidate_id": "DE-DOE:414e3e5e-f046-4f92-9d19-435794df567c:01",
+      "title": "Rahmenvertrag Konzeptionierung und Durchführung des überfachlichen Seminarangebots (Q-Seminare) im BLB NRW",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 7,
+        "positive": [
+          "cpv:80522000:SPM_TRAINING"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "80522000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "DE-DOE:7ad138c8-4306-4856-8fb2-1dcf6400b6a1:01",
+      "title": "RV Bearbeitung/Digitalisierung von Posteingängen für das Feststellungsverfahren im Schwerbehindertenrecht",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 8,
+        "positive": [
+          "cpv:72315000:SPM_DATA"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "72315000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true
+    },
+    {
+      "candidate_id": "DK-UDBUD:7f499979-9ffb-41bc-92bf-0b6823d89bb2:01",
+      "title": "Udbud af kontrakt vedrørende levering, drift, vedligeholdelse, support og videreudvikling af et internetbaseret bookingsystem til Forsvarets Puljekøretøjer",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 12,
+        "positive": [
+          "cpv:72268000:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "72268000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "DK-UDBUD:8dacdef7-a230-451e-a4ac-8f6a40790f3d:01",
+      "title": "Dynamisk indkøbssystem om oversættelsesydelser",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 14,
+        "positive": [
+          "cpv:79530000:SPM_TRANSLATION_TRANSCRIPTION"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "79530000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "EE-RHR:1017a836-95d3-4786-8d31-145ec719a72e",
+      "title": "Tarkvaraarendus koos hooldustööde, tehnilise toe ja arendusressursi hankimisega",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 12,
+        "positive": [
+          "cpv:72200000:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "72200000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "EE-RHR:13767add-294c-4a45-8d35-6a44ce7681a4",
+      "title": "Tallinna valgustuspunktipõhise juhtimissüsteemi soetamine ja paigaldus",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 12,
+        "positive": [
+          "cpv:72260000:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "31700000",
+          "45222000",
+          "51900000",
+          "71300000",
+          "72260000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true
+    },
+    {
+      "candidate_id": "EE-RHR:5d3f7d33-0f6f-4d64-9785-2c69a1ed5809",
+      "title": "TTJA menetlusprotsesside ärianalüüs",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 12,
+        "positive": [
+          "cpv:72200000:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "72200000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "EE-RHR:91f1fa1f-8f7b-43af-806b-0d41b0814ca1",
+      "title": "Kommunikatsioonimaterjalide loomise, kujundamise ja teostamise teenus Eesti Töötukassale",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 14,
+        "positive": [
+          "cpv:79340000:SPM_MARKETING"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "79340000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true
+    },
+    {
+      "candidate_id": "EE-RHR:9f7cb364-43b0-4f7e-a548-96cb47777bcf",
+      "title": "Eesti Elektrijaama 5. energiaploki katla rekonstrueerimise ja Narva linna kaugküttevõrguga ühendamise projektijuhtimise teenuse osutamine",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 12,
+        "positive": [
+          "cpv:72224000:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "72224000",
+          "79420000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true
+    },
+    {
+      "candidate_id": "EE-RHR:b1a3b7a9-1fc7-4d8c-8feb-6ba3afc63308",
+      "title": "Turba tn 2 rajatise kasutusse andmine mootorsõidukijuhi õppesõidu teenuse korraldamiseks",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 7,
+        "positive": [
+          "cpv:80520000:SPM_TRAINING"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "70332000",
+          "80520000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true
+    },
+    {
+      "candidate_id": "EE-RHR:e1de8fff-996b-42e0-bc62-7734d298b644",
+      "title": "Kirjastamis- ja trükiteenus",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 16,
+        "positive": [
+          "cpv:79800000:SPM_PRINT"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "79800000",
+          "79970000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "EE-RHR:e96c0aa9-9562-4cf8-8c33-893f715ed3a5",
+      "title": "EMSUKA ja murrete tööriistade raamhange",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 16,
+        "positive": [
+          "cpv:72212517:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "72212517"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "EE-RHR:ed74ffeb-d1ed-4e09-b9e4-28345951f992",
+      "title": "Kehtna valla infolehe Valla Vaatleja väljaandja leidmine perioodiks 2027–2029",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 16,
+        "positive": [
+          "cpv:79820000:SPM_PRINT"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "79820000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true
+    },
+    {
+      "candidate_id": "EE-RHR:f6db4f2f-8467-4465-83ec-96f5677864d0",
+      "title": "Rohefoori 2. etapp: põllumajanduse esmatootjate kestlikkuse hindamise tarkvaralahenduse väljatöötamine ja digitaalse tööriista prototüübi katsetamine (Riigikantselei)",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 12,
+        "positive": [
+          "cpv:72200000:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "72200000",
+          "73100000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": true
+    },
+    {
+      "candidate_id": "LT-CVP:1036847",
+      "title": "27907 (25207) SAP licencijos ir jų palaikymo paslaugos (seno CVP IS Nr. 713398)",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 12,
+        "positive": [
+          "cpv:72261000:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "48442000",
+          "72261000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "LT-CVP:195498",
+      "title": "Programinės įrangos palaikymo paslaugų centralizuotas viešasis pirkimas per VRS CPO, siekiant sukurti dinaminę pirkimo sistemą (PPR-927) (seno CVPIS Nr. 697161)",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 12,
+        "positive": [
+          "cpv:72261000:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "72261000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "LT-CVP:299226",
+      "title": "Informacinių sistemų kūrimo ir vystymo komandų paslaugos DPS (seno CVP IS Nr. 580190)",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 12,
+        "positive": [
+          "cpv:72200000:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "72200000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "LT-CVP:668860",
+      "title": "702686 - Mokymų paslaugos (NEGALIOJANTIS)",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 7,
+        "positive": [
+          "cpv:80511000:SPM_TRAINING",
+          "cpv:80522000:SPM_TRAINING",
+          "cpv:80570000:SPM_TRAINING"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "80340000",
+          "80511000",
+          "80522000",
+          "80570000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "LT-CVP:682960",
+      "title": "(VPP-3526) Nr.711971 Informacinių technologijų specialistų paslaugos kvalifikacijos vertinimo sistema",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 16,
+        "positive": [
+          "cpv:72212900:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "72212900"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "LT-CVP:75893",
+      "title": "Interneto ryšio paslaugų užsakymai per CPO LT elektroninį katalogą (seno CVP IS Nr. 727888).",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 10,
+        "positive": [
+          "cpv:72400000:SPM_WEB"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "72400000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "NO-DOFFIN:2026-113030",
+      "title": "2. gangsutlysning Adressebasert befolkningsvarsling til Nittedal kommune, og opsjon på gruppe- og kollegavarslingssystem",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 10,
+        "positive": [
+          "cpv:72400000:SPM_WEB"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "64000000",
+          "64200000",
+          "64210000",
+          "64212000",
+          "64212100",
+          "64216000",
+          "64216100",
+          "72000000",
+          "72400000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "NO-DOFFIN:2026-113046",
+      "title": "Trinn 1 - Prekvalifisering til Rammeavtale reklame, kampanjer og grafisk design",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 16,
+        "positive": [
+          "cpv:79340000:SPM_MARKETING",
+          "cpv:79341000:SPM_MARKETING",
+          "cpv:79341100:SPM_MARKETING",
+          "cpv:79341400:SPM_MARKETING",
+          "cpv:79800000:SPM_PRINT",
+          "cpv:79820000:SPM_PRINT",
+          "cpv:79822000:SPM_PRINT",
+          "cpv:79822500:SPM_PRINT",
+          "cpv:92110000:SPM_VIDEO",
+          "cpv:92111000:SPM_VIDEO",
+          "cpv:92111200:SPM_VIDEO"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "79000000",
+          "79300000",
+          "79340000",
+          "79341000",
+          "79341100",
+          "79341400",
+          "79800000",
+          "79820000",
+          "79822000",
+          "79822500",
+          "92000000",
+          "92100000",
+          "92110000",
+          "92111000",
+          "92111200"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "NO-DOFFIN:2026-113091",
+      "title": "Avtale om konsulentbistand i tilknytning til prosjekt-og systemtjenester",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 12,
+        "positive": [
+          "cpv:72200000:SPM_SOFTWARE",
+          "cpv:72220000:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "72000000",
+          "72200000",
+          "72220000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "NO-DOFFIN:2026-113094",
+      "title": "Kontraktstildeling - Kommunikasjonsrådgiver i 50 % til SAMT-BU - DPS",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 12,
+        "positive": [
+          "cpv:72200000:SPM_SOFTWARE",
+          "cpv:72220000:SPM_SOFTWARE",
+          "cpv:72222000:SPM_SOFTWARE",
+          "cpv:72223000:SPM_SOFTWARE",
+          "cpv:72224000:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "72000000",
+          "72200000",
+          "72220000",
+          "72222000",
+          "72223000",
+          "72224000",
+          "75000000",
+          "75100000",
+          "75110000",
+          "75112000",
+          "75112100",
+          "79000000",
+          "79400000",
+          "79420000",
+          "79421000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "NO-DOFFIN:2026-113096",
+      "title": "Anskaffelse av prosjektstyringsverktøy",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 12,
+        "positive": [
+          "cpv:72200000:SPM_SOFTWARE",
+          "cpv:72220000:SPM_SOFTWARE",
+          "cpv:72224000:SPM_SOFTWARE",
+          "cpv:72250000:SPM_SOFTWARE",
+          "cpv:72260000:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "48000000",
+          "48300000",
+          "48330000",
+          "48331000",
+          "72000000",
+          "72200000",
+          "72220000",
+          "72224000",
+          "72250000",
+          "72260000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "NO-DOFFIN:2026-113108",
+      "title": "Fagsystem til Iris Salten IKS",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 12,
+        "positive": [
+          "cpv:72200000:SPM_SOFTWARE",
+          "cpv:72260000:SPM_SOFTWARE",
+          "cpv:72400000:SPM_WEB",
+          "cpv:72410000:SPM_WEB"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "48000000",
+          "48200000",
+          "48210000",
+          "48219000",
+          "48219300",
+          "48400000",
+          "48440000",
+          "48445000",
+          "72000000",
+          "72200000",
+          "72260000",
+          "72400000",
+          "72410000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "NO-DOFFIN:2026-113132",
+      "title": "RA-26-003-GR-Velferdsteknologi - Gjøvikregionen og Hadeland",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 12,
+        "positive": [
+          "cpv:72200000:SPM_SOFTWARE",
+          "cpv:72220000:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "33000000",
+          "33100000",
+          "33190000",
+          "33195000",
+          "33196000",
+          "72000000",
+          "72200000",
+          "72220000",
+          "85000000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "PL-BZP:08defc3b-a997-1e36-962b-1200014af5c1",
+      "title": "Kompleksowa organizacja 1-dniowej konferencji „The Future is data. Przyszłość to dane”",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 16,
+        "positive": [
+          "cpv:72400000:SPM_WEB",
+          "cpv:79342200:SPM_MARKETING",
+          "cpv:79822500:SPM_PRINT"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "55300000",
+          "72400000",
+          "79342200",
+          "79540000",
+          "79822500",
+          "79950000",
+          "79951000",
+          "79952000",
+          "79961000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "PL-BZP:08defc4a-6ab0-d44f-962b-12000115bd59",
+      "title": "Dostawa i wdrożenie infrastruktury, systemów oraz narzędzi cyberbezpieczeństwa IT/OT, wraz z wirtualizacją, backupem, monitoringiem, ochroną sieci dla Zakładu Komunalnego Sp. z o.o. w Jasieniu",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 12,
+        "positive": [
+          "cpv:72260000:SPM_SOFTWARE"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "30233000",
+          "32420000",
+          "48000000",
+          "48820000",
+          "72260000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    },
+    {
+      "candidate_id": "PL-BZP:08defc4f-1343-27f7-962b-12000115be1b",
+      "title": "SZP/243-250/2026 Szkolenie z projektowania usług z wykorzystaniem metodyki Design Thinking w ramach projektu StayOnTrack–Razem Przeciw Rezygnacji z Edukacji realizowanego przez Politechnikę Wrocławską",
+      "qwen_classification": "MAYBE",
+      "codes": {
+        "delta": 7,
+        "positive": [
+          "cpv:80500000:SPM_TRAINING"
+        ],
+        "negative": [],
+        "cpv_tokens": [
+          "80500000"
+        ],
+        "naics_tokens": [],
+        "contradiction": false,
+        "rule": "priority_only_never_drop_never_eligibility"
+      },
+      "attempted": false
+    }
+  ],
+  "safety": {
+    "exact_material_hash_checked": true,
+    "code_prior_is_observability_only_here": true,
+    "no_classification_or_eligibility_mutation": true
+  }
+}
