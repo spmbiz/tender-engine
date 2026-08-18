@@ -36,16 +36,20 @@ def test_regulated_guard_keeps_row_but_caps_lean():
     assert actions
 
 
-def test_physical_goods_are_retained_for_broker_recall():
+def test_physical_model_reject_is_preserved_for_post_guard_recall():
     decoded = mod.decode_item({"i":"A","d":"R","l":"H","r":"D","f":[],"n":0,"g":0})
     out, _ = mod.deterministic_guard(decoded, envelope("A", "Commercial truck parts"))
-    assert out["classification"] == "MAYBE"
+    assert out["classification"] == "REJECT_OBVIOUS"
     assert out["delivery_mode"] == "BROKER_RESELL"
     assert out["lean_attractiveness"] == "MEDIUM"
+    assert out["dce_eligible"] is False
+    assert out["business_calibration_version"] == "spm-business-fit-v2"
 
 
-def test_clear_digital_scope_gets_non_destructive_fit_floor():
+def test_digital_model_reject_is_preserved_for_post_guard_recall():
     decoded = mod.decode_item({"i":"A","d":"R","l":"M","r":"U","f":[],"n":0,"g":1})
     out, actions = mod.deterministic_guard(decoded, envelope("A", "Website redesign and CMS migration"))
-    assert out["classification"] == "FIT"
-    assert "clear_digital_floor_fit" in actions
+    assert out["classification"] == "REJECT_OBVIOUS"
+    assert out["dce_eligible"] is False
+    assert "clear_digital_floor_fit" not in actions
+    assert out["business_calibration_version"] == "spm-business-fit-v2"
