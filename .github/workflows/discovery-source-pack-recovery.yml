@@ -1,0 +1,39 @@
+name: Discovery Source Pack Recovery
+
+on:
+  workflow_run:
+    workflows: ["SuperGreen Discovery V2"]
+    types: [completed]
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: discovery-source-pack-recovery-${{ github.event.workflow_run.id }}
+  cancel-in-progress: false
+
+jobs:
+  retry-failed-source-jobs:
+    if: >-
+      github.event.workflow_run.conclusion != 'success' &&
+      github.event.workflow_run.run_attempt < 3
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Let concurrent Release upload pressure drain
+        run: sleep 90
+      - name: Re-run only failed jobs and their dependents
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Recovering discovery run=$RUN_ID prior_attempt=$RUN_ATTEMPT"
+          gh run rerun "$RUN_ID" --failed --repo "$GITHUB_REPOSITORY"
+      - name: Recovery contract
+        run: |
+          echo 'This workflow only retries failed jobs from the same immutable discovery run.'
+          echo 'It does not convert missing/degraded coverage into success; the downstream coverage guard remains authoritative.'
