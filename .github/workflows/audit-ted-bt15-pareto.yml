@@ -1,0 +1,65 @@
+name: Audit TED BT-15 Pareto
+
+on:
+  push:
+    branches:
+      - 'test/ted-bt15-pareto-20260818'
+    paths:
+      - 'benchmarks/ted-bt15-pareto-trigger.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install runtime dependency
+        run: python -m pip install --disable-pip-version-check requests
+
+      - name: Read test size
+        id: cfg
+        shell: bash
+        run: |
+          set -euo pipefail
+          MAX_NOTICES="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('benchmarks/ted-bt15-pareto-trigger.json')
+          if p.exists():
+              data = json.loads(p.read_text())
+              print(int(data.get('max_notices', 2000)))
+          else:
+              print(2000)
+          PY
+          )"
+          echo "max_notices=$MAX_NOTICES" >> "$GITHUB_OUTPUT"
+          echo "Testing $MAX_NOTICES active TED competition notices"
+
+      - name: Run BT-15 Pareto audit
+        run: |
+          python pipeline/audit_ted_bt15_pareto.py \
+            --max-notices "${{ steps.cfg.outputs.max_notices }}" \
+            --out benchmarks/ted-bt15-pareto-latest.json
+
+      - name: Commit compact benchmark result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add benchmarks/ted-bt15-pareto-latest.json
+          if git diff --cached --quiet; then
+            echo 'No benchmark change to commit'
+            exit 0
+          fi
+          git commit -m 'Update TED BT-15 Pareto benchmark'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
