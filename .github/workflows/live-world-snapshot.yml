@@ -93,21 +93,46 @@ jobs:
           echo "DISCOVERY_SUMMARY_PATH=source-release/$summary" >> "$GITHUB_ENV"
           echo "WIDE_READ_ASSET=$asset" >> "$GITHUB_ENV"
 
+          # Read the previous stable snapshot before this generation replaces it.
+          # It is continuity evidence only: carried rows remain visibly stale and
+          # never upgrade a missing/degraded source into successful current coverage.
+          mkdir -p previous-snapshot
+          echo "PREVIOUS_SNAPSHOT_PATH=" >> "$GITHUB_ENV"
+          echo "PREVIOUS_SNAPSHOT_MANIFEST=" >> "$GITHUB_ENV"
+          if gh release view live-world-snapshot-latest >/dev/null 2>&1; then
+            latest_assets="$(gh release view live-world-snapshot-latest --json assets --jq '.assets[].name')"
+            if grep -Fxq live-open-tenders-latest.jsonl.gz <<< "$latest_assets" && grep -Fxq snapshot-manifest-latest.json <<< "$latest_assets"; then
+              gh release download live-world-snapshot-latest \
+                --pattern live-open-tenders-latest.jsonl.gz \
+                --pattern snapshot-manifest-latest.json \
+                --dir previous-snapshot --clobber
+              echo "PREVIOUS_SNAPSHOT_PATH=previous-snapshot/live-open-tenders-latest.jsonl.gz" >> "$GITHUB_ENV"
+              echo "PREVIOUS_SNAPSHOT_MANIFEST=previous-snapshot/snapshot-manifest-latest.json" >> "$GITHUB_ENV"
+            fi
+          fi
+
       - name: Build fail-closed open-tender snapshot and GPT packets
         env:
           SOURCE_RUN: ${{ steps.source.outputs.run }}
         shell: bash
         run: |
           set -euo pipefail
+          previous=()
+          if [ -n "${PREVIOUS_SNAPSHOT_PATH:-}" ] && [ -s "$PREVIOUS_SNAPSHOT_PATH" ]; then
+            previous+=(--previous "$PREVIOUS_SNAPSHOT_PATH")
+            if [ -n "${PREVIOUS_SNAPSHOT_MANIFEST:-}" ] && [ -s "$PREVIOUS_SNAPSHOT_MANIFEST" ]; then
+              previous+=(--previous-manifest "$PREVIOUS_SNAPSHOT_MANIFEST")
+            fi
+          fi
           python pipeline/build_live_world_snapshot.py \
             --input "$CANDIDATES_PATH" \
             --out-dir live-snapshot \
             --source-run "$SOURCE_RUN" \
-            --packet-size 500
+            --packet-size 500 \
+            "${previous[@]}"
 
-          # Attach the measured discovery-coverage truth to every snapshot
-          # product. We preserve the full source manifest and derive only a
-          # compact display status; no failed source is silently treated as 0.
+          # Attach measured discovery-coverage truth to every snapshot. Carry-
+          # forward preserves recall only; it never repairs the coverage claim.
           python - <<'PY'
           import json, os
           from pathlib import Path
@@ -116,8 +141,11 @@ jobs:
           mpath=Path('live-snapshot/snapshot_manifest.json')
           m=json.loads(mpath.read_text(encoding='utf-8'))
           status=(cov.get('coverage_status') or cov.get('world_coverage_status') or cov.get('status') or ds.get('coverage_status') or 'UNKNOWN_COVERAGE')
-          # Derive a transparent list where schemas expose source rows/statuses.
           failed=[]
+          for key in ('missing_packs','degraded_packs','external_missing_lanes'):
+              vals=cov.get(key)
+              if isinstance(vals,list):
+                  failed.extend(str(x) for x in vals if str(x).strip())
           for container_key in ('sources','source_status','source_coverage','measurements','lanes'):
               obj=cov.get(container_key)
               if isinstance(obj,dict):
@@ -127,7 +155,7 @@ jobs:
               for row in iterable:
                   if not isinstance(row,dict): continue
                   st=str(row.get('status') or row.get('coverage_status') or row.get('result') or '').upper()
-                  if any(x in st for x in ('FAIL','ERROR','BROKEN','UNAVAILABLE')):
+                  if any(x in st for x in ('FAIL','ERROR','BROKEN','UNAVAILABLE','DEGRADED','MISSING')):
                       failed.append(str(row.get('source') or row.get('name') or row.get('lane') or row.get('_source') or 'UNKNOWN'))
           m['discovery_coverage_status']=status
           m['discovery_failed_sources']=sorted(set(failed))
@@ -135,15 +163,15 @@ jobs:
           m['discovery_summary_file']=f"discovery-summary-{os.environ['SOURCE_RUN']}.json"
           m['wide_read_source_asset']=os.environ['WIDE_READ_ASSET']
           m['world_exhaustive_claim_allowed']=str(status).upper() in {'COMPLETE','FULL','FULL_WORLD_COVERAGE','COMPLETE_WORLD_COVERAGE'}
-          m['coverage_rule']='Snapshot completeness is bounded by the measured discovery coverage manifest. Failed/unknown source lanes remain explicit and are never represented as zero or successfully harvested.'
+          m['coverage_rule']='Snapshot completeness is bounded by measured discovery coverage. Failed/unknown lanes remain explicit. High-recall carry-forward may preserve previously observed still-live rows, but never converts a missing/degraded source into successful current coverage.'
           mpath.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
           Path('live-snapshot/discovery_coverage.json').write_text(json.dumps(cov,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
           Path('live-snapshot/discovery_summary.json').write_text(json.dumps(ds,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
           ipath=Path('live-snapshot/GPT_WIDE_READ_INSTRUCTIONS.md')
           text=ipath.read_text(encoding='utf-8')
-          text += f"\n## Discovery coverage\nCoverage status: **{status}**.\n\nRead `discovery_coverage.json` before making worldwide or source-completeness claims. A failed/unknown source lane is missing coverage, never zero opportunities.\n"
+          text += f"\n## Discovery coverage\nCoverage status: **{status}**.\n\nRead `discovery_coverage.json` before making worldwide or source-completeness claims. A failed/unknown source lane is missing coverage, never zero opportunities. Rows marked `carried_forward_from_previous_snapshot=true` are continuity rows, not proof that the source succeeded in this generation.\n"
           ipath.write_text(text,encoding='utf-8')
-          print(json.dumps({'coverage_status':status,'failed_sources':m['discovery_failed_sources'],'snapshot_rows':m['snapshot_rows']},indent=2))
+          print(json.dumps({'coverage_status':status,'failed_sources':m['discovery_failed_sources'],'snapshot_rows':m['snapshot_rows'],'carried_forward_rows':m.get('carried_forward_rows',0)},indent=2))
           PY
 
           tar -C live-snapshot/gpt-packets -czf "gpt-wide-read-packets-${SOURCE_RUN}.tar.gz" .
@@ -165,7 +193,7 @@ jobs:
           gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" \
             --target main \
             --title "Live World Snapshot ${SOURCE_RUN}" \
-            --notes "GPT-readable snapshot derived from canonical consolidated discovery assets. Measured coverage: ${coverage_status}. No lexical business-fit ranking removes candidates. Parseable expired deadlines are excluded; unknown deadlines remain explicit. See bundled discovery coverage before making worldwide completeness claims."
+            --notes "GPT-readable snapshot derived from canonical consolidated discovery assets. Measured coverage: ${coverage_status}. No lexical business-fit ranking removes candidates. Parseable expired deadlines are excluded; unknown deadlines remain explicit. Continuity rows may be carried from the prior snapshot when a source regresses, without upgrading coverage truth."
           gh release upload "$tag" \
             "live-open-tenders-${SOURCE_RUN}.jsonl.gz" \
             "gpt-wide-read-packets-${SOURCE_RUN}.tar.gz" \
@@ -216,6 +244,7 @@ jobs:
           m=json.load(open('live-snapshot/snapshot_manifest.json'))
           text = '# Live Tender Snapshot\n\n'
           text += f"Source discovery run: `{m['source_discovery_run']}`  \nRows: **{m['snapshot_rows']:,}**  \nGPT packets: **{m['packet_count']}**  \nCoverage: **{m.get('discovery_coverage_status','UNKNOWN')}**\n\n"
+          text += f"Carried forward for recall: **{m.get('carried_forward_rows',0):,}**. These rows are explicitly marked and do not repair coverage.\n\n"
           text += 'This branch is force-replaced on every snapshot so the repository does not accumulate hourly snapshot history. Read `discovery_coverage.json` and `GPT_WIDE_READ_INSTRUCTIONS.md`, then scan `gpt-packets/packet-*.jsonl`.\n'
           Path('branch-publish/README.md').write_text(text, encoding='utf-8')
           PY
@@ -245,6 +274,9 @@ jobs:
             'source_discovery_run':m['source_discovery_run'],
             'generated_at':m['generated_at'],
             'snapshot_rows':m['snapshot_rows'],
+            'current_materialized_rows':m.get('current_materialized_rows',m['snapshot_rows']),
+            'carried_forward_rows':m.get('carried_forward_rows',0),
+            'carried_forward_by_source':m.get('carried_forward_by_source',{}),
             'open_state_counts':m['open_state_counts'],
             'packet_count':m['packet_count'],
             'coverage_status':m.get('discovery_coverage_status','UNKNOWN'),
@@ -256,7 +288,7 @@ jobs:
             'stable_release_tag':'live-world-snapshot-latest',
             'immutable_release_tag':f'live-world-snapshot-{run}',
             'dce_request_path':'control/gpt_dce_request.json',
-            'rule':'GPT selects candidate IDs semantically; GitHub retrieves DCE only after selection. Failed source lanes remain missing/UNKNOWN. No notice-only FINAL_SUPER_GREEN.'
+            'rule':'GPT selects candidate IDs semantically; GitHub retrieves DCE only after selection. Coverage gaps stay explicit even when prior still-live rows are carried forward for recall. No notice-only FINAL_SUPER_GREEN.'
           }
           Path('control').mkdir(exist_ok=True)
           Path('control/live_snapshot_latest.json').write_text(json.dumps(pointer,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
