@@ -32,6 +32,7 @@ def main() -> None:
             payload_path, meta_path, lock_path = v17._cache_paths(url)
             assert payload_path.is_file()
             assert meta_path.is_file()
+            assert payload_path.parent.name == "placsp-atom"
             assert lock_path.parent == Path(tmp) / "placsp-atom"
             payload_path.write_bytes(b"not xml")
             assert v17._read_cache(url) is None
@@ -41,7 +42,7 @@ def main() -> None:
             else:
                 os.environ["DCE_SHARED_CACHE_DIR"] = old
     assert v15._resolve_from_atom is v17._resolve_from_atom_cached
-    print({"placsp_cache": "validated_xml_only", "shared_lock": True, "ttl_seconds": v17.PLACSP_CACHE_TTL, "status": "ok"})
+    print({"placsp_cache": "validated_xml_only", "shared_lock": True, "isolated_namespace": True, "ttl_seconds": v17.PLACSP_CACHE_TTL, "status": "ok"})
 
 
 if __name__ == "__main__":
