@@ -140,11 +140,30 @@ def _native_text_yield(text: str) -> int:
     return len(text.strip())
 
 
+def _load_docling_adapter():
+    """Support both `python -m pipeline...` and direct `python pipeline/...py`.
+
+    DCE workers execute this file directly from the repository root, where
+    `pipeline` is not necessarily importable as a package inside child processes.
+    Falling back to the sibling module removes the observed
+    `ModuleNotFoundError("No module named 'pipeline'")` without changing parser
+    selection or any evidence semantics.
+    """
+    try:
+        from pipeline.docling_deep_parser import parse_with_docling, should_deep_parse
+        return parse_with_docling, should_deep_parse
+    except ModuleNotFoundError as first:
+        if getattr(first, "name", None) != "pipeline":
+            raise
+        from docling_deep_parser import parse_with_docling, should_deep_parse
+        return parse_with_docling, should_deep_parse
+
+
 def _try_docling(path: Path, root: Path, kind: str, text: str) -> tuple[str, dict | None]:
     mode = os.getenv("DCE_DOCLING_MODE", "auto").strip().lower()
     min_chars = max(0, int(os.getenv("DCE_DOCLING_MIN_CHARS", "800")))
     try:
-        from pipeline.docling_deep_parser import parse_with_docling, should_deep_parse
+        parse_with_docling, should_deep_parse = _load_docling_adapter()
     except Exception as exc:
         return text, {"status": "ADAPTER_IMPORT_ERROR", "error": repr(exc)}
 
@@ -162,8 +181,6 @@ def _try_docling(path: Path, root: Path, kind: str, text: str) -> tuple[str, dic
         deep["error"] = repr(exc)
         return text, deep
 
-    # Deep extraction supplements/replaces only the derived corpus text for this
-    # file. The authoritative original stays untouched and hashed in the index.
     if len(deep_text.strip()) > _native_text_yield(text):
         return deep_text, deep
     return text, deep
