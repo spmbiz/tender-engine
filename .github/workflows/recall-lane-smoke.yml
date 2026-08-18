@@ -1,0 +1,186 @@
+name: Recall Lane Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'control/lane_repair_smoke_trigger.txt'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: recall-lane-smoke
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    name: smoke-${{ matrix.source }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        source: [UNGM_PUBLIC, UK_PCS_OCDS, IT_ANAC_DELTA, AU_AUSTENDER, CYPRUS_EPPS, MALTA_EPPS]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install adapter dependencies
+        run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4 playwright
+      - name: Reuse runner Chrome where browser-backed
+        shell: bash
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Run one recall lane without hiding failure
+        env:
+          SOURCE: ${{ matrix.source }}
+          DISCOVERY_OUT: lane-out/${{ matrix.source }}
+        shell: bash
+        run: |
+          set +e
+          mkdir -p "$DISCOVERY_OUT"
+          primary_rc=0
+          fallback_rc=''
+          case "$SOURCE" in
+            UNGM_PUBLIC)
+              python pipeline/discover_ungm_public.py
+              primary_rc=$?
+              ;;
+            UK_PCS_OCDS)
+              python pipeline/discover_uk_pcs_current.py
+              primary_rc=$?
+              ;;
+            IT_ANAC_DELTA)
+              ANAC_PVL_LOOKBACK_DAYS=730 python pipeline/discover_it_anac_pvl.py
+              primary_rc=$?
+              ;;
+            AU_AUSTENDER)
+              python pipeline/discover_austender_browser.py
+              primary_rc=$?
+              ;;
+            CYPRUS_EPPS)
+              export EPPS_SOURCE=CYPRUS_EPPS EPPS_BASE_URL='https://www.eprocurement.gov.cy' EPPS_ID_PREFIX='CY-EPPS' EPPS_TIMEZONE='Asia/Nicosia' PAGE_END=5
+              python pipeline/discover_epps_public.py
+              primary_rc=$?
+              if [ "$primary_rc" -ne 0 ]; then
+                EPPS_PUBLISHED_LOOKBACK_DAYS=240 EPPS_PUBLISHED_MAX_PAGES=80 python pipeline/discover_epps_published_fallback.py
+                fallback_rc=$?
+              fi
+              ;;
+            MALTA_EPPS)
+              export EPPS_SOURCE=MALTA_EPPS EPPS_BASE_URL='https://www.etenders.gov.mt' EPPS_ID_PREFIX='MT-EPPS' EPPS_TIMEZONE='Europe/Malta' PAGE_END=5
+              python pipeline/discover_epps_public.py
+              primary_rc=$?
+              if [ "$primary_rc" -ne 0 ]; then
+                EPPS_PUBLISHED_LOOKBACK_DAYS=240 EPPS_PUBLISHED_MAX_PAGES=80 EPPS_PUBLISHED_DETAIL_BUDGET=120 python pipeline/discover_epps_published_fallback.py
+                fallback_rc=$?
+              fi
+              ;;
+          esac
+          export PRIMARY_RC="$primary_rc" FALLBACK_RC="$fallback_rc"
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          source=os.environ['SOURCE']
+          out=Path(os.environ['DISCOVERY_OUT'])
+          try:
+              stats=json.loads((out/'stats.json').read_text(encoding='utf-8'))
+          except Exception as exc:
+              stats={'errors':[{'type':'SMOKE_STATS_MISSING','error':repr(exc)}]}
+          current=int(stats.get('current_materialized') or 0)
+          complete=stats.get('enumeration_complete') is True and stats.get('live_coverage_credit_allowed') is not False
+          if complete and current>0:
+              verdict='PASS_FULL'
+          elif current>0:
+              verdict='RECALL_ONLY'
+          else:
+              verdict='FAIL'
+          payload={
+              'schema':'RECALL_LANE_SMOKE_RESULT_V1',
+              'source':source,
+              'checked_at':datetime.now(timezone.utc).isoformat(),
+              'primary_exit_code':int(os.environ.get('PRIMARY_RC') or 0),
+              'fallback_exit_code':int(os.environ['FALLBACK_RC']) if os.environ.get('FALLBACK_RC','').isdigit() else None,
+              'verdict':verdict,
+              'current_materialized':current,
+              'enumeration_complete':stats.get('enumeration_complete'),
+              'live_coverage_credit_allowed':stats.get('live_coverage_credit_allowed'),
+              'errors':stats.get('errors') or [],
+              'warnings':stats.get('warnings') or [],
+              'stats':stats,
+          }
+          Path(f'smoke-result-{source}.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps({k:payload[k] for k in ('source','verdict','current_materialized','enumeration_complete','primary_exit_code','fallback_exit_code')},indent=2))
+          PY
+          exit 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lane-${{ matrix.source }}
+          path: smoke-result-${{ matrix.source }}.json
+          retention-days: 3
+
+  publish:
+    needs: probe
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: lane-*
+          path: smoke-results
+          merge-multiple: true
+      - name: Build transparent source-by-source verdict
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from datetime import datetime, timezone
+          from pathlib import Path
+          files=sorted(Path('smoke-results').glob('smoke-result-*.json'))
+          results=[json.loads(p.read_text(encoding='utf-8')) for p in files]
+          expected={'UNGM_PUBLIC','UK_PCS_OCDS','IT_ANAC_DELTA','AU_AUSTENDER','CYPRUS_EPPS','MALTA_EPPS'}
+          found={str(x.get('source')) for x in results}
+          for missing in sorted(expected-found):
+              results.append({'source':missing,'verdict':'FAIL','current_materialized':0,'errors':[{'type':'SMOKE_ARTIFACT_MISSING'}]})
+          results.sort(key=lambda x:str(x.get('source')))
+          counts=dict(Counter(str(x.get('verdict') or 'UNKNOWN') for x in results))
+          payload={
+              'schema':'RECALL_LANE_SMOKE_SUMMARY_V1',
+              'generated_at':datetime.now(timezone.utc).isoformat(),
+              'counts':counts,
+              'all_sources_full':counts.get('PASS_FULL',0)==len(expected),
+              'results':results,
+              'contract':'PASS_FULL requires nonzero current materialization plus adapter exhaustion/coverage proof. RECALL_ONLY means useful candidates were recovered without sufficient evidence for full current-registry coverage. FAIL is explicit. This smoke never changes canonical tender data or final verdicts.',
+          }
+          Path('control/lane_repair_smoke_latest.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps({'counts':counts,'all_sources_full':payload['all_sources_full']},indent=2))
+          PY
+      - name: Persist latest smoke summary
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add control/lane_repair_smoke_latest.json
+          git diff --cached --quiet && exit 0
+          git commit -m "diag: persist recall lane smoke ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((i*2))"
+          done
+          exit 1
