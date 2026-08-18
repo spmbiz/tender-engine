@@ -46,7 +46,7 @@ jobs:
 
       - name: Run BT-15 Pareto audit
         run: |
-          python pipeline/audit_ted_bt15_pareto.py \
+          PYTHONPATH=. python pipeline/audit_ted_bt15_pareto.py \
             --max-notices "${{ steps.cfg.outputs.max_notices }}" \
             --out benchmarks/ted-bt15-pareto-latest.json
 
