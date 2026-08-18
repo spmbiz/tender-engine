@@ -1,0 +1,104 @@
+name: GPT DCE Provenance Refresh
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: Maximum useful legacy candidates to refresh
+        required: false
+        default: '16'
+      max_releases:
+        description: Maximum immutable DCE releases to download
+        required: false
+        default: '2'
+  schedule:
+    - cron: '43 4 * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'control/gpt_provenance_refresh_trigger.txt'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: gpt-dce-provenance-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install extraction dependencies
+        run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4 pypdf python-docx openpyxl python-pptx
+      - name: Build bounded useful-candidate plan
+        env:
+          INPUT_LIMIT: ${{ github.event.inputs.limit }}
+          INPUT_RELEASES: ${{ github.event.inputs.max_releases }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          limit="${INPUT_LIMIT:-16}"
+          releases="${INPUT_RELEASES:-2}"
+          python pipeline/build_provenance_refresh_plan.py \
+            --inbox control/gpt_supergreen_inbox.json \
+            --out control/gpt_provenance_refresh_plan.json \
+            --limit "$limit" \
+            --max-releases "$releases"
+      - name: Re-extract provenance from immutable canonical DCE originals
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python pipeline/refresh_dce_provenance_from_releases.py \
+            --plan control/gpt_provenance_refresh_plan.json \
+            --existing control/gpt_provenance_overrides.json \
+            --out control/gpt_provenance_overrides.json
+      - name: Persist provenance overrides monotonically
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add control/gpt_provenance_refresh_plan.json control/gpt_provenance_overrides.json
+          if git diff --cached --quiet; then
+            echo 'No provenance override change.'
+            exit 0
+          fi
+          git commit -m "dce: refresh legacy GPT evidence provenance ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
+      - name: Rebuild GPT read surface with exact provenance overlays
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git pull --rebase origin main
+          python pipeline/build_gpt_web_read_batches.py \
+            --inbox control/gpt_supergreen_inbox.json \
+            --provenance-overrides control/gpt_provenance_overrides.json \
+            --out-dir control/gpt_web_read_batches \
+            --batch-size 10
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add -A control/gpt_web_read_batches
+          git diff --cached --quiet && exit 0
+          git commit -m "gpt: apply refreshed DCE provenance ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
