@@ -267,7 +267,9 @@ async def main():
         async with async_playwright() as pw:
             chrome = os.getenv("CHROME_BIN") or None
             browser = await pw.chromium.launch(headless=True, executable_path=chrome)
-            page = await browser.new_page(viewport={"width": 1440, "height": 1000}, user_agent=UA)
+            # Keep the runner Chrome user-agent. UNGM serves the public landing to
+            # a normal browser session but blocks custom bot-style UAs with 403.
+            page = await browser.new_page(viewport={"width": 1440, "height": 1000})
             response = await page.goto(LIST_URL, wait_until="domcontentloaded", timeout=90000)
             telemetry["landing_status"] = response.status if response else None
             if response and response.status >= 400:
