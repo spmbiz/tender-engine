@@ -81,7 +81,6 @@ Review-order evidence only. No candidate is GREEN before DCE.
 
 ## research_surveys
 - **US-SAM:b0006a53c0d54778a4d6841f7cf5eee2** · USA · p=56 · deadline=2026-08-28T17:00:00+00:00 · blockers=none · TCG BOSS Equipment and Link-16 Related Products
-- **US-SAM:880c3a9db9434d5988178a4b9b797e24** · USA · p=47 · deadline=2026-08-18T18:00:00+00:00 · blockers=SOURCES_SOUGHT_OR_RFI · De-Icing Simulator
 - **US-SAM:dc270dd3a02c43149e4bb39994a9d8b9** · USA · p=47 · deadline=2026-08-28T17:00:00+00:00 · blockers=SET_ASIDE_OR_LOCAL_RESTRICTION · Fuel Management Cloud Software & Integration (SaaS) at North Dakota National Guard
 - **US-SAM:991d1eb9836945da9aca9d00105e8293** · USA · p=47 · deadline=2026-09-01T14:00:00+00:00 · blockers=SOURCES_SOUGHT_OR_RFI · Sources Sought � Motorola GTR 8000 Land Mobile Radio (LMR) System with OCONUS Installation in Japan
 - **US-SAM:29daee56de8744ffa8bd226a9ad8211b** · USA · p=47 · deadline=2026-09-10T00:00:00+00:00 · blockers=SOLE_SOURCE_OR_OEM · eQUIP Software Licenses
@@ -100,6 +99,7 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **US-SAM:986f563206454e5aacf33d07e67102b8** · USA · p=46 · deadline=2026-08-24T04:00:00+00:00 · blockers=none · 61--REGULATOR,VOLTAGE, IN REPAIR/MODIFICATION OF
 - **US-SAM:83bfded640f44e85a9d5e984165a4ac3** · USA · p=46 · deadline=2026-08-25T04:00:00+00:00 · blockers=none · 48--MANIFOLD,PRESSURE
 - **US-SAM:a3c1cbc0f86d463182d1ee4fcaac5854** · USA · p=46 · deadline=2026-08-26T20:30:00+00:00 · blockers=none · 16--ACTUATOR,ELECTROMEC, IN REPAIR/MODIFICATION OF
+- **US-SAM:17e8df2916ef4d8296fdd36292e60ce1** · USA · p=46 · deadline=2026-08-26T21:00:00+00:00 · blockers=none · NATO Business Opportunity: Commercial Cloud Service Provider Marketplace � Protected Business Network
 
 ## social_marketing
 - **CA:WS5612173135** · CANADA · p=38 · deadline=2026-08-24T14:00:00+00:00 · blockers=none · Request for Proposal - Government of Canada Social Media Management Service (SMMS) -
@@ -109,11 +109,6 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **US-SAM:b0006a53c0d54778a4d6841f7cf5eee2** · USA · p=56 · deadline=2026-08-28T17:00:00+00:00 · blockers=none · TCG BOSS Equipment and Link-16 Related Products
 - **ZA_ETENDERS_OCDS:ocds-9t57fa-165925-2026-08-18** · UNKNOWN · p=54 · deadline=2026-08-24T11:00:00+00:00 · blockers=none · POS9919
 - **US-SAM:2e1bfb153fbf3e898a9cbd1b0e255ae2** · USA · p=50 · deadline=UNKNOWN · blockers=none · 70--Endgame software subscription renewals
-- **US-SAM:40da871d02ca4eda99eb31b8c023e062** · USA · p=48 · deadline=2026-08-18T18:00:00+00:00 · blockers=none · Indian Health Service - Cisco Network Equipment and Software Maintenance
-- **US-SAM:74dbef20052548a2a15aa730d8531f0d** · USA · p=48 · deadline=2026-08-18T18:00:00+00:00 · blockers=none · Indian Health Service - Cisco Network Equipment and Software Maintenance
-- **US-SAM:8a3cc89ba7fb4ae6bc9fe27404bfe62d** · USA · p=48 · deadline=2026-08-18T18:00:00+00:00 · blockers=none · Indian Health Service - Cisco Network Equipment and Software Maintenance
-- **US-SAM:945b07edf5ab4da4a902523aee121e84** · USA · p=48 · deadline=2026-08-18T18:00:00+00:00 · blockers=none · Indian Health Service - Cisco Network Equipment and Software Maintenance
-- **US-SAM:e8fb30b0971743949b7616e74b219255** · USA · p=48 · deadline=2026-08-18T18:00:00+00:00 · blockers=none · Indian Health Service - Cisco Network Equipment and Software Maintenance
 - **US-SAM:b11ff0bde8974de18f643227fa3b73c5** · USA · p=48 · deadline=2026-08-18T23:00:00+00:00 · blockers=none · 5G Cellular Base Station (BRAND NAME Ericsson)
 - **US-SAM:192d177cce134254af5a5055dbfc8424** · USA · p=48 · deadline=2026-08-20T00:00:00+00:00 · blockers=none · Oracle Enterprise Software License Maintenance Support - Brand Name Justification
 - **US-SAM:0377f6cba8b74cb78a9b515c8d31e9d4** · USA · p=48 · deadline=2026-08-20T16:00:00+00:00 · blockers=none · MATLAB LICENSES/TOOLBOXES
@@ -125,6 +120,11 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **US-SAM:3f814d8a4b2e487c9e6d01ea0e80ffcf** · USA · p=48 · deadline=2026-09-03T00:00:00+00:00 · blockers=none · Navisworks Manage Government Annual Subscription Renewal
 - **US-SAM:3cedfd0ad17b4f8aa5e7daefcd5ef103** · USA · p=48 · deadline=2026-09-04T00:00:00+00:00 · blockers=none · Mirantis and Zimperium Software License Subscription Renewals
 - **US-SAM:f75643b110264313b8fa69feae99eeed** · USA · p=48 · deadline=2026-09-05T09:00:00+00:00 · blockers=none · WATER SYSTEM FAULTY PROGRAMMABLE LOGIC CONTROLER REPLACEMENT
+- **US-SAM:e9571c5b0419428b857d739433b2bac8** · USA · p=48 · deadline=2026-09-06T00:00:00+00:00 · blockers=none · Autodesk Subscription Licenses for USACE Engineering Research and Development Center (ERDC) ITL
+- **US-SAM:bb3419168e1045c099a42fe19d43fdf6** · USA · p=48 · deadline=2026-09-16T00:00:00+00:00 · blockers=none · ArcGIS
+- **US-SAM:bff1d7dc01834a8c9ee797c85c65ee6e** · USA · p=48 · deadline=2026-10-24T17:00:00+00:00 · blockers=none · Brand Name Only (BNO) Palo Alto Software Licenses FY26
+- **US-SAM:ed3a615be8f04a5aa0d8583beb38677c** · USA · p=48 · deadline=2026-11-19T00:00:00+00:00 · blockers=none · F-16 CENTER DISPLAY UNIT LINE REPLACEABLE UNIT (CDU)
+- **US-SAM:b8fceec9c4cf4bc4aaa6f1f30e7dd631** · USA · p=48 · deadline=2026-12-07T18:20:00+00:00 · blockers=none · Locklizard DRM
 
 ## transcription
 - **US-SAM:b440523eeea948f9977b78e73d6732d6** · USA · p=38 · deadline=2026-08-20T18:00:00+00:00 · blockers=none · A1: R606--RFQ: VISN16-Wide Court Reporting and Transcription - SDVOSB Set-Aside - IDC
