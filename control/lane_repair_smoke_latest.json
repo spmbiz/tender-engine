@@ -1,0 +1,304 @@
+{
+  "schema": "RECALL_LANE_SMOKE_SUMMARY_V1",
+  "generated_at": "2026-08-18T23:06:19.680787+00:00",
+  "counts": {
+    "FAIL": 4,
+    "RECALL_ONLY": 1,
+    "PASS_FULL": 1
+  },
+  "all_sources_full": false,
+  "results": [
+    {
+      "schema": "RECALL_LANE_SMOKE_RESULT_V1",
+      "source": "AU_AUSTENDER",
+      "checked_at": "2026-08-18T22:59:38.525665+00:00",
+      "primary_exit_code": 0,
+      "fallback_exit_code": null,
+      "verdict": "FAIL",
+      "current_materialized": 0,
+      "enumeration_complete": false,
+      "live_coverage_credit_allowed": false,
+      "errors": [
+        {
+          "type": "PUBLIC_SOURCE_HTTP_BLOCK",
+          "status": 403,
+          "message": "AusTender public listing returned HTTP 403"
+        }
+      ],
+      "warnings": [
+        {
+          "type": "RSS_HTTP_BLOCK",
+          "status": 403
+        }
+      ],
+      "stats": {
+        "source": "AU_AUSTENDER",
+        "raw_materialized": 0,
+        "current_materialized": 0,
+        "enumeration_exhausted": false,
+        "enumeration_complete": false,
+        "live_candidate_capable": true,
+        "live_coverage_credit_allowed": false,
+        "generated_at": "2026-08-18T22:59:29.717898+00:00",
+        "errors": [
+          {
+            "type": "PUBLIC_SOURCE_HTTP_BLOCK",
+            "status": 403,
+            "message": "AusTender public listing returned HTTP 403"
+          }
+        ],
+        "warnings": [
+          {
+            "type": "RSS_HTTP_BLOCK",
+            "status": 403
+          }
+        ],
+        "official_url": "https://www.tenders.gov.au/?event=public.ATM.list",
+        "official_rss_url": "https://www.tenders.gov.au/public_data/rss/rss.xml",
+        "bridge_url_configured": false,
+        "bridge_trusted": false,
+        "freshness_contract": "OFFICIAL_CURRENT_ATM_RSS_UPDATED_DAILY_AFTER_BUSINESS_HOURS_WHEN_RSS_PATH_USED",
+        "telemetry": {
+          "list_url": "https://www.tenders.gov.au/?event=public.ATM.list",
+          "rss_url": "https://www.tenders.gov.au/public_data/rss/rss.xml",
+          "rss_http_status": 403,
+          "browser_http_status": 403,
+          "page_title": "ERROR: The request could not be satisfied",
+          "html_bytes": 923
+        },
+        "semantics": "Primary truth is the official AusTender current-ATM RSS/browser scope. An optional bridge is accepted only when explicitly marked trusted and must relay the same official RSS payload; otherwise GitHub-cloud 403 remains a visible coverage failure."
+      }
+    },
+    {
+      "schema": "RECALL_LANE_SMOKE_RESULT_V1",
+      "source": "CYPRUS_EPPS",
+      "checked_at": "2026-08-18T22:59:37.009070+00:00",
+      "primary_exit_code": 3,
+      "fallback_exit_code": 3,
+      "verdict": "FAIL",
+      "current_materialized": 0,
+      "enumeration_complete": false,
+      "live_coverage_credit_allowed": false,
+      "errors": [],
+      "warnings": [
+        {
+          "type": "PUBLISHED_NOTICES_RECALL_FALLBACK",
+          "pages": 80,
+          "lookback_days": 240,
+          "cutoff_reached": false,
+          "detail_calls": 0,
+          "coverage_credit": false
+        }
+      ],
+      "stats": {
+        "source": "CYPRUS_EPPS",
+        "base_url": "https://www.eprocurement.gov.cy",
+        "listing_contract": "EPPS_PUBLISHED_NOTICES_RECALL_FALLBACK_V1",
+        "current_materialized": 0,
+        "raw_materialized": 0,
+        "published_fallback_pages": 80,
+        "deadline_parsed": 0,
+        "enumeration_exhausted": false,
+        "enumeration_complete": false,
+        "live_candidate_capable": true,
+        "live_coverage_credit_allowed": false,
+        "errors": [],
+        "warnings": [
+          {
+            "type": "PUBLISHED_NOTICES_RECALL_FALLBACK",
+            "pages": 80,
+            "lookback_days": 240,
+            "cutoff_reached": false,
+            "detail_calls": 0,
+            "coverage_credit": false
+          }
+        ],
+        "generated_at": "2026-08-19T01:59:13.103482+03:00",
+        "semantics": "Official Published Notices repairs recall when Current Opportunities is gated or empty. It is publication-window reconstruction, not proof of full current-opportunity exhaustion."
+      }
+    },
+    {
+      "schema": "RECALL_LANE_SMOKE_RESULT_V1",
+      "source": "IT_ANAC_DELTA",
+      "checked_at": "2026-08-18T22:59:40.582089+00:00",
+      "primary_exit_code": 3,
+      "fallback_exit_code": null,
+      "verdict": "FAIL",
+      "current_materialized": 0,
+      "enumeration_complete": false,
+      "live_coverage_credit_allowed": false,
+      "errors": [
+        {
+          "type": "PVL_RESULT_LINKS_NOT_MATERIALIZED"
+        }
+      ],
+      "warnings": [
+        {
+          "type": "BOUNDED_PUBLICATION_WINDOW_NOT_FULL_CURRENT_UNIVERSE",
+          "lookback_days": 730
+        }
+      ],
+      "stats": {
+        "source": "IT_ANAC_PVL",
+        "portal": "ANAC_PVL",
+        "listing_contract": "ANAC_PVL_PUBLIC_TENDER_WINDOW_V1",
+        "raw_materialized": 0,
+        "current_materialized": 0,
+        "search_pages_fetched": 0,
+        "search_pagination_exhausted": false,
+        "detail_errors": 0,
+        "publication_lookback_days": 730,
+        "enumeration_exhausted": false,
+        "enumeration_complete": false,
+        "live_candidate_capable": true,
+        "live_coverage_credit_allowed": false,
+        "errors": [
+          {
+            "type": "PVL_RESULT_LINKS_NOT_MATERIALIZED"
+          }
+        ],
+        "warnings": [
+          {
+            "type": "BOUNDED_PUBLICATION_WINDOW_NOT_FULL_CURRENT_UNIVERSE",
+            "lookback_days": 730
+          }
+        ],
+        "generated_at": "2026-08-18T22:59:06.051160+00:00",
+        "source_url": "https://pubblicitalegale.anticorruzione.it/ricerca-generica"
+      }
+    },
+    {
+      "schema": "RECALL_LANE_SMOKE_RESULT_V1",
+      "source": "MALTA_EPPS",
+      "checked_at": "2026-08-18T23:01:00.619607+00:00",
+      "primary_exit_code": 3,
+      "fallback_exit_code": 0,
+      "verdict": "RECALL_ONLY",
+      "current_materialized": 357,
+      "enumeration_complete": false,
+      "live_coverage_credit_allowed": false,
+      "errors": [],
+      "warnings": [
+        {
+          "type": "PUBLISHED_NOTICES_RECALL_FALLBACK",
+          "pages": 80,
+          "lookback_days": 240,
+          "cutoff_reached": false,
+          "detail_calls": 120,
+          "coverage_credit": false
+        }
+      ],
+      "stats": {
+        "source": "MALTA_EPPS",
+        "base_url": "https://www.etenders.gov.mt",
+        "listing_contract": "EPPS_PUBLISHED_NOTICES_RECALL_FALLBACK_V1",
+        "current_materialized": 357,
+        "raw_materialized": 357,
+        "published_fallback_pages": 80,
+        "deadline_parsed": 0,
+        "enumeration_exhausted": false,
+        "enumeration_complete": false,
+        "live_candidate_capable": true,
+        "live_coverage_credit_allowed": false,
+        "errors": [],
+        "warnings": [
+          {
+            "type": "PUBLISHED_NOTICES_RECALL_FALLBACK",
+            "pages": 80,
+            "lookback_days": 240,
+            "cutoff_reached": false,
+            "detail_calls": 120,
+            "coverage_credit": false
+          }
+        ],
+        "generated_at": "2026-08-19T00:59:21.534225+02:00",
+        "semantics": "Official Published Notices repairs recall when Current Opportunities is gated or empty. It is publication-window reconstruction, not proof of full current-opportunity exhaustion."
+      }
+    },
+    {
+      "schema": "RECALL_LANE_SMOKE_RESULT_V1",
+      "source": "UK_PCS_OCDS",
+      "checked_at": "2026-08-18T23:00:15.983809+00:00",
+      "primary_exit_code": 3,
+      "fallback_exit_code": null,
+      "verdict": "FAIL",
+      "current_materialized": 0,
+      "enumeration_complete": false,
+      "live_coverage_credit_allowed": false,
+      "errors": [
+        {
+          "type": "CURRENT_FILTER_NOT_FOUND"
+        }
+      ],
+      "warnings": [],
+      "stats": {
+        "source": "UK_PCS_OCDS",
+        "portal": "PUBLIC_CONTRACTS_SCOTLAND",
+        "listing_contract": "PCS_CURRENT_OPPORTUNITIES_BROWSER_V1",
+        "raw_materialized": 0,
+        "current_materialized": 0,
+        "pages_fetched": 0,
+        "total_reported": null,
+        "enumeration_exhausted": false,
+        "enumeration_complete": false,
+        "live_candidate_capable": true,
+        "live_coverage_credit_allowed": false,
+        "errors": [
+          {
+            "type": "CURRENT_FILTER_NOT_FOUND"
+          }
+        ],
+        "warnings": [],
+        "telemetry": {
+          "url": "https://www.publiccontractsscotland.gov.uk/search/Search_MainPage.aspx",
+          "http_status": 200
+        },
+        "generated_at": "2026-08-18T22:59:07.754282+00:00",
+        "source_url": "https://www.publiccontractsscotland.gov.uk/search/Search_MainPage.aspx",
+        "semantics": "The official PCS Current Opportunities filter is used. Only notices open for tender are traversed; coverage credit requires pagination exhaustion and a non-empty current set."
+      }
+    },
+    {
+      "schema": "RECALL_LANE_SMOKE_RESULT_V1",
+      "source": "UNGM_PUBLIC",
+      "checked_at": "2026-08-18T22:59:59.541928+00:00",
+      "primary_exit_code": 0,
+      "fallback_exit_code": null,
+      "verdict": "PASS_FULL",
+      "current_materialized": 15,
+      "enumeration_complete": true,
+      "live_coverage_credit_allowed": true,
+      "errors": [],
+      "warnings": [],
+      "stats": {
+        "source": "UNGM_PUBLIC",
+        "portal": "UNGM",
+        "listing_contract": "UNGM_PUBLIC_ACTIVE_OPPORTUNITIES_V1",
+        "raw_materialized": 15,
+        "current_materialized": 15,
+        "pages_fetched": 1,
+        "enumeration_exhausted": true,
+        "enumeration_complete": true,
+        "live_candidate_capable": true,
+        "live_coverage_credit_allowed": true,
+        "errors": [],
+        "warnings": [],
+        "telemetry": {
+          "url": "https://www.ungm.org/Public/Notice",
+          "http_status": 200,
+          "active_filter_explicit": true,
+          "pages": [
+            {
+              "page_index": 1,
+              "rows_parsed": 15
+            }
+          ]
+        },
+        "generated_at": "2026-08-18T22:59:42.666320+00:00",
+        "source_url": "https://www.ungm.org/Public/Notice",
+        "semantics": "UNGM public Procurement Opportunities is read with Only currently active enabled. Coverage credit requires exhaustive pagination of the public result set; no authenticated UNGM API is assumed."
+      }
+    }
+  ],
+  "contract": "PASS_FULL requires nonzero current materialization plus adapter exhaustion/coverage proof. RECALL_ONLY means useful candidates were recovered without sufficient evidence for full current-registry coverage. FAIL is explicit. This smoke never changes canonical tender data or final verdicts."
+}
