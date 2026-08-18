@@ -24,7 +24,7 @@ DETAIL_BUDGET = max(0, int(os.getenv("EPPS_PUBLISHED_DETAIL_BUDGET", "300")))
 NOW = datetime.now(TZ)
 CUTOFF = NOW - timedelta(days=LOOKBACK_DAYS)
 S = requests.Session()
-S.headers.update({"User-Agent": "Tender-Engine/6.6 public procurement research", "Accept": "text/html,application/xhtml+xml,*/*"})
+S.headers.update({"User-Agent": "Tender-Engine/6.7 public procurement research", "Accept": "text/html,application/xhtml+xml,*/*"})
 RESOURCE_RE = re.compile(r"resourceId=(\d+)", re.I)
 AWARD_RE = re.compile(r"award notice|contract award|γνωστοποίηση συναφθείσας|ανάθεση", re.I)
 COMPETITION_RE = re.compile(
@@ -107,9 +107,7 @@ def choose_title(cells, mapped, row_text):
     candidates = []
     for cell in cells:
         text = clean(cell)
-        if len(text) < 8:
-            continue
-        if COMPETITION_RE.search(text) or AWARD_RE.search(text):
+        if len(text) < 8 or COMPETITION_RE.search(text) or AWARD_RE.search(text):
             continue
         if DATE_RE.fullmatch(text) or re.fullmatch(r"(?:EN|EL|MT|Published|Δημοσιεύθηκε)", text, re.I):
             continue
@@ -167,14 +165,17 @@ def detail_workspace(resource_id):
         markers = (
             "time-limit for receipt of tenders or requests to participate",
             "time limit for receipt of tenders or requests to participate",
-            "deadline", "closing date", "submission deadline",
-            "καταληκτική ημερομηνία υποβολής προσφορών", "καταληκ", "υποβολ",
+            "deadline",
+            "closing date",
+            "submission deadline",
+            "καταληκτική ημερομηνία υποβολής προσφορών",
+            "καταληκ",
         )
         lower = text.lower()
         for marker in markers:
             pos = lower.find(marker.lower())
             if pos >= 0:
-                value = parse_dt(text[pos:pos + 420])
+                value = parse_dt(text[pos:pos + 500])
                 if value:
                     deadline = value
                     break
@@ -289,25 +290,25 @@ def main():
                 mapped_type = pick(cells, hs, ("type", "τύπος"))
                 title = choose_title(cells, pick(cells, hs, ("title", "τίτλος")), row_text)
                 dates = all_dates(row_text)
-                submission = pick(cells, hs, ("submission", "ημερομηνία υποβολής"))
-                deadline = parse_dt(submission) if submission else None
-                # Cyprus Published Notices has columns Submission Date then
-                # Publication Date. If header/cell alignment is shifted by the
-                # checkbox column, the first date in the row is still the
-                # authoritative submission date.
-                if SOURCE == "CYPRUS_EPPS" and deadline is None and dates:
-                    deadline = dates[0]
                 pub_raw = pick(cells, hs, ("date pub", "ημερομηνία δημοσίευσης"))
                 pub = parse_dt(pub_raw) if pub_raw else (dates[-1] if dates else None)
                 if pub and (oldest_pub is None or pub < oldest_pub):
                     oldest_pub = pub
+                if pub and pub < CUTOFF:
+                    continue
+
+                # Published Notices "Submission Date" is a notice-workflow date,
+                # not the tender bid deadline. Preserve it only as provenance.
+                published_submission_raw = pick(cells, hs, ("submission", "ημερομηνία υποβολής"))
+                published_submission = parse_dt(published_submission_raw) if published_submission_raw else (dates[0] if dates else None)
 
                 workspace = None
-                if (deadline is None or SOURCE == "MALTA_EPPS") and detail_budget > 0:
+                deadline = None
+                if detail_budget > 0:
                     workspace = detail_workspace(rid)
                     detail_budget -= 1
                     detail_calls += 1
-                    deadline = workspace.get("deadline") or deadline
+                    deadline = workspace.get("deadline")
                 if deadline and deadline < NOW:
                     continue
 
@@ -324,8 +325,9 @@ def main():
                     "country": "MT" if SOURCE == "MALTA_EPPS" else ("CY" if SOURCE == "CYPRUS_EPPS" else None),
                     "deadline": deadline.isoformat() if deadline else None,
                     "published": pub.isoformat() if pub else None,
+                    "published_notice_submission_date": published_submission.isoformat() if published_submission else None,
                     "current": True,
-                    "currentness_evidence": "EPPS_PUBLISHED_NOTICE_FUTURE_DEADLINE" if deadline else "EPPS_RECENT_PUBLISHED_COMPETITION_NOTICE_DEADLINE_UNKNOWN",
+                    "currentness_evidence": "EPPS_CFT_WORKSPACE_FUTURE_DEADLINE" if deadline else "EPPS_RECENT_PUBLISHED_COMPETITION_NOTICE_DEADLINE_UNKNOWN",
                     "notice_url": notice_href or detail_url,
                     "description": (workspace.get("text") if workspace else None) or row_text,
                     "cpv": workspace.get("cpv") if workspace else [],
@@ -368,7 +370,7 @@ def main():
     stats = {
         "source": SOURCE,
         "base_url": BASE_URL,
-        "listing_contract": "EPPS_PUBLISHED_NOTICES_RECALL_FALLBACK_V3",
+        "listing_contract": "EPPS_PUBLISHED_NOTICES_RECALL_FALLBACK_V4_WORKSPACE_DEADLINE",
         "current_materialized": len(rows),
         "raw_materialized": len(rows),
         "published_fallback_pages": pages,
@@ -383,7 +385,7 @@ def main():
         "warnings": warnings,
         "authority_stats": authority_stats,
         "generated_at": NOW.isoformat(),
-        "semantics": "Official Published Notices repairs recall when Current Opportunities is gated or empty. Row classification uses complete table-row text so checkbox/header offsets cannot suppress contract notices. Cyprus uses only verified public authority seeds and table submission dates; Malta resolves public CfT workspaces. This remains recall reconstruction, never proof of full current-opportunity exhaustion.",
+        "semantics": "Published Notices is recall reconstruction only. Its Submission Date is explicitly NOT treated as the bid deadline. The authoritative tender deadline is resolved from the public CfT workspace via resourceId; recent unresolved notices remain UNKNOWN rather than being assumed expired. Cyprus uses only verified public authority seeds.",
     }
     (OUT / "stats.json").write_text(json.dumps(stats, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(stats, indent=2, ensure_ascii=False))
