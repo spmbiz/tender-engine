@@ -1,80 +1,21 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32111866806,
+  "latest_source_dce_run_id": 32117037699,
   "total_inbox_rows": 160,
-  "dce_authenticity_rows": 64,
+  "dce_authenticity_rows": 1,
   "portal_counts": {
-    "IRELAND_ETENDERS": 38,
-    "ZA_ETENDERS": 16,
-    "GENERIC_PUBLIC_PAGE": 3,
-    "EE_RHR": 2,
-    "TED": 2,
-    "ES_PLACSP": 2,
-    "SCOTLAND_PCS": 1
+    "EE_RHR": 1
   },
   "status_counts": {
-    "UNKNOWN_RETRIEVED_DOCUMENT": 60,
-    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 4
+    "UNKNOWN_RETRIEVED_DOCUMENT": 1
   },
   "reason_counts": {
-    "NON_AUTHORITATIVE": 62,
-    "AUTH_REQUIRED": 1,
-    "NO_PUBLIC_FILE": 1
+    "NON_AUTHORITATIVE": 1
   },
   "method_counts": {},
   "recovery_opportunities": [
     {
-      "portal": "TED",
-      "blocked": 2,
-      "likely_public_recovery_target": 1,
-      "reason_counts": {
-        "NO_PUBLIC_FILE": 1,
-        "NON_AUTHORITATIVE": 1
-      }
-    },
-    {
-      "portal": "IRELAND_ETENDERS",
-      "blocked": 38,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 38
-      }
-    },
-    {
-      "portal": "ZA_ETENDERS",
-      "blocked": 16,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 15,
-        "AUTH_REQUIRED": 1
-      }
-    },
-    {
-      "portal": "GENERIC_PUBLIC_PAGE",
-      "blocked": 3,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 3
-      }
-    },
-    {
       "portal": "EE_RHR",
-      "blocked": 2,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 2
-      }
-    },
-    {
-      "portal": "ES_PLACSP",
-      "blocked": 2,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 2
-      }
-    },
-    {
-      "portal": "SCOTLAND_PCS",
       "blocked": 1,
       "likely_public_recovery_target": 0,
       "reason_counts": {
@@ -91,58 +32,6 @@
         "buyer": "Meconet AS",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
         "notice_url": "https://riigihanked.riik.ee/rhr-web/#/procurement/10592524/general-info"
-      },
-      {
-        "candidate_id": "IE:8754026",
-        "portal": "IRELAND_ETENDERS",
-        "title": "The Provision of Clinical Simulation and Integrated Assessment Equipment for Healthcare and Veterinary Education at Cork Education and Training Board - Cork College of FET",
-        "buyer": "Cork Education and Training Board",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8754026"
-      },
-      {
-        "candidate_id": "IE:8825829",
-        "portal": "IRELAND_ETENDERS",
-        "title": "Invitation to Tender for EU Dairy Ingredients Technical Video",
-        "buyer": "Bord Bia (Irish Food Board)",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8825829"
-      },
-      {
-        "candidate_id": "IE:8701573",
-        "portal": "IRELAND_ETENDERS",
-        "title": "Multi-Party Framework for the Provision of Videography Services to Horse Racing Ireland and Subsidiaries",
-        "buyer": "Horse Racing Ireland (HRI)",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8701573"
-      },
-      {
-        "candidate_id": "IE:8702808",
-        "portal": "IRELAND_ETENDERS",
-        "title": "Research Services for Updating QQI’s Standards-based Assessment Infrastructure for FET and HE in Ireland",
-        "buyer": "Quality and Qualifications Ireland (QQI)",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8702808"
-      }
-    ],
-    "AUTH_REQUIRED": [
-      {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164931-2026-08-07",
-        "portal": "ZA_ETENDERS",
-        "title": "TE/2026/06/2200/6894-RFP",
-        "buyer": "Transnet SOC Ltd",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-164931"
-      }
-    ],
-    "NO_PUBLIC_FILE": [
-      {
-        "candidate_id": "TED:568274-2026",
-        "portal": "TED",
-        "title": "Netherlands – Road signs – Wegbebakening en bebording",
-        "buyer": "Irado",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://ted.europa.eu/en/notice/-/detail/568274-2026"
       }
     ]
   },
