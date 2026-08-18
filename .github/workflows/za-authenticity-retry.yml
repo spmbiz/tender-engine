@@ -1,0 +1,97 @@
+name: ZA eTenders DCE Authenticity Retry
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/za_auth_retry_trigger.json'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: Maximum exact ZA eTenders candidates to replay
+        required: false
+        default: '24'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: za-authenticity-retry
+  cancel-in-progress: false
+
+jobs:
+  build-and-dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test selector safety contract
+        run: python -m unittest tests/test_za_auth_retry.py
+      - name: Build exact-OCID ZA authenticity retry queue
+        env:
+          LIMIT: ${{ github.event.inputs.limit || '24' }}
+        run: |
+          set -euo pipefail
+          python pipeline/build_za_auth_retry.py \
+            --inbox control/gpt_supergreen_inbox.json \
+            --out queues/za_auth_retry_latest.jsonl \
+            --summary control/za_auth_retry_summary.json \
+            --limit "$LIMIT"
+      - id: meta
+        name: Resolve current discovery generation and selected count
+        run: |
+          set -euo pipefail
+          source_run="$(python - <<'PY'
+          import json
+          x=json.load(open('control/qwen_live/selection_summary.json',encoding='utf-8'))
+          print(x.get('source_run') or '')
+          PY
+          )"
+          selected="$(python - <<'PY'
+          import json
+          x=json.load(open('control/za_auth_retry_summary.json',encoding='utf-8'))
+          print(int(x.get('selected') or 0))
+          PY
+          )"
+          [[ "$source_run" =~ ^[0-9]+$ ]] || { echo "invalid source run: $source_run" >&2; exit 1; }
+          echo "source_run=$source_run" >> "$GITHUB_OUTPUT"
+          echo "selected=$selected" >> "$GITHUB_OUTPUT"
+      - name: Persist retry queue and audit summary
+        if: steps.meta.outputs.selected != '0'
+        run: |
+          set -euo pipefail
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add queues/za_auth_retry_latest.jsonl control/za_auth_retry_summary.json
+          if ! git diff --cached --quiet; then
+            git commit -m "retry: refresh exact ZA DCE authenticity queue ${GITHUB_RUN_ID}"
+            for attempt in 1 2 3 4; do
+              if git pull --rebase origin main && git push origin HEAD:main; then break; fi
+              if [ "$attempt" -eq 4 ]; then exit 1; fi
+              sleep "$((attempt * 3))"
+            done
+          fi
+      - name: Dispatch bounded DCE replay through canonical fanout
+        if: steps.meta.outputs.selected != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run dce-fanout-v2.yml --ref main \
+            -f selection_path=queues/za_auth_retry_latest.jsonl \
+            -f source_discovery_run='${{ steps.meta.outputs.source_run }}' \
+            -f max_jobs='${{ steps.meta.outputs.selected }}' \
+            -f max_parallel='6' \
+            -f max_shards='32' \
+            -f jobs_per_shard='1'
+      - name: Safety summary
+        if: always()
+        run: |
+          echo "ZA eTenders authenticity retry selected=${{ steps.meta.outputs.selected }} source_run=${{ steps.meta.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
+          echo 'This lane only replays exact official ZA OCDS candidate IDs through canonical DCE. It cannot create GREEN or bypass evidence-quality, mandatory gates, or final-verdict guards.' >> "$GITHUB_STEP_SUMMARY"
