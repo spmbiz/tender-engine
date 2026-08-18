@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import json
+import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from pipeline.build_fresh_digital_express import build
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "pipeline"))
+
+from build_fresh_digital_express import build
 
 
 def row(cid: str, *, title: str, reason: str = "NEW", hours: int = 120, material_hash: str = "h1", portal: str = "IRELAND_ETENDERS"):
