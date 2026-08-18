@@ -1,0 +1,318 @@
+name: Pipeline A/B Live Canary V2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pipeline-ab-live-canary-v2.yml'
+      - 'pipeline/materialize_qwen_ab_golden_fixture.py'
+      - 'pipeline/qwen_notice_batch_selfheal.py'
+      - 'pipeline/qwen_notice_post_guard.py'
+      - 'pipeline/evaluate_qwen_recall_golden.py'
+      - 'tests/test_qwen_post_guard_recall.py'
+      - 'benchmarks/qwen_batch_recall_golden_v1.json'
+      - 'control/pipeline_ab_canary_v2_trigger.json'
+  schedule:
+    - cron: '23 */4 * * *'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: pipeline-ab-live-canary-v2
+  cancel-in-progress: false
+
+env:
+  BASELINE_REF: 98a992d57fbea7f3f23ac68173bca8778a6f8880
+
+jobs:
+  prepare-fixture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download canonical golden discovery generation once
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p source-release canonical
+          generation="$(python - <<'PY'
+          import json
+          print(int(json.load(open('benchmarks/qwen_batch_recall_golden_v1.json'))['canonical_source_run']))
+          PY
+          )"
+          source_tag="discovery-harvest-${generation}"
+          assets="$(gh release view "$source_tag" --json assets --jq '.assets[].name')"
+          repaired="supergreen-wide-read-${generation}-repaired.tar.gz"
+          normal="supergreen-wide-read-${generation}.tar.gz"
+          if grep -Fxq "$repaired" <<< "$assets"; then asset="$repaired";
+          elif grep -Fxq "$normal" <<< "$assets"; then asset="$normal";
+          else echo "missing canonical asset for $generation" >&2; exit 1; fi
+          gh release download "$source_tag" --pattern "$asset" --dir source-release
+          tar -xzf "source-release/$asset" -C canonical
+          source="$(find canonical -type f -name current_candidates.jsonl -print -quit)"
+          test -s "$source"
+          echo "CANONICAL_SOURCE=$source" >> "$GITHUB_ENV"
+          echo "GOLDEN_GENERATION=$generation" >> "$GITHUB_ENV"
+      - name: Build one time-stable byte-identical fixture for both variants
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/materialize_qwen_ab_golden_fixture.py \
+            --source "$CANONICAL_SOURCE" \
+            --golden benchmarks/qwen_batch_recall_golden_v1.json \
+            --out golden-ab-queue.jsonl \
+            --manifest golden-ab-manifest.json
+          test "$(wc -l < golden-ab-queue.jsonl)" -eq 9
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qwen-ab-fixture-${{ github.run_id }}
+          path: |
+            golden-ab-queue.jsonl
+            golden-ab-manifest.json
+          retention-days: 14
+
+  qwen-golden:
+    needs: prepare-fixture
+    name: qwen-${{ matrix.variant }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: baseline
+            ref: 98a992d57fbea7f3f23ac68173bca8778a6f8880
+          - variant: current
+            ref: main
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.ref }}
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: qwen-ab-fixture-${{ github.run_id }}
+          path: fixture
+      - name: Prove exact fixture identity
+        run: |
+          test -s fixture/golden-ab-queue.jsonl
+          test -s fixture/golden-ab-manifest.json
+          sha256sum fixture/golden-ab-queue.jsonl
+      - name: Cache Qwen GGUF
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: qwen3-4b-q4-k-m-hf-v1
+      - name: Install llama.cpp CPU runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p llama-dist
+          gh api 'repos/ggml-org/llama.cpp/releases?per_page=20' > /tmp/releases.json
+          readarray -t picked < <(python - <<'PY'
+          import json,re
+          for rel in json.load(open('/tmp/releases.json')):
+              if rel.get('draft') or rel.get('prerelease'): continue
+              for a in rel.get('assets',[]):
+                  if re.fullmatch(r'llama-.*-bin-ubuntu-x64\.tar\.gz',a.get('name','')):
+                      print(rel['tag_name']); print(a['name']); raise SystemExit
+          raise SystemExit('no llama.cpp Ubuntu x64 asset found')
+          PY
+          )
+          gh release download "${picked[0]}" --repo ggml-org/llama.cpp --pattern "${picked[1]}" --dir llama-dist
+          tar -xzf "llama-dist/${picked[1]}" -C llama-dist
+          server="$(find llama-dist -type f -name llama-server -perm -u+x -print -quit)"
+          test -n "$server"
+          echo "LLAMA_SERVER=$server" >> "$GITHUB_ENV"
+          echo "LLAMA_CPP_TAG=${picked[0]}" >> "$GITHUB_ENV"
+      - name: Start Qwen3 4B once
+        shell: bash
+        run: |
+          set -euo pipefail
+          start="$(date +%s)"
+          "$LLAMA_SERVER" -hf Qwen/Qwen3-4B-GGUF:Q4_K_M --host 127.0.0.1 --port 8080 --jinja -c 8192 -t 4 > qwen-server.log 2>&1 &
+          echo $! > qwen-server.pid
+          ready=0
+          for i in $(seq 1 180); do
+            if curl -fsS http://127.0.0.1:8080/health >/dev/null 2>&1; then ready=1; break; fi
+            kill -0 "$(cat qwen-server.pid)" >/dev/null 2>&1 || { tail -200 qwen-server.log; exit 1; }
+            sleep 3
+          done
+          [ "$ready" = 1 ] || { tail -200 qwen-server.log; exit 1; }
+          echo "QWEN_STARTUP_SECONDS=$(($(date +%s)-start))" >> "$GITHUB_ENV"
+      - id: classify
+        name: Run real Qwen singleton canary
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          started="$(date +%s)"
+          python pipeline/qwen_notice_batch_selfheal.py \
+            --queue fixture/golden-ab-queue.jsonl \
+            --out qwen-raw.jsonl \
+            --summary qwen-summary.json \
+            --batch-size 1 \
+            --sample-size 9 \
+            --source-ledger-generation AB-V2 \
+            --description-chars 500 \
+            --timeout 75 \
+            --max-tokens 1100 \
+            --max-runtime-seconds 1200 \
+            --startup-seconds "$QWEN_STARTUP_SECONDS"
+          python pipeline/qwen_notice_post_guard.py --input qwen-raw.jsonl --output qwen-guarded.jsonl --summary qwen-guard-summary.json
+          echo "CLASSIFY_WALL_SECONDS=$(($(date +%s)-started))" >> "$GITHUB_ENV"
+      - name: Evaluate recall and conservation
+        if: always()
+        env:
+          VARIANT: ${{ matrix.variant }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -s qwen-guarded.jsonl ]; then
+            printf '{"schema":"QWEN_RECALL_GOLDEN_REPORT_V3","scale_out_gate":"BLOCK","failures":["classifier_crash"],"known_positive_recall":0}\n' > qwen-golden-report.json
+          else
+            python pipeline/evaluate_qwen_recall_golden.py --golden benchmarks/qwen_batch_recall_golden_v1.json --results qwen-guarded.jsonl --report qwen-golden-report.json || true
+          fi
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          d=json.loads(Path('qwen-golden-report.json').read_text())
+          summary=json.loads(Path('qwen-summary.json').read_text()) if Path('qwen-summary.json').exists() else {}
+          manifest=json.loads(Path('fixture/golden-ab-manifest.json').read_text())
+          rows=[json.loads(x) for x in Path('qwen-guarded.jsonl').read_text().splitlines() if x.strip()] if Path('qwen-guarded.jsonl').exists() else []
+          d.update({
+              'variant':os.environ['VARIANT'],
+              'fixture_sha256':manifest['sha256'],
+              'fixture_future_deadline':manifest['future_deadline'],
+              'classification_wall_seconds':int(os.environ.get('CLASSIFY_WALL_SECONDS') or 0),
+              'output_rows':len(rows),
+              'unique_output_ids':len({str(x.get('canonical_notice_id') or '') for x in rows}),
+              'row_conservation_pass':len(rows)==9 and len({str(x.get('canonical_notice_id') or '') for x in rows})==9,
+              'parse_or_fallback_rows':int(summary.get('parse_or_fallback_rows') or 0),
+              'split_events':int(summary.get('split_events') or 0),
+              'singleton_fallbacks':int(summary.get('singleton_fallbacks') or 0),
+              'failed_attempts':int(summary.get('failed_attempts') or 0),
+              'classifier_version':summary.get('classifier_version'),
+              'prompt_version':summary.get('classifier_prompt_version'),
+          })
+          Path('qwen-golden-report.json').write_text(json.dumps(d,indent=2,ensure_ascii=False)+'\n')
+          print(json.dumps(d,indent=2))
+          PY
+      - name: Stop model
+        if: always()
+        run: '[ -s qwen-server.pid ] && kill "$(cat qwen-server.pid)" >/dev/null 2>&1 || true'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pipeline-ab-qwen-v2-${{ matrix.variant }}-${{ github.run_id }}
+          path: |
+            fixture/golden-ab-manifest.json
+            qwen-golden-report.json
+            qwen-summary.json
+            qwen-guard-summary.json
+            qwen-guarded.jsonl
+          retention-days: 14
+          if-no-files-found: warn
+
+  compare-qwen:
+    needs: qwen-golden
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: pipeline-ab-qwen-v2-*-${{ github.run_id }}
+          path: variants
+      - id: compare
+        name: Test B V2 — current must preserve or improve rollback recall
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          reports={}
+          for p in Path('variants').rglob('qwen-golden-report.json'):
+              d=json.loads(p.read_text()); reports[d['variant']]=d
+          errors=[]
+          if set(reports)!={'baseline','current'}: errors.append(f'missing_variant_reports:{sorted(reports)}')
+          b=reports.get('baseline',{}); c=reports.get('current',{})
+          if b.get('fixture_sha256') != c.get('fixture_sha256'): errors.append('fixture_hash_mismatch')
+          if not c.get('row_conservation_pass'): errors.append('current_row_conservation_fail')
+          if int(c.get('parse_or_fallback_rows') or 0)>0: errors.append('current_parse_or_fallback_rows')
+          br=float(b.get('known_positive_recall') or 0); cr=float(c.get('known_positive_recall') or 0)
+          if cr < br: errors.append(f'current_recall_regressed:{cr}<{br}')
+          if int(c.get('cases_failed') or 0)>int(b.get('cases_failed') or 0): errors.append('current_policy_failures_exceed_baseline')
+          if c.get('scale_out_gate')!='PASS': errors.append('current_golden_gate_not_pass')
+          payload={
+              'schema':'TENDER_PIPELINE_AB_LIVE_CANARY_V2',
+              'status':'PASS' if not errors else 'FAIL',
+              'errors':errors,
+              'baseline':b,
+              'current':c,
+              'comparison':{
+                  'fixture_sha256':c.get('fixture_sha256'),
+                  'known_positive_recall_delta':cr-br,
+                  'classification_wall_seconds_delta':int(c.get('classification_wall_seconds') or 0)-int(b.get('classification_wall_seconds') or 0),
+                  'baseline_gate':b.get('scale_out_gate'),
+                  'current_gate':c.get('scale_out_gate'),
+              },
+          }
+          Path('pipeline-ab-canary-v2-report.json').write_text(json.dumps(payload,indent=2,ensure_ascii=False)+'\n')
+          print(json.dumps(payload,indent=2))
+          if errors: raise SystemExit(2)
+          PY
+      - name: Persist latest Test B V2 report transactionally
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          HEAD_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -s pipeline-ab-canary-v2-report.json ]; then
+            printf '{"schema":"TENDER_PIPELINE_AB_LIVE_CANARY_V2","status":"HARNESS_CRASH","workflow_run_id":"%s"}\n' "$RUN_ID" > pipeline-ab-canary-v2-report.json
+          fi
+          python - <<'PY'
+          import json,os
+          p='pipeline-ab-canary-v2-report.json'; d=json.load(open(p)); d['workflow_run_id']=os.environ['RUN_ID']; d['head_sha']=os.environ['HEAD_SHA']
+          open(p,'w').write(json.dumps(d,indent=2,ensure_ascii=False)+'\n')
+          PY
+          path='control/pipeline_ab_canary_latest.json'
+          content="$(base64 -w0 pipeline-ab-canary-v2-report.json)"
+          for attempt in 1 2 3 4 5 6; do
+            sha="$(gh api "repos/$REPO/contents/$path?ref=main" --jq '.sha' 2>/dev/null || true)"
+            args=(--method PUT "repos/$REPO/contents/$path" -f message="ci: persist pipeline live canary v2 $RUN_ID" -f content="$content" -f branch=main)
+            [ -n "$sha" ] && args+=(-f sha="$sha")
+            if gh api "${args[@]}" >/dev/null; then exit 0; fi
+            sleep "$((attempt*2))"
+          done
+          exit 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pipeline-ab-live-canary-v2-${{ github.run_id }}
+          path: pipeline-ab-canary-v2-report.json
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Fail on current regression or blocked current golden gate
+        if: steps.compare.outcome != 'success'
+        run: exit 1
