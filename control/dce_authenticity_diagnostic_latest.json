@@ -1,69 +1,52 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32106912628,
+  "latest_source_dce_run_id": 32111866806,
   "total_inbox_rows": 160,
-  "dce_authenticity_rows": 93,
+  "dce_authenticity_rows": 64,
   "portal_counts": {
-    "IRELAND_ETENDERS": 54,
-    "ZA_ETENDERS": 21,
-    "EE_RHR": 10,
+    "IRELAND_ETENDERS": 38,
+    "ZA_ETENDERS": 16,
     "GENERIC_PUBLIC_PAGE": 3,
+    "EE_RHR": 2,
+    "TED": 2,
     "ES_PLACSP": 2,
-    "SCOTLAND_PCS": 1,
-    "TED": 1,
-    "PL_EZAMOWIENIA": 1
+    "SCOTLAND_PCS": 1
   },
   "status_counts": {
-    "UNKNOWN_RETRIEVED_DOCUMENT": 89,
+    "UNKNOWN_RETRIEVED_DOCUMENT": 60,
     "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 4
   },
   "reason_counts": {
-    "NON_AUTHORITATIVE": 90,
+    "NON_AUTHORITATIVE": 62,
     "AUTH_REQUIRED": 1,
-    "NO_PUBLIC_FILE": 1,
-    "ERROR_RETRYABLE": 1
+    "NO_PUBLIC_FILE": 1
   },
   "method_counts": {},
   "recovery_opportunities": [
     {
-      "portal": "PL_EZAMOWIENIA",
-      "blocked": 1,
-      "likely_public_recovery_target": 1,
-      "reason_counts": {
-        "ERROR_RETRYABLE": 1
-      }
-    },
-    {
       "portal": "TED",
-      "blocked": 1,
+      "blocked": 2,
       "likely_public_recovery_target": 1,
       "reason_counts": {
-        "NO_PUBLIC_FILE": 1
+        "NO_PUBLIC_FILE": 1,
+        "NON_AUTHORITATIVE": 1
       }
     },
     {
       "portal": "IRELAND_ETENDERS",
-      "blocked": 54,
+      "blocked": 38,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 54
+        "NON_AUTHORITATIVE": 38
       }
     },
     {
       "portal": "ZA_ETENDERS",
-      "blocked": 21,
+      "blocked": 16,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 20,
+        "NON_AUTHORITATIVE": 15,
         "AUTH_REQUIRED": 1
-      }
-    },
-    {
-      "portal": "EE_RHR",
-      "blocked": 10,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 10
       }
     },
     {
@@ -72,6 +55,14 @@
       "likely_public_recovery_target": 0,
       "reason_counts": {
         "NON_AUTHORITATIVE": 3
+      }
+    },
+    {
+      "portal": "EE_RHR",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
       }
     },
     {
@@ -152,16 +143,6 @@
         "buyer": "Irado",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
         "notice_url": "https://ted.europa.eu/en/notice/-/detail/568274-2026"
-      }
-    ],
-    "ERROR_RETRYABLE": [
-      {
-        "candidate_id": "PL-BZP:08def836-5ac2-5963-962b-120001f5bd03",
-        "portal": "PL_EZAMOWIENIA",
-        "title": "Budowa oświetlenia przy drodze powiatowej nr 2018L w m. Łuszczów Kolonia.",
-        "buyer": "Gmina Łęczna",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08def836-5ac2-5963-962b-120001f5bd03"
       }
     ]
   },
