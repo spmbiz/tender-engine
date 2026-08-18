@@ -1,0 +1,165 @@
+name: DCE Rich Portal Empirical Validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'benchmarks/dce-rich-portals-trigger.json'
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      source_run: ${{ steps.source.outputs.source_run }}
+      sampled_total: ${{ steps.matrix.outputs.sampled_total }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - id: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rid="$(python - <<'PY'
+          import json
+          for line in open('queues/qwen_live_selection_latest.jsonl',encoding='utf-8',errors='replace'):
+              if not line.strip(): continue
+              r=json.loads(line)
+              x=r.get('wide_read_run_id') or r.get('source_discovery_run') or r.get('source_run')
+              if x is not None:
+                  print(x); break
+          PY
+          )"
+          [[ "$rid" =~ ^[0-9]+$ ]] || exit 1
+          echo "source_run=$rid" >> "$GITHUB_OUTPUT"
+      - name: Recover canonical wide-read and freeze portal-family samples
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ steps.source.outputs.source_run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="discovery-harvest-${SOURCE_RUN}"
+          mkdir -p source-release source-wide benchmark-input/queues
+          assets="$(gh release view "$tag" --json assets --jq '.assets[].name')"
+          repaired="supergreen-wide-read-${SOURCE_RUN}-repaired.tar.gz"
+          normal="supergreen-wide-read-${SOURCE_RUN}.tar.gz"
+          if grep -Fxq "$repaired" <<< "$assets"; then asset="$repaired"; else asset="$normal"; fi
+          gh release download "$tag" --pattern "$asset" --dir source-release
+          tar -xzf "source-release/$asset" -C source-wide
+          candidates="$(find source-wide -type f -name current_candidates.jsonl -print -quit)"
+          test -s "$candidates"
+          cp "$candidates" source-current-candidates.jsonl
+          python pipeline/dce_rich_portal_benchmark.py sample --candidates source-current-candidates.jsonl --out-dir benchmark-input --per-country 15
+          : > /tmp/empty-ledger.jsonl
+          for sel in benchmark-input/selections/*.jsonl; do
+            [ -s "$sel" ] || continue
+            family="$(basename "$sel" .jsonl)"
+            python pipeline/materialize_dce_selection.py --candidates source-current-candidates.jsonl --selection "$sel" --out "benchmark-input/queues/${family}.jsonl" --attempt-ledger /tmp/empty-ledger.jsonl
+          done
+      - id: matrix
+        shell: bash
+        run: |
+          python - <<'PY' > /tmp/matrix
+          import glob,json,os
+          x=[]; total=0
+          for p in sorted(glob.glob('benchmark-input/queues/*.jsonl')):
+              n=sum(bool(z.strip()) for z in open(p,encoding='utf-8',errors='replace'))
+              if n: x.append({'family':os.path.basename(p)[:-6],'count':n}); total+=n
+          print('matrix='+json.dumps({'include':x},separators=(',',':')))
+          print('sampled_total='+str(total))
+          PY
+          cat /tmp/matrix >> "$GITHUB_OUTPUT"
+          cat benchmark-input/inventory.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rich-portal-input-${{ github.run_id }}
+          path: benchmark-input/
+          retention-days: 5
+
+  portal:
+    needs: prepare
+    if: needs.prepare.outputs.sampled_total != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 34
+    strategy:
+      fail-fast: false
+      max-parallel: 18
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/download-artifact@v4
+        with: {name: 'rich-portal-input-${{ github.run_id }}', path: benchmark-input}
+      - run: python -m pip install --disable-pip-version-check -q requests pypdf python-docx openpyxl python-pptx 'playwright>=1.46,<2'
+      - shell: bash
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
+      - name: Run frozen portal sample through current production resolver
+        env: {FAMILY: '${{ matrix.family }}', COUNT: '${{ matrix.count }}', DCE_BROWSER_INLINE_RETRIES: '0', DCE_HTTP_INLINE_RETRIES: '0'}
+        shell: bash
+        run: |
+          lines="$(seq -s, 1 "$COUNT")"
+          python pipeline/dce_batch_worker.py --queue "benchmark-input/queues/${FAMILY}.jsonl" --lines "$lines" --out out --concurrency 3 --http-concurrency 8 --placsp-concurrency 4 --http-probe-concurrency 12 --http-probe-timeout-seconds 5 --retries 0 --timeout-seconds 125
+          mkdir -p summary
+          python pipeline/dce_rich_portal_benchmark.py summarize-country --country "$FAMILY" --queue "benchmark-input/queues/${FAMILY}.jsonl" --out out --summary summary/country-summary.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rich-portal-${{ matrix.family }}-${{ github.run_id }}
+          path: |
+            summary/
+            out/batch_results.json
+            out/batch_summary.json
+            out/http_probe_summary.json
+            out/**/manifest.json
+          retention-days: 5
+
+  aggregate:
+    needs: [prepare, portal]
+    if: always() && needs.prepare.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'rich-portal-*-${{ github.run_id }}', path: portal-results}
+      - name: Aggregate and persist isolated rich-portal scorecard
+        env:
+          RUN_ID: ${{ github.run_id }}
+          SOURCE_RUN: ${{ needs.prepare.outputs.source_run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/dce_rich_portal_benchmark.py aggregate --inputs portal-results --out-dir report
+          sed -i 's/DCE Country Validation V2/DCE Rich Portal Validation/g' report/REPORT.md
+          sed -i 's/| Country |/| Portal family |/' report/REPORT.md
+          cat report/REPORT.md >> "$GITHUB_STEP_SUMMARY"
+          mkdir -p /tmp/publish
+          cp report/REPORT.md report/report.json report/report.csv /tmp/publish/
+          printf '{"benchmark_run_id":"%s","source_discovery_run":"%s","head_sha":"%s","dimension":"portal_family","per_family_target":15}\n' "$RUN_ID" "$SOURCE_RUN" "$GITHUB_SHA" > /tmp/publish/provenance.json
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          if git ls-remote --exit-code --heads origin benchmark/dce-rich-portal-results >/dev/null 2>&1; then
+            git fetch origin benchmark/dce-rich-portal-results
+            git checkout -B benchmark/dce-rich-portal-results origin/benchmark/dce-rich-portal-results
+          else
+            git checkout -B benchmark/dce-rich-portal-results
+          fi
+          rm -rf benchmarks/dce-rich-portals/latest
+          mkdir -p benchmarks/dce-rich-portals/latest
+          cp -a /tmp/publish/. benchmarks/dce-rich-portals/latest/
+          git add benchmarks/dce-rich-portals/latest
+          git commit -m "benchmark: rich portal validation ${RUN_ID}" || true
+          git push origin HEAD:benchmark/dce-rich-portal-results
