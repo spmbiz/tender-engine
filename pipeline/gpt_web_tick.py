@@ -18,7 +18,10 @@ def load_json(path: Path) -> dict[str, Any]:
 
 
 def review_items(obj: dict[str, Any]) -> list[dict[str, Any]]:
-    for field in ('items', 'reviews', 'reviewed_items'):
+    # `results` is the canonical field used by persisted GPT_DCE_ADJUDICATION_V1
+    # files. Supporting it here makes the final-bank writer and review ledger one
+    # idempotent transaction instead of two unrelated surfaces.
+    for field in ('items', 'reviews', 'reviewed_items', 'results'):
         rows = obj.get(field)
         if isinstance(rows, list):
             return [x for x in rows if isinstance(x, dict)]
@@ -32,7 +35,7 @@ def run_id(value: Any) -> int | None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description='Apply one GPT Web review pass as durable ticks.')
-    ap.add_argument('--reviews', required=True, help='JSON review pass containing items/reviews')
+    ap.add_argument('--reviews', required=True, help='JSON review pass containing items/reviews/results')
     ap.add_argument('--ledger', default='control/gpt_web_review_ledger.json')
     ap.add_argument('--pass-id', required=True)
     ap.add_argument('--reviewed-at')
@@ -43,8 +46,8 @@ def main() -> None:
     ledger_path = Path(args.ledger)
     reviews = load_json(reviews_path)
     ledger = load_json(ledger_path)
-    now = args.reviewed_at or datetime.now(timezone.utc).isoformat()
-    default_run = run_id(args.source_dce_run or reviews.get('source_dce_run'))
+    now = args.reviewed_at or reviews.get('created_at') or datetime.now(timezone.utc).isoformat()
+    default_run = run_id(args.source_dce_run or reviews.get('source_dce_run') or reviews.get('source_dce_run_id'))
 
     ticks = ledger.get('ticks') if isinstance(ledger.get('ticks'), dict) else {}
     touched: list[str] = []
@@ -53,13 +56,19 @@ def main() -> None:
         if not cid:
             continue
         source_run = run_id(row.get('source_dce_run_id')) or default_run
+        verdict = str(
+            row.get('gpt_web_verdict')
+            or row.get('classification')
+            or row.get('verdict')
+            or 'REVIEWED'
+        ).strip()
         tick = {
             'candidate_id': cid,
             'reviewed': True,
             'reviewed_at': now,
             'review_pass_id': args.pass_id,
             'source_dce_run_id': source_run,
-            'verdict': str(row.get('gpt_web_verdict') or row.get('verdict') or 'REVIEWED').strip(),
+            'verdict': verdict,
         }
         if row.get('review_key'):
             tick['review_key'] = str(row.get('review_key'))
