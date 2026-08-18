@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
 from collections import Counter
 from datetime import datetime, timezone
@@ -9,7 +10,6 @@ from pathlib import Path
 from typing import Any
 
 from build_gpt_web_read_batches import clip
-from rebuild_gpt_review_bank_from_release import load_jsonl, run_and_shard
 
 STRESS_GATES = (
     "entity_geography",
@@ -38,6 +38,31 @@ def load(path: Path) -> dict[str, Any]:
         return {}
 
 
+def load_jsonl(path: Path) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    try:
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            obj = json.loads(line)
+            if isinstance(obj, dict):
+                rows.append(obj)
+    except Exception:
+        return []
+    return rows
+
+
+def run_and_shard(path: Path) -> tuple[int, int]:
+    run_id = 0
+    for part in path.parts:
+        m = re.fullmatch(r"(?:dce-harvest-)?(\d{8,})", part)
+        if m:
+            run_id = max(run_id, int(m.group(1)))
+    sm = re.search(r"fast-adjudication-shard-(\d+)\.jsonl$", path.name)
+    return run_id, int(sm.group(1)) if sm else 0
+
+
 def cid(row: dict[str, Any]) -> str:
     return str(row.get("candidate_id") or row.get("canonical_notice_id") or "").strip()
 
@@ -49,16 +74,6 @@ def key(value: Any) -> str:
 def raw_gate_map(row: dict[str, Any]) -> dict[str, Any]:
     raw = row.get("evidence_by_gate") or row.get("gate_evidence_candidates") or {}
     return raw if isinstance(raw, dict) else {}
-
-
-def first_gate_text(row: dict[str, Any], gate: str, chars: int = 320) -> str:
-    vals = raw_gate_map(row).get(gate)
-    if not isinstance(vals, list) or not vals:
-        return ""
-    item = vals[0]
-    if isinstance(item, dict):
-        return clip(item.get("text") or item.get("snippet") or item.get("context"), chars)
-    return clip(item, chars)
 
 
 def gate_evidence(row: dict[str, Any], chars: int = 360) -> dict[str, dict[str, Any]]:
