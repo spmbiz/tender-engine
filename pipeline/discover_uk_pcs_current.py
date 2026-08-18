@@ -53,7 +53,7 @@ def persist(records, *, pages, total_reported, exhausted, errors, warnings, tele
     stats = {
         "source": "UK_PCS_OCDS",
         "portal": "PUBLIC_CONTRACTS_SCOTLAND",
-        "listing_contract": "PCS_CURRENT_OPPORTUNITIES_BROWSER_V3",
+        "listing_contract": "PCS_CURRENT_OPPORTUNITIES_BROWSER_V4_POSTBACK",
         "raw_materialized": len(rows),
         "current_materialized": len(current),
         "pages_fetched": pages,
@@ -177,27 +177,77 @@ async def select_current_opportunities(page, telemetry, errors):
 async def submit_search(page, telemetry):
     candidates = [
         page.get_by_role("button", name=re.compile(r"^search$", re.I)),
-        page.locator("input[type=submit]").filter(has=page.locator("xpath=.")),
+        page.locator("input[type=submit]"),
+        page.locator("input[type=image][alt*='search' i], input[type=image][title*='search' i]"),
+        page.locator("input[type=button][value*='search' i]"),
+        page.locator("a[id*='search' i], button[id*='search' i], [onclick*='search' i]"),
+        page.get_by_text(re.compile(r"^\s*search\s*$", re.I)),
     ]
+    debug = []
     for loc in candidates:
         try:
             count = await loc.count()
         except Exception:
             continue
-        for i in range(min(count, 20)):
+        for i in range(min(count, 30)):
             node = loc.nth(i)
             try:
-                text = clean(await node.get_attribute("value") or await node.inner_text())
-                if text and "search" not in text.lower() and loc is candidates[1]:
+                if not await node.is_visible():
+                    continue
+                meta = await node.evaluate("el => ({tag:el.tagName,id:el.id||'',name:el.getAttribute('name')||'',value:el.getAttribute('value')||'',type:el.getAttribute('type')||'',text:(el.innerText||'').trim()})")
+                debug.append(meta)
+                hay = clean(' '.join(str(meta.get(k) or '') for k in ('id','name','value','text')))
+                if 'search' not in hay.lower():
                     continue
                 await node.click(timeout=5000)
-                await page.wait_for_load_state("domcontentloaded", timeout=30000)
+                try:
+                    await page.wait_for_load_state("domcontentloaded", timeout=30000)
+                except Exception:
+                    pass
                 await page.wait_for_timeout(PAGE_WAIT_MS)
-                telemetry["search_submitted"] = True
+                telemetry["search_submitted"] = "CONTROL_CLICK"
+                telemetry["search_control"] = meta
                 return True
             except Exception:
                 continue
+
+    # PCS is classic ASP.NET and some renders expose no semantic Search button
+    # to Playwright. The selected Notice Type is still a normal form control, so
+    # submit its owning form directly. This uses the page's own public form and
+    # preserves all ViewState/filter values; it does not bypass any access gate.
+    selects = page.locator("select")
+    for i in range(await selects.count()):
+        sel = selects.nth(i)
+        try:
+            selected = clean(await sel.locator("option:checked").inner_text())
+        except Exception:
+            selected = ''
+        if not current_option(selected):
+            continue
+        try:
+            fired = await sel.evaluate("""el => {
+              const form = el.form;
+              if (!form) return false;
+              setTimeout(() => {
+                if (typeof form.requestSubmit === 'function') form.requestSubmit();
+                else form.submit();
+              }, 0);
+              return true;
+            }""")
+            if fired:
+                try:
+                    await page.wait_for_load_state("domcontentloaded", timeout=30000)
+                except Exception:
+                    pass
+                await page.wait_for_timeout(PAGE_WAIT_MS)
+                telemetry["search_submitted"] = "FORM_FALLBACK"
+                telemetry["search_controls_debug"] = debug[:40]
+                return True
+        except Exception:
+            continue
+
     telemetry["search_submitted"] = False
+    telemetry["search_controls_debug"] = debug[:40]
     return False
 
 
@@ -289,12 +339,32 @@ async def advance(page, next_page, before_signature):
     selector, _, labels = await find_page_select(page)
     if selector is not None:
         try:
-            await selector.select_option(label=labels.get(next_page, f"Page {next_page}"))
-            await page.wait_for_timeout(PAGE_WAIT_MS)
-            # A successful select/postback is enough to continue. The main loop
-            # verifies the actual result-row signature on the next iteration,
-            # so an ineffective postback cannot silently count as progress.
-            return True
+            label = labels.get(next_page, f"Page {next_page}")
+            await selector.select_option(label=label)
+            await page.wait_for_timeout(350)
+            body = clean(await page.locator("body").inner_text())
+            match = re.search(r"Showing\s+page\s+(\d+)\s+of", body, re.I)
+            if match and int(match.group(1)) == next_page:
+                await page.wait_for_timeout(PAGE_WAIT_MS)
+                return True
+
+            # Some PCS renders do not wire the page select's change event in a
+            # way Playwright triggers. Submit the same public ASP.NET form with
+            # the selected Page N value; the next loop verifies Reference-No
+            # signature, so an ineffective submit is caught rather than trusted.
+            fired = await selector.evaluate("""el => {
+              const form = el.form;
+              if (!form) return false;
+              setTimeout(() => form.submit(), 0);
+              return true;
+            }""")
+            if fired:
+                try:
+                    await page.wait_for_load_state("domcontentloaded", timeout=30000)
+                except Exception:
+                    pass
+                await page.wait_for_timeout(PAGE_WAIT_MS)
+                return True
         except Exception:
             pass
     for pattern in (r"^next$", r"next\s*>", r"^>$", r"^›$", r"^»$"):
