@@ -1,6 +1,6 @@
 {
   "schema": "GPT_INBOX_HEALTH_V2",
-  "updated_at": "2026-08-18T17:46:48.232205+00:00",
+  "updated_at": "2026-08-18T17:51:09.457814+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V2",
   "latest_source_dce_run_id": 32166961956,
   "counts": {
@@ -14,44 +14,44 @@
   },
   "review_bank_count": 160,
   "review_bank_schema": "GPT_REVIEW_HOT_V6",
-  "review_index_count": 1322,
+  "review_index_count": 1338,
   "review_index_counts": {
-    "pending_total_uncapped": 1322,
+    "pending_total_uncapped": 1338,
     "by_stage": {
-      "BUSINESS_GATES": 864,
-      "DCE_AUTHENTICITY": 458
+      "BUSINESS_GATES": 873,
+      "DCE_AUTHENTICITY": 465
     },
     "by_spm_fit_band": {
       "HOT": 1,
-      "GOOD": 17,
-      "MAYBE": 78,
-      "LOW": 1226
+      "GOOD": 18,
+      "MAYBE": 81,
+      "LOW": 1238
     },
     "rich_hot_window_target": 160,
-    "overflow_beyond_hot_160": 1162,
+    "overflow_beyond_hot_160": 1178,
     "cross_portal_duplicates_collapsed": 4
   },
-  "true_pending_before_hot_cap": 1322,
-  "overflow_beyond_hot_160": 1162,
+  "true_pending_before_hot_cap": 1338,
+  "overflow_beyond_hot_160": 1178,
   "assistant_read_batch_count": 16,
   "assistant_read_batch_size": 10,
   "recovery_metrics": {
-    "shard_files_scanned": 151,
-    "adjudication_rows_scanned": 1210,
-    "model_review_rows_seen": 351,
-    "dce_authenticity_rows_seen": 95,
+    "shard_files_scanned": 155,
+    "adjudication_rows_scanned": 1239,
+    "model_review_rows_seen": 360,
+    "dce_authenticity_rows_seen": 102,
     "scope_auto_rejected": 0,
     "scope_auto_reject_reason_counts": {},
     "cross_portal_duplicates_collapsed": 4,
-    "uncapped_unique_pending_before_hot_window": 440,
+    "uncapped_unique_pending_before_hot_window": 456,
     "rich_hot_window_count": 160,
-    "overflow_beyond_hot_window": 280
+    "overflow_beyond_hot_window": 296
   },
   "index_recovery": {
-    "shard_files_scanned_this_refresh": 151,
-    "adjudication_rows_scanned_this_refresh": 1210,
-    "gate_rows_seen_this_refresh": 351,
-    "authenticity_rows_seen_this_refresh": 95,
+    "shard_files_scanned_this_refresh": 155,
+    "adjudication_rows_scanned_this_refresh": 1239,
+    "gate_rows_seen_this_refresh": 360,
+    "authenticity_rows_seen_this_refresh": 102,
     "source_runs_seen_this_refresh": [
       32166961956,
       32163652520,
