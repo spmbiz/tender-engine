@@ -15,7 +15,7 @@ on:
       - 'control/dce_evidence_regression_trigger.json'
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: dce-evidence-regression
@@ -34,15 +34,64 @@ jobs:
           python-version: '3.12'
       - name: Install narrow test dependencies
         run: python -m pip install --disable-pip-version-check -q pytest pypdf
-      - name: Compile evidence and extraction modules
+      - id: evidence
+        name: Compile and run evidence-quality regression suite
+        continue-on-error: true
+        shell: bash
         run: |
+          set -euo pipefail
           python -m py_compile \
             pipeline/dce_evidence_quality.py \
             pipeline/extract_corpus.py \
             pipeline/docling_deep_parser.py
-      - name: Run evidence-quality regression suite
-        run: |
           python -m pytest -q \
             tests/test_dce_evidence_quality.py \
             tests/test_dce_evidence_provenance.py \
             tests/test_extract_corpus_docling_import.py
+      - name: Persist latest evidence regression result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          HEAD_SHA: ${{ github.sha }}
+          OUTCOME: ${{ steps.evidence.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import datetime as dt,json,os
+          d={
+            'schema':'DCE_EVIDENCE_REGRESSION_V1',
+            'generated_at':dt.datetime.now(dt.timezone.utc).isoformat(),
+            'workflow_run_id':os.environ['RUN_ID'],
+            'head_sha':os.environ['HEAD_SHA'],
+            'status':'PASS' if os.environ['OUTCOME']=='success' else 'FAIL',
+            'tests':[
+              'tests/test_dce_evidence_quality.py',
+              'tests/test_dce_evidence_provenance.py',
+              'tests/test_extract_corpus_docling_import.py',
+            ],
+            'guards':{
+              'khmdhs_exact_official_provenance_required':True,
+              'wrong_notice_id_remains_blocked':True,
+              'lookalike_host_remains_blocked':True,
+              'empty_text_remains_blocked':True,
+              'deep_parser_direct_script_import_supported':True,
+            },
+          }
+          open('dce-evidence-regression.json','w').write(json.dumps(d,indent=2)+'\n')
+          PY
+          path='control/dce_evidence_regression_latest.json'
+          content="$(base64 -w0 dce-evidence-regression.json)"
+          for attempt in 1 2 3 4 5 6; do
+            sha="$(gh api "repos/$REPO/contents/$path?ref=main" --jq '.sha' 2>/dev/null || true)"
+            args=(--method PUT "repos/$REPO/contents/$path" -f message="ci: persist DCE evidence regression $RUN_ID" -f content="$content" -f branch=main)
+            [ -n "$sha" ] && args+=(-f sha="$sha")
+            if gh api "${args[@]}" >/dev/null; then exit 0; fi
+            sleep "$((attempt*2))"
+          done
+          exit 1
+      - name: Fail closed on evidence regression
+        if: steps.evidence.outcome != 'success'
+        run: exit 1
