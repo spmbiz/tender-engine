@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "pipeline"))
 
 from procurement_code_prior import code_priority
+from review_procedure_identity import strong_procedure_aliases
 
 
 def test_cpv_web_is_positive_priority_only():
@@ -30,6 +31,17 @@ def test_positive_digital_code_wins_in_mixed_procurement():
     out = code_priority({"cpv_codes": ["45000000", "72413000"]})
     assert out["delta"] > 0
     assert out["contradiction"] is False
+
+
+def test_strong_alias_parser_uses_explicit_etenders_resource_only():
+    aliases = strong_procedure_aliases({
+        "notice_url": "https://ted.europa.eu/en/notice/-/detail/571373-2026",
+        "evidence_quality_summary": {
+            "source_urls": ["https://www.etenders.gov.ie/epps/cft/listContractDocuments.do?resourceId=8853905"]
+        },
+    })
+    assert "ie_resource:8853905" in aliases
+    assert not strong_procedure_aliases({"title": "same words", "buyer": "same buyer"})
 
 
 def _review_row(cid: str, title: str, score: int = 80):
@@ -56,30 +68,14 @@ def _review_row(cid: str, title: str, score: int = 80):
     }
 
 
-def test_review_index_is_uncapped_and_quality_first(tmp_path: Path):
-    release = tmp_path / "release"
-    old = release / "32100000001"
-    new = release / "32200000001"
-    old.mkdir(parents=True)
-    new.mkdir(parents=True)
-
-    old_rows = [_review_row("OLD:BEST", "Website redesign and development", 88)]
-    new_rows = [_review_row(f"NEW:{i:03d}", "Generic procurement support", 40) for i in range(199)]
-    (old / "fast-adjudication-shard-0.jsonl").write_text(
-        "".join(json.dumps(x) + "\n" for x in old_rows), encoding="utf-8"
-    )
-    (new / "fast-adjudication-shard-0.jsonl").write_text(
-        "".join(json.dumps(x) + "\n" for x in new_rows), encoding="utf-8"
-    )
-
+def _run_index(tmp_path: Path, release: Path, final_payload=None):
     existing = tmp_path / "existing.json"
     final = tmp_path / "final.json"
     ledger = tmp_path / "ledger.json"
     out = tmp_path / "index.json"
     existing.write_text('{"items":[]}\n', encoding="utf-8")
-    final.write_text('{"items":[]}\n', encoding="utf-8")
+    final.write_text(json.dumps(final_payload or {"items": []}) + "\n", encoding="utf-8")
     ledger.write_text('{"ticks":{}}\n', encoding="utf-8")
-
     subprocess.run(
         [
             sys.executable,
@@ -93,7 +89,24 @@ def test_review_index_is_uncapped_and_quality_first(tmp_path: Path):
         cwd=ROOT,
         check=True,
     )
-    payload = json.loads(out.read_text(encoding="utf-8"))
+    return json.loads(out.read_text(encoding="utf-8"))
+
+
+def test_review_index_is_uncapped_and_quality_first(tmp_path: Path):
+    release = tmp_path / "release"
+    old = release / "32100000001"
+    new = release / "32200000001"
+    old.mkdir(parents=True)
+    new.mkdir(parents=True)
+    old_rows = [_review_row("OLD:BEST", "Website redesign and development", 88)]
+    new_rows = [_review_row(f"NEW:{i:03d}", "Generic procurement support", 40) for i in range(199)]
+    (old / "fast-adjudication-shard-0.jsonl").write_text(
+        "".join(json.dumps(x) + "\n" for x in old_rows), encoding="utf-8"
+    )
+    (new / "fast-adjudication-shard-0.jsonl").write_text(
+        "".join(json.dumps(x) + "\n" for x in new_rows), encoding="utf-8"
+    )
+    payload = _run_index(tmp_path, release)
     assert payload["count"] == 200
     assert payload["counts"]["overflow_beyond_hot_160"] == 40
     assert payload["items"][0]["candidate_id"] == "OLD:BEST"
@@ -106,28 +119,35 @@ def test_review_index_removes_final_bank_items(tmp_path: Path):
     (release / "fast-adjudication-shard-0.jsonl").write_text(
         "".join(json.dumps(x) + "\n" for x in rows), encoding="utf-8"
     )
-    existing = tmp_path / "existing.json"
-    final = tmp_path / "final.json"
-    ledger = tmp_path / "ledger.json"
-    out = tmp_path / "index.json"
-    existing.write_text('{"items":[]}\n', encoding="utf-8")
-    final.write_text(json.dumps({"items": [{"candidate_id": "DONE:1"}]}) + "\n", encoding="utf-8")
-    ledger.write_text('{"ticks":{}}\n', encoding="utf-8")
-    subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "pipeline/build_gpt_review_index.py"),
-            "--release-root", str(tmp_path / "release"),
-            "--existing", str(existing),
-            "--final-bank", str(final),
-            "--review-ledger", str(ledger),
-            "--out", str(out),
-        ],
-        cwd=ROOT,
-        check=True,
-    )
-    payload = json.loads(out.read_text(encoding="utf-8"))
+    payload = _run_index(tmp_path, tmp_path / "release", {"items": [{"candidate_id": "DONE:1"}]})
     assert [x["candidate_id"] for x in payload["items"]] == ["KEEP:1"]
+
+
+def test_review_index_collapses_only_shared_strong_procedure_alias(tmp_path: Path):
+    release = tmp_path / "release" / "32100000003"
+    release.mkdir(parents=True)
+    ted = _review_row("TED:571373-2026", "Immersive Learning Platform", 70)
+    ie = _review_row("IE:8853905", "Immersive Learning Platform", 72)
+    ted["evidence_quality"] = {
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": True,
+        "text_chars": 50000,
+        "documents_with_text": 4,
+        "source_urls": ["https://www.etenders.gov.ie/epps/cft/listContractDocuments.do?resourceId=8853905"],
+    }
+    ie["notice_url"] = "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8853905"
+    ie["evidence_quality"] = dict(ted["evidence_quality"])
+    unrelated = _review_row("OTHER:1", "Immersive Learning Platform", 60)
+    (release / "fast-adjudication-shard-0.jsonl").write_text(
+        "".join(json.dumps(x) + "\n" for x in [ted, ie, unrelated]), encoding="utf-8"
+    )
+    payload = _run_index(tmp_path, tmp_path / "release")
+    assert payload["count"] == 2
+    assert payload["counts"]["cross_portal_duplicates_collapsed"] == 1
+    joined = [x for x in payload["items"] if "ie_resource:8853905" in (x.get("procedure_aliases") or [])]
+    assert len(joined) == 1
+    assert any(x["candidate_id"] == "OTHER:1" for x in payload["items"])
 
 
 def _write_jsonl(path: Path, rows):
@@ -200,9 +220,11 @@ def test_coded_scheduler_prioritizes_codes_but_preserves_candidate_pool(tmp_path
     assert "BUILD:1" not in ids2
     assert summary2["base_candidate_pool"] == 3
     assert summary2["code_prior"]["noncore_code_contradictions_in_pool"] == 1
+    assert sum(summary2["selection_decisions"].values()) == summary2["selected"] == 2
 
-    all3, _ = run(3)
+    all3, summary3 = run(3)
     assert {x["candidate_id"] for x in all3} == set(ids)
+    assert sum(summary3["selection_decisions"].values()) == summary3["selected"] == 3
     build = next(x for x in all3 if x["candidate_id"] == "BUILD:1")
     assert build["qwen"]["classification"] == "FIT"
     assert build["procurement_code_prior"]["contradiction"] is True
