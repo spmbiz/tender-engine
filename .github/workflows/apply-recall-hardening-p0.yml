@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - 'control/recall_hardening_p0_trigger.txt'
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
   pull_request_target:
     branches: [main]
     types: [opened, synchronize, reopened]
@@ -19,7 +22,7 @@ concurrency:
 
 jobs:
   patch-test-commit:
-    if: github.event_name != 'pull_request_target' || github.event.pull_request.head.ref == 'agent/recall-hardening-p0'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.pull_request.head.ref == 'agent/recall-hardening-p0'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
