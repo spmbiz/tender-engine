@@ -62,7 +62,7 @@ def stats_health(pack_dir):
     for path in exit_files:
         try:rc=int(path.read_text(encoding="utf-8",errors="replace").strip())
         except Exception:bad.append({"path":str(path),"reason":"UNREADABLE_ADAPTER_EXIT_CODE"});continue
-        if rc!=0:bad.append({"path":str(path),"reason":"ADAPTER_EXIT_NONZERO","value":rc)
+        if rc!=0:bad.append({"path":str(path),"reason":"ADAPTER_EXIT_NONZERO","value":rc})
     return {"status":"DEGRADED" if bad else "OK","stats_files":[str(x) for x in stats_files],"adapter_exit_files":[str(x) for x in exit_files],"problems":bad}
 def main():
     ap=argparse.ArgumentParser();ap.add_argument("--root",default="discovery-download");ap.add_argument("--out",default="merged/source_coverage.json");ap.add_argument("--mode",default="delta",choices=["delta","reconcile"]);ap.add_argument("--external-present",default="");ap.add_argument("--strict",action="store_true");args=ap.parse_args()
