@@ -1,0 +1,52 @@
+{
+  "contract": "GPT_DCE_ADJUDICATION_V1",
+  "source_dce_run": "32123828524",
+  "mode": "SPM_LEAN_WITH_PARTNER_OPTION",
+  "created_at": "2026-08-18T13:52:00Z",
+  "persist_to_final_bank": true,
+  "doctrine": "Missing bidder-specific evidence remains UNKNOWN. GREEN is permitted when the authoritative DCE establishes an open, live, strongly SPM-fit opportunity without a demonstrated hard eligibility blocker; FINAL_SUPER_GREEN remains forbidden unless every mandatory gate and the authoritative submission deadline are fully resolved.",
+  "results": [
+    {
+      "candidate_id": "TED:570846-2026",
+      "title": "Ireland – Computer support services – ICT services for the Operation and Maintenance of the Waters of LIFE Web Portal and Smart Phone Application",
+      "buyer": "Department of Housing Local Government and Heritage",
+      "deadline": "2026-09-18T17:00:00+01:00",
+      "classification": "GREEN",
+      "final_score": 86,
+      "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "deadline_authority": "DCE_RESOLVED_TENDER_DEADLINE_2026_09_18_17_00_QUERY_DEADLINE_2026_09_11",
+      "mandatory_gate_statuses": {
+        "entity_geography": "OPEN_EU_PROCEDURE_NO_BELGIUM_EXCLUSION_IDENTIFIED",
+        "turnover_financial": "TURNOVER_CRITERION_NA_NO_MINIMUM_TURNOVER_THRESHOLD",
+        "references_experience": "CAPABILITY_EXPERIENCE_REQUIRED_BUT_NO_NUMERIC_MINIMUM_REFERENCE_THRESHOLD_IDENTIFIED",
+        "certifications_partner": "NO_MANDATORY_NAMED_CERTIFICATION_THRESHOLD_IDENTIFIED",
+        "staffing_team": "KEY_PERSONNEL_CONTINUITY_REQUIRED_NO_MINIMUM_TEAM_SIZE_IDENTIFIED",
+        "insurance_bonds": "INSURANCE_REQUIRED_IF_AWARDED_EXACT_LEVELS_REQUIRE_BIDDER_CONFIRMATION",
+        "subcontracting_consortium": "CONSORTIUM_AND_SUBCONTRACTING_PERMITTED_PRIME_RETAINS_RESPONSIBILITY",
+        "deliverables_scope": "DIRECT_SPM_CORE_GO_BACKEND_WEB_DASHBOARD_FLUTTER_APP_MAINTENANCE_SECURITY_BUGFIX_TESTING_SUPPORT",
+        "sla_onsite": "SERVICE_RESPONSE_AND_SUPPORT_MODEL_REQUIRED_NO_MANDATORY_SITE_VISIT_IDENTIFIED",
+        "term_value": "MAXIMUM_EUR_80000_EX_VAT_TERM_33_MONTHS_WITH_POSSIBLE_SHORT_EXTENSIONS",
+        "award_criteria": "DETAILED_TECHNICAL_RESPONSE_AND_PRICING_REQUIRED_PRESENTATION_MAY_BE_REQUESTED_NOT_SCORED",
+        "forms_signatures": "STANDARD_IRISH_ETENDERS_TENDERER_STATEMENT_AND_APPENDICES",
+        "submission": "ETENDERS_ELECTRONIC_SUBMISSION_DEADLINE_2026_09_18_17_00_IRELAND_QUERY_DEADLINE_2026_09_11",
+        "ip_data_security": "ONGOING_SECURITY_MAINTENANCE_TESTING_AND_POSSIBLE_PEN_TEST_SUPPORT_WITH_GDPR_OBLIGATIONS",
+        "payment_tax": "IRISH_TAX_CLEARANCE_REQUIRED_PRIOR_TO_AWARD"
+      },
+      "blockers": [],
+      "unknowns": [
+        "SPM must confirm that its current insurance arrangements can meet the exact policy levels required by paragraph 2.21.1 or arrange compliant cover if awarded.",
+        "SPM must evidence a credible delivery team for the existing Go backend, web management dashboard and Flutter mobile application across the contract term; subcontracting/consortium is expressly available if specialist capacity is needed.",
+        "SPM must provide acceptable Irish tax-clearance evidence prior to award.",
+        "The existing system takeover and ongoing security/support obligations should be technically scoped before pricing to avoid underestimating maintenance effort."
+      ],
+      "why": "This is a live, authoritative and unusually strong SPM-fit ICT maintenance opportunity. The DCE resolves the true tender deadline to 18 September 2026 at 17:00, while 11 September is only the query deadline. The contract is capped at EUR 80k, the turnover selection criterion is explicitly N/A, no numeric minimum prior-reference or named-certification threshold was identified, and consortium/subcontracting is permitted. The work directly covers a Go backend, web dashboard and Flutter mobile app with maintenance, security, bug-fixing, compatibility and testing. Bidder-specific insurance, tax and delivery-capacity evidence prevent FINAL_SUPER_GREEN but do not constitute an established hard blocker to GREEN.",
+      "action": "REVIEW_AND_PREPARE_BID_NOW_CONFIRM_INSURANCE_AND_GO_FLUTTER_CAPACITY",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/570846-2026"
+    }
+  ],
+  "learning_signals": [
+    "Query deadlines and tender deadlines must be semantically distinguished before final review; Waters of LIFE was incorrectly left with a multiple-submission-date conflict despite explicit DCE wording.",
+    "A live dynamic last-mile consumer must adjudicate new BUSINESS_GATES rows; frozen one-shot GPT Web workflows are not a production consumer.",
+    "Strong SPM digital scopes with turnover N/A and no numeric reference threshold should be ranked ahead of hardware/vendor-specialist tenders even when preliminary lexical scores are similar."
+  ]
+}
