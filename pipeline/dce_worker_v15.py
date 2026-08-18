@@ -26,7 +26,8 @@ PLACSP_HTTP_FALLBACK_TIMEOUT = max(5, min(30, int(os.getenv("ES_DCE_HTTP_FALLBAC
 def _candidate_urls(candidate: dict) -> list[str]:
     out: list[str] = []
     route = candidate.get("route") or {}
-    for value in route.get("document_urls") or [] if isinstance(route, dict) else []:
+    route_document_urls = route.get("document_urls") or [] if isinstance(route, dict) else []
+    for value in route_document_urls:
         if isinstance(value, str) and value.startswith(("http://", "https://")) and value not in out:
             out.append(value)
     for doc in candidate.get("documents") or []:
