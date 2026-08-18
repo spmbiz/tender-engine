@@ -51,8 +51,6 @@ jobs:
   ted-discovery:
     needs: init-release
     runs-on: ubuntu-latest
-    # FULL_ACTIVE is intentionally uncapped. Leave a post-enumeration margin so
-    # an incomplete checkpoint pack can still be uploaded if the TED step times out.
     timeout-minutes: 70
     steps:
       - uses: actions/checkout@v4
@@ -197,7 +195,7 @@ jobs:
     needs: init-release
     name: official-${{ matrix.source }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -210,7 +208,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4
-      - name: Enumerate public ePPS live registry
+      - name: Enumerate public ePPS live registry with Published Notices recall fallback
         env:
           EPPS_SOURCE: ${{ matrix.source }}
           EPPS_BASE_URL: ${{ matrix.base }}
@@ -220,9 +218,23 @@ jobs:
           DISCOVERY_MODE: ${{ needs.init-release.outputs.mode }}
         shell: bash
         run: |
-          set -euo pipefail
+          set +e
           if [ "$DISCOVERY_MODE" = reconcile ]; then export PAGE_END=20; else export PAGE_END=5; fi
           python pipeline/discover_epps_public.py
+          primary_rc=$?
+          if [ "$primary_rc" -ne 0 ]; then
+            echo "ePPS current registry incomplete rc=$primary_rc; invoking official Published Notices recall fallback"
+            if [ "$DISCOVERY_MODE" = reconcile ]; then
+              export EPPS_PUBLISHED_LOOKBACK_DAYS=730 EPPS_PUBLISHED_MAX_PAGES=400
+            else
+              export EPPS_PUBLISHED_LOOKBACK_DAYS=240 EPPS_PUBLISHED_MAX_PAGES=160
+            fi
+            python pipeline/discover_epps_published_fallback.py
+            fallback_rc=$?
+            test -s "discovery/global/${{ matrix.source }}/current.jsonl"
+            exit $fallback_rc
+          fi
+          exit 0
       - name: Persist ePPS source durably
         if: always()
         env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
@@ -258,12 +270,12 @@ jobs:
     needs: init-release
     name: official-${{ matrix.source }}
     runs-on: ubuntu-latest
-    timeout-minutes: 22
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       max-parallel: 15
       matrix:
-        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP, NO_DOFFIN, FI_HILMA, PT_BASE_OPEN, DK_UDBUD_PUBLIC, CZ_ZAKAZKY_GOV, IT_ANAC_DELTA, SI_EJN, SK_UVO, EE_RHR, WORLD_BANK_PROCUREMENT, ZA_ETENDERS_OCDS, UK_PCS_OCDS, UK_FTS_OCDS, LT_CVP_API]
+        source: [CA_CANADABUYS, FR_BOAMP, QC_SEAO, AU_AUSTENDER, NZ_GETS, DE_DOE, ES_PLACSP, US_SAM_BULK, NL_TENDERNED_RSS, GR_KHMDHS, PL_BZP, LV_IUB, CH_SIMAP, NO_DOFFIN, FI_HILMA, PT_BASE_OPEN, DK_UDBUD_PUBLIC, CZ_ZAKAZKY_GOV, IT_ANAC_DELTA, SI_EJN, SK_UVO, EE_RHR, WORLD_BANK_PROCUREMENT, ZA_ETENDERS_OCDS, UK_PCS_OCDS, UK_FTS_OCDS, LT_CVP_API, UNGM_PUBLIC]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -272,7 +284,7 @@ jobs:
       - name: Reuse runner Chrome for browser-backed national lanes
         run: |
           chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; fi
+          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
       - name: Syntax gate
         run: python -m py_compile pipeline/discover_*.py pipeline/dce_worker_v6.py
       - name: Harvest official national source with delta/reconcile window
@@ -300,15 +312,16 @@ jobs:
             PT_BASE_OPEN) python pipeline/discover_pt_base_open.py ;;
             DK_UDBUD_PUBLIC) python pipeline/discover_dk_udbud_public.py ;;
             CZ_ZAKAZKY_GOV) python pipeline/discover_cz_zakazky_public.py ;;
-            IT_ANAC_DELTA) python pipeline/discover_it_anac_delta.py ;;
+            IT_ANAC_DELTA) if [ "$DISCOVERY_MODE" = reconcile ]; then export ANAC_PVL_LOOKBACK_DAYS=1095; else export ANAC_PVL_LOOKBACK_DAYS=730; fi; python pipeline/discover_it_anac_pvl.py ;;
             SI_EJN) python pipeline/discover_si_ejn_browser.py ;;
             SK_UVO) python pipeline/discover_sk_uvo.py ;;
             EE_RHR) if [ "$DISCOVERY_MODE" = reconcile ]; then months=3; else months=2; fi; python pipeline/discover_ee_rhr.py --output "$DISCOVERY_OUT" --months "$months" ;;
             WORLD_BANK_PROCUREMENT) if [ "$DISCOVERY_MODE" = reconcile ]; then pages=80; else pages=20; fi; python pipeline/discover_worldbank_procurement.py --output "$DISCOVERY_OUT" --max-pages "$pages" --page-size 100 ;;
             ZA_ETENDERS_OCDS) if [ "$DISCOVERY_MODE" = reconcile ]; then days=365; pages=80; else days=90; pages=20; fi; python pipeline/discover_za_etenders_ocds.py --output "$DISCOVERY_OUT" --lookback-days "$days" --page-size 100 --max-pages "$pages" ;;
-            UK_PCS_OCDS) export PROACTIS_ALLOW_INCOMPLETE_TLS=1 PROACTIS_WORKERS=8; if [ "$DISCOVERY_MODE" = reconcile ]; then months=6; else months=2; fi; python pipeline/discover_uk_proactis_ocds.py --source UK_PCS_OCDS --output "$DISCOVERY_OUT" --months "$months" --workers 8 ;;
+            UK_PCS_OCDS) python pipeline/discover_uk_pcs_current.py ;;
             UK_FTS_OCDS) if [ "$DISCOVERY_MODE" = reconcile ]; then days=30; pages=150; else days=5; pages=80; fi; python pipeline/discover_uk_fts_ocds.py --output "$DISCOVERY_OUT" --lookback-days "$days" --max-pages "$pages" --page-size 100 ;;
             LT_CVP_API) python -m pip install --disable-pip-version-check -q brotli; if [ "$DISCOVERY_MODE" = reconcile ]; then pages=200; else pages=40; fi; python pipeline/discover_lt_cvp_api.py --output "$DISCOVERY_OUT" --page-size 250 --max-pages "$pages" ;;
+            UNGM_PUBLIC) python pipeline/discover_ungm_public.py ;;
             *) python pipeline/discover_global_official.py ;;
           esac
           rc=$?;echo "source_exit_code=$rc"
