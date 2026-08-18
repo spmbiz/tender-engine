@@ -10,7 +10,7 @@ on:
       - '.github/workflows/dce-aggregate-v2-live-replay.yml'
 
 permissions:
-  contents: read
+  contents: write
   actions: read
 
 # Real replay target: immutable pre-fix shard-0 from DCE run 32098369885.
@@ -48,7 +48,8 @@ jobs:
           set -euo pipefail
           python pipeline/aggregate_dce.py --root replay-root --out replay-aggregate
           python - <<'PY'
-          import json
+          import json, os
+          from datetime import datetime, timezone
           from pathlib import Path
           s=json.loads(Path('replay-aggregate/summary.json').read_text())
           assert s['candidates'] == 6, s
@@ -60,13 +61,38 @@ jobs:
           assert bord['content_quality'] == 'SUBSTANTIVE_DCE_PRESENT', bord
           assert bord['gate_readiness'] is True, bord
           assert bord['candidate_document_relevance']['proven'] is True, bord
-          print(json.dumps({
+          report={
+            'schema':'DCE_AGGREGATE_V2_LIVE_REPLAY_V1',
+            'generated_at':datetime.now(timezone.utc).isoformat(),
+            'workflow_run_id':os.environ.get('GITHUB_RUN_ID'),
+            'source_dce_run_id':32098369885,
+            'source_shard':0,
             'status':'PASS',
             'real_candidates':s['candidates'],
             'gate_ready':s['gate_ready_substantive_dce'],
             'content_unverified':s['content_unverified'],
-            'bord_bia_quality':bord['content_quality'],
-            'bord_bia_gate_ready':bord['gate_readiness'],
-            'bord_bia_relevance':bord['candidate_document_relevance']['status'],
-          },indent=2))
+            'bord_bia':{
+              'candidate_id':'IE:8825829',
+              'quality':bord['content_quality'],
+              'gate_ready':bord['gate_readiness'],
+              'relevance':bord['candidate_document_relevance']['status'],
+            },
+            'safety':'Evidence V1/V2 only; unknown future contracts remain legacy-blocked by unit regression.',
+          }
+          Path('control/dce_aggregate_v2_replay_latest.json').write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report,indent=2))
           PY
+      - name: Persist replay proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add control/dce_aggregate_v2_replay_latest.json
+          git commit -m "ci: persist DCE aggregate V2 replay ${GITHUB_RUN_ID}"
+          for n in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep "$((n*2))"
+          done
+          exit 1
