@@ -32,6 +32,13 @@ def parse_deadline(value):
     return None
 
 
+def current_option(text: str) -> bool:
+    # PCS currently renders the native option as singular "Current Opportunity",
+    # while its help copy uses the plural "Current Opportunities". Match the
+    # semantic root so a cosmetic singular/plural change cannot zero the lane.
+    return bool(re.search(r"\bcurrent\s+opportunit(?:y|ies)\b", clean(text), re.I))
+
+
 def write_jsonl(path: Path, rows):
     with path.open("w", encoding="utf-8") as fh:
         for row in rows:
@@ -46,7 +53,7 @@ def persist(records, *, pages, total_reported, exhausted, errors, warnings, tele
     stats = {
         "source": "UK_PCS_OCDS",
         "portal": "PUBLIC_CONTRACTS_SCOTLAND",
-        "listing_contract": "PCS_CURRENT_OPPORTUNITIES_BROWSER_V2",
+        "listing_contract": "PCS_CURRENT_OPPORTUNITIES_BROWSER_V3",
         "raw_materialized": len(rows),
         "current_materialized": len(current),
         "pages_fetched": pages,
@@ -60,7 +67,7 @@ def persist(records, *, pages, total_reported, exhausted, errors, warnings, tele
         "telemetry": telemetry,
         "generated_at": NOW.isoformat(),
         "source_url": URL,
-        "semantics": "The official PCS Current Opportunities filter is used. Native and Telerik/custom Notice Type controls are supported. Only notices open for tender are traversed; coverage credit requires pagination exhaustion and a non-empty current set.",
+        "semantics": "The official PCS Current Opportunity/Opportunities filter is used. Native and Telerik/custom Notice Type controls are supported. Only notices open for tender are traversed; coverage credit requires pagination exhaustion and a non-empty current set.",
     }
     (OUT / "stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
     return stats
@@ -79,7 +86,7 @@ async def select_current_opportunities(page, telemetry, errors):
             text = clean(await option.inner_text())
             if text:
                 texts.append(text)
-            if "current opportunities" not in text.lower():
+            if not current_option(text):
                 continue
             value = await option.get_attribute("value")
             try:
@@ -99,7 +106,7 @@ async def select_current_opportunities(page, telemetry, errors):
             option_debug.append({"select_index": idx, "options": texts[:30]})
 
     # 2) PCS uses Telerik/custom controls on some renders. Find likely Notice
-    # Type comboboxes, open them, then click the exact popup option.
+    # Type comboboxes, open them, then click the current-opportunity option.
     controls = page.locator(
         "[id*='NoticeType' i], [name*='NoticeType' i], [aria-label*='Notice Type' i], "
         "[title*='Notice Type' i], [role='combobox']"
@@ -135,7 +142,7 @@ async def select_current_opportunities(page, telemetry, errors):
             opt = popups.nth(oi)
             try:
                 text = clean(await opt.inner_text())
-                if "current opportunities" in text.lower() and await opt.is_visible():
+                if current_option(text) and await opt.is_visible():
                     await opt.click(timeout=3000)
                     await page.wait_for_timeout(PAGE_WAIT_MS)
                     telemetry["current_filter_mode"] = "CUSTOM_COMBOBOX"
@@ -145,9 +152,9 @@ async def select_current_opportunities(page, telemetry, errors):
             except Exception:
                 continue
 
-    # 3) Exact visible option fallback. This deliberately does not match the help
-    # text "Current Opportunities - Notices open for tender".
-    exact = page.get_by_text(re.compile(r"^\s*Current Opportunities\s*$", re.I))
+    # 3) Exact visible option fallback. Avoid the help sentence containing the
+    # same words by requiring the whole element to be only the option label.
+    exact = page.get_by_text(re.compile(r"^\s*Current\s+Opportunit(?:y|ies)\s*$", re.I))
     for i in range(min(await exact.count(), 20)):
         candidate = exact.nth(i)
         try:
@@ -261,25 +268,28 @@ async def find_page_select(page):
     selects = page.locator("select")
     best = None
     best_max = 0
+    best_labels = {}
     for idx in range(await selects.count()):
         sel = selects.nth(idx)
         options = sel.locator("option")
-        nums = []
+        labels = {}
         for oi in range(min(await options.count(), 2500)):
             text = clean(await options.nth(oi).inner_text())
-            if text.isdigit():
-                nums.append(int(text))
-        if len(nums) >= 2 and max(nums) > best_max:
+            match = re.fullmatch(r"(?:Page\s*)?(\d+)", text, re.I)
+            if match:
+                labels[int(match.group(1))] = text
+        if len(labels) >= 2 and max(labels) > best_max:
             best = sel
-            best_max = max(nums)
-    return best, best_max
+            best_max = max(labels)
+            best_labels = labels
+    return best, best_max, best_labels
 
 
 async def advance(page, next_page, before_signature):
-    selector, _ = await find_page_select(page)
+    selector, _, labels = await find_page_select(page)
     if selector is not None:
         try:
-            await selector.select_option(label=str(next_page))
+            await selector.select_option(label=labels.get(next_page, f"Page {next_page}"))
             await page.wait_for_timeout(PAGE_WAIT_MS)
             after = clean(await page.locator("body").inner_text())[:5000]
             if after != before_signature:
