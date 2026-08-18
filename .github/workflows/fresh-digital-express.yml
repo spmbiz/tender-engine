@@ -1,0 +1,167 @@
+name: Fresh Digital Express to DCE
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Notice Intelligence Ledger"]
+    types: [completed]
+  schedule:
+    - cron: '*/5 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/build_fresh_digital_express.py'
+      - 'tests/test_fresh_digital_express.py'
+      - '.github/workflows/fresh-digital-express.yml'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: fresh-digital-express
+  cancel-in-progress: true
+
+jobs:
+  express:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Regression-test express safety before routing anything
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check -q pytest
+          python -m pytest -q tests/test_fresh_digital_express.py
+          python -m py_compile pipeline/build_fresh_digital_express.py
+
+      - name: Download current residual semantic queue and resolve canonical source generation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p express-input
+          gh release download notice-intelligence-ledger-latest \
+            --pattern notice-classification-queue-latest.jsonl.gz \
+            --dir express-input --clobber
+          test -s express-input/notice-classification-queue-latest.jsonl.gz
+          body="$(gh release view notice-intelligence-ledger-latest --json body --jq '.body')"
+          source_run="$(grep -oE 'run=[0-9]+' <<< "$body" | head -n1 | cut -d= -f2)"
+          if ! [[ "$source_run" =~ ^[0-9]+$ ]]; then
+            name="$(gh release view notice-intelligence-ledger-latest --json name --jq '.name')"
+            source_run="$(grep -oE '[0-9]{8,}' <<< "$name" | tail -n1)"
+          fi
+          [[ "$source_run" =~ ^[0-9]+$ ]] || { echo 'Cannot resolve ledger source run' >&2; exit 1; }
+          echo "SOURCE_RUN=$source_run" >> "$GITHUB_ENV"
+
+      - name: Build bounded precision-biased NEW/UPDATED DCE selection
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/build_fresh_digital_express.py \
+            --input express-input/notice-classification-queue-latest.jsonl.gz \
+            --source-run "$SOURCE_RUN" \
+            --attempt-ledger control/dce_attempt_ledger.jsonl \
+            --out fresh-digital-express.jsonl \
+            --summary fresh-digital-express-summary.json \
+            --limit 48 \
+            --min-score 84
+          selected="$(grep -cve '^\s*$' fresh-digital-express.jsonl || true)"
+          echo "SELECTED=$selected" >> "$GITHUB_ENV"
+          echo "Fresh Digital Express selected=$selected source_run=$SOURCE_RUN"
+
+      - name: Persist queue and summary only when content changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          persist_if_changed() {
+            local local_path="$1" repo_path="$2" message="$3"
+            local current=/tmp/current-file
+            if gh api "repos/$REPO/contents/$repo_path?ref=main" --jq '.content' 2>/dev/null | tr -d '\n' | base64 -d > "$current" 2>/dev/null; then
+              if cmp -s "$local_path" "$current"; then
+                echo "unchanged: $repo_path"
+                return 0
+              fi
+            fi
+            local content sha
+            content="$(base64 -w0 "$local_path")"
+            for attempt in 1 2 3 4 5 6; do
+              sha="$(gh api "repos/$REPO/contents/$repo_path?ref=main" --jq '.sha' 2>/dev/null || true)"
+              args=(--method PUT "repos/$REPO/contents/$repo_path" -f message="$message" -f content="$content" -f branch=main)
+              [ -n "$sha" ] && args+=(-f sha="$sha")
+              if gh api "${args[@]}" >/dev/null; then
+                echo "persisted: $repo_path"
+                return 0
+              fi
+              sleep "$((attempt*2))"
+            done
+            return 1
+          }
+          persist_if_changed fresh-digital-express.jsonl queues/fresh_digital_express_latest.jsonl "express: refresh fresh digital DCE queue ${GITHUB_RUN_ID}"
+          persist_if_changed fresh-digital-express-summary.json control/fresh_digital_express_summary.json "express: refresh fresh digital summary ${GITHUB_RUN_ID}"
+
+      - name: Dispatch unseen express DCE only when DCE fleet is idle
+        if: env.SELECTED != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          active="$(gh run list --workflow dce-fanout-v2.yml --limit 40 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
+          if [ "$active" -gt 0 ]; then
+            echo "DCE fleet already busy ($active); express queue persisted for the next 5-minute retry."
+            exit 0
+          fi
+          # Read back main so the exact persisted queue, not a stale checkout, is dispatched.
+          git fetch --depth=1 origin main
+          git checkout -f origin/main -- queues/fresh_digital_express_latest.jsonl control/dce_attempt_ledger.jsonl pipeline/dce_attempt_ledger.py pipeline/global_admission.py
+          unseen="$(python pipeline/dce_attempt_ledger.py count --queue queues/fresh_digital_express_latest.jsonl --ledger control/dce_attempt_ledger.jsonl)"
+          if [ "$unseen" -le 0 ]; then
+            echo 'No unseen exact versions remain in express queue.'
+            exit 0
+          fi
+          jobs="$unseen"; [ "$jobs" -gt 48 ] && jobs=48
+          dce_parallel="$(DCE_SELECTION_PATH='queues/fresh_digital_express_latest.jsonl' python - <<'PY'
+          from pipeline.global_admission import dynamic_tender_parallel
+          allowed,_=dynamic_tender_parallel(6)
+          print(allowed)
+          PY
+          )"
+          if [ "${dce_parallel:-0}" -le 0 ]; then
+            echo 'Shared Tender capacity is unavailable; queue stays persisted.'
+            exit 0
+          fi
+          gh workflow run dce-fanout-v2.yml --ref main \
+            -f selection_path='queues/fresh_digital_express_latest.jsonl' \
+            -f source_discovery_run="$SOURCE_RUN" \
+            -f max_jobs="$jobs" \
+            -f max_parallel="$dce_parallel" \
+            -f max_shards=24 \
+            -f jobs_per_shard=0
+          echo "Express DCE dispatched unseen=$unseen jobs=$jobs parallel=$dce_parallel source=$SOURCE_RUN"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo '### Fresh Digital Express' >> "$GITHUB_STEP_SUMMARY"
+          echo "- source generation: ${SOURCE_RUN:-unknown}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- selected current fresh direct-core rows: ${SELECTED:-unknown}" >> "$GITHUB_STEP_SUMMARY"
+          if [ -s fresh-digital-express-summary.json ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat fresh-digital-express-summary.json >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
