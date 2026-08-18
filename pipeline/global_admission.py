@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import urllib.parse
 import urllib.request
 from collections import Counter
 
@@ -19,7 +20,7 @@ DEFAULT_POLICY = {
 
 
 def _request(url: str):
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/2.0"})
+    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/2.1"})
     tok = os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")
     if tok:
         req.add_header("Authorization", f"Bearer {tok}")
@@ -55,6 +56,21 @@ def _classify(repo: str, name: str, path: str) -> str:
     return "external"
 
 
+def _per_page(url: str, n: int = 100) -> str:
+    """Return a GitHub REST URL with an explicit high first-page bound.
+
+    Current workflow designs stay below 100 jobs/run. Raising the bound from the
+    GitHub default/30 prevents silent under-counting as the number of independent
+    tender lanes grows. We still fail conservative at the physical account cap.
+    """
+    if not url:
+        return url
+    parts = urllib.parse.urlsplit(url)
+    query = dict(urllib.parse.parse_qsl(parts.query, keep_blank_values=True))
+    query["per_page"] = str(max(1, min(100, int(n))))
+    return urllib.parse.urlunsplit((parts.scheme, parts.netloc, parts.path, urllib.parse.urlencode(query), parts.fragment))
+
+
 def _repo_capacity_state(repo: str, ignore_run_id: str = "") -> tuple[Counter, Counter]:
     """Return (active slots, queued jobs) by workload.
 
@@ -66,14 +82,14 @@ def _repo_capacity_state(repo: str, ignore_run_id: str = "") -> tuple[Counter, C
     queued: Counter[str] = Counter()
     seen: set[str] = set()
     for run_status in ("in_progress", "queued"):
-        data = _json(f"{API}/repos/{repo}/actions/runs?status={run_status}&per_page=30", {})
+        data = _json(f"{API}/repos/{repo}/actions/runs?status={run_status}&per_page=100", {})
         for run in (data or {}).get("workflow_runs") or []:
             rid = str(run.get("id") or "")
             if not rid or rid in seen or rid == ignore_run_id:
                 continue
             seen.add(rid)
             workload = _classify(repo, str(run.get("name") or run.get("display_title") or ""), str(run.get("path") or ""))
-            jobs = _json(run.get("jobs_url") or "", {})
+            jobs = _json(_per_page(str(run.get("jobs_url") or ""), 100), {})
             rows = (jobs or {}).get("jobs") or []
             if rows:
                 active[workload] += sum(j.get("status") == "in_progress" for j in rows)
@@ -148,9 +164,6 @@ def _qwen_live_streaming_lane() -> bool:
 def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     requested = max(0, int(requested))
 
-    # The fleet controller has already made the global capacity decision on this
-    # path, so do not make a second remote broker vote. It may preauthorize up to
-    # the full hosted-runner capacity; the controller itself remains the authority.
     if _controller_preauthorized():
         hard_cap = 20
         allowed = min(requested, hard_cap)
