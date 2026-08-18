@@ -164,11 +164,59 @@ def run() -> dict:
     truncated_by_page_cap = False
     exhausted = False
 
+    # Checkpoint every committed page before requesting the next one. If a long
+    # ACTIVE traversal is interrupted by runner/step termination, already-read
+    # notices and explicit incomplete coverage survive instead of vanishing.
+    active_path = OUT / "active.jsonl"
+    current_path = OUT / "current.jsonl"
+    stats_path = OUT / "stats.json"
+    active_path.write_text("", encoding="utf-8")
+    current_path.write_text("", encoding="utf-8")
+
+    def checkpoint(state: str, *, next_token_present: bool = False) -> None:
+        current_count = sum(1 for r in rows if r.get("current"))
+        payload = {
+            "source": "TED",
+            "scope": SCOPE,
+            "enumeration_mode": "FULL_ACTIVE_COMPETITION" if FULL_ACTIVE else "RECENT_PUBLICATION_WINDOW",
+            "query": QUERY,
+            "lookback_days": None if FULL_ACTIVE else LOOKBACK_DAYS,
+            "window_start_day": None if FULL_ACTIVE else START_DAY.isoformat(),
+            "window_end_day": NOW.date().isoformat(),
+            "pages": page_count,
+            "limit": LIMIT,
+            "hard_max_pages": HARD_MAX_PAGES,
+            "total_reported": total_reported,
+            "source_items_seen": source_items_seen,
+            "materialized_unique": len(rows),
+            "current_materialized": current_count,
+            "future_deadline_records": sum(1 for r in rows if r.get("has_future_deadline")),
+            "enumeration_exhausted": False,
+            "enumeration_complete": False,
+            "truncated_by_page_cap": truncated_by_page_cap,
+            "request_retries": REQUEST_RETRIES,
+            "page_delay_seconds": PAGE_DELAY_SECONDS,
+            "retry_events": retry_events,
+            "rate_limit_events": sum(1 for x in retry_events if x.get("status") == 429),
+            "errors": errors,
+            "checkpoint": True,
+            "checkpoint_state": state,
+            "next_token_present": bool(next_token_present),
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "semantics": "Checkpoint only: partial TED ACTIVE traversal is durable but never complete until iteration-token exhaustion is proven.",
+        }
+        tmp = OUT / "stats.json.tmp"
+        tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+        tmp.replace(stats_path)
+
+    checkpoint("STARTED")
+
     page_no = 0
     while True:
         page_no += 1
         if HARD_MAX_PAGES and page_no > HARD_MAX_PAGES:
             truncated_by_page_cap = True
+            checkpoint("HARD_PAGE_CAP", next_token_present=bool(token))
             break
 
         body = {
@@ -194,6 +242,7 @@ def run() -> dict:
                     if attempt + 1 < REQUEST_RETRIES:
                         wait = retry_after_seconds(resp, attempt)
                         retry_events.append({"page": page_no, "attempt": attempt + 1, "status": resp.status_code, "wait_seconds": wait})
+                        checkpoint("RETRY_WAIT", next_token_present=bool(token))
                         time.sleep(wait)
                         continue
                 resp.raise_for_status()
@@ -206,6 +255,7 @@ def run() -> dict:
                 if retryable and attempt + 1 < REQUEST_RETRIES:
                     wait = retry_after_seconds(resp, attempt)
                     retry_events.append({"page": page_no, "attempt": attempt + 1, "status": status, "wait_seconds": wait, "error": repr(exc)})
+                    checkpoint("RETRY_WAIT", next_token_present=bool(token))
                     time.sleep(wait)
                     continue
                 break
@@ -217,6 +267,7 @@ def run() -> dict:
                 "status": getattr(final_response, "status_code", None),
                 "response": getattr(final_response, "text", "")[:2000] if final_response is not None else None,
             })
+            checkpoint("REQUEST_FAILED", next_token_present=bool(token))
             break
 
         page_count += 1
@@ -224,8 +275,10 @@ def run() -> dict:
         items = data.get("notices") or data.get("results") or data.get("items") or []
         if not isinstance(items, list):
             errors.append({"page": page_no, "error": "unrecognized_items_shape", "keys": list(data.keys())})
+            checkpoint("BAD_ITEMS_SHAPE", next_token_present=bool(token))
             break
         source_items_seen += len(items)
+        page_row_start = len(rows)
 
         for item in items:
             if not isinstance(item, dict):
@@ -288,24 +341,28 @@ def run() -> dict:
                 "discovered_at": NOW.isoformat(),
             })
 
+        page_rows = rows[page_row_start:]
+        if page_rows:
+            with active_path.open("a", encoding="utf-8") as f:
+                for rec in page_rows:
+                    f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+            with current_path.open("a", encoding="utf-8") as f:
+                for rec in page_rows:
+                    if rec.get("current"):
+                        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
         next_token = data.get("iterationNextToken") or data.get("nextToken") or data.get("nextPageToken")
         if not next_token or not items:
             exhausted = True
             token = None
+            checkpoint("EXHAUSTED", next_token_present=False)
             break
         token = next_token
+        checkpoint("PAGE_COMMITTED", next_token_present=True)
         if PAGE_DELAY_SECONDS:
             time.sleep(PAGE_DELAY_SECONDS)
 
-    with (OUT / "active.jsonl").open("w", encoding="utf-8") as f:
-        for rec in rows:
-            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
-
     current_rows = [r for r in rows if r.get("current")]
-    with (OUT / "current.jsonl").open("w", encoding="utf-8") as f:
-        for rec in current_rows:
-            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
-
     enumeration_complete = bool(exhausted and not errors and not truncated_by_page_cap)
     if total_reported is not None:
         try:
@@ -337,10 +394,11 @@ def run() -> dict:
         "retry_events": retry_events,
         "rate_limit_events": sum(1 for x in retry_events if x.get("status") == 429),
         "errors": errors,
-        "generated_at": NOW.isoformat(),
+        "checkpoint": False,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
         "semantics": "FULL_ACTIVE_COMPETITION enumerates TED ACTIVE-scope competition notices to iteration-token exhaustion; no publication-date lookback is applied. A hard page cap, request error, or reported-count mismatch makes enumeration_complete false.",
     }
-    (OUT / "stats.json").write_text(json.dumps(stats, indent=2, ensure_ascii=False), encoding="utf-8")
+    stats_path.write_text(json.dumps(stats, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(stats, indent=2, ensure_ascii=False))
     return stats
 
