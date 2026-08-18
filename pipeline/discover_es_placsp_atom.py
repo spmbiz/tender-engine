@@ -6,6 +6,8 @@ from pathlib import Path
 from urllib.parse import urljoin
 import requests
 
+import placsp_atom
+
 OUT=Path(os.getenv('DISCOVERY_OUT','discovery/global/ES_PLACSP')); OUT.mkdir(parents=True,exist_ok=True)
 NOW=datetime.now(timezone.utc)
 LOOKBACK=max(1,int(os.getenv('LOOKBACK_DAYS','3')))
@@ -13,10 +15,10 @@ MAX_PAGES=max(1,min(12,int(os.getenv('ES_MAX_PAGES','4'))))
 REQUEST_TIMEOUT=max(10,min(90,int(os.getenv('ES_REQUEST_TIMEOUT','40'))))
 CUTOFF=NOW-timedelta(days=LOOKBACK)
 FEEDS=[
- ('hosted','https://contrataciondelsectorpublico.gob.es/sindicacion/sindicacion_643/licitacionesPerfilesContratanteCompleto3.atom'),
- ('aggregated','https://contrataciondelsectorpublico.gob.es/sindicacion/sindicacion_1044/PlataformasAgregadasSinMenores.atom'),
+ ('hosted',placsp_atom.HOSTED_FEED),
+ ('aggregated',placsp_atom.AGGREGATED_FEED),
 ]
-S=requests.Session(); S.headers.update({'User-Agent':'Tender-Engine/4.3 (+public procurement research)','Accept':'application/atom+xml,application/xml,text/xml,*/*'})
+S=requests.Session(); S.headers.update({'User-Agent':'Tender-Engine/4.4 (+public procurement research)','Accept':'application/atom+xml,application/xml,text/xml,*/*'})
 
 def clean(v): return ' '.join(str(v or '').split())
 def local(tag): return tag.rsplit('}',1)[-1] if '}' in tag else tag
@@ -89,8 +91,32 @@ def parse_feed(kind,start):
             detail=next((u for u in links if 'contrataciondelestado' in u and ('detalle' in u.lower() or 'poc' in u.lower())),links[0] if links else None)
             rid=clean(atom_id or folder)
             if not rid and not project_title:continue
-            cid='ES-PLACSP:'+re.sub(r'[^A-Za-z0-9._:-]+','_',rid) if rid else 'ES-PLACSP:'+str(abs(hash((project_title,buyer,str(updated)))))
-            records.append({'candidate_id':cid,'source':'ES_PLACSP','portal':'ES_PLACSP','notice_id':clean(folder or atom_id),'title':clean(project_title),'buyer':clean(buyer) or None,'deadline':deadline.isoformat() if deadline else None,'published':updated.isoformat() if updated else None,'current':not deadline or deadline>=NOW,'notice_url':detail,'estimated_value':amount,'currency':currency,'description':clean(desc),'route':{'document_urls':[u for u in links if re.search(r'\.(pdf|zip|docx?|xlsx?)(?:\?|$)',u,re.I)]},'feed_lane':kind,'discovered_at':NOW.isoformat()})
+            cid=placsp_atom.candidate_id(e) if rid else 'ES-PLACSP:'+str(abs(hash((project_title,buyer,str(updated)))))
+            document_urls=placsp_atom.document_urls(e,start)
+            records.append({
+                'candidate_id':cid,
+                'source':'ES_PLACSP',
+                'portal':'ES_PLACSP',
+                'notice_id':clean(folder or atom_id),
+                'title':clean(project_title),
+                'buyer':clean(buyer) or None,
+                'deadline':deadline.isoformat() if deadline else None,
+                'published':updated.isoformat() if updated else None,
+                'current':not deadline or deadline>=NOW,
+                'notice_url':detail,
+                'estimated_value':amount,
+                'currency':currency,
+                'description':clean(desc),
+                'route':{
+                    'document_urls':document_urls,
+                    'atom_id':clean(atom_id) or None,
+                    'contract_folder_id':clean(folder) or None,
+                    'atom_feed_url':start,
+                    'feed_lane':kind,
+                },
+                'feed_lane':kind,
+                'discovered_at':NOW.isoformat(),
+            })
         nxt=None
         for x in root.iter():
             if local(x.tag)=='link' and x.attrib.get('rel')=='next':nxt=x.attrib.get('href');break
@@ -112,7 +138,19 @@ def main():
             for x in data:f.write(json.dumps(x,ensure_ascii=False)+'\n')
     errors=[]
     if not rows:errors.append({'type':'NO_ROWS','telemetry':tele})
-    stats={'source':'ES_PLACSP','raw_materialized':len(rows),'current_materialized':len(current),'lookback_days':LOOKBACK,'max_pages_per_feed':MAX_PAGES,'generated_at':NOW.isoformat(),'errors':errors,'official_feeds':[x[1] for x in FEEDS],'telemetry':tele}
+    stats={
+        'source':'ES_PLACSP',
+        'raw_materialized':len(rows),
+        'current_materialized':len(current),
+        'with_direct_document_urls':sum(1 for x in rows if (x.get('route') or {}).get('document_urls')),
+        'direct_document_url_count':sum(len((x.get('route') or {}).get('document_urls') or []) for x in rows),
+        'lookback_days':LOOKBACK,
+        'max_pages_per_feed':MAX_PAGES,
+        'generated_at':NOW.isoformat(),
+        'errors':errors,
+        'official_feeds':[x[1] for x in FEEDS],
+        'telemetry':tele,
+    }
     (OUT/'stats.json').write_text(json.dumps(stats,indent=2,ensure_ascii=False),encoding='utf-8');print(json.dumps(stats,indent=2,ensure_ascii=False))
 
 if __name__=='__main__':main()
