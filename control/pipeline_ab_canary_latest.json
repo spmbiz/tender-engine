@@ -1,5 +1,5 @@
 {
-  "schema": "TENDER_PIPELINE_AB_LIVE_CANARY_V1",
+  "schema": "TENDER_PIPELINE_AB_LIVE_CANARY_V2",
   "status": "FAIL",
   "errors": [
     "current_golden_gate_not_pass"
@@ -8,29 +8,25 @@
     "schema": "QWEN_RECALL_GOLDEN_REPORT_V3",
     "golden_schema": "QWEN_BATCH_RECALL_GOLDEN_SET_V1",
     "case_count": 9,
-    "cases_passed": 5,
-    "cases_failed": 4,
-    "known_positive_recall": 0.625,
-    "known_positive_retained": 5,
+    "cases_passed": 7,
+    "cases_failed": 2,
+    "known_positive_recall": 1.0,
+    "known_positive_retained": 8,
     "known_positive_total": 8,
-    "quality_warning_count": 1,
-    "quality_warnings": [
-      "preferred_mode_mismatch:IE:8670172:UNCLEAR"
-    ],
+    "quality_warning_count": 0,
+    "quality_warnings": [],
     "scale_out_gate": "BLOCK",
     "failures": [
       "policy_failure:IE:8670172",
-      "policy_failure:PL-BZP:08def84e-fb8f-254e-962b-1200016e42b5",
-      "policy_failure:IE:8623183",
-      "policy_failure:US-SAM:d5c30c0b355d4a81ab4e4e2a16acbfc2"
+      "policy_failure:PL-BZP:08def84e-fb8f-254e-962b-1200016e42b5"
     ],
     "cases": [
       {
         "candidate_id": "IE:8670172",
         "label": "DCE-reviewed strong digital positive: Animation and Software Development",
-        "classification": "REJECT_OBVIOUS",
-        "delivery_mode": "UNCLEAR",
-        "lean_attractiveness": "LOW",
+        "classification": "MAYBE",
+        "delivery_mode": "DIRECT_DIGITAL",
+        "lean_attractiveness": "HIGH",
         "friction_flags": [],
         "model_classification": null,
         "model_delivery_mode": null,
@@ -38,13 +34,13 @@
         "checks": [
           {
             "check": "must_not_reject",
-            "passed": false,
-            "actual": "REJECT_OBVIOUS"
+            "passed": true,
+            "actual": "MAYBE"
           },
           {
             "check": "min_rank",
             "expected": "FIT",
-            "actual": "REJECT_OBVIOUS",
+            "actual": "MAYBE",
             "passed": false
           }
         ],
@@ -56,8 +52,8 @@
               "AI_ENABLED",
               "MIXED"
             ],
-            "actual": "UNCLEAR",
-            "passed": false,
+            "actual": "DIRECT_DIGITAL",
+            "passed": true,
             "severity": "warning"
           }
         ]
@@ -103,24 +99,24 @@
       {
         "candidate_id": "IE:8623183",
         "label": "DCE-reviewed partnerable editorial/web-system positive",
-        "classification": "REJECT_OBVIOUS",
-        "delivery_mode": "UNCLEAR",
-        "lean_attractiveness": "LOW",
+        "classification": "MAYBE",
+        "delivery_mode": "DIRECT_DIGITAL",
+        "lean_attractiveness": "HIGH",
         "friction_flags": [],
         "model_classification": null,
         "model_delivery_mode": null,
-        "passed": false,
+        "passed": true,
         "checks": [
           {
             "check": "must_not_reject",
-            "passed": false,
-            "actual": "REJECT_OBVIOUS"
+            "passed": true,
+            "actual": "MAYBE"
           },
           {
             "check": "min_rank",
             "expected": "MAYBE",
-            "actual": "REJECT_OBVIOUS",
-            "passed": false
+            "actual": "MAYBE",
+            "passed": true
           }
         ],
         "warnings": []
@@ -284,23 +280,23 @@
       {
         "candidate_id": "US-SAM:d5c30c0b355d4a81ab4e4e2a16acbfc2",
         "label": "Commercial parts: broker/resell recall control",
-        "classification": "REJECT_OBVIOUS",
-        "delivery_mode": "UNCLEAR",
-        "lean_attractiveness": "LOW",
+        "classification": "MAYBE",
+        "delivery_mode": "BROKER_RESELL",
+        "lean_attractiveness": "MEDIUM",
         "friction_flags": [],
         "model_classification": null,
         "model_delivery_mode": null,
-        "passed": false,
+        "passed": true,
         "checks": [
           {
             "check": "must_not_reject",
-            "passed": false,
-            "actual": "REJECT_OBVIOUS"
+            "passed": true,
+            "actual": "MAYBE"
           },
           {
             "check": "max_rank",
             "expected": "FIT",
-            "actual": "REJECT_OBVIOUS",
+            "actual": "MAYBE",
             "passed": true
           },
           {
@@ -311,7 +307,7 @@
               "MIXED",
               "UNCLEAR"
             ],
-            "actual": "UNCLEAR",
+            "actual": "BROKER_RESELL",
             "passed": true
           },
           {
@@ -321,7 +317,7 @@
               "MEDIUM",
               "UNKNOWN"
             ],
-            "actual": "LOW",
+            "actual": "MEDIUM",
             "passed": true
           }
         ],
@@ -426,7 +422,9 @@
       }
     ],
     "variant": "baseline",
-    "classification_wall_seconds": 166,
+    "fixture_sha256": "fa152b5ca447e225f4578e2df7dce468d8c38bb8ce966feb3d679e9d505b9889",
+    "fixture_future_deadline": "2099-09-21T12:00:00+00:00",
+    "classification_wall_seconds": 172,
     "output_rows": 9,
     "unique_output_ids": 9,
     "row_conservation_pass": true,
@@ -441,44 +439,39 @@
     "schema": "QWEN_RECALL_GOLDEN_REPORT_V3",
     "golden_schema": "QWEN_BATCH_RECALL_GOLDEN_SET_V1",
     "case_count": 9,
-    "cases_passed": 5,
-    "cases_failed": 4,
-    "known_positive_recall": 0.625,
-    "known_positive_retained": 5,
+    "cases_passed": 8,
+    "cases_failed": 1,
+    "known_positive_recall": 1.0,
+    "known_positive_retained": 8,
     "known_positive_total": 8,
-    "quality_warning_count": 1,
-    "quality_warnings": [
-      "preferred_mode_mismatch:IE:8670172:UNCLEAR"
-    ],
+    "quality_warning_count": 0,
+    "quality_warnings": [],
     "scale_out_gate": "BLOCK",
     "failures": [
-      "policy_failure:IE:8670172",
-      "policy_failure:PL-BZP:08def84e-fb8f-254e-962b-1200016e42b5",
-      "policy_failure:IE:8623183",
-      "policy_failure:US-SAM:d5c30c0b355d4a81ab4e4e2a16acbfc2"
+      "policy_failure:PL-BZP:08def84e-fb8f-254e-962b-1200016e42b5"
     ],
     "cases": [
       {
         "candidate_id": "IE:8670172",
         "label": "DCE-reviewed strong digital positive: Animation and Software Development",
-        "classification": "REJECT_OBVIOUS",
-        "delivery_mode": "UNCLEAR",
-        "lean_attractiveness": "LOW",
+        "classification": "FIT",
+        "delivery_mode": "DIRECT_DIGITAL",
+        "lean_attractiveness": "HIGH",
         "friction_flags": [],
         "model_classification": null,
         "model_delivery_mode": null,
-        "passed": false,
+        "passed": true,
         "checks": [
           {
             "check": "must_not_reject",
-            "passed": false,
-            "actual": "REJECT_OBVIOUS"
+            "passed": true,
+            "actual": "FIT"
           },
           {
             "check": "min_rank",
             "expected": "FIT",
-            "actual": "REJECT_OBVIOUS",
-            "passed": false
+            "actual": "FIT",
+            "passed": true
           }
         ],
         "warnings": [
@@ -489,8 +482,8 @@
               "AI_ENABLED",
               "MIXED"
             ],
-            "actual": "UNCLEAR",
-            "passed": false,
+            "actual": "DIRECT_DIGITAL",
+            "passed": true,
             "severity": "warning"
           }
         ]
@@ -536,24 +529,24 @@
       {
         "candidate_id": "IE:8623183",
         "label": "DCE-reviewed partnerable editorial/web-system positive",
-        "classification": "REJECT_OBVIOUS",
-        "delivery_mode": "UNCLEAR",
-        "lean_attractiveness": "LOW",
+        "classification": "FIT",
+        "delivery_mode": "DIRECT_DIGITAL",
+        "lean_attractiveness": "HIGH",
         "friction_flags": [],
         "model_classification": null,
         "model_delivery_mode": null,
-        "passed": false,
+        "passed": true,
         "checks": [
           {
             "check": "must_not_reject",
-            "passed": false,
-            "actual": "REJECT_OBVIOUS"
+            "passed": true,
+            "actual": "FIT"
           },
           {
             "check": "min_rank",
             "expected": "MAYBE",
-            "actual": "REJECT_OBVIOUS",
-            "passed": false
+            "actual": "FIT",
+            "passed": true
           }
         ],
         "warnings": []
@@ -717,23 +710,23 @@
       {
         "candidate_id": "US-SAM:d5c30c0b355d4a81ab4e4e2a16acbfc2",
         "label": "Commercial parts: broker/resell recall control",
-        "classification": "REJECT_OBVIOUS",
-        "delivery_mode": "UNCLEAR",
-        "lean_attractiveness": "LOW",
+        "classification": "MAYBE",
+        "delivery_mode": "BROKER_RESELL",
+        "lean_attractiveness": "MEDIUM",
         "friction_flags": [],
         "model_classification": null,
         "model_delivery_mode": null,
-        "passed": false,
+        "passed": true,
         "checks": [
           {
             "check": "must_not_reject",
-            "passed": false,
-            "actual": "REJECT_OBVIOUS"
+            "passed": true,
+            "actual": "MAYBE"
           },
           {
             "check": "max_rank",
             "expected": "FIT",
-            "actual": "REJECT_OBVIOUS",
+            "actual": "MAYBE",
             "passed": true
           },
           {
@@ -744,7 +737,7 @@
               "MIXED",
               "UNCLEAR"
             ],
-            "actual": "UNCLEAR",
+            "actual": "BROKER_RESELL",
             "passed": true
           },
           {
@@ -754,7 +747,7 @@
               "MEDIUM",
               "UNKNOWN"
             ],
-            "actual": "LOW",
+            "actual": "MEDIUM",
             "passed": true
           }
         ],
@@ -859,7 +852,9 @@
       }
     ],
     "variant": "current",
-    "classification_wall_seconds": 159,
+    "fixture_sha256": "fa152b5ca447e225f4578e2df7dce468d8c38bb8ce966feb3d679e9d505b9889",
+    "fixture_future_deadline": "2099-09-21T12:00:00+00:00",
+    "classification_wall_seconds": 124,
     "output_rows": 9,
     "unique_output_ids": 9,
     "row_conservation_pass": true,
@@ -870,15 +865,13 @@
     "classifier_version": "qwen3-4b-q4km-batch-selfheal-v1",
     "prompt_version": "qwen-batch-high-recall-business-fit-v2"
   },
-  "input_hashes": {
-    "baseline": "7ba368841409d1f9b39644ee7547798727151e6d5fce36518bb8e986ac3773dd",
-    "current": "7ba368841409d1f9b39644ee7547798727151e6d5fce36518bb8e986ac3773dd"
-  },
   "comparison": {
+    "fixture_sha256": "fa152b5ca447e225f4578e2df7dce468d8c38bb8ce966feb3d679e9d505b9889",
     "known_positive_recall_delta": 0.0,
-    "classification_wall_seconds_delta": -7,
+    "classification_wall_seconds_delta": -48,
     "baseline_gate": "BLOCK",
     "current_gate": "BLOCK"
   },
-  "workflow_run_id": "32083532918"
+  "workflow_run_id": "32083749512",
+  "head_sha": "85cd43ed27f0431e7bb2743496bee6cfa110902b"
 }
