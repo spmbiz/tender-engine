@@ -342,7 +342,8 @@ def main() -> None:
     final: dict[str, dict[str, Any]] = {}
     row_meta: dict[str, dict[str, Any]] = {}
     sample_by_id = {cid(row): row for row in sample}
-    # Release uploads are intentionally opt-in. Publishing after every recursive\n    # split/output can consume hundreds of GitHub API calls per pass and starve\n    # the authoritative aggregate writer. Local checkpoints and final workflow\n    # artifacts remain enabled regardless.\n    external_progress_enabled = str(os.environ.get("QWEN_EXTERNAL_PROGRESS_RELEASES") or "").strip().lower() in {"1", "true", "yes"}\n    live_release_tag = (\n        f"qwen-live-progress-{run_id}"\n        if external_progress_enabled and os.environ.get("GITHUB_ACTIONS") == "true" and run_id != "local"\n        else None\n    )\n    live_release_repo = os.environ.get("GITHUB_REPOSITORY")
+    live_release_tag = f"qwen-live-progress-{run_id}" if os.environ.get("GITHUB_ACTIONS") == "true" and run_id != "local" else None
+    live_release_repo = os.environ.get("GITHUB_REPOSITORY")
     live_release_ready = False
     live_auth_env: dict[str, str] | None = None
 
