@@ -1,20 +1,20 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32093332367,
+  "latest_source_dce_run_id": 32097065064,
   "total_inbox_rows": 160,
   "dce_authenticity_rows": 137,
   "portal_counts": {
-    "ES_PLACSP": 48,
-    "ZA_ETENDERS": 27,
-    "IRELAND_ETENDERS": 21,
-    "GR_KHMDHS": 20,
-    "EE_RHR": 9,
-    "SCOTLAND_PCS": 6,
-    "GENERIC_PUBLIC_PAGE": 6
+    "IRELAND_ETENDERS": 40,
+    "ES_PLACSP": 32,
+    "EE_RHR": 28,
+    "ZA_ETENDERS": 24,
+    "SCOTLAND_PCS": 7,
+    "GENERIC_PUBLIC_PAGE": 4,
+    "GR_KHMDHS": 2
   },
   "status_counts": {
-    "UNKNOWN_RETRIEVED_DOCUMENT": 132,
-    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 5
+    "UNKNOWN_RETRIEVED_DOCUMENT": 133,
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 4
   },
   "reason_counts": {
     "NON_AUTHORITATIVE": 134,
@@ -23,66 +23,82 @@
   "method_counts": {},
   "recovery_opportunities": [
     {
-      "portal": "ES_PLACSP",
-      "blocked": 48,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 48
-      }
-    },
-    {
-      "portal": "ZA_ETENDERS",
-      "blocked": 27,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 26,
-        "AUTH_REQUIRED": 1
-      }
-    },
-    {
       "portal": "IRELAND_ETENDERS",
-      "blocked": 21,
+      "blocked": 40,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 19,
+        "NON_AUTHORITATIVE": 38,
         "AUTH_REQUIRED": 2
       }
     },
     {
-      "portal": "GR_KHMDHS",
-      "blocked": 20,
+      "portal": "ES_PLACSP",
+      "blocked": 32,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 20
+        "NON_AUTHORITATIVE": 32
       }
     },
     {
       "portal": "EE_RHR",
-      "blocked": 9,
+      "blocked": 28,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 9
+        "NON_AUTHORITATIVE": 28
       }
     },
     {
-      "portal": "GENERIC_PUBLIC_PAGE",
-      "blocked": 6,
+      "portal": "ZA_ETENDERS",
+      "blocked": 24,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 6
+        "NON_AUTHORITATIVE": 23,
+        "AUTH_REQUIRED": 1
       }
     },
     {
       "portal": "SCOTLAND_PCS",
-      "blocked": 6,
+      "blocked": 7,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 6
+        "NON_AUTHORITATIVE": 7
+      }
+    },
+    {
+      "portal": "GENERIC_PUBLIC_PAGE",
+      "blocked": 4,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 4
+      }
+    },
+    {
+      "portal": "GR_KHMDHS",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
       }
     }
   ],
   "samples_by_reason": {
     "NON_AUTHORITATIVE": [
+      {
+        "candidate_id": "IE:8701573",
+        "portal": "IRELAND_ETENDERS",
+        "title": "Multi-Party Framework for the Provision of Videography Services to Horse Racing Ireland and Subsidiaries",
+        "buyer": "Horse Racing Ireland (HRI)",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8701573"
+      },
+      {
+        "candidate_id": "IE:8702808",
+        "portal": "IRELAND_ETENDERS",
+        "title": "Research Services for Updating QQI’s Standards-based Assessment Infrastructure for FET and HE in Ireland",
+        "buyer": "Quality and Qualifications Ireland (QQI)",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8702808"
+      },
       {
         "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164943-2026-08-07",
         "portal": "ZA_ETENDERS",
@@ -92,36 +108,20 @@
         "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-164943"
       },
       {
-        "candidate_id": "IE:8771483",
+        "candidate_id": "IE:8753790",
         "portal": "IRELAND_ETENDERS",
-        "title": "2026/07 - The provision of Psychotherapy and Counselling Services and Clinical Psychologists to LMETB schools and centres",
-        "buyer": "Louth and Meath Education and Training Board 1384",
+        "title": "Design and Delivery of an AI Upskilling Programme for Engineers",
+        "buyer": "Technology Ireland Digital Skillnet",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8771483"
+        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8753790"
       },
       {
-        "candidate_id": "UK_PCS_OCDS:rls-22-JUL560622",
-        "portal": "SCOTLAND_PCS",
-        "title": "Oakley Core and Cluster 1",
-        "buyer": "Fife Council",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://api.publiccontractsscotland.gov.uk/v1/Notice?id=ocds-r6ebe6-0000823640"
-      },
-      {
-        "candidate_id": "IE:8838515",
+        "candidate_id": "IE:8746621",
         "portal": "IRELAND_ETENDERS",
-        "title": "P20861 OEJU Tender for a short term hotel operator at existing Dublin airport Maldron hotel",
-        "buyer": "daa plc",
+        "title": "Asset Management Platform",
+        "buyer": "The Land Development Agency",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8838515"
-      },
-      {
-        "candidate_id": "IE:8737998",
-        "portal": "IRELAND_ETENDERS",
-        "title": "A secure, EU-hosted, cloud-based Aviation Regulation Content - Document Management System (ARC-DMS). The ARC-DMS shall support controlled aviation document lifecycle management, regulatory requirement",
-        "buyer": "The Irish Air Navigation Service",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8737998"
+        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8746621"
       }
     ],
     "AUTH_REQUIRED": [
