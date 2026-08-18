@@ -9,6 +9,9 @@ on:
       - 'pipeline/dce_batch_worker.py'
       - 'pipeline/build_matrix.py'
       - 'pipeline/compare_dce_ab.py'
+      - 'pipeline/placsp_atom.py'
+      - 'pipeline/discover_es_placsp_atom.py'
+      - 'pipeline/test_placsp_atom_v*.py'
       - 'benchmarks/dce_ab_fixed_20260818.ids'
       - '.github/workflows/dce-rollback-ab-v15.yml'
   pull_request:
@@ -17,6 +20,9 @@ on:
       - 'pipeline/dce_batch_worker.py'
       - 'pipeline/build_matrix.py'
       - 'pipeline/compare_dce_ab.py'
+      - 'pipeline/placsp_atom.py'
+      - 'pipeline/discover_es_placsp_atom.py'
+      - 'pipeline/test_placsp_atom_v*.py'
       - 'benchmarks/dce_ab_fixed_20260818.ids'
       - '.github/workflows/dce-rollback-ab-v15.yml'
 
@@ -43,20 +49,36 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Compile resolver chain and regression tooling
+      - name: Compile active resolver and regression tooling
+        shell: bash
         run: |
+          set -euo pipefail
           python -m py_compile \
             pipeline/build_matrix.py \
-            pipeline/dce_worker_v11.py \
-            pipeline/dce_worker_v12.py \
-            pipeline/dce_worker_v13.py \
-            pipeline/dce_worker_v14.py \
             pipeline/dce_batch_worker.py \
             pipeline/compare_dce_ab.py
-          python pipeline/test_dce_worker_v11_routes.py
-          python pipeline/test_dce_worker_v13_routes.py
-          python pipeline/test_dce_worker_v14_routes.py
-          grep -F 'pipeline/dce_worker_v14.py' pipeline/dce_batch_worker.py
+          python - <<'PY'
+          import pathlib, re, py_compile
+          text=pathlib.Path('pipeline/dce_batch_worker.py').read_text(encoding='utf-8')
+          matches=re.findall(r'["\'](pipeline/dce_worker_v\d+\.py)["\']', text)
+          if len(set(matches)) != 1:
+              raise SystemExit(f'expected exactly one active versioned worker, got {matches}')
+          worker=pathlib.Path(matches[0])
+          if not worker.is_file():
+              raise SystemExit(f'active worker missing: {worker}')
+          py_compile.compile(str(worker), doraise=True)
+          print({'active_worker':str(worker),'status':'compiled'})
+          PY
+          for test_file in pipeline/test_dce_worker_v*_routes.py; do
+            [ -e "$test_file" ] || continue
+            python "$test_file"
+          done
+          if [ -f pipeline/placsp_atom.py ]; then
+            python -m py_compile pipeline/placsp_atom.py pipeline/discover_es_placsp_atom.py
+          fi
+          if [ -f pipeline/test_placsp_atom_v15.py ]; then
+            python pipeline/test_placsp_atom_v15.py
+          fi
 
   legacy-rollback-ab:
     needs: static-contracts
