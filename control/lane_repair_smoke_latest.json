@@ -1,6 +1,6 @@
 {
   "schema": "RECALL_LANE_SMOKE_SUMMARY_V1",
-  "generated_at": "2026-08-18T23:38:39.126539+00:00",
+  "generated_at": "2026-08-18T23:45:07.355401+00:00",
   "counts": {
     "FAIL": 3,
     "RECALL_ONLY": 3
@@ -10,7 +10,7 @@
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "AU_AUSTENDER",
-      "checked_at": "2026-08-18T23:35:14.653837+00:00",
+      "checked_at": "2026-08-18T23:42:21.100918+00:00",
       "primary_exit_code": 0,
       "fallback_exit_code": null,
       "verdict": "FAIL",
@@ -38,7 +38,7 @@
         "enumeration_complete": false,
         "live_candidate_capable": true,
         "live_coverage_credit_allowed": false,
-        "generated_at": "2026-08-18T23:35:10.550054+00:00",
+        "generated_at": "2026-08-18T23:41:54.564362+00:00",
         "errors": [
           {
             "type": "PUBLIC_SOURCE_HTTP_BLOCK",
@@ -71,7 +71,7 @@
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "CYPRUS_EPPS",
-      "checked_at": "2026-08-18T23:35:57.712700+00:00",
+      "checked_at": "2026-08-18T23:42:29.563393+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": 0,
       "verdict": "RECALL_ONLY",
@@ -217,14 +217,14 @@
             "current_rows": 11
           }
         ],
-        "generated_at": "2026-08-19T02:35:13.961753+03:00",
+        "generated_at": "2026-08-19T02:41:53.273063+03:00",
         "semantics": "Published Notices is recall reconstruction only. Its Submission Date is explicitly NOT treated as the bid deadline. The authoritative tender deadline is resolved from the public CfT workspace via resourceId; recent unresolved notices remain UNKNOWN rather than being assumed expired. Cyprus uses only verified public authority seeds."
       }
     },
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "IT_ANAC_DELTA",
-      "checked_at": "2026-08-18T23:35:44.548509+00:00",
+      "checked_at": "2026-08-18T23:42:36.635878+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": null,
       "verdict": "FAIL",
@@ -270,7 +270,7 @@
             "cutoff_reached": false
           }
         ],
-        "generated_at": "2026-08-18T23:35:10.435751+00:00",
+        "generated_at": "2026-08-18T23:41:54.049920+00:00",
         "source_url": "https://pubblicitalegale.anticorruzione.it/bandi",
         "semantics": "Direct official PVL /bandi listing repairs live recall without the fragile advanced-search UI. It remains publication-window reconstruction, so it never claims exhaustive current-universe coverage."
       }
@@ -278,7 +278,7 @@
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "MALTA_EPPS",
-      "checked_at": "2026-08-18T23:36:53.387739+00:00",
+      "checked_at": "2026-08-18T23:43:27.078902+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": 0,
       "verdict": "RECALL_ONLY",
@@ -331,14 +331,14 @@
             "current_rows": 431
           }
         ],
-        "generated_at": "2026-08-19T01:35:12.488901+02:00",
+        "generated_at": "2026-08-19T01:41:52.075398+02:00",
         "semantics": "Published Notices is recall reconstruction only. Its Submission Date is explicitly NOT treated as the bid deadline. The authoritative tender deadline is resolved from the public CfT workspace via resourceId; recent unresolved notices remain UNKNOWN rather than being assumed expired. Cyprus uses only verified public authority seeds."
       }
     },
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "UK_PCS_OCDS",
-      "checked_at": "2026-08-18T23:36:35.350323+00:00",
+      "checked_at": "2026-08-18T23:43:14.733619+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": null,
       "verdict": "RECALL_ONLY",
@@ -386,7 +386,7 @@
             }
           ]
         },
-        "generated_at": "2026-08-18T23:35:12.964625+00:00",
+        "generated_at": "2026-08-18T23:41:55.092422+00:00",
         "source_url": "https://www.publiccontractsscotland.gov.uk/search/Search_MainPage.aspx",
         "semantics": "The official PCS Current Opportunity/Opportunities filter is used. Native and Telerik/custom Notice Type controls are supported. Only notices open for tender are traversed; coverage credit requires pagination exhaustion and a non-empty current set."
       }
@@ -394,7 +394,7 @@
     {
       "schema": "RECALL_LANE_SMOKE_RESULT_V1",
       "source": "UNGM_PUBLIC",
-      "checked_at": "2026-08-18T23:35:14.363761+00:00",
+      "checked_at": "2026-08-18T23:42:00.062722+00:00",
       "primary_exit_code": 3,
       "fallback_exit_code": null,
       "verdict": "FAIL",
@@ -403,15 +403,15 @@
       "live_coverage_credit_allowed": false,
       "errors": [
         {
-          "type": "LANDING_REQUEST_FAILED",
-          "error": "HTTPError('403 Client Error: Forbidden for url: https://www.ungm.org/Public/Notice')"
+          "type": "LANDING_HTTP_ERROR",
+          "status": 403
         }
       ],
       "warnings": [],
       "stats": {
         "source": "UNGM_PUBLIC",
         "portal": "UNGM",
-        "listing_contract": "UNGM_PUBLIC_SEARCH_POST_V3",
+        "listing_contract": "UNGM_PUBLIC_BROWSER_SESSION_SEARCH_V4",
         "raw_materialized": 0,
         "current_materialized": 0,
         "pages_fetched": 0,
@@ -423,22 +423,22 @@
         "live_coverage_credit_allowed": false,
         "errors": [
           {
-            "type": "LANDING_REQUEST_FAILED",
-            "error": "HTTPError('403 Client Error: Forbidden for url: https://www.ungm.org/Public/Notice')"
+            "type": "LANDING_HTTP_ERROR",
+            "status": 403
           }
         ],
         "warnings": [],
         "telemetry": {
           "list_url": "https://www.ungm.org/Public/Notice",
-          "search_url": "https://www.ungm.org/Public/Notice/Search",
+          "search_path": "/Public/Notice/Search",
           "deadline_from": "18-Aug-2026",
           "pages": [],
           "landing_status": 403
         },
-        "generated_at": "2026-08-18T23:35:13.893902+00:00",
+        "generated_at": "2026-08-18T23:41:52.514814+00:00",
         "source_url": "https://www.ungm.org/Public/Notice",
-        "search_url": "https://www.ungm.org/Public/Notice/Search",
-        "semantics": "Uses UNGM's public Procurement Opportunities POST search contract with DeadlineFrom=today and PageIndex/PageSize. Traversal is complete only after the first empty result page; an observed total, when exposed, must also be satisfied."
+        "search_path": "/Public/Notice/Search",
+        "semantics": "UNGM public landing is opened in a real browser session, then the page performs same-origin public POST searches with PageIndex/PageSize and DeadlineFrom=today. This avoids treating browser-bot session requirements as an API failure. Traversal is complete only after the first empty search page; any exposed total must also be satisfied."
       }
     }
   ],
