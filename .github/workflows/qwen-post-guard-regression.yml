@@ -15,7 +15,9 @@ permissions:
 
 concurrency:
   group: qwen-post-guard-regression
-  cancel-in-progress: true
+  # This gate is short. Do not cancel an in-flight run: its `always()` persistence
+  # step would otherwise publish a transient false FAIL before the successor passes.
+  cancel-in-progress: false
 
 jobs:
   regression:
