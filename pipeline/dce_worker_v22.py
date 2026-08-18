@@ -90,21 +90,24 @@ def extract_boamp_downstream_links(raw: str, base_url: str = "") -> list[dict]:
     text = html.unescape(str(raw or ""))
     candidates: dict[str, dict] = {}
 
-    # Hrefs retain nearby field labels such as "Adresse internet du profil d'acheteur".
+    # BOAMP labels precede their link. Keep the window mostly backward-looking so
+    # the next field's "profil d'acheteur" label cannot contaminate the previous
+    # ordinary buyer-homepage link.
     for m in re.finditer(r"href\s*=\s*[\"']([^\"']+)[\"']", text, re.I):
         href = html.unescape(m.group(1)).strip()
         url = urljoin(base_url, href)
         if not url.startswith(("http://", "https://")):
             continue
-        lo, hi = max(0, m.start() - 320), min(len(text), m.end() + 220)
+        lo, hi = max(0, m.start() - 240), min(len(text), m.end() + 20)
         context = re.sub(r"<[^>]+>", " ", text[lo:hi])
         context = re.sub(r"\s+", " ", context).strip()
         candidates.setdefault(url, {"url": url, "contexts": []})["contexts"].append(context)
 
-    # Structured descriptions sometimes carry the profile URL as plain text.
+    # Structured descriptions sometimes carry the profile URL as plain text. The
+    # same backward-biased window binds the nearby label to this URL only.
     for m in re.finditer(r"https?://[^\s<>\"']+", text, re.I):
         url = html.unescape(m.group(0)).rstrip(".,);]")
-        lo, hi = max(0, m.start() - 260), min(len(text), m.end() + 180)
+        lo, hi = max(0, m.start() - 220), min(len(text), m.end() + 30)
         context = re.sub(r"<[^>]+>", " ", text[lo:hi])
         context = re.sub(r"\s+", " ", context).strip()
         candidates.setdefault(url, {"url": url, "contexts": []})["contexts"].append(context)
