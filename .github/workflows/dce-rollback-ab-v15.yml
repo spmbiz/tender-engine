@@ -49,6 +49,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install static-test dependency
+        run: python -m pip install --disable-pip-version-check -q requests
       - name: Compile active resolver and regression tooling
         shell: bash
         run: |
