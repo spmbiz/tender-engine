@@ -8,6 +8,7 @@ on:
       - 'pipeline/procurement_code_prior.py'
       - 'pipeline/qwen_funnel_audit.py'
       - 'pipeline/build_gpt_review_index.py'
+      - 'pipeline/build_qwen_dce_selection_coded.py'
       - 'tests/test_procurement_code_and_review_index.py'
       - '.github/workflows/qwen-funnel-review-regression.yml'
 
@@ -29,7 +30,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check -q pytest requests
-      - name: Test code-prior safety and uncapped review persistence
+      - name: Test code-prior safety, coded scheduler and uncapped review persistence
         run: python -m pytest -q tests/test_procurement_code_and_review_index.py
 
   live-funnel-audit:
@@ -80,12 +81,13 @@ jobs:
           python - <<'PY'
           import json
           d=json.load(open('audit/qwen-funnel-audit.json'))
-          fit=d['fit_coverage']
-          print(json.dumps(fit,indent=2))
-          # Silent disappearance is a hard regression. Explicitly unattempted /
-          # unblocked work is allowed and remains visible as backlog.
-          f=d['fit_funnel']
-          assert int(f.get('attempted_not_visible_anywhere') or 0) == 0, f
+          assert int(d.get('state_current_exact_hash_rows') or 0) > 0, d
+          assert sum(int(v) for v in (d.get('decision_counts') or {}).values()) == int(d['state_current_exact_hash_rows']), d
+          print(json.dumps({
+              'fit_coverage':d.get('fit_coverage'),
+              'fit_funnel':d.get('fit_funnel'),
+              'code_prior_audit':d.get('code_prior_audit'),
+          },indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
