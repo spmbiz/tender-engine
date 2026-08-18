@@ -147,6 +147,8 @@ def build(
         if cid:
             previous[cid] = row
 
+    previous_sources: Counter[str] = Counter(str(row.get("source") or "UNKNOWN") for row in previous.values())
+
     ledger: list[dict[str, Any]] = []
     change_queue: list[dict[str, Any]] = []
     classification_queue: list[dict[str, Any]] = []
@@ -217,6 +219,22 @@ def build(
             classification_queue.append(queue_envelope)
 
     dropped = sorted(set(previous) - seen)
+    previous_count = len(previous)
+    current_count = len(ledger)
+    total_ratio = (current_count / previous_count) if previous_count else 1.0
+    source_regressions = {}
+    for source, prior_count in previous_sources.items():
+        now_count = int(sources.get(source, 0))
+        if prior_count >= 500 and now_count < prior_count * 0.50:
+            source_regressions[source] = {
+                "previous": prior_count,
+                "current": now_count,
+                "ratio": (now_count / prior_count) if prior_count else 0.0,
+            }
+    hard_fail = bool(
+        (previous_count >= 1000 and total_ratio < 0.80)
+        or source_regressions
+    )
     summary = {
         "schema": "NOTICE_INTELLIGENCE_LEDGER_SUMMARY_V1",
         "generated_at": now,
@@ -230,6 +248,16 @@ def build(
         "classification_queue": len(classification_queue),
         "target_classifier_version": target_classifier_version,
         "sources": dict(sorted(sources.items())),
+        "generation_qualification": {
+            "status": "REJECT_REGRESSION" if hard_fail else "PASS",
+            "hard_fail": hard_fail,
+            "current_vs_previous_ratio": total_ratio,
+            "minimum_total_ratio": 0.80,
+            "major_source_min_previous": 500,
+            "major_source_min_ratio": 0.50,
+            "source_regressions": source_regressions,
+            "rule": "Never advance the stable ledger on catastrophic whole-universe loss or a >50% collapse of a previously large source. Snapshot carry-forward should normally prevent these conditions; hitting this guard requires investigation or an explicit code change, never silent acceptance.",
+        },
         "rules": {
             "identity": "Exact canonical_notice_id only; no fuzzy cross-source merge.",
             "change_queue": "Only NEW or materially UPDATED notices enter the live change queue.",
@@ -266,6 +294,12 @@ def main() -> None:
         now=now,
         target_classifier_version=args.classifier_version or None,
     )
+    qualification = summary.get("generation_qualification") or {}
+    if qualification.get("hard_fail"):
+        Path(args.summary_out).write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        print(json.dumps(summary, indent=2, ensure_ascii=False))
+        raise SystemExit("Refusing to advance ledger: snapshot generation regressed below durable safety thresholds")
+
     write_jsonl(Path(args.ledger_out), ledger)
     write_jsonl(Path(args.change_queue_out), changes)
     write_jsonl(Path(args.classification_queue_out), classification)
