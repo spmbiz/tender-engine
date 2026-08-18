@@ -3,7 +3,7 @@ name: DCE Rollback A/B V15
 on:
   workflow_dispatch:
   push:
-    branches: [agent/dce-ab-regression-v15]
+    branches: [main, agent/dce-ab-regression-v15]
     paths:
       - 'pipeline/dce_worker_v*.py'
       - 'pipeline/dce_batch_worker.py'
@@ -86,6 +86,7 @@ jobs:
             echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
           else
             python -m playwright install --with-deps chromium
+          fi
       - name: Recover exact durable canonical queue
         env:
           GH_TOKEN: ${{ github.token }}
@@ -159,6 +160,7 @@ jobs:
           --baseline-dir ab-baseline
           --current-dir ab-current
           --out ab-report
+          --expected-candidates 20
           --fail-on-regression
       - name: Publish A/B summary
         if: always()
