@@ -470,54 +470,44 @@ def publish(repo: str, path: str, branch: str, token: str, builder, msg: str, at
 
 
 def publish_live_inbox(repo: str, branch: str, token: str, run_id: str, shard: str, attempts: int):
-    """Rebuild the final user-facing inbox inside the already-running DCE shard.
-
-    This deliberately avoids requiring another GitHub runner. The separate inbox
-    workflow remains only a fallback. Fresh hot states are re-read from GitHub so
-    concurrent shards converge through the same optimistic PUT/retry primitive.
-    """
+    """Rebuild the user-facing inbox transactionally from freshest state."""
     import subprocess
     import sys
     import tempfile
 
-    paths = {
-        "existing": "control/gpt_supergreen_inbox.json",
-        "final_bank": "control/final_supergreen_bank.json",
-        "hot_green": "control/supergreen_hot.json",
-        "hot_review": "control/gpt_review_hot.json",
-    }
-    with tempfile.TemporaryDirectory(prefix="tender-inbox-") as td:
-        local: dict[str, str] = {}
-        for name, remote in paths.items():
-            obj, _ = gh_get(repo, remote, branch, token)
-            lp = Path(td) / f"{name}.json"
-            lp.write_text(json.dumps(obj, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-            local[name] = str(lp)
-        out = str(Path(td) / "inbox.json")
-        script = str(Path(__file__).with_name("refresh_gpt_inbox_live.py"))
-        subprocess.run(
-            [
-                sys.executable, script,
-                "--existing", local["existing"],
-                "--final-bank", local["final_bank"],
-                "--hot-green", local["hot_green"],
-                "--hot-review", local["hot_review"],
-                "--out", out,
-                "--max-items", "60",
-            ],
-            check=True,
-        )
-        payload = json.loads(Path(out).read_text(encoding="utf-8"))
-    return publish(
-        repo,
-        "control/gpt_supergreen_inbox.json",
-        branch,
-        token,
-        lambda _existing: payload,
-        f"inbox: direct live DCE {run_id} shard {shard}",
-        attempts,
-    )
+    script = str(Path(__file__).with_name("refresh_gpt_inbox_live.py"))
 
+    def builder(current_existing: dict[str, Any]) -> dict[str, Any]:
+        with tempfile.TemporaryDirectory(prefix="tender-inbox-") as td:
+            local: dict[str, str] = {}
+            sources: dict[str, dict[str, Any]] = {"existing": current_existing}
+            for name, remote in {
+                "final_bank": "control/final_supergreen_bank.json",
+                "hot_green": "control/supergreen_hot.json",
+                "hot_review": "control/gpt_review_hot.json",
+            }.items():
+                obj, _ = gh_get(repo, remote, branch, token)
+                sources[name] = obj
+            for name, obj in sources.items():
+                lp = Path(td) / f"{name}.json"
+                lp.write_text(json.dumps(obj, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+                local[name] = str(lp)
+            out = str(Path(td) / "inbox.json")
+            subprocess.run(
+                [sys.executable, script,
+                 "--existing", local["existing"],
+                 "--final-bank", local["final_bank"],
+                 "--hot-green", local["hot_green"],
+                 "--hot-review", local["hot_review"],
+                 "--out", out, "--max-items", "60"],
+                check=True,
+            )
+            return json.loads(Path(out).read_text(encoding="utf-8"))
+
+    return publish(
+        repo, "control/gpt_supergreen_inbox.json", branch, token, builder,
+        f"inbox: direct live DCE {run_id} shard {shard}", attempts,
+    )
 
 def main() -> None:
     ap = argparse.ArgumentParser()
