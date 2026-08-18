@@ -1,6 +1,6 @@
 {
-  "schema": "GPT_INBOX_HEALTH_V2",
-  "updated_at": "2026-08-18T22:37:16.310716+00:00",
+  "schema": "GPT_INBOX_HEALTH_V3_FAIR_SHARE",
+  "updated_at": "2026-08-18T22:38:50.261446+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
   "latest_source_dce_run_id": 32190330115,
   "counts": {
@@ -8,7 +8,7 @@
     "reviewed_ticks_total": 182,
     "excluded_already_reviewed": 0,
     "excluded_already_in_final_bank": 0,
-    "pending_before_visible_cap": 251,
+    "pending_before_visible_cap": 226,
     "pending_by_stage": {
       "BUSINESS_GATES": 140,
       "DCE_AUTHENTICITY": 20
@@ -34,8 +34,66 @@
       "WORLD_BANK": 1
     }
   },
+  "window_selection": {
+    "priority_target": 120,
+    "authenticity_target": 20,
+    "low_surveillance_target": 20,
+    "selected_by_lane": {
+      "GPT_PRIORITY": 120,
+      "DCE_AUTHENTICITY_REPAIR": 20,
+      "LOW_PORTAL_SURVEILLANCE": 20
+    },
+    "selected_by_stage": {
+      "BUSINESS_GATES": 140,
+      "DCE_AUTHENTICITY": 20
+    },
+    "selected_by_band": {
+      "HOT": 6,
+      "GOOD": 70,
+      "MAYBE": 55,
+      "LOW": 29
+    },
+    "selected_by_portal": {
+      "IRELAND_ETENDERS": 10,
+      "TED": 56,
+      "ZA_ETENDERS": 48,
+      "US_SAM": 42,
+      "GENERIC_PUBLIC_PAGE": 1,
+      "SCOTLAND_PCS": 2,
+      "WORLD_BANK": 1
+    }
+  },
   "review_bank_count": 160,
   "review_bank_schema": "GPT_REVIEW_HOT_V7_FAIR_SHARE",
+  "review_bank_window_selection": {
+    "priority_target": 120,
+    "authenticity_target": 20,
+    "low_surveillance_target": 20,
+    "selected_by_lane": {
+      "SPM_PRIORITY": 74,
+      "DCE_AUTHENTICITY_REPAIR": 20,
+      "LOW_PORTAL_SURVEILLANCE": 20,
+      "ELASTIC_FILL": 46
+    },
+    "selected_by_band": {
+      "HOT": 5,
+      "GOOD": 39,
+      "MAYBE": 41,
+      "LOW": 75
+    },
+    "selected_by_stage": {
+      "BUSINESS_GATES": 136,
+      "DCE_AUTHENTICITY": 24
+    },
+    "selected_by_portal": {
+      "IRELAND_ETENDERS": 19,
+      "TED": 43,
+      "ZA_ETENDERS": 93,
+      "SCOTLAND_PCS": 1,
+      "US_SAM": 3,
+      "WORLD_BANK": 1
+    }
+  },
   "review_index_count": 1863,
   "review_index_counts": {
     "pending_total_uncapped": 1863,
@@ -57,6 +115,7 @@
   "overflow_beyond_hot_160": 1703,
   "assistant_read_batch_count": 16,
   "assistant_read_batch_size": 10,
+  "assistant_read_batch_schema": "GPT_WEB_READ_BATCH_MANIFEST_V2_PROVENANCE",
   "recovery_metrics": {
     "shard_files_scanned": 0,
     "adjudication_rows_scanned": 0,
@@ -76,6 +135,6 @@
     "authenticity_rows_seen_this_refresh": 0,
     "source_runs_seen_this_refresh": []
   },
-  "healthy": false,
-  "contract": "Health sidecar exposes true uncapped GPT review backlog. Rich review files are mechanical read surfaces; GPT Web adjudicator is the assistant in the conversation."
+  "healthy": true,
+  "contract": "Health sidecar exposes the true uncapped GPT review backlog plus visible-window fair-share. Rich review batches preserve document provenance where available; GPT Web adjudicator remains the assistant in the conversation."
 }
