@@ -128,3 +128,81 @@ def test_review_index_removes_final_bank_items(tmp_path: Path):
     )
     payload = json.loads(out.read_text(encoding="utf-8"))
     assert [x["candidate_id"] for x in payload["items"]] == ["KEEP:1"]
+
+
+def _write_jsonl(path: Path, rows):
+    path.write_text("".join(json.dumps(x) + "\n" for x in rows), encoding="utf-8")
+
+
+def test_coded_scheduler_prioritizes_codes_but_preserves_candidate_pool(tmp_path: Path):
+    state = tmp_path / "state.jsonl"
+    ledger = tmp_path / "ledger.jsonl"
+    snapshot = tmp_path / "snapshot.jsonl"
+    blocked = tmp_path / "blocked.json"
+    review = tmp_path / "review.json"
+    dispatch = tmp_path / "dispatch.json"
+    attempts = tmp_path / "attempts.jsonl"
+
+    ids = ["WEB:1", "GENERIC:1", "BUILD:1"]
+    state_rows = []
+    ledger_rows = []
+    snapshot_rows = []
+    for i, cid in enumerate(ids):
+        h = f"hash-{i}"
+        state_rows.append({
+            "canonical_notice_id": cid,
+            "material_fields_hash": h,
+            "classification": "FIT",
+            "survival_decision": "KEEP",
+            "dce_eligible": True,
+            "lean_attractiveness": "MEDIUM",
+            "delivery_mode": "DIRECT_DIGITAL",
+            "friction_flags": [],
+        })
+        ledger_rows.append({
+            "canonical_notice_id": cid,
+            "material_fields_hash": h,
+            "ledger_event": "NEW",
+            "first_seen_at": "2099-01-01T00:00:00+00:00",
+        })
+        cpv = "72413000" if cid.startswith("WEB") else "45000000" if cid.startswith("BUILD") else ""
+        snapshot_rows.append({
+            "candidate_id": cid,
+            "title": "Website design" if cid.startswith("WEB") else "Construction work" if cid.startswith("BUILD") else "General service",
+            "cpv_or_category": cpv,
+            "deadline": "2099-09-18T12:00:00+00:00",
+            "wide_read_run_id": "TEST",
+        })
+    _write_jsonl(state, state_rows)
+    _write_jsonl(ledger, ledger_rows)
+    _write_jsonl(snapshot, snapshot_rows)
+    blocked.write_text('{"processed_candidate_ids":[],"dce_retry_after":{}}\n', encoding="utf-8")
+    review.write_text('{"items":[]}\n', encoding="utf-8")
+    dispatch.write_text('{"records":{}}\n', encoding="utf-8")
+    attempts.write_text("", encoding="utf-8")
+
+    def run(limit: int):
+        out = tmp_path / f"out-{limit}.jsonl"
+        summary = tmp_path / f"summary-{limit}.json"
+        subprocess.run([
+            sys.executable, str(ROOT / "pipeline/build_qwen_dce_selection_coded.py"),
+            "--state", str(state), "--ledger", str(ledger), "--snapshot", str(snapshot),
+            "--blocked-state", str(blocked), "--review-backlog", str(review),
+            "--dispatch-state", str(dispatch), "--attempt-ledger", str(attempts),
+            "--out", str(out), "--summary", str(summary), "--source-run", "TEST",
+            "--limit", str(limit), "--explore-share", "0", "--reject-audit-share", "0",
+        ], cwd=ROOT, check=True)
+        return [json.loads(x) for x in out.read_text(encoding="utf-8").splitlines() if x.strip()], json.loads(summary.read_text(encoding="utf-8"))
+
+    top2, summary2 = run(2)
+    ids2 = [x["candidate_id"] for x in top2]
+    assert "WEB:1" in ids2
+    assert "BUILD:1" not in ids2
+    assert summary2["base_candidate_pool"] == 3
+    assert summary2["code_prior"]["noncore_code_contradictions_in_pool"] == 1
+
+    all3, _ = run(3)
+    assert {x["candidate_id"] for x in all3} == set(ids)
+    build = next(x for x in all3 if x["candidate_id"] == "BUILD:1")
+    assert build["qwen"]["classification"] == "FIT"
+    assert build["procurement_code_prior"]["contradiction"] is True
