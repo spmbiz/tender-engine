@@ -14,6 +14,7 @@ concurrency:
   group: qwen-api-safety-patch-once
   cancel-in-progress: false
 
+# One-shot trigger: 2026-08-18 API-pressure hardening.
 jobs:
   patch:
     runs-on: ubuntu-latest
