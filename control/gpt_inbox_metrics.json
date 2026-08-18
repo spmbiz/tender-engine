@@ -1,6 +1,6 @@
 {
   "schema": "GPT_INBOX_HEALTH_V2",
-  "updated_at": "2026-08-18T22:12:34.773824+00:00",
+  "updated_at": "2026-08-18T22:34:58.425513+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V2",
   "latest_source_dce_run_id": 32190330115,
   "counts": {
@@ -22,48 +22,37 @@
       "DCE_AUTHENTICITY": 604
     },
     "by_spm_fit_band": {
-      "HOT": 6,
-      "GOOD": 47,
-      "MAYBE": 87,
-      "LOW": 1723
+      "HOT": 7,
+      "GOOD": 36,
+      "MAYBE": 68,
+      "LOW": 1752
     },
     "rich_hot_window_target": 160,
     "overflow_beyond_hot_160": 1703,
-    "cross_portal_duplicates_collapsed": 5
+    "cross_portal_duplicates_collapsed": 0
   },
   "true_pending_before_hot_cap": 1863,
   "overflow_beyond_hot_160": 1703,
   "assistant_read_batch_count": 16,
   "assistant_read_batch_size": 10,
   "recovery_metrics": {
-    "shard_files_scanned": 244,
-    "adjudication_rows_scanned": 1641,
-    "model_review_rows_seen": 521,
-    "dce_authenticity_rows_seen": 189,
+    "shard_files_scanned": 0,
+    "adjudication_rows_scanned": 0,
+    "model_review_rows_seen": 0,
+    "dce_authenticity_rows_seen": 0,
     "scope_auto_rejected": 0,
     "scope_auto_reject_reason_counts": {},
-    "cross_portal_duplicates_collapsed": 6,
-    "uncapped_unique_pending_before_hot_window": 621,
+    "cross_portal_duplicates_collapsed": 0,
+    "uncapped_unique_pending_before_hot_window": 160,
     "rich_hot_window_count": 160,
-    "overflow_beyond_hot_window": 461
+    "overflow_beyond_hot_window": 0
   },
   "index_recovery": {
-    "shard_files_scanned_this_refresh": 244,
-    "adjudication_rows_scanned_this_refresh": 1641,
-    "gate_rows_seen_this_refresh": 521,
-    "authenticity_rows_seen_this_refresh": 189,
-    "source_runs_seen_this_refresh": [
-      32190330115,
-      32188400508,
-      32188261474,
-      32184680934,
-      32179607313,
-      32171785141,
-      32169502902,
-      32166961956,
-      32163652520,
-      32150412154
-    ]
+    "shard_files_scanned_this_refresh": 0,
+    "adjudication_rows_scanned_this_refresh": 0,
+    "gate_rows_seen_this_refresh": 0,
+    "authenticity_rows_seen_this_refresh": 0,
+    "source_runs_seen_this_refresh": []
   },
   "healthy": true,
   "contract": "Health sidecar exposes true uncapped GPT review backlog. Rich review files are mechanical read surfaces; GPT Web adjudicator is the assistant in the conversation."
