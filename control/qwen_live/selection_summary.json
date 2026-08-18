@@ -1,17 +1,17 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V1",
-  "generated_at_utc": "2026-08-18T15:09:35+00:00",
-  "source_run": "32142583593",
+  "generated_at_utc": "2026-08-18T15:13:12+00:00",
+  "source_run": "32120769848",
   "state_rows": 5968,
-  "ledger_rows": 44053,
-  "snapshot_rows": 44053,
+  "ledger_rows": 43371,
+  "snapshot_rows": 43371,
   "blocked_ids": 22646,
-  "durable_attempted_exact_versions_ignored": 166,
-  "valid_exact_hash_current_unattempted": 693,
-  "eligible_keep_for_dce": 650,
-  "stale_hash_ignored": 115,
+  "durable_attempted_exact_versions_ignored": 205,
+  "valid_exact_hash_current_unattempted": 762,
+  "eligible_keep_for_dce": 716,
+  "stale_hash_ignored": 0,
   "missing_snapshot": 0,
-  "expired_ignored": 0,
+  "expired_ignored": 7,
   "selected": 160,
   "selection_decisions": {
     "MAYBE": 610,
@@ -26,7 +26,8 @@
     "qwen-elastic": 480
   },
   "selection_freshness": {
-    "recent_unseen_carryover": 640
+    "material_new_or_updated": 151,
+    "recent_unseen_carryover": 489
   },
   "policy": {
     "keep_is_not_fit": true,
@@ -49,7 +50,7 @@
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
-    "noncore_code_contradictions_in_pool": 22,
+    "noncore_code_contradictions_in_pool": 52,
     "policy": "priority_only_never_drop_never_eligibility",
     "candidate_pool_multiplier": 4
   }
