@@ -39,6 +39,19 @@ def main() -> None:
         "https://ekr.gov.hu/api/publikus/kozbeszerzesi-hirdetmenyek/123/dokumentum-letoltes"
     )
 
+    dedupe_manifest = {
+        "files": [
+            {"name": "contract.docx", "size": 10, "sha256": "abc", "source_url": detail_only["notice_url"]},
+            {"name": "contract_2.docx", "size": 10, "sha256": "abc", "source_url": "https://ekr.gov.hu/api/publikus/kozbeszerzesi-eljaras-nyilvantartas/1/dokumentum-letoltes/2"},
+            {"name": "other.zip", "size": 20, "sha256": "def", "source_url": "https://ekr.gov.hu/api/publikus/kozbeszerzesi-eljaras-nyilvantartas/1/dokumentum-letoltes/3"},
+        ],
+        "dce_method_attempts": [],
+    }
+    assert v19._dedupe_manifest_files(dedupe_manifest) == 1
+    assert len(dedupe_manifest["files"]) == 2
+    contract = next(row for row in dedupe_manifest["files"] if row["sha256"] == "abc")
+    assert "kozbeszerzesi-eljaras-nyilvantartas" in contract["source_url"]
+
     old_http = v19._bounded_http_probe
     old_browser = v19._bounded_browser_download
     old_public = v19._OLD_HU_PUBLIC
@@ -83,7 +96,7 @@ def main() -> None:
 
         def hit_http(detail, out, manifest):
             events.append("http")
-            manifest.setdefault("files", []).append({"name": "bounded.zip"})
+            manifest.setdefault("files", []).append({"name": "bounded.zip", "sha256": "ghi", "size": 30})
             return True
 
         v19._bounded_http_probe = hit_http
@@ -92,7 +105,7 @@ def main() -> None:
             v19.adapter_hu_ekr_v19(detail_only, Path(td), manifest)
         assert events == ["http"], events
         assert manifest["status"] == "DOWNLOADED_PUBLIC"
-        print({"hu_ekr_detail_only": "targeted_dce_network", "explicit_routes": "legacy_preserved", "safe_controls": 3, "notice_pdf_excluded": True, "status": "ok"})
+        print({"hu_ekr_detail_only": "targeted_dce_network", "explicit_routes": "legacy_preserved", "safe_controls": 3, "notice_pdf_excluded": True, "sha256_dedupe": True, "status": "ok"})
     finally:
         v19._bounded_http_probe = old_http
         v19._bounded_browser_download = old_browser
