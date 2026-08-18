@@ -291,9 +291,10 @@ async def advance(page, next_page, before_signature):
         try:
             await selector.select_option(label=labels.get(next_page, f"Page {next_page}"))
             await page.wait_for_timeout(PAGE_WAIT_MS)
-            after = clean(await page.locator("body").inner_text())[:5000]
-            if after != before_signature:
-                return True
+            # A successful select/postback is enough to continue. The main loop
+            # verifies the actual result-row signature on the next iteration,
+            # so an ineffective postback cannot silently count as progress.
+            return True
         except Exception:
             pass
     for pattern in (r"^next$", r"next\s*>", r"^>$", r"^›$", r"^»$"):
@@ -336,7 +337,9 @@ async def main():
 
             seen_signatures = set()
             for _ in range(MAX_PAGES):
-                signature = clean(await page.locator("body").inner_text())[:5000]
+                body_text = clean(await page.locator("body").inner_text())
+                refs = tuple(re.findall(r"Reference\s*No:\s*([^\s]+)", body_text, re.I))
+                signature = refs if refs else (body_text[-5000:],)
                 if signature in seen_signatures:
                     warnings.append({"type": "REPEATED_PAGE_SIGNATURE", "page": pages + 1})
                     break
