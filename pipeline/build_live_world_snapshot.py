@@ -202,12 +202,30 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
+def iter_previous(path: Path):
+    opener = gzip.open if path.suffix == ".gz" else open
+    with opener(path, "rt", encoding="utf-8", errors="replace") as f:
+        for line in f:
+            if not line.strip():
+                continue
+            try:
+                row = json.loads(line)
+            except Exception:
+                continue
+            if isinstance(row, dict):
+                yield row
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True)
     ap.add_argument("--out-dir", required=True)
     ap.add_argument("--source-run", required=True)
     ap.add_argument("--packet-size", type=int, default=500)
+    ap.add_argument("--previous", help="Previous normalized live snapshot JSONL(.gz), used only as a continuity guard")
+    ap.add_argument("--previous-manifest", help="Previous snapshot manifest for provenance")
+    ap.add_argument("--source-regression-ratio", type=float, default=0.70)
+    ap.add_argument("--source-regression-min-rows", type=int, default=5)
     args = ap.parse_args()
 
     now = datetime.now(timezone.utc)
@@ -244,6 +262,74 @@ def main() -> None:
             seen_ids.add(cid)
             rows.append(row)
 
+    current_materialized_rows = len(rows)
+    current_by_source = Counter(str(r.get("source_family") or "UNKNOWN") for r in rows)
+    previous_rows: list[dict[str, Any]] = []
+    previous_by_source: Counter[str] = Counter()
+    previous_source_run: Any = None
+
+    previous_path = Path(args.previous) if args.previous else None
+    if previous_path and previous_path.exists() and previous_path.stat().st_size:
+        for prev in iter_previous(previous_path):
+            cid = str(prev.get("candidate_id") or "").strip()
+            if not cid:
+                continue
+            deadline_dt = parse_dt(prev.get("deadline_utc") or prev.get("deadline"))
+            if deadline_dt and deadline_dt <= now:
+                continue
+            family = str(prev.get("source_family") or source_family(prev, cid) or "UNKNOWN")
+            normalized = dict(prev)
+            normalized["source_family"] = family
+            previous_rows.append(normalized)
+            previous_by_source[family] += 1
+
+    if args.previous_manifest:
+        try:
+            pm = json.loads(Path(args.previous_manifest).read_text(encoding="utf-8"))
+            previous_source_run = pm.get("source_discovery_run")
+        except Exception:
+            previous_source_run = None
+
+    ratio = min(0.99, max(0.05, float(args.source_regression_ratio)))
+    min_rows = max(1, int(args.source_regression_min_rows))
+    source_regressions: dict[str, dict[str, Any]] = {}
+    for family, previous_count in previous_by_source.items():
+        current_count = int(current_by_source.get(family, 0))
+        if previous_count >= min_rows and current_count < previous_count * ratio:
+            source_regressions[family] = {
+                "previous_unexpired_or_unknown": previous_count,
+                "current_materialized": current_count,
+                "ratio": (current_count / previous_count) if previous_count else 0.0,
+            }
+
+    carry_forward_reasons: Counter[str] = Counter()
+    carried_by_source: Counter[str] = Counter()
+    for prev in previous_rows:
+        cid = str(prev.get("candidate_id") or "").strip()
+        if not cid or cid in seen_ids:
+            continue
+        family = str(prev.get("source_family") or "UNKNOWN")
+        deadline_dt = parse_dt(prev.get("deadline_utc") or prev.get("deadline"))
+        if deadline_dt and deadline_dt > now:
+            reason = "FUTURE_DEADLINE_NOT_REOBSERVED"
+        elif family in source_regressions:
+            reason = "SOURCE_REGRESSION_UNKNOWN_DEADLINE"
+        else:
+            continue
+        row = dict(prev)
+        row["carried_forward_from_previous_snapshot"] = True
+        row["carry_forward_reason"] = reason
+        row["carry_forward_previous_source_run"] = previous_source_run
+        if deadline_dt:
+            row["deadline_utc"] = deadline_dt.isoformat()
+            row["open_state"] = "OPEN_CONFIRMED_BY_DEADLINE"
+        else:
+            row["open_state"] = "OPEN_UNVERIFIED_NO_PARSEABLE_DEADLINE"
+        seen_ids.add(cid)
+        rows.append(row)
+        carry_forward_reasons[reason] += 1
+        carried_by_source[family] += 1
+
     rows.sort(key=lambda r: (r.get("deadline_utc") or "9999", r.get("source_family") or "", r.get("candidate_id") or ""))
 
     full = out / "live_open_tenders.jsonl"
@@ -274,8 +360,15 @@ def main() -> None:
         "schema": "LIVE_WORLD_SNAPSHOT_V1",
         "source_discovery_run": int(args.source_run) if str(args.source_run).isdigit() else str(args.source_run),
         "generated_at": now.isoformat(),
-        "rule": "Contains every canonical discovery row not proven expired by a parseable deadline. Missing/unparseable deadline remains explicitly OPEN_UNVERIFIED; it is never silently treated as confirmed open.",
+        "rule": "Contains every current canonical discovery row not proven expired, plus explicit high-recall carry-forward from the previous snapshot for still-future deadlines and materially regressed source lanes. Carry-forward never upgrades coverage truth or eligibility.",
         "raw_canonical_rows": raw_count,
+        "current_materialized_rows": current_materialized_rows,
+        "previous_snapshot_rows_considered": len(previous_rows),
+        "previous_source_run": previous_source_run,
+        "carried_forward_rows": sum(carry_forward_reasons.values()),
+        "carry_forward_reasons": dict(carry_forward_reasons),
+        "carried_forward_by_source": dict(carried_by_source.most_common()),
+        "source_regressions_guarded": source_regressions,
         "snapshot_rows": len(rows),
         "duplicate_candidate_ids_removed": duplicate_ids,
         "rejected": dict(rejected),
