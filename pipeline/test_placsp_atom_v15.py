@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import xml.etree.ElementTree as ET
 
+import dce_worker as base
+import dce_worker_v17  # noqa: F401 - registers the active v17 PLACSP adapter
 import placsp_atom
 from build_matrix import BROWSER_PORTALS, SUPPORTED
 
@@ -64,11 +66,19 @@ def main() -> None:
     assert "ES_PLACSP" in SUPPORTED
     assert "ES_PLACSP" not in BROWSER_PORTALS
 
+    # Production must retain the v17 HTTP/cache adapter. This catches accidental
+    # promotion of an unvalidated versioned worker or a fallback to the browser lane.
+    adapter = base.ADAPTERS.get("ES_PLACSP")
+    assert adapter is not None
+    assert adapter.__module__ == "dce_worker_v17", adapter
+    assert adapter.__name__ == "adapter_placsp_v17", adapter
+
     print(
         {
             "placsp_document_urls": len(urls),
             "extensionless": 2,
             "lane": "http",
+            "active_adapter": f"{adapter.__module__}.{adapter.__name__}",
             "status": "ok",
         }
     )
