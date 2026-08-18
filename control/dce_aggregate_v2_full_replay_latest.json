@@ -1,0 +1,79 @@
+{
+  "schema": "DCE_AGGREGATE_V2_FULL_REPLAY_V1",
+  "generated_at": "2026-08-18T05:30:00+00:00",
+  "verification_mode": "LOCAL_REPLAY_OF_ALL_27_IMMUTABLE_GITHUB_ACTIONS_SHARD_ARTIFACTS",
+  "source_dce_run_id": 32098369885,
+  "source_artifacts": 27,
+  "selected_input_rows": 160,
+  "durable_manifest_rows": 156,
+  "worker_failures": 4,
+  "failed_candidates": [
+    {"candidate_id": "IE:8636547", "portal": "IRELAND_ETENDERS", "status": "WORKER_ERROR", "returncode": 124},
+    {"candidate_id": "IE:8615198", "portal": "IRELAND_ETENDERS", "status": "WORKER_ERROR", "returncode": 124},
+    {"candidate_id": "TED:566561-2026", "portal": "TED", "status": "WORKER_ERROR", "returncode": 124},
+    {"candidate_id": "IE:8843560", "portal": "IRELAND_ETENDERS", "status": "WORKER_ERROR", "returncode": 124}
+  ],
+  "baseline_v1_only": {
+    "gate_ready": 0,
+    "content_unverified": 81,
+    "status_counts": {
+      "GENERIC_PUBLIC_PAGE_UNRESOLVED": 18,
+      "DCE_CONTENT_UNVERIFIED": 81,
+      "INTEREST_RECORDING_REQUIRED": 5,
+      "AUTH_REQUIRED": 23,
+      "ROUTE_INCOMPLETE": 20,
+      "NO_PUBLIC_FILE": 2,
+      "PORTAL_GENERIC_ONLY": 2,
+      "TED_ROUTE_UNRESOLVED": 1,
+      "ERROR_RETRYABLE": 4
+    }
+  },
+  "current_v1_v2_plus_candidate_relevance": {
+    "gate_ready": 40,
+    "content_unverified": 3,
+    "candidate_relevance_unproven": 39,
+    "status_counts": {
+      "GENERIC_PUBLIC_PAGE_UNRESOLVED": 18,
+      "DCE_CANDIDATE_RELEVANCE_UNVERIFIED": 39,
+      "DOWNLOADED_PUBLIC": 40,
+      "INTEREST_RECORDING_REQUIRED": 5,
+      "DCE_CONTENT_UNVERIFIED": 3,
+      "AUTH_REQUIRED": 23,
+      "ROUTE_INCOMPLETE": 20,
+      "NO_PUBLIC_FILE": 2,
+      "PORTAL_GENERIC_ONLY": 1,
+      "TED_ROUTE_UNRESOLVED": 1,
+      "ERROR_RETRYABLE": 4
+    },
+    "content_quality_counts": {
+      "NOT_APPLICABLE": 73,
+      "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 39,
+      "SUBSTANTIVE_DCE_PRESENT": 40,
+      "UNKNOWN_RETRIEVED_DOCUMENT": 3,
+      "PORTAL_GENERIC_ONLY": 1
+    }
+  },
+  "portal_breakdown": {
+    "EE_RHR": {"n": 8, "old_unknown": 8, "new_unknown": 0, "new_gate_ready": 8, "new_rel_unproven": 0, "auth": 0, "route": 0},
+    "GR_KHMDHS": {"n": 41, "old_unknown": 41, "new_unknown": 1, "new_gate_ready": 2, "new_rel_unproven": 38, "auth": 0, "route": 0},
+    "IRELAND_ETENDERS": {"n": 18, "old_unknown": 18, "new_unknown": 0, "new_gate_ready": 18, "new_rel_unproven": 0, "auth": 0, "route": 0},
+    "SCOTLAND_PCS": {"n": 53, "old_unknown": 6, "new_unknown": 0, "new_gate_ready": 6, "new_rel_unproven": 0, "auth": 27, "route": 20},
+    "TED": {"n": 11, "old_unknown": 5, "new_unknown": 2, "new_gate_ready": 3, "new_rel_unproven": 1, "auth": 0, "route": 4},
+    "ZA_ETENDERS": {"n": 3, "old_unknown": 3, "new_unknown": 0, "new_gate_ready": 3, "new_rel_unproven": 0, "auth": 0, "route": 0},
+    "DK_UDBUD": {"n": 5, "old_unknown": 0, "new_unknown": 0, "new_gate_ready": 0, "new_rel_unproven": 0, "auth": 0, "route": 5},
+    "QC_SEAO": {"n": 5, "old_unknown": 0, "new_unknown": 0, "new_gate_ready": 0, "new_rel_unproven": 0, "auth": 0, "route": 5},
+    "US_SAM": {"n": 4, "old_unknown": 0, "new_unknown": 0, "new_gate_ready": 0, "new_rel_unproven": 0, "auth": 0, "route": 4},
+    "LV_IUB": {"n": 3, "old_unknown": 0, "new_unknown": 0, "new_gate_ready": 0, "new_rel_unproven": 0, "auth": 1, "route": 2},
+    "CZ_NIPEZ": {"n": 1, "old_unknown": 0, "new_unknown": 0, "new_gate_ready": 0, "new_rel_unproven": 0, "auth": 0, "route": 1},
+    "DE_DOE": {"n": 1, "old_unknown": 0, "new_unknown": 0, "new_gate_ready": 0, "new_rel_unproven": 0, "auth": 0, "route": 1},
+    "GENERIC_PUBLIC_PAGE": {"n": 1, "old_unknown": 0, "new_unknown": 0, "new_gate_ready": 0, "new_rel_unproven": 0, "auth": 0, "route": 1},
+    "NZ_GETS": {"n": 1, "old_unknown": 0, "new_unknown": 0, "new_gate_ready": 0, "new_rel_unproven": 0, "auth": 0, "route": 1},
+    "SK_UVO": {"n": 1, "old_unknown": 0, "new_unknown": 0, "new_gate_ready": 0, "new_rel_unproven": 0, "auth": 0, "route": 1}
+  },
+  "safety": {
+    "unknown_future_evidence_contracts_auto_promoted": false,
+    "candidate_document_relevance_guard_preserved": true,
+    "portal_refetch_performed": false,
+    "automatic_final_verdict": false
+  }
+}
