@@ -1,85 +1,93 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32098369885,
+  "latest_source_dce_run_id": 32106912628,
   "total_inbox_rows": 160,
-  "dce_authenticity_rows": 137,
+  "dce_authenticity_rows": 93,
   "portal_counts": {
-    "IRELAND_ETENDERS": 58,
-    "EE_RHR": 36,
-    "ZA_ETENDERS": 22,
-    "ES_PLACSP": 12,
-    "GENERIC_PUBLIC_PAGE": 4,
-    "TED": 3,
-    "SCOTLAND_PCS": 2
+    "IRELAND_ETENDERS": 54,
+    "ZA_ETENDERS": 21,
+    "EE_RHR": 10,
+    "GENERIC_PUBLIC_PAGE": 3,
+    "ES_PLACSP": 2,
+    "SCOTLAND_PCS": 1,
+    "TED": 1,
+    "PL_EZAMOWIENIA": 1
   },
   "status_counts": {
-    "UNKNOWN_RETRIEVED_DOCUMENT": 133,
+    "UNKNOWN_RETRIEVED_DOCUMENT": 89,
     "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 4
   },
   "reason_counts": {
-    "NON_AUTHORITATIVE": 133,
-    "AUTH_REQUIRED": 3,
-    "NO_PUBLIC_FILE": 1
+    "NON_AUTHORITATIVE": 90,
+    "AUTH_REQUIRED": 1,
+    "NO_PUBLIC_FILE": 1,
+    "ERROR_RETRYABLE": 1
   },
   "method_counts": {},
   "recovery_opportunities": [
     {
-      "portal": "TED",
-      "blocked": 3,
+      "portal": "PL_EZAMOWIENIA",
+      "blocked": 1,
       "likely_public_recovery_target": 1,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 2,
+        "ERROR_RETRYABLE": 1
+      }
+    },
+    {
+      "portal": "TED",
+      "blocked": 1,
+      "likely_public_recovery_target": 1,
+      "reason_counts": {
         "NO_PUBLIC_FILE": 1
       }
     },
     {
       "portal": "IRELAND_ETENDERS",
-      "blocked": 58,
+      "blocked": 54,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 56,
-        "AUTH_REQUIRED": 2
-      }
-    },
-    {
-      "portal": "EE_RHR",
-      "blocked": 36,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 36
+        "NON_AUTHORITATIVE": 54
       }
     },
     {
       "portal": "ZA_ETENDERS",
-      "blocked": 22,
+      "blocked": 21,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 21,
+        "NON_AUTHORITATIVE": 20,
         "AUTH_REQUIRED": 1
       }
     },
     {
-      "portal": "ES_PLACSP",
-      "blocked": 12,
+      "portal": "EE_RHR",
+      "blocked": 10,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 12
+        "NON_AUTHORITATIVE": 10
       }
     },
     {
       "portal": "GENERIC_PUBLIC_PAGE",
-      "blocked": 4,
+      "blocked": 3,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 4
+        "NON_AUTHORITATIVE": 3
       }
     },
     {
-      "portal": "SCOTLAND_PCS",
+      "portal": "ES_PLACSP",
       "blocked": 2,
       "likely_public_recovery_target": 0,
       "reason_counts": {
         "NON_AUTHORITATIVE": 2
+      }
+    },
+    {
+      "portal": "SCOTLAND_PCS",
+      "blocked": 1,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 1
       }
     }
   ],
@@ -134,22 +142,6 @@
         "buyer": "Transnet SOC Ltd",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
         "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-164931"
-      },
-      {
-        "candidate_id": "IE:8645131",
-        "portal": "IRELAND_ETENDERS",
-        "title": "Design, Construction and Delivery of Cherry Orchard (Affordable for Sale) Housing Development (Pro405)",
-        "buyer": "The Land Development Agency",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8645131"
-      },
-      {
-        "candidate_id": "IE:8784211",
-        "portal": "IRELAND_ETENDERS",
-        "title": "Construction of MUGA for Coolaney/Mullinabreena GAA Club at Achonry",
-        "buyer": "Coolaney/Mullinabreena GAA club",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8784211"
       }
     ],
     "NO_PUBLIC_FILE": [
@@ -160,6 +152,16 @@
         "buyer": "Irado",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
         "notice_url": "https://ted.europa.eu/en/notice/-/detail/568274-2026"
+      }
+    ],
+    "ERROR_RETRYABLE": [
+      {
+        "candidate_id": "PL-BZP:08def836-5ac2-5963-962b-120001f5bd03",
+        "portal": "PL_EZAMOWIENIA",
+        "title": "Budowa oświetlenia przy drodze powiatowej nr 2018L w m. Łuszczów Kolonia.",
+        "buyer": "Gmina Łęczna",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08def836-5ac2-5963-962b-120001f5bd03"
       }
     ]
   },
