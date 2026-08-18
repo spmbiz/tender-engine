@@ -15,6 +15,10 @@ concurrency:
 
 jobs:
   persist:
+    # Canonical quality evidence on main must only be written by a canary that
+    # actually tested main. Experimental/agent branches keep their own Actions
+    # artifacts but may never overwrite control/dce_rollback_ab_latest.json.
+    if: github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -38,6 +42,7 @@ jobs:
           SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
           SOURCE_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
           SOURCE_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          SOURCE_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
           SOURCE_CREATED_AT: ${{ github.event.workflow_run.created_at }}
         shell: bash
         run: |
@@ -69,6 +74,9 @@ jobs:
           hard=int((rollback or {}).get('hard_regression_count') or 0)
           expansion_bad=list((expansion or {}).get('bad') or [])
           source_conclusion=os.environ.get('SOURCE_CONCLUSION') or 'unknown'
+          source_head_branch=os.environ.get('SOURCE_HEAD_BRANCH') or 'unknown'
+          if source_head_branch != 'main':
+              errors.append(f'non_main_source_branch:{source_head_branch}')
           if hard:
               errors.append(f'rollback_hard_regressions:{hard}')
           if expansion_bad:
@@ -86,12 +94,14 @@ jobs:
                   'run_id':os.environ.get('SOURCE_RUN_ID'),
                   'conclusion':source_conclusion,
                   'head_sha':os.environ.get('SOURCE_HEAD_SHA'),
+                  'head_branch':source_head_branch,
                   'created_at':os.environ.get('SOURCE_CREATED_AT'),
               },
               'rollback_report':rollback,
               'expansion_summary':expansion,
               'artifact_paths':{'rollback':rollback_path,'expansion':expansion_path},
               'gate':{
+                  'canonical_source_branch':'main',
                   'current_may_not_lose_baseline_downloaded_public':True,
                   'hard_regression_count':hard,
                   'expansion_bad_route_count':len(expansion_bad),
@@ -105,6 +115,7 @@ jobs:
               'hard_regressions':hard,
               'expansion_bad_routes':len(expansion_bad),
               'source_run_id':payload['source_workflow']['run_id'],
+              'source_head_branch':source_head_branch,
           },indent=2))
           PY
 
