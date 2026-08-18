@@ -1,0 +1,39 @@
+{
+  "schema": "FRESH_DIGITAL_EXPRESS_SUMMARY_V1",
+  "source_run": "32079758178",
+  "min_score": 84,
+  "limit": 48,
+  "counts": {
+    "deferred_by_limit": 0,
+    "eligible_before_limit": 10,
+    "input_rows": 38007,
+    "selected": 10,
+    "skip_deadline_unknown": 82,
+    "skip_not_express_core": 907,
+    "skip_not_new_or_updated": 37008
+  },
+  "portal_counts": {
+    "EE_RHR": 1,
+    "IRELAND_ETENDERS": 8,
+    "SCOTLAND_PCS": 1
+  },
+  "fit_class_counts": {
+    "SPM_CONTENT_MARKETING": 1,
+    "SPM_DESIGN": 2,
+    "SPM_DIGITAL_TRAINING": 1,
+    "SPM_PRINT_MIDDLEMAN": 4,
+    "SPM_SOFTWARE_AUTOMATION": 1,
+    "SPM_WEB": 1
+  },
+  "safety": {
+    "new_or_updated_only": true,
+    "requires_parseable_live_deadline": true,
+    "description_only_does_not_enter_express": true,
+    "supported_dce_portal_required": true,
+    "exact_version_attempt_ledger_checked": true,
+    "express_lane_can_create_green": false,
+    "authoritative_dce_required_downstream": true,
+    "semantic_qwen_lane_remains_independent": true,
+    "drops_or_deletes_notices": false
+  }
+}
