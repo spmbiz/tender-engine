@@ -1,8 +1,8 @@
 {
   "schema": "GPT_INBOX_HEALTH_V2",
-  "updated_at": "2026-08-18T15:22:24.501961+00:00",
+  "updated_at": "2026-08-18T17:07:09.634141+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V2",
-  "latest_source_dce_run_id": 32150412154,
+  "latest_source_dce_run_id": 32163652520,
   "counts": {
     "pending_gpt_web_review": 160,
     "reviewed_ticks_total": 182,
@@ -23,9 +23,9 @@
     },
     "by_spm_fit_band": {
       "HOT": 1,
-      "GOOD": 19,
+      "GOOD": 18,
       "MAYBE": 80,
-      "LOW": 1181
+      "LOW": 1182
     },
     "rich_hot_window_target": 160,
     "overflow_beyond_hot_160": 1121,
@@ -36,23 +36,24 @@
   "assistant_read_batch_count": 16,
   "assistant_read_batch_size": 10,
   "recovery_metrics": {
-    "shard_files_scanned": 162,
-    "adjudication_rows_scanned": 1327,
-    "model_review_rows_seen": 429,
-    "dce_authenticity_rows_seen": 92,
+    "shard_files_scanned": 145,
+    "adjudication_rows_scanned": 1235,
+    "model_review_rows_seen": 410,
+    "dce_authenticity_rows_seen": 84,
     "scope_auto_rejected": 0,
     "scope_auto_reject_reason_counts": {},
     "cross_portal_duplicates_collapsed": 3,
-    "uncapped_unique_pending_before_hot_window": 515,
+    "uncapped_unique_pending_before_hot_window": 491,
     "rich_hot_window_count": 160,
-    "overflow_beyond_hot_window": 355
+    "overflow_beyond_hot_window": 331
   },
   "index_recovery": {
-    "shard_files_scanned_this_refresh": 162,
-    "adjudication_rows_scanned_this_refresh": 1327,
-    "gate_rows_seen_this_refresh": 429,
-    "authenticity_rows_seen_this_refresh": 92,
+    "shard_files_scanned_this_refresh": 145,
+    "adjudication_rows_scanned_this_refresh": 1235,
+    "gate_rows_seen_this_refresh": 410,
+    "authenticity_rows_seen_this_refresh": 84,
     "source_runs_seen_this_refresh": [
+      32163652520,
       32150412154,
       32149659207,
       32147698042,
@@ -61,8 +62,7 @@
       32141305381,
       32139057985,
       32137345232,
-      32136570899,
-      32132558029
+      32136570899
     ]
   },
   "healthy": true,
