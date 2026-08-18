@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import urllib.request
+from collections import Counter, defaultdict
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -30,14 +31,7 @@ def load_json(path: Path | None) -> dict[str, Any]:
 
 
 def load_live_current_inbox(path: Path) -> dict[str, Any]:
-    """Prefer the current canonical main-branch inbox over a stale shard snapshot.
-
-    DCE shards run concurrently and may have materialized their local ``--existing``
-    file before a recovery/refresh job restored a much larger persistent queue. A
-    late shard must rebase on the live canonical inbox before rebuilding; otherwise
-    an optimistic GitHub PUT retry can legally overwrite the newer queue with its
-    stale payload. Local tests and non-Actions usage fall back to the supplied file.
-    """
+    """Prefer the current canonical main-branch inbox over a stale shard snapshot."""
     repo = str(os.getenv('GITHUB_REPOSITORY') or '').strip()
     token = str(os.getenv('GH_TOKEN') or os.getenv('GITHUB_TOKEN') or '').strip()
     if repo and token:
@@ -49,7 +43,7 @@ def load_live_current_inbox(path: Path) -> dict[str, Any]:
                 'Authorization': f'Bearer {token}',
                 'Accept': 'application/vnd.github.raw+json',
                 'X-GitHub-Api-Version': '2022-11-28',
-                'User-Agent': 'tender-gpt-inbox/1.1',
+                'User-Agent': 'tender-gpt-inbox/1.2',
             },
         )
         try:
@@ -64,12 +58,7 @@ def load_live_current_inbox(path: Path) -> dict[str, Any]:
 
 
 def load_live_review_ledger(path: Path) -> dict[str, Any]:
-    """Prefer the current main-branch ledger when running inside Actions.
-
-    DCE shards may have checked out before GPT Web added a tick. Reading the live
-    Contents API prevents a late shard from resurrecting already-reviewed rows.
-    Local/scheduled runs safely fall back to the checked-out file.
-    """
+    """Prefer the current main-branch ledger when running inside Actions."""
     repo = str(os.getenv('GITHUB_REPOSITORY') or '').strip()
     token = str(os.getenv('GH_TOKEN') or os.getenv('GITHUB_TOKEN') or '').strip()
     if repo and token:
@@ -80,7 +69,7 @@ def load_live_review_ledger(path: Path) -> dict[str, Any]:
                 'Authorization': f'Bearer {token}',
                 'Accept': 'application/vnd.github.raw+json',
                 'X-GitHub-Api-Version': '2022-11-28',
-                'User-Agent': 'tender-gpt-inbox/1.0',
+                'User-Agent': 'tender-gpt-inbox/1.1',
             },
         )
         try:
@@ -153,7 +142,6 @@ def is_reviewed(row: dict[str, Any], ticks: dict[str, dict[str, Any]]) -> bool:
         return True
     current_run = source_run(row)
     reviewed_run = run_id(tick.get('source_dce_run_id'))
-    # A later DCE generation is allowed to re-enter GPT Web review.
     if current_run is not None and reviewed_run is not None:
         return current_run <= reviewed_run
     return True
@@ -171,14 +159,115 @@ def pending_rank(row: dict[str, Any]):
     )
 
 
-def normalize_hot_review(row: dict[str, Any], source_name: str = 'control/gpt_review_hot.json') -> dict[str, Any] | None:
-    """Normalize anything deliberately placed on the persistent GPT review surface.
+def _stage(row: dict[str, Any]) -> str:
+    return str(row.get('review_stage') or 'BUSINESS_GATES').upper()
 
-    BUSINESS_GATES rows have authoritative post-DCE evidence. At this final queue
-    boundary, deterministic scope rejects may remove only unambiguous physical
-    non-broker work. DCE_AUTHENTICITY rows are never scope-rejected here because GPT
-    Web must first verify that their retrieved material is actually authoritative DCE.
+
+def _band(row: dict[str, Any]) -> str:
+    return str(row.get('spm_fit_band') or 'UNKNOWN').upper()
+
+
+def _portal(row: dict[str, Any]) -> str:
+    return str(row.get('portal') or row.get('source') or 'UNKNOWN').upper()
+
+
+def _visible_priority(row: dict[str, Any]) -> bool:
+    signal = str(row.get('upstream_signal') or row.get('classification') or '').upper()
+    return signal in VISIBLE_REVIEW_SIGNALS
+
+
+def _diverse_pick(rows: list[dict[str, Any]], n: int, chosen: set[str], lane: str) -> list[dict[str, Any]]:
+    groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        k = key(row)
+        if k and k not in chosen:
+            groups[_portal(row)].append(row)
+    for portal in groups:
+        groups[portal].sort(key=lambda r: (pending_rank(r), hashlib.sha256(key(r).encode()).hexdigest()), reverse=True)
+    portals = sorted(groups, key=lambda p: (-len(groups[p]), p))
+    out = []
+    while portals and len(out) < n:
+        next_portals = []
+        for portal in portals:
+            bucket = groups[portal]
+            while bucket and key(bucket[0]) in chosen:
+                bucket.pop(0)
+            if not bucket:
+                continue
+            row = dict(bucket.pop(0))
+            chosen.add(key(row))
+            row['upstream_review_lane'] = row.get('review_lane')
+            row['inbox_lane'] = lane
+            out.append(row)
+            if bucket:
+                next_portals.append(portal)
+            if len(out) >= n:
+                break
+        portals = next_portals
+    return out
+
+
+def select_inbox_window(rows: list[dict[str, Any]], max_items: int) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Non-destructive visible-window selection.
+
+    75% priority + 12.5% authenticity repair + 12.5% portal-diverse LOW
+    surveillance. The full uncapped backlog remains in gpt_review_index.json.
     """
+    if max_items <= 0:
+        return [], {}
+    auth_n = max(1, int(round(max_items * 0.125)))
+    low_n = max(1, int(round(max_items * 0.125)))
+    priority_n = max(0, max_items - auth_n - low_n)
+    ordered = sorted(rows, key=pending_rank, reverse=True)
+    chosen: set[str] = set()
+    selected: list[dict[str, Any]] = []
+
+    priority_pool = [r for r in ordered if _visible_priority(r) or (_stage(r) != 'DCE_AUTHENTICITY' and _band(r) != 'LOW')]
+    for row in priority_pool:
+        if len(selected) >= priority_n:
+            break
+        k = key(row)
+        if not k or k in chosen:
+            continue
+        chosen.add(k)
+        out = dict(row)
+        out['upstream_review_lane'] = out.get('review_lane')
+        out['inbox_lane'] = 'GPT_PRIORITY'
+        selected.append(out)
+
+    auth_pool = [r for r in ordered if _stage(r) == 'DCE_AUTHENTICITY']
+    selected.extend(_diverse_pick(auth_pool, auth_n, chosen, 'DCE_AUTHENTICITY_REPAIR'))
+
+    low_pool = [r for r in ordered if _band(r) == 'LOW' and _stage(r) != 'DCE_AUTHENTICITY']
+    selected.extend(_diverse_pick(low_pool, low_n, chosen, 'LOW_PORTAL_SURVEILLANCE'))
+
+    if len(selected) < max_items:
+        for row in ordered:
+            if len(selected) >= max_items:
+                break
+            k = key(row)
+            if not k or k in chosen:
+                continue
+            chosen.add(k)
+            out = dict(row)
+            out['upstream_review_lane'] = out.get('review_lane')
+            out['inbox_lane'] = 'ELASTIC_FILL'
+            selected.append(out)
+
+    metrics = {
+        'priority_target': priority_n,
+        'authenticity_target': auth_n,
+        'low_surveillance_target': low_n,
+        'selected_by_lane': dict(Counter(str(r.get('inbox_lane') or 'UNKNOWN') for r in selected)),
+        'selected_by_stage': dict(Counter(_stage(r) for r in selected)),
+        'selected_by_band': dict(Counter(_band(r) for r in selected)),
+        'selected_by_portal': dict(Counter(_portal(r) for r in selected)),
+    }
+    return selected, metrics
+
+
+def normalize_hot_review(row: dict[str, Any], source_name: str = 'control/gpt_review_hot.json') -> dict[str, Any] | None:
+    """Normalize anything deliberately placed on the persistent GPT review surface."""
     if not isinstance(row, dict) or not key(row) or not open_deadline(row):
         return None
 
@@ -192,8 +281,6 @@ def normalize_hot_review(row: dict[str, Any], source_name: str = 'control/gpt_re
     elif not gate_ready or coverage <= 0:
         return None
     elif evaluate_post_dce_scope(row).get('auto_reject'):
-        # Safety net against stale existing inbox rows and legacy release assets.
-        # New shards are already resolved earlier by final_verdict_guard.py.
         return None
 
     score = int(row.get('spm_post_dce_score') or row.get('priority_score') or 0)
@@ -229,6 +316,7 @@ def normalize_hot_green(row: dict[str, Any]) -> dict[str, Any] | None:
     out['gpt_priority_score'] = max(70, min(100, int(out.get('final_score') or 0)))
     out['finality'] = 'UPSTREAM_GUARDED_SIGNAL_NOT_A_GPT_WEB_VERDICT'
     out['inbox_live_source'] = 'control/supergreen_hot.json'
+    out['review_lane'] = 'GUARDED_GREEN_PRIORITY'
     out['evidence_locator'] = {
         'dce_run_id': source_run(out),
         'shard': out.get('source_shard'),
@@ -277,8 +365,6 @@ def main() -> None:
         if cur is None or pending_rank(row) >= pending_rank(cur):
             pending[k] = row
 
-    # Carry forward still-unreviewed items from every prior DCE generation, except
-    # deterministic post-DCE scope rejects that are no longer valid GPT work.
     existing_rows = existing.get('review_queue')
     if not isinstance(existing_rows, list):
         existing_rows = existing.get('pending_final_review') or []
@@ -286,23 +372,17 @@ def main() -> None:
         if isinstance(raw, dict):
             consider(normalize_hot_review(raw, 'existing_inbox'))
 
-    # Persistent recovered DCE review rows. Ranking changes order only; the scope gate
-    # removes only the narrowly defined post-DCE physical non-broker cases.
     for raw in hot_review.get('items', []) or []:
         if isinstance(raw, dict):
             consider(normalize_hot_review(raw))
 
-    # Guarded/automatic GREEN is a priority signal only; GPT Web still reviews it.
     for bucket in ('final_supergreens', 'greens'):
         for raw in hot_green.get(bucket, []) or []:
             if isinstance(raw, dict):
                 consider(normalize_hot_green(raw))
 
-    # Old callers still pass 60/100. Treat that as a compatibility hint, never as a
-    # destructive cap: the persistent queue must be large enough to retain the whole
-    # current review surface until GPT Web ticks it.
     max_items = max(MIN_PERSISTENT_INBOX_ITEMS, int(args.max_items or 0))
-    rows = sorted(pending.values(), key=pending_rank, reverse=True)[:max_items]
+    rows, window_selection = select_inbox_window(list(pending.values()), max_items)
 
     runs: list[int] = []
     for value in (hot_review.get('latest_dce_run_id'), hot_green.get('latest_dce_run_id')):
@@ -314,28 +394,29 @@ def main() -> None:
         if n is not None:
             runs.append(n)
 
-    stage_counts: dict[str, int] = {}
-    for row in rows:
-        stage = str(row.get('review_stage') or 'BUSINESS_GATES').upper()
-        stage_counts[stage] = stage_counts.get(stage, 0) + 1
-
+    stage_counts = dict(Counter(_stage(row) for row in rows))
     payload = {
-        'schema': 'GPT_WEB_REVIEW_INBOX_V2',
+        'schema': 'GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE',
         'updated_at': datetime.now(timezone.utc).isoformat(),
         'latest_source_dce_run_id': max(runs) if runs else existing.get('latest_source_dce_run_id'),
         'review_queue': rows,
         'pending_final_review': rows,
+        'window_selection': window_selection,
         'counts': {
             'pending_gpt_web_review': len(rows),
             'reviewed_ticks_total': len(ticks),
             'excluded_already_reviewed': filtered_reviewed,
             'excluded_already_in_final_bank': filtered_resolved,
+            'pending_before_visible_cap': len(pending),
             'pending_by_stage': stage_counts,
+            'pending_by_inbox_lane': dict(Counter(str(row.get('inbox_lane') or 'UNKNOWN') for row in rows)),
+            'pending_by_fit_band': dict(Counter(_band(row) for row in rows)),
+            'pending_by_portal': dict(Counter(_portal(row) for row in rows)),
         },
-        'review_contract': 'This file is only GPT Web work. BUSINESS_GATES rows have gate-ready DCE and narrowly-scoped deterministic physical rejects are removed before this boundary. DCE_AUTHENTICITY rows require GPT Web to verify retrieved candidate material first. Nothing in this inbox is a final verdict.',
+        'review_contract': 'This file is only the visible GPT Web work window. It uses 75% priority, 12.5% DCE-authenticity repair, and 12.5% portal-diverse LOW surveillance with elastic fill. The durable uncapped backlog remains control/gpt_review_index.json; no candidate is deleted by this visible cap.',
         'tick_contract': 'After GPT Web reviews a pass, add one durable reviewed tick per candidate to control/gpt_web_review_ledger.json. The next rebuild removes ticked rows automatically. A later DCE run may re-enter review.',
         'final_bank_contract': 'Decided GREEN/YELLOW/RED/FINAL_SUPER_GREEN results belong in control/final_supergreen_bank.json, never mixed into this inbox.',
-        'pipeline_contract': 'harvest -> Qwen/local triage -> DCE/evidence -> deterministic post-DCE scope gate -> persistent GPT Web review inbox -> GPT Web review + tick -> final bank.',
+        'pipeline_contract': 'harvest -> rich-context Qwen triage -> DCE/evidence with document provenance -> deterministic post-DCE scope gate -> fair-share GPT Web inbox -> GPT Web review + tick -> final bank.',
     }
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
