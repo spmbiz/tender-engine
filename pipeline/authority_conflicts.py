@@ -50,6 +50,7 @@ SUBMISSION_WORDS = re.compile(
     r"deadline for receipt of (?:tenders|offers|requests to participate|quotations)|"
     r"closing date for (?:tender )?submission|closing date for submissions|deadline for (?:tender )?submission|"
     r"deadline for receipt of quotations|deadline for receipt of bids|submission deadline|tender deadline|bid deadline|"
+    r"(?:rfq|rfp|bid|tender|quotation|proposal)\s+closing date|"
     r"remise des offres|réception des offres|reception des offres|date limite de (?:remise|réception|reception) des offres|"
     r"angebotsfrist|einreichungsfrist|teilnahmefrist|frist (?:zur|für die|fuer die) (?:abgabe|einreichung)|"
     r"termin sk[łl]adania ofert|termin z[łl]o[żz]enia ofert|plazo de presentaci[oó]n|"
@@ -154,10 +155,14 @@ def deadline_contexts(gates: dict, corpus: str) -> tuple[str,dict]:
 
 
 def labelled_deadline_dates(text: str) -> list[dict]:
-    dates=extract_dates(text)
+    # Procurement PDFs/HTML frequently use NBSP/narrow-NBSP between words.
+    # Replace them one-for-one so regex labels match while every date/span offset
+    # remains valid against the original text used for evidence context.
+    scan_text=(text or '').replace('\u00a0',' ').replace('\u202f',' ')
+    dates=extract_dates(scan_text)
     labelled=[]; seen=set()
     for label,rx in (('SUBMISSION',SUBMISSION_WORDS),('QUERY',QUERY_WORDS)):
-        for kw in rx.finditer(text or ''):
+        for kw in rx.finditer(scan_text):
             # Deadline values normally appear after the label. Permit a tiny prefix
             # for layouts where a table puts the date immediately before the label.
             candidates=[d for d in dates if d['start'] >= kw.start()-25 and d['start'] <= kw.end()+240]
@@ -170,7 +175,7 @@ def labelled_deadline_dates(text: str) -> list[dict]:
             labelled.append({
                 'date':nearest['date'],'match':nearest['match'],'label':label,
                 'keyword':kw.group(0),'distance':nearest['start']-kw.end(),
-                'context':text[max(0,kw.start()-180):min(len(text),nearest['end']+300)]
+                'context':scan_text[max(0,kw.start()-180):min(len(scan_text),nearest['end']+300)]
             })
     return labelled
 
