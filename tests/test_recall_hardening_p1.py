@@ -51,15 +51,17 @@ def test_qwen_rich_context_preserves_tail_and_gate_fields():
             "award_criteria": "AWARD_TOKEN",
         },
     }
-    text = rich.rich_description(row, 2200)
+    text = rich.rich_description(row, 500)
+    assert len(text) <= rich.MIN_CONTEXT_CHARS + 8
+    assert rich.MIN_CONTEXT_CHARS >= 2200
     assert "HEAD" in text
     assert "TAIL_CONSTRAINT_TOKEN" in text
     assert "ELIGIBILITY_TOKEN" in text
     assert "SUBCONTRACT_TOKEN" in text
 
 
-def test_live_qwen_workflow_tracks_rich_implementation_and_context_budget():
-    text = (ROOT / ".github/workflows/qwen-live-classification.yml").read_text(encoding="utf-8")
-    assert "pipeline/qwen_notice_batch_selfheal_rich.py" in text
-    assert "pipeline/qwen_notice_batch_selfheal_core.py" in text
-    assert "--description-chars 2200" in text
+def test_live_qwen_entrypoint_uses_rich_wrapper():
+    wrapper = (ROOT / "pipeline/qwen_notice_batch_selfheal.py").read_text(encoding="utf-8")
+    workflow = (ROOT / ".github/workflows/qwen-live-classification.yml").read_text(encoding="utf-8")
+    assert "qwen_notice_batch_selfheal_rich" in wrapper
+    assert "pipeline/qwen_notice_batch_selfheal.py" in workflow
