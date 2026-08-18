@@ -14,6 +14,9 @@ TED_SEARCH = "https://api.ted.europa.eu/v3/notices/search"
 FIELDS = [
     "publication-number",
     "publication-date",
+    "notice-title",
+    "buyer-name",
+    "description-proc",
     "document-url-lot",
     "document-url-part",
 ]
@@ -54,6 +57,11 @@ def scalar(value):
     if isinstance(value, str):
         return value
     if isinstance(value, dict):
+        for key in ("eng", "en", "fra", "fr", "value"):
+            if key in value:
+                x = scalar(value.get(key))
+                if x:
+                    return x
         for v in value.values():
             x = scalar(v)
             if x:
@@ -150,6 +158,9 @@ def main():
                     "portal": "TED",
                     "source": "TED",
                     "publication_number": pub,
+                    "title": scalar(notice.get("notice-title")) or "",
+                    "buyer": scalar(notice.get("buyer-name")) or "",
+                    "description": scalar(notice.get("description-proc")) or "",
                     "notice_url": f"https://ted.europa.eu/en/notice/-/detail/{pub}",
                     "route": {"publication_number": pub},
                     "benchmark_target_host": host,
@@ -178,6 +189,7 @@ def main():
         "rows": len(rows),
         "scanned": scanned,
         "queue": str(out),
+        "route_recovery_fields": ["title", "buyer", "description"],
     }
     print(json.dumps(summary, indent=2, ensure_ascii=False))
     if not rows:

@@ -1,0 +1,162 @@
+name: DCE V22/V23 Regression
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pipeline/dce_worker_v22.py'
+      - 'pipeline/dce_worker_v23.py'
+      - 'pipeline/dce_batch_worker.py'
+      - 'pipeline/dce_batch_worker_v22.py'
+      - 'pipeline/build_ted_top_host_smoke_queue.py'
+      - 'pipeline/test_dce_worker_v22_routes.py'
+      - 'pipeline/test_dce_worker_v23_routes.py'
+      - '.github/workflows/dce-v22-regression.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install unit dependencies
+        run: python -m pip install --disable-pip-version-check -q requests pytest pypdf python-docx openpyxl python-pptx 'playwright>=1.46,<2'
+      - name: Compile V22/V23
+        run: python -m py_compile pipeline/dce_worker_v22.py pipeline/dce_worker_v23.py pipeline/dce_batch_worker.py pipeline/dce_batch_worker_v22.py pipeline/build_ted_top_host_smoke_queue.py pipeline/test_dce_worker_v22_routes.py pipeline/test_dce_worker_v23_routes.py
+      - name: V22/V23 resolver contracts
+        run: |
+          PYTHONPATH=pipeline:. python pipeline/test_dce_worker_v22_routes.py
+          PYTHONPATH=pipeline:. python pipeline/test_dce_worker_v23_routes.py
+      - name: Existing evidence contracts
+        run: PYTHONPATH=pipeline:. python -m pytest -q tests/test_dce_evidence_quality.py tests/test_aggregate_dce_evidence_contract.py tests/test_dce_evidence_provenance.py
+
+  live-top-hosts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install resolver dependencies
+        run: python -m pip install --disable-pip-version-check -q requests pypdf python-docx openpyxl python-pptx 'playwright>=1.46,<2'
+      - name: Reuse runner Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then
+            echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Build enriched real TED top-host queue
+        run: |
+          PYTHONPATH=. python pipeline/build_ted_top_host_smoke_queue.py \
+            --out generated/ted-top-hosts-v23.jsonl \
+            --max-scan 10000 \
+            --per-host 1
+          echo '--- queue ---'
+          cat generated/ted-top-hosts-v23.jsonl
+      - name: Resolve through branch active worker
+        env:
+          DCE_BROWSER_INLINE_RETRIES: '0'
+          DCE_HTTP_INLINE_RETRIES: '0'
+          DCE_BROWSER_FAST_TIMEOUT_SECONDS: '150'
+          DCE_HTTP_FAST_TIMEOUT_SECONDS: '90'
+        run: |
+          count="$(wc -l < generated/ted-top-hosts-v23.jsonl | tr -d ' ')"
+          lines="$(seq -s, 1 "$count")"
+          PYTHONPATH=pipeline:. python pipeline/dce_batch_worker.py \
+            --queue generated/ted-top-hosts-v23.jsonl \
+            --lines "$lines" \
+            --out ted-v23-out \
+            --concurrency 6 \
+            --http-probe-concurrency 8 \
+            --http-probe-timeout-seconds 7 \
+            --retries 0 \
+            --timeout-seconds 150
+      - name: Validate transport hygiene, canonical PLACSP and route recovery
+        shell: bash
+        run: |
+          PYTHONPATH=pipeline:. python - <<'PY'
+          import json, re
+          from collections import Counter
+          from pathlib import Path
+
+          queue = {}
+          for line in Path('generated/ted-top-hosts-v23.jsonl').read_text(encoding='utf-8').splitlines():
+              if line.strip():
+                  c=json.loads(line); queue[c['candidate_id']]=c
+
+          bad = re.compile(r'ionicons|nutzungsbedingungen|depot[-_ ]?pli|agb[-_ ]?subreport|datenschutzerklaerung|auftragsdatenverarbeitung', re.I)
+          rows=[]; counts=Counter(); leaked=[]
+          for p in sorted(Path('ted-v23-out').rglob('manifest.json')):
+              m=json.loads(p.read_text(encoding='utf-8',errors='replace'))
+              cid=str(m.get('candidate_id') or '')
+              c=queue.get(cid,{})
+              files=[x for x in (m.get('files') or []) if isinstance(x,dict)]
+              for f in files:
+                  if bad.search(str(f.get('name') or '')):
+                      leaked.append({'candidate_id':cid,'name':f.get('name')})
+              methods=[a for a in (m.get('dce_method_attempts') or []) if isinstance(a,dict)]
+              status=str(m.get('status') or 'UNKNOWN')
+              counts[status]+=1
+              rows.append({
+                  'host':c.get('benchmark_target_host'),
+                  'candidate_id':cid,
+                  'title':c.get('title'),
+                  'status':status,
+                  'files':[f.get('name') for f in files],
+                  'rejected_files':[f.get('name') for f in (m.get('transport_rejected_files') or []) if isinstance(f,dict)],
+                  'auth_redirect_v22':m.get('auth_redirect_v22'),
+                  'nen_recovered':m.get('cz_nen_profile_recovered_detail_v22'),
+                  'place_recovered':m.get('fr_place_search_recovered_detail_v22'),
+                  'placsp_match':(m.get('placsp_atom_resolution') or {}).get('match_method'),
+                  'methods':[a.get('method') for a in methods[-15:]],
+              })
+          experimental_placsp=[r for r in rows if str(r['placsp_match'] or '').endswith('v22')]
+          result={
+              'tested':len(rows),
+              'status_counts':dict(counts.most_common()),
+              'downloaded_public':sum(1 for r in rows if r['status']=='DOWNLOADED_PUBLIC' and r['files']),
+              'transport_rejections':sum(len(r['rejected_files']) for r in rows),
+              'auth_redirect_refinements':sum(1 for r in rows if r['auth_redirect_v22']),
+              'nen_route_recoveries':sum(1 for r in rows if r['nen_recovered']),
+              'place_route_recoveries':sum(1 for r in rows if r['place_recovered']),
+              'experimental_placsp_matches':experimental_placsp,
+              'leaked_known_non_dce_assets':leaked,
+              'rows':rows,
+          }
+          print(json.dumps(result,indent=2,ensure_ascii=False))
+          Path('ted-v23-summary.json').write_text(json.dumps(result,indent=2,ensure_ascii=False),encoding='utf-8')
+          if not rows:
+              raise SystemExit('no V23 manifests produced')
+          if leaked:
+              raise SystemExit(f'known portal assets leaked into DCE files: {leaked}')
+          if experimental_placsp:
+              raise SystemExit(f'V23 leaked experimental PLACSP title matching: {experimental_placsp}')
+          if result['downloaded_public'] < 5:
+              raise SystemExit(f'unexpected broad DCE regression: only {result["downloaded_public"]} public downloads')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dce-v23-regression-${{ github.run_id }}
+          path: |
+            ted-v23-summary.json
+            generated/ted-top-hosts-v23.jsonl
+            ted-v23-out/batch_results.json
+            ted-v23-out/batch_summary.json
+            ted-v23-out/http_probe_summary.json
+            ted-v23-out/**/manifest.json
+            ted-v23-out/**/transport_rejections.jsonl
+          retention-days: 5
+          if-no-files-found: warn
