@@ -64,6 +64,30 @@ def test_high_lean_direct_core_maybe_is_promoted_to_fit():
     assert "high_recall_core_high_direct_maybe_promoted_to_fit" in out["post_guard_actions"]
 
 
+def test_polish_web_application_high_confidence_maybe_is_promoted_without_finalizing_truth():
+    out = guard(base(
+        "Zaprojektowanie, wykonanie i uruchomienie dostępnej aplikacji web ułatwiającej wybór kierunku studiów",
+        classification="MAYBE",
+        lean="HIGH",
+        route="DIRECT_DIGITAL",
+    ))
+    assert out["classification"] == "FIT"
+    assert out["dce_eligible"] is True
+    assert out["needs_gpt_review"] is True
+    assert "high_recall_core_high_direct_maybe_promoted_to_fit" in out["post_guard_actions"]
+    assert "classification" in out and "FINAL_SUPER_GREEN" not in str(out.values())
+
+
+def test_polish_web_word_alone_does_not_promote_when_confidence_legs_are_missing():
+    out = guard(base(
+        "Dostępna aplikacja web dla studentów",
+        classification="MAYBE",
+        lean="MEDIUM",
+        route="DIRECT_DIGITAL",
+    ))
+    assert out["classification"] == "MAYBE"
+
+
 def test_exact_external_context_promotes_raw_result_without_embedded_notice(tmp_path: Path):
     raw = {
         "canonical_notice_id": "PL-BZP:abc",
