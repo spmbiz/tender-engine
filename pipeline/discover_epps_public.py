@@ -23,12 +23,13 @@ PAGE_END = max(PAGE_START, int(os.getenv("PAGE_END", "20")))
 PAGE_SIZE = max(10, min(100, int(os.getenv("PAGE_SIZE", "100"))))
 NOW = datetime.now(TZ)
 S = requests.Session()
-S.headers.update({"User-Agent":"Tender-Engine/6.2 (+public procurement research; official ePPS public registries)","Accept":"text/html,application/xhtml+xml,*/*"})
+S.headers.update({"User-Agent":"Tender-Engine/6.3 (+public procurement research; official ePPS public registries)","Accept":"text/html,application/xhtml+xml,*/*"})
 RESOURCE_RE=re.compile(r"resourceId=(\d+)",re.I)
 TEXTUAL_DEADLINE_RE=re.compile(r"\b(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2})\s+(\d{2}:\d{2}:\d{2})\s+(?:CET|CEST|EET|EEST|GMT|UTC|IST)\s+(\d{4})\b",re.I)
 NUMERIC_DEADLINE_RE=re.compile(r"\b(\d{1,2}/\d{1,2}/\d{4})\s+(\d{1,2}:\d{2}(?::\d{2})?)\b")
 EXPIRED_STATUS=re.compile(r"\b(?:awarded|archived|cancelled|canceled|closed|evaluation|completed|withdrawn|concluded|for archival)\b|(?:Ακυρώ|Κατακυρ|Παγιωμ|Ολοκληρ)",re.I)
 LIVE_STATUS=re.compile(r"\b(?:tender submission|open|awaiting tender opening|submission)\b|(?:Υποβολ|Προσφορ)",re.I)
+CAPTCHA_RE=re.compile(r"\bcaptcha\b|type the code shown|κωδικό captcha",re.I)
 
 def clean(v): return " ".join(str(v or "").split())
 def request(url):
@@ -97,30 +98,37 @@ def parse_page(html,page_url,page_no):
     return rows
 
 def page_url(pg):
-    # Production installs differ. Cyprus exposes its registry through viewCFTSAction;
-    # Malta exposes the CfT registry through quickSearchAction. Sort on deadline so
-    # the bounded first pages contain current/future opportunities rather than archives.
     if SOURCE=="CYPRUS_EPPS":
         return f"{BASE_URL}/epps/viewCFTSAction.do?T01_ps={PAGE_SIZE}&d-3680175-n=1&d-3680175-o=2&d-3680175-p={pg}&d-3680175-s=deadline"
     if SOURCE=="MALTA_EPPS":
         return f"{BASE_URL}/epps/quickSearchAction.do?T01_ps={PAGE_SIZE}&d-3680175-n=1&d-3680175-o=2&d-3680175-p={pg}&d-3680175-s=deadline&searchSelect=1"
     return f"{BASE_URL}/epps/quickSearchAction.do?T01_ps={PAGE_SIZE}&d-3680175-p={pg}&searchSelect=1"
-
 def main():
-    by_id={};errors=[];pages=0;empty_streak=0
+    by_id={};errors=[];warnings=[];pages=0;empty_streak=0;captcha_pages=[];exhausted=False
     for pg in range(PAGE_START,PAGE_END+1):
         url=page_url(pg)
         try:
-            r=request(url);records=parse_page(r.text,r.url,pg);pages+=1;empty_streak=empty_streak+1 if not records else 0
+            r=request(url)
+            body=r.text
+            if CAPTCHA_RE.search(body):
+                captcha_pages.append(pg)
+                errors.append({"page":pg,"url":r.url,"type":"PUBLIC_SEARCH_CAPTCHA_GATE","message":"Official ePPS response requires CAPTCHA; automation stops rather than bypassing it."})
+                break
+            records=parse_page(body,r.url,pg);pages+=1;empty_streak=empty_streak+1 if not records else 0
             for rec in records:by_id.setdefault(rec["candidate_id"],rec)
-            if empty_streak>=2:break
+            if empty_streak>=2:
+                exhausted=True
+                break
         except Exception as exc:errors.append({"page":pg,"url":url,"error":repr(exc)})
+    if not errors and not captcha_pages and PAGE_END>=PAGE_START and empty_streak<2:
+        warnings.append({"type":"PAGE_WINDOW_ENDED_WITHOUT_EXHAUSTION_PROOF","page_end":PAGE_END})
     rows=sorted(by_id.values(),key=lambda r:(r.get("deadline") or "9999",r["candidate_id"]))
     for name in ("raw.jsonl","current.jsonl"):
         with (OUT/name).open("w",encoding="utf-8") as f:
             for rec in rows:f.write(json.dumps(rec,ensure_ascii=False)+"\n")
-    stats={"source":SOURCE,"base_url":BASE_URL,"listing_contract":"EPPS_PRODUCTION_REGISTRY_V2","page_start":PAGE_START,"page_end_requested":PAGE_END,"pages_fetched":pages,"current_materialized":len(rows),"raw_materialized":len(rows),"deadline_parsed":sum(1 for r in rows if r.get("deadline")),"buyer_parsed":sum(1 for r in rows if r.get("buyer")),"value_parsed":sum(1 for r in rows if r.get("estimated_value") is not None),"errors":errors,"generated_at":NOW.isoformat()}
+    enumeration_complete=bool(exhausted and not errors and rows)
+    stats={"source":SOURCE,"base_url":BASE_URL,"listing_contract":"EPPS_PRODUCTION_REGISTRY_V3_CAPTCHA_AWARE","page_start":PAGE_START,"page_end_requested":PAGE_END,"pages_fetched":pages,"current_materialized":len(rows),"raw_materialized":len(rows),"deadline_parsed":sum(1 for r in rows if r.get("deadline")),"buyer_parsed":sum(1 for r in rows if r.get("buyer")),"value_parsed":sum(1 for r in rows if r.get("estimated_value") is not None),"captcha_pages":captcha_pages,"enumeration_exhausted":exhausted,"enumeration_complete":enumeration_complete,"errors":errors,"warnings":warnings,"generated_at":NOW.isoformat(),"semantics":"Never bypass CAPTCHA. Two consecutive parse-empty registry pages are treated as exhaustion only when no CAPTCHA/error is present; a bounded page window without that proof remains incomplete."}
     (OUT/"stats.json").write_text(json.dumps(stats,indent=2,ensure_ascii=False),encoding="utf-8");print(json.dumps(stats,indent=2,ensure_ascii=False))
     if not rows:raise SystemExit(3)
-    if errors and len(rows)<3:raise SystemExit(2)
+    if errors or not enumeration_complete:raise SystemExit(2)
 if __name__=="__main__":main()
