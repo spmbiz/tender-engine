@@ -54,14 +54,10 @@ def portal_for_fr_url_v22(url: str) -> str | None:
     for suffix, portal in FR_HOST_SUFFIX:
         if host == suffix.lstrip(".") or host.endswith(suffix):
             return portal
-    # Reuse every existing host router after the France-specific aliases.
     try:
-        return v21.v20.v19.v18.v17.v16.v15.v14.portal_for_url_v14(url)
+        return v13.portal_for_url_v13(url)
     except Exception:
-        try:
-            return v13.portal_for_url_v13(url)
-        except Exception:
-            return None
+        return None
 
 
 def _candidate_urls(candidate: dict) -> list[str]:
@@ -167,8 +163,9 @@ def adapter_fr_boamp_v22(candidate: dict, out: Path, manifest: dict):
             host = ""
         if BOAMP_HOST_RE.search(host) and url not in boamp_urls:
             boamp_urls.append(url)
-        elif host and not BOAMP_HOST_RE.search(host):
-            # Preserve authoritative external routes already materialized by discovery.
+        elif host and not BOAMP_HOST_RE.search(host) and portal_for_fr_url_v22(url):
+            # Only known procurement hosts may be promoted without nearby BOAMP
+            # profile/document label context. Unknown buyer homepages remain ignored.
             evidence_blobs.append((f"Adresse internet du profil d'acheteur: {url}", url))
 
     for url in boamp_urls[:3]:
