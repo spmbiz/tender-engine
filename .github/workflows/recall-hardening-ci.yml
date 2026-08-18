@@ -1,0 +1,45 @@
+name: Recall Hardening CI
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recall-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install validation dependencies
+        run: python -m pip install --disable-pip-version-check -q pytest requests pyyaml
+      - name: Compile recall-critical Python
+        run: |
+          python -m py_compile \
+            pipeline/discover_ted.py \
+            pipeline/build_live_world_snapshot.py \
+            pipeline/build_qwen_dce_selection_coded.py
+      - name: Validate recall-critical workflow YAML
+        run: |
+          python - <<'PY'
+          import yaml
+          from pathlib import Path
+          for rel in ('.github/workflows/supergreen-discovery-v2.yml','.github/workflows/live-world-snapshot.yml'):
+              obj=yaml.safe_load(Path(rel).read_text(encoding='utf-8'))
+              assert isinstance(obj,dict) and ('jobs' in obj), rel
+          print('workflow YAML OK')
+          PY
+      - name: Run recall regression suite
+        run: |
+          python -m pytest -q \
+            tests/test_live_universe_contract.py \
+            tests/test_snapshot_carry_forward.py \
+            tests/test_ted_checkpoint.py \
+            tests/test_recall_workflow_contract.py \
+            tests/test_procurement_code_and_review_index.py
