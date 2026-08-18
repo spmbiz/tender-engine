@@ -1,0 +1,53 @@
+{
+  "source_run_id": 32161203600,
+  "generated_at": "2026-08-18T16:38:25Z",
+  "sample_design": "one newest active TED competition notice found per selected dominant BT-15 host",
+  "tested": 19,
+  "transport_status_counts": {
+    "DOWNLOADED_PUBLIC": 12,
+    "GENERIC_PUBLIC_PAGE_UNRESOLVED": 3,
+    "AUTH_REQUIRED": 3,
+    "NO_PUBLIC_FILE": 1
+  },
+  "manifest_triage": {
+    "clear_procurement_document_or_package": [
+      "platformazakupowa.pl",
+      "dtvp.de",
+      "ezamowienia.gov.pl",
+      "viesiejipirkimai.lt",
+      "etenders.gov.ie",
+      "publicprocurement.be",
+      "e-licitatie.ro"
+    ],
+    "transport_success_but_obvious_portal_or_non_dce_asset": {
+      "subreport.de": ["en_AGB_subreport.pdf", "en_Datenschutzerklaerung_subreport.pdf", "en_Vereinbarung_Auftragsdatenverarbeitung_subreport.pdf"],
+      "meinauftrag.rib.de": ["rib-tender-nutzungsbedingungen-05-2026.pdf"],
+      "marches-publics.info": ["depot-pli.pdf"],
+      "eojn.hr": ["ionicons.ttf"],
+      "eis.gov.lv": ["rozamunde1.png"]
+    },
+    "unresolved_or_access_limited": {
+      "app.eop.bg": "GENERIC_PUBLIC_PAGE_UNRESOLVED",
+      "contrataciondelestado.es": "NO_PUBLIC_FILE",
+      "evergabe-online.de": "AUTH_REQUIRED",
+      "marches-publics.gouv.fr": "AUTH_REQUIRED; sampled BT-15 was portal root rather than consultation-specific route",
+      "nen.nipez.cz": "GENERIC_PUBLIC_PAGE_UNRESOLVED; sampled BT-15 was buyer profile rather than tender-detail route",
+      "tarjouspalvelu.fi": "AUTH_REQUIRED",
+      "tendsign.com": "GENERIC_PUBLIC_PAGE_UNRESOLVED"
+    }
+  },
+  "clear_examples": {
+    "platformazakupowa.pl": ["18_ZP_2026 SWZ.pdf", "18_ZP_2026 ToR.pdf", "espd-request en.zip"],
+    "dtvp.de": ["Vergabeunterlagen_CXP4Y4VMUCC.zip", "Vertragsmuster.zip", "Honorar_VgV_HOAI.xlsx"],
+    "ezamowienia.gov.pl": ["ZP.261.13.2026_SWZ_zalaczniki.zip", "ZP.261.13.2026_SWZ.pdf"],
+    "viesiejipirkimai.lt": ["1016_9185234.zip"],
+    "etenders.gov.ie": ["1200_8703892.zip"],
+    "publicprocurement.be": ["831b95f6-fe94-4fa9-8c2b-07d94118687a.zip"],
+    "e-licitatie.ro": ["Instructiuni_ofertanti_FisaDate_DF1275281.pdf", "Clarificare_Oficiu_Automata_CN1094397.pdf"]
+  },
+  "interpretation": [
+    "Transport success is not equivalent to substantive DCE success.",
+    "The repository already has a separate fail-closed evidence-quality layer intended to reject portal guides, terms-of-use and other generic assets.",
+    "The strongest next gains are route recovery and portal-specific extraction, not simply adding another generic browser runtime."
+  ]
+}
