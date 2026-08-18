@@ -1,11 +1,202 @@
 {
   "schema": "GPT_REVIEW_HOT_V3",
-  "updated_at": "2026-08-18T21:36:01.380644+00:00",
+  "updated_at": "2026-08-18T21:36:32.022052+00:00",
   "latest_dce_run_id": 32188400508,
-  "latest_shard": 3,
+  "latest_shard": 2,
   "generation_reset": false,
-  "count": 3,
+  "count": 5,
   "items": [
+    {
+      "candidate_id": "TED:494626-2026",
+      "title": "Romania – Technical support services – Servicii de extindere, întreținere și actualizare a Ecosistemului de Learning Management System (LMS) Moodle al UB - reluare loturile 1, 3 și 4, anunț participare nr.CN1092216 / 05.05.2026",
+      "buyer": "Universitatea din Bucuresti",
+      "portal": "TED",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/494626-2026",
+      "deadline": "2026-08-21T03:00:00+00:00",
+      "estimated_value": 654285.0,
+      "currency": "RON",
+      "preliminary_score": 89,
+      "priority_score": 89,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-21T03:00:00+00:00",
+        "notice_deadline_date": "2026-08-21",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 8,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "lte cohorte la un singur curs sau la mai multe cursuri. Volum cod (nr. linii) = 822 Adaptat pentru versiunea: Moodle 5.1.5+ 10. Sync MOPAS (enabled) local_syncmopas / 2025102902 Acest plugin sincronizează structura anului universitar pe facultăți, nivel de studii (licență, master, doctorat, ddpr), forma de învățământ (la zi sau la distanță), specializare, anul de studiu și semestre, apoi cursurile, rolurile utilizatorilor, înrolar ea utilizatorilor la cursurile corespunzătoare specializării și anului de studiu, toate acestea cu o aplicație externă a UniBuc de tip UMS (University Management System). La momentul sincronizării se creează în platforma Moodle automat categorii, cursuri, cohorte cu studenți și profesorii sunt înrolați la cursurile corespunzătoare conform planului de învățământ. De asemenea se realizează înscrierea utilizatorilor la cursuri în mod automat cu rolurile aferente fiecăruia. Volum cod (nr. linii) = 153206 Adaptat pentru versiunea: Moodle 5.1.5+ 11. Course Category Upload (enabled) tool_uploadcoursecategory / 2011091700 Acest plugin permite următoarele acțiuni: • Adăugare categorii de cursuri cu fișier csv • Posibilitate de ștergere categorii • Posibilitate de redenumire categorii • Câmpuri pentru fișierul CSV: • Name - numele categor",
+            "source": null,
+            "match": "eea"
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "042400 Activat 22) User picture customcertelement_userpicture 2023042400 Activat 23) OpenID Connect auth_oidc 5.0.0 2025040800 Activat 24) Course category upload tool_uploadcoursecategory 2011091700 Activat 25) eMail Test local_mailtest 3.1.7 2025042700 Activat 79 26) Microsoft 365 Integration local_o365 5.0.1 2025040805 Dezactivat 27) Stripe paygw_stripe 1.30 2025091700 Dezactivat Platformă de cursuri – mediul PROD CURSURI - https://moodle.unibuc.ro/ 3. Versiunea Moodle: 5.1.5+ (Build: 20260728) 4. Plugin-uri (total): 524 Modificări aduse asupra Moodle Core: public/user/classes/route/api/preferences.php – Aici se extinde condiția ca să nu se verifice valorile pentru 'block_myoverview_user_semester_preference', pentru că nu este necesar să setăm preferințe noi de fiecare dată când filtrăm după semestre. public/enrol/meta/lib.php – Când se adaugă o instanță nouă la metode de înscriere, atunci se extinde funcția cu parametrul care preia cursuri relaționate. public/enrol/meta/locallib.php – La crearea unui nou grup la metoda de înscriere se customizează ca numele cursului să fie luată în varianta shortname, apoi grupul nou creat să aibă numele compus din numele scurt al cursului și un increment automat. public/enrol/locallib.php – S",
+            "source": null,
+            "match": "references"
+          },
+          {
+            "text": "idc 5.0.0 2025040800 Activat 24) Course category upload tool_uploadcoursecategory 2011091700 Activat 25) eMail Test local_mailtest 3.1.7 2025042700 Activat 79 26) Microsoft 365 Integration local_o365 5.0.1 2025040805 Dezactivat 27) Stripe paygw_stripe 1.30 2025091700 Dezactivat Platformă de cursuri – mediul PROD CURSURI - https://moodle.unibuc.ro/ 3. Versiunea Moodle: 5.1.5+ (Build: 20260728) 4. Plugin-uri (total): 524 Modificări aduse asupra Moodle Core: public/user/classes/route/api/preferences.php – Aici se extinde condiția ca să nu se verifice valorile pentru 'block_myoverview_user_semester_preference', pentru că nu este necesar să setăm preferințe noi de fiecare dată când filtrăm după semestre. public/enrol/meta/lib.php – Când se adaugă o instanță nouă la metode de înscriere, atunci se extinde funcția cu parametrul care preia cursuri relaționate. public/enrol/meta/locallib.php – La crearea unui nou grup la metoda de înscriere se customizează ca numele cursului să fie luată în varianta shortname, apoi grupul nou creat să aibă numele compus din numele scurt al cursului și un increment automat. public/enrol/locallib.php – Se face o extindere în SQL pentru cele de mai sus, unde se ascund studenții care sunt suspendați. public/cours",
+            "source": null,
+            "match": "reference"
+          },
+          {
+            "text": "Previne să fie asignat rolul de non -editing teacher la utilizatorii care sunt studenți și au în email @s.unibuc.ro public/lib/templates/comboboxsearch.mustache – Se șterge o clasă p-0. public/lib/templates/select_menu.mustache – Se adaugă clasa btn-grade. public/lib/templates/loginform.mustache – Se adaugă un link custom și un separator html. public/lib/templates/full_header.mustache – Se adaugă o stirilizare în plus (un margin CSS). Platformă de UAT - https://uat.cursuri.moodle.unibuc.ro/ 3. Versiunea Moodle: 5.1.5+ (Build: 20260728) 4. Plugin-uri (total): 524 Modificări aduse asupra Moodle Core: public/user/classes/route/api/preferences.php – Aici se extinde condiția ca să nu se verifice valorile pentru 'block_myoverview_user_semester_preference', pentru că nu este necesar să setăm preferințe noi de fiecare dată când filtrăm după semestre. public/enrol/meta/lib.php – Când se adaugă o instanță nouă la metode de înscriere, atunci se extinde funcția cu parametrul care preia cursuri relaționate. public/enrol/meta/locallib.php – La crearea unui nou grup la metoda de înscriere se customizează ca numele cursului să fie luată în varianta shortname, apoi grupul nou creat să aibă numele compus din numele scurt al cursului și un increment automat. public/enrol/locallib.php – S",
+            "source": null,
+            "match": "references"
+          },
+          {
+            "text": ".ro public/lib/templates/comboboxsearch.mustache – Se șterge o clasă p-0. public/lib/templates/select_menu.mustache – Se adaugă clasa btn-grade. public/lib/templates/loginform.mustache – Se adaugă un link custom și un separator html. public/lib/templates/full_header.mustache – Se adaugă o stirilizare în plus (un margin CSS). Platformă de UAT - https://uat.cursuri.moodle.unibuc.ro/ 3. Versiunea Moodle: 5.1.5+ (Build: 20260728) 4. Plugin-uri (total): 524 Modificări aduse asupra Moodle Core: public/user/classes/route/api/preferences.php – Aici se extinde condiția ca să nu se verifice valorile pentru 'block_myoverview_user_semester_preference', pentru că nu este necesar să setăm preferințe noi de fiecare dată când filtrăm după semestre. public/enrol/meta/lib.php – Când se adaugă o instanță nouă la metode de înscriere, atunci se extinde funcția cu parametrul care preia cursuri relaționate. public/enrol/meta/locallib.php – La crearea unui nou grup la metoda de înscriere se customizează ca numele cursului să fie luată în varianta shortname, apoi grupul nou creat să aibă numele compus din numele scurt al cursului și un increment automat. public/enrol/locallib.php – Se face o extindere în SQL pentru cele de mai sus, unde se ascund studenții care sunt suspendați. public/cours",
+            "source": null,
+            "match": "reference"
+          }
+        ],
+        "certifications_partner": [
+          {
+            "text": "executare Cod NUTS: RO321 Bucureşti Locul principal de executare: Universitatea din București, Șoseaua Panduri, nr.90, sector 5, București. II.2.4 Descrierea achizitiei publice (natura si cantitatea lucrarilor, produselor sau serviciilor sau o mentiune privind nevoile si cerintele) 1.1 - Servicii de mentenanță și suport tehnic care includ: servicii de suport pentru utilizare și administrare, servicii de configurare și actualizare, servicii de mentenanță preventivă, servicii de mentenanță corectivă; 1.2 - Dezvoltări suplimentare la cerere care includ: integrare testare automatizată, implementare deletion plugin conform GDPR. implementare certificat custom – emitere diplome, implementare alte funcționalități la cerere; 1.3 - Servicii de instruire post-upgrade (administratori, utilizatori, actualizare manuale, prezentări video, ateliere de demonstrații). II.2.5 Criterii de atribuire Pretul cel mai scazut II.2.6 Valoarea totala estimata Valoarea estimata fara TVA : -; Moneda: RON Intervalul intre : 21465si 636795; Moneda: RON Alte valori: Valoare celui mai mare contract subsecvent: 190800 ; Moneda: RON Valoarea garantiei de participare: 1900 - RON (0,9958 %) II.2.7 Durata contractului, concesiunii, a acordului-cadru sau a sistemului dinamic de achizitii Durata in luni: 36; Dur",
+            "source": null,
+            "match": "certificat"
+          },
+          {
+            "text": "Achizitii Publice, 14.07.2026 16:02 Pagina 6 18 alineatul (2) din Directiva 2014/24/UE. Se va completa DUAE de catre ofertanți/asociați, terți susținatori și subcontractanți în conformitate cu art. 193 alin. (1) din Legea nr. 98/2016, cu informatiile aferente situatiei privind neincadrarea in prevederile art.167 din Legea nr.98/2016. Documentele justificative care probează îndeplinirea celor asumate prin completarea DUAE urmează a fi prezentate la solicitarea autorității contractante, doar de către ofertantului clasat pe primul loc după aplicarea criteriului de atribuire. Documentele suport includ, dar nu se limitează la: caziere judiciare, certificate de atestare fiscală și / sau alte documente justificative sau alte documente echivalente emise de autoritățile competente din țara în care este stabilit operatorul economic Loturile la care se aplica: 1, 2, 3 Cerinta 2: Motiv excludere: Încălcarea obligațiilor în domeniile legislației sociale Descriere: In masura cunostintelor sale, operatorul economic si-a Incalcat obligatiile In domeniul legislatiei sociale? Astfel cum sunt mentionate In scopul acestei achizitii publice In legislatia nationala, In anuntul relevant sau In documentele achizitiei ori la articolul 18 alineatul (2) din Directiva 2014/24/UE. Se va completa DUAE de catre of",
+            "source": null,
+            "match": "certificate"
+          },
+          {
+            "text": "au In documentele achizitiei ori la articolul 18 alineatul (2) din Directiva 2014/24/UE. Se va completa DUAE de catre ofertanți/asociați, terți susținatori și subcontractanți în conformitate cu art. 193 alin. (1) din Legea nr. 98/2016, cu informatiile aferente situatiei privind neincadrarea in prevederile art.167 din Legea nr.98/2016. Documentele justificative care probează îndeplinirea celor asumate prin completarea DUAE urmează a fi prezentate la solicitarea autorității contractante, doar de către ofertantului clasat pe primul loc după aplicarea criteriului de atribuire. Documentele suport includ, dar nu se limitează la: caziere judiciare, certificate de atestare fiscală și / sau alte documente justificative sau alte documente echivalente emise de autoritățile competente din țara în care este stabilit operatorul economic Loturile la care se aplica: 1, 2, 3 Cerinta 3: Motiv excludere: Încălcarea obligațiilor în domeniile legislației muncii Descriere: In masura cunostintelor sale, operatorul economic si-a Incalcat obligatiile In domeniul legislatiei muncii? Astfel cum sunt mentionate In scopul acestei achizitii publice In legislatia nationala, In anuntul relevant sau In documentele achizitiei ori la articolul 18 alineatul (2) din Directiva 2014/24/UE. Se va completa DUAE de catre ofer",
+            "source": null,
+            "match": "certificate"
+          },
+          {
+            "text": ": Motiv excludere: Faliment Descriere: Operatorul economic este In stare de faliment? Se va completa DUAE de catre ofertanți/asociați, terți susținatori și subcontractanți în conformitate cu art. 193 alin. (1) din Legea nr. 98/2016, cu informatiile aferente situatiei privind neincadrarea in prevederile art.167 din Legea nr.98/2016. Documentele justificative care probează îndeplinirea celor asumate prin completarea DUAE urmează a fi prezentate la solicitarea autorității contractante, doar de către ofertantului clasat pe primul loc după aplicarea criteriului de atribuire. Documentele suport includ, dar nu se limitează la: caziere judiciare, certificate de atestare fiscală și / sau alte documente justificative sau alte documente echivalente emise de autoritățile competente din țara în care este stabilit operatorul economic Loturile la care se aplica: 1, 2, 3 Cerinta 5: Motiv excludere: Insolvență Descriere: Operatorul economic este In situatie de insolventa sau de lichidare? Sistemul Electronic de Achizitii Publice Sistemul Electronic de Achizitii Publice, 14.07.2026 16:02 Pagina 7 Se va completa DUAE de catre ofertanți/asociați, terți susținatori și subcontractanți în conformitate cu art. 193 alin. (1) din Legea nr. 98/2016, cu informatiile aferente situatiei privind neincadrarea in",
+            "source": null,
+            "match": "certificate"
+          }
+        ],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [
+          {
+            "text": "III.1.1 a) Situatia personala a candidatului sau ofertantului Cerinta 1: Motiv excludere: Încălcarea obligațiilor în domeniile legislației de mediu Descriere: In masura cunostintelor sale, operatorul economic si-a Incalcat obligatiile In domeniul legislatiei mediului? Astfel cum sunt mentionate In scopul acestei achizitii publice In legislatia nationala, In anuntul relevant sau In documentele achizitiei ori la articolul Sistemul Electronic de Achizitii Publice Sistemul Electronic de Achizitii Publice, 14.07.2026 16:02 Pagina 6 18 alineatul (2) din Directiva 2014/24/UE. Se va completa DUAE de catre ofertanți/asociați, terți susținatori și subcontractanți în conformitate cu art. 193 alin. (1) din Legea nr. 98/2016, cu informatiile aferente situatiei privind neincadrarea in prevederile art.167 din Legea nr.98/2016. Documentele justificative care probează îndeplinirea celor asumate prin completarea DUAE urmează a fi prezentate la solicitarea autorității contractante, doar de către ofertantului clasat pe primul loc după aplicarea criteriului de atribuire. Documentele suport includ, dar nu se limitează la: caziere judiciare, certificate de atestare fiscală și / sau alte documente justificative sau alte documente echivalente emise de autoritățile competente din țara în care este stabilit opera",
+            "source": null,
+            "match": "subcontract"
+          },
+          {
+            "text": "mente justificative sau alte documente echivalente emise de autoritățile competente din țara în care este stabilit operatorul economic Loturile la care se aplica: 1, 2, 3 Cerinta 2: Motiv excludere: Încălcarea obligațiilor în domeniile legislației sociale Descriere: In masura cunostintelor sale, operatorul economic si-a Incalcat obligatiile In domeniul legislatiei sociale? Astfel cum sunt mentionate In scopul acestei achizitii publice In legislatia nationala, In anuntul relevant sau In documentele achizitiei ori la articolul 18 alineatul (2) din Directiva 2014/24/UE. Se va completa DUAE de catre ofertanți/asociați, terți susținatori și subcontractanți în conformitate cu art. 193 alin. (1) din Legea nr. 98/2016, cu informatiile aferente situatiei privind neincadrarea in prevederile art.167 din Legea nr.98/2016. Documentele justificative care probează îndeplinirea celor asumate prin completarea DUAE urmează a fi prezentate la solicitarea autorității contractante, doar de către ofertantului clasat pe primul loc după aplicarea criteriului de atribuire. Documentele suport includ, dar nu se limitează la: caziere judiciare, certificate de atestare fiscală și / sau alte documente justificative sau alte documente echivalente emise de autoritățile competente din țara în care este stabilit opera",
+            "source": null,
+            "match": "subcontract"
+          },
+          {
+            "text": "cumente justificative sau alte documente echivalente emise de autoritățile competente din țara în care este stabilit operatorul economic Loturile la care se aplica: 1, 2, 3 Cerinta 3: Motiv excludere: Încălcarea obligațiilor în domeniile legislației muncii Descriere: In masura cunostintelor sale, operatorul economic si-a Incalcat obligatiile In domeniul legislatiei muncii? Astfel cum sunt mentionate In scopul acestei achizitii publice In legislatia nationala, In anuntul relevant sau In documentele achizitiei ori la articolul 18 alineatul (2) din Directiva 2014/24/UE. Se va completa DUAE de catre ofertanți/asociați, terți susținatori și subcontractanți în conformitate cu art. 193 alin. (1) din Legea nr. 98/2016, cu informatiile aferente situatiei privind neincadrarea in prevederile art.167 din Legea nr.98/2016. Documentele justificative care probează îndeplinirea celor asumate prin completarea DUAE urmează a fi prezentate la solicitarea autorității contractante, doar de către ofertantului clasat pe primul loc după aplicarea criteriului de atribuire. Documentele suport includ, dar nu se limitează la: caziere judiciare, certificate de atestare fiscală și / sau alte documente justificative sau alte documente echivalente emise de autoritățile competente din țara în care este stabilit opera",
+            "source": null,
+            "match": "subcontract"
+          },
+          {
+            "text": "lor asumate prin completarea DUAE urmează a fi prezentate la solicitarea autorității contractante, doar de către ofertantului clasat pe primul loc după aplicarea criteriului de atribuire. Documentele suport includ, dar nu se limitează la: caziere judiciare, certificate de atestare fiscală și / sau alte documente justificative sau alte documente echivalente emise de autoritățile competente din țara în care este stabilit operatorul economic Loturile la care se aplica: 1, 2, 3 Cerinta 4: Motiv excludere: Faliment Descriere: Operatorul economic este In stare de faliment? Se va completa DUAE de catre ofertanți/asociați, terți susținatori și subcontractanți în conformitate cu art. 193 alin. (1) din Legea nr. 98/2016, cu informatiile aferente situatiei privind neincadrarea in prevederile art.167 din Legea nr.98/2016. Documentele justificative care probează îndeplinirea celor asumate prin completarea DUAE urmează a fi prezentate la solicitarea autorității contractante, doar de către ofertantului clasat pe primul loc după aplicarea criteriului de atribuire. Documentele suport includ, dar nu se limitează la: caziere judiciare, certificate de atestare fiscală și / sau alte documente justificative sau alte documente echivalente emise de autoritățile competente din țara în care este stabilit opera",
+            "source": null,
+            "match": "subcontract"
+          }
+        ],
+        "deliverables_scope": [
+          {
+            "text": "dificat să se preia numele complet al cursului la momentul exportului. public/grade/export/xml/grade_export_xml.php - S-a modificat să se preia numele complet al cursului la momentul exportului. 80 public/grade/export/ods/grade_export_ods.php - S-a modificat să se preia numele complet al cursului la momentul exportului. public/lib/accesslib.php – Previne să fie asignat rolul de non -editing teacher la utilizatorii care sunt studenți și au în email @s.unibuc.ro public/lib/classes/check/performance/dbschema.php – Adaptarea plugin -ului Performance Report cu metricele corecte aferente bazei de date. public/lib/classes/navigation/output/primary.php – Aici se restricționează elementul Formare Colegială din meniul de navigare, să nu fie disponibil studenților. public/lib/external/externallib.php - Previne să fie asignat rolul de non -editing teacher la utilizatorii care sunt studenți și au în email @s.unibuc.ro public/lib/templates/comboboxsearch.mustache – Se șterge o clasă p-0. public/lib/templates/select_menu.mustache – Se adaugă clasa btn-grade. public/lib/templates/loginform.mustache – Se adaugă un link custom și un separator html. public/lib/templates/full_header.mustache – Se adaugă o stirilizare în plus (un margin CSS). Platformă de UAT - https://uat.cursuri",
+            "source": null,
+            "match": "output"
+          },
+          {
+            "text": "- S-a modificat să se preia numele complet al cursului la momentul exportului. public/grade/export/xml/grade_export_xml.php - S-a modificat să se preia numele complet al cursului la momentul exportului. public/grade/export/ods/grade_export_ods.php - S-a modificat să se preia numele complet al cursului la momentul exportului. public/lib/accesslib.php – Previne să fie asignat rolul de non -editing teacher la utilizatorii care sunt studenți și au în email @s.unibuc.ro public/lib/classes/check/performance/dbschema.php – Adaptarea plugin -ului Performance Report cu metricele corecte aferente bazei de date. public/lib/classes/navigation/output/primary.php – Aici se restricționează elementul Formare Colegială din meniul de navigare, să nu fie disponibil studenților. public/lib/external/externallib.php - Previne să fie asignat rolul de non -editing teacher la utilizatorii care sunt studenți și au în email @s.unibuc.ro public/lib/templates/comboboxsearch.mustache – Se șterge o clasă p-0. public/lib/templates/select_menu.mustache – Se adaugă clasa btn-grade. public/lib/templates/loginform.mustache – Se adaugă un link custom și un separator html. public/lib/templates/full_header.mustache – Se adaugă o stirilizare în plus (un margin CSS). Platformă de DEV - https://dev.cursuri",
+            "source": null,
+            "match": "output"
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "===== FILE: files/Instructiuni_ofertanti_FisaDate_DF1275734.pdf ===== Instructiuni pentru ofertanti/candidati (Fisa de date) Tip anunt: Anunt de participare Tip Legislatie: Legea nr. 98/23.05.2016 S-a organizat o consultare de piata: Nu Sectiunea I Autoritatea contractanta I.1) Denumire si adrese Universitatea din Bucuresti Cod de identificare fiscala: 4505502; Adresa: Strada: Panduri, nr. 90; Localitate: Bucuresti; Cod Postal: 050663; Tara: Romania; Codul NUTS: RO321 Bucuresti; Adresa de e-mail: oana.ivan@unibuc.ro; Nr de telefon: +40 213054622; Fax: -Persoana de contact: Oana Ivan; Adresa web a sediului principal al autoritatii/entitatii contractante(URL) https://unibuc.ro; Adresa web a profilului cumparatorului: https://www.e- licitatie.ro; I.2) Achizitie comuna Contractul implica o achizitie",
+            "source": null,
+            "match": "sla"
+          },
+          {
+            "text": "t de ambele părți. Ajustarea prețului se aplică restului de prestat, fără a se raporta la restul de plată în situația în care există diferențe între acestea. Ajustarea prețului acordului-cadru se va face în condițiile prevederilor art. 2222 din Legea nr. 98/2016, prin actualizare în cazul în care pe piață au apărut anumite condiții, în urma cărora s-a constatat creșterea/diminuarea indicilor de preț pentru elemente constitutive ale ofertei, al căror efect se reflectă în creșterea/diminuarea costurilor pe baza cărora s-a fundamentat prețul contractului. Ajustarea prețului acordului-cadru se poate face și în cazul în care au loc modificări legislative sau au fost emise de către autoritățile locale acte administrative care au ca obiect instituirea, modificarea sau renunțarea la anumite taxe/impozite locale, al căror efect se reflectă în creșterea / diminuarea costurilor pe baza cărora s-a fundamentat prețul acordului-cadru. Ajustarea prețului acordului-cadru se va face doar în măsura strict necesară pentru acoperirea costurilor pe baza cărora s-a fundamentat prețul acordului-cadru. Sectiunea III Informatii juridice, economice, financiare si tehnice III.1) CONDITII DE PARTICIPARE: III.1.1 a) Situatia personala a candidatului sau ofertantului Cerinta 1: Motiv excludere: Încălcarea",
+            "source": null,
+            "match": "sla"
+          },
+          {
+            "text": "e autoritățile locale acte administrative care au ca obiect instituirea, modificarea sau renunțarea la anumite taxe/impozite locale, al căror efect se reflectă în creșterea / diminuarea costurilor pe baza cărora s-a fundamentat prețul acordului-cadru. Ajustarea prețului acordului-cadru se va face doar în măsura strict necesară pentru acoperirea costurilor pe baza cărora s-a fundamentat prețul acordului-cadru. Sectiunea III Informatii juridice, economice, financiare si tehnice III.1) CONDITII DE PARTICIPARE: III.1.1 a) Situatia personala a candidatului sau ofertantului Cerinta 1: Motiv excludere: Încălcarea obligațiilor în domeniile legislației de mediu Descriere: In masura cunostintelor sale, operatorul economic si-a Incalcat obligatiile In domeniul legislatiei mediului? Astfel cum sunt mentionate In scopul acestei achizitii publice In legislatia nationala, In anuntul relevant sau In documentele achizitiei ori la articolul Sistemul Electronic de Achizitii Publice Sistemul Electronic de Achizitii Publice, 14.07.2026 16:02 Pagina 6 18 alineatul (2) din Directiva 2014/24/UE. Se va completa DUAE de catre ofertanți/asociați, terți susținatori și subcontractanți în conformitate cu art. 193 alin. (1) din Legea nr. 98/2016, cu informatiile aferente situatiei privind neincadrarea in p",
+            "source": null,
+            "match": "sla"
+          },
+          {
+            "text": "ite locale, al căror efect se reflectă în creșterea / diminuarea costurilor pe baza cărora s-a fundamentat prețul acordului-cadru. Ajustarea prețului acordului-cadru se va face doar în măsura strict necesară pentru acoperirea costurilor pe baza cărora s-a fundamentat prețul acordului-cadru. Sectiunea III Informatii juridice, economice, financiare si tehnice III.1) CONDITII DE PARTICIPARE: III.1.1 a) Situatia personala a candidatului sau ofertantului Cerinta 1: Motiv excludere: Încălcarea obligațiilor în domeniile legislației de mediu Descriere: In masura cunostintelor sale, operatorul economic si-a Incalcat obligatiile In domeniul legislatiei mediului? Astfel cum sunt mentionate In scopul acestei achizitii publice In legislatia nationala, In anuntul relevant sau In documentele achizitiei ori la articolul Sistemul Electronic de Achizitii Publice Sistemul Electronic de Achizitii Publice, 14.07.2026 16:02 Pagina 6 18 alineatul (2) din Directiva 2014/24/UE. Se va completa DUAE de catre ofertanți/asociați, terți susținatori și subcontractanți în conformitate cu art. 193 alin. (1) din Legea nr. 98/2016, cu informatiile aferente situatiei privind neincadrarea in prevederile art.167 din Legea nr.98/2016. Documentele justificative care probează îndeplinirea celor asumate prin completa",
+            "source": null,
+            "match": "sla"
+          }
+        ],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [
+          {
+            "text": "soft Word file Import/Export (Book) booktool_wordimport 1.4.14 (Build: 2025042300) 2025042300 Activat 21) Background image customcertelement_bgimage 2023042400 Activat 22) Border customcertelement_border 2023042400 Activat 23) Category name customcertelement_categoryname 2023042400 Activat 5 24) Code customcertelement_code 2023042400 Activat 25) Course field customcertelement_coursefield 2023042400 Activat 26) Course name customcertelement_coursename 2023042400 Activat 27) Date customcertelement_date 2023042400 Activat 28) Date range customcertelement_daterange 2023042400 Activat 29) Digital signature customcertelement_digitalsignature 2023042400 Activat 30) Expiry customcertelement_expiry 2023042400 Activat 31) Grade customcertelement_grade 2023042400 Activat 32) Grade item name customcertelement_gradeitemname 2023042400 Activat 33) Image customcertelement_image 2023042400 Activat 34) QR code customcertelement_qrcode 2023042400 Activat 35) Student name customcertelement_studentname 2023042400 Activat 36) Teacher name customcertelement_teachername 2023042400 Activat 37) Text customcertelement_text 2023042400 Activat 38) User field customcertelement_userfield 2023042400 Activat 39) User picture cust",
+            "source": null,
+            "match": "signature"
+          },
+          {
+            "text": "booktool_wordimport 1.4.14 (Build: 2025042300) 2025042300 Activat 21) Background image customcertelement_bgimage 2023042400 Activat 22) Border customcertelement_border 2023042400 Activat 23) Category name customcertelement_categoryname 2023042400 Activat 5 24) Code customcertelement_code 2023042400 Activat 25) Course field customcertelement_coursefield 2023042400 Activat 26) Course name customcertelement_coursename 2023042400 Activat 27) Date customcertelement_date 2023042400 Activat 28) Date range customcertelement_daterange 2023042400 Activat 29) Digital signature customcertelement_digitalsignature 2023042400 Activat 30) Expiry customcertelement_expiry 2023042400 Activat 31) Grade customcertelement_grade 2023042400 Activat 32) Grade item name customcertelement_gradeitemname 2023042400 Activat 33) Image customcertelement_image 2023042400 Activat 34) QR code customcertelement_qrcode 2023042400 Activat 35) Student name customcertelement_studentname 2023042400 Activat 36) Teacher name customcertelement_teachername 2023042400 Activat 37) Text customcertelement_text 2023042400 Activat 38) User field customcertelement_userfield 2023042400 Activat 39) User picture customcertelement_userpicture 202304240",
+            "source": null,
+            "match": "signature"
+          },
+          {
+            "text": "soft Word file Import/Export (Book) booktool_wordimport 1.4.14 (Build: 2025042300) 2025042300 Activat 21) Background image customcertelement_bgimage 2023042400 Activat 22) Border 2023042400 Activat 38 customcertelement_border 23) Category name customcertelement_categoryname 2023042400 Activat 24) Code customcertelement_code 2023042400 Activat 25) Course field customcertelement_coursefield 2023042400 Activat 26) Course name customcertelement_coursename 2023042400 Activat 27) Date customcertelement_date 2023042400 Activat 28) Date range customcertelement_daterange 2023042400 Activat 29) Digital signature customcertelement_digitalsignature 2023042400 Activat 30) Expiry customcertelement_expiry 2023042400 Activat 31) Grade customcertelement_grade 2023042400 Activat 32) Grade item name customcertelement_gradeitemname 2023042400 Activat 33) Image customcertelement_image 2023042400 Activat 34) QR code customcertelement_qrcode 2023042400 Activat 35) Student name customcertelement_studentname 2023042400 Activat 36) Teacher name customcertelement_teachername 2023042400 Activat 37) Text customcertelement_text 2023042400 Activat 38) User field customcertelement_userfield 2023042400 Activat 39) User picture cust",
+            "source": null,
+            "match": "signature"
+          },
+          {
+            "text": "booktool_wordimport 1.4.14 (Build: 2025042300) 2025042300 Activat 21) Background image customcertelement_bgimage 2023042400 Activat 22) Border 2023042400 Activat 38 customcertelement_border 23) Category name customcertelement_categoryname 2023042400 Activat 24) Code customcertelement_code 2023042400 Activat 25) Course field customcertelement_coursefield 2023042400 Activat 26) Course name customcertelement_coursename 2023042400 Activat 27) Date customcertelement_date 2023042400 Activat 28) Date range customcertelement_daterange 2023042400 Activat 29) Digital signature customcertelement_digitalsignature 2023042400 Activat 30) Expiry customcertelement_expiry 2023042400 Activat 31) Grade customcertelement_grade 2023042400 Activat 32) Grade item name customcertelement_gradeitemname 2023042400 Activat 33) Image customcertelement_image 2023042400 Activat 34) QR code customcertelement_qrcode 2023042400 Activat 35) Student name customcertelement_studentname 2023042400 Activat 36) Teacher name customcertelement_teachername 2023042400 Activat 37) Text customcertelement_text 2023042400 Activat 38) User field customcertelement_userfield 2023042400 Activat 39) User picture customcertelement_userpicture 202304240",
+            "source": null,
+            "match": "signature"
+          }
+        ],
+        "submission": [],
+        "ip_data_security": [
+          {
+            "text": "II.2.3 Locul de executare Cod NUTS: RO321 Bucureşti Locul principal de executare: Universitatea din București, Șoseaua Panduri, nr.90, sector 5, București. II.2.4 Descrierea achizitiei publice (natura si cantitatea lucrarilor, produselor sau serviciilor sau o mentiune privind nevoile si cerintele) 1.1 - Servicii de mentenanță și suport tehnic care includ: servicii de suport pentru utilizare și administrare, servicii de configurare și actualizare, servicii de mentenanță preventivă, servicii de mentenanță corectivă; 1.2 - Dezvoltări suplimentare la cerere care includ: integrare testare automatizată, implementare deletion plugin conform GDPR. implementare certificat custom – emitere diplome, implementare alte funcționalități la cerere; 1.3 - Servicii de instruire post-upgrade (administratori, utilizatori, actualizare manuale, prezentări video, ateliere de demonstrații). II.2.5 Criterii de atribuire Pretul cel mai scazut II.2.6 Valoarea totala estimata Valoarea estimata fara TVA : -; Moneda: RON Intervalul intre : 21465si 636795; Moneda: RON Alte valori: Valoare celui mai mare contract subsecvent: 190800 ; Moneda: RON Valoarea garantiei de participare: 1900 - RON (0,9958 %) II.2.7 Durata contractului, concesiunii, a acordului-cadru sau a sistemului dinamic de achiziti",
+            "source": null,
+            "match": "GDPR"
+          }
+        ]
+      },
+      "source_dce_run_id": 32188400508,
+      "source_shard": 2,
+      "hot_ready_at": "2026-08-18T21:36:31.657469+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 61,
+      "spm_fit_band": "GOOD",
+      "spm_fit_reasons": [
+        "e-learning",
+        "lms"
+      ],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
     {
       "candidate_id": "TED:522966-2026",
       "title": "Ireland – Repair and maintenance services – Managed Print Services for National Council for Curriculum and Assessment (NCCA)",
@@ -848,6 +1039,243 @@
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
+      "candidate_id": "PL-BZP:08defd26-46c3-dcf6-962b-12000115cc27",
+      "title": "Dostawa sprzętu komputerowego oraz oprogramowania w ramach projektu „Zwiększenie cyberbezpieczeństwa sieci wewnętrznych jednostek organizacyjnych Powiatu Opolskiego”",
+      "buyer": "Powiat Opolski",
+      "portal": "PL_EZAMOWIENIA",
+      "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defd26-46c3-dcf6-962b-12000115cc27",
+      "deadline": "2026-08-26T08:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 82,
+      "priority_score": 82,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-26T08:00:00+00:00",
+        "notice_deadline_date": "2026-08-26",
+        "authoritative_submission_date": "2026-08-26",
+        "submission_deadline_candidates": [
+          "2026-08-26"
+        ],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [
+          "2019-09-11",
+          "2026-08-17",
+          "2026-08-18",
+          "2026-08-26",
+          "2026-09-24",
+          "2026-09-28"
+        ],
+        "labelled_evidence": [
+          {
+            "date": "2026-08-26",
+            "match": "2026-08-26",
+            "label": "SUBMISSION",
+            "keyword": "Termin składania ofert",
+            "distance": 3,
+            "context": "od rygorem nieważności.\n7.5.) Zamawiający uwzględnił aspekty społeczne, środowiskowe, innowacyjne lub etykiety związane z realizacją\nzamówienia: \nNie\nSEKCJA VIII – PROCEDURA\n8.1.) Termin składania ofert: \n2026-08-26 10:00\n8.2.) Miejsce składania ofert: \nhttps://platformazakupowa.pl/transakcja/1351330\n8.3.) Termin otwarcia ofert: \n2026-08-26 10:05\n8.4.) Termin związania ofertą: \n30 dni\nOgłoszenie nr 2026/BZP 00396619/01 z dnia 2026-08-18\n2026-08-18 Biuletyn Zamówień Publicznych\nOgłoszenie o zamówieniu - Zamówie"
+          }
+        ],
+        "evidence": [
+          {
+            "date": "2026-08-18",
+            "match": "2026-08-18",
+            "context": "\nNie\n4.2. Informacje szczegółowe odnoszące się do przedmiotu zamówienia:\nCzęść 1\n4.2.2.) Krótki opis przedmiotu zamówienia\nOprogramowanie chmurowe do kopii bezpieczeństwa plików\nOgłoszenie nr 2026/BZP 00396619/01 z dnia 2026-08-18\n2026-08-18 Biuletyn Zamówień Publicznych\nOgłoszenie o zamówieniu - Zamówienie udzielane jest w trybie podstawowym na podstawie: art. 275 pkt 1 ustawy - Dostawy\n4.2.6.) Główny kod CPV: \n72268000-1 - Usługi dostawy oprogr"
+          },
+          {
+            "date": "2026-08-18",
+            "match": "2026-08-18",
+            "context": "nformacje szczegółowe odnoszące się do przedmiotu zamówienia:\nCzęść 1\n4.2.2.) Krótki opis przedmiotu zamówienia\nOprogramowanie chmurowe do kopii bezpieczeństwa plików\nOgłoszenie nr 2026/BZP 00396619/01 z dnia 2026-08-18\n2026-08-18 Biuletyn Zamówień Publicznych\nOgłoszenie o zamówieniu - Zamówienie udzielane jest w trybie podstawowym na podstawie: art. 275 pkt 1 ustawy - Dostawy\n4.2.6.) Główny kod CPV: \n72268000-1 - Usługi dostawy oprogramowania\n4."
+          },
+          {
+            "date": "2026-08-26",
+            "match": "2026-08-26",
+            "context": "mnego aneksu, pod rygorem nieważności.\n7.5.) Zamawiający uwzględnił aspekty społeczne, środowiskowe, innowacyjne lub etykiety związane z realizacją\nzamówienia: \nNie\nSEKCJA VIII – PROCEDURA\n8.1.) Termin składania ofert: \n2026-08-26 10:00\n8.2.) Miejsce składania ofert: \nhttps://platformazakupowa.pl/transakcja/1351330\n8.3.) Termin otwarcia ofert: \n2026-08-26 10:05\n8.4.) Termin związania ofertą: \n30 dni\nOgłoszenie nr 2026/BZP 00396619/01 z dnia 2026-"
+          },
+          {
+            "date": "2026-08-26",
+            "match": "2026-08-26",
+            "context": "wiązane z realizacją\nzamówienia: \nNie\nSEKCJA VIII – PROCEDURA\n8.1.) Termin składania ofert: \n2026-08-26 10:00\n8.2.) Miejsce składania ofert: \nhttps://platformazakupowa.pl/transakcja/1351330\n8.3.) Termin otwarcia ofert: \n2026-08-26 10:05\n8.4.) Termin związania ofertą: \n30 dni\nOgłoszenie nr 2026/BZP 00396619/01 z dnia 2026-08-18\n2026-08-18 Biuletyn Zamówień Publicznych\nOgłoszenie o zamówieniu - Zamówienie udzielane jest w trybie podstawowym na pods"
+          },
+          {
+            "date": "2026-08-18",
+            "match": "2026-08-18",
+            "context": "08-26 10:00\n8.2.) Miejsce składania ofert: \nhttps://platformazakupowa.pl/transakcja/1351330\n8.3.) Termin otwarcia ofert: \n2026-08-26 10:05\n8.4.) Termin związania ofertą: \n30 dni\nOgłoszenie nr 2026/BZP 00396619/01 z dnia 2026-08-18\n2026-08-18 Biuletyn Zamówień Publicznych\nOgłoszenie o zamówieniu - Zamówienie udzielane jest w trybie podstawowym na podstawie: art. 275 pkt 1 ustawy - Dostawy\n\n===== FILE: files/SWZ AG.272.12.2026.pdf =====\n \nStrona 1 "
+          },
+          {
+            "date": "2026-08-18",
+            "match": "2026-08-18",
+            "context": "\n8.2.) Miejsce składania ofert: \nhttps://platformazakupowa.pl/transakcja/1351330\n8.3.) Termin otwarcia ofert: \n2026-08-26 10:05\n8.4.) Termin związania ofertą: \n30 dni\nOgłoszenie nr 2026/BZP 00396619/01 z dnia 2026-08-18\n2026-08-18 Biuletyn Zamówień Publicznych\nOgłoszenie o zamówieniu - Zamówienie udzielane jest w trybie podstawowym na podstawie: art. 275 pkt 1 ustawy - Dostawy\n\n===== FILE: files/SWZ AG.272.12.2026.pdf =====\n \nStrona 1 z 37 \nProje"
+          },
+          {
+            "date": "2019-09-11",
+            "match": "11 września 2019",
+            "context": "ECYFIKACJA WARUNKÓW ZAMÓWIENIA \n \nZAMAWIAJĄCY: POWIAT OPOLSKI  \nADRES ZAMAWIAJĄCEGO: ul. 1 Maja 29, 45-068 Opole \nNUMER  SPRAWY: AG.272.12.2026 \nTRYB UDZIELENIA ZAMÓWIENIA: TRYB PODSTAWOWY art. 275 pkt 1 ustawy  \nz dnia 11 września 2019 r. Prawo zamówień publicznych (t.j. Dz.U. 2026, poz. 793) \nNAZWA ZADANIA NADANA PRZEZ ZAMAWIAJĄCEGO \nDostawa sprzętu komputerowego oraz oprogramowania w ramach \nprojektu „Zwiększenie cyberbezpieczeństwa sieci wewnętrzny"
+          },
+          {
+            "date": "2026-08-17",
+            "match": "17.08.2026",
+            "context": "raz nie przewiduje wyboru najkorzystniejszej oferty z zastosowaniem aukcji \nelektronicznej. Zamawiający nie przewiduje rozliczeń w walutach obcych oraz nie \nprzewiduje zwrotu kosztów udziału w postępowaniu. \nOpole, dnia 17.08.2026 r.                                                                                     \nZatwierdził:                                                                               \n  \n \n \n \n \n \n \n \n \nStrona 3 z 37 \nSPECY"
+          },
+          {
+            "date": "2026-09-28",
+            "match": "28.09.2026",
+            "context": "kładania ofert wariantowych. \nV Termin wykonania zamówienia \nZamówienie należy zrealizować w terminie do 10 dni od dnia podpisania umowy dla \nzadań nr 1-6 oraz do 14 dni dla zadania nr 7, nie później jednak niż do dnia \n28.09.2026 r. Dla wszystkich zadań końcowy termin dostawy musi uwzględniać okres 4 \ndni na weryfikację przez Zamawiającego parametrów technicznych dostarczonego \nsprzętu/oprogramowania. \n     Zgodnie z § 3 ust. 3 projektu umowy „Z"
+          },
+          {
+            "date": "2026-09-24",
+            "match": "24.09.2026",
+            "context": "lu wyjaśnienia \ntreści SWZ. \nXII Wymagania dotyczące wadium. \nZamawiający nie wymaga wniesienia wadium. \n \nStrona 19 z 37 \nXIII Termin związania ofertą. \n1. Wykonawca jest związany ofertą przez okres 30 dni tj.  do dnia 24.09.2026 r. Bieg \nterminu rozpoczyna się wraz z upływem terminu składania ofert. \n2. W przypadku gdy wybór najkorzystniejszej oferty nie nastąpi przed upływem \nterminu związania ofertą wskazanego w pkt. 1, Zamawiający przed upły"
+          }
+        ],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 6,
+          "unique_contexts": 6
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 6,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "rial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:bCs/><w:color w:val=\"000000\" w:themeColor=\"text1\"/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr></w:pPr></w:p><w:p w14:paraId=\"1BC3F6BC\" w14:textId=\"77777777\" w:rsidR=\"00740AEB\" w:rsidRPr=\"00740AEB\" w:rsidRDefault=\"00740AEB\" w:rsidP=\"00C21A19\"><w:pPr><w:ind w:left=\"0\" w:firstLine=\"0\"/><w:jc w:val=\"left\"/><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:bCs/><w:color w:val=\"000000\" w:themeColor=\"text1\"/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr></w:pPr></w:p><w:sectPr w:rsidR=\"00740AEB\" w:rsidRPr=\"00740AEB\" w:rsidSect=\"001613EB\"><w:headerReference w:type=\"default\" r:id=\"rId7\"/><w:pgSz w:w=\"11906\" w:h=\"16838\"/><w:pgMar w:top=\"426\" w:right=\"1417\" w:bottom=\"1417\" w:left=\"1417\" w:header=\"708\" w:footer=\"708\" w:gutter=\"0\"/><w:cols w:space=\"708\"/><w:docGrid w:linePitch=\"360\"/></w:sectPr></w:body></w:document> ===== FILE: files/Za_acznik nr 1 do SWZ - formularz ofertowy AG.272.12.2026_unpacked/word/endnotes.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <w:endnotes xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:cx=\"http://schemas.microsoft.com/office/drawing/2014/chartex\" xmlns:cx1=\"http://schemas.microsoft.com/office/drawing/2015/9/8/",
+            "source": null,
+            "match": "Reference"
+          },
+          {
+            "text": "iHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"header\" w:semiHidden=\"1\" w:uiPriority=\"0\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footer\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"index heading\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"caption\" w:semiHidden=\"1\" w:uiPriority=\"35\" w:unhideWhenUsed=\"1\" w:qFormat=\"1\"/><w:lsdException w:name=\"table of figures\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope address\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope return\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footnote reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"annotation reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"line number\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"page number\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"endnote reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"endnote text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"table of authorities\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"macro\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toa heading\" w:semiHidden=\"1\" w:un",
+            "source": null,
+            "match": "reference"
+          },
+          {
+            "text": "uiPriority=\"0\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footer\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"index heading\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"caption\" w:semiHidden=\"1\" w:uiPriority=\"35\" w:unhideWhenUsed=\"1\" w:qFormat=\"1\"/><w:lsdException w:name=\"table of figures\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope address\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope return\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footnote reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"annotation reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"line number\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"page number\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"endnote reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"endnote text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"table of authorities\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"macro\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toa heading\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"",
+            "source": null,
+            "match": "reference"
+          },
+          {
+            "text": "\" w:uiPriority=\"35\" w:unhideWhenUsed=\"1\" w:qFormat=\"1\"/><w:lsdException w:name=\"table of figures\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope address\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"envelope return\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"footnote reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"annotation reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"line number\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"page number\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"endnote reference\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"endnote text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"table of authorities\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"macro\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"toa heading\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Bullet\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List 2\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdExc",
+            "source": null,
+            "match": "reference"
+          }
+        ],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [
+          {
+            "text": "z sterowniki producenta dostarczanego przedmiotu zamówienia , o ile nie są one udostępnione na stronach internetowych tego producenta, 9) Każdy oferowany składnik przedmiotu zamówienia musi być kompletny i gotowy do użycia po zainstalowaniu, bez żadnych dodatkowych zakupów i inwestycji po stronie Zamawiającego; AG.272.12.2026 11. Gwarancja 1) Okres gwarancji min. 36 miesięcy. ===== FILE: files/portal_page_http.txt ===== Postępowanie: Dostawa sprzętu komputerowego oraz oprogramowania w ramach projektu „Zwiększenie cyberbezpieczeństwa sieci wewnętrznych jednostek organizacyjnych Powiatu Opolskiego” - Platforma Zakupowa @{ appsTranslations[resolvedActiveApplication] } Załóż profil wykonawcy Zaloguj się Zaloguj się Zamknij Wykonawca Zamawiający Powrót do wyboru Logowanie jako zamawiający Zamknij Podaj adres e-mail Podaj hasło Zaloguj się Nie pamiętasz hasła? 1\" class=\"tabs\" data-testid=\"tabs-selected-sidemenu\"> @{ tab.tooltip } @{appsTranslations[key]} Ta strona korzysta z plików cookies O plikach cookie Używamy plików cookies, aby zapewnić prawidłowe działanie serwisu oraz – za Twoją zgodą – do celów analitycznych. Wykorzystujemy w tym zakresie rozwiązania naszych partnerów: Google i Meta. Możesz zaakceptować wszystkie pliki cookies, odrzucić wszystkie poza niezbędnymi al",
+            "source": null,
+            "match": "sla"
+          },
+          {
+            "text": "cego; AG.272.12.2026 11. Gwarancja 1) Okres gwarancji min. 36 miesięcy. ===== FILE: files/portal_page_http.txt ===== Postępowanie: Dostawa sprzętu komputerowego oraz oprogramowania w ramach projektu „Zwiększenie cyberbezpieczeństwa sieci wewnętrznych jednostek organizacyjnych Powiatu Opolskiego” - Platforma Zakupowa @{ appsTranslations[resolvedActiveApplication] } Załóż profil wykonawcy Zaloguj się Zaloguj się Zamknij Wykonawca Zamawiający Powrót do wyboru Logowanie jako zamawiający Zamknij Podaj adres e-mail Podaj hasło Zaloguj się Nie pamiętasz hasła? 1\" class=\"tabs\" data-testid=\"tabs-selected-sidemenu\"> @{ tab.tooltip } @{appsTranslations[key]} Ta strona korzysta z plików cookies O plikach cookie Używamy plików cookies, aby zapewnić prawidłowe działanie serwisu oraz – za Twoją zgodą – do celów analitycznych. Wykorzystujemy w tym zakresie rozwiązania naszych partnerów: Google i Meta. Możesz zaakceptować wszystkie pliki cookies, odrzucić wszystkie poza niezbędnymi albo wybrać szczegółowe ustawienia Polityce prywatności Niezbędne pliki cookies Niezbędne pliki cookie są nieodzowne dla prawidłowego funkcjonowania serwisu. Umożliwiają podstawowe działania, takie jak nawigacja po stronie, logowanie czy zapewnienie bezpieczeństwa. Bez tych plików strona nie może działać poprawni",
+            "source": null,
+            "match": "sla"
+          }
+        ],
+        "term_value": [
+          {
+            "text": "ostkowa brutto | Wartość brutto Odnowienie licencji na oprogramowanie antywirusowe Bitdefender Business Security | 1 | | | | | Asortyment | Szt. | Cena jednostkowa brutto | Wartość brutto Odnowienie licencji Fortinet 24x7 UTP | 2 | | | | | Asortyment | Szt. | Cena jednostkowa brutto | Wartość brutto Urządzenie UTM Firewall | 1 | | Urządzenie NDR sBDS | 1 | | | | | ===== FILE: files/Za_acznik nr 1 do SWZ - formularz ofertowy AG.272.12.2026_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"jpeg\" ContentType=\"image/jpeg\"/><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/><Override PartName=\"/word/numbering.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml\"/><Override PartName=\"/word/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml\"/><Override PartName=\"/word/settings.xml\" ContentType=\"application/v",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "na oprogramowanie antywirusowe Bitdefender Business Security | 1 | | | | | Asortyment | Szt. | Cena jednostkowa brutto | Wartość brutto Odnowienie licencji Fortinet 24x7 UTP | 2 | | | | | Asortyment | Szt. | Cena jednostkowa brutto | Wartość brutto Urządzenie UTM Firewall | 1 | | Urządzenie NDR sBDS | 1 | | | | | ===== FILE: files/Za_acznik nr 1 do SWZ - formularz ofertowy AG.272.12.2026_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"jpeg\" ContentType=\"image/jpeg\"/><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/><Override PartName=\"/word/numbering.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml\"/><Override PartName=\"/word/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml\"/><Override PartName=\"/word/settings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.se",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "Szt. | Cena jednostkowa brutto | Wartość brutto Odnowienie licencji Fortinet 24x7 UTP | 2 | | | | | Asortyment | Szt. | Cena jednostkowa brutto | Wartość brutto Urządzenie UTM Firewall | 1 | | Urządzenie NDR sBDS | 1 | | | | | ===== FILE: files/Za_acznik nr 1 do SWZ - formularz ofertowy AG.272.12.2026_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"jpeg\" ContentType=\"image/jpeg\"/><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/><Override PartName=\"/word/numbering.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml\"/><Override PartName=\"/word/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml\"/><Override PartName=\"/word/settings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml\"/><Override PartName=\"/word/webSettings.xml\" ContentType=\"application/vnd.openxmlformat",
+            "source": null,
+            "match": "Extension"
+          },
+          {
+            "text": "cy **) *) Oświadczenie składa: Wykonawca (w przypadku wspólnego ubiegania się o zamówienie przez Wykonawców, oświadczenie składa każdy z wykonawców) Podmiot udostepniający zasoby (jeżeli dotyczy) **) Podpis(y) osoby(osób) upoważnionej(ych) do podpisania oświadczenia w imieniu Wykonawcy(ów). Oświadczenie powinno być podpisane podpisem kwalifikowanym lub podpisem zaufanym lub podpisem osobistym (e-dowodem). ===== FILE: files/Za_acznik nr 2 do SWZ - o_wiadczenie wst_pne_unpacked/[Content_Types].xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"jpeg\" ContentType=\"image/jpeg\"/><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/word/document.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/><Override PartName=\"/word/numbering.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml\"/><Override PartName=\"/word/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml\"/><Override PartName=\"/word/settings.xml\" ContentType=\"application/v",
+            "source": null,
+            "match": "Extension"
+          }
+        ],
+        "award_criteria": [
+          {
+            "text": "zCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr></w:pPr><w:r w:rsidRPr=\"00D05A82\"><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr><w:t>Telefon kontaktowy***</w:t></w:r></w:p><w:p w14:paraId=\"10F59A0A\" w14:textId=\"77777777\" w:rsidR=\"00B625E0\" w:rsidRDefault=\"00B625E0\" w:rsidP=\"00B625E0\"><w:pPr><w:spacing w:before=\"0\" w:after=\"160\"/><w:ind w:left=\"0\" w:right=\"0\" w:firstLine=\"0\"/><w:jc w:val=\"left\"/><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:b/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr></w:pPr><w:bookmarkStart w:id=\"0\" w:name=\"_Hlk147135227\"/></w:p><w:p w14:paraId=\"39232542\" w14:textId=\"77777777\" w:rsidR=\"00B625E0\" w:rsidRPr=\"00245AE4\" w:rsidRDefault=\"00B625E0\" w:rsidP=\"00B625E0\"><w:pPr><w:spacing w:before=\"0\" w:after=\"160\"/><w:ind w:left=\"0\" w:right=\"0\" w:firstLine=\"0\"/><w:jc w:val=\"left\"/><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:b/><w:sz w:val=\"32\"/><w:szCs w:val=\"32\"/><w:lang w:val=\"pl-PL\"/></w:rPr></w:pPr><w:r w:rsidRPr=\"00245AE4\"><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:b/><w:sz w:val=\"32\"/><w:szCs w:val=\"32\"/><w:lang w:val=\"pl-PL\"/></w:rPr><w:t>O F E R T A</w:t></w:r></w:p><w:p w14:paraId",
+            "source": null,
+            "match": "markS"
+          },
+          {
+            "text": "ng w:before=\"0\" w:after=\"160\"/><w:ind w:left=\"0\" w:right=\"0\" w:firstLine=\"0\"/><w:jc w:val=\"left\"/><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:b/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr></w:pPr></w:p><w:p w14:paraId=\"47D07093\" w14:textId=\"77777777\" w:rsidR=\"00B625E0\" w:rsidRPr=\"00DD0772\" w:rsidRDefault=\"00502FD3\" w:rsidP=\"00B625E0\"><w:pPr><w:spacing w:before=\"0\" w:after=\"160\"/><w:ind w:left=\"0\" w:right=\"0\" w:firstLine=\"0\"/><w:jc w:val=\"left\"/><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:b/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr></w:pPr><w:bookmarkStart w:id=\"1\" w:name=\"_Hlk237947782\"/><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:b/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr><w:t>ZOBOWIĄZUJEMY SIĘ DOSTARCZYĆ PRZEDMIOT ZAMÓWIENIA W TERMINIE</w:t></w:r><w:r w:rsidR=\"00B625E0\" w:rsidRPr=\"00B625E0\"><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:b/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr><w:t xml:space=\"preserve\">: </w:t></w:r></w:p><w:bookmarkEnd w:id=\"1\"/><w:p w14:paraId=\"227B9B82\" w14:textId=\"77777777\" w:rsidR=\"00B625E0\" w:rsidRPr=\"00B625E0\" w:rsidRDefault=\"00B625E0\" w:rsidP=\"00B625E0\"><w:p",
+            "source": null,
+            "match": "markS"
+          },
+          {
+            "text": "Pr></w:pPr><w:r w:rsidRPr=\"00B625E0\"><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:b/><w:i/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr><w:t>(znaczyć właściwy kwadrat znakiem „X”)</w:t></w:r></w:p><w:p w14:paraId=\"7B099779\" w14:textId=\"77777777\" w:rsidR=\"00B625E0\" w:rsidRPr=\"00B625E0\" w:rsidRDefault=\"00B625E0\" w:rsidP=\"00B625E0\"><w:pPr><w:spacing w:before=\"0\" w:after=\"160\"/><w:ind w:left=\"0\" w:right=\"0\" w:firstLine=\"0\"/><w:jc w:val=\"left\"/><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr></w:pPr><w:bookmarkStart w:id=\"2\" w:name=\"_Hlk226618248\"/><w:r w:rsidRPr=\"00B625E0\"><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr><w:t xml:space=\"preserve\">□ </w:t></w:r><w:r w:rsidR=\"00502FD3\"><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:b/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr><w:t>6</w:t></w:r><w:r w:rsidRPr=\"00B625E0\"><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:b/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r w:rsidR=\"0",
+            "source": null,
+            "match": "markS"
+          },
+          {
+            "text": "w:t></w:r><w:r w:rsidR=\"00EA0FEF\"><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr><w:br/><w:t xml:space=\"preserve\">a) dla zadań od nr 1 do nr 6 </w:t></w:r><w:r w:rsidRPr=\"00D05A82\"><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr><w:t xml:space=\"preserve\">w </w:t></w:r><w:r w:rsidRPr=\"00F51D64\"><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr><w:t xml:space=\"preserve\">terminie </w:t></w:r><w:bookmarkStart w:id=\"3\" w:name=\"_Hlk80783504\"/><w:bookmarkStart w:id=\"4\" w:name=\"_Hlk80775552\"/><w:r w:rsidRPr=\"00F51D64\"><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr><w:t>do</w:t></w:r><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr><w:t xml:space=\"preserve\"> </w:t></w:r><w:r w:rsidR=\"00EA0FEF\" w:rsidRPr=\"00EA0FEF\"><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:b/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"pl-PL\"/></w:rPr><w:t>10</w:t></w:r><w:r w:rs",
+            "source": null,
+            "match": "markS"
+          }
+        ],
+        "forms_signatures": [
+          {
+            "text": "w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Bullet 4\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Bullet 5\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 2\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 3\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 4\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Number 5\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Title\" w:uiPriority=\"10\" w:qFormat=\"1\"/><w:lsdException w:name=\"Closing\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Signature\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Default Paragraph Font\" w:semiHidden=\"1\" w:uiPriority=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Body Text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Body Text Indent\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue 2\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue 3\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Continue 4\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"List Con",
+            "source": null,
+            "match": "Signature"
+          },
+          {
+            "text": ":unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Body Text Indent 3\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Block Text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Hyperlink\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"FollowedHyperlink\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Strong\" w:uiPriority=\"22\" w:qFormat=\"1\"/><w:lsdException w:name=\"Emphasis\" w:uiPriority=\"20\" w:qFormat=\"1\"/><w:lsdException w:name=\"Document Map\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Plain Text\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"E-mail Signature\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Top of Form\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Bottom of Form\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"Normal (Web)\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Acronym\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Address\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Cite\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Code\" w:semiHidden=\"1\" w:unhideWhenUsed=\"1\"/><w:lsdException w:name=\"HTML Definition\" w:semiHidden=\"1\" w:unhid",
+            "source": null,
+            "match": "Signature"
+          }
+        ],
+        "submission": [],
+        "ip_data_security": [
+          {
+            "text": "| ​ cwk@platformazakupowa.pl 6. Plik docelowy Po zakończeniu wypakowywanie właściwy plik będzie znajdował się w nowo utworzonym folderze. W przypadku dalszych pytań, serdecznie zachęcamy do kontaktu z​ Centrum Wsparcia Klienta​ : ● tel. ​ 22 101 02 02 ● e-mail: ​ cwk@platformazakupowa.pl OPEN NEXUS Sp. z o.o., 28 Czerwca 1956 Roku 406, 61-441 Poznań 22 101 02 02 ​ | ​ PRZETARGowa.pl ​ | ​ cwk@platformazakupowa.pl ===== FILE: files/Og_oszenie o zam_wieniu - AG.272.12.2026.pdf ===== Ogłoszenie o zamówieniu Dostawy Dostawa sprzętu komputerowego oraz oprogramowania w ramach projektu „Zwiększenie cyberbezpieczeństwa sieci wewnętrznych jednostek organizacyjnych Powiatu Opolskiego” SEKCJA I - ZAMAWIAJĄCY 1.1.) Rola zamawiającego Postępowanie prowadzone jest samodzielnie przez zamawiającego 1.2.) Nazwa zamawiającego: Powiat Opolski 1.4) Krajowy Numer Identyfikacyjny: REGON 531412585 1.5) Adres zamawiającego 1.5.1.) Ulica: 1 Maja 29 1.5.2.) Miejscowość: Opole 1.5.3.) Kod pocztowy: 45-068 1.5.4.) Województwo: opolskie 1.5.5.) Kraj: Polska 1.5.6.) Lokalizacja NUTS 3: PL524 - Opolski 1.5.9.) Adres poczty elektronicznej: zamowienia@powiatopolski.pl 1.5.10.) Adres strony internetowej zamawiającego: www.bip.powiatopolski.pl 1.6.) Rodzaj za",
+            "source": null,
+            "match": "cyber"
+          },
+          {
+            "text": "NUTS 3: PL524 - Opolski 1.5.9.) Adres poczty elektronicznej: zamowienia@powiatopolski.pl 1.5.10.) Adres strony internetowej zamawiającego: www.bip.powiatopolski.pl 1.6.) Rodzaj zamawiającego: Zamawiający publiczny - jednostka sektora finansów publicznych - jednostka samorządu terytorialnego 1.7.) Przedmiot działalności zamawiającego: Ogólne usługi publiczne SEKCJA II – INFORMACJE PODSTAWOWE 2.1.) Ogłoszenie dotyczy: Zamówienia publicznego 2.2.) Ogłoszenie dotyczy usług społecznych i innych szczególnych usług: Nie 2.3.) Nazwa zamówienia albo umowy ramowej: Dostawa sprzętu komputerowego oraz oprogramowania w ramach projektu „Zwiększenie cyberbezpieczeństwa sieci wewnętrznych jednostek organizacyjnych Powiatu Opolskiego” 2.4.) Identyfikator postępowania: ocds-148610-157754aa-3ffe-4a45-9abd-a15ab83af344 2.5.) Numer ogłoszenia: 2026/BZP 00396619 2.6.) Wersja ogłoszenia: 01 2.7.) Data ogłoszenia: 2026-08-18 2.8.) Zamówienie albo umowa ramowa zostały ujęte w planie postępowań: Tak 2.9.) Numer planu postępowań w BZP: 2026/BZP 00038840/04/P 2.10.) Identyfikator pozycji planu postępowań: 1.2.3 Zakup sprzętu i oprogramowania zwiększającego cyberbezpieczeństwo Starostwa Powiatowego w Opolu oraz siedmiu jednostek organizacyjnych Powiatu Opolskiego 2.11.) O udzielenie zamówienia mogą u",
+            "source": null,
+            "match": "cyber"
+          },
+          {
+            "text": "ych usług: Nie 2.3.) Nazwa zamówienia albo umowy ramowej: Dostawa sprzętu komputerowego oraz oprogramowania w ramach projektu „Zwiększenie cyberbezpieczeństwa sieci wewnętrznych jednostek organizacyjnych Powiatu Opolskiego” 2.4.) Identyfikator postępowania: ocds-148610-157754aa-3ffe-4a45-9abd-a15ab83af344 2.5.) Numer ogłoszenia: 2026/BZP 00396619 2.6.) Wersja ogłoszenia: 01 2.7.) Data ogłoszenia: 2026-08-18 2.8.) Zamówienie albo umowa ramowa zostały ujęte w planie postępowań: Tak 2.9.) Numer planu postępowań w BZP: 2026/BZP 00038840/04/P 2.10.) Identyfikator pozycji planu postępowań: 1.2.3 Zakup sprzętu i oprogramowania zwiększającego cyberbezpieczeństwo Starostwa Powiatowego w Opolu oraz siedmiu jednostek organizacyjnych Powiatu Opolskiego 2.11.) O udzielenie zamówienia mogą ubiegać się wyłącznie wykonawcy, o których mowa w art. 94 ustawy: Nie 2.14.) Czy zamówienie albo umowa ramowa dotyczy projektu lub programu współfinansowanego ze środków Unii Europejskiej: Tak 2.15.) Nazwa projektu lub programu Ogłoszenie nr 2026/BZP 00396619/01 z dnia 2026-08-18 2026-08-18 Biuletyn Zamówień Publicznych Ogłoszenie o zamówieniu - Zamówienie udzielane jest w trybie podstawowym na podstawie: art. 275 pkt 1 ustawy - Dostawy „Zwiększenie cyberbezpieczeństwa sieci wewnętrznych jednostek organi",
+            "source": null,
+            "match": "cyber"
+          },
+          {
+            "text": "2.3 Zakup sprzętu i oprogramowania zwiększającego cyberbezpieczeństwo Starostwa Powiatowego w Opolu oraz siedmiu jednostek organizacyjnych Powiatu Opolskiego 2.11.) O udzielenie zamówienia mogą ubiegać się wyłącznie wykonawcy, o których mowa w art. 94 ustawy: Nie 2.14.) Czy zamówienie albo umowa ramowa dotyczy projektu lub programu współfinansowanego ze środków Unii Europejskiej: Tak 2.15.) Nazwa projektu lub programu Ogłoszenie nr 2026/BZP 00396619/01 z dnia 2026-08-18 2026-08-18 Biuletyn Zamówień Publicznych Ogłoszenie o zamówieniu - Zamówienie udzielane jest w trybie podstawowym na podstawie: art. 275 pkt 1 ustawy - Dostawy „Zwiększenie cyberbezpieczeństwa sieci wewnętrznych jednostek organizacyjnych Powiatu Opolskiego” 2.16.) Tryb udzielenia zamówienia wraz z podstawą prawną Zamówienie udzielane jest w trybie podstawowym na podstawie: art. 275 pkt 1 ustawy SEKCJA III – UDOSTĘPNIANIE DOKUMENTÓW ZAMÓWIENIA I KOMUNIKACJA 3.1.) Adres strony internetowej prowadzonego postępowania https://platformazakupowa.pl/transakcja/1351330 3.2.) Zamawiający zastrzega dostęp do dokumentów zamówienia: Nie 3.4.) Wykonawcy zobowiązani są do składania ofert, wniosków o dopuszczenie do udziału w postępowaniu, oświadczeń oraz innych dokumentów wyłącznie przy użyciu środków komunikacji elektronicznej:",
+            "source": null,
+            "match": "cyber"
+          }
+        ]
+      },
+      "source_dce_run_id": 32188400508,
+      "source_shard": 2,
+      "hot_ready_at": "2026-08-18T21:36:31.657469+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 4,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [
+        "24x7-operations"
+      ],
       "review_lane": "SPM_PRIORITY"
     }
   ],
