@@ -9,6 +9,7 @@ import requests
 
 import dce_worker as base
 import dce_worker_v2 as v2
+import dce_worker_v11 as v11
 import dce_worker_v12 as v12
 import dce_worker_v18 as v18  # register the complete validated V18 stack first
 
@@ -17,8 +18,12 @@ _OLD_HU = base.ADAPTERS.get("HU_EKR")
 
 FILE_RE = re.compile(r"\.(?:pdf|zip|docx?|xlsx?|xls|pptx?|csv|7z|rar)(?:$|[?#])", re.I)
 DOWNLOAD_RE = re.compile(r"download|letölt|attachment|export|(?:^|[/_-])file(?:[/_.?=&-]|$)", re.I)
-DOC_SECTION_RE = re.compile(r"Közbeszerzési dokumentáció|Kijelölt dokumentumok letöltése|Download selected documents", re.I)
-BUTTON_RE = re.compile(r"Kijelölt dokumentumok letöltése|Download selected documents", re.I)
+EKR_API_DOWNLOAD_RE = re.compile(r"/api/publikus/.*/dokumentum-letoltes(?:/|$|[?#])", re.I)
+EKR_SAFE_CONTROL_RE = re.compile(
+    r"EKR\s*PDF\s*letöltés|Kijelölt dokumentumok letöltése|Download selected documents|"
+    r"\.(?:pdf|zip|docx?|xlsx?|xls|pptx?|csv|7z|rar)(?:\s|$)",
+    re.I,
+)
 
 
 def _detail_url(candidate: dict) -> str:
@@ -69,7 +74,7 @@ def _bounded_file_fetch(url: str, out: Path, session: requests.Session) -> dict 
 def _bounded_http_probe(detail: str, out: Path, manifest: dict) -> bool:
     session = requests.Session()
     session.headers.update({
-        "User-Agent": "Tender-Engine/19.1 public procurement research",
+        "User-Agent": "Tender-Engine/19.2 public procurement research",
         "Accept": "text/html,application/xhtml+xml,application/pdf,application/zip,*/*",
     })
     try:
@@ -125,65 +130,141 @@ def _bounded_http_probe(detail: str, out: Path, manifest: dict) -> bool:
         return False
 
 
+def _safe_ekr_control_indices(items: list[dict]) -> list[int]:
+    chosen: list[int] = []
+    for item in items or []:
+        if not isinstance(item, dict) or not item.get("visible") or item.get("disabled"):
+            continue
+        hay = " ".join(str(item.get(k) or "") for k in ("text", "aria", "title")).strip()
+        if not hay or v11.BLOCK_CONTROL_RE.search(hay) or not EKR_SAFE_CONTROL_RE.search(hay):
+            continue
+        try:
+            chosen.append(int(item.get("index")))
+        except Exception:
+            continue
+        if len(chosen) >= 10:
+            break
+    return chosen
+
+
+def _filename_from_playwright_response(resp, ordinal: int) -> str:
+    try:
+        headers = resp.headers or {}
+    except Exception:
+        headers = {}
+    cd = str(headers.get("content-disposition") or "")
+    match = re.search(r"filename\*?=(?:UTF-8''|\")?([^\";]+)", cd, re.I)
+    if match:
+        value = match.group(1).strip().strip('"')
+        if value:
+            return base.safe_name(value)
+    try:
+        name = Path(urlparse(str(resp.url or "")).path).name
+    except Exception:
+        name = ""
+    return base.safe_name(name or f"ekr-network-{ordinal}.bin")
+
+
 def _bounded_browser_download(detail: str, out: Path, manifest: dict) -> bool:
+    """Target the exact EKR public-file behavior seen in successful V18 runs.
+
+    V18's occasional success came from public EKR file controls plus first-party
+    `/dokumentum-letoltes` network responses, not from a generic selected-documents
+    button. This keeps that successful path without V11's broad control/page crawl.
+    """
     pw = browser = context = page = None
     body = ""
+    network_responses: dict[str, object] = {}
+    control_outcomes: list[dict] = []
     try:
         pw, browser, context = v2.optimized_browser_context()
         page = context.new_page()
-        page.goto(detail, wait_until="domcontentloaded", timeout=30000)
-        page.wait_for_timeout(800)
+
+        def on_response(resp):
+            try:
+                url = str(resp.url or "")
+                host = (urlparse(url).hostname or "").casefold()
+                if host != "ekr.gov.hu" and not host.endswith(".ekr.gov.hu"):
+                    return
+                headers = resp.headers or {}
+                ct = str(headers.get("content-type") or "").casefold()
+                cd = str(headers.get("content-disposition") or "").casefold()
+                if EKR_API_DOWNLOAD_RE.search(url) or "attachment" in cd or any(x in ct for x in ("application/pdf", "application/zip", "application/octet-stream")):
+                    network_responses.setdefault(url, resp)
+            except Exception:
+                pass
+
+        page.on("response", on_response)
+        page.goto(detail, wait_until="domcontentloaded", timeout=35000)
+        page.wait_for_timeout(1200)
+        try:
+            page.wait_for_load_state("networkidle", timeout=5000)
+        except Exception:
+            pass
         try:
             body = page.locator("body").inner_text(timeout=5000)
-            (out / "portal_page.txt").write_text(body[:800_000], encoding="utf-8")
+            if body:
+                (out / "portal_page.txt").write_text(body[:800_000], encoding="utf-8")
         except Exception:
             body = ""
 
-        if not DOC_SECTION_RE.search(body):
-            manifest.setdefault("dce_method_attempts", []).append({
-                "method": "HU_EKR_BOUNDED_SELECTED_DOCUMENTS_V19", "url": detail,
-                "outcome": "DOCUMENT_SECTION_NOT_PROVEN",
-            })
-            return False
-
+        controls = page.locator("button, [role='button'], a")
         try:
-            selected = int(page.locator("input[type='checkbox']").evaluate_all(
-                """els => { let n=0; for (const el of els) { const s=getComputedStyle(el); const r=el.getBoundingClientRect(); const visible=s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0; if (visible && !el.disabled) { if (!el.checked) el.click(); if (el.checked) n++; } } return n; }"""
-            ) or 0)
+            items = controls.evaluate_all(
+                """els => els.map((el,index) => { const s=getComputedStyle(el); const r=el.getBoundingClientRect(); return {index, text:(el.innerText||el.textContent||'').trim(), aria:el.getAttribute('aria-label')||'', title:el.getAttribute('title')||'', disabled:!!el.disabled, visible:s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0}; })"""
+            )
         except Exception:
-            selected = 0
-        if selected <= 0:
-            manifest.setdefault("dce_method_attempts", []).append({
-                "method": "HU_EKR_BOUNDED_SELECTED_DOCUMENTS_V19", "url": detail,
-                "outcome": "NO_SELECTABLE_DOCUMENTS",
-            })
-            return False
+            items = []
+        indices = _safe_ekr_control_indices(items or [])
 
-        page.wait_for_timeout(400)
-        controls = page.locator("button, [role='button'], a").filter(has_text=BUTTON_RE)
-        for i in range(min(controls.count(), 2)):
-            node = controls.nth(i)
+        for index in indices:
+            node = controls.nth(index)
+            hay = ""
             try:
-                if not node.is_visible():
-                    continue
-                with page.expect_download(timeout=15000) as dl_info:
-                    node.click(force=True, timeout=4000)
+                item = (items or [])[index]
+                hay = str((item or {}).get("text") or "")[:300]
+            except Exception:
+                pass
+            try:
+                with page.expect_download(timeout=5000) as dl_info:
+                    node.click(force=True, timeout=3000)
                 manifest.setdefault("files", []).append(base.persist_download(out, dl_info.value, page.url))
-                manifest.setdefault("dce_method_attempts", []).append({
-                    "method": "HU_EKR_BOUNDED_SELECTED_DOCUMENTS_V19", "url": detail,
-                    "selected_checkboxes": selected, "outcome": "DOWNLOADED",
-                })
-                return True
+                control_outcomes.append({"text": hay, "outcome": "DOWNLOADED"})
             except Exception as exc:
-                manifest.setdefault("dce_method_attempts", []).append({
-                    "method": "HU_EKR_BOUNDED_SELECTED_DOCUMENTS_V19", "url": detail,
-                    "selected_checkboxes": selected, "outcome": "CONTROL_FAILED",
-                    "error": repr(exc)[:400],
-                })
-        return False
+                control_outcomes.append({"text": hay, "outcome": "NO_DIRECT_DOWNLOAD", "error": repr(exc)[:240]})
+            try:
+                page.wait_for_timeout(150)
+            except Exception:
+                pass
+
+        network_meta: list[dict] = []
+        for ordinal, (url, resp) in enumerate(list(network_responses.items())[:8], start=1):
+            try:
+                headers = resp.headers or {}
+                content = resp.body()
+                prefix = bytes(content[:8]) if content else b""
+                ct = str(headers.get("content-type") or "")
+                cd = str(headers.get("content-disposition") or "")
+                fileish = bool(content and ("attachment" in cd.casefold() or any(x in ct.casefold() for x in ("application/pdf", "application/zip", "application/octet-stream")) or prefix.startswith(b"%PDF-") or prefix.startswith(b"PK\x03\x04")))
+                network_meta.append({"url": url[:2000], "status": getattr(resp, "status", None), "content_type": ct[:200], "content_disposition": cd[:300], "bytes": len(content), "fileish": fileish})
+                if fileish:
+                    manifest.setdefault("files", []).append(base.persist_bytes(out, _filename_from_playwright_response(resp, ordinal), content, url, ct))
+            except Exception as exc:
+                network_meta.append({"url": url[:2000], "outcome": "BODY_UNAVAILABLE", "error": repr(exc)[:300]})
+
+        manifest.setdefault("dce_method_attempts", []).append({
+            "method": "HU_EKR_TARGETED_NETWORK_V19",
+            "url": detail,
+            "safe_control_count": len(indices),
+            "safe_controls": control_outcomes,
+            "network_files": network_meta,
+            "downloaded": len(manifest.get("files") or []),
+            "outcome": "DOWNLOADED" if manifest.get("files") else "NO_FILE",
+        })
+        return bool(manifest.get("files"))
     except Exception as exc:
         manifest.setdefault("dce_method_attempts", []).append({
-            "method": "HU_EKR_BOUNDED_SELECTED_DOCUMENTS_V19", "url": detail,
+            "method": "HU_EKR_TARGETED_NETWORK_V19", "url": detail,
             "outcome": "ERROR", "error": repr(exc)[:700],
         })
         return False
@@ -227,7 +308,7 @@ def adapter_hu_ekr_v19(candidate: dict, out: Path, manifest: dict) -> None:
         manifest["status"] = state
     else:
         manifest["status"] = "ERROR_RETRYABLE"
-        manifest["error"] = "HU_EKR_DETAIL_ONLY_BOUNDED_V19_EXHAUSTED"
+        manifest["error"] = "HU_EKR_DETAIL_ONLY_TARGETED_V19_EXHAUSTED"
 
 
 base.ADAPTERS["HU_EKR_PUBLIC"] = adapter_hu_ekr_v19
