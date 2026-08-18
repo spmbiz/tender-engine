@@ -51,40 +51,48 @@ jobs:
   ted-discovery:
     needs: init-release
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # FULL_ACTIVE is intentionally uncapped. Leave a post-enumeration margin so
+    # an incomplete checkpoint pack can still be uploaded if the TED step times out.
+    timeout-minutes: 70
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests
-      - name: Enumerate TED with delta/reconcile safety window
+      - name: Enumerate complete TED ACTIVE registry
+        timeout-minutes: 55
         env:
           DISCOVERY_MODE: ${{ needs.init-release.outputs.mode }}
           TED_SCOPE: ACTIVE
           TED_MAX_PAGES: '80'
           TED_REQUEST_RETRIES: '7'
-          TED_PAGE_DELAY_SECONDS: '0.25'
+          TED_PAGE_DELAY_SECONDS: '0.05'
         shell: bash
         run: |
           set -euo pipefail
           if [ "$DISCOVERY_MODE" = reconcile ]; then export TED_LOOKBACK_DAYS=10; else export TED_LOOKBACK_DAYS=3; fi
-          echo "TED mode=$DISCOVERY_MODE lookback=$TED_LOOKBACK_DAYS days"
+          echo "TED mode=$DISCOVERY_MODE ACTIVE scope; publication lookback is ignored by FULL_ACTIVE"
           python pipeline/discover_ted.py
       - name: Persist TED discovery durably BEFORE completeness validation
+        if: always()
         env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
         shell: bash
         run: |
           set -euo pipefail
+          test -s discovery/ted/stats.json
+          test -f discovery/ted/current.jsonl
           tar -C discovery/ted -czf discovery-ted.tar.gz .
           gh release upload "$RELEASE_TAG" discovery-ted.tar.gz --clobber
           gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | grep -Fxq discovery-ted.tar.gz
       - name: Verify TED coverage integrity
+        if: always()
         run: |
           python - <<'PY'
           import json
           s=json.load(open('discovery/ted/stats.json'));print(json.dumps(s,indent=2))
           assert not s.get('errors'),s
           assert not s.get('truncated_by_page_cap'),s
+          assert s.get('enumeration_complete') is True,s
           if s.get('total_reported') is not None: assert s.get('source_items_seen',0)>=s['total_reported'],s
           PY
 
@@ -216,10 +224,13 @@ jobs:
           if [ "$DISCOVERY_MODE" = reconcile ]; then export PAGE_END=20; else export PAGE_END=5; fi
           python pipeline/discover_epps_public.py
       - name: Persist ePPS source durably
+        if: always()
         env: {GH_TOKEN: '${{ github.token }}', RELEASE_TAG: '${{ needs.init-release.outputs.release_tag }}'}
         run: |
+          set -euo pipefail
           slug="$(echo '${{ matrix.source }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')"
           archive="discovery-global-${slug}.tar.gz"
+          test -d "discovery/global/${{ matrix.source }}"
           tar -C "discovery/global/${{ matrix.source }}" -czf "$archive" .
           gh release upload "$RELEASE_TAG" "$archive" --clobber
 
