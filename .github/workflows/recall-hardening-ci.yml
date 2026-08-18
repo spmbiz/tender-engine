@@ -21,9 +21,18 @@ on:
       - 'pipeline/merge_qwen_classification_state.py'
       - 'pipeline/build_qwen_calibration_corpus.py'
       - 'pipeline/evaluate_qwen_recall_golden.py'
+      - 'pipeline/extract_corpus.py'
+      - 'pipeline/extract_gates.py'
+      - 'pipeline/auto_adjudicate_dce.py'
+      - 'pipeline/rebuild_gpt_review_bank_from_release.py'
+      - 'pipeline/refresh_gpt_inbox_live.py'
+      - 'pipeline/build_gpt_web_read_batches.py'
       - '.github/workflows/supergreen-discovery-v2.yml'
+      - '.github/workflows/gpt-inbox-live-refresh.yml'
       - '.github/workflows/recall-hardening-ci.yml'
       - 'tests/test_open_world_lane_contracts.py'
+      - 'tests/test_gate_snippet_document_provenance.py'
+      - 'tests/test_gpt_review_fair_share.py'
 
 permissions:
   contents: read
@@ -31,14 +40,14 @@ permissions:
 jobs:
   recall-regression:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install validation dependencies
-        run: python -m pip install --disable-pip-version-check -q pytest requests pyyaml beautifulsoup4 playwright
+        run: python -m pip install --disable-pip-version-check -q pytest requests pyyaml beautifulsoup4 playwright pypdf python-docx openpyxl python-pptx
       - name: Compile recall-critical Python
         run: |
           python -m py_compile \
@@ -57,7 +66,13 @@ jobs:
             pipeline/qwen_notice_batch_selfheal_rich.py \
             pipeline/merge_qwen_classification_state.py \
             pipeline/build_qwen_calibration_corpus.py \
-            pipeline/evaluate_qwen_recall_golden.py
+            pipeline/evaluate_qwen_recall_golden.py \
+            pipeline/extract_corpus.py \
+            pipeline/extract_gates.py \
+            pipeline/auto_adjudicate_dce.py \
+            pipeline/rebuild_gpt_review_bank_from_release.py \
+            pipeline/refresh_gpt_inbox_live.py \
+            pipeline/build_gpt_web_read_batches.py
       - name: Validate recall-critical workflow YAML
         run: |
           python - <<'PY'
@@ -68,13 +83,14 @@ jobs:
               '.github/workflows/live-world-snapshot.yml',
               '.github/workflows/qwen-live-classification.yml',
               '.github/workflows/qwen-calibration-corpus.yml',
+              '.github/workflows/gpt-inbox-live-refresh.yml',
               '.github/workflows/recall-hardening-ci.yml',
           ):
               obj=yaml.safe_load(Path(rel).read_text(encoding='utf-8'))
               assert isinstance(obj,dict) and ('jobs' in obj), rel
           print('workflow YAML OK')
           PY
-      - name: Run recall regression suite
+      - name: Run recall, provenance and review-window regression suite
         run: |
           python -m pytest -q \
             tests/test_live_universe_contract.py \
@@ -82,4 +98,6 @@ jobs:
             tests/test_ted_checkpoint.py \
             tests/test_recall_workflow_contract.py \
             tests/test_procurement_code_and_review_index.py \
-            tests/test_open_world_lane_contracts.py
+            tests/test_open_world_lane_contracts.py \
+            tests/test_gate_snippet_document_provenance.py \
+            tests/test_gpt_review_fair_share.py
