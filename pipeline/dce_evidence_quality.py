@@ -4,7 +4,7 @@ import argparse
 import json
 import re
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 ACCESS_GUIDE_FILENAME_PATTERNS = [
     r"instructions?.*(?:access|tender|portal)", r"how.*access.*tender", r"user.?guide", r"supplier.*guide", r"portal.*guide", r"terms.*use",
@@ -104,6 +104,54 @@ def _is_notice_only_source_url(url: str) -> bool:
     return host.endswith("boamp.fr") and "/telechargements/" in path and path.endswith(".pdf")
 
 
+def _candidate_notice_id(candidate: dict, manifest: dict) -> str:
+    raw = candidate.get("notice_id") or manifest.get("notice_id") or candidate.get("candidate_id") or manifest.get("candidate_id") or ""
+    value = str(raw).strip()
+    if ":" in value:
+        value = value.rsplit(":", 1)[-1]
+    return value
+
+
+def _official_khmdhs_attachment_provenance(candidate: dict, manifest: dict, source_urls: list[str], docs: list[dict]) -> dict:
+    """Prove an exact Greek KHMDHS official attachment without guessing from text.
+
+    The public KHMDHS API exposes notice attachments at the official government
+    host under `/khmdhs-opendata/notice/attachment/<notice_id>`. When the endpoint
+    ID exactly matches the candidate notice ID, the response was persisted as a
+    real file and at least one indexed document yielded text, the retrieved file
+    is authoritative candidate-specific procurement evidence even when the corpus
+    is Greek and therefore has no English/French/German marker hits.
+
+    This proves provenance only; mandatory-gate extraction may still return
+    UNKNOWN and nothing here can create a GREEN by itself.
+    """
+    notice_id = _candidate_notice_id(candidate, manifest)
+    if not notice_id:
+        return {"matched": False, "reason": "missing_notice_id"}
+    candidate_portal = str(candidate.get("portal") or candidate.get("source") or "").upper()
+    if candidate_portal not in {"GR_KHMDHS", "GR-KHMDHS"} and not str(manifest.get("candidate_id") or "").upper().startswith("GR-KHMDHS:"):
+        return {"matched": False, "reason": "not_gr_khmdhs"}
+    hits = []
+    expected_suffix = "/khmdhs-opendata/notice/attachment/" + notice_id.casefold()
+    for raw in source_urls:
+        try:
+            p = urlparse(str(raw))
+        except Exception:
+            continue
+        host = (p.hostname or "").casefold()
+        path = unquote(p.path or "").rstrip("/").casefold()
+        if host == "cerpp.eprocurement.gov.gr" and path.endswith(expected_suffix):
+            hits.append(str(raw))
+    docs_with_text = sum(1 for x in docs if isinstance(x, dict) and int(x.get("text_chars") or 0) >= 200)
+    return {
+        "matched": bool(hits) and docs_with_text > 0,
+        "notice_id": notice_id,
+        "matching_source_urls": hits,
+        "documents_with_usable_text": docs_with_text,
+        "authority": "Greek KHMDHS official government notice-attachment endpoint",
+    }
+
+
 def classify_candidate(root: Path) -> dict:
     manifest = _load(root / "manifest.json", {})
     candidate = manifest.get("candidate") or _load(root / "candidate.json", {})
@@ -123,6 +171,7 @@ def classify_candidate(root: Path) -> dict:
     manifest_files = [x for x in (manifest.get("files") or []) if isinstance(x, dict)]
     source_urls = [str(x.get("source_url") or "") for x in manifest_files if str(x.get("source_url") or "")]
     all_source_files_notice_only = bool(source_urls) and all(_is_notice_only_source_url(u) for u in source_urls)
+    khmdhs_provenance = _official_khmdhs_attachment_provenance(candidate, manifest, source_urls, docs)
 
     quality = "NOT_APPLICABLE"
     derived_status = raw_status
@@ -138,6 +187,11 @@ def classify_candidate(root: Path) -> dict:
             quality = "EXTRACTION_EMPTY"
             derived_status = "DOWNLOADED_PUBLIC_EMPTY"
             reasons.append("downloaded_files_but_no_extractable_authoritative_text")
+        elif khmdhs_provenance.get("matched"):
+            quality = "SUBSTANTIVE_DCE_PRESENT"
+            derived_status = "DOWNLOADED_PUBLIC"
+            gate_readiness = True
+            reasons.append("exact_official_khmdhs_notice_attachment_provenance_matches_candidate_id")
         else:
             named = [n for n in filenames if n]
             all_named_generic = bool(named) and len(generic_names) == len(named)
@@ -169,7 +223,7 @@ def classify_candidate(root: Path) -> dict:
         reasons.append("retrieval_status_not_downloaded_public")
 
     return {
-        "contract": "DCE_EVIDENCE_QUALITY_V1",
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
         "candidate_id": manifest.get("candidate_id") or candidate.get("candidate_id") or root.name,
         "raw_status": raw_status,
         "derived_status": derived_status,
@@ -180,13 +234,14 @@ def classify_candidate(root: Path) -> dict:
         "documents_with_text": extracted_text_docs,
         "source_urls": source_urls[:30],
         "all_source_files_notice_only": all_source_files_notice_only,
+        "official_khmdhs_provenance": khmdhs_provenance,
         "generic_filename_hits": generic_names[:30],
         "access_guide_hits": access_hits,
         "interest_required_hits": interest_hits,
         "substantive_marker_hits": substantive_hits,
         "candidate_title_overlap": title_match,
         "reasons": reasons,
-        "rule": "DOWNLOADED_PUBLIC is transport success only. Mandatory-gate review is permitted only when gate_readiness=true; publication notice PDFs are never promoted to DCE evidence.",
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN.",
     }
 
 
