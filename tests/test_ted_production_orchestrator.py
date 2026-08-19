@@ -1,6 +1,10 @@
 from datetime import datetime, timezone
 
-from pipeline.ted_production import build_delta_queries, build_year_queries
+from pipeline.ted_production import (
+    _rows_equivalent_across_delta_lanes,
+    build_delta_queries,
+    build_year_queries,
+)
 
 
 def test_delta_future_deadline_lane_has_no_publication_lookback():
@@ -29,3 +33,21 @@ def test_year_query_builder_refuses_inverted_range():
         assert "current_year" in str(exc)
     else:
         raise AssertionError("expected ValueError")
+
+
+def test_delta_overlap_ignores_only_volatile_discovery_timestamp():
+    left = {
+        "candidate_id": "TED:1-2026",
+        "title": "Same",
+        "current": True,
+        "discovered_at": "2026-08-19T10:00:00+00:00",
+    }
+    right = {
+        "candidate_id": "TED:1-2026",
+        "title": "Same",
+        "current": True,
+        "discovered_at": "2026-08-19T10:00:02+00:00",
+    }
+    assert _rows_equivalent_across_delta_lanes(left, right) is True
+    changed = dict(right, title="Changed upstream")
+    assert _rows_equivalent_across_delta_lanes(left, changed) is False
