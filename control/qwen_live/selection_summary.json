@@ -1,35 +1,36 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-19T05:04:19+00:00",
-  "source_run": "32192589684",
+  "generated_at_utc": "2026-08-19T05:17:04+00:00",
+  "source_run": "32211392759",
   "state_rows": 1305,
-  "ledger_rows": 100729,
-  "snapshot_rows": 100729,
-  "blocked_ids": 24668,
+  "ledger_rows": 121642,
+  "snapshot_rows": 121642,
+  "blocked_ids": 24989,
   "durable_attempted_exact_versions_ignored": 0,
-  "valid_exact_hash_current_unattempted": 168,
-  "eligible_keep_for_dce": 167,
+  "valid_exact_hash_current_unattempted": 152,
+  "eligible_keep_for_dce": 151,
   "review_worthy_rejects_promoted_to_explore": 0,
-  "stale_hash_ignored": 0,
+  "stale_hash_ignored": 16,
   "missing_snapshot": 0,
-  "expired_ignored": 1,
-  "selected": 160,
+  "expired_ignored": 0,
+  "selected": 152,
   "selection_decisions": {
-    "FIT": 5,
-    "MAYBE": 154,
+    "FIT": 4,
+    "MAYBE": 147,
     "REJECT_OBVIOUS": 1
   },
   "selection_survival": {
-    "KEEP": 160
+    "KEEP": 152
   },
   "selection_lanes": {
-    "qwen-primary-coded": 5,
+    "qwen-primary-coded": 4,
     "qwen-explore-coded": 48,
     "qwen-reject-audit-coded": 1,
-    "qwen-elastic-coded": 106
+    "qwen-elastic-coded": 99
   },
   "selection_freshness": {
-    "material_new_or_updated": 160
+    "recent_unseen_carryover": 84,
+    "historical_backfill": 68
   },
   "policy": {
     "keep_is_not_fit": true,
@@ -53,16 +54,16 @@
       "reason": "Qwen runtime is still benchmark-blocked; spend more DCE capacity auditing MAYBE/REJECT paths to measure false negatives."
     }
   },
-  "base_candidate_pool": 168,
+  "base_candidate_pool": 152,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "FIT": 5,
-    "MAYBE": 162,
+    "FIT": 4,
+    "MAYBE": 147,
     "REJECT_OBVIOUS": 1
   },
   "candidate_pool_lanes": {
-    "qwen-primary": 5,
-    "qwen-open-world-explore": 162,
+    "qwen-primary": 4,
+    "qwen-open-world-explore": 147,
     "qwen-reject-audit": 1
   },
   "code_prior": {
