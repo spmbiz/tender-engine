@@ -1,0 +1,49 @@
+{
+  "schema": "PCS_FULL_RECONCILE_PROOF_V1",
+  "release_tag": "pcs-reconcile-proof-32296830203",
+  "adapter_exit_code": 3,
+  "listing_contract": "PCS_OFFICIAL_MONTH_TYPE_BULK_OCDS_V4_DIRECT_CURRENT_RECONCILED",
+  "month_manifest": "OFFICIAL_BULK_FORM_OPTIONS",
+  "months_requested": 48,
+  "notice_types": [
+    2,
+    5,
+    7,
+    12,
+    21,
+    22,
+    23,
+    24,
+    101,
+    102
+  ],
+  "requests_expected": 480,
+  "requests_completed": 480,
+  "source_releases_seen": 13360,
+  "bulk_current_materialized_before_reconcile": 282,
+  "current_materialized": 590,
+  "publication_window_enumeration_complete": true,
+  "enumeration_complete": false,
+  "live_coverage_credit_allowed": false,
+  "current_universe_reconciliation": {
+    "contract": "PCS_BULK_CURRENT_UNIVERSE_RECONCILIATION_V1",
+    "direct_official_total_reported": 586,
+    "direct_current_rows": 586,
+    "exact_matched_direct_rows": 278,
+    "direct_missing_from_bulk": 308,
+    "bulk_recall_against_official_current": 0.47440273037542663,
+    "all_official_current_matched_to_bulk": false,
+    "direct_current_contract_complete": true,
+    "coverage_complete": false
+  },
+  "errors": [],
+  "warnings": [
+    {
+      "type": "CURRENT_UNIVERSE_RECONCILIATION_INCOMPLETE",
+      "direct_contract_complete": true,
+      "bulk_publication_contract_complete": true,
+      "direct_missing_from_bulk": 308
+    }
+  ],
+  "pass": false
+}
