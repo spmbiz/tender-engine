@@ -22,28 +22,30 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check -q requests
-      - name: Fetch official ANAC avvisi page 0 and record outcome
+      - name: Fetch official ANAC avvisi recent page 0 and record outcome
         run: |
           python - <<'PY'
           import json,requests
-          from datetime import datetime,timezone
+          from datetime import datetime,timezone,timedelta
           from pathlib import Path
-          today=datetime.now(timezone.utc).strftime('%d/%m/%Y')
+          now=datetime.now(timezone.utc)
+          start=(now-timedelta(days=7)).strftime('%d/%m/%Y'); end=now.strftime('%d/%m/%Y')
           url='https://pubblicitalegale.anticorruzione.it/api/v0/avvisi'
-          params={'dataPubblicazioneStart':today,'dataPubblicazioneEnd':today,'page':0,'size':10,'codiceScheda':'2,4'}
+          params={'dataPubblicazioneStart':start,'dataPubblicazioneEnd':end,'page':0,'size':10,'codiceScheda':'2,4'}
           s=requests.Session();s.headers.update({'User-Agent':'Mozilla/5.0','Accept':'application/json'})
-          payload={'schema':'ANAC_AVVISI_API_SCHEMA_PROBE_V2_ALWAYS_PERSIST','generated_at':datetime.now(timezone.utc).isoformat(),'request_url':None,'status':None,'json_type':None,'json':None,'error':None,'body_sample':None}
+          payload={'schema':'ANAC_AVVISI_API_SCHEMA_PROBE_V3_RECENT_WINDOW','generated_at':now.isoformat(),'request_url':None,'status':None,'json_type':None,'json':None,'error':None,'body_sample':None}
           try:
               r=s.get(url,params=params,timeout=45)
-              payload['request_url']=r.url; payload['status']=r.status_code; payload['body_sample']=r.text[:20000]
+              payload['request_url']=r.url; payload['status']=r.status_code; payload['body_sample']=r.text[:50000]
               if r.ok:
                   data=r.json(); payload['json_type']=type(data).__name__; payload['json']=data
           except Exception as exc:
               payload['error']=repr(exc)
           Path('control/anac_api_schema_probe.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           summary={'status':payload['status'],'error':payload['error'],'type':payload['json_type']}
-          if isinstance(payload.get('json'),dict): summary['top_keys']=list(payload['json'])[:50]
-          if isinstance(payload.get('json'),list): summary['items']=len(payload['json'])
+          if isinstance(payload.get('json'),dict):
+              summary['top_keys']=list(payload['json'])[:50]; summary['content_items']=len(payload['json'].get('content') or [])
+              if payload['json'].get('content'): summary['item_keys']=list(payload['json']['content'][0])[:100]
           print(json.dumps(summary,indent=2))
           PY
       - name: Persist schema sample
