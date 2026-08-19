@@ -1,41 +1,40 @@
 {
   "schema": "GPT_INBOX_HEALTH_V4_FAIR_SHARE_PROVENANCE",
-  "updated_at": "2026-08-19T22:11:52.301931+00:00",
+  "updated_at": "2026-08-19T22:25:33.330716+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
-  "latest_source_dce_run_id": 32307519020,
+  "latest_source_dce_run_id": 32308370173,
   "counts": {
-    "pending_gpt_web_review": 108,
+    "pending_gpt_web_review": 147,
     "reviewed_ticks_total": 485,
-    "excluded_already_reviewed": 52,
+    "excluded_already_reviewed": 18,
     "excluded_already_in_final_bank": 0,
-    "pending_before_visible_cap": 108,
+    "pending_before_visible_cap": 147,
     "pending_by_stage": {
-      "BUSINESS_GATES": 82,
-      "DCE_AUTHENTICITY": 26
+      "BUSINESS_GATES": 109,
+      "DCE_AUTHENTICITY": 38
     },
     "pending_by_inbox_lane": {
       "GPT_PRIORITY": 15,
       "DCE_AUTHENTICITY_REPAIR": 20,
       "LOW_PORTAL_SURVEILLANCE": 20,
-      "ELASTIC_FILL": 53
+      "ELASTIC_FILL": 92
     },
     "pending_by_fit_band": {
-      "MAYBE": 19,
-      "LOW": 89
+      "MAYBE": 18,
+      "LOW": 129
     },
     "pending_by_portal": {
       "MALTA_EPPS": 7,
-      "ZA_ETENDERS": 43,
+      "ZA_ETENDERS": 52,
       "IRELAND_ETENDERS": 1,
-      "WORLD_BANK": 7,
-      "PL_EZAMOWIENIA": 8,
-      "GR_KHMDHS": 3,
-      "TED": 25,
+      "WORLD_BANK": 8,
+      "GR_KHMDHS": 5,
+      "PL_EZAMOWIENIA": 25,
+      "TED": 16,
       "CA_CANADABUYS": 4,
       "SK_UVO": 1,
-      "SCOTLAND_PCS": 4,
+      "SCOTLAND_PCS": 25,
       "CYPRUS_EPPS": 2,
-      "US_SAM": 2,
       "NO_DOFFIN": 1
     }
   },
@@ -47,29 +46,28 @@
       "GPT_PRIORITY": 15,
       "DCE_AUTHENTICITY_REPAIR": 20,
       "LOW_PORTAL_SURVEILLANCE": 20,
-      "ELASTIC_FILL": 53
+      "ELASTIC_FILL": 92
     },
     "selected_by_stage": {
-      "BUSINESS_GATES": 82,
-      "DCE_AUTHENTICITY": 26
+      "BUSINESS_GATES": 109,
+      "DCE_AUTHENTICITY": 38
     },
     "selected_by_band": {
-      "MAYBE": 19,
-      "LOW": 89
+      "MAYBE": 18,
+      "LOW": 129
     },
     "selected_by_portal": {
       "MALTA_EPPS": 7,
-      "ZA_ETENDERS": 43,
+      "ZA_ETENDERS": 52,
       "IRELAND_ETENDERS": 1,
-      "WORLD_BANK": 7,
-      "PL_EZAMOWIENIA": 8,
-      "GR_KHMDHS": 3,
-      "TED": 25,
+      "WORLD_BANK": 8,
+      "GR_KHMDHS": 5,
+      "PL_EZAMOWIENIA": 25,
+      "TED": 16,
       "CA_CANADABUYS": 4,
       "SK_UVO": 1,
-      "SCOTLAND_PCS": 4,
+      "SCOTLAND_PCS": 25,
       "CYPRUS_EPPS": 2,
-      "US_SAM": 2,
       "NO_DOFFIN": 1
     }
   },
@@ -80,78 +78,77 @@
     "authenticity_target": 20,
     "low_surveillance_target": 20,
     "selected_by_lane": {
-      "SPM_PRIORITY": 60,
+      "SPM_PRIORITY": 32,
       "DCE_AUTHENTICITY_REPAIR": 20,
       "LOW_PORTAL_SURVEILLANCE": 20,
-      "ELASTIC_FILL": 60
+      "ELASTIC_FILL": 88
     },
     "selected_by_band": {
-      "GOOD": 23,
-      "MAYBE": 47,
-      "LOW": 90
+      "GOOD": 6,
+      "MAYBE": 30,
+      "LOW": 124
     },
     "selected_by_stage": {
-      "BUSINESS_GATES": 127,
-      "DCE_AUTHENTICITY": 33
+      "BUSINESS_GATES": 121,
+      "DCE_AUTHENTICITY": 39
     },
     "selected_by_portal": {
-      "WORLD_BANK": 8,
-      "ZA_ETENDERS": 51,
-      "TED": 63,
-      "US_SAM": 4,
-      "SCOTLAND_PCS": 5,
+      "TED": 32,
       "MALTA_EPPS": 8,
+      "ZA_ETENDERS": 53,
       "IRELAND_ETENDERS": 1,
-      "PL_EZAMOWIENIA": 8,
-      "GR_KHMDHS": 3,
+      "WORLD_BANK": 8,
+      "PL_EZAMOWIENIA": 26,
+      "GR_KHMDHS": 5,
       "CA_CANADABUYS": 4,
-      "GENERIC_PUBLIC_PAGE": 1,
       "SK_UVO": 1,
+      "SCOTLAND_PCS": 19,
       "CYPRUS_EPPS": 2,
       "NO_DOFFIN": 1
     }
   },
-  "review_index_count": 2886,
+  "review_index_count": 2902,
   "review_index_counts": {
-    "pending_total_uncapped": 2886,
+    "pending_total_uncapped": 2902,
     "by_stage": {
-      "BUSINESS_GATES": 1999,
+      "BUSINESS_GATES": 2015,
       "DCE_AUTHENTICITY": 887
     },
     "by_spm_fit_band": {
       "HOT": 1,
       "GOOD": 59,
       "MAYBE": 99,
-      "LOW": 2727
+      "LOW": 2743
     },
     "rich_hot_window_target": 160,
-    "overflow_beyond_hot_160": 2726,
+    "overflow_beyond_hot_160": 2742,
     "cross_portal_duplicates_collapsed": 0
   },
-  "true_pending_before_hot_cap": 2886,
-  "overflow_beyond_hot_160": 2726,
-  "assistant_read_batch_count": 11,
+  "true_pending_before_hot_cap": 2902,
+  "overflow_beyond_hot_160": 2742,
+  "assistant_read_batch_count": 15,
   "assistant_read_batch_size": 10,
   "assistant_read_batch_schema": "GPT_WEB_READ_BATCH_MANIFEST_V3_PROVENANCE_REFRESH",
   "provenance_overrides_applied_in_window": 0,
   "recovery_metrics": {
-    "shard_files_scanned": 150,
-    "adjudication_rows_scanned": 941,
-    "model_review_rows_seen": 233,
-    "dce_authenticity_rows_seen": 97,
+    "shard_files_scanned": 109,
+    "adjudication_rows_scanned": 688,
+    "model_review_rows_seen": 187,
+    "dce_authenticity_rows_seen": 80,
     "scope_auto_rejected": 0,
     "scope_auto_reject_reason_counts": {},
     "cross_portal_duplicates_collapsed": 0,
-    "uncapped_unique_pending_before_hot_window": 320,
+    "uncapped_unique_pending_before_hot_window": 262,
     "rich_hot_window_count": 160,
-    "overflow_beyond_hot_window": 160
+    "overflow_beyond_hot_window": 102
   },
   "index_recovery": {
-    "shard_files_scanned_this_refresh": 150,
-    "adjudication_rows_scanned_this_refresh": 941,
-    "gate_rows_seen_this_refresh": 239,
-    "authenticity_rows_seen_this_refresh": 99,
+    "shard_files_scanned_this_refresh": 109,
+    "adjudication_rows_scanned_this_refresh": 688,
+    "gate_rows_seen_this_refresh": 193,
+    "authenticity_rows_seen_this_refresh": 82,
     "source_runs_seen_this_refresh": [
+      32308370173,
       32307519020,
       32304085305,
       32303792506,
@@ -160,8 +157,7 @@
       32293854313,
       32289652535,
       32287943453,
-      32285036732,
-      32284744374
+      32285036732
     ]
   },
   "healthy": true,
