@@ -1,6 +1,6 @@
 {
   "schema": "AUTHENTICITY_RETRY_ROUTER_PLAN_V1",
-  "generated_at": "2026-08-19T21:31:25.075882+00:00",
+  "generated_at": "2026-08-19T21:34:26.278061+00:00",
   "selected_counts": {
     "IRELAND": 0,
     "ZA_ETENDERS": 2,
@@ -10,14 +10,14 @@
     "IRELAND": [],
     "ZA_ETENDERS": [
       {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164502-2026-08-04",
+        "candidate_id": "za_etenders_ocds:ocds-9t57fa-160095",
         "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
         "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
         "prior_attempts": 0,
         "source_dce_run_id": 32303792506
       },
       {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164581-2026-08-04",
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164504-2026-08-04",
         "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
         "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
         "prior_attempts": 0,
@@ -32,7 +32,7 @@
     "ESTONIA": "queues/estonia_auth_retry_router.jsonl"
   },
   "blocked": {
-    "cooldown": 8,
+    "cooldown": 10,
     "attempt_cap": 0,
     "unsupported": 15
   },
