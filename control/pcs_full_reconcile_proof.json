@@ -1,8 +1,8 @@
 {
   "schema": "PCS_FULL_RECONCILE_PROOF_V1",
-  "release_tag": "pcs-reconcile-proof-32296830203",
-  "adapter_exit_code": 3,
-  "listing_contract": "PCS_OFFICIAL_MONTH_TYPE_BULK_OCDS_V4_DIRECT_CURRENT_RECONCILED",
+  "release_tag": "pcs-reconcile-proof-32313651371",
+  "adapter_exit_code": 0,
+  "listing_contract": "PCS_CURRENT_OPPORTUNITY_REGISTRY_V5_AUTHORITATIVE_PLUS_BULK_ENRICHMENT",
   "month_manifest": "OFFICIAL_BULK_FORM_OPTIONS",
   "months_requested": 48,
   "notice_types": [
@@ -19,31 +19,37 @@
   ],
   "requests_expected": 480,
   "requests_completed": 480,
-  "source_releases_seen": 13360,
-  "bulk_current_materialized_before_reconcile": 282,
-  "current_materialized": 590,
+  "source_releases_seen": 13371,
+  "bulk_current_materialized_before_reconcile": 293,
+  "current_materialized": 586,
   "publication_window_enumeration_complete": true,
-  "enumeration_complete": false,
-  "live_coverage_credit_allowed": false,
+  "enumeration_complete": true,
+  "live_coverage_credit_allowed": true,
   "current_universe_reconciliation": {
-    "contract": "PCS_BULK_CURRENT_UNIVERSE_RECONCILIATION_V1",
+    "schema": "PCS_CURRENT_REGISTRY_AUTHORITATIVE_RECONCILIATION_V2",
+    "direct_current_contract_complete": true,
     "direct_official_total_reported": 586,
     "direct_current_rows": 586,
-    "exact_matched_direct_rows": 278,
-    "direct_missing_from_bulk": 308,
-    "bulk_recall_against_official_current": 0.47440273037542663,
-    "all_official_current_matched_to_bulk": false,
-    "direct_current_contract_complete": true,
-    "coverage_complete": false
+    "final_current_rows": 586,
+    "bulk_publication_contract_complete": true,
+    "bulk_current_rows_before_reconcile": 293,
+    "exact_notice_reference_links": 0,
+    "procedure_ocid_links": 289,
+    "direct_without_bulk_enrichment": 297,
+    "bulk_enrichment_recall_against_official_current": 0.4931740614334471,
+    "bulk_current_not_in_direct_registry": 4,
+    "coverage_complete": true,
+    "generated_at": "2026-08-19T23:55:53.388113+00:00",
+    "semantics": "The exhaustively paged official PCS Current Opportunity registry is authoritative for live current-universe coverage. Monthly OCDS bulk is an enrichment/provenance surface, not an eligibility condition for existence in the current registry. Exact notice references are notice identity; OCID links are procedure-level enrichment only and never destructive notice dedupe. Bulk-only reconstructed-current rows are preserved diagnostically but excluded from current.jsonl."
   },
   "errors": [],
   "warnings": [
     {
-      "type": "CURRENT_UNIVERSE_RECONCILIATION_INCOMPLETE",
-      "direct_contract_complete": true,
-      "bulk_publication_contract_complete": true,
-      "direct_missing_from_bulk": 308
+      "type": "PCS_BULK_ENRICHMENT_RECALL_BELOW_CURRENT_REGISTRY",
+      "bulk_enrichment_recall_against_official_current": 0.4931740614334471,
+      "direct_without_bulk_enrichment": 297,
+      "impact": "ENRICHMENT_ONLY_NOT_LIVE_COVERAGE"
     }
   ],
-  "pass": false
+  "pass": true
 }
