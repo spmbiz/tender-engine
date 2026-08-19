@@ -1,10 +1,12 @@
 name: Apply TED Delta Overlap Fix
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
       - '.github/workflows/apply-ted-delta-overlap-fix.yml'
+      - 'control/ted_delta_overlap_fix_trigger.txt'
 
 permissions:
   contents: write
