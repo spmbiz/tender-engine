@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main, fetch-depth: 0}
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests
@@ -38,7 +38,7 @@ jobs:
           pages=[p for w in t for p in (w.get('pages') or [])]
           failed=[x for x in t if x.get('status')=='FAILED_SINGLE_DAY']
           payload={
-            'schema':'ZA_KINGFISHER_LINKS_NEXT_SMOKE_V3_FAILED_DAY_DETAIL',
+            'schema':'ZA_KINGFISHER_LINKS_NEXT_SMOKE_V4_HALO',
             'adapter_exit_code':int(os.environ['ADAPTER_RC']),
             'listing_contract':s.get('listing_contract'),
             'raw_materialized':s.get('raw_materialized'),
@@ -47,6 +47,8 @@ jobs:
             'enumeration_complete':s.get('enumeration_complete'),
             'complete_windows':sum(1 for x in t if x.get('status')=='COMPLETE'),
             'bisected_windows':sum(1 for x in t if x.get('status')=='BISECT'),
+            'halo_recoveries':s.get('halo_recoveries'),
+            'halo_failures':s.get('halo_failures'),
             'failed_single_days':len(failed),
             'failed_day_detail':failed[:10],
             'official_next_pages':sum(1 for x in pages if x.get('request_mode')=='OFFICIAL_LINKS_NEXT'),
