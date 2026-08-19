@@ -1,7 +1,9 @@
 {
   "schema": "TENDER_PIPELINE_AB_LIVE_CANARY_V2",
-  "status": "PASS",
-  "errors": [],
+  "status": "FAIL",
+  "errors": [
+    "current_golden_gate_not_pass"
+  ],
   "baseline": {
     "schema": "QWEN_RECALL_GOLDEN_REPORT_V3",
     "golden_schema": "QWEN_BATCH_RECALL_GOLDEN_SET_V1",
@@ -422,7 +424,7 @@
     "variant": "baseline",
     "fixture_sha256": "fa152b5ca447e225f4578e2df7dce468d8c38bb8ce966feb3d679e9d505b9889",
     "fixture_future_deadline": "2099-09-21T12:00:00+00:00",
-    "classification_wall_seconds": 165,
+    "classification_wall_seconds": 164,
     "output_rows": 9,
     "unique_output_ids": 9,
     "row_conservation_pass": true,
@@ -434,7 +436,7 @@
     "prompt_version": "qwen-batch-high-recall-business-fit-v2"
   },
   "current": {
-    "schema": "QWEN_RECALL_GOLDEN_REPORT_V3",
+    "schema": "QWEN_RECALL_GOLDEN_REPORT_V4_CORPUS_GATE",
     "golden_schema": "QWEN_BATCH_RECALL_GOLDEN_SET_V1",
     "case_count": 9,
     "cases_passed": 9,
@@ -442,10 +444,17 @@
     "known_positive_recall": 1.0,
     "known_positive_retained": 8,
     "known_positive_total": 8,
+    "minimum_truth_cases_required": 500,
+    "minimum_positive_recall_cases_required": 100,
+    "corpus_ready": false,
     "quality_warning_count": 0,
     "quality_warnings": [],
-    "scale_out_gate": "PASS",
-    "failures": [],
+    "scale_out_gate": "BLOCK",
+    "failures": [
+      "insufficient_truth_cases:9<500",
+      "insufficient_positive_recall_cases:8<100"
+    ],
+    "policy": "A tiny perfect benchmark cannot unlock destructive or high-trust filtering. Scale-out PASS requires the configured substantial DCE/GPT-grounded corpus and zero known-positive recall misses.",
     "cases": [
       {
         "candidate_id": "IE:8670172",
@@ -850,7 +859,7 @@
     "variant": "current",
     "fixture_sha256": "fa152b5ca447e225f4578e2df7dce468d8c38bb8ce966feb3d679e9d505b9889",
     "fixture_future_deadline": "2099-09-21T12:00:00+00:00",
-    "classification_wall_seconds": 126,
+    "classification_wall_seconds": 185,
     "output_rows": 9,
     "unique_output_ids": 9,
     "row_conservation_pass": true,
@@ -864,10 +873,10 @@
   "comparison": {
     "fixture_sha256": "fa152b5ca447e225f4578e2df7dce468d8c38bb8ce966feb3d679e9d505b9889",
     "known_positive_recall_delta": 0.0,
-    "classification_wall_seconds_delta": -39,
+    "classification_wall_seconds_delta": 21,
     "baseline_gate": "BLOCK",
-    "current_gate": "PASS"
+    "current_gate": "BLOCK"
   },
-  "workflow_run_id": "32192226915",
-  "head_sha": "fdbcf74110b50c96653ff4802303e8b32106cc93"
+  "workflow_run_id": "32206771784",
+  "head_sha": "9db5b270d3a3ec4e97c6f7240a40ccba7ba8f6a2"
 }
