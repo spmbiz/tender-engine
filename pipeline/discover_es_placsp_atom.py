@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import json, os, re, xml.etree.ElementTree as ET
+import json, os, re, time, xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urljoin
@@ -13,12 +13,13 @@ NOW=datetime.now(timezone.utc)
 LOOKBACK=max(1,int(os.getenv('LOOKBACK_DAYS','3')))
 MAX_PAGES=max(1,min(12,int(os.getenv('ES_MAX_PAGES','4'))))
 REQUEST_TIMEOUT=max(10,min(90,int(os.getenv('ES_REQUEST_TIMEOUT','40'))))
+PARSE_RETRIES=max(1,min(6,int(os.getenv('ES_PARSE_RETRIES','3'))))
 CUTOFF=NOW-timedelta(days=LOOKBACK)
 FEEDS=[
  ('hosted',placsp_atom.HOSTED_FEED),
  ('aggregated',placsp_atom.AGGREGATED_FEED),
 ]
-S=requests.Session(); S.headers.update({'User-Agent':'Tender-Engine/4.4 (+public procurement research)','Accept':'application/atom+xml,application/xml,text/xml,*/*'})
+S=requests.Session(); S.headers.update({'User-Agent':'Tender-Engine/4.5 (+public procurement research)','Accept':'application/atom+xml,application/xml,text/xml,*/*'})
 
 def clean(v): return ' '.join(str(v or '').split())
 def local(tag): return tag.rsplit('}',1)[-1] if '}' in tag else tag
@@ -63,14 +64,34 @@ def deadline_from(entry):
     if dates:return pdt(dates[0] + ('T'+times[0] if times else ''))
     return None
 
+def fetch_xml(url,page,telemetry):
+    last=None
+    for attempt in range(1,PARSE_RETRIES+1):
+        try:
+            r=S.get(url,timeout=REQUEST_TIMEOUT,headers={'Cache-Control':'no-cache' if attempt>1 else 'max-age=0'})
+            item={'page':page,'url':url,'status':r.status_code,'bytes':len(r.content),'attempt':attempt,'content_type':r.headers.get('content-type')}
+            r.raise_for_status()
+            try:
+                root=ET.fromstring(r.content)
+                item['parse_ok']=True
+                telemetry.append(item)
+                return root
+            except ET.ParseError as exc:
+                item['parse_ok']=False; item['parse_error']=repr(exc)
+                try:item['parse_position']={'line':exc.position[0],'column':exc.position[1]}
+                except Exception:pass
+                telemetry.append(item); last=exc
+        except Exception as exc:
+            telemetry.append({'page':page,'url':url,'attempt':attempt,'error':repr(exc)})
+            last=exc
+        if attempt<PARSE_RETRIES:time.sleep(min(6,attempt*1.5))
+    raise RuntimeError(f'PLACSP feed remained unreadable after {PARSE_RETRIES} attempts: {last!r}')
+
 def parse_feed(kind,start):
     url=start; page=0; records=[]; telemetry=[]; seen=set()
     while url and page<MAX_PAGES and url not in seen:
         seen.add(url); page+=1
-        r=S.get(url,timeout=REQUEST_TIMEOUT)
-        telemetry.append({'page':page,'url':url,'status':r.status_code,'bytes':len(r.content)})
-        r.raise_for_status()
-        root=ET.fromstring(r.content)
+        root=fetch_xml(url,page,telemetry)
         entries=[x for x in root if local(x.tag)=='entry']
         oldest=None
         for e in entries:
@@ -100,6 +121,7 @@ def parse_feed(kind,start):
                 'notice_id':clean(folder or atom_id),
                 'title':clean(project_title),
                 'buyer':clean(buyer) or None,
+                'country':'ES',
                 'deadline':deadline.isoformat() if deadline else None,
                 'published':updated.isoformat() if updated else None,
                 'current':not deadline or deadline>=NOW,
@@ -146,11 +168,13 @@ def main():
         'direct_document_url_count':sum(len((x.get('route') or {}).get('document_urls') or []) for x in rows),
         'lookback_days':LOOKBACK,
         'max_pages_per_feed':MAX_PAGES,
+        'parse_retries':PARSE_RETRIES,
         'generated_at':NOW.isoformat(),
         'errors':errors,
         'official_feeds':[x[1] for x in FEEDS],
         'telemetry':tele,
     }
     (OUT/'stats.json').write_text(json.dumps(stats,indent=2,ensure_ascii=False),encoding='utf-8');print(json.dumps(stats,indent=2,ensure_ascii=False))
+    if not rows: raise SystemExit(3)
 
 if __name__=='__main__':main()
