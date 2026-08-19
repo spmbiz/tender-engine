@@ -1,0 +1,66 @@
+name: ES PLACSP Feed Probe
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/es_placsp_feed_probe_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Probe official Atom payloads
+        run: |
+          python - <<'PY'
+          import json,requests
+          from datetime import datetime,timezone
+          from pathlib import Path
+          urls=[
+            'https://contrataciondelsectorpublico.gob.es/sindicacion/sindicacion_643/licitacionesPerfilesContratanteCompleto3.atom',
+            'https://contrataciondelsectorpublico.gob.es/sindicacion/sindicacion_1044/PlataformasAgregadasSinMenores.atom',
+          ]
+          s=requests.Session();s.headers.update({'User-Agent':'Tender-Engine/PLACSP-diagnostic','Accept':'application/atom+xml,application/xml,text/xml,*/*'})
+          out=[]
+          for u in urls:
+            try:
+              r=s.get(u,timeout=45)
+              raw=r.content
+              out.append({
+                'url':u,'status':r.status_code,'content_type':r.headers.get('content-type'),
+                'content_encoding':r.headers.get('content-encoding'),'requests_encoding':r.encoding,
+                'bytes':len(raw),'prefix_hex':raw[:256].hex(),
+                'prefix_latin1':raw[:1000].decode('latin-1','replace'),
+              })
+            except Exception as e: out.append({'url':u,'error':repr(e)})
+          p={'schema':'ES_PLACSP_FEED_PROBE_V1','generated_at':datetime.now(timezone.utc).isoformat(),'feeds':out}
+          Path('control/es_placsp_feed_probe.json').write_text(json.dumps(p,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print(json.dumps(p,indent=2,ensure_ascii=False))
+          PY
+      - name: Persist probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add control/es_placsp_feed_probe.json
+          git diff --cached --quiet && exit 0
+          git commit -m "diag: persist PLACSP feed probe ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
