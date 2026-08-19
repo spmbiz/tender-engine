@@ -1,14 +1,166 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32232648708,
-  "total_inbox_rows": 0,
-  "dce_authenticity_rows": 0,
-  "portal_counts": {},
-  "status_counts": {},
-  "reason_counts": {},
+  "latest_source_dce_run_id": 32248024907,
+  "total_inbox_rows": 107,
+  "dce_authenticity_rows": 16,
+  "portal_counts": {
+    "GR_KHMDHS": 3,
+    "GENERIC_PUBLIC_PAGE": 2,
+    "PL_EZAMOWIENIA": 2,
+    "US_SAM": 2,
+    "ZA_ETENDERS": 2,
+    "CA_CANADABUYS": 1,
+    "CYPRUS_EPPS": 1,
+    "DE_DOE": 1,
+    "SK_UVO": 1,
+    "WORLD_BANK": 1
+  },
+  "status_counts": {
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 11,
+    "UNKNOWN_RETRIEVED_DOCUMENT": 5
+  },
+  "reason_counts": {
+    "NON_AUTHORITATIVE": 15,
+    "ERROR_RETRYABLE": 1
+  },
   "method_counts": {},
-  "recovery_opportunities": [],
-  "samples_by_reason": {},
+  "recovery_opportunities": [
+    {
+      "portal": "PL_EZAMOWIENIA",
+      "blocked": 2,
+      "likely_public_recovery_target": 1,
+      "reason_counts": {
+        "ERROR_RETRYABLE": 1,
+        "NON_AUTHORITATIVE": 1
+      }
+    },
+    {
+      "portal": "GR_KHMDHS",
+      "blocked": 3,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 3
+      }
+    },
+    {
+      "portal": "GENERIC_PUBLIC_PAGE",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
+      }
+    },
+    {
+      "portal": "US_SAM",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
+      }
+    },
+    {
+      "portal": "ZA_ETENDERS",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
+      }
+    },
+    {
+      "portal": "CA_CANADABUYS",
+      "blocked": 1,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 1
+      }
+    },
+    {
+      "portal": "CYPRUS_EPPS",
+      "blocked": 1,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 1
+      }
+    },
+    {
+      "portal": "DE_DOE",
+      "blocked": 1,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 1
+      }
+    },
+    {
+      "portal": "SK_UVO",
+      "blocked": 1,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 1
+      }
+    },
+    {
+      "portal": "WORLD_BANK",
+      "blocked": 1,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 1
+      }
+    }
+  ],
+  "samples_by_reason": {
+    "NON_AUTHORITATIVE": [
+      {
+        "candidate_id": "GR-KHMDHS:26PROC019640567",
+        "portal": "GR_KHMDHS",
+        "title": "Πρόσκληση Εκδήλωσης Ενδιαφέροντος για την ετήσια προμήθεια Υγειονομικού Υλικού (ΕΠΙΔΕΣΜΙΚΕΣ ΤΑΙΝΙΕΣ",
+        "buyer": "ΝΟΜ.ΓΕΝ. ΝΟΣΟΚΟΜΕΙΟ ΛΕΙΒΑΔΙΑΣ",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019640567"
+      },
+      {
+        "candidate_id": "IT-PVL:e74d2820-dfc9-4073-b377-c3c60d436c4e",
+        "portal": "GENERIC_PUBLIC_PAGE",
+        "title": "Fornitura dispositivi CHIRURGIA MINI INVASIVA",
+        "buyer": "ASL CASERTA",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/e74d2820-dfc9-4073-b377-c3c60d436c4e?ricercaArchivio=false"
+      },
+      {
+        "candidate_id": "US-SAM:cdaa5a708b434376affb7c9a353be7ae",
+        "portal": "US_SAM",
+        "title": "Hypoxia Chamber Services",
+        "buyer": "NATIONAL AERONAUTICS AND SPACE ADMINISTRATION",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://sam.gov/opp/cdaa5a708b434376affb7c9a353be7ae/view"
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165900-2026-08-18",
+        "portal": "ZA_ETENDERS",
+        "title": "RFQ-012723",
+        "buyer": "NATIONAL METROLOGY INSTITUTE OF SOUTH AFRICA",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165900"
+      },
+      {
+        "candidate_id": "CA:CX220903_CN81169",
+        "portal": "CA_CANADABUYS",
+        "title": "Modified Category 2 Base Building",
+        "buyer": null,
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://www.merx.com/public/solicitations/4007251785/abstract?language=EN"
+      }
+    ],
+    "ERROR_RETRYABLE": [
+      {
+        "candidate_id": "PL-BZP:08defd23-6867-eeec-962b-12000115cba3",
+        "portal": "PL_EZAMOWIENIA",
+        "title": "Dostawa wyposażenia łazienek biurowych i koszy na odpady",
+        "buyer": "NARODOWY BANK POLSKI",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defd23-6867-eeec-962b-12000115cba3"
+      }
+    ]
+  },
   "safety": {
     "diagnostic_only": true,
     "mutates_inbox": false,
