@@ -1,15 +1,230 @@
 {
-  "schema": "PCS_BULK_SAMPLE_V1",
-  "generated_at": "2026-08-19T16:38:54.965057+00:00",
+  "schema": "PCS_BULK_SAMPLE_V2_ALWAYS_PERSIST",
+  "generated_at": "2026-08-19T16:44:38.318865+00:00",
   "landing_status": 200,
   "post_status": 200,
   "final_url": "https://www.publiccontractsscotland.gov.uk/NoticeDownload/Download.aspx",
-  "selected_range": "2026-08-01 00:00:00|2026-08-18 23:59:59",
-  "notice_type": 102,
+  "selected": {
+    "collection_type": "0",
+    "date_range": "2026-08-01 00:00:00|2026-08-18 23:59:59",
+    "output_type": "0",
+    "download_type": "0",
+    "notice_type": "102"
+  },
+  "radio_debug": [
+    {
+      "name": "ctl00$maincontent$rblCollectionType",
+      "id": "ctl00_maincontent_rblCollectionType_0",
+      "value": "0",
+      "checked": true,
+      "label": "Download a list of notices by month and type"
+    },
+    {
+      "name": "ctl00$maincontent$rblCollectionType",
+      "id": "ctl00_maincontent_rblCollectionType_1",
+      "value": "1",
+      "checked": false,
+      "label": "Download a notice family by OCID"
+    },
+    {
+      "name": "ctl00$maincontent$rblOutputType",
+      "id": "ctl00_maincontent_rblOutputType_0",
+      "value": "0",
+      "checked": true,
+      "label": "Open Contract Data Standard (OCDS)"
+    },
+    {
+      "name": "ctl00$maincontent$rblOutputType",
+      "id": "ctl00_maincontent_rblOutputType_1",
+      "value": "1",
+      "checked": false,
+      "label": "Custom / TED format"
+    },
+    {
+      "name": "ctl00$maincontent$rblDownloadType",
+      "id": "ctl00_maincontent_rblDownloadType_0",
+      "value": "0",
+      "checked": true,
+      "label": "Download as JSON format"
+    },
+    {
+      "name": "ctl00$maincontent$rblDownloadType",
+      "id": "ctl00_maincontent_rblDownloadType_1",
+      "value": "1",
+      "checked": false,
+      "label": "Download as XML format"
+    },
+    {
+      "name": "ctl00$maincontent$rblDownloadType",
+      "id": "ctl00_maincontent_rblDownloadType_2",
+      "value": "2",
+      "checked": false,
+      "label": "Download as Excel format"
+    },
+    {
+      "name": "ctl00$maincontent$rblDownloadType",
+      "id": "ctl00_maincontent_rblDownloadType_3",
+      "value": "3",
+      "checked": false,
+      "label": "Download as CSV format"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_0",
+      "value": "1",
+      "checked": false,
+      "label": "FTS - F1 - Prior Information Notice"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_1",
+      "value": "2",
+      "checked": true,
+      "label": "FTS - F2 - Contract Notice"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_2",
+      "value": "3",
+      "checked": false,
+      "label": "FTS - F3 - Contract Award Notice"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_3",
+      "value": "4",
+      "checked": false,
+      "label": "FTS - F4 - Prior Information Notice (Utilities)"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_4",
+      "value": "5",
+      "checked": false,
+      "label": "FTS - F5 - Contract Notice (Utilities)"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_5",
+      "value": "6",
+      "checked": false,
+      "label": "FTS - F6 - Contract Award Notice (Utilities)"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_6",
+      "value": "7",
+      "checked": false,
+      "label": "FTS - F7 - Qualification Systems (Utilities)"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_7",
+      "value": "12",
+      "checked": false,
+      "label": "FTS - F12 - Public design contest"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_8",
+      "value": "13",
+      "checked": false,
+      "label": "FTS - F13 - Results of Design Contest"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_9",
+      "value": "14",
+      "checked": false,
+      "label": "FTS - F14 - Corrigendum"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_10",
+      "value": "15",
+      "checked": false,
+      "label": "FTS - F15 - Voluntary Ex Ante Transparency Notice"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_11",
+      "value": "20",
+      "checked": false,
+      "label": "FTS - F20 - Modification Notice"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_12",
+      "value": "21",
+      "checked": false,
+      "label": "FTS - F21 - Social And other Specific Services (Public Contracts)"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_13",
+      "value": "22",
+      "checked": false,
+      "label": "FTS - F22 - Social and other specific services (Utilities)"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_14",
+      "value": "23",
+      "checked": false,
+      "label": "FTS - F23 - Social and other specific services (Concessions)"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_15",
+      "value": "24",
+      "checked": false,
+      "label": "FTS - F24 - Concession Notice"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_16",
+      "value": "25",
+      "checked": false,
+      "label": "FTS - F25 - Concession Award Notice"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_17",
+      "value": "101",
+      "checked": false,
+      "label": "Site Notice - Website Prior Information Notice"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_18",
+      "value": "102",
+      "checked": false,
+      "label": "Site Notice - Website Contract Notice"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_19",
+      "value": "103",
+      "checked": false,
+      "label": "Site Notice - Website Contract Award Notice"
+    },
+    {
+      "name": "ctl00$maincontent$rblNoticeTypes",
+      "id": "ctl00_maincontent_rblNoticeTypes_20",
+      "value": "104",
+      "checked": false,
+      "label": "Site Notice - Quick Quote Award"
+    }
+  ],
   "content_type": "text/json",
   "content_disposition": "attachment; filename=Notices 2026-08-19.json",
-  "bytes": 462975,
-  "prefix": "{\"uri\":\"https://www.publiccontractsscotland.gov.uk/NoticeDownload/Download.aspx\",\"version\":\"1.1\",\"publishedDate\":\"2026-08-19T16:38:54.2419106Z\",\"releases\":[{\"id\":\"rls-1-AUG562599\",\"ocid\":\"ocds-r6ebe6-0000840483\",\"date\":\"2026-08-18T00:00:00Z\",\"tag\":[\"tender\"],\"initiationType\":\"tender\",\"parties\":[{\"na",
+  "bytes": 462974,
+  "prefix_text": "{\"uri\":\"https://www.publiccontractsscotland.gov.uk/NoticeDownload/Download.aspx\",\"version\":\"1.1\",\"publishedDate\":\"2026-08-19T16:44:37.604144Z\",\"releases\":[{\"id\":\"rls-1-AUG562599\",\"ocid\":\"ocds-r6ebe6-0000840483\",\"date\":\"2026-08-18T00:00:00Z\",\"tag\":[\"tender\"],\"initiationType\":\"tender\",\"parties\":[{\"name\":\"Edinburgh Leisure\",\"id\":\"org-1\",\"identifier\":{\"legalName\":\"Edinburgh Leisure\"},\"address\":{\"streetAddress\":\"Meadowbank Sports Centre, 139 London Road\",\"locality\":\"Edinburgh\",\"region\":\"UKM75\",\"postalCode\":\"EH7 6AE\"},\"contactPoint\":{\"email\":\"procurement@EdinburghLeisure.co.uk\",\"telephone\":\"+44 1314430101\",\"url\":\"https://www.publiccontractsscotland.gov.uk\"},\"roles\":[\"buyer\",\"centralPurchasingBody\"],\"details\":{\"classifications\":[{\"id\":\"Charity\",\"scheme\":\"TED_CA_TYPE\"},{\"id\":\"08\",\"description\":\"Recreation, culture and religion\",\"scheme\":\"COFOG\"}],\"url\":\"http://www.edinburghleisure.co.uk\"}},{\"name\":\"Edinburgh Sheriff Court\",\"id\":\"org-2\",\"identifier\":{\"legalName\":\"Edinburgh Sheriff Court\"},\"address\":{\"streetAddress\":\"27 Chamber Street\",\"locality\":\"Edinburgh\",\"postalCode\":\"EH1 1LB\"},\"contactPoint\":{\"url\":\"http://\"},\"roles\":[\"reviewBody\"]}],\"buyer\":{\"name\":\"Edinburgh Leisure\",\"id\":\"org-1\"},\"tender\":{\"id\":\"EL26174OP\",\"title\":\"Lighting Framework\",\"description\":\"A lighting Framework for four years to cover multiple venues over Edinburgh for reduction in energy cost. Primarily internal lighting systems.\",\"status\":\"active\",\"items\":[{\"id\":\"1\",\"additionalClassifications\":[{\"id\":\"31527260\",\"sche",
+  "response_headers": {
+    "Cache-Control": "private",
+    "Content-Type": "text/json",
+    "Content-Disposition": "attachment; filename=Notices 2026-08-19.json"
+  },
   "json_type": "dict",
   "keys": [
     "uri",
