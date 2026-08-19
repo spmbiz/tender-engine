@@ -1,0 +1,183 @@
+{
+  "schema": "TED_PARTITION_QUERY_PROBE_V1",
+  "generated_at": "2026-08-19T19:24:12.290393+00:00",
+  "today": "20260819",
+  "results": {
+    "active_competition": {
+      "query": "form-type = competition",
+      "status": 200,
+      "content_type": "application/json",
+      "bytes": 4553,
+      "keys": [
+        "notices",
+        "totalNoticeCount",
+        "iterationNextToken",
+        "timedOut"
+      ],
+      "total": 413453,
+      "item_count": 1,
+      "sample": {
+        "publication-number": "295587-2016",
+        "publication-date": "2016-08-26+02:00",
+        "notice-type": "qu-sy",
+        "form-type": "competition"
+      }
+    },
+    "generic_deadline_future": {
+      "query": "form-type = competition AND deadline >= 20260819",
+      "status": 200,
+      "content_type": "application/json",
+      "bytes": 4655,
+      "keys": [
+        "notices",
+        "totalNoticeCount",
+        "iterationNextToken",
+        "timedOut"
+      ],
+      "total": 7595,
+      "item_count": 1,
+      "sample": {
+        "publication-number": "179640-2019",
+        "publication-date": "2019-04-16+02:00",
+        "deadline": [
+          "2029-05-31T00:00:00+02:00"
+        ],
+        "deadline-receipt-request": [
+          "2029-04-30T00:00:00+02:00"
+        ],
+        "notice-type": "cn-standard",
+        "form-type": "competition"
+      }
+    },
+    "request_deadline_future": {
+      "query": "form-type = competition AND deadline-receipt-request >= 20260819",
+      "status": 200,
+      "content_type": "application/json",
+      "bytes": 4615,
+      "keys": [
+        "notices",
+        "totalNoticeCount",
+        "iterationNextToken",
+        "timedOut"
+      ],
+      "total": 49407,
+      "item_count": 1,
+      "sample": {
+        "publication-number": "303895-2016",
+        "publication-date": "2016-09-02+02:00",
+        "deadline-receipt-request": [
+          "2028-08-31T17:00:00+02:00"
+        ],
+        "notice-type": "cn-standard",
+        "form-type": "competition"
+      }
+    },
+    "lot_tender_deadline_future": {
+      "query": "form-type = competition AND deadline-receipt-tender-date-lot >= 20260819",
+      "status": 200,
+      "content_type": "application/json",
+      "bytes": 4723,
+      "keys": [
+        "notices",
+        "totalNoticeCount",
+        "iterationNextToken",
+        "timedOut"
+      ],
+      "total": 39485,
+      "item_count": 1,
+      "sample": {
+        "publication-number": "564937-2023",
+        "publication-date": "2023-09-19Z",
+        "deadline-receipt-request": [
+          "2026-12-31T23:59:59+02:00"
+        ],
+        "deadline-receipt-tender-date-lot": [
+          "2026-12-31+02:00"
+        ],
+        "notice-type": "cn-standard",
+        "form-type": "competition"
+      }
+    },
+    "union_future_deadlines": {
+      "query": "form-type = competition AND (deadline >= 20260819 OR deadline-receipt-request >= 20260819 OR deadline-receipt-tender-date-lot >= 20260819)",
+      "status": 200,
+      "content_type": "application/json",
+      "bytes": 4615,
+      "keys": [
+        "notices",
+        "totalNoticeCount",
+        "iterationNextToken",
+        "timedOut"
+      ],
+      "total": 49464,
+      "item_count": 1,
+      "sample": {
+        "publication-number": "303895-2016",
+        "publication-date": "2016-09-02+02:00",
+        "deadline-receipt-request": [
+          "2028-08-31T17:00:00+02:00"
+        ],
+        "notice-type": "cn-standard",
+        "form-type": "competition"
+      }
+    },
+    "oldest_active_publication": {
+      "query": "form-type = competition SORT BY publication-date",
+      "status": 200,
+      "content_type": "application/json",
+      "bytes": 4553,
+      "keys": [
+        "notices",
+        "totalNoticeCount",
+        "iterationNextToken",
+        "timedOut"
+      ],
+      "total": 413453,
+      "item_count": 1,
+      "sample": {
+        "publication-number": "295587-2016",
+        "publication-date": "2016-08-26+02:00",
+        "notice-type": "qu-sy",
+        "form-type": "competition"
+      }
+    },
+    "newest_active_publication": {
+      "query": "form-type = competition SORT BY publication-date DESC",
+      "status": 200,
+      "content_type": "application/json",
+      "bytes": 4954,
+      "keys": [
+        "notices",
+        "totalNoticeCount",
+        "iterationNextToken",
+        "timedOut"
+      ],
+      "total": 413453,
+      "item_count": 1,
+      "sample": {
+        "publication-number": "572275-2026",
+        "publication-date": "2026-08-19+02:00",
+        "deadline-receipt-request": [
+          "2026-09-21T09:30:00+02:00",
+          "2026-09-21T09:30:00+02:00",
+          "2026-09-21T09:30:00+02:00",
+          "2026-09-21T09:30:00+02:00",
+          "2026-09-21T09:30:00+02:00",
+          "2026-09-21T09:30:00+02:00",
+          "2026-09-21T09:30:00+02:00"
+        ],
+        "deadline-receipt-tender-date-lot": [
+          "2026-09-21+02:00",
+          "2026-09-21+02:00",
+          "2026-09-21+02:00",
+          "2026-09-21+02:00",
+          "2026-09-21+02:00",
+          "2026-09-21+02:00",
+          "2026-09-21+02:00"
+        ],
+        "notice-type": "cn-standard",
+        "form-type": "competition"
+      }
+    }
+  }
+}
