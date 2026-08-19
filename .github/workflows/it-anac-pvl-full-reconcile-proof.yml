@@ -1,0 +1,132 @@
+name: Italy ANAC PVL Full Reconcile Proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'control/it_anac_pvl_full_reconcile_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests pytest
+      - name: Unit and syntax gate
+        run: |
+          python -m py_compile pipeline/discover_it_anac_pvl.py pipeline/discover_it_anac_pvl_v4.py
+          pytest -q tests/test_it_anac_pvl_v4.py tests/test_anac_pvl_api_contract.py
+      - name: Create durable proof Release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="it-anac-pvl-reconcile-proof-${GITHUB_RUN_ID}"
+          gh release create "$tag" --title "Italy ANAC PVL full reconcile ${GITHUB_RUN_ID}" --notes "Official ANAC PVL /bandi API full publication-history traversal from platform launch through today."
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+      - name: Exhaust complete PVL bandi publication history
+        id: run
+        env:
+          DISCOVERY_MODE: reconcile
+          DISCOVERY_OUT: it-pvl-reconcile
+          ANAC_PVL_WINDOW_DAYS: '31'
+          ANAC_PVL_PAGE_SIZE: '500'
+          ANAC_PVL_WORKERS: '4'
+          ANAC_PVL_REQUEST_RETRIES: '6'
+        shell: bash
+        run: |
+          set +e
+          python pipeline/discover_it_anac_pvl_v4.py
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Build fail-closed verdict
+        if: always()
+        env:
+          RUN_RC: ${{ steps.run.outputs.rc }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('it-pvl-reconcile/stats.json')
+          s=json.loads(p.read_text()) if p.exists() else {}
+          try: rc=int(os.environ.get('RUN_RC') or 999)
+          except Exception: rc=999
+          passed=bool(
+              rc==0
+              and s.get('listing_contract')=='ANAC_PVL_BANDI_FULL_PUBLICATION_HISTORY_V4'
+              and s.get('pvl_launch_date')=='2024-01-02'
+              and s.get('full_publication_history_requested') is True
+              and s.get('publication_window_enumeration_complete') is True
+              and s.get('enumeration_complete') is True
+              and s.get('enumeration_exhausted') is True
+              and s.get('live_coverage_credit_allowed') is True
+              and s.get('windows_expected')==s.get('windows_completed')
+              and not (s.get('errors') or [])
+              and int(s.get('current_materialized') or 0)>0
+          )
+          proof={
+              'schema':'IT_ANAC_PVL_FULL_HISTORY_PROOF_V4',
+              'release_tag':os.environ.get('RELEASE_TAG'),
+              'adapter_exit_code':rc,
+              'listing_contract':s.get('listing_contract'),
+              'pvl_launch_date':s.get('pvl_launch_date'),
+              'query_codes':s.get('query_codes'),
+              'windows_expected':s.get('windows_expected'),
+              'windows_completed':s.get('windows_completed'),
+              'api_elements_seen':s.get('api_elements_seen'),
+              'raw_materialized':s.get('raw_materialized'),
+              'current_materialized':s.get('current_materialized'),
+              'deadline_unknown_radar':s.get('deadline_unknown_radar'),
+              'publication_window_enumeration_complete':s.get('publication_window_enumeration_complete'),
+              'enumeration_complete':s.get('enumeration_complete'),
+              'live_coverage_credit_allowed':s.get('live_coverage_credit_allowed'),
+              'errors':s.get('errors') or [],
+              'pass':passed,
+          }
+          Path('control/it_anac_pvl_full_reconcile_proof.json').write_text(json.dumps(proof,indent=2)+'\n')
+          print(json.dumps(proof,indent=2))
+          PY
+      - name: Preserve proof pack durably
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f it-pvl-reconcile/stats.json
+          tar -czf it-anac-pvl-full-reconcile.tar.gz it-pvl-reconcile/stats.json it-pvl-reconcile/current.jsonl it-pvl-reconcile/radar_unknown_deadline.jsonl control/it_anac_pvl_full_reconcile_proof.json
+          gh release upload "$RELEASE_TAG" it-anac-pvl-full-reconcile.tar.gz --clobber
+      - name: Persist compact verdict
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f control/it_anac_pvl_full_reconcile_proof.json || printf '%s\n' '{"schema":"IT_ANAC_PVL_RECONCILE_WORKFLOW_FAILURE","pass":false}' > control/it_anac_pvl_full_reconcile_proof.json
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add control/it_anac_pvl_full_reconcile_proof.json
+          git diff --cached --quiet && exit 0
+          git commit -m "diag: persist Italy ANAC PVL full reconcile ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
+      - name: Enforce verdict
+        if: always()
+        run: python -c "import json; p=json.load(open('control/it_anac_pvl_full_reconcile_proof.json')); raise SystemExit(0 if p.get('pass') is True else 3)"
