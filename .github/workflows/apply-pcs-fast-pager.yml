@@ -1,0 +1,58 @@
+name: Apply PCS Fast Pager
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/pcs_fast_pager_trigger.txt'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pcs-fast-pager-patch
+  cancel-in-progress: false
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply exact patch
+        run: python tools/apply_pcs_fast_pager.py
+      - name: Validate fast pager
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile pipeline/discover_uk_pcs_current.py
+          python - <<'PY'
+          from pathlib import Path
+          text=Path('pipeline/discover_uk_pcs_current.py').read_text(encoding='utf-8')
+          assert 'PCS_CURRENT_OPPORTUNITIES_BROWSER_V5_FAST_PAGER' in text
+          assert 'Array.from(el.options || []' in text
+          block=text.split('async def find_page_select(page):',1)[1].split('\n\nasync def advance',1)[0]
+          assert 'options.nth(oi).inner_text()' not in block
+          print('PCS fast pager validation OK')
+          PY
+      - name: Commit verified patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add pipeline/discover_uk_pcs_current.py
+          git diff --cached --quiet && exit 0
+          git commit -m 'discovery: make PCS 1400-page selector O(1) per page'
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
