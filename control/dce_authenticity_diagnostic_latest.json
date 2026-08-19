@@ -1,14 +1,148 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32293854313,
-  "total_inbox_rows": 0,
-  "dce_authenticity_rows": 0,
-  "portal_counts": {},
-  "status_counts": {},
-  "reason_counts": {},
+  "latest_source_dce_run_id": 32304085305,
+  "total_inbox_rows": 120,
+  "dce_authenticity_rows": 27,
+  "portal_counts": {
+    "ZA_ETENDERS": 12,
+    "PL_EZAMOWIENIA": 4,
+    "TED": 4,
+    "GR_KHMDHS": 3,
+    "CA_CANADABUYS": 2,
+    "SK_UVO": 1,
+    "WORLD_BANK": 1
+  },
+  "status_counts": {
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 19,
+    "UNKNOWN_RETRIEVED_DOCUMENT": 8
+  },
+  "reason_counts": {
+    "NON_AUTHORITATIVE": 25,
+    "AUTH_REQUIRED": 2
+  },
   "method_counts": {},
-  "recovery_opportunities": [],
-  "samples_by_reason": {},
+  "recovery_opportunities": [
+    {
+      "portal": "ZA_ETENDERS",
+      "blocked": 12,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 11,
+        "AUTH_REQUIRED": 1
+      }
+    },
+    {
+      "portal": "PL_EZAMOWIENIA",
+      "blocked": 4,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 4
+      }
+    },
+    {
+      "portal": "TED",
+      "blocked": 4,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 3,
+        "AUTH_REQUIRED": 1
+      }
+    },
+    {
+      "portal": "GR_KHMDHS",
+      "blocked": 3,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 3
+      }
+    },
+    {
+      "portal": "CA_CANADABUYS",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
+      }
+    },
+    {
+      "portal": "SK_UVO",
+      "blocked": 1,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 1
+      }
+    },
+    {
+      "portal": "WORLD_BANK",
+      "blocked": 1,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 1
+      }
+    }
+  ],
+  "samples_by_reason": {
+    "NON_AUTHORITATIVE": [
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-166123-2026-08-19",
+        "portal": "ZA_ETENDERS",
+        "title": "RFP08/26",
+        "buyer": "Kwa-Zulu Natal - Ithala Development Finance Corporation",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-166123"
+      },
+      {
+        "candidate_id": "PL-BZP:08defde1-8434-2ea7-b346-030001e087b7",
+        "portal": "PL_EZAMOWIENIA",
+        "title": "Wykonanie wymiany 2 sztuk dźwigów pożarowych w Pawilonie Łóżkowym nr 5D1 i 5D2 z dostosowaniem dla osób z niepełnosprawnościami w SPZOZ WSS nr 3 w Rybniku (...)",
+        "buyer": "SAMODZIELNY PUBLICZNY ZAKŁAD OPIEKI ZDROWOTNEJ WOJEWÓDZKI SZPITAL SPECJALISTYCZNY NR 3 W RYBNIKU",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defde1-8434-2ea7-b346-030001e087b7"
+      },
+      {
+        "candidate_id": "GR-KHMDHS:26PROC019641551",
+        "portal": "GR_KHMDHS",
+        "title": "ΔΙΑΚΗΡΥΞΗ ΓΙΑ ΤΗΝ ΠΡΟΜΗΘΕΙΑ ΤΡΙΩΝ (3) ΑΠΟΡΡΙΜΜΑΤΟΦΟΡΩΝ ΟΧΗΜΑΤΩΝ",
+        "buyer": "ΔΗΜΟΣ ΣΠΑΡΤΗΣ",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019641551"
+      },
+      {
+        "candidate_id": "CA:OK000411_85741",
+        "portal": "CA_CANADABUYS",
+        "title": "Design & Construction of the New Accommodations Buildings",
+        "buyer": null,
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://www.merx.com/public/solicitations/4057311204/abstract?language=EN"
+      },
+      {
+        "candidate_id": "SK-UVO:559244",
+        "portal": "SK_UVO",
+        "title": "Zníženie energetickej náročnosti budovy kultúrneho domu v Banskom Studenci",
+        "buyer": "Obec Banský Studenec",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/detail/559244?cHash=7193c8a9e2286263ac2ef1658431d844"
+      }
+    ],
+    "AUTH_REQUIRED": [
+      {
+        "candidate_id": "TED:545005-2024",
+        "portal": "TED",
+        "title": "Norway – Software package and information systems – Dynamic purchasing system for software licences",
+        "buyer": "FORSVARSMATERIELL",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ted.europa.eu/en/notice/-/detail/545005-2024"
+      },
+      {
+        "candidate_id": "za_etenders_ocds:ocds-9t57fa-160095",
+        "portal": "ZA_ETENDERS",
+        "title": null,
+        "buyer": null,
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-160095"
+      }
+    ]
+  },
   "safety": {
     "diagnostic_only": true,
     "mutates_inbox": false,
