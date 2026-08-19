@@ -29,8 +29,9 @@ jobs:
         shell: bash
         run: |
           set +e
-          python tools/run_pcs_v6_probe.py
+          python tools/run_pcs_v6_probe.py > pcs-v6-probe.log 2>&1
           rc=$?
+          cat pcs-v6-probe.log
           export RC="$rc"
           python - <<'PY'
           import json,os
@@ -42,7 +43,8 @@ jobs:
                   try: rows.append(json.loads(line))
                   except Exception: pass
           pages=[x.get('page') for x in (s.get('telemetry') or {}).get('pages',[]) if x.get('page') is not None]
-          payload={'schema':'PCS_V6_ISOLATED_PROBE_V1','adapter_exit_code':int(os.environ.get('RC') or 0),'pages_fetched':s.get('pages_fetched'),'page_numbers_seen':pages,'current_materialized':s.get('current_materialized'),'unique_candidate_ids':len({r.get('candidate_id') for r in rows if r.get('candidate_id')}),'total_reported':s.get('total_reported'),'errors':s.get('errors') or [],'warnings':s.get('warnings') or [],'pagination_progress_proven':len(set(pages))>=3 and len({r.get('candidate_id') for r in rows if r.get('candidate_id')})>=20}
+          log=Path('pcs-v6-probe.log').read_text(encoding='utf-8',errors='replace') if Path('pcs-v6-probe.log').exists() else ''
+          payload={'schema':'PCS_V6_ISOLATED_PROBE_V2_WITH_LOG','adapter_exit_code':int(os.environ.get('RC') or 0),'pages_fetched':s.get('pages_fetched'),'page_numbers_seen':pages,'current_materialized':s.get('current_materialized'),'unique_candidate_ids':len({r.get('candidate_id') for r in rows if r.get('candidate_id')}),'total_reported':s.get('total_reported'),'errors':s.get('errors') or [],'warnings':s.get('warnings') or [],'log_tail':log[-12000:],'pagination_progress_proven':len(set(pages))>=3 and len({r.get('candidate_id') for r in rows if r.get('candidate_id')})>=20}
           Path('control/pcs_v6_isolated_probe.json').write_text(json.dumps(payload,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
           print(json.dumps(payload,indent=2,ensure_ascii=False))
           PY
