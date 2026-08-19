@@ -7,16 +7,23 @@ def text(rel: str) -> str:
     return (ROOT / rel).read_text(encoding="utf-8")
 
 
-def test_pcs_accepts_current_opportunity_singular_and_posts_public_form():
+def test_pcs_accepts_current_opportunity_and_uses_fast_page_selector():
     body = text("pipeline/discover_uk_pcs_current.py")
     assert "current_option" in body
     assert "opportunit(?:y|ies)" in body
     assert "Page\\s*" in body
-    assert "PCS_CURRENT_OPPORTUNITIES_BROWSER_V4_POSTBACK" in body
     assert "refs = tuple(re.findall" in body
     assert "FORM_FALLBACK" in body
-    assert "form.submit()" in body
+    assert "Array.from(el.options || []" in body
     assert "after != before_signature" not in body
+    assert (
+        "PCS_CURRENT_OPPORTUNITIES_BROWSER_V5_FAST_PAGER" in body
+        or "PCS_CURRENT_OPPORTUNITIES_BROWSER_V6_ASPNET_POSTBACK" in body
+    )
+    advance = body.split("async def advance(page, next_page, before_signature):", 1)[1].split("\n\nasync def main", 1)[0]
+    if "PCS_CURRENT_OPPORTUNITIES_BROWSER_V6_ASPNET_POSTBACK" in body:
+        assert "window.__doPostBack" in advance
+        assert "form.submit()" not in advance
 
 
 def test_cyprus_fallback_uses_row_text_but_never_mistakes_submission_for_deadline():
