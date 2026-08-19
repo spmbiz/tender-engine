@@ -23,7 +23,7 @@ PAGE_END = max(PAGE_START, int(os.getenv("PAGE_END", "20")))
 PAGE_SIZE = max(10, min(100, int(os.getenv("PAGE_SIZE", "100"))))
 NOW = datetime.now(TZ)
 S = requests.Session()
-S.headers.update({"User-Agent":"Tender-Engine/6.3 (+public procurement research; official ePPS public registries)","Accept":"text/html,application/xhtml+xml,*/*"})
+S.headers.update({"User-Agent":"Tender-Engine/6.8 (+public procurement research; official ePPS public registries)","Accept":"text/html,application/xhtml+xml,*/*"})
 RESOURCE_RE=re.compile(r"resourceId=(\d+)",re.I)
 TEXTUAL_DEADLINE_RE=re.compile(r"\b(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2})\s+(\d{2}:\d{2}:\d{2})\s+(?:CET|CEST|EET|EEST|GMT|UTC|IST)\s+(\d{4})\b",re.I)
 NUMERIC_DEADLINE_RE=re.compile(r"\b(\d{1,2}/\d{1,2}/\d{4})\s+(\d{1,2}:\d{2}(?::\d{2})?)\b")
@@ -94,12 +94,16 @@ def parse_page(html,page_url,page_no):
             if m:
                 try:estimated_value=float(m.group(0).replace(" ","").replace(",",""))
                 except ValueError:pass
-        rows.append({"candidate_id":f"{PREFIX}:{rid}","source":SOURCE,"portal":SOURCE,"resource_id":rid,"notice_id":clean(ca_unique) or rid,"title":clean(title) or text[:300],"buyer":clean(buyer) or None,"deadline":deadline.isoformat() if deadline else None,"current":True,"notice_url":detail_url,"description":text,"procurement_method":clean(procedure) or None,"source_status":clean(status) or None,"estimated_value":estimated_value,"currency":"EUR","route":{"resource_id":rid,"base_url":BASE_URL,"detail_url":detail_url,"documents_url":f"{BASE_URL}/epps/cft/listContractDocuments.do?resourceId={rid}"},"discovery_page":page_no,"discovered_at":NOW.isoformat()})
+        rows.append({"candidate_id":f"{PREFIX}:{rid}","source":SOURCE,"portal":SOURCE,"resource_id":rid,"notice_id":clean(ca_unique) or rid,"title":clean(title) or text[:300],"buyer":clean(buyer) or None,"country":"CY" if SOURCE=="CYPRUS_EPPS" else ("MT" if SOURCE=="MALTA_EPPS" else None),"deadline":deadline.isoformat() if deadline else None,"current":True,"currentness_evidence":"CYPRUS_OFFICIAL_RECENT_TENDERS_QUICKSEARCH" if SOURCE=="CYPRUS_EPPS" else "EPPS_PUBLIC_REGISTRY","notice_url":detail_url,"description":text,"procurement_method":clean(procedure) or None,"source_status":clean(status) or None,"estimated_value":estimated_value,"currency":"EUR","route":{"resource_id":rid,"base_url":BASE_URL,"detail_url":detail_url,"documents_url":f"{BASE_URL}/epps/cft/listContractDocuments.do?resourceId={rid}"},"discovery_page":page_no,"discovered_at":NOW.isoformat()})
     return rows
 
 def page_url(pg):
     if SOURCE=="CYPRUS_EPPS":
-        return f"{BASE_URL}/epps/viewCFTSAction.do?T01_ps={PAGE_SIZE}&d-3680175-n=1&d-3680175-o=2&d-3680175-p={pg}&d-3680175-s=deadline"
+        # The Cyprus Treasury's official Public Procurement portal links its
+        # "Recent Tenders" surface to this public quick-search route. It does
+        # not bypass the CAPTCHA-gated advanced search; it is an independent,
+        # intentionally public recall surface exposed by the authority itself.
+        return f"{BASE_URL}/epps/quickSearchAction.do?latest=true&searchSelect=4&T01_ps={PAGE_SIZE}&d-3680175-n=1&d-3680175-o=2&d-3680175-p={pg}&d-3680175-s=deadline"
     if SOURCE=="MALTA_EPPS":
         return f"{BASE_URL}/epps/quickSearchAction.do?T01_ps={PAGE_SIZE}&d-3680175-n=1&d-3680175-o=2&d-3680175-p={pg}&d-3680175-s=deadline&searchSelect=1"
     return f"{BASE_URL}/epps/quickSearchAction.do?T01_ps={PAGE_SIZE}&d-3680175-p={pg}&searchSelect=1"
@@ -122,12 +126,18 @@ def main():
         except Exception as exc:errors.append({"page":pg,"url":url,"error":repr(exc)})
     if not errors and not captcha_pages and PAGE_END>=PAGE_START and empty_streak<2:
         warnings.append({"type":"PAGE_WINDOW_ENDED_WITHOUT_EXHAUSTION_PROOF","page_end":PAGE_END})
+    if SOURCE=="CYPRUS_EPPS":
+        warnings.append({"type":"CYPRUS_RECENT_TENDERS_QUICKSEARCH_RECALL_ONLY","coverage_credit":False,"followup":"PUBLISHED_NOTICES_UNION"})
     rows=sorted(by_id.values(),key=lambda r:(r.get("deadline") or "9999",r["candidate_id"]))
     for name in ("raw.jsonl","current.jsonl"):
         with (OUT/name).open("w",encoding="utf-8") as f:
             for rec in rows:f.write(json.dumps(rec,ensure_ascii=False)+"\n")
-    enumeration_complete=bool(exhausted and not errors and rows)
-    stats={"source":SOURCE,"base_url":BASE_URL,"listing_contract":"EPPS_PRODUCTION_REGISTRY_V3_CAPTCHA_AWARE","page_start":PAGE_START,"page_end_requested":PAGE_END,"pages_fetched":pages,"current_materialized":len(rows),"raw_materialized":len(rows),"deadline_parsed":sum(1 for r in rows if r.get("deadline")),"buyer_parsed":sum(1 for r in rows if r.get("buyer")),"value_parsed":sum(1 for r in rows if r.get("estimated_value") is not None),"captcha_pages":captcha_pages,"enumeration_exhausted":exhausted,"enumeration_complete":enumeration_complete,"errors":errors,"warnings":warnings,"generated_at":NOW.isoformat(),"semantics":"Never bypass CAPTCHA. Two consecutive parse-empty registry pages are treated as exhaustion only when no CAPTCHA/error is present; a bounded page window without that proof remains incomplete."}
+    # Cyprus Recent Tenders is a useful official recall surface, but it is not
+    # evidence of exhaustive nationwide current-registry coverage. Always leave
+    # it incomplete so the workflow unions Published Notices afterward.
+    enumeration_complete=bool(exhausted and not errors and rows and SOURCE!="CYPRUS_EPPS")
+    contract="CYPRUS_EPPS_OFFICIAL_RECENT_TENDERS_QUICKSEARCH_V4_RECALL" if SOURCE=="CYPRUS_EPPS" else "EPPS_PRODUCTION_REGISTRY_V3_CAPTCHA_AWARE"
+    stats={"source":SOURCE,"base_url":BASE_URL,"listing_contract":contract,"page_start":PAGE_START,"page_end_requested":PAGE_END,"pages_fetched":pages,"current_materialized":len(rows),"raw_materialized":len(rows),"deadline_parsed":sum(1 for r in rows if r.get("deadline")),"buyer_parsed":sum(1 for r in rows if r.get("buyer")),"value_parsed":sum(1 for r in rows if r.get("estimated_value") is not None),"captcha_pages":captcha_pages,"enumeration_exhausted":bool(exhausted and SOURCE!="CYPRUS_EPPS"),"enumeration_complete":enumeration_complete,"live_candidate_capable":bool(rows),"live_coverage_credit_allowed":enumeration_complete,"errors":errors,"warnings":warnings,"generated_at":NOW.isoformat(),"semantics":"Never bypass CAPTCHA. Cyprus uses the authority-linked Recent Tenders quick-search only as additive recall and always forces Published Notices union; it never receives exhaustive coverage credit. Other ePPS lanes require two consecutive parse-empty registry pages with no CAPTCHA/error for exhaustion."}
     (OUT/"stats.json").write_text(json.dumps(stats,indent=2,ensure_ascii=False),encoding="utf-8");print(json.dumps(stats,indent=2,ensure_ascii=False))
     if not rows:raise SystemExit(3)
     if errors or not enumeration_complete:raise SystemExit(2)
