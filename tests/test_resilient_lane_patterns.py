@@ -7,13 +7,19 @@ def text(path: str) -> str:
     return (ROOT / path).read_text(encoding="utf-8")
 
 
-def test_za_uses_adaptive_official_ocds_windows_not_one_brittle_range():
+def test_za_mirrors_kingfisher_seven_day_links_next_contract():
     body = text("pipeline/discover_za_etenders_ocds_resilient.py")
-    assert "ZA_ETENDERS_OCDS_ADAPTIVE_RELEASE_WINDOWS_V2" in body
+    assert "ZA_ETENDERS_OCDS_KINGFISHER_LINKS_NEXT_V3" in body
+    assert "south_africa_national_treasury_api + LinksSpider" in body
+    assert 'ZA_WINDOW_DAYS", "7"' in body
+    assert "OFFICIAL_LINKS_NEXT" in body
+    assert "normalize_next_url" in body
     assert "BISECT" in body
-    assert "REDUCE_PAGE_SIZE" in body
     assert "FAILED_SINGLE_DAY" in body
     assert "live_coverage_credit_allowed" in body
+    # Later pages must follow links.next instead of synthesizing PageNumber/PageSize.
+    assert "url = next_url" in body
+    assert "params = None" in body
     wrapper = text("pipeline/discover_za_etenders_ocds.py")
     assert "discover_za_etenders_ocds_resilient" in wrapper
 
@@ -27,6 +33,18 @@ def test_pcs_has_open_contracting_month_type_api_collector_fail_closed():
     assert "outputType" in body
     assert '"live_coverage_credit_allowed": False' in body
     assert '"enumeration_complete": False' in body
+
+
+def test_pcs_bulk_collector_preserves_kingfisher_pattern_without_broken_api_tls():
+    body = text("pipeline/discover_uk_pcs_bulk_current.py")
+    assert "PCS_OFFICIAL_MONTH_TYPE_BULK_OCDS_V1_KINGFISHER_PATTERN" in body
+    assert "NoticeDownload/Download.aspx" in body
+    assert "open-contracting/kingfisher-collect" in body
+    assert "rblNoticeTypes" in body
+    assert "rblOutputType" in body
+    assert "rblDownloadType" in body
+    assert '"enumeration_complete":False' in body
+    assert '"live_coverage_credit_allowed":False' in body
 
 
 def test_cyprus_recent_tenders_can_only_add_recall_never_full_coverage():
