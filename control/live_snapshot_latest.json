@@ -1,41 +1,42 @@
 {
   "schema": "LIVE_WORLD_SNAPSHOT_POINTER_V2",
-  "source_discovery_run": 32199145822,
-  "generated_at": "2026-08-19T01:00:09.577373+00:00",
-  "snapshot_rows": 103018,
-  "current_materialized_rows": 99887,
-  "carried_forward_rows": 3131,
+  "source_discovery_run": 32211392759,
+  "generated_at": "2026-08-19T04:00:03.875904+00:00",
+  "snapshot_rows": 121602,
+  "current_materialized_rows": 118497,
+  "carried_forward_rows": 3105,
   "carried_forward_by_source": {
-    "ES_PLACSP": 1431,
     "UK_PCS_OCDS": 1208,
-    "MT": 433,
-    "DK": 23,
-    "CH_SIMAP": 14,
-    "ZA_ETENDERS_OCDS": 11,
+    "ZA_ETENDERS_OCDS": 842,
+    "ES_PLACSP": 552,
+    "MT": 448,
+    "NL": 22,
+    "DK": 18,
     "GR_KHMDHS": 6,
     "CZ_ZAKAZKY_GOV": 4,
-    "FR": 1
+    "FI": 3,
+    "LV_IUB": 2
   },
   "open_state_counts": {
-    "OPEN_CONFIRMED_BY_DEADLINE": 88577,
-    "OPEN_UNVERIFIED_NO_PARSEABLE_DEADLINE": 14441
+    "OPEN_CONFIRMED_BY_DEADLINE": 99044,
+    "OPEN_UNVERIFIED_NO_PARSEABLE_DEADLINE": 22558
   },
-  "packet_count": 207,
+  "packet_count": 244,
   "coverage_status": "PARTIAL_WORLD_COVERAGE",
   "failed_sources": [
     "discovery-global-au-austender",
     "discovery-global-cyprus-epps",
-    "discovery-global-es-placsp",
     "discovery-global-it-anac-delta",
     "discovery-global-malta-epps",
-    "discovery-global-uk-pcs-ocds"
+    "discovery-global-uk-pcs-ocds",
+    "discovery-global-za-etenders-ocds"
   ],
   "world_exhaustive_claim_allowed": false,
   "direct_read_branch": "live-snapshot",
   "packet_path_template": "gpt-packets/packet-XXXX.jsonl",
   "coverage_path": "discovery_coverage.json",
   "stable_release_tag": "live-world-snapshot-latest",
-  "immutable_release_tag": "live-world-snapshot-32199145822",
+  "immutable_release_tag": "live-world-snapshot-32211392759",
   "dce_request_path": "control/gpt_dce_request.json",
   "rule": "GPT selects candidate IDs semantically; GitHub retrieves DCE only after selection. Coverage gaps stay explicit even when prior still-live rows are carried forward for recall. No notice-only FINAL_SUPER_GREEN."
 }
