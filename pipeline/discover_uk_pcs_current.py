@@ -53,7 +53,7 @@ def persist(records, *, pages, total_reported, exhausted, errors, warnings, tele
     stats = {
         "source": "UK_PCS_OCDS",
         "portal": "PUBLIC_CONTRACTS_SCOTLAND",
-        "listing_contract": "PCS_CURRENT_OPPORTUNITIES_BROWSER_V4_POSTBACK",
+        "listing_contract": "PCS_CURRENT_OPPORTUNITIES_BROWSER_V5_FAST_PAGER",
         "raw_materialized": len(rows),
         "current_materialized": len(current),
         "pages_fetched": pages,
@@ -321,13 +321,21 @@ async def find_page_select(page):
     best_labels = {}
     for idx in range(await selects.count()):
         sel = selects.nth(idx)
-        options = sel.locator("option")
+        # Read every option in one browser-context call. PCS currently exposes
+        # ~1,400 Page N options; querying them one-by-one through Playwright can
+        # spend tens of seconds and time out before pagination even starts.
+        try:
+            option_texts = await sel.evaluate(
+                "el => Array.from(el.options || [], o => (o.textContent || '').trim())"
+            )
+        except Exception:
+            continue
         labels = {}
-        for oi in range(min(await options.count(), 2500)):
-            text = clean(await options.nth(oi).inner_text())
-            match = re.fullmatch(r"(?:Page\s*)?(\d+)", text, re.I)
+        for option_text in option_texts or []:
+            label = clean(option_text)
+            match = re.fullmatch(r"(?:Page\s*)?(\d+)", label, re.I)
             if match:
-                labels[int(match.group(1))] = text
+                labels[int(match.group(1))] = label
         if len(labels) >= 2 and max(labels) > best_max:
             best = sel
             best_max = max(labels)
