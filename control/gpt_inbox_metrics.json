@@ -1,43 +1,42 @@
 {
   "schema": "GPT_INBOX_HEALTH_V4_FAIR_SHARE_PROVENANCE",
-  "updated_at": "2026-08-19T00:20:55.661816+00:00",
+  "updated_at": "2026-08-19T00:30:27.890232+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
-  "latest_source_dce_run_id": 32199560904,
+  "latest_source_dce_run_id": 32201339655,
   "counts": {
     "pending_gpt_web_review": 160,
     "reviewed_ticks_total": 182,
     "excluded_already_reviewed": 0,
     "excluded_already_in_final_bank": 0,
-    "pending_before_visible_cap": 184,
+    "pending_before_visible_cap": 160,
     "pending_by_stage": {
-      "BUSINESS_GATES": 140,
-      "DCE_AUTHENTICITY": 20
+      "BUSINESS_GATES": 126,
+      "DCE_AUTHENTICITY": 34
     },
     "pending_by_inbox_lane": {
-      "GPT_PRIORITY": 74,
+      "GPT_PRIORITY": 55,
       "DCE_AUTHENTICITY_REPAIR": 20,
       "LOW_PORTAL_SURVEILLANCE": 20,
-      "ELASTIC_FILL": 46
+      "ELASTIC_FILL": 65
     },
     "pending_by_fit_band": {
       "HOT": 5,
-      "GOOD": 37,
-      "MAYBE": 40,
-      "LOW": 78
+      "GOOD": 31,
+      "MAYBE": 26,
+      "LOW": 98
     },
     "pending_by_portal": {
-      "IRELAND_ETENDERS": 19,
-      "TED": 41,
-      "ZA_ETENDERS": 70,
+      "IRELAND_ETENDERS": 10,
+      "TED": 45,
+      "ZA_ETENDERS": 78,
+      "WORLD_BANK": 5,
       "SCOTLAND_PCS": 3,
-      "US_SAM": 4,
-      "WORLD_BANK": 4,
-      "SK_UVO": 4,
+      "PL_EZAMOWIENIA": 6,
       "GR_KHMDHS": 3,
-      "PL_EZAMOWIENIA": 5,
+      "SK_UVO": 2,
       "GENERIC_PUBLIC_PAGE": 3,
       "ES_PLACSP": 2,
-      "CA_CANADABUYS": 1,
+      "US_SAM": 2,
       "EE_RHR": 1
     }
   },
@@ -46,34 +45,33 @@
     "authenticity_target": 20,
     "low_surveillance_target": 20,
     "selected_by_lane": {
-      "GPT_PRIORITY": 74,
+      "GPT_PRIORITY": 55,
       "DCE_AUTHENTICITY_REPAIR": 20,
       "LOW_PORTAL_SURVEILLANCE": 20,
-      "ELASTIC_FILL": 46
+      "ELASTIC_FILL": 65
     },
     "selected_by_stage": {
-      "BUSINESS_GATES": 140,
-      "DCE_AUTHENTICITY": 20
+      "BUSINESS_GATES": 126,
+      "DCE_AUTHENTICITY": 34
     },
     "selected_by_band": {
       "HOT": 5,
-      "GOOD": 37,
-      "MAYBE": 40,
-      "LOW": 78
+      "GOOD": 31,
+      "MAYBE": 26,
+      "LOW": 98
     },
     "selected_by_portal": {
-      "IRELAND_ETENDERS": 19,
-      "TED": 41,
-      "ZA_ETENDERS": 70,
+      "IRELAND_ETENDERS": 10,
+      "TED": 45,
+      "ZA_ETENDERS": 78,
+      "WORLD_BANK": 5,
       "SCOTLAND_PCS": 3,
-      "US_SAM": 4,
-      "WORLD_BANK": 4,
-      "SK_UVO": 4,
+      "PL_EZAMOWIENIA": 6,
       "GR_KHMDHS": 3,
-      "PL_EZAMOWIENIA": 5,
+      "SK_UVO": 2,
       "GENERIC_PUBLIC_PAGE": 3,
       "ES_PLACSP": 2,
-      "CA_CANADABUYS": 1,
+      "US_SAM": 2,
       "EE_RHR": 1
     }
   },
@@ -84,77 +82,78 @@
     "authenticity_target": 20,
     "low_surveillance_target": 20,
     "selected_by_lane": {
-      "SPM_PRIORITY": 66,
+      "SPM_PRIORITY": 55,
       "DCE_AUTHENTICITY_REPAIR": 20,
       "LOW_PORTAL_SURVEILLANCE": 20,
-      "ELASTIC_FILL": 54
+      "ELASTIC_FILL": 65
     },
     "selected_by_band": {
       "HOT": 5,
-      "GOOD": 36,
-      "MAYBE": 34,
-      "LOW": 85
+      "GOOD": 31,
+      "MAYBE": 26,
+      "LOW": 98
     },
     "selected_by_stage": {
-      "BUSINESS_GATES": 129,
-      "DCE_AUTHENTICITY": 31
+      "BUSINESS_GATES": 126,
+      "DCE_AUTHENTICITY": 34
     },
     "selected_by_portal": {
       "IRELAND_ETENDERS": 10,
-      "TED": 43,
+      "TED": 45,
       "ZA_ETENDERS": 78,
+      "WORLD_BANK": 5,
       "SCOTLAND_PCS": 3,
-      "US_SAM": 4,
-      "WORLD_BANK": 4,
       "PL_EZAMOWIENIA": 6,
       "GR_KHMDHS": 3,
-      "SK_UVO": 3,
+      "SK_UVO": 2,
       "GENERIC_PUBLIC_PAGE": 3,
       "ES_PLACSP": 2,
+      "US_SAM": 2,
       "EE_RHR": 1
     }
   },
-  "review_index_count": 1847,
+  "review_index_count": 1861,
   "review_index_counts": {
-    "pending_total_uncapped": 1847,
+    "pending_total_uncapped": 1861,
     "by_stage": {
-      "BUSINESS_GATES": 1250,
+      "BUSINESS_GATES": 1264,
       "DCE_AUTHENTICITY": 597
     },
     "by_spm_fit_band": {
       "HOT": 6,
-      "GOOD": 44,
-      "MAYBE": 87,
-      "LOW": 1710
+      "GOOD": 39,
+      "MAYBE": 79,
+      "LOW": 1737
     },
     "rich_hot_window_target": 160,
-    "overflow_beyond_hot_160": 1687,
+    "overflow_beyond_hot_160": 1701,
     "cross_portal_duplicates_collapsed": 2
   },
-  "true_pending_before_hot_cap": 1847,
-  "overflow_beyond_hot_160": 1687,
+  "true_pending_before_hot_cap": 1861,
+  "overflow_beyond_hot_160": 1701,
   "assistant_read_batch_count": 16,
   "assistant_read_batch_size": 10,
   "assistant_read_batch_schema": "GPT_WEB_READ_BATCH_MANIFEST_V3_PROVENANCE_REFRESH",
   "provenance_overrides_applied_in_window": 16,
   "recovery_metrics": {
-    "shard_files_scanned": 253,
-    "adjudication_rows_scanned": 1679,
-    "model_review_rows_seen": 457,
-    "dce_authenticity_rows_seen": 149,
+    "shard_files_scanned": 245,
+    "adjudication_rows_scanned": 1558,
+    "model_review_rows_seen": 397,
+    "dce_authenticity_rows_seen": 105,
     "scope_auto_rejected": 0,
     "scope_auto_reject_reason_counts": {},
     "cross_portal_duplicates_collapsed": 2,
-    "uncapped_unique_pending_before_hot_window": 513,
+    "uncapped_unique_pending_before_hot_window": 409,
     "rich_hot_window_count": 160,
-    "overflow_beyond_hot_window": 353
+    "overflow_beyond_hot_window": 249
   },
   "index_recovery": {
-    "shard_files_scanned_this_refresh": 253,
-    "adjudication_rows_scanned_this_refresh": 1679,
-    "gate_rows_seen_this_refresh": 457,
-    "authenticity_rows_seen_this_refresh": 149,
+    "shard_files_scanned_this_refresh": 245,
+    "adjudication_rows_scanned_this_refresh": 1558,
+    "gate_rows_seen_this_refresh": 397,
+    "authenticity_rows_seen_this_refresh": 105,
     "source_runs_seen_this_refresh": [
+      32201339655,
       32199560904,
       32195978583,
       32194648385,
@@ -163,8 +162,7 @@
       32188261474,
       32184680934,
       32179607313,
-      32171785141,
-      32169502902
+      32171785141
     ]
   },
   "healthy": true,
