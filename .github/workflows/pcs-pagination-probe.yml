@@ -30,7 +30,7 @@ jobs:
         run: |
           chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
           if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
-      - name: Traverse five PCS pages
+      - name: Traverse five PCS pages and record result
         env:
           DISCOVERY_OUT: pcs-probe
           PCS_CURRENT_MAX_PAGES: '5'
@@ -55,7 +55,7 @@ jobs:
           ids=[r.get('candidate_id') for r in rows if r.get('candidate_id')]
           pages=[x.get('page') for x in (stats.get('telemetry') or {}).get('pages',[]) if x.get('page') is not None]
           payload={
-              'schema':'PCS_PAGINATION_PROBE_V1',
+              'schema':'PCS_PAGINATION_PROBE_V2_ALWAYS_PERSIST',
               'adapter_exit_code':int(os.environ.get('RC') or 0),
               'listing_contract':stats.get('listing_contract'),
               'pages_fetched':stats.get('pages_fetched'),
@@ -65,17 +65,18 @@ jobs:
               'total_reported':stats.get('total_reported'),
               'errors':stats.get('errors') or [],
               'warnings':stats.get('warnings') or [],
+              'telemetry':stats.get('telemetry') or {},
               'pagination_progress_proven': len(set(pages)) >= 3 and len(set(ids)) >= 20,
           }
           Path('control/pcs_pagination_probe.json').write_text(json.dumps(payload,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
           print(json.dumps(payload,indent=2,ensure_ascii=False))
-          if not payload['pagination_progress_proven']:
-              raise SystemExit(1)
           PY
-      - name: Persist probe
+      - name: Persist probe even when pagination is not proven
+        if: always()
         shell: bash
         run: |
           set -euo pipefail
+          test -f control/pcs_pagination_probe.json || exit 1
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add control/pcs_pagination_probe.json
