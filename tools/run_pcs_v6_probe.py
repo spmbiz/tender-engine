@@ -12,48 +12,55 @@ if str(ROOT) not in sys.path:
 import pipeline.discover_uk_pcs_current as base
 
 
-async def advance_v7(page, next_page, before_signature):
+async def page_number(page):
+    body = base.clean(await page.locator("body").inner_text())
+    match = re.search(r"Showing\s+page\s+(\d+)\s+of", body, re.I)
+    return int(match.group(1)) if match else None
+
+
+async def advance_v8(page, next_page, before_signature):
     selector, _, labels = await base.find_page_select(page)
-    if selector is not None:
-        try:
-            label = labels.get(next_page, f"Page {next_page}")
+    if selector is None:
+        return False
+    label = labels.get(next_page, f"Page {next_page}")
+
+    # The real PCS pager select has an inline onchange which calls
+    # __doPostBack. Arm the navigation waiter BEFORE select_option so we do not
+    # race the native postback with a second synthetic submit/postback.
+    try:
+        async with page.expect_navigation(wait_until="domcontentloaded", timeout=30000):
             await selector.select_option(label=label)
-            await page.wait_for_timeout(150)
-            body = base.clean(await page.locator("body").inner_text())
-            match = re.search(r"Showing\s+page\s+(\d+)\s+of", body, re.I)
-            if match and int(match.group(1)) == next_page:
-                await page.wait_for_timeout(base.PAGE_WAIT_MS)
-                return True
+        await page.wait_for_timeout(base.PAGE_WAIT_MS)
+        if await page_number(page) == next_page:
+            return True
+    except Exception:
+        pass
 
-            meta = await selector.evaluate("""el => ({
-              name:el.name||'', id:el.id||'', onchange:el.getAttribute('onchange')||'',
-              value:el.value||'', formId:el.form?.id||''
-            })""")
-            target = meta.get("name") or meta.get("id") or ""
-            if target:
-                try:
-                    async with page.expect_navigation(wait_until="domcontentloaded", timeout=60000):
-                        fired = await selector.evaluate("""el => {
-                          const target = el.name || el.id || '';
-                          if (!target || typeof window.__doPostBack !== 'function') return false;
-                          window.__doPostBack(target, '');
-                          return true;
-                        }""")
-                    if not fired:
-                        return False
-                except Exception:
-                    return False
-                await page.wait_for_timeout(base.PAGE_WAIT_MS)
-                body = base.clean(await page.locator("body").inner_text())
-                match = re.search(r"Showing\s+page\s+(\d+)\s+of", body, re.I)
-                if match and int(match.group(1)) == next_page:
-                    return True
-        except Exception:
-            pass
-    return False
+    # If a render did not fire the inline change handler, reacquire the pager
+    # and reproduce the exact public ASP.NET event once, with navigation armed.
+    try:
+        selector, _, labels = await base.find_page_select(page)
+        if selector is None:
+            return False
+        if await page_number(page) == next_page:
+            return True
+        await selector.select_option(label=labels.get(next_page, f"Page {next_page}"))
+        async with page.expect_navigation(wait_until="domcontentloaded", timeout=30000):
+            fired = await selector.evaluate("""el => {
+              const target = el.name || el.id || '';
+              if (!target || typeof window.__doPostBack !== 'function') return false;
+              window.__doPostBack(target, '');
+              return true;
+            }""")
+        if not fired:
+            return False
+        await page.wait_for_timeout(base.PAGE_WAIT_MS)
+        return await page_number(page) == next_page
+    except Exception:
+        return False
 
 
-base.advance = advance_v7
+base.advance = advance_v8
 base.MAX_PAGES = 5
 base.PAGE_WAIT_MS = 300
 
