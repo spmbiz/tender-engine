@@ -1,0 +1,78 @@
+name: Apply TED Delta Overlap Fix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apply-ted-delta-overlap-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-test-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          fetch-tags: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Patch overlap equivalence and regression test
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          p=Path('pipeline/ted_production.py')
+          s=p.read_text(encoding='utf-8')
+          anchor='''def _candidate_key(row: dict[str, Any]) -> str | None:\n    cid = str(row.get("candidate_id") or "").strip()\n    if cid:\n        return cid\n    pub = str(row.get("publication_number") or "").strip()\n    return f"TED:{pub}" if pub else None\n\n\n'''
+          helper='''def _candidate_key(row: dict[str, Any]) -> str | None:\n    cid = str(row.get("candidate_id") or "").strip()\n    if cid:\n        return cid\n    pub = str(row.get("publication_number") or "").strip()\n    return f"TED:{pub}" if pub else None\n\n\ndef _rows_equivalent_across_delta_lanes(left: dict[str, Any], right: dict[str, Any]) -> bool:\n    # The same official notice can be returned by both delta queries. Each child\n    # process stamps its own collection time, so discovered_at is expected to\n    # differ and is not a content collision. All substantive fields remain strict.\n    a = dict(left)\n    b = dict(right)\n    a.pop("discovered_at", None)\n    b.pop("discovered_at", None)\n    return a == b\n\n\n'''
+          if anchor in s:
+              s=s.replace(anchor,helper,1)
+          elif '_rows_equivalent_across_delta_lanes' not in s:
+              raise SystemExit('candidate key anchor changed; refusing blind patch')
+          old='''            elif previous != row:\n                # The two queries overlap heavily. Preserve one authoritative-ID row\n                # but never hide a content disagreement between lanes.\n                errors.append({"type": "TED_DELTA_EXACT_ID_CONTENT_COLLISION", "candidate_id": key})\n'''
+          new='''            elif not _rows_equivalent_across_delta_lanes(previous, row):\n                # The two queries overlap heavily. Preserve one authoritative-ID row\n                # but never hide a substantive content disagreement between lanes.\n                errors.append({"type": "TED_DELTA_EXACT_ID_CONTENT_COLLISION", "candidate_id": key})\n'''
+          if old in s:
+              s=s.replace(old,new,1)
+          elif new not in s:
+              raise SystemExit('delta collision block changed; refusing blind patch')
+          p.write_text(s,encoding='utf-8')
+
+          t=Path('tests/test_ted_production_orchestrator.py')
+          x=t.read_text(encoding='utf-8')
+          x=x.replace('from pipeline.ted_production import build_delta_queries, build_year_queries',
+                      'from pipeline.ted_production import (\n    _rows_equivalent_across_delta_lanes,\n    build_delta_queries,\n    build_year_queries,\n)')
+          test='''\n\ndef test_delta_overlap_ignores_only_volatile_discovery_timestamp():\n    left = {"candidate_id": "TED:1-2026", "title": "Same", "current": True, "discovered_at": "2026-08-19T10:00:00+00:00"}\n    right = {"candidate_id": "TED:1-2026", "title": "Same", "current": True, "discovered_at": "2026-08-19T10:00:02+00:00"}\n    assert _rows_equivalent_across_delta_lanes(left, right) is True\n    changed = dict(right, title="Changed upstream")\n    assert _rows_equivalent_across_delta_lanes(left, changed) is False\n'''
+          if 'test_delta_overlap_ignores_only_volatile_discovery_timestamp' not in x:
+              x += test
+          t.write_text(x,encoding='utf-8')
+          PY
+      - name: Focused validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check -q pytest requests
+          python -m py_compile pipeline/ted_production.py pipeline/discover_ted.py
+          pytest -q tests/test_ted_production_orchestrator.py tests/test_ted_transport_resilience.py
+      - name: Publish and self-remove
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git rm .github/workflows/apply-ted-delta-overlap-fix.yml
+          git add pipeline/ted_production.py tests/test_ted_production_orchestrator.py
+          git commit -m "ted: ignore volatile timestamps in delta overlap merge"
+          for i in 1 2 3 4 5 6; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
