@@ -12,13 +12,13 @@ if str(ROOT) not in sys.path:
 import pipeline.discover_uk_pcs_current as base
 
 
-async def advance_v6(page, next_page, before_signature):
+async def advance_v7(page, next_page, before_signature):
     selector, _, labels = await base.find_page_select(page)
     if selector is not None:
         try:
             label = labels.get(next_page, f"Page {next_page}")
             await selector.select_option(label=label)
-            await page.wait_for_timeout(250)
+            await page.wait_for_timeout(150)
             body = base.clean(await page.locator("body").inner_text())
             match = re.search(r"Showing\s+page\s+(\d+)\s+of", body, re.I)
             if match and int(match.group(1)) == next_page:
@@ -31,28 +31,29 @@ async def advance_v6(page, next_page, before_signature):
             })""")
             target = meta.get("name") or meta.get("id") or ""
             if target:
-                fired = await selector.evaluate("""el => {
-                  const target = el.name || el.id || '';
-                  if (!target || typeof window.__doPostBack !== 'function') return false;
-                  setTimeout(() => window.__doPostBack(target, ''), 0);
-                  return true;
-                }""")
-                if fired:
-                    try:
-                        await page.wait_for_load_state("domcontentloaded", timeout=30000)
-                    except Exception:
-                        pass
-                    await page.wait_for_timeout(base.PAGE_WAIT_MS)
-                    body = base.clean(await page.locator("body").inner_text())
-                    match = re.search(r"Showing\s+page\s+(\d+)\s+of", body, re.I)
-                    if match and int(match.group(1)) == next_page:
-                        return True
+                try:
+                    async with page.expect_navigation(wait_until="domcontentloaded", timeout=60000):
+                        fired = await selector.evaluate("""el => {
+                          const target = el.name || el.id || '';
+                          if (!target || typeof window.__doPostBack !== 'function') return false;
+                          window.__doPostBack(target, '');
+                          return true;
+                        }""")
+                    if not fired:
+                        return False
+                except Exception:
+                    return False
+                await page.wait_for_timeout(base.PAGE_WAIT_MS)
+                body = base.clean(await page.locator("body").inner_text())
+                match = re.search(r"Showing\s+page\s+(\d+)\s+of", body, re.I)
+                if match and int(match.group(1)) == next_page:
+                    return True
         except Exception:
             pass
     return False
 
 
-base.advance = advance_v6
+base.advance = advance_v7
 base.MAX_PAGES = 5
 base.PAGE_WAIT_MS = 300
 
