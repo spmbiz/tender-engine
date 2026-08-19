@@ -1,0 +1,67 @@
+name: PCS Direct Adapter Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/pcs_direct_adapter_smoke_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q playwright beautifulsoup4
+      - name: Reuse runner Chrome
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
+      - name: Test three independent filtered pages
+        env:
+          DISCOVERY_OUT: pcs-direct-smoke
+          PCS_DIRECT_HARD_MAX_PAGES: '3'
+        shell: bash
+        run: |
+          set +e
+          python pipeline/discover_uk_pcs_current_direct.py
+          rc=$?
+          export RC="$rc"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          s=json.loads(Path('pcs-direct-smoke/stats.json').read_text(encoding='utf-8')) if Path('pcs-direct-smoke/stats.json').exists() else {}
+          pages=(s.get('telemetry') or {}).get('pages') or []
+          observed=[x.get('page') for x in pages]
+          totals=[x.get('total_pages') for x in pages if x.get('total_pages') is not None]
+          reported=[x.get('total_reported') for x in pages if x.get('total_reported') is not None]
+          errors=s.get('errors') or []
+          only_cap=all(x.get('type')=='HARD_PAGE_CAP_REACHED' for x in errors)
+          proven=(observed==[1,2,3] and len(set(totals))==1 and len(set(reported))==1 and (s.get('current_materialized') or 0)>=30 and only_cap)
+          payload={'schema':'PCS_DIRECT_ADAPTER_SMOKE_V1','adapter_exit_code':int(os.environ.get('RC') or 0),'listing_contract':s.get('listing_contract'),'pages':observed,'total_pages_seen':totals,'total_reported_seen':reported,'current_materialized':s.get('current_materialized'),'source_rows_seen':s.get('source_rows_seen'),'errors':errors,'direct_jump_proven':proven}
+          Path('control/pcs_direct_adapter_smoke.json').write_text(json.dumps(payload,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print(json.dumps(payload,indent=2,ensure_ascii=False))
+          PY
+      - name: Persist smoke
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f control/pcs_direct_adapter_smoke.json || exit 1
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add control/pcs_direct_adapter_smoke.json
+          git diff --cached --quiet && exit 0
+          git commit -m "diag: persist PCS direct adapter smoke ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
