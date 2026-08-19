@@ -12,7 +12,7 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,10 +22,10 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check -q requests
-      - name: Probe official Atom payloads
+      - name: Probe and parse official Atom payloads
         run: |
           python - <<'PY'
-          import json,requests
+          import json,requests,xml.etree.ElementTree as ET
           from datetime import datetime,timezone
           from pathlib import Path
           urls=[
@@ -36,16 +36,25 @@ jobs:
           out=[]
           for u in urls:
             try:
-              r=s.get(u,timeout=45)
-              raw=r.content
-              out.append({
-                'url':u,'status':r.status_code,'content_type':r.headers.get('content-type'),
-                'content_encoding':r.headers.get('content-encoding'),'requests_encoding':r.encoding,
-                'bytes':len(raw),'prefix_hex':raw[:256].hex(),
-                'prefix_latin1':raw[:1000].decode('latin-1','replace'),
-              })
-            except Exception as e: out.append({'url':u,'error':repr(e)})
-          p={'schema':'ES_PLACSP_FEED_PROBE_V1','generated_at':datetime.now(timezone.utc).isoformat(),'feeds':out}
+              r=s.get(u,timeout=60); raw=r.content
+              item={'url':u,'status':r.status_code,'content_type':r.headers.get('content-type'),'content_encoding':r.headers.get('content-encoding'),'requests_encoding':r.encoding,'bytes':len(raw),'prefix_hex':raw[:256].hex(),'prefix_latin1':raw[:1000].decode('latin-1','replace'),'parse_ok':False,'parse_error':None,'parse_context_utf8':None,'parse_context_hex':None}
+              try:
+                root=ET.fromstring(raw); item['parse_ok']=True; item['root_tag']=root.tag; item['direct_entries']=sum(1 for x in root if x.tag.rsplit('}',1)[-1]=='entry')
+              except ET.ParseError as exc:
+                item['parse_error']=repr(exc)
+                try:
+                  line,col=exc.position
+                  lines=raw.splitlines(keepends=True)
+                  offset=sum(len(x) for x in lines[:max(0,line-1)])+col
+                  lo=max(0,offset-240); hi=min(len(raw),offset+240)
+                  ctx=raw[lo:hi]
+                  item['parse_position']={'line':line,'column':col,'byte_offset_approx':offset}
+                  item['parse_context_utf8']=ctx.decode('utf-8','replace')
+                  item['parse_context_hex']=ctx.hex()
+                except Exception as ctx_exc: item['context_error']=repr(ctx_exc)
+              out.append(item)
+            except Exception as e: out.append({'url':u,'error':repr(e),'parse_ok':False})
+          p={'schema':'ES_PLACSP_FEED_PROBE_V2_PARSE_CONTEXT','generated_at':datetime.now(timezone.utc).isoformat(),'feeds':out}
           Path('control/es_placsp_feed_probe.json').write_text(json.dumps(p,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
           print(json.dumps(p,indent=2,ensure_ascii=False))
           PY
