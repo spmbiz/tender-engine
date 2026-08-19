@@ -1,6 +1,6 @@
 {
   "schema": "GPT_INBOX_HEALTH_V4_FAIR_SHARE_PROVENANCE",
-  "updated_at": "2026-08-19T10:10:15.998227+00:00",
+  "updated_at": "2026-08-19T10:14:00.878890+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
   "latest_source_dce_run_id": 32240495352,
   "counts": {
@@ -20,14 +20,14 @@
     },
     "pending_by_fit_band": {
       "HOT": 7,
-      "GOOD": 89,
-      "MAYBE": 28,
+      "GOOD": 90,
+      "MAYBE": 27,
       "LOW": 36
     },
     "pending_by_portal": {
-      "TED": 81,
+      "TED": 82,
       "US_SAM": 37,
-      "MALTA_EPPS": 7,
+      "MALTA_EPPS": 6,
       "GENERIC_PUBLIC_PAGE": 5,
       "IRELAND_ETENDERS": 5,
       "SCOTLAND_PCS": 3,
@@ -58,14 +58,14 @@
     },
     "selected_by_band": {
       "HOT": 7,
-      "GOOD": 89,
-      "MAYBE": 28,
+      "GOOD": 90,
+      "MAYBE": 27,
       "LOW": 36
     },
     "selected_by_portal": {
-      "TED": 81,
+      "TED": 82,
       "US_SAM": 37,
-      "MALTA_EPPS": 7,
+      "MALTA_EPPS": 6,
       "GENERIC_PUBLIC_PAGE": 5,
       "IRELAND_ETENDERS": 5,
       "SCOTLAND_PCS": 3,
@@ -88,25 +88,25 @@
     "authenticity_target": 20,
     "low_surveillance_target": 20,
     "selected_by_lane": {
-      "SPM_PRIORITY": 106,
+      "SPM_PRIORITY": 108,
       "DCE_AUTHENTICITY_REPAIR": 20,
       "LOW_PORTAL_SURVEILLANCE": 20,
-      "ELASTIC_FILL": 14
+      "ELASTIC_FILL": 12
     },
     "selected_by_band": {
       "HOT": 1,
-      "GOOD": 75,
-      "MAYBE": 41,
-      "LOW": 43
+      "GOOD": 77,
+      "MAYBE": 42,
+      "LOW": 40
     },
     "selected_by_stage": {
-      "BUSINESS_GATES": 133,
-      "DCE_AUTHENTICITY": 27
+      "BUSINESS_GATES": 132,
+      "DCE_AUTHENTICITY": 28
     },
     "selected_by_portal": {
-      "TED": 70,
+      "TED": 72,
       "US_SAM": 42,
-      "MALTA_EPPS": 10,
+      "MALTA_EPPS": 8,
       "GENERIC_PUBLIC_PAGE": 8,
       "IRELAND_ETENDERS": 5,
       "SCOTLAND_PCS": 3,
@@ -121,46 +121,46 @@
       "ES_PLACSP": 2
     }
   },
-  "review_index_count": 2300,
+  "review_index_count": 2310,
   "review_index_counts": {
-    "pending_total_uncapped": 2300,
+    "pending_total_uncapped": 2310,
     "by_stage": {
-      "BUSINESS_GATES": 1593,
-      "DCE_AUTHENTICITY": 707
+      "BUSINESS_GATES": 1601,
+      "DCE_AUTHENTICITY": 709
     },
     "by_spm_fit_band": {
       "HOT": 9,
-      "GOOD": 115,
-      "MAYBE": 115,
-      "LOW": 2061
+      "GOOD": 117,
+      "MAYBE": 116,
+      "LOW": 2068
     },
     "rich_hot_window_target": 160,
-    "overflow_beyond_hot_160": 2140,
+    "overflow_beyond_hot_160": 2150,
     "cross_portal_duplicates_collapsed": 0
   },
-  "true_pending_before_hot_cap": 2300,
-  "overflow_beyond_hot_160": 2140,
+  "true_pending_before_hot_cap": 2310,
+  "overflow_beyond_hot_160": 2150,
   "assistant_read_batch_count": 16,
   "assistant_read_batch_size": 10,
   "assistant_read_batch_schema": "GPT_WEB_READ_BATCH_MANIFEST_V3_PROVENANCE_REFRESH",
   "provenance_overrides_applied_in_window": 0,
   "recovery_metrics": {
-    "shard_files_scanned": 174,
-    "adjudication_rows_scanned": 1114,
-    "model_review_rows_seen": 366,
-    "dce_authenticity_rows_seen": 125,
+    "shard_files_scanned": 184,
+    "adjudication_rows_scanned": 1171,
+    "model_review_rows_seen": 374,
+    "dce_authenticity_rows_seen": 127,
     "scope_auto_rejected": 0,
     "scope_auto_reject_reason_counts": {},
     "cross_portal_duplicates_collapsed": 0,
-    "uncapped_unique_pending_before_hot_window": 419,
+    "uncapped_unique_pending_before_hot_window": 429,
     "rich_hot_window_count": 160,
-    "overflow_beyond_hot_window": 259
+    "overflow_beyond_hot_window": 269
   },
   "index_recovery": {
-    "shard_files_scanned_this_refresh": 174,
-    "adjudication_rows_scanned_this_refresh": 1114,
-    "gate_rows_seen_this_refresh": 366,
-    "authenticity_rows_seen_this_refresh": 125,
+    "shard_files_scanned_this_refresh": 184,
+    "adjudication_rows_scanned_this_refresh": 1171,
+    "gate_rows_seen_this_refresh": 374,
+    "authenticity_rows_seen_this_refresh": 127,
     "source_runs_seen_this_refresh": [
       32240495352,
       32240112846,
