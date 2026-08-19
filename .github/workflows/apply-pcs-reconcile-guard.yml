@@ -1,10 +1,12 @@
 name: Apply PCS Reconcile Guard
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
       - '.github/workflows/apply-pcs-reconcile-guard.yml'
+      - 'control/pcs_reconcile_guard_trigger.txt'
 
 permissions:
   contents: write
