@@ -1,5 +1,5 @@
 {
-  "schema": "PCS_V6_ISOLATED_PROBE_V1",
+  "schema": "PCS_V6_ISOLATED_PROBE_V2_WITH_LOG",
   "adapter_exit_code": 3,
   "pages_fetched": 1,
   "page_numbers_seen": [
@@ -17,5 +17,6 @@
     }
   ],
   "warnings": [],
+  "log_tail": "{\n  \"source\": \"UK_PCS_OCDS\",\n  \"portal\": \"PUBLIC_CONTRACTS_SCOTLAND\",\n  \"listing_contract\": \"PCS_CURRENT_OPPORTUNITIES_BROWSER_V5_FAST_PAGER\",\n  \"raw_materialized\": 10,\n  \"current_materialized\": 10,\n  \"pages_fetched\": 1,\n  \"total_reported\": 13970,\n  \"enumeration_exhausted\": false,\n  \"enumeration_complete\": false,\n  \"live_candidate_capable\": true,\n  \"live_coverage_credit_allowed\": false,\n  \"errors\": [\n    {\n      \"type\": \"PAGINATION_ADVANCE_FAILED\",\n      \"page\": 1,\n      \"target\": 2,\n      \"total_pages\": 1397\n    }\n  ],\n  \"warnings\": [],\n  \"telemetry\": {\n    \"url\": \"https://www.publiccontractsscotland.gov.uk/search/Search_MainPage.aspx\",\n    \"http_status\": 200,\n    \"current_filter_mode\": \"NATIVE_SELECT\",\n    \"current_filter_option\": \"Current Opportunity\",\n    \"current_filter_select_index\": 0,\n    \"search_submitted\": \"CONTROL_CLICK\",\n    \"search_control\": {\n      \"tag\": \"A\",\n      \"id\": \"ctl00_maincontent_btnSearch\",\n      \"name\": \"\",\n      \"value\": \"\",\n      \"type\": \"\",\n      \"text\": \"Search Notices\"\n    },\n    \"pages\": [\n      {\n        \"page\": 1,\n        \"rows_parsed\": 10,\n        \"total_pages\": 1397\n      }\n    ]\n  },\n  \"generated_at\": \"2026-08-19T02:30:24.495439+00:00\",\n  \"source_url\": \"https://www.publiccontractsscotland.gov.uk/search/Search_MainPage.aspx\",\n  \"semantics\": \"The official PCS Current Opportunity/Opportunities filter is used. Native and Telerik/custom Notice Type controls are supported. Only notices open for tender are traversed; coverage credit requires pagination exhaustion and a non-empty current set.\"\n}\n",
   "pagination_progress_proven": false
 }
