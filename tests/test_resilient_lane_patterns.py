@@ -17,7 +17,6 @@ def test_za_mirrors_kingfisher_seven_day_links_next_contract():
     assert "BISECT" in body
     assert "FAILED_SINGLE_DAY" in body
     assert "live_coverage_credit_allowed" in body
-    # Later pages must follow links.next instead of synthesizing PageNumber/PageSize.
     assert "url = next_url" in body
     assert "params = None" in body
     wrapper = text("pipeline/discover_za_etenders_ocds.py")
@@ -37,12 +36,14 @@ def test_pcs_has_open_contracting_month_type_api_collector_fail_closed():
 
 def test_pcs_bulk_collector_preserves_kingfisher_pattern_without_broken_api_tls():
     body = text("pipeline/discover_uk_pcs_bulk_current.py")
-    assert "PCS_OFFICIAL_MONTH_TYPE_BULK_OCDS_V1_KINGFISHER_PATTERN" in body
+    assert "PCS_OFFICIAL_MONTH_TYPE_BULK_OCDS_V2_REUSED_FORM_KINGFISHER_PATTERN" in body
     assert "NoticeDownload/Download.aspx" in body
     assert "open-contracting/kingfisher-collect" in body
     assert "rblNoticeTypes" in body
     assert "rblOutputType" in body
     assert "rblDownloadType" in body
+    assert "_worker_context" in body
+    assert "form_fetch_upper_bound" in body
     assert '"enumeration_complete":False' in body
     assert '"live_coverage_credit_allowed":False' in body
 
