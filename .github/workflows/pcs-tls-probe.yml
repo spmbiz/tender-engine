@@ -1,0 +1,31 @@
+name: PCS TLS Chain Probe
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/pcs_tls_probe_trigger.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python tools/probe_pcs_tls.py
+      - name: Persist probe
+        run: |
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add control/pcs_tls_probe.json
+          git diff --cached --quiet && exit 0
+          git commit -m "diag: persist PCS TLS probe ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do git pull --rebase origin main && git push origin HEAD:main && exit 0; git rebase --abort >/dev/null 2>&1 || true; sleep $((i*2)); done
+          exit 1
