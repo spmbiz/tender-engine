@@ -1,0 +1,61 @@
+name: Promote Spain PLACSP V2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/es_placsp_live_proof.json'
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests pytest
+      - name: Require passing independent live proof
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('control/es_placsp_live_proof.json'))
+          assert p.get('schema')=='ES_PLACSP_LIVE_ATOM_PROOF_V2',p
+          assert p.get('pass') is True,p
+          assert p.get('publication_window_enumeration_complete') is True,p
+          PY
+          pytest -q tests/test_es_placsp_atom_v2.py
+      - name: Route global Spain lane to V2
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/supergreen-discovery-v2.yml')
+          s=p.read_text()
+          old='ES_PLACSP) python pipeline/discover_es_placsp_atom.py ;;'
+          new='ES_PLACSP) python pipeline/discover_es_placsp_atom_v2.py ;;'
+          if old in s:
+              s=s.replace(old,new,1)
+              p.write_text(s)
+          elif new not in s:
+              raise SystemExit('Spain route marker missing')
+          PY
+          grep -F 'ES_PLACSP) python pipeline/discover_es_placsp_atom_v2.py ;;' .github/workflows/supergreen-discovery-v2.yml
+      - name: Commit promotion
+        shell: bash
+        run: |
+          git diff --quiet -- .github/workflows/supergreen-discovery-v2.yml && exit 0
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add .github/workflows/supergreen-discovery-v2.yml
+          git commit -m 'es: promote resilient official Atom discovery after live proof'
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
