@@ -163,7 +163,7 @@ def main()->None:
                 ocid=str(release.get("ocid") or "").strip()
                 cand=release_to_candidate(
                     release,source="UK_PCS_OCDS",portal="PUBLIC_CONTRACTS_SCOTLAND",
-                    notice_url=f"https://www.publiccontractsscotland.gov.uk/search/show/search_view.aspx?ID={ocid}" if ocid else URL,
+                    notice_url=URL,
                     now=NOW,
                 )
                 if not cand or not cand.get("current"): continue
@@ -173,6 +173,7 @@ def main()->None:
                 cand["currentness_evidence"]="PCS_OFFICIAL_BULK_OCDS_FUTURE_DEADLINE_OR_ACTIVE_TENDER"
                 cand.setdefault("route",{})["pcs_bulk_month"]=f"{y:04d}-{m:02d}"
                 cand["route"]["pcs_notice_type"]=nt
+                if ocid: cand["route"]["ocid"]=ocid
                 candidates[cand["candidate_id"]]=cand
 
     out=args.output;out.mkdir(parents=True,exist_ok=True)
