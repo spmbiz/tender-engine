@@ -1,14 +1,14 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-19T12:02:57+00:00",
+  "generated_at_utc": "2026-08-19T12:11:47+00:00",
   "source_run": "32236982231",
   "state_rows": 3781,
   "ledger_rows": 122518,
   "snapshot_rows": 122518,
   "blocked_ids": 26096,
-  "durable_attempted_exact_versions_ignored": 4,
-  "valid_exact_hash_current_unattempted": 755,
-  "eligible_keep_for_dce": 635,
+  "durable_attempted_exact_versions_ignored": 158,
+  "valid_exact_hash_current_unattempted": 601,
+  "eligible_keep_for_dce": 481,
   "review_worthy_rejects_promoted_to_explore": 83,
   "stale_hash_ignored": 641,
   "missing_snapshot": 0,
@@ -53,18 +53,18 @@
       "reason": "Qwen runtime is still benchmark-blocked; spend more DCE capacity auditing MAYBE/REJECT paths to measure false negatives."
     }
   },
-  "base_candidate_pool": 640,
+  "base_candidate_pool": 518,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
     "FIT": 4,
-    "MAYBE": 631,
+    "MAYBE": 509,
     "REJECT_OBVIOUS": 5
   },
   "candidate_pool_lanes": {
     "qwen-primary": 4,
     "qwen-open-world-explore": 192,
     "qwen-reject-audit": 37,
-    "qwen-elastic": 407
+    "qwen-elastic": 285
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
