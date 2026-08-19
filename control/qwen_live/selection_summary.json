@@ -1,36 +1,33 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-19T21:41:52+00:00",
-  "source_run": "32287945844",
+  "generated_at_utc": "2026-08-19T21:45:28+00:00",
+  "source_run": "32280180295",
   "state_rows": 4424,
-  "ledger_rows": 123253,
-  "snapshot_rows": 123253,
+  "ledger_rows": 123426,
+  "snapshot_rows": 123426,
   "blocked_ids": 28097,
-  "durable_attempted_exact_versions_ignored": 18,
-  "valid_exact_hash_current_unattempted": 187,
-  "eligible_keep_for_dce": 137,
-  "review_worthy_rejects_promoted_to_explore": 32,
-  "stale_hash_ignored": 501,
+  "durable_attempted_exact_versions_ignored": 53,
+  "valid_exact_hash_current_unattempted": 653,
+  "eligible_keep_for_dce": 445,
+  "review_worthy_rejects_promoted_to_explore": 130,
+  "stale_hash_ignored": 0,
   "missing_snapshot": 0,
   "expired_ignored": 0,
   "selected": 160,
   "selection_decisions": {
-    "FIT": 1,
-    "MAYBE": 117,
-    "REJECT_OBVIOUS": 42
+    "MAYBE": 128,
+    "REJECT_OBVIOUS": 32
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
-    "qwen-primary-coded": 1,
     "qwen-explore-coded": 48,
     "qwen-reject-audit-coded": 32,
-    "qwen-elastic-coded": 79
+    "qwen-elastic-coded": 80
   },
   "selection_freshness": {
-    "recent_unseen_carryover": 150,
-    "historical_backfill": 10
+    "material_new_or_updated": 160
   },
   "policy": {
     "keep_is_not_fit": true,
@@ -54,23 +51,22 @@
       "reason": "Qwen runtime is still benchmark-blocked; spend more DCE capacity auditing MAYBE/REJECT paths to measure false negatives."
     }
   },
-  "base_candidate_pool": 187,
+  "base_candidate_pool": 523,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "FIT": 1,
-    "MAYBE": 137,
-    "REJECT_OBVIOUS": 49
+    "MAYBE": 446,
+    "REJECT_OBVIOUS": 77
   },
   "candidate_pool_lanes": {
-    "qwen-primary": 1,
-    "qwen-open-world-explore": 168,
-    "qwen-reject-audit": 18
+    "qwen-open-world-explore": 192,
+    "qwen-reject-audit": 78,
+    "qwen-elastic": 253
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
-    "noncore_code_contradictions_in_pool": 65,
+    "noncore_code_contradictions_in_pool": 83,
     "positive_code_rows_selected": 0,
-    "noncore_code_contradictions_selected": 42,
+    "noncore_code_contradictions_selected": 0,
     "policy": "priority_only_never_drop_never_eligibility",
     "candidate_pool_multiplier": 4
   }
