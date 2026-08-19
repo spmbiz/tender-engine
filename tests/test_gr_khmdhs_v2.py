@@ -55,3 +55,34 @@ def test_cpv_supports_both_object_detail_shapes():
     b = {"objectDetailsList": [{"cpvs": [{"name": "87654321"}]}]}
     assert gr.cpvs(a) == ["12345678"]
     assert gr.cpvs(b) == ["87654321"]
+
+
+class FakeResponse:
+    def __init__(self, *, status=404, payload=None, text="", headers=None):
+        self.status_code = status
+        self._payload = payload
+        self.text = text
+        self.headers = headers or {}
+
+    def json(self):
+        if isinstance(self._payload, Exception):
+            raise self._payload
+        return self._payload
+
+
+def test_verified_no_data_404_is_strictly_bounded_to_page_zero_and_explicit_message():
+    explicit = FakeResponse(payload={"error": "No data found for the given criteria"})
+    assert gr.verified_no_data_404(explicit, 0) is True
+    assert gr.verified_no_data_404(explicit, 1) is False
+
+    generic = FakeResponse(payload={"error": "Not Found"}, text="Not Found")
+    assert gr.verified_no_data_404(generic, 0) is False
+
+    html = FakeResponse(payload=ValueError("not json"), text="No data found for the given criteria")
+    assert gr.verified_no_data_404(html, 0) is True
+
+
+def test_retry_after_parses_seconds(monkeypatch):
+    monkeypatch.setattr(gr, "MAX_RETRY_AFTER", 90.0)
+    response = FakeResponse(status=429, payload={}, headers={"Retry-After": "12"})
+    assert gr.retry_after_seconds(response) == 12.0
