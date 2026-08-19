@@ -1,33 +1,30 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32195978583,
-  "total_inbox_rows": 160,
-  "dce_authenticity_rows": 29,
+  "latest_source_dce_run_id": 32206114061,
+  "total_inbox_rows": 132,
+  "dce_authenticity_rows": 21,
   "portal_counts": {
-    "ZA_ETENDERS": 11,
+    "PL_EZAMOWIENIA": 12,
     "TED": 6,
-    "PL_EZAMOWIENIA": 4,
-    "GR_KHMDHS": 3,
-    "SK_UVO": 3,
-    "GENERIC_PUBLIC_PAGE": 1,
-    "WORLD_BANK": 1
+    "ZA_ETENDERS": 2,
+    "GENERIC_PUBLIC_PAGE": 1
   },
   "status_counts": {
-    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 21,
-    "UNKNOWN_RETRIEVED_DOCUMENT": 8
+    "UNKNOWN_RETRIEVED_DOCUMENT": 11,
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 10
   },
   "reason_counts": {
-    "NON_AUTHORITATIVE": 28,
+    "NON_AUTHORITATIVE": 20,
     "AUTH_REQUIRED": 1
   },
   "method_counts": {},
   "recovery_opportunities": [
     {
-      "portal": "ZA_ETENDERS",
-      "blocked": 11,
+      "portal": "PL_EZAMOWIENIA",
+      "blocked": 12,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 11
+        "NON_AUTHORITATIVE": 12
       }
     },
     {
@@ -40,39 +37,15 @@
       }
     },
     {
-      "portal": "PL_EZAMOWIENIA",
-      "blocked": 4,
+      "portal": "ZA_ETENDERS",
+      "blocked": 2,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 4
-      }
-    },
-    {
-      "portal": "GR_KHMDHS",
-      "blocked": 3,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 3
-      }
-    },
-    {
-      "portal": "SK_UVO",
-      "blocked": 3,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 3
+        "NON_AUTHORITATIVE": 2
       }
     },
     {
       "portal": "GENERIC_PUBLIC_PAGE",
-      "blocked": 1,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 1
-      }
-    },
-    {
-      "portal": "WORLD_BANK",
       "blocked": 1,
       "likely_public_recovery_target": 0,
       "reason_counts": {
@@ -83,12 +56,12 @@
   "samples_by_reason": {
     "NON_AUTHORITATIVE": [
       {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164913-2026-08-07",
-        "portal": "ZA_ETENDERS",
-        "title": "Request For QuotationLearnership2",
-        "buyer": "Land and Agricultural Development Bank of South Africa",
+        "candidate_id": "PL-BZP:08defd1e-d227-b1df-962b-12000115caf0",
+        "portal": "PL_EZAMOWIENIA",
+        "title": "Świadczenie pogwarancyjnej opieki serwisowej systemu Quanti Dose",
+        "buyer": "CENTRALNA WOJSKOWA PRZYCHODNIA LEKARSKA CEPELEK SAMODZIELNY PUBLICZNY ZAKŁAD OPIEKI ZDROWOTNEJ",
         "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-164913"
+        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defd1e-d227-b1df-962b-12000115caf0"
       },
       {
         "candidate_id": "TED:476581-2026",
@@ -99,28 +72,28 @@
         "notice_url": "https://ted.europa.eu/en/notice/-/detail/476581-2026"
       },
       {
-        "candidate_id": "PL-BZP:08defd1e-d227-b1df-962b-12000115caf0",
-        "portal": "PL_EZAMOWIENIA",
-        "title": "Świadczenie pogwarancyjnej opieki serwisowej systemu Quanti Dose",
-        "buyer": "CENTRALNA WOJSKOWA PRZYCHODNIA LEKARSKA CEPELEK SAMODZIELNY PUBLICZNY ZAKŁAD OPIEKI ZDROWOTNEJ",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defd1e-d227-b1df-962b-12000115caf0"
-      },
-      {
-        "candidate_id": "GR-KHMDHS:26PROC019636440",
-        "portal": "GR_KHMDHS",
-        "title": "ΠΑΡΟΧΗ ΑΝΕΞΑΡΤΗΤΩΝ ΙΑΤΡΙΚΩΝ ΥΠΗΡΕΣΙΩΝ ΠΑΡΑΚΟΛΟΥΘΗΣΗΣ ΜΕΛΩΝ ΚΑΠΗ ΚΑΙ ΚΗΦΗ ΔΗΜΟΥ ΡΟΔΟΥ",
-        "buyer": "ΔΗΜΟΣ ΡΟΔΟΥ",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019636440"
-      },
-      {
-        "candidate_id": "SK-UVO:560388",
-        "portal": "SK_UVO",
-        "title": "Potraviny pre Domov dôchodcov a domov sociálnych služieb pre dospelých v Holíči",
-        "buyer": "Domov dôchodcov a domov sociálnych služieb pre dospelých v Holíči",
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165926-2026-08-17",
+        "portal": "ZA_ETENDERS",
+        "title": "NB110/2026",
+        "buyer": "Tourism",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/detail/560388?cHash=020c7719d86c1bc8aa31d5a6f603a91b"
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165926"
+      },
+      {
+        "candidate_id": "LT-CVP:2321435",
+        "portal": "GENERIC_PUBLIC_PAGE",
+        "title": "Ultragarsiniai šalto vandens apskaitos prietaisai su integruota nuotoline duomenų perdavimo įranga (seno CVP IS Nr. 596991)",
+        "buyer": "Vilniaus vandenys (PV)",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": null
+      },
+      {
+        "candidate_id": "PL-BZP:08defd14-bb7c-cf99-962b-12000115c93c",
+        "portal": "PL_EZAMOWIENIA",
+        "title": "„Odbudowa drogi powiatowej nr 3276D [powódź - wrzesień 2024 r.] - Poręba, I etap: km 2+416 - 3+406\"",
+        "buyer": "Zarząd Dróg Powiatowych w Kłodzku",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defd14-bb7c-cf99-962b-12000115c93c"
       }
     ],
     "AUTH_REQUIRED": [
