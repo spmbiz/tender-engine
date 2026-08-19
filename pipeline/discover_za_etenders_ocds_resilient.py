@@ -18,7 +18,7 @@ except ModuleNotFoundError:
 
 BASE = "https://ocds-api.etenders.gov.za/api/OCDSReleases"
 OFFICIAL_HOST = "ocds-api.etenders.gov.za"
-UA = "Tender-Engine/6.9 (+official South Africa National Treasury OCDS; Kingfisher-compatible pagination)"
+UA = "Tender-Engine/7.0 (+official South Africa National Treasury OCDS; Kingfisher-compatible pagination)"
 
 
 def write_jsonl(path: Path, rows):
@@ -37,7 +37,7 @@ def fetch_package(session: requests.Session, url: str, *, params: dict[str, Any]
     reconstructed locally.
     """
     last = None
-    for attempt in range(3):
+    for attempt in range(4):
         try:
             r = session.get(url, params=params, timeout=45)
             if r.status_code >= 500 or r.status_code in (408, 425, 429):
@@ -49,7 +49,7 @@ def fetch_package(session: requests.Session, url: str, *, params: dict[str, Any]
             return data
         except Exception as exc:
             last = exc
-            if attempt < 2:
+            if attempt < 3:
                 time.sleep(1.5 * (2 ** attempt))
     raise RuntimeError(f"ZA_PACKAGE_FAILED url={url!r} params={params!r}: {last!r}")
 
@@ -105,6 +105,7 @@ def harvest_window(
     awards: dict,
     telemetry: list,
     depth: int = 0,
+    halo_depth: int = 0,
 ) -> bool:
     """Harvest one inclusive release-date window.
 
@@ -115,8 +116,12 @@ def harvest_window(
     - first URL uses dateFrom/dateTo/PageNumber=1;
     - every later page follows the official OCDS ``links.next`` URL.
 
-    If a multi-day period still fails after retries, it is bisected. A failed
-    single day remains explicit rather than being guessed complete.
+    If a multi-day period fails after retries, it is bisected. If one exact day
+    itself returns a publisher-side 5xx, we make one *official overlapping halo*
+    attempt that includes an adjacent healthy day. Exhausting that wider official
+    interval proves coverage of the broken day too; extra releases are harmlessly
+    exact-deduped by candidate/award identity. The halo is attempted once only and
+    can never recursively claim success from an unresolved child partition.
     """
     local_pages = []
     try:
@@ -156,15 +161,13 @@ def harvest_window(
                     "start": start.isoformat(),
                     "end": end.isoformat(),
                     "depth": depth,
+                    "halo_depth": halo_depth,
                     "status": "COMPLETE",
                     "pages": local_pages,
                     "pagination_contract": "OFFICIAL_LINKS_NEXT",
                 })
                 return True
 
-            # From page 2 onward, follow the publisher's URL verbatim. This is
-            # the material difference from the old collector that rebuilt page
-            # parameters locally and triggered HTTP 500s.
             url = next_url
             params = None
             page_no += 1
@@ -176,6 +179,7 @@ def harvest_window(
                 "start": start.isoformat(),
                 "end": end.isoformat(),
                 "depth": depth,
+                "halo_depth": halo_depth,
                 "status": "BISECT",
                 "failed_after_pages": local_pages,
                 "error": repr(exc),
@@ -191,6 +195,7 @@ def harvest_window(
                 awards=awards,
                 telemetry=telemetry,
                 depth=depth + 1,
+                halo_depth=halo_depth,
             )
             right_ok = harvest_window(
                 session,
@@ -201,13 +206,57 @@ def harvest_window(
                 awards=awards,
                 telemetry=telemetry,
                 depth=depth + 1,
+                halo_depth=halo_depth,
             )
             return left_ok and right_ok
+
+        # Some National Treasury dates are reproducibly broken as an exact
+        # one-day query even though a wider official interval containing that day
+        # can be enumerated. Try one adjacent-day halo, but never recurse halos.
+        if halo_depth == 0:
+            today = now.date()
+            if end < today:
+                halo_start, halo_end = start, min(today, end + timedelta(days=1))
+            else:
+                halo_start, halo_end = max(date(2017, 1, 1), start - timedelta(days=1)), end
+            if halo_start < halo_end:
+                telemetry.append({
+                    "start": start.isoformat(),
+                    "end": end.isoformat(),
+                    "depth": depth,
+                    "halo_depth": halo_depth,
+                    "status": "HALO_RECOVERY_ATTEMPT",
+                    "error": repr(exc),
+                    "failed_after_pages": local_pages,
+                    "halo": [halo_start.isoformat(), halo_end.isoformat()],
+                })
+                halo_ok = harvest_window(
+                    session,
+                    start=halo_start,
+                    end=halo_end,
+                    now=now,
+                    candidates=candidates,
+                    awards=awards,
+                    telemetry=telemetry,
+                    depth=depth + 1,
+                    halo_depth=1,
+                )
+                telemetry.append({
+                    "start": start.isoformat(),
+                    "end": end.isoformat(),
+                    "depth": depth,
+                    "halo_depth": halo_depth,
+                    "status": "HALO_RECOVERY_COMPLETE" if halo_ok else "HALO_RECOVERY_FAILED",
+                    "halo": [halo_start.isoformat(), halo_end.isoformat()],
+                })
+                if halo_ok:
+                    return True
 
         telemetry.append({
             "start": start.isoformat(),
             "end": end.isoformat(),
             "depth": depth,
+            "halo_depth": halo_depth,
             "status": "FAILED_SINGLE_DAY",
             "error": repr(exc),
             "failed_after_pages": local_pages,
@@ -219,10 +268,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--output", type=Path, default=Path(os.getenv("DISCOVERY_OUT", "discovery/global/ZA_ETENDERS_OCDS")))
     ap.add_argument("--lookback-days", type=int, default=int(os.getenv("ZA_LOOKBACK_DAYS", "90")))
-    # OCP Kingfisher's maintained National Treasury spider uses step=7.
     ap.add_argument("--window-days", type=int, default=int(os.getenv("ZA_WINDOW_DAYS", "7")))
-    # Compatibility only. The V3 collector intentionally does not synthesize
-    # PageSize; later pages come from publisher-supplied links.next.
     ap.add_argument("--page-size", type=int, default=int(os.getenv("ZA_PAGE_SIZE", "0")))
     args = ap.parse_args()
 
@@ -268,7 +314,7 @@ def main():
     stats = {
         "source": "ZA_ETENDERS_OCDS",
         "grain": ["NOTICE_FIRST_TENDER", "AWARD"],
-        "listing_contract": "ZA_ETENDERS_OCDS_KINGFISHER_LINKS_NEXT_V3",
+        "listing_contract": "ZA_ETENDERS_OCDS_KINGFISHER_LINKS_NEXT_V4_HALO_RECOVERY",
         "reference_collector": "open-contracting/kingfisher-collect: south_africa_national_treasury_api + LinksSpider",
         "date_from": first.isoformat(),
         "date_to": last.isoformat(),
@@ -279,6 +325,8 @@ def main():
         "document_routes": sum(bool((x.get("route") or {}).get("document_urls")) for x in raw),
         "competition_signal_rows": sum(x.get("tenderers_received_observed") is not None for x in raw)
         + sum(x.get("tenderers_received_observed") is not None for x in award_rows),
+        "halo_recoveries": sum(1 for x in telemetry if x.get("status") == "HALO_RECOVERY_COMPLETE"),
+        "halo_failures": sum(1 for x in telemetry if x.get("status") == "HALO_RECOVERY_FAILED"),
         "publication_window_enumeration_complete": all_complete,
         "enumeration_complete": all_complete,
         "live_candidate_capable": bool(current),
@@ -288,9 +336,10 @@ def main():
         "telemetry": telemetry,
         "source_url": BASE,
         "semantics": (
-            "Official National Treasury OCDS API only. Collection mirrors OCP Kingfisher's seven-day periodic spider and "
-            "follows the publisher-provided OCDS links.next URL verbatim. Date bisection is a fail-safe only. Coverage "
-            "credit requires every final date partition to exhaust without an unresolved single day."
+            "Official National Treasury OCDS API only. Collection mirrors OCP Kingfisher's seven-day periodic spider and follows "
+            "publisher-provided links.next verbatim. Multi-day failures are bisected. A publisher-broken exact day may be covered "
+            "once by an overlapping adjacent-day official interval; coverage credit is granted only if that halo itself exhausts "
+            "without an unresolved child. Candidate and award duplicates are removed by deterministic identities."
         ),
     }
     (out / "stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
