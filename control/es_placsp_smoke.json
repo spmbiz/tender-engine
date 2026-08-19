@@ -1,0 +1,52 @@
+{
+  "schema": "ES_PLACSP_RETRY_SMOKE_V1",
+  "adapter_exit_code": 0,
+  "raw_materialized": 1397,
+  "current_materialized": 478,
+  "with_direct_document_urls": 1217,
+  "parse_retries": 3,
+  "errors": [],
+  "telemetry": {
+    "hosted": [
+      {
+        "page": 1,
+        "url": "https://contrataciondelsectorpublico.gob.es/sindicacion/sindicacion_643/licitacionesPerfilesContratanteCompleto3.atom",
+        "status": 200,
+        "bytes": 10976077,
+        "attempt": 1,
+        "content_type": "application/atom+xml",
+        "parse_ok": true
+      },
+      {
+        "page": 2,
+        "url": "https://contrataciondelestado.es/sindicacion/sindicacion_643/licitacionesPerfilesContratanteCompleto3_20260818_201114.atom",
+        "status": 200,
+        "bytes": 15741923,
+        "attempt": 1,
+        "content_type": "application/atom+xml",
+        "parse_ok": true
+      }
+    ],
+    "aggregated": [
+      {
+        "page": 1,
+        "url": "https://contrataciondelsectorpublico.gob.es/sindicacion/sindicacion_1044/PlataformasAgregadasSinMenores.atom",
+        "status": 200,
+        "bytes": 330404,
+        "attempt": 1,
+        "content_type": "application/atom+xml",
+        "parse_ok": true
+      },
+      {
+        "page": 2,
+        "url": "https://contrataciondelestado.es/sindicacion/sindicacion_1044/PlataformasAgregadasSinMenores_20260819_030030.atom",
+        "status": 200,
+        "bytes": 5728772,
+        "attempt": 1,
+        "content_type": "application/atom+xml",
+        "parse_ok": true
+      }
+    ]
+  },
+  "pass_recall": true
+}
