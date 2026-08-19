@@ -21,8 +21,10 @@ def test_pcs_accepts_current_opportunity_and_uses_fast_page_selector():
         or "PCS_CURRENT_OPPORTUNITIES_BROWSER_V6_ASPNET_POSTBACK" in body
         or "PCS_CURRENT_OPPORTUNITIES_BROWSER_V7_NAVIGATION_SAFE_POSTBACK" in body
         or "PCS_CURRENT_OPPORTUNITIES_BROWSER_V8_NATIVE_ONCHANGE" in body
+        or "PCS_CURRENT_OPPORTUNITIES_BROWSER_V10_NAV_SAFE_SEARCH_POSTBACK" in body
     )
     advance = body.split("async def advance(page, next_page, before_signature):", 1)[1].split("\n\nasync def main", 1)[0]
+    search = body.split("async def submit_search(page, telemetry):", 1)[1].split("\n\nasync def parse_current_page", 1)[0]
     if "PCS_CURRENT_OPPORTUNITIES_BROWSER_V6_ASPNET_POSTBACK" in body:
         assert "window.__doPostBack" in advance
         assert "form.submit()" not in advance
@@ -34,6 +36,13 @@ def test_pcs_accepts_current_opportunity_and_uses_fast_page_selector():
     if "PCS_CURRENT_OPPORTUNITIES_BROWSER_V8_NATIVE_ONCHANGE" in body:
         assert "page.expect_navigation" in advance
         assert "await selector.select_option(label=label)" in advance
+        assert "window.__doPostBack" in advance
+        assert "form.submit()" not in advance
+    if "PCS_CURRENT_OPPORTUNITIES_BROWSER_V10_NAV_SAFE_SEARCH_POSTBACK" in body:
+        assert "page.expect_navigation" in search
+        assert 'search_navigation_proven' in search
+        assert "page.expect_navigation" in advance
+        assert "el.value = String(nextPage)" in advance
         assert "window.__doPostBack" in advance
         assert "form.submit()" not in advance
 
