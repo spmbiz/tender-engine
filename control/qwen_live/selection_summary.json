@@ -1,33 +1,35 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-19T17:59:13+00:00",
-  "source_run": "32236982231",
-  "state_rows": 4216,
-  "ledger_rows": 122518,
-  "snapshot_rows": 122518,
+  "generated_at_utc": "2026-08-19T18:12:10+00:00",
+  "source_run": "32274603794",
+  "state_rows": 4171,
+  "ledger_rows": 122971,
+  "snapshot_rows": 122971,
   "blocked_ids": 27573,
-  "durable_attempted_exact_versions_ignored": 39,
-  "valid_exact_hash_current_unattempted": 583,
-  "eligible_keep_for_dce": 394,
-  "review_worthy_rejects_promoted_to_explore": 138,
-  "stale_hash_ignored": 0,
+  "durable_attempted_exact_versions_ignored": 40,
+  "valid_exact_hash_current_unattempted": 312,
+  "eligible_keep_for_dce": 231,
+  "review_worthy_rejects_promoted_to_explore": 54,
+  "stale_hash_ignored": 323,
   "missing_snapshot": 0,
-  "expired_ignored": 2,
+  "expired_ignored": 0,
   "selected": 160,
   "selection_decisions": {
-    "MAYBE": 128,
-    "REJECT_OBVIOUS": 32
+    "FIT": 8,
+    "MAYBE": 125,
+    "REJECT_OBVIOUS": 27
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
+    "qwen-primary-coded": 6,
     "qwen-explore-coded": 48,
-    "qwen-reject-audit-coded": 32,
-    "qwen-elastic-coded": 80
+    "qwen-reject-audit-coded": 27,
+    "qwen-elastic-coded": 79
   },
   "selection_freshness": {
-    "material_new_or_updated": 160
+    "recent_unseen_carryover": 160
   },
   "policy": {
     "keep_is_not_fit": true,
@@ -51,22 +53,24 @@
       "reason": "Qwen runtime is still benchmark-blocked; spend more DCE capacity auditing MAYBE/REJECT paths to measure false negatives."
     }
   },
-  "base_candidate_pool": 445,
+  "base_candidate_pool": 258,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "MAYBE": 395,
-    "REJECT_OBVIOUS": 50
+    "FIT": 8,
+    "MAYBE": 223,
+    "REJECT_OBVIOUS": 27
   },
   "candidate_pool_lanes": {
+    "qwen-primary": 8,
     "qwen-open-world-explore": 192,
-    "qwen-reject-audit": 51,
-    "qwen-elastic": 202
+    "qwen-reject-audit": 27,
+    "qwen-elastic": 31
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
-    "noncore_code_contradictions_in_pool": 38,
+    "noncore_code_contradictions_in_pool": 48,
     "positive_code_rows_selected": 0,
-    "noncore_code_contradictions_selected": 0,
+    "noncore_code_contradictions_selected": 3,
     "policy": "priority_only_never_drop_never_eligibility",
     "candidate_pool_multiplier": 4
   }
