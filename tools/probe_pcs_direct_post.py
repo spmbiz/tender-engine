@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+import copy
 import json
 import os
 import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urljoin
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -34,7 +34,7 @@ def page_markers(html: str):
 
 
 async def main():
-    out = {"schema": "PCS_DIRECT_ASPNET_POST_PROBE_V1", "generated_at": datetime.now(timezone.utc).isoformat(), "errors": []}
+    out = {"schema": "PCS_DIRECT_ASPNET_POST_PROBE_V2_INDEPENDENT_JUMPS", "generated_at": datetime.now(timezone.utc).isoformat(), "errors": []}
     async with async_playwright() as pw:
         chrome = os.getenv("CHROME_BIN") or None
         browser = await pw.chromium.launch(headless=True, executable_path=chrome)
@@ -50,9 +50,9 @@ async def main():
                 await submit_search(page, telemetry)
                 await page.wait_for_timeout(700)
                 out["search_telemetry"] = telemetry
-                html1 = await page.content()
-                out["page1"] = page_markers(html1)
-                form = await page.locator("#aspnetForm").evaluate("""form => {
+                browser_html = await page.content()
+                out["browser_grid_before_direct_posts"] = page_markers(browser_html)
+                base_form = await page.locator("#aspnetForm").evaluate("""form => {
                   const data = {};
                   for (const el of Array.from(form.elements || [])) {
                     if (!el.name || el.disabled) continue;
@@ -67,21 +67,33 @@ async def main():
                   }
                   return data;
                 }""")
-                out["form_field_count"] = len(form)
-                out["viewstate_len"] = len(str(form.get("__VIEWSTATE") or ""))
-                out["eventvalidation_len"] = len(str(form.get("__EVENTVALIDATION") or ""))
-                form["__EVENTTARGET"] = PAGE_TARGET
-                form["__EVENTARGUMENT"] = ""
-                form[PAGE_TARGET] = "2"
-                # Browser native behavior leaves the other pager at its previous value.
-                out["page2_post_relevant"] = {k: form.get(k) for k in ("__EVENTTARGET","__EVENTARGUMENT",PAGE_TARGET,PAGE_BOTTOM,"ctl00$maincontent$ddDocType","ctl00$maincontent$ddLocation")}
-                r2 = await context.request.post(URL, form=form, timeout=90000)
-                out["page2_status"] = r2.status
-                out["page2_content_type"] = r2.headers.get("content-type")
-                html2 = await r2.text()
-                out["page2_bytes"] = len(html2.encode("utf-8", errors="ignore"))
-                out["page2"] = page_markers(html2)
-                out["page2_prefix"] = html2[:500]
+                out["form_field_count"] = len(base_form)
+                out["viewstate_len"] = len(str(base_form.get("__VIEWSTATE") or ""))
+                out["eventvalidation_len"] = len(str(base_form.get("__EVENTVALIDATION") or ""))
+                out["base_relevant"] = {k: base_form.get(k) for k in ("__EVENTTARGET","__EVENTARGUMENT",PAGE_TARGET,PAGE_BOTTOM,"ctl00$maincontent$ddDocType","ctl00$maincontent$ddLocation")}
+
+                jumps = []
+                for wanted in (1, 2, 3):
+                    form = copy.deepcopy(base_form)
+                    form["__EVENTTARGET"] = PAGE_TARGET
+                    form["__EVENTARGUMENT"] = ""
+                    form[PAGE_TARGET] = str(wanted)
+                    r = await context.request.post(URL, form=form, timeout=90000)
+                    html = await r.text()
+                    jumps.append({
+                        "requested_page": wanted,
+                        "status": r.status,
+                        "content_type": r.headers.get("content-type"),
+                        "bytes": len(html.encode("utf-8", errors="ignore")),
+                        "markers": page_markers(html),
+                    })
+                out["independent_jumps"] = jumps
+                page_sets = [set((x.get("markers") or {}).get("refs") or []) for x in jumps]
+                out["independent_jump_proven"] = (
+                    [x.get("markers", {}).get("page") for x in jumps] == [1, 2, 3]
+                    and len({x.get("markers", {}).get("total_pages") for x in jumps}) == 1
+                    and all(page_sets[i].isdisjoint(page_sets[j]) for i in range(len(page_sets)) for j in range(i+1, len(page_sets)))
+                )
         except Exception as exc:
             out["errors"].append({"type": "PROBE_ERROR", "error": repr(exc)})
         finally:
