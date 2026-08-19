@@ -1,37 +1,41 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32248024907,
-  "total_inbox_rows": 107,
-  "dce_authenticity_rows": 16,
+  "latest_source_dce_run_id": 32249901406,
+  "total_inbox_rows": 86,
+  "dce_authenticity_rows": 27,
   "portal_counts": {
+    "TED": 11,
+    "GENERIC_PUBLIC_PAGE": 4,
     "GR_KHMDHS": 3,
-    "GENERIC_PUBLIC_PAGE": 2,
-    "PL_EZAMOWIENIA": 2,
-    "US_SAM": 2,
-    "ZA_ETENDERS": 2,
-    "CA_CANADABUYS": 1,
+    "US_SAM": 3,
+    "ZA_ETENDERS": 3,
     "CYPRUS_EPPS": 1,
-    "DE_DOE": 1,
-    "SK_UVO": 1,
+    "PL_EZAMOWIENIA": 1,
     "WORLD_BANK": 1
   },
   "status_counts": {
-    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 11,
-    "UNKNOWN_RETRIEVED_DOCUMENT": 5
+    "UNKNOWN_RETRIEVED_DOCUMENT": 18,
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 9
   },
   "reason_counts": {
-    "NON_AUTHORITATIVE": 15,
-    "ERROR_RETRYABLE": 1
+    "NON_AUTHORITATIVE": 27
   },
   "method_counts": {},
   "recovery_opportunities": [
     {
-      "portal": "PL_EZAMOWIENIA",
-      "blocked": 2,
-      "likely_public_recovery_target": 1,
+      "portal": "TED",
+      "blocked": 11,
+      "likely_public_recovery_target": 0,
       "reason_counts": {
-        "ERROR_RETRYABLE": 1,
-        "NON_AUTHORITATIVE": 1
+        "NON_AUTHORITATIVE": 11
+      }
+    },
+    {
+      "portal": "GENERIC_PUBLIC_PAGE",
+      "blocked": 4,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 4
       }
     },
     {
@@ -43,35 +47,19 @@
       }
     },
     {
-      "portal": "GENERIC_PUBLIC_PAGE",
-      "blocked": 2,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 2
-      }
-    },
-    {
       "portal": "US_SAM",
-      "blocked": 2,
+      "blocked": 3,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 2
+        "NON_AUTHORITATIVE": 3
       }
     },
     {
       "portal": "ZA_ETENDERS",
-      "blocked": 2,
+      "blocked": 3,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 2
-      }
-    },
-    {
-      "portal": "CA_CANADABUYS",
-      "blocked": 1,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 1
+        "NON_AUTHORITATIVE": 3
       }
     },
     {
@@ -83,15 +71,7 @@
       }
     },
     {
-      "portal": "DE_DOE",
-      "blocked": 1,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 1
-      }
-    },
-    {
-      "portal": "SK_UVO",
+      "portal": "PL_EZAMOWIENIA",
       "blocked": 1,
       "likely_public_recovery_target": 0,
       "reason_counts": {
@@ -110,12 +90,12 @@
   "samples_by_reason": {
     "NON_AUTHORITATIVE": [
       {
-        "candidate_id": "GR-KHMDHS:26PROC019640567",
-        "portal": "GR_KHMDHS",
-        "title": "Πρόσκληση Εκδήλωσης Ενδιαφέροντος για την ετήσια προμήθεια Υγειονομικού Υλικού (ΕΠΙΔΕΣΜΙΚΕΣ ΤΑΙΝΙΕΣ",
-        "buyer": "ΝΟΜ.ΓΕΝ. ΝΟΣΟΚΟΜΕΙΟ ΛΕΙΒΑΔΙΑΣ",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019640567"
+        "candidate_id": "TED:204636-2026",
+        "portal": "TED",
+        "title": "Austria – IT services: consulting, software development, Internet and support – Dynamisches Beschaffungssystem - IT-Entwicklungs- und Betriebsunterstützung",
+        "buyer": "KELAG-Kärntner Elektrizitäts-Aktiengesellschaft",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://ted.europa.eu/en/notice/-/detail/204636-2026"
       },
       {
         "candidate_id": "IT-PVL:e74d2820-dfc9-4073-b377-c3c60d436c4e",
@@ -126,38 +106,28 @@
         "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/e74d2820-dfc9-4073-b377-c3c60d436c4e?ricercaArchivio=false"
       },
       {
-        "candidate_id": "US-SAM:cdaa5a708b434376affb7c9a353be7ae",
+        "candidate_id": "GR-KHMDHS:26PROC019643762",
+        "portal": "GR_KHMDHS",
+        "title": "ΒΙΤ-ΒΛ36-2026 ΑΠΟΣΤΕΙΡΩΣΗ",
+        "buyer": "ΠΑΝΕΠΙΣΤΗΜΙΑΚΟ ΓΕΝΙΚΟ ΝΟΣΟΚΟΜΕΙΟ ΕΒΡΟΥ",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019643762"
+      },
+      {
+        "candidate_id": "US-SAM:4592ad2fa55b4a829629ff9fe7ff0f4e",
         "portal": "US_SAM",
-        "title": "Hypoxia Chamber Services",
-        "buyer": "NATIONAL AERONAUTICS AND SPACE ADMINISTRATION",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://sam.gov/opp/cdaa5a708b434376affb7c9a353be7ae/view"
-      },
-      {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165900-2026-08-18",
-        "portal": "ZA_ETENDERS",
-        "title": "RFQ-012723",
-        "buyer": "NATIONAL METROLOGY INSTITUTE OF SOUTH AFRICA",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165900"
-      },
-      {
-        "candidate_id": "CA:CX220903_CN81169",
-        "portal": "CA_CANADABUYS",
-        "title": "Modified Category 2 Base Building",
-        "buyer": null,
+        "title": "MRO API Web Services",
+        "buyer": "DEPT OF DEFENSE",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://www.merx.com/public/solicitations/4007251785/abstract?language=EN"
-      }
-    ],
-    "ERROR_RETRYABLE": [
+        "notice_url": "https://sam.gov/opp/4592ad2fa55b4a829629ff9fe7ff0f4e/view"
+      },
       {
-        "candidate_id": "PL-BZP:08defd23-6867-eeec-962b-12000115cba3",
-        "portal": "PL_EZAMOWIENIA",
-        "title": "Dostawa wyposażenia łazienek biurowych i koszy na odpady",
-        "buyer": "NARODOWY BANK POLSKI",
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165956-2026-08-18",
+        "portal": "ZA_ETENDERS",
+        "title": "E3364NTCSAMWP",
+        "buyer": "ESKOM",
         "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defd23-6867-eeec-962b-12000115cba3"
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165956"
       }
     ]
   },
