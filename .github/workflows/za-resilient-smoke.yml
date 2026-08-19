@@ -13,20 +13,20 @@ permissions:
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
         with: {ref: main, fetch-depth: 0}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests
-      - name: Harvest 30 days through adaptive windows
+      - name: Harvest 14 days with Kingfisher links-next contract
         env:
           DISCOVERY_OUT: lane-out/ZA_ETENDERS_OCDS
         shell: bash
         run: |
           set +e
-          python pipeline/discover_za_etenders_ocds_resilient.py --output "$DISCOVERY_OUT" --lookback-days 30 --window-days 7 --page-size 100
+          python pipeline/discover_za_etenders_ocds_resilient.py --output "$DISCOVERY_OUT" --lookback-days 14 --window-days 7
           rc=$?
           export ADAPTER_RC="$rc"
           python - <<'PY'
@@ -35,25 +35,34 @@ jobs:
           p=Path('lane-out/ZA_ETENDERS_OCDS/stats.json')
           s=json.loads(p.read_text()) if p.exists() else {'errors':[{'type':'STATS_MISSING'}]}
           t=s.get('telemetry') or []
+          pages=[p for w in t for p in (w.get('pages') or [])]
           payload={
-            'schema':'ZA_RESILIENT_SMOKE_V1',
+            'schema':'ZA_KINGFISHER_LINKS_NEXT_SMOKE_V2',
             'adapter_exit_code':int(os.environ['ADAPTER_RC']),
             'listing_contract':s.get('listing_contract'),
             'raw_materialized':s.get('raw_materialized'),
             'current_materialized':s.get('current_materialized'),
+            'awards_materialized':s.get('awards_materialized'),
             'enumeration_complete':s.get('enumeration_complete'),
+            'complete_windows':sum(1 for x in t if x.get('status')=='COMPLETE'),
             'bisected_windows':sum(1 for x in t if x.get('status')=='BISECT'),
-            'reduced_page_size_windows':sum(1 for x in t if x.get('status')=='REDUCE_PAGE_SIZE'),
             'failed_single_days':sum(1 for x in t if x.get('status')=='FAILED_SINGLE_DAY'),
+            'official_next_pages':sum(1 for x in pages if x.get('request_mode')=='OFFICIAL_LINKS_NEXT'),
+            'synthesized_first_pages':sum(1 for x in pages if x.get('request_mode')=='SYNTHESIZED_FIRST_PAGE'),
             'errors':s.get('errors') or [],
-            'pass_recall':bool(s.get('current_materialized')) and not any(x.get('status')=='FAILED_SINGLE_DAY' for x in t),
           }
+          payload['pass_recall']=bool(payload['current_materialized']) and payload['enumeration_complete'] is True and not payload['failed_single_days']
           Path('control/za_resilient_smoke.json').write_text(json.dumps(payload,indent=2)+'\n')
           print(json.dumps(payload,indent=2))
           PY
           exit 0
       - name: Persist smoke
+        if: always()
         run: |
+          set -euo pipefail
+          if [ ! -f control/za_resilient_smoke.json ]; then
+            printf '%s\n' '{"schema":"ZA_KINGFISHER_LINKS_NEXT_SMOKE_WORKFLOW_FAILURE","pass_recall":false}' > control/za_resilient_smoke.json
+          fi
           git config user.name tender-engine-bot
           git config user.email tender-engine-bot@users.noreply.github.com
           git add control/za_resilient_smoke.json
