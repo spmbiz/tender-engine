@@ -20,6 +20,7 @@ def test_pcs_accepts_current_opportunity_and_uses_fast_page_selector():
         "PCS_CURRENT_OPPORTUNITIES_BROWSER_V5_FAST_PAGER" in body
         or "PCS_CURRENT_OPPORTUNITIES_BROWSER_V6_ASPNET_POSTBACK" in body
         or "PCS_CURRENT_OPPORTUNITIES_BROWSER_V7_NAVIGATION_SAFE_POSTBACK" in body
+        or "PCS_CURRENT_OPPORTUNITIES_BROWSER_V8_NATIVE_ONCHANGE" in body
     )
     advance = body.split("async def advance(page, next_page, before_signature):", 1)[1].split("\n\nasync def main", 1)[0]
     if "PCS_CURRENT_OPPORTUNITIES_BROWSER_V6_ASPNET_POSTBACK" in body:
@@ -29,6 +30,11 @@ def test_pcs_accepts_current_opportunity_and_uses_fast_page_selector():
         assert "page.expect_navigation" in advance
         assert "window.__doPostBack" in advance
         assert "setTimeout(() => window.__doPostBack" not in advance
+        assert "form.submit()" not in advance
+    if "PCS_CURRENT_OPPORTUNITIES_BROWSER_V8_NATIVE_ONCHANGE" in body:
+        assert "page.expect_navigation" in advance
+        assert "await selector.select_option(label=label)" in advance
+        assert "window.__doPostBack" in advance
         assert "form.submit()" not in advance
 
 
