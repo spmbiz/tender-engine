@@ -10,7 +10,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
 
-from discover_uk_pcs_current_direct import (
+from pipeline.discover_uk_pcs_current_direct import (
     URL,
     NOTICE_TYPE,
     PAGE_TARGET,
@@ -69,7 +69,7 @@ def client_state_debug(state: dict[str, str]):
 
 async def main():
     payload = {
-        "schema": "PCS_STATEFUL_FILTERED_PAGER_PROBE_V1",
+        "schema": "PCS_STATEFUL_FILTERED_PAGER_PROBE_V2_IMPORT_FIXED",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "pages": [],
     }
@@ -87,10 +87,6 @@ async def main():
             payload["base_notice_type"] = base.get(NOTICE_TYPE)
             payload["base_state_debug"] = client_state_debug(base)
 
-            # Empirically, a pager event from the selected UI state materializes
-            # the true Current Opportunity result universe even when a Search
-            # postback returns the stale all-notices page 1. Capture that response
-            # and, crucially, use ITS returned ASP.NET state for every next post.
             html2_boot, status = await post_state(context, base, target=PAGE_TARGET, page_value=2)
             p2, tp2, tr2, _ = page_markers(html2_boot)
             state = serialize_html_form(html2_boot)
@@ -103,10 +99,6 @@ async def main():
                 raise RuntimeError(f"FILTERED_BOOTSTRAP_FAILED:{p2}/{tp2}/{tr2}")
 
             expected_pages, expected_total = tp2, tr2
-
-            # Walk 1 -> 4, each time serializing the response form and using it
-            # for the subsequent page. This tests whether state continuity fixes
-            # the stale-page contract mismatch.
             for wanted in (1, 2, 3, 4):
                 html, status = await post_state(context, state, target=PAGE_TARGET, page_value=wanted)
                 page_no, total_pages, total_reported, parsed = parse_rows(html, records)
