@@ -1,14 +1,14 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32228414415,
+  "latest_source_dce_run_id": 32232648708,
   "total_inbox_rows": 160,
-  "dce_authenticity_rows": 26,
+  "dce_authenticity_rows": 21,
   "portal_counts": {
-    "TED": 9,
+    "TED": 4,
     "GENERIC_PUBLIC_PAGE": 3,
     "GR_KHMDHS": 3,
-    "PL_EZAMOWIENIA": 2,
     "CYPRUS_EPPS": 2,
+    "PL_EZAMOWIENIA": 2,
     "US_SAM": 2,
     "ZA_ETENDERS": 2,
     "CA_CANADABUYS": 1,
@@ -16,13 +16,12 @@
     "SK_UVO": 1
   },
   "status_counts": {
-    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 20,
-    "UNKNOWN_RETRIEVED_DOCUMENT": 6
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 16,
+    "UNKNOWN_RETRIEVED_DOCUMENT": 5
   },
   "reason_counts": {
-    "NON_AUTHORITATIVE": 24,
-    "ERROR_RETRYABLE": 1,
-    "AUTH_REQUIRED": 1
+    "NON_AUTHORITATIVE": 20,
+    "ERROR_RETRYABLE": 1
   },
   "method_counts": {},
   "recovery_opportunities": [
@@ -37,11 +36,10 @@
     },
     {
       "portal": "TED",
-      "blocked": 9,
+      "blocked": 4,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 8,
-        "AUTH_REQUIRED": 1
+        "NON_AUTHORITATIVE": 4
       }
     },
     {
@@ -160,16 +158,6 @@
         "buyer": "NARODOWY BANK POLSKI",
         "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
         "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defd23-6867-eeec-962b-12000115cba3"
-      }
-    ],
-    "AUTH_REQUIRED": [
-      {
-        "candidate_id": "TED:454886-2026",
-        "portal": "TED",
-        "title": "Norway – IT services: consulting, software development, Internet and support – IK-EEA 046-2026 Case handling system for collection (debt collection).",
-        "buyer": "Bergen kommune - Innkjøp konsern",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ted.europa.eu/en/notice/-/detail/454886-2026"
       }
     ]
   },
