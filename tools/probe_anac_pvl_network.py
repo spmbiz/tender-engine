@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -17,7 +18,8 @@ async def main():
     captured = []
     pages = []
     async with async_playwright() as pw:
-        browser = await pw.chromium.launch(headless=True)
+        chrome = os.getenv("CHROME_BIN") or None
+        browser = await pw.chromium.launch(headless=True, executable_path=chrome)
         context = await browser.new_context(viewport={"width": 1440, "height": 1000})
         page = await context.new_page()
 
@@ -68,8 +70,9 @@ async def main():
         await browser.close()
 
     out = {
-        "schema": "ANAC_PVL_PUBLIC_NETWORK_PROBE_V1",
+        "schema": "ANAC_PVL_PUBLIC_NETWORK_PROBE_V2_RUNNER_CHROME",
         "generated_at": datetime.now(timezone.utc).isoformat(),
+        "chrome": chrome,
         "pages": pages,
         "responses": captured[:500],
     }
