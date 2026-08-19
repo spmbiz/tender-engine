@@ -1,37 +1,29 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32253437798,
-  "total_inbox_rows": 113,
-  "dce_authenticity_rows": 28,
+  "latest_source_dce_run_id": 32257625524,
+  "total_inbox_rows": 160,
+  "dce_authenticity_rows": 20,
   "portal_counts": {
-    "TED": 11,
-    "PL_EZAMOWIENIA": 4,
+    "TED": 4,
     "GENERIC_PUBLIC_PAGE": 3,
     "GR_KHMDHS": 3,
+    "PL_EZAMOWIENIA": 3,
     "US_SAM": 3,
     "ZA_ETENDERS": 2,
     "SK_UVO": 1,
     "WORLD_BANK": 1
   },
   "status_counts": {
-    "UNKNOWN_RETRIEVED_DOCUMENT": 21,
-    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 7
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 12,
+    "UNKNOWN_RETRIEVED_DOCUMENT": 8
   },
   "reason_counts": {
-    "NON_AUTHORITATIVE": 28
+    "NON_AUTHORITATIVE": 20
   },
   "method_counts": {},
   "recovery_opportunities": [
     {
       "portal": "TED",
-      "blocked": 11,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 11
-      }
-    },
-    {
-      "portal": "PL_EZAMOWIENIA",
       "blocked": 4,
       "likely_public_recovery_target": 0,
       "reason_counts": {
@@ -48,6 +40,14 @@
     },
     {
       "portal": "GR_KHMDHS",
+      "blocked": 3,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 3
+      }
+    },
+    {
+      "portal": "PL_EZAMOWIENIA",
       "blocked": 3,
       "likely_public_recovery_target": 0,
       "reason_counts": {
@@ -90,20 +90,12 @@
   "samples_by_reason": {
     "NON_AUTHORITATIVE": [
       {
-        "candidate_id": "TED:204636-2026",
+        "candidate_id": "TED:510930-2026",
         "portal": "TED",
-        "title": "Austria – IT services: consulting, software development, Internet and support – Dynamisches Beschaffungssystem - IT-Entwicklungs- und Betriebsunterstützung",
-        "buyer": "KELAG-Kärntner Elektrizitäts-Aktiengesellschaft",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://ted.europa.eu/en/notice/-/detail/204636-2026"
-      },
-      {
-        "candidate_id": "PL-BZP:08defdbe-4419-10a7-b346-0300019a7449",
-        "portal": "PL_EZAMOWIENIA",
-        "title": "Dostawa 2 szt. fabrycznie nowych piaskarko-solarek na pojazd typu wywrotka/platforma na potrzeby RPZiUK Sp. z o.o. w Kielcach",
-        "buyer": "REJONOWE PRZEDSIĘBIORSTWO ZIELENI I USŁUG KOMUNALNYCH SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defdbe-4419-10a7-b346-0300019a7449"
+        "title": "Germany – Firefighting vehicles – LF 20",
+        "buyer": "Stadt Sachsenheim",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ted.europa.eu/en/notice/-/detail/510930-2026"
       },
       {
         "candidate_id": "IT-PVL:22eef9f2-5715-4750-8f23-b2c2631b41df",
@@ -122,12 +114,20 @@
         "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019643762"
       },
       {
-        "candidate_id": "US-SAM:4592ad2fa55b4a829629ff9fe7ff0f4e",
-        "portal": "US_SAM",
-        "title": "MRO API Web Services",
-        "buyer": "DEPT OF DEFENSE",
+        "candidate_id": "PL-BZP:08defdbe-4419-10a7-b346-0300019a7449",
+        "portal": "PL_EZAMOWIENIA",
+        "title": "Dostawa 2 szt. fabrycznie nowych piaskarko-solarek na pojazd typu wywrotka/platforma na potrzeby RPZiUK Sp. z o.o. w Kielcach",
+        "buyer": "REJONOWE PRZEDSIĘBIORSTWO ZIELENI I USŁUG KOMUNALNYCH SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://sam.gov/opp/4592ad2fa55b4a829629ff9fe7ff0f4e/view"
+        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defdbe-4419-10a7-b346-0300019a7449"
+      },
+      {
+        "candidate_id": "US-SAM:b933fb69bbf44aee965f07407e0d982d",
+        "portal": "US_SAM",
+        "title": "J063--ACCESS CONTROL SYSTEM FOR B514",
+        "buyer": "VETERANS AFFAIRS, DEPARTMENT OF",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://sam.gov/opp/b933fb69bbf44aee965f07407e0d982d/view"
       }
     ]
   },
