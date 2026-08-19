@@ -33,7 +33,7 @@ def test_bounded_fallbacks_never_claim_exhaustive_coverage():
 
 
 def test_current_registry_lanes_require_exhaustion():
-    pcs = text('pipeline/discover_uk_pcs_current.py')
+    pcs = text('pipeline/discover_uk_pcs_bulk_current.py')
     ungm = text('pipeline/discover_ungm_public.py')
     for body in (pcs, ungm):
         assert 'enumeration_exhausted' in body
@@ -41,13 +41,19 @@ def test_current_registry_lanes_require_exhaustion():
         assert 'live_coverage_credit_allowed' in body
 
 
-def test_pcs_coverage_requires_filtered_search_proof_and_stable_page_total():
+def test_pcs_coverage_is_contract_aware_and_bulk_requires_101():
     guard = text('pipeline/source_coverage_guard.py')
+    # Legacy browser/direct POST proofs stay available for old packs.
     assert 'PCS_FILTERED_SEARCH_PROOF_MISSING' in guard
     assert 'PCS_FILTERED_PAGE_TOTAL_NOT_STABLE' in guard
     assert 'search_navigation_proven' in guard
     assert 'direct_filtered_post_proven' in guard
-    assert 'SOURCE_COVERAGE_GUARD_V8_PCS_FILTERED_SEARCH_PROOF' in guard
+    # New official-bulk packs use their own proof contract instead of browser UI state.
+    assert 'PCS_OFFICIAL_MONTH_TYPE_BULK_OCDS_' in guard
+    assert 'PCS_BULK_PUBLICATION_PARTITIONS_INCOMPLETE' in guard
+    assert 'PCS_BULK_REQUEST_COUNT_MISMATCH' in guard
+    assert 'PCS_BULK_WEBSITE_CONTRACT_NOTICE_101_MISSING' in guard
+    assert 'SOURCE_COVERAGE_GUARD_V9_PCS_CONTRACT_AWARE' in guard
 
 
 def test_qwen_live_entrypoint_is_rich_and_old_prompt_state_is_invalidated():
