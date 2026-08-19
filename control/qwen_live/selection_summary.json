@@ -1,23 +1,23 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-19T11:00:04+00:00",
-  "source_run": "32236982231",
+  "generated_at_utc": "2026-08-19T11:03:35+00:00",
+  "source_run": "32225601083",
   "state_rows": 3013,
-  "ledger_rows": 122518,
-  "snapshot_rows": 122518,
+  "ledger_rows": 123248,
+  "snapshot_rows": 123248,
   "blocked_ids": 25698,
-  "durable_attempted_exact_versions_ignored": 112,
-  "valid_exact_hash_current_unattempted": 953,
-  "eligible_keep_for_dce": 827,
+  "durable_attempted_exact_versions_ignored": 113,
+  "valid_exact_hash_current_unattempted": 961,
+  "eligible_keep_for_dce": 834,
   "review_worthy_rejects_promoted_to_explore": 77,
-  "stale_hash_ignored": 12,
+  "stale_hash_ignored": 0,
   "missing_snapshot": 0,
-  "expired_ignored": 2,
+  "expired_ignored": 5,
   "selected": 160,
   "selection_decisions": {
     "FIT": 12,
-    "MAYBE": 131,
-    "REJECT_OBVIOUS": 17
+    "MAYBE": 130,
+    "REJECT_OBVIOUS": 18
   },
   "selection_survival": {
     "KEEP": 159,
@@ -26,8 +26,8 @@
   "selection_lanes": {
     "qwen-primary-coded": 12,
     "qwen-explore-coded": 48,
-    "qwen-reject-audit-coded": 17,
-    "qwen-elastic-coded": 83
+    "qwen-reject-audit-coded": 18,
+    "qwen-elastic-coded": 82
   },
   "selection_freshness": {
     "recent_unseen_carryover": 160
@@ -58,18 +58,18 @@
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
     "FIT": 12,
-    "MAYBE": 611,
-    "REJECT_OBVIOUS": 17
+    "MAYBE": 610,
+    "REJECT_OBVIOUS": 18
   },
   "candidate_pool_lanes": {
     "qwen-primary": 12,
     "qwen-open-world-explore": 192,
-    "qwen-reject-audit": 49,
-    "qwen-elastic": 387
+    "qwen-reject-audit": 50,
+    "qwen-elastic": 386
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
-    "noncore_code_contradictions_in_pool": 6,
+    "noncore_code_contradictions_in_pool": 7,
     "positive_code_rows_selected": 0,
     "noncore_code_contradictions_selected": 0,
     "policy": "priority_only_never_drop_never_eligibility",
