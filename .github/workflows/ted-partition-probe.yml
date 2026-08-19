@@ -13,15 +13,25 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main, fetch-depth: 0}
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests
-      - run: python tools/probe_ted_partition_queries.py
+      - name: Probe official TED query partitions
+        shell: bash
+        run: |
+          set +e
+          python tools/probe_ted_partition_queries.py
+          rc=$?
+          if [ ! -f control/ted_partition_probe.json ]; then
+            printf '{"schema":"TED_PARTITION_QUERY_PROBE_WORKFLOW_FAILURE","exit_code":%s}\n' "$rc" > control/ted_partition_probe.json
+          fi
+          exit 0
       - name: Persist probe
+        if: always()
         run: |
           set -euo pipefail
           git config user.name tender-engine-bot
