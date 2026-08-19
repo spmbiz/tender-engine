@@ -1,0 +1,33 @@
+{
+  "schema": "PCS_DIRECT_ADAPTER_SMOKE_V1",
+  "adapter_exit_code": 3,
+  "listing_contract": "PCS_CURRENT_OPPORTUNITIES_DIRECT_ASPNET_POST_V12",
+  "pages": [
+    1
+  ],
+  "total_pages_seen": [
+    1397
+  ],
+  "total_reported_seen": [
+    13970
+  ],
+  "current_materialized": 20,
+  "source_rows_seen": 10,
+  "errors": [
+    {
+      "type": "PCS_DIRECT_PAGE_CONTRACT_MISMATCH",
+      "requested": 2,
+      "observed_page": 2,
+      "observed_total_pages": 58,
+      "expected_total_pages": 1397,
+      "observed_total_reported": 575,
+      "expected_total_reported": 13970
+    },
+    {
+      "type": "HARD_PAGE_CAP_REACHED",
+      "max_pages": 3,
+      "total_pages": 1397
+    }
+  ],
+  "direct_jump_proven": false
+}
