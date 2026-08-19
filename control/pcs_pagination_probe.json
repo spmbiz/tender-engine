@@ -1,0 +1,48 @@
+{
+  "schema": "PCS_PAGINATION_PROBE_V2_ALWAYS_PERSIST",
+  "adapter_exit_code": 3,
+  "listing_contract": "PCS_CURRENT_OPPORTUNITIES_BROWSER_V5_FAST_PAGER",
+  "pages_fetched": 2,
+  "page_numbers_seen": [
+    1
+  ],
+  "current_materialized": 10,
+  "unique_candidate_ids": 10,
+  "total_reported": 13970,
+  "errors": [],
+  "warnings": [
+    {
+      "type": "NO_RESULT_ROWS_ON_PAGE",
+      "page": 2
+    }
+  ],
+  "telemetry": {
+    "url": "https://www.publiccontractsscotland.gov.uk/search/Search_MainPage.aspx",
+    "http_status": 200,
+    "current_filter_mode": "NATIVE_SELECT",
+    "current_filter_option": "Current Opportunity",
+    "current_filter_select_index": 0,
+    "search_submitted": "CONTROL_CLICK",
+    "search_control": {
+      "tag": "A",
+      "id": "ctl00_maincontent_btnSearch",
+      "name": "",
+      "value": "",
+      "type": "",
+      "text": "Search Notices"
+    },
+    "pages": [
+      {
+        "page": 1,
+        "rows_parsed": 10,
+        "total_pages": 1397
+      },
+      {
+        "page": null,
+        "rows_parsed": 0,
+        "total_pages": null
+      }
+    ]
+  },
+  "pagination_progress_proven": false
+}
