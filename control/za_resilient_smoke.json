@@ -1,20 +1,19 @@
 {
-  "schema": "ZA_KINGFISHER_LINKS_NEXT_SMOKE_V2",
-  "adapter_exit_code": 3,
-  "listing_contract": "ZA_ETENDERS_OCDS_KINGFISHER_LINKS_NEXT_V3",
-  "raw_materialized": 722,
-  "current_materialized": 634,
+  "schema": "ZA_KINGFISHER_LINKS_NEXT_SMOKE_V4_HALO",
+  "adapter_exit_code": 0,
+  "listing_contract": "ZA_ETENDERS_OCDS_KINGFISHER_LINKS_NEXT_V4_HALO_RECOVERY",
+  "raw_materialized": 754,
+  "current_materialized": 666,
   "awards_materialized": 5,
-  "enumeration_complete": false,
-  "complete_windows": 4,
+  "enumeration_complete": true,
+  "complete_windows": 5,
   "bisected_windows": 2,
-  "failed_single_days": 1,
-  "official_next_pages": 12,
-  "synthesized_first_pages": 4,
-  "errors": [
-    {
-      "type": "ONE_OR_MORE_ZA_WINDOWS_INCOMPLETE"
-    }
-  ],
-  "pass_recall": false
+  "halo_recoveries": 1,
+  "halo_failures": 0,
+  "failed_single_days": 0,
+  "failed_day_detail": [],
+  "official_next_pages": 14,
+  "synthesized_first_pages": 5,
+  "errors": [],
+  "pass_recall": true
 }
