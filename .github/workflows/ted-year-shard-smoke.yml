@@ -1,0 +1,123 @@
+name: TED Year-Shard Architecture Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/ted_year_shard_smoke_trigger.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  shard:
+    name: ted-year-${{ matrix.year }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        year: [2016, 2025, 2026]
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Enumerate independent TED publication-year shard
+        shell: bash
+        env:
+          TED_SCOPE: ACTIVE
+          TED_REQUEST_RETRIES: '8'
+          TED_PAGE_DELAY_SECONDS: '0.12'
+          TED_QUERY: 'PD = (${{ matrix.year }}0101 <> ${{ matrix.year }}1231) AND form-type = competition'
+          DISCOVERY_OUT: 'lane-out/year-${{ matrix.year }}'
+        run: |
+          set +e
+          python pipeline/discover_ted.py
+          rc=$?
+          printf '%s\n' "$rc" > "$DISCOVERY_OUT/adapter_exit_code.txt"
+          exit 0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ted-year-${{ matrix.year }}
+          path: lane-out/year-${{ matrix.year }}
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    needs: shard
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ted-year-*
+          path: downloads
+      - name: Rebuild shard directory layout and exact-merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ted-shards
+          for y in 2016 2025 2026; do
+            test -d "downloads/ted-year-$y"
+            mv "downloads/ted-year-$y" "ted-shards/year-$y"
+          done
+          set +e
+          python pipeline/merge_ted_year_shards.py --root ted-shards --output merged-ted --expected-years 2016,2025,2026
+          merge_rc=$?
+          export MERGE_RC="$merge_rc"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('merged-ted/stats.json')
+          s=json.loads(p.read_text()) if p.exists() else {'errors':[{'type':'MERGED_STATS_MISSING'}]}
+          payload={
+            'schema':'TED_YEAR_SHARD_ARCHITECTURE_SMOKE_V1',
+            'merge_exit_code':int(os.environ['MERGE_RC']),
+            'expected_years':s.get('expected_years'),
+            'complete_years':s.get('complete_years'),
+            'shard_count_expected':s.get('shard_count_expected'),
+            'shard_count_complete':s.get('shard_count_complete'),
+            'total_reported':s.get('total_reported'),
+            'source_items_seen':s.get('source_items_seen'),
+            'materialized_unique':s.get('materialized_unique'),
+            'current_materialized':s.get('current_materialized'),
+            'open_confirmed_by_future_deadline':s.get('open_confirmed_by_future_deadline'),
+            'open_unverified_no_parseable_deadline':s.get('open_unverified_no_parseable_deadline'),
+            'enumeration_complete':s.get('enumeration_complete'),
+            'errors':s.get('errors') or [],
+            'shards':s.get('shards') or [],
+          }
+          payload['pass']=payload['merge_exit_code']==0 and payload['enumeration_complete'] is True and not payload['errors']
+          Path('control/ted_year_shard_smoke.json').write_text(json.dumps(payload,indent=2)+'\n')
+          print(json.dumps(payload,indent=2))
+          PY
+          exit 0
+      - name: Persist architecture verdict
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -f control/ted_year_shard_smoke.json ]; then
+            printf '%s\n' '{"schema":"TED_YEAR_SHARD_ARCHITECTURE_WORKFLOW_FAILURE","pass":false}' > control/ted_year_shard_smoke.json
+          fi
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add control/ted_year_shard_smoke.json
+          git diff --cached --quiet && exit 0
+          git commit -m "diag: persist TED year-shard smoke ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
