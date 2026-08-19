@@ -1,57 +1,47 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32216321220,
-  "total_inbox_rows": 151,
-  "dce_authenticity_rows": 34,
+  "latest_source_dce_run_id": 32218121774,
+  "total_inbox_rows": 160,
+  "dce_authenticity_rows": 20,
   "portal_counts": {
-    "GR_KHMDHS": 12,
-    "TED": 6,
-    "PL_EZAMOWIENIA": 5,
-    "ZA_ETENDERS": 3,
+    "GENERIC_PUBLIC_PAGE": 3,
+    "GR_KHMDHS": 3,
+    "TED": 3,
     "CYPRUS_EPPS": 2,
+    "PL_EZAMOWIENIA": 2,
     "US_SAM": 2,
+    "ZA_ETENDERS": 2,
     "CA_CANADABUYS": 1,
     "DE_DOE": 1,
-    "GENERIC_PUBLIC_PAGE": 1,
     "SK_UVO": 1
   },
   "status_counts": {
-    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 24,
-    "UNKNOWN_RETRIEVED_DOCUMENT": 10
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 15,
+    "UNKNOWN_RETRIEVED_DOCUMENT": 5
   },
   "reason_counts": {
-    "NON_AUTHORITATIVE": 33,
-    "AUTH_REQUIRED": 1
+    "NON_AUTHORITATIVE": 20
   },
   "method_counts": {},
   "recovery_opportunities": [
     {
-      "portal": "GR_KHMDHS",
-      "blocked": 12,
+      "portal": "GENERIC_PUBLIC_PAGE",
+      "blocked": 3,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 12
+        "NON_AUTHORITATIVE": 3
+      }
+    },
+    {
+      "portal": "GR_KHMDHS",
+      "blocked": 3,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 3
       }
     },
     {
       "portal": "TED",
-      "blocked": 6,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 5,
-        "AUTH_REQUIRED": 1
-      }
-    },
-    {
-      "portal": "PL_EZAMOWIENIA",
-      "blocked": 5,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 5
-      }
-    },
-    {
-      "portal": "ZA_ETENDERS",
       "blocked": 3,
       "likely_public_recovery_target": 0,
       "reason_counts": {
@@ -67,7 +57,23 @@
       }
     },
     {
+      "portal": "PL_EZAMOWIENIA",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
+      }
+    },
+    {
       "portal": "US_SAM",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
+      }
+    },
+    {
+      "portal": "ZA_ETENDERS",
       "blocked": 2,
       "likely_public_recovery_target": 0,
       "reason_counts": {
@@ -91,14 +97,6 @@
       }
     },
     {
-      "portal": "GENERIC_PUBLIC_PAGE",
-      "blocked": 1,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 1
-      }
-    },
-    {
       "portal": "SK_UVO",
       "blocked": 1,
       "likely_public_recovery_target": 0,
@@ -109,6 +107,14 @@
   ],
   "samples_by_reason": {
     "NON_AUTHORITATIVE": [
+      {
+        "candidate_id": "IT-PVL:d028cfe4-cc7a-4734-9cce-6451946d13b3",
+        "portal": "GENERIC_PUBLIC_PAGE",
+        "title": "Fornitura di una Piattaforma Hardware Didattica Prototipale Modulare ed integrata per attivita di formazione sui Veicoli Elettrici e sui sistemi di ricarica nell ambito del Progetto di Ricerca LEGAME Learning GAteway per la Mobilita Elettrica e l economia circolare Patti Territoriali dell Alta Formazione per le imprese",
+        "buyer": "UNIVERSITA' DELLA CALABRIA",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/d028cfe4-cc7a-4734-9cce-6451946d13b3?ricercaArchivio=false"
+      },
       {
         "candidate_id": "GR-KHMDHS:26PROC019643321",
         "portal": "GR_KHMDHS",
@@ -126,38 +132,20 @@
         "notice_url": "https://ted.europa.eu/en/notice/-/detail/476581-2026"
       },
       {
-        "candidate_id": "PL-BZP:08defd1e-d227-b1df-962b-12000115caf0",
-        "portal": "PL_EZAMOWIENIA",
-        "title": "Świadczenie pogwarancyjnej opieki serwisowej systemu Quanti Dose",
-        "buyer": "CENTRALNA WOJSKOWA PRZYCHODNIA LEKARSKA CEPELEK SAMODZIELNY PUBLICZNY ZAKŁAD OPIEKI ZDROWOTNEJ",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defd1e-d227-b1df-962b-12000115caf0"
-      },
-      {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165900-2026-08-18",
-        "portal": "ZA_ETENDERS",
-        "title": "RFQ-012723",
-        "buyer": "NATIONAL METROLOGY INSTITUTE OF SOUTH AFRICA",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165900"
-      },
-      {
         "candidate_id": "CY-EPPS:9163004",
         "portal": "CYPRUS_EPPS",
         "title": "Παροχή υπηρεσιών εκτύπωσης, φακελώματος και ταχυδρόμησης λογαριασμών.(64/2026)",
         "buyer": "ΔΗΜΟΣ ΛΕΜΕΣΟΥ",
         "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
         "notice_url": "https://www.eprocurement.gov.cy/epps/notices/viewPublishedContractNotice.do?resourceId=9163004&documentId=9163081&noticeType=16&extId=d47182ea-3265-4fc9-b98a-eeea06b232c6&lang=el&noticeId=9163078&isNational=true"
-      }
-    ],
-    "AUTH_REQUIRED": [
+      },
       {
-        "candidate_id": "TED:454886-2026",
-        "portal": "TED",
-        "title": "Norway – IT services: consulting, software development, Internet and support – IK-EEA 046-2026 Case handling system for collection (debt collection).",
-        "buyer": "Bergen kommune - Innkjøp konsern",
+        "candidate_id": "PL-BZP:08defd1e-d227-b1df-962b-12000115caf0",
+        "portal": "PL_EZAMOWIENIA",
+        "title": "Świadczenie pogwarancyjnej opieki serwisowej systemu Quanti Dose",
+        "buyer": "CENTRALNA WOJSKOWA PRZYCHODNIA LEKARSKA CEPELEK SAMODZIELNY PUBLICZNY ZAKŁAD OPIEKI ZDROWOTNEJ",
         "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ted.europa.eu/en/notice/-/detail/454886-2026"
+        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defd1e-d227-b1df-962b-12000115caf0"
       }
     ]
   },
