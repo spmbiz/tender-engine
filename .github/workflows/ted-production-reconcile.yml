@@ -1,0 +1,221 @@
+name: TED Production Reconcile
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'control/ted_production_reconcile_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      years: ${{ steps.meta.outputs.years }}
+      years_csv: ${{ steps.meta.outputs.years_csv }}
+      release_tag: ${{ steps.meta.outputs.release_tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - name: Build deterministic year manifest and durable Release
+        id: meta
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from datetime import datetime, timezone
+          first=2016
+          current=datetime.now(timezone.utc).year
+          years=list(range(first,current+1))
+          print('years='+json.dumps(years,separators=(',',':')))
+          print('years_csv='+','.join(map(str,years)))
+          print('release_tag=ted-reconcile-'+str(__import__('os').environ['GITHUB_RUN_ID']))
+          PY
+          tag="ted-reconcile-${GITHUB_RUN_ID}"
+          gh release create "$tag" --title "TED production reconcile ${GITHUB_RUN_ID}" --notes "Durable independent publication-year shards for full TED competition reconcile. Each shard must prove source exhaustion; final merge is exact-ID and independently reconciled to an unpartitioned TED total."
+
+  shard:
+    needs: prepare
+    name: ted-year-${{ matrix.year }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        year: ${{ fromJSON(needs.prepare.outputs.years) }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Exhaust independent publication-year shard
+        env:
+          TED_SCOPE: ACTIVE
+          TED_REQUEST_RETRIES: '8'
+          TED_PAGE_DELAY_SECONDS: '0.12'
+          TED_QUERY: 'PD = (${{ matrix.year }}0101 <> ${{ matrix.year }}1231) AND form-type = competition'
+          DISCOVERY_OUT: 'shard/year-${{ matrix.year }}'
+        shell: bash
+        run: |
+          set +e
+          python pipeline/discover_ted.py
+          rc=$?
+          mkdir -p "$DISCOVERY_OUT"
+          printf '%s\n' "$rc" > "$DISCOVERY_OUT/adapter_exit_code.txt"
+          exit 0
+      - name: Validate shard proof before upload
+        env:
+          YEAR: ${{ matrix.year }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          y=os.environ['YEAR']; root=Path('shard')/f'year-{y}'
+          s=json.loads((root/'stats.json').read_text())
+          rc=int((root/'adapter_exit_code.txt').read_text().strip())
+          ok=(rc==0 and s.get('enumeration_complete') is True and s.get('enumeration_exhausted') is True and not (s.get('errors') or []))
+          proof={
+            'schema':'TED_YEAR_SHARD_PROOF_V1','year':int(y),'adapter_exit_code':rc,
+            'query':s.get('query'),'pages':s.get('pages'),'total_reported':s.get('total_reported'),
+            'source_items_seen':s.get('source_items_seen'),'materialized_unique':s.get('materialized_unique'),
+            'current_materialized':s.get('current_materialized'),'enumeration_complete':s.get('enumeration_complete'),
+            'errors':s.get('errors') or [],'pass':ok,
+          }
+          (root/'shard_proof.json').write_text(json.dumps(proof,indent=2)+'\n')
+          print(json.dumps(proof,indent=2))
+          if not ok: raise SystemExit(3)
+          PY
+      - name: Preserve shard in canonical Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
+          YEAR: ${{ matrix.year }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -C shard -czf "ted-year-${YEAR}.tar.gz" "year-${YEAR}"
+          gh release upload "$RELEASE_TAG" "ted-year-${YEAR}.tar.gz" --clobber
+
+  merge:
+    needs: [prepare, shard]
+    if: always() && needs.prepare.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Download durable shards from Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
+          YEARS_CSV: ${{ needs.prepare.outputs.years_csv }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p shard-assets ted-shards
+          gh release download "$RELEASE_TAG" --pattern 'ted-year-*.tar.gz' --dir shard-assets
+          IFS=',' read -ra years <<< "$YEARS_CSV"
+          for y in "${years[@]}"; do
+            test -f "shard-assets/ted-year-${y}.tar.gz"
+            tar -xzf "shard-assets/ted-year-${y}.tar.gz" -C ted-shards
+            test -f "ted-shards/year-${y}/shard_proof.json"
+          done
+      - name: Exact merge all year shards
+        env:
+          YEARS_CSV: ${{ needs.prepare.outputs.years_csv }}
+        shell: bash
+        run: |
+          set +e
+          python pipeline/merge_ted_year_shards.py --root ted-shards --output merged-ted --expected-years "$YEARS_CSV"
+          printf '%s\n' "$?" > merged-ted/merge_exit_code.txt
+          exit 0
+      - name: Independent unpartitioned total probe
+        env:
+          TED_SCOPE: ACTIVE
+          TED_QUERY: 'form-type = competition'
+          TED_HARD_MAX_PAGES: '1'
+          TED_REQUEST_RETRIES: '8'
+          DISCOVERY_OUT: total-probe
+        shell: bash
+        run: |
+          set +e
+          python pipeline/discover_ted.py
+          printf '%s\n' "$?" > total-probe/adapter_exit_code.txt
+          exit 0
+      - name: Build fail-closed reconcile verdict
+        env:
+          YEARS_CSV: ${{ needs.prepare.outputs.years_csv }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          merged=json.loads(Path('merged-ted/stats.json').read_text()) if Path('merged-ted/stats.json').exists() else {}
+          probe=json.loads(Path('total-probe/stats.json').read_text()) if Path('total-probe/stats.json').exists() else {}
+          merge_rc=int(Path('merged-ted/merge_exit_code.txt').read_text().strip()) if Path('merged-ted/merge_exit_code.txt').exists() else 999
+          expected=[int(x) for x in os.environ['YEARS_CSV'].split(',') if x]
+          merged_total=merged.get('total_reported')
+          official_total=probe.get('total_reported')
+          total_match=(merged_total is not None and official_total is not None and int(merged_total)==int(official_total))
+          all_years=(merged.get('complete_years')==expected and merged.get('shard_count_complete')==len(expected))
+          passed=bool(merge_rc==0 and merged.get('enumeration_complete') is True and not (merged.get('errors') or []) and all_years and total_match)
+          payload={
+            'schema':'TED_PRODUCTION_RECONCILE_PROOF_V1',
+            'release_tag':os.environ['RELEASE_TAG'],'expected_years':expected,
+            'merge_exit_code':merge_rc,'complete_years':merged.get('complete_years'),
+            'shard_count_expected':len(expected),'shard_count_complete':merged.get('shard_count_complete'),
+            'merged_total_reported':merged_total,'unpartitioned_official_total_reported':official_total,
+            'total_reconciliation_match':total_match,'source_items_seen':merged.get('source_items_seen'),
+            'materialized_unique':merged.get('materialized_unique'),'current_materialized':merged.get('current_materialized'),
+            'open_confirmed_by_future_deadline':merged.get('open_confirmed_by_future_deadline'),
+            'open_unverified_no_parseable_deadline':merged.get('open_unverified_no_parseable_deadline'),
+            'enumeration_complete':passed,'enumeration_exhausted':passed,
+            'live_coverage_credit_allowed':passed,'errors':merged.get('errors') or [],'pass':passed,
+            'semantics':'Full TED competition reconcile is credited only when every deterministic publication-year shard independently exhausts, the exact merge is complete, and the sum of year-shard source totals equals a fresh unpartitioned official TED count. No single long scroll is authoritative.',
+          }
+          Path('control/ted_production_reconcile_proof.json').write_text(json.dumps(payload,indent=2)+'\n')
+          print(json.dumps(payload,indent=2))
+          PY
+      - name: Preserve merged reconcile and total probe in Release
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -czf ted-reconcile-merged.tar.gz merged-ted total-probe control/ted_production_reconcile_proof.json
+          gh release upload "$RELEASE_TAG" ted-reconcile-merged.tar.gz --clobber
+      - name: Persist compact verdict
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f control/ted_production_reconcile_proof.json || printf '%s\n' '{"schema":"TED_PRODUCTION_RECONCILE_WORKFLOW_FAILURE","pass":false}' > control/ted_production_reconcile_proof.json
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add control/ted_production_reconcile_proof.json
+          git diff --cached --quiet && exit 0
+          git commit -m "diag: persist TED production reconcile ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
+      - name: Enforce verdict
+        if: always()
+        run: python -c "import json; s=json.load(open('control/ted_production_reconcile_proof.json')); raise SystemExit(0 if s.get('pass') is True else 3)"
