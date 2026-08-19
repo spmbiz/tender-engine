@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main, fetch-depth: 0}
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4
@@ -33,9 +33,10 @@ jobs:
           p=Path('lane-out/UK_PCS_OCDS/stats.json')
           s=json.loads(p.read_text()) if p.exists() else {'errors':[{'type':'STATS_MISSING'}]}
           payload={
-            'schema':'PCS_BULK_COLLECTOR_SMOKE_V1',
+            'schema':'PCS_BULK_COLLECTOR_SMOKE_V2_TYPE101',
             'adapter_exit_code':int(os.environ['ADAPTER_RC']),
             'listing_contract':s.get('listing_contract'),
+            'notice_types':s.get('notice_types'),
             'requests_expected':s.get('requests_expected'),
             'requests_completed':s.get('requests_completed'),
             'source_releases_seen':s.get('source_releases_seen'),
@@ -49,7 +50,12 @@ jobs:
           PY
           exit 0
       - name: Persist smoke
+        if: always()
         run: |
+          set -euo pipefail
+          if [ ! -f control/pcs_bulk_collector_smoke.json ]; then
+            printf '%s\n' '{"schema":"PCS_BULK_COLLECTOR_SMOKE_WORKFLOW_FAILURE","pass_recall":false}' > control/pcs_bulk_collector_smoke.json
+          fi
           git config user.name tender-engine-bot
           git config user.email tender-engine-bot@users.noreply.github.com
           git add control/pcs_bulk_collector_smoke.json
