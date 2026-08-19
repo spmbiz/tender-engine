@@ -16,10 +16,10 @@ permissions:
 jobs:
   regression:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main, fetch-depth: 0}
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install --disable-pip-version-check -q requests pytest
@@ -37,7 +37,7 @@ jobs:
           from pathlib import Path
           txt=Path('/tmp/ted-transport-pytest.txt').read_text(errors='replace') if Path('/tmp/ted-transport-pytest.txt').exists() else ''
           payload={
-            'schema':'TED_TRANSPORT_REGRESSION_V1',
+            'schema':'TED_TRANSPORT_REGRESSION_V2_SHALLOW_CI',
             'compile_exit_code':int(os.environ['COMPILE_RC']),
             'pytest_exit_code':int(os.environ['TEST_RC']),
             'pass':int(os.environ['COMPILE_RC'])==0 and int(os.environ['TEST_RC'])==0,
@@ -53,6 +53,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          if [ ! -f control/ted_transport_regression.json ]; then
+            printf '%s\n' '{"schema":"TED_TRANSPORT_REGRESSION_WORKFLOW_FAILURE","pass":false}' > control/ted_transport_regression.json
+          fi
           git config user.name tender-engine-bot
           git config user.email tender-engine-bot@users.noreply.github.com
           git add control/ted_transport_regression.json
