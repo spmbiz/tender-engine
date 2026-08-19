@@ -1,35 +1,23 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-19T00:43:25+00:00",
+  "generated_at_utc": "2026-08-19T00:48:16+00:00",
   "source_run": "32192589684",
   "state_rows": 7669,
   "ledger_rows": 100729,
   "snapshot_rows": 100729,
   "blocked_ids": 24183,
-  "durable_attempted_exact_versions_ignored": 475,
-  "valid_exact_hash_current_unattempted": 85,
-  "eligible_keep_for_dce": 28,
-  "review_worthy_rejects_promoted_to_explore": 57,
+  "durable_attempted_exact_versions_ignored": 560,
+  "valid_exact_hash_current_unattempted": 0,
+  "eligible_keep_for_dce": 0,
+  "review_worthy_rejects_promoted_to_explore": 0,
   "stale_hash_ignored": 1028,
   "missing_snapshot": 0,
   "expired_ignored": 0,
-  "selected": 85,
-  "selection_decisions": {
-    "MAYBE": 28,
-    "REJECT_OBVIOUS": 57
-  },
-  "selection_survival": {
-    "KEEP": 85
-  },
-  "selection_lanes": {
-    "qwen-explore-coded": 28,
-    "qwen-reject-audit-coded": 32,
-    "qwen-elastic-coded": 25
-  },
-  "selection_freshness": {
-    "recent_unseen_carryover": 67,
-    "historical_backfill": 18
-  },
+  "selected": 0,
+  "selection_decisions": {},
+  "selection_survival": {},
+  "selection_lanes": {},
+  "selection_freshness": {},
   "policy": {
     "keep_is_not_fit": true,
     "drop_is_retained_in_state_but_not_primary_dce": true,
@@ -52,20 +40,15 @@
       "reason": "Qwen runtime is still benchmark-blocked; spend more DCE capacity auditing MAYBE/REJECT paths to measure false negatives."
     }
   },
-  "base_candidate_pool": 85,
+  "base_candidate_pool": 0,
   "requested_final_limit": 160,
-  "candidate_pool_decisions": {
-    "MAYBE": 28,
-    "REJECT_OBVIOUS": 57
-  },
-  "candidate_pool_lanes": {
-    "qwen-open-world-explore": 85
-  },
+  "candidate_pool_decisions": {},
+  "candidate_pool_lanes": {},
   "code_prior": {
     "positive_code_rows_in_pool": 0,
-    "noncore_code_contradictions_in_pool": 21,
+    "noncore_code_contradictions_in_pool": 0,
     "positive_code_rows_selected": 0,
-    "noncore_code_contradictions_selected": 21,
+    "noncore_code_contradictions_selected": 0,
     "policy": "priority_only_never_drop_never_eligibility",
     "candidate_pool_multiplier": 4
   }
