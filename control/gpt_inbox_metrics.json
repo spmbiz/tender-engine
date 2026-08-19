@@ -1,35 +1,35 @@
 {
   "schema": "GPT_INBOX_HEALTH_V4_FAIR_SHARE_PROVENANCE",
-  "updated_at": "2026-08-19T12:23:54.200144+00:00",
+  "updated_at": "2026-08-19T12:28:35.436632+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
   "latest_source_dce_run_id": 32251431605,
   "counts": {
-    "pending_gpt_web_review": 95,
+    "pending_gpt_web_review": 101,
     "reviewed_ticks_total": 344,
     "excluded_already_reviewed": 74,
     "excluded_already_in_final_bank": 1,
-    "pending_before_visible_cap": 95,
+    "pending_before_visible_cap": 101,
     "pending_by_stage": {
-      "BUSINESS_GATES": 68,
+      "BUSINESS_GATES": 74,
       "DCE_AUTHENTICITY": 27
     },
     "pending_by_inbox_lane": {
       "GPT_PRIORITY": 38,
       "DCE_AUTHENTICITY_REPAIR": 20,
       "LOW_PORTAL_SURVEILLANCE": 20,
-      "ELASTIC_FILL": 17
+      "ELASTIC_FILL": 23
     },
     "pending_by_fit_band": {
       "GOOD": 20,
       "MAYBE": 26,
       "UNKNOWN": 3,
-      "LOW": 46
+      "LOW": 52
     },
     "pending_by_portal": {
-      "TED": 25,
+      "TED": 27,
       "US_SAM": 46,
       "ZA_ETENDERS": 6,
-      "GENERIC_PUBLIC_PAGE": 6,
+      "GENERIC_PUBLIC_PAGE": 10,
       "GR_KHMDHS": 3,
       "PL_EZAMOWIENIA": 6,
       "WORLD_BANK": 2,
@@ -44,23 +44,23 @@
       "GPT_PRIORITY": 38,
       "DCE_AUTHENTICITY_REPAIR": 20,
       "LOW_PORTAL_SURVEILLANCE": 20,
-      "ELASTIC_FILL": 17
+      "ELASTIC_FILL": 23
     },
     "selected_by_stage": {
-      "BUSINESS_GATES": 68,
+      "BUSINESS_GATES": 74,
       "DCE_AUTHENTICITY": 27
     },
     "selected_by_band": {
       "GOOD": 20,
       "MAYBE": 26,
       "UNKNOWN": 3,
-      "LOW": 46
+      "LOW": 52
     },
     "selected_by_portal": {
-      "TED": 25,
+      "TED": 27,
       "US_SAM": 46,
       "ZA_ETENDERS": 6,
-      "GENERIC_PUBLIC_PAGE": 6,
+      "GENERIC_PUBLIC_PAGE": 10,
       "GR_KHMDHS": 3,
       "PL_EZAMOWIENIA": 6,
       "WORLD_BANK": 2,
@@ -102,46 +102,46 @@
       "SCOTLAND_PCS": 1
     }
   },
-  "review_index_count": 2379,
+  "review_index_count": 2388,
   "review_index_counts": {
-    "pending_total_uncapped": 2379,
+    "pending_total_uncapped": 2388,
     "by_stage": {
-      "BUSINESS_GATES": 1642,
-      "DCE_AUTHENTICITY": 737
+      "BUSINESS_GATES": 1648,
+      "DCE_AUTHENTICITY": 740
     },
     "by_spm_fit_band": {
       "HOT": 1,
       "GOOD": 53,
       "MAYBE": 90,
-      "LOW": 2235
+      "LOW": 2244
     },
     "rich_hot_window_target": 160,
-    "overflow_beyond_hot_160": 2219,
+    "overflow_beyond_hot_160": 2228,
     "cross_portal_duplicates_collapsed": 0
   },
-  "true_pending_before_hot_cap": 2379,
-  "overflow_beyond_hot_160": 2219,
-  "assistant_read_batch_count": 10,
+  "true_pending_before_hot_cap": 2388,
+  "overflow_beyond_hot_160": 2228,
+  "assistant_read_batch_count": 11,
   "assistant_read_batch_size": 10,
   "assistant_read_batch_schema": "GPT_WEB_READ_BATCH_MANIFEST_V3_PROVENANCE_REFRESH",
   "provenance_overrides_applied_in_window": 0,
   "recovery_metrics": {
-    "shard_files_scanned": 169,
-    "adjudication_rows_scanned": 1257,
-    "model_review_rows_seen": 379,
-    "dce_authenticity_rows_seen": 65,
+    "shard_files_scanned": 173,
+    "adjudication_rows_scanned": 1281,
+    "model_review_rows_seen": 385,
+    "dce_authenticity_rows_seen": 68,
     "scope_auto_rejected": 0,
     "scope_auto_reject_reason_counts": {},
     "cross_portal_duplicates_collapsed": 0,
-    "uncapped_unique_pending_before_hot_window": 391,
+    "uncapped_unique_pending_before_hot_window": 401,
     "rich_hot_window_count": 160,
-    "overflow_beyond_hot_window": 231
+    "overflow_beyond_hot_window": 241
   },
   "index_recovery": {
-    "shard_files_scanned_this_refresh": 169,
-    "adjudication_rows_scanned_this_refresh": 1257,
-    "gate_rows_seen_this_refresh": 379,
-    "authenticity_rows_seen_this_refresh": 65,
+    "shard_files_scanned_this_refresh": 173,
+    "adjudication_rows_scanned_this_refresh": 1281,
+    "gate_rows_seen_this_refresh": 385,
+    "authenticity_rows_seen_this_refresh": 68,
     "source_runs_seen_this_refresh": [
       32251431605,
       32250177938,
