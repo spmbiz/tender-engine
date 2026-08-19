@@ -1,0 +1,102 @@
+name: Spain PLACSP Live Proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'control/es_placsp_live_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  live-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests pytest
+      - name: Unit and syntax gate
+        run: |
+          python -m py_compile pipeline/discover_es_placsp_atom_v2.py pipeline/placsp_atom.py
+          pytest -q tests/test_es_placsp_atom_v2.py
+      - name: Run official hosted plus aggregated live window
+        id: run
+        env:
+          DISCOVERY_OUT: es-live-proof
+          LOOKBACK_DAYS: '5'
+          ES_PARSE_RETRIES: '5'
+          ES_MAX_RUNTIME_SECONDS: '1000'
+          ES_HARD_MAX_PAGES: '0'
+        shell: bash
+        run: |
+          set +e
+          python pipeline/discover_es_placsp_atom_v2.py
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Build compact verdict
+        if: always()
+        env:
+          RUN_RC: ${{ steps.run.outputs.rc }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('es-live-proof/stats.json')
+          s=json.loads(p.read_text()) if p.exists() else {}
+          try: rc=int(os.environ.get('RUN_RC') or 999)
+          except Exception: rc=999
+          lanes=s.get('lane_proofs') or {}
+          passed=bool(
+              rc==0
+              and s.get('listing_contract')=='ES_PLACSP_OFFICIAL_ATOM_V2_RECOVERABLE_XML_EXHAUSTION'
+              and s.get('publication_window_enumeration_complete') is True
+              and s.get('enumeration_complete') is True
+              and s.get('live_coverage_credit_allowed') is True
+              and not (s.get('errors') or [])
+              and set(lanes)=={'hosted','aggregated'}
+              and all((lanes[k] or {}).get('publication_window_complete') is True for k in lanes)
+              and int(s.get('current_materialized') or 0)>0
+          )
+          proof={
+              'schema':'ES_PLACSP_LIVE_ATOM_PROOF_V2',
+              'adapter_exit_code':rc,
+              'listing_contract':s.get('listing_contract'),
+              'lookback_days':s.get('lookback_days'),
+              'raw_materialized':s.get('raw_materialized'),
+              'current_materialized':s.get('current_materialized'),
+              'repaired_pages':s.get('repaired_pages'),
+              'publication_window_enumeration_complete':s.get('publication_window_enumeration_complete'),
+              'lane_proofs':lanes,
+              'errors':s.get('errors') or [],
+              'pass':passed,
+          }
+          Path('control/es_placsp_live_proof.json').write_text(json.dumps(proof,indent=2)+'\n')
+          print(json.dumps(proof,indent=2))
+          PY
+      - name: Persist verdict
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f control/es_placsp_live_proof.json || printf '%s\n' '{"schema":"ES_PLACSP_LIVE_PROOF_WORKFLOW_FAILURE","pass":false}' > control/es_placsp_live_proof.json
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add control/es_placsp_live_proof.json
+          git diff --cached --quiet && exit 0
+          git commit -m "diag: persist Spain PLACSP live proof ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
+      - name: Enforce verdict
+        if: always()
+        run: python -c "import json; s=json.load(open('control/es_placsp_live_proof.json')); raise SystemExit(0 if s.get('pass') is True else 3)"
