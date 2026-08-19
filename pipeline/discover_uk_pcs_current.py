@@ -2,23 +2,19 @@ from __future__ import annotations
 
 """Public Contracts Scotland live entrypoint.
 
-Primary collection is the official PCS Notice Download surface on the main
-publiccontractsscotland.gov.uk domain. It returns genuine OCDS release packages
-by calendar month and notice type, matching the maintained Open Contracting
-Scotland collection pattern.
+Two official PCS surfaces are intentionally combined:
 
-Production contract:
+- the monthly OCDS Notice Download surface is retained as rich publication and
+  procedure-level enrichment/provenance; and
+- the state-chained ASP.NET Current Opportunity registry is authoritative for the
+  live current-universe in reconcile mode because it is the actual filtered live
+  listing and can prove stable page/count exhaustion.
 
-- DELTA: retain the fast/high-recall official monthly bulk reconstruction. It is
-  useful live data but deliberately receives no full current-universe credit.
-- RECONCILE: run the same bulk first, then independently enumerate the official
-  Current Opportunity registry with the state-chained ASP.NET V13 adapter and
-  exact-reconcile both official surfaces. Full coverage credit is granted only
-  when both enumeration contracts are complete and every official current row
-  exact-matches the bulk by OCID or exact notice reference.
-
-This keeps PCS fail-closed while preserving useful bulk data even when the
-independent current-registry reconciler is temporarily unavailable.
+DELTA remains the fast monthly bulk lane and receives no full current-universe
+credit. RECONCILE enumerates the official Current Opportunity registry with V13,
+then projects current.jsonl from that exhaustive registry while preserving bulk
+rows and linkage evidence separately. Bulk enrichment recall is measured but is
+not allowed to erase an opportunity that exists in the official current registry.
 """
 
 import json
@@ -28,7 +24,7 @@ import sys
 from pathlib import Path
 
 from discover_uk_pcs_bulk_current import main as bulk_main
-from reconcile_uk_pcs_bulk_direct import reconcile
+from reconcile_uk_pcs_registry_authoritative import reconcile
 
 
 # Diagnostic compatibility marker retained for older tests/readers.
@@ -38,8 +34,8 @@ def current_option(text: str) -> bool:
 
 
 def main() -> None:
-    # Always materialize the authoritative official bulk first. If later
-    # reconciliation fails, these rows remain durable and coverage stays closed.
+    # Materialize the official OCDS bulk first. It remains durable source evidence
+    # and enrichment even if direct-registry enumeration later fails.
     bulk_main()
 
     if os.getenv("DISCOVERY_MODE", "").strip().lower() != "reconcile":
@@ -67,18 +63,20 @@ def main() -> None:
             check=False,
         )
 
-    # The reconciler is intentionally able to consume an incomplete direct pack:
-    # it preserves any authoritative direct-only current rows, but cannot grant
-    # coverage credit unless the direct adapter itself proved exhaustion/counts.
     proof = reconcile(bulk_out, direct_out)
     orchestrator = {
-        "schema": "PCS_CURRENT_RECONCILE_ORCHESTRATOR_V1",
+        "schema": "PCS_CURRENT_RECONCILE_ORCHESTRATOR_V2_REGISTRY_AUTHORITATIVE",
         "direct_adapter_exit_code": proc.returncode,
         "direct_output": str(direct_out),
         "coverage_complete": proof.get("coverage_complete"),
         "direct_official_total_reported": proof.get("direct_official_total_reported"),
-        "exact_matched_direct_rows": proof.get("exact_matched_direct_rows"),
-        "direct_missing_from_bulk": proof.get("direct_missing_from_bulk"),
+        "direct_current_rows": proof.get("direct_current_rows"),
+        "final_current_rows": proof.get("final_current_rows"),
+        "exact_notice_reference_links": proof.get("exact_notice_reference_links"),
+        "procedure_ocid_links": proof.get("procedure_ocid_links"),
+        "direct_without_bulk_enrichment": proof.get("direct_without_bulk_enrichment"),
+        "bulk_enrichment_recall_against_official_current": proof.get("bulk_enrichment_recall_against_official_current"),
+        "bulk_current_not_in_direct_registry": proof.get("bulk_current_not_in_direct_registry"),
     }
     (log_dir / "orchestrator.json").write_text(
         json.dumps(orchestrator, ensure_ascii=False, indent=2) + "\n",
