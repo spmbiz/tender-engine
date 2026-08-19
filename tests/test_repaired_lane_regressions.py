@@ -7,44 +7,23 @@ def text(rel: str) -> str:
     return (ROOT / rel).read_text(encoding="utf-8")
 
 
-def test_pcs_accepts_current_opportunity_and_uses_fast_page_selector():
-    body = text("pipeline/discover_uk_pcs_current.py")
-    assert "current_option" in body
-    assert "opportunit(?:y|ies)" in body
-    assert "Page\\s*" in body
-    assert "refs = tuple(re.findall" in body
-    assert "FORM_FALLBACK" in body
-    assert "Array.from(el.options || []" in body
-    assert "after != before_signature" not in body
-    assert (
-        "PCS_CURRENT_OPPORTUNITIES_BROWSER_V5_FAST_PAGER" in body
-        or "PCS_CURRENT_OPPORTUNITIES_BROWSER_V6_ASPNET_POSTBACK" in body
-        or "PCS_CURRENT_OPPORTUNITIES_BROWSER_V7_NAVIGATION_SAFE_POSTBACK" in body
-        or "PCS_CURRENT_OPPORTUNITIES_BROWSER_V8_NATIVE_ONCHANGE" in body
-        or "PCS_CURRENT_OPPORTUNITIES_BROWSER_V10_NAV_SAFE_SEARCH_POSTBACK" in body
-    )
-    advance = body.split("async def advance(page, next_page, before_signature):", 1)[1].split("\n\nasync def main", 1)[0]
-    search = body.split("async def submit_search(page, telemetry):", 1)[1].split("\n\nasync def parse_current_page", 1)[0]
-    if "PCS_CURRENT_OPPORTUNITIES_BROWSER_V6_ASPNET_POSTBACK" in body:
-        assert "window.__doPostBack" in advance
-        assert "form.submit()" not in advance
-    if "PCS_CURRENT_OPPORTUNITIES_BROWSER_V7_NAVIGATION_SAFE_POSTBACK" in body:
-        assert "page.expect_navigation" in advance
-        assert "window.__doPostBack" in advance
-        assert "setTimeout(() => window.__doPostBack" not in advance
-        assert "form.submit()" not in advance
-    if "PCS_CURRENT_OPPORTUNITIES_BROWSER_V8_NATIVE_ONCHANGE" in body:
-        assert "page.expect_navigation" in advance
-        assert "await selector.select_option(label=label)" in advance
-        assert "window.__doPostBack" in advance
-        assert "form.submit()" not in advance
-    if "PCS_CURRENT_OPPORTUNITIES_BROWSER_V10_NAV_SAFE_SEARCH_POSTBACK" in body:
-        assert "page.expect_navigation" in search
-        assert 'search_navigation_proven' in search
-        assert "page.expect_navigation" in advance
-        assert "el.value = String(nextPage)" in advance
-        assert "window.__doPostBack" in advance
-        assert "form.submit()" not in advance
+def test_pcs_live_entrypoint_uses_official_bulk_ocds_not_browser_pagination():
+    entry = text("pipeline/discover_uk_pcs_current.py")
+    bulk = text("pipeline/discover_uk_pcs_bulk_current.py")
+    assert "discover_uk_pcs_bulk_current" in entry
+    assert "bulk_main" in entry
+    assert "V13 direct ASP.NET" not in entry
+    assert "NoticeDownload/Download.aspx" in bulk
+    assert "PCS_OFFICIAL_MONTH_TYPE_BULK_OCDS_V1_KINGFISHER_PATTERN" in bulk
+    assert "rblCollectionType" in bulk
+    assert "rblOutputType" in bulk
+    assert "rblDownloadType" in bulk
+    assert "rblNoticeTypes" in bulk
+    assert "open-contracting/kingfisher-collect" in bulk
+    # Bulk rows are authoritative recall, but full current-universe coverage
+    # stays fail-closed until an independent reconciliation exists.
+    assert '"enumeration_complete":False' in bulk
+    assert '"live_coverage_credit_allowed":False' in bulk
 
 
 def test_cyprus_fallback_uses_row_text_but_never_mistakes_submission_for_deadline():
