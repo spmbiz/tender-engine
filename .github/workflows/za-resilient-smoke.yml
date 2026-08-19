@@ -36,8 +36,9 @@ jobs:
           s=json.loads(p.read_text()) if p.exists() else {'errors':[{'type':'STATS_MISSING'}]}
           t=s.get('telemetry') or []
           pages=[p for w in t for p in (w.get('pages') or [])]
+          failed=[x for x in t if x.get('status')=='FAILED_SINGLE_DAY']
           payload={
-            'schema':'ZA_KINGFISHER_LINKS_NEXT_SMOKE_V2',
+            'schema':'ZA_KINGFISHER_LINKS_NEXT_SMOKE_V3_FAILED_DAY_DETAIL',
             'adapter_exit_code':int(os.environ['ADAPTER_RC']),
             'listing_contract':s.get('listing_contract'),
             'raw_materialized':s.get('raw_materialized'),
@@ -46,7 +47,8 @@ jobs:
             'enumeration_complete':s.get('enumeration_complete'),
             'complete_windows':sum(1 for x in t if x.get('status')=='COMPLETE'),
             'bisected_windows':sum(1 for x in t if x.get('status')=='BISECT'),
-            'failed_single_days':sum(1 for x in t if x.get('status')=='FAILED_SINGLE_DAY'),
+            'failed_single_days':len(failed),
+            'failed_day_detail':failed[:10],
             'official_next_pages':sum(1 for x in pages if x.get('request_mode')=='OFFICIAL_LINKS_NEXT'),
             'synthesized_first_pages':sum(1 for x in pages if x.get('request_mode')=='SYNTHESIZED_FIRST_PAGE'),
             'errors':s.get('errors') or [],
