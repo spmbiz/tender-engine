@@ -21,8 +21,13 @@ except ModuleNotFoundError:
 
 URL = "https://www.publiccontractsscotland.gov.uk/NoticeDownload/Download.aspx"
 NOW = datetime.now(timezone.utc)
-UA = "Tender-Engine/PCS-Bulk-OCDS/1.1 (+official Public Contracts Scotland monthly download)"
-OPPORTUNITY_NOTICE_TYPES = [2, 5, 7, 12, 21, 22, 23, 24, 102]
+UA = "Tender-Engine/PCS-Bulk-OCDS/1.2 (+official Public Contracts Scotland monthly download)"
+# Competition-capable notice types. Crucially include 101 (Website Contract
+# Notice), which Open Contracting Partnership's maintained Scotland spider lists
+# as a PCS-specific notice type. 102 is retained for recall because some prior
+# information/site notices can expose an active tender period; downstream
+# currentness/business gates remain fail-closed.
+OPPORTUNITY_NOTICE_TYPES = [2, 5, 7, 12, 21, 22, 23, 24, 101, 102]
 _THREAD = threading.local()
 
 
@@ -36,18 +41,20 @@ def months_back(count: int) -> list[tuple[int, int]]:
     return out
 
 
-def months_from_2019() -> list[tuple[int,int]]:
-    y,m=2019,1
-    out=[]
-    while (y,m) <= (NOW.year,NOW.month):
-        out.append((y,m))
-        if m==12: y,m=y+1,1
-        else: m+=1
-    return out
-
-
 def month_label(year:int,month:int)->str:
     return datetime(year,month,1).strftime("%B, %Y")
+
+
+def parse_offered_months(ranges: dict[str, str]) -> list[tuple[int, int]]:
+    """Treat the official form itself as the authoritative bulk-month manifest."""
+    out=[]
+    for label in ranges:
+        try:
+            dt=datetime.strptime(label,"%B, %Y")
+        except ValueError:
+            continue
+        out.append((dt.year,dt.month))
+    return sorted(set(out), reverse=True)
 
 
 def _new_worker_context() -> dict[str, Any]:
@@ -139,10 +146,23 @@ def main()->None:
     ap.add_argument("--output",type=Path,default=Path(os.getenv("DISCOVERY_OUT","discovery/global/UK_PCS_OCDS")))
     ap.add_argument("--months",type=int,default=int(os.getenv("PCS_BULK_LOOKBACK_MONTHS","36")))
     ap.add_argument("--workers",type=int,default=int(os.getenv("PCS_BULK_WORKERS","4")))
+    # Legacy flag name retained for workflow compatibility. Its semantics are now
+    # correct: reconcile every month the official bulk form actually offers,
+    # rather than inventing unavailable pre-form dates and failing on them.
     ap.add_argument("--from-2019",action="store_true",default=os.getenv("DISCOVERY_MODE")=="reconcile")
     args=ap.parse_args()
 
-    months=months_from_2019() if args.from_2019 else months_back(args.months)
+    manifest_ctx=None
+    if args.from_2019:
+        manifest_ctx=_new_worker_context()
+        months=parse_offered_months(manifest_ctx["ranges"])
+        try: manifest_ctx["session"].close()
+        except Exception: pass
+        if not months:
+            raise SystemExit("PCS_BULK_NO_OFFERED_MONTHS")
+    else:
+        months=months_back(args.months)
+
     tasks=[(y,m,nt) for y,m in months for nt in OPPORTUNITY_NOTICE_TYPES]
     telemetry=[];errors=[];candidates={};releases_seen=0
     worker_count=max(1,min(args.workers,6))
@@ -182,10 +202,13 @@ def main()->None:
     publication_complete=not errors and len(telemetry)==len(tasks)
     stats={
         "source":"UK_PCS_OCDS","portal":"PUBLIC_CONTRACTS_SCOTLAND",
-        "listing_contract":"PCS_OFFICIAL_MONTH_TYPE_BULK_OCDS_V2_REUSED_FORM_KINGFISHER_PATTERN",
+        "listing_contract":"PCS_OFFICIAL_MONTH_TYPE_BULK_OCDS_V3_PORTAL_MANIFEST_PLUS_101",
         "collector_pattern_source":"open-contracting/kingfisher-collect united_kingdom_scotland/ProactisBase",
         "source_url":URL,"months_requested":len(months),"notice_types":OPPORTUNITY_NOTICE_TYPES,
-        "workers":worker_count,"form_fetch_upper_bound":worker_count + sum(int(x.get("worker_form_refreshes") or 0) for x in telemetry),
+        "month_manifest":"OFFICIAL_BULK_FORM_OPTIONS" if args.from_2019 else "BOUNDED_LOOKBACK",
+        "oldest_month_requested":f"{min(months)[0]:04d}-{min(months)[1]:02d}" if months else None,
+        "newest_month_requested":f"{max(months)[0]:04d}-{max(months)[1]:02d}" if months else None,
+        "workers":worker_count,"form_fetch_upper_bound":worker_count + sum(int(x.get("worker_form_refreshes") or 0) for x in telemetry) + (1 if manifest_ctx else 0),
         "requests_expected":len(tasks),"requests_completed":len(telemetry),
         "source_releases_seen":releases_seen,"raw_materialized":len(rows),"current_materialized":len(rows),
         "publication_window_enumeration_complete":publication_complete,
@@ -195,7 +218,7 @@ def main()->None:
         "warnings":[] if args.from_2019 else [{"type":"BOUNDED_MONTHLY_BULK_RECONSTRUCTION","months":len(months),"coverage_credit":False}],
         "telemetry":sorted(telemetry,key=lambda x:(x["year"],x["month"],x["notice_type"])),
         "generated_at":NOW.isoformat(),
-        "semantics":"Official PCS main-domain monthly bulk download only, using OCDS JSON and the same month x noticeType collection pattern as Open Contracting Kingfisher. One ASP.NET download form/session is reused per worker to reduce portal load. Active/future-deadline releases are materialized for recall. Full Current Opportunity coverage remains fail-closed until independently reconciled.",
+        "semantics":"Official PCS main-domain monthly bulk download only, using OCDS JSON and the month x noticeType collection pattern documented by Open Contracting Kingfisher. Website Contract Notice type 101 is explicitly included. Reconcile mode enumerates every month offered by the official bulk form. Active/future-deadline releases are materialized for recall. Full Current Opportunity coverage remains fail-closed until independently reconciled.",
     }
     (out/"stats.json").write_text(json.dumps(stats,ensure_ascii=False,indent=2),encoding="utf-8")
     print(json.dumps(stats,ensure_ascii=False,indent=2))
