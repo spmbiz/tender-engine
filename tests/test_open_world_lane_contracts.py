@@ -41,6 +41,15 @@ def test_current_registry_lanes_require_exhaustion():
         assert 'live_coverage_credit_allowed' in body
 
 
+def test_pcs_coverage_requires_filtered_search_proof_and_stable_page_total():
+    guard = text('pipeline/source_coverage_guard.py')
+    assert 'PCS_FILTERED_SEARCH_PROOF_MISSING' in guard
+    assert 'PCS_FILTERED_PAGE_TOTAL_NOT_STABLE' in guard
+    assert 'search_navigation_proven' in guard
+    assert 'direct_filtered_post_proven' in guard
+    assert 'SOURCE_COVERAGE_GUARD_V8_PCS_FILTERED_SEARCH_PROOF' in guard
+
+
 def test_qwen_live_entrypoint_is_rich_and_old_prompt_state_is_invalidated():
     entry = text('pipeline/qwen_notice_batch_selfheal.py')
     rich = text('pipeline/qwen_notice_batch_selfheal_rich.py')
