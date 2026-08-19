@@ -1,205 +1,34 @@
 version: 2.1
 
 jobs:
-  executor-smoke:
+  austender-rss-egress-smoke:
     docker:
       - image: cimg/base:stable
     resource_class: small
     steps:
       - checkout
       - run:
-          name: Verify Circle executor and checkout
+          name: Fetch official AusTender Current ATM RSS from CircleCI egress
           command: |
             set -euo pipefail
-            echo "circle_build=${CIRCLE_BUILD_NUM:-unknown}"
-            echo "cpu=$(getconf _NPROCESSORS_ONLN || true)"
-            awk '/MemTotal/{print "memory_kb=" $2}' /proc/meminfo || true
-            test -f .circleci/config.yml
-            echo 'CIRCLE_EXECUTOR_SMOKE_PASS'
-
-  github-egress-smoke:
-    docker:
-      - image: cimg/base:stable
-    resource_class: small
-    steps:
-      - checkout
-      - run:
-          name: Verify outbound GitHub API connectivity
-          command: |
-            set -euo pipefail
-            curl -fsS --retry 3 --retry-all-errors --connect-timeout 10 https://api.github.com/rate_limit >/tmp/github-rate.json
-            grep -q 'rate' /tmp/github-rate.json
-            echo 'CIRCLE_GITHUB_EGRESS_PASS'
-
-  contracts-finder-source-smoke:
-    docker:
-      - image: cimg/base:stable
-    resource_class: small
-    steps:
-      - checkout
-      - run:
-          name: Verify official Contracts Finder daily CSV route
-          command: |
-            set -euo pipefail
-            Y="$(date -u -d 'yesterday' +%Y)"
-            M="$(date -u -d 'yesterday' +%-m)"
-            D="$(date -u -d 'yesterday' +%-d)"
-            URL="https://www.contractsfinder.service.gov.uk/Harvester/Notices/Data/CSV/${Y}/${M}/${D}"
-            CODE="$(curl -sS -o /tmp/contracts-finder.csv -w '%{http_code}' --connect-timeout 15 --max-time 90 "$URL")"
-            echo "contracts_finder_http=${CODE}"
-            if [ "$CODE" = '403' ]; then
-              echo 'Contracts Finder source is rate-limiting this egress IP. Official cooldown is 5 minutes.' >&2
-              exit 23
-            fi
+            URL='https://www.tenders.gov.au/public_data/rss/rss.xml'
+            CODE="$(curl -sS -L -o /tmp/austender-rss.xml -D /tmp/austender-headers.txt -w '%{http_code}' \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Accept: application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.2' \
+              -A 'Mozilla/5.0 (compatible; Tender-Engine-CircleCI-AusTender-Probe/1.0)' \
+              "$URL")"
+            echo "austender_http=${CODE}"
+            sed -n '1,30p' /tmp/austender-headers.txt || true
+            echo "bytes=$(wc -c </tmp/austender-rss.xml || echo 0)"
             test "$CODE" = '200'
-            test -s /tmp/contracts-finder.csv
-            head -n 1 /tmp/contracts-finder.csv | grep -qi 'releases/0/ocid'
-            echo 'CONTRACTS_FINDER_DAILY_CSV_PASS'
-
-  durable-bridge:
-    docker:
-      - image: cimg/base:stable
-    resource_class: small
-    steps:
-      - checkout
-      - run:
-          name: Verify durable GitHub persistence bridge and write permission
-          command: |
-            set -euo pipefail
-            if [ -z "${FLEET_GITHUB_TOKEN:-}" ]; then
-              echo 'FLEET_GITHUB_TOKEN is not configured in CircleCI.' >&2
-              echo 'Project Settings -> Environment Variables -> Add Variable.' >&2
-              exit 20
-            fi
-            REPO="${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
-            AUTH="Authorization: Bearer ${FLEET_GITHUB_TOKEN}"
-            CODE="$(curl -sS -o /tmp/repo.json -w '%{http_code}' \
-              -H "$AUTH" -H 'Accept: application/vnd.github+json' \
-              -H 'X-GitHub-Api-Version: 2022-11-28' \
-              "https://api.github.com/repos/${REPO}")"
-            if [ "$CODE" != '200' ]; then
-              echo "GitHub token cannot read ${REPO}; HTTP ${CODE}" >&2
-              exit 21
-            fi
-            CODE="$(curl -sS -o /tmp/release-probe.json -w '%{http_code}' -X POST \
-              -H "$AUTH" -H 'Accept: application/vnd.github+json' \
-              -H 'X-GitHub-Api-Version: 2022-11-28' -H 'Content-Type: application/json' \
-              "https://api.github.com/repos/${REPO}/releases" \
-              -d '{"tag_name":"fleet-state","target_commitish":"main","name":"permission-probe"}')"
-            if [ "$CODE" = '422' ] && grep -q 'already_exists' /tmp/release-probe.json; then
-              echo 'FLEET_GITHUB_TOKEN_CONTENTS_WRITE_PASS'
-            else
-              echo "GitHub durable-write permission probe failed; HTTP ${CODE}" >&2
-              cat /tmp/release-probe.json >&2
-              exit 22
-            fi
-
-  historical-worker-smoke:
-    docker:
-      - image: cimg/python:3.12
-    resource_class: medium
-    environment:
-      CF_FAIL_FAST_ON_403: "1"
-    steps:
-      - checkout
-      - run:
-          name: Install worker dependency
-          command: python -m pip install --disable-pip-version-check -q requests
-      - run:
-          name: Run one-day durable daily-CSV smoke on medium executor
-          command: >-
-            python pipeline/circleci_contracts_daily_worker.py
-            --index 1
-            --total 1
-            --history-days 2
-            --max-days 1
-            --out circle-out/historical-smoke
-
-  contracts-finder-daily-shards:
-    parallelism: 30
-    docker:
-      - image: cimg/python:3.12
-    resource_class: medium
-    environment:
-      CF_403_COOLDOWN_SECONDS: "300"
-    steps:
-      - checkout
-      - run:
-          name: Install minimal worker dependency
-          command: python -m pip install --disable-pip-version-check -q requests
-      - run:
-          name: Harvest non-overlapping official daily CSV dates
-          command: >-
-            python pipeline/circleci_contracts_daily_worker.py
-            --index "$CIRCLE_NODE_INDEX"
-            --total "$CIRCLE_NODE_TOTAL"
-            --history-days 360
-            --out "circle-out/daily-shard-$CIRCLE_NODE_INDEX"
-
-  live-search-worker-smoke:
-    docker:
-      - image: cimg/python:3.12
-    resource_class: medium
-    environment:
-      CIRCLE_IO_WORKERS: "1"
-      CF_FAIL_FAST_ON_403: "1"
-    steps:
-      - checkout
-      - run:
-          name: Install worker dependency
-          command: python -m pip install --disable-pip-version-check -q requests
-      - run:
-          name: Smoke current Search API separately from historical harvest
-          command: >-
-            python pipeline/circleci_contracts_worker.py
-            --index 0
-            --total 1
-            --history-days 1
-            --io-workers 1
-            --max-pages 3
-            --out circle-out/live-smoke
+            test -s /tmp/austender-rss.xml
+            grep -Eqi '<rss|<channel|<item' /tmp/austender-rss.xml
+            echo 'CIRCLE_AUSTENDER_RSS_EGRESS_PASS'
 
 workflows:
-  circleci-harvest:
+  austender-egress-probe:
     jobs:
-      - executor-smoke:
+      - austender-rss-egress-smoke:
           filters:
             branches:
-              only: circleci-fleet
-      - github-egress-smoke:
-          requires:
-            - executor-smoke
-          filters:
-            branches:
-              only: circleci-fleet
-      - contracts-finder-source-smoke:
-          requires:
-            - executor-smoke
-          filters:
-            branches:
-              only: circleci-fleet
-      - durable-bridge:
-          requires:
-            - github-egress-smoke
-          filters:
-            branches:
-              only: circleci-fleet
-      - historical-worker-smoke:
-          requires:
-            - durable-bridge
-            - contracts-finder-source-smoke
-          filters:
-            branches:
-              only: circleci-fleet
-      - live-search-worker-smoke:
-          requires:
-            - durable-bridge
-          filters:
-            branches:
-              only: circleci-fleet
-      - contracts-finder-daily-shards:
-          requires:
-            - historical-worker-smoke
-          filters:
-            branches:
-              only: circleci-fleet
+              only: circleci-austender-probe
