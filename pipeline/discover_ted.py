@@ -469,4 +469,13 @@ def run() -> dict:
 
 
 if __name__ == "__main__":
+    mode = os.getenv("DISCOVERY_MODE", "").strip().lower()
+    explicit_query = bool(os.getenv("TED_QUERY", "").strip())
+    orchestrator_disabled = os.getenv("TED_DISABLE_PRODUCTION_ORCHESTRATOR", "").strip().lower() in {"1", "true", "yes"}
+    if mode in {"delta", "reconcile"} and not explicit_query and not orchestrator_disabled:
+        # Production global runs use a fast actionable delta and a deep,
+        # independently year-sharded reconcile. Explicit TED_QUERY runs (smokes,
+        # probes, regression tests) keep the single-query collector unchanged.
+        from ted_production import run_production
+        raise SystemExit(run_production(mode, OUT))
     run()
