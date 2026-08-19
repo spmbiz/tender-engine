@@ -49,6 +49,29 @@ def stats_health(pack_dir):
             bad.append({"path":str(path),"reason":"NOT_LIVE_CANDIDATE_SOURCE","source":source or "UNKNOWN"})
         if source in STRICT_NONZERO_SOURCES and obj.get("current_materialized") is not None and int(obj.get("current_materialized") or 0)==0:
             bad.append({"path":str(path),"reason":"ZERO_CURRENT_MATERIALIZED","source":source})
+        if source == "UK_PCS_OCDS":
+            telemetry = obj.get("telemetry") if isinstance(obj.get("telemetry"), dict) else {}
+            filtered_search_proven = (
+                obj.get("filtered_current_search_proven") is True
+                or telemetry.get("search_navigation_proven") is True
+                or obj.get("direct_filtered_post_proven") is True
+            )
+            if not filtered_search_proven:
+                bad.append({
+                    "path": str(path),
+                    "reason": "PCS_FILTERED_SEARCH_PROOF_MISSING",
+                    "source": source,
+                    "listing_contract": obj.get("listing_contract"),
+                })
+            page_rows = telemetry.get("pages") if isinstance(telemetry.get("pages"), list) else []
+            page_totals = [x.get("total_pages") for x in page_rows if isinstance(x, dict) and x.get("total_pages") is not None]
+            if page_totals and len(set(page_totals)) > 1:
+                bad.append({
+                    "path": str(path),
+                    "reason": "PCS_FILTERED_PAGE_TOTAL_NOT_STABLE",
+                    "source": source,
+                    "page_totals_seen": page_totals[:20],
+                })
         if source in STRICT_EXHAUSTION_SOURCES:
             complete=obj.get("enumeration_complete")
             exhausted=obj.get("enumeration_exhausted", obj.get("exhausted"))
@@ -75,7 +98,7 @@ def main():
         if h["status"]!="OK":degraded.append(name)
     external_present={x.strip().upper() for x in args.external_present.split(",") if x.strip()};external_missing=[x for x in EXTERNAL_REQUIRED_LANES if x.upper() not in external_present]
     clean=not missing and not degraded and not external_missing;status="WORLD_COMPLETE" if clean else "PARTIAL_WORLD_COVERAGE"
-    payload={"contract":"SOURCE_COVERAGE_GUARD_V7_CURRENT_REGISTRY_EXHAUSTION","discovery_mode":args.mode,"coverage_status":status,"worldwide_claim_allowed":clean,"expected_materialized_packs":len(expected_packs),"present_materialized_packs":len(expected_packs)-len(missing),"missing_packs":missing,"degraded_packs":degraded,"external_required_lanes":EXTERNAL_REQUIRED_LANES,"external_present_lanes":sorted(external_present),"external_missing_lanes":external_missing,"strict_exhaustion_sources":sorted(STRICT_EXHAUSTION_SOURCES),"pack_health":health,"semantics":"WORLD_COMPLETE means every configured live-candidate-capable lane materialized cleanly and every adapter with an exhaustion contract proved full traversal. Archive-only lanes, source caps, runtime budgets, request failures or missing exhaustion proof keep coverage PARTIAL. UNGM and PCS Current Opportunities are measured as internal public live lanes with explicit exhaustion contracts. This still does not mean every procurement authority on Earth is configured."}
+    payload={"contract":"SOURCE_COVERAGE_GUARD_V8_PCS_FILTERED_SEARCH_PROOF","discovery_mode":args.mode,"coverage_status":status,"worldwide_claim_allowed":clean,"expected_materialized_packs":len(expected_packs),"present_materialized_packs":len(expected_packs)-len(missing),"missing_packs":missing,"degraded_packs":degraded,"external_required_lanes":EXTERNAL_REQUIRED_LANES,"external_present_lanes":sorted(external_present),"external_missing_lanes":external_missing,"strict_exhaustion_sources":sorted(STRICT_EXHAUSTION_SOURCES),"pack_health":health,"semantics":"WORLD_COMPLETE means every configured live-candidate-capable lane materialized cleanly and every adapter with an exhaustion contract proved full traversal. PCS additionally requires proof that Current Opportunity filtering completed before page traversal and that the result-page total stayed stable, preventing stale All Notices page 1 from receiving false exhaustion credit. Archive-only lanes, source caps, runtime budgets, request failures or missing exhaustion proof keep coverage PARTIAL. This still does not mean every procurement authority on Earth is configured."}
     out=Path(args.out);out.parent.mkdir(parents=True,exist_ok=True);out.write_text(json.dumps(payload,indent=2,ensure_ascii=False),encoding="utf-8");print(json.dumps(payload,indent=2,ensure_ascii=False))
     if args.strict and not clean:raise SystemExit(3)
 if __name__=="__main__":main()
