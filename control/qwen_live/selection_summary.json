@@ -1,30 +1,32 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-19T11:31:21+00:00",
-  "source_run": "32236982231",
+  "generated_at_utc": "2026-08-19T11:36:59+00:00",
+  "source_run": "32225601083",
   "state_rows": 3013,
-  "ledger_rows": 122518,
-  "snapshot_rows": 122518,
-  "blocked_ids": 25819,
-  "durable_attempted_exact_versions_ignored": 155,
-  "valid_exact_hash_current_unattempted": 802,
-  "eligible_keep_for_dce": 693,
+  "ledger_rows": 123248,
+  "snapshot_rows": 123248,
+  "blocked_ids": 25612,
+  "durable_attempted_exact_versions_ignored": 156,
+  "valid_exact_hash_current_unattempted": 819,
+  "eligible_keep_for_dce": 709,
   "review_worthy_rejects_promoted_to_explore": 77,
-  "stale_hash_ignored": 12,
+  "stale_hash_ignored": 0,
   "missing_snapshot": 0,
-  "expired_ignored": 1,
+  "expired_ignored": 4,
   "selected": 160,
   "selection_decisions": {
-    "FIT": 1,
-    "MAYBE": 159
+    "FIT": 5,
+    "MAYBE": 154,
+    "REJECT_OBVIOUS": 1
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
-    "qwen-primary-coded": 1,
+    "qwen-primary-coded": 5,
     "qwen-explore-coded": 48,
-    "qwen-elastic-coded": 111
+    "qwen-reject-audit-coded": 1,
+    "qwen-elastic-coded": 106
   },
   "selection_freshness": {
     "recent_unseen_carryover": 160
@@ -54,18 +56,19 @@
   "base_candidate_pool": 640,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "FIT": 1,
-    "MAYBE": 639
+    "FIT": 5,
+    "MAYBE": 634,
+    "REJECT_OBVIOUS": 1
   },
   "candidate_pool_lanes": {
-    "qwen-primary": 1,
+    "qwen-primary": 5,
     "qwen-open-world-explore": 192,
-    "qwen-reject-audit": 32,
-    "qwen-elastic": 415
+    "qwen-reject-audit": 33,
+    "qwen-elastic": 410
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
-    "noncore_code_contradictions_in_pool": 8,
+    "noncore_code_contradictions_in_pool": 10,
     "positive_code_rows_selected": 0,
     "noncore_code_contradictions_selected": 0,
     "policy": "priority_only_never_drop_never_eligibility",
