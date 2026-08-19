@@ -38,8 +38,13 @@ async def main():
                         "method": req.method,
                         "post_data": (req.post_data or "")[:5000],
                     }
-                    if item not in captured:
-                        captured.append(item)
+                    if "/api/v0/avvisi" in url and resp.status == 200:
+                        try:
+                            body = await resp.text()
+                            item["body_sample"] = body[:50000]
+                        except Exception as exc:
+                            item["body_sample_error"] = repr(exc)
+                    captured.append(item)
             except Exception:
                 pass
 
@@ -70,7 +75,7 @@ async def main():
         await browser.close()
 
     out = {
-        "schema": "ANAC_PVL_PUBLIC_NETWORK_PROBE_V2_RUNNER_CHROME",
+        "schema": "ANAC_PVL_PUBLIC_NETWORK_PROBE_V3_API_BODY_SAMPLE",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "chrome": chrome,
         "pages": pages,
