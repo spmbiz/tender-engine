@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -21,9 +22,10 @@ MAX_PAGES_PER_WINDOW = max(1, int(os.getenv("ANAC_PVL_MAX_PAGES_PER_WINDOW", "10
 REQUEST_RETRIES = max(1, int(os.getenv("ANAC_PVL_REQUEST_RETRIES", "5")))
 PAGE_DELAY = max(0.0, float(os.getenv("ANAC_PVL_PAGE_DELAY_SECONDS", "0.05")))
 QUERY_CODES = os.getenv("ANAC_PVL_CODICE_SCHEDA", "2,4")
-UA = "Tender-Engine/7.0 (+public procurement research; ANAC PVL public API)"
+UA = "Tender-Engine/7.1 (+public procurement research; ANAC PVL public API)"
 S = requests.Session()
 S.headers.update({"User-Agent": UA, "Accept": "application/json"})
+TED_NOTICE_RE = re.compile(r"/(?:detail/)?(\d{4,8}-20\d{2})(?:$|[/?#])", re.I)
 
 
 def clean(value):
@@ -41,6 +43,14 @@ def parse_iso(value):
         return out.astimezone(timezone.utc)
     except Exception:
         return None
+
+
+def ted_publication_number(url):
+    text = clean(url)
+    if not text:
+        return None
+    match = TED_NOTICE_RE.search(text)
+    return match.group(1) if match else None
 
 
 def preferred_template(item):
@@ -66,6 +76,7 @@ def analyse_template(item):
     if not title or title.lower() in {"senza titolo", "untitled", "n/a"}:
         title = description[:1500] or clean(item.get("idAvviso"))
     ted_url = clean(metadata.get("link_eform_ted")) or None
+    ted_number = ted_publication_number(ted_url)
 
     buyers = []
     document_urls = []
@@ -125,6 +136,7 @@ def analyse_template(item):
         "buyers": buyers,
         "document_urls": document_urls,
         "ted_url": ted_url,
+        "ted_publication_number": ted_number,
         "cpv": cpv,
         "cigs": cigs,
         "nature": nature,
@@ -188,6 +200,7 @@ def materialize(item):
         "portal": "ANAC_PVL",
         "notice_id": notice_id,
         "id_appalto": id_appalto,
+        "ted_publication_number": analysed["ted_publication_number"],
         "title": analysed["title"],
         "buyer": analysed["buyer"],
         "buyers": analysed["buyers"],
@@ -216,6 +229,7 @@ def materialize(item):
             "id_appalto": id_appalto,
             "document_urls": analysed["document_urls"],
             "ted_url": analysed["ted_url"],
+            "ted_publication_number": analysed["ted_publication_number"],
             "api_url": API_URL,
         },
         "discovered_at": NOW.isoformat(),
@@ -243,6 +257,7 @@ def write_stats(records, *, windows, pages, api_elements_seen, errors, window_co
         "deadline_unknown": sum(1 for row in rows if not row.get("deadline")),
         "with_document_urls": sum(1 for row in rows if (row.get("route") or {}).get("document_urls")),
         "with_ted_link": sum(1 for row in rows if (row.get("route") or {}).get("ted_url")),
+        "with_ted_publication_number": sum(1 for row in rows if row.get("ted_publication_number")),
         "publication_lookback_days": LOOKBACK_DAYS,
         "window_days": WINDOW_DAYS,
         "query_codes": QUERY_CODES,
@@ -268,7 +283,7 @@ def write_stats(records, *, windows, pages, api_elements_seen, errors, window_co
         "generated_at": NOW.isoformat(),
         "source_url": PORTAL_URL,
         "api_url": API_URL,
-        "semantics": "Official ANAC PVL /bandi JSON API. Exact idAvviso is preserved; future dataScadenza proves currentness, while missing deadline stays UNKNOWN. DCE and TED routes are taken directly from the API payload. Coverage remains recall-only until full current-universe semantics are proven.",
+        "semantics": "Official ANAC PVL /bandi JSON API. Exact idAvviso is preserved; future dataScadenza proves currentness, while missing deadline stays UNKNOWN. DCE and TED routes plus exact TED publication-number linkage are taken directly from the API payload. Coverage remains recall-only until full current-universe semantics are proven.",
     }
     (OUT / "stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
     return stats
@@ -313,8 +328,6 @@ def main():
                 if row:
                     records[row["candidate_id"]] = row
 
-            # Durable local checkpoint: a runner timeout cannot erase every page
-            # already recovered from the official API.
             write_stats(
                 records,
                 windows=windows,
