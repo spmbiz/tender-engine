@@ -34,7 +34,6 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **TED:568438-2026** · POL · p=40 · deadline=2026-09-14T02:00:00+00:00 · blockers=none · Poland – Advertising campaign services – Usługa opracowania i przeprowadzenia drugiej edycji kampanii promocyjnej oraz obsługi medialnej w ramach projektu „PPO WSL 2030. Utworzenie Regionalnego Obserwatorium Innowacji
 
 ## automation_data
-- **US-SAM:1739402e244d46cbb7458fed7566c269** · US · p=56 · deadline=2026-08-19T07:30:00+00:00 · blockers=none · Scanning Total Station with Extended-Range Wireless
 - **TED:570364-2026** · IRL · p=54 · deadline=2026-09-16T12:00:00+00:00 · blockers=none · Ireland – Global navigation and positioning systems (GPS or equivalent) – National Geodetic Surveying Infrastructure Upgrade for Tailte Éireann
 - **TED:366748-2026** · NLD · p=48 · deadline=2026-09-03T02:00:00+00:00 · blockers=none · Netherlands – World wide web (www) site design services – Onderhoud, beheer en doorontwikkeling websites
 - **US-SAM:bbe836c5d7ba4e2eb2fa5dca3296f742** · US · p=46 · deadline=2026-08-20T17:00:00+00:00 · blockers=none · Iron Stable Isotope Analysis
@@ -54,10 +53,10 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **US-SAM:81da075a26ef4e9fa5568576fc5cacbc** · US · p=46 · deadline=2026-11-30T00:00:00+00:00 · blockers=none · FIGHT TONIGHT
 - **US-SAM:89553cca5b4c4bf485408853f4b75fcb** · US · p=46 · deadline=2026-11-30T00:00:00+00:00 · blockers=none · FIGHT TONIGHT
 - **US-SAM:9a852ee40820424eb721e1fb7163d8bf** · US · p=46 · deadline=2026-11-30T00:00:00+00:00 · blockers=none · FIGHT TONIGHT
+- **US-SAM:a801e89d66f248519a2804ca5eb352d7** · US · p=46 · deadline=2026-11-30T00:00:00+00:00 · blockers=none · FIGHT TONIGHT
 
 ## design_dtp
 - **TED:522221-2026** · FRA · p=86 · deadline=2026-09-07T02:00:00+00:00 · blockers=none · France – Graphic design services – Prestations graphiques, vidéos, podcasts, impression et rédaction
-- **TED:462381-2026** · FRA · p=78 · deadline=2026-08-19T10:00:00+00:00 · blockers=none · France – Typing, word-processing and desktop publishing services – Prestations de sténotypiste, de retranscription et de transcription
 - **TED:530167-2026** · FRA · p=78 · deadline=2026-09-14T02:00:00+00:00 · blockers=none · France – Printing services – Conception, impression et distribution du magazine &amp;quot;Puy-de-Dôme en mouvement&amp;quot;- Lot 2
 - **TED:482302-2026** · FRA · p=74 · deadline=2026-09-04T15:00:00+00:00 · blockers=none · France – Graphic design services – Réalisation, impression et routage du journal interne Filieris
 - **TED:550488-2026** · FRA · p=71 · deadline=2026-09-30T02:00:00+00:00 · blockers=none · France – Advertising consultancy services – PRESTATIONS DE COMMUNICATION POUR L'EPA NICE ECOVALLEE
@@ -76,6 +75,7 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **FR-BOAMP:26-80272** · FR · p=64 · deadline=2026-09-18T10:00:00+00:00 · blockers=none · CENTRALE D'ACHAT - Stratégie de communication et conception graphique
 - **FR-BOAMP:26-79336** · FR · p=64 · deadline=2026-09-21T12:00:00+00:00 · blockers=none · Conseil et accompagnement à la refonte de la communication institutionnelle de la Communauté de communes de Montesquieu : stratégie, identité visuelle et magazine communautaire
 - **FR-BOAMP:26-80176** · FR · p=64 · deadline=2026-09-21T12:00:00+00:00 · blockers=none · Prestations de conception graphique, de mise en page, d'impression et de livraison des supports d'information et de communication pour la commune de Bièvres
+- **FR-BOAMP:26-78312** · FR · p=64 · deadline=2026-10-06T10:00:00+00:00 · blockers=none · PRESTATIONS DE MISE EN PAGE, DE RÉDACTION ET D'IMPRESSION
 
 ## digitization
 - **TED:209183-2024** · FRA · p=72 · deadline=UNKNOWN · blockers=none · France – Miscellaneous software development services and computer systems – Mise à disposition d’une solution de gestion de remboursement des frais de déplacements professionnels en mode software as a service et de prestations associées
@@ -99,8 +99,6 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **TED:448172-2026** · FRA · p=40 · deadline=2026-09-07T02:00:00+00:00 · blockers=none · France – Camping sites and other non-hotel accommodation – Concession de service public pour l'exploitation du camping de Strasbourg
 - **TED:476899-2026** · FRA · p=40 · deadline=2026-09-11T02:00:00+00:00 · blockers=none · France – Meal-preparation services – Fourniture et livraison de repas en liaison froide et de goûters pour les Accueils de Loisirs Sans Hébergement et les structures petite enfance de la Communauté Alès Agglomération
 - **TED:572826-2026** · FRA · p=40 · deadline=2026-09-18T02:00:00+00:00 · blockers=none · France – Accommodation, building and window cleaning services – Accord-cadre à bons de commande relatif au nettoyage des locaux et des vitres des bâtiments départementaux et au nettoyage partiel de certains collèges du Val d'Oise (8 lots)
-- **US-SAM:08fd9bd20bcc49069edcf06fa126c2af** · US · p=38 · deadline=2026-08-27T18:00:00+00:00 · blockers=none · JOURNAL SUBMISSION AND WEB HOSTING � JOURNAL OF REPLICATION AND REPRODUCIBILITY
-- **US-SAM:57a826bdee1143a7903cfa82e3adcbd1** · US · p=38 · deadline=2026-08-27T18:00:00+00:00 · blockers=none · JOURNAL SUBMISSION AND WEB HOSTING � JOURNAL OF REPLICATION AND REPRODUCIBILITY
 
 ## media_monitoring
 - **TED:489984-2026** · NOR · p=48 · deadline=2026-08-26T00:00:00+00:00 · blockers=none · Norway – News-agency services – Monitoring and press service
@@ -108,6 +106,7 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **US-SAM:46d3624427c64e4ea996ffbc264bba53** · US · p=46 · deadline=2026-08-25T23:00:00+00:00 · blockers=none · GUATEMALA Social Listening and Digital Monitoring Services
 - **US-SAM:e49eab4f43984750ae63f336578bbee7** · US · p=46 · deadline=2026-08-25T23:00:00+00:00 · blockers=none · GUATEMALA Social Listening and Digital Monitoring Services
 - **DK-UDBUD:9f77d7a2-ded8-4142-8a3f-b6cfff72ab6d:01** · DK · p=46 · deadline=2026-08-30T21:59:59+00:00 · blockers=none · Media Monitoring System
+- **ZA_ETENDERS_OCDS:ocds-9t57fa-166145-2026-08-19** · ZA · p=40 · deadline=2026-08-25T12:00:00+00:00 · blockers=none · PR10117750
 - **TED:444818-2026** · NOR · p=40 · deadline=2026-08-26T00:00:00+00:00 · blockers=none · Norway – News-agency services – Framework agreement media monitoring
 - **TED:471471-2026** · BEL · p=40 · deadline=2026-08-27T21:59:59+00:00 · blockers=none · Belgium – Public relations services – Call for Tender for media monitoring services
 - **TED:519741-2026** · BEL · p=40 · deadline=2026-08-27T21:59:59+00:00 · blockers=none · Belgium – Public relations services – Call for Tender for media monitoring services
@@ -141,9 +140,8 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **TED:782153-2025** · FRA · p=60 · deadline=2026-12-31T01:00:00+00:00 · blockers=none · France – Information and promotion products – Système d'acquisition dynamique (SAD) - Acquisition de goodies et textiles personnalisés
 - **TED:426994-2026** · FRA · p=56 · deadline=2026-12-31T01:00:00+00:00 · blockers=none · France – Information and promotion products – FOURNITURE DE GOODIES
 - **TED:424272-2026** · FRA · p=54 · deadline=2026-09-15T02:00:00+00:00 · blockers=none · France – Information and promotion products – 2026-FA0081 Fourniture d'articles promotionnels aux couleurs du Département de la Moselle
-- **US-SAM:e497672a9dba403392c8e799921bb095** · US · p=48 · deadline=2026-08-19T16:00:00+00:00 · blockers=none · 189AW Promotional Items
-- **US-SAM:f7b2e6266fd04bb297dccd8c26367f41** · US · p=48 · deadline=2026-08-19T16:00:00+00:00 · blockers=none · 189AW Promotional Items
 - **CA:WS4246767482** · CA · p=48 · deadline=2026-10-31T18:00:00+00:00 · blockers=none · EN578-191297 Request for Supply Arrangement
+- **ZA_ETENDERS_OCDS:ocds-9t57fa-166181-2026-08-19** · ZA · p=46 · deadline=2026-08-24T09:00:00+00:00 · blockers=none · IM1222026
 - **TED:513158-2026** · MLT · p=46 · deadline=2026-08-28T21:59:59+00:00 · blockers=none · Malta – Clothing, footwear, luggage articles and accessories – Provision of EUAA Branded Merchandise and Operational Clothing
 - **TED:564438-2026** · FRA · p=46 · deadline=2026-09-14T02:00:00+00:00 · blockers=none · France – Information and promotion products – PROCUREMENT OF PROMOTIONAL ITEMS AND ELECTRONIC ACCESSORIES AND RELATED ITEMS
 - **MT-EPPS:13719559** · MT · p=42 · deadline=UNKNOWN · blockers=none · Call for Quotes in Lots for the Provision of Branded Merchandise Items, Including Environmentally Friendly Textile Products for the Malta Financial Services Authority.
@@ -151,11 +149,13 @@ Review-order evidence only. No candidate is GREEN before DCE.
 ## research_surveys
 - **US-SAM:b0006a53c0d54778a4d6841f7cf5eee2** · US · p=56 · deadline=2026-08-28T17:00:00+00:00 · blockers=none · TCG BOSS Equipment and Link-16 Related Products
 - **US-SAM:dc270dd3a02c43149e4bb39994a9d8b9** · US · p=47 · deadline=2026-08-28T17:00:00+00:00 · blockers=SET_ASIDE_OR_LOCAL_RESTRICTION · Fuel Management Cloud Software & Integration (SaaS) at North Dakota National Guard
+- **US-SAM:f651ef641ed44afba2a8f7eddfdef7f6** · US · p=47 · deadline=2026-08-28T17:00:00+00:00 · blockers=SET_ASIDE_OR_LOCAL_RESTRICTION · AMENDMENT No. 001: Fuel Management Cloud Software & Integration (SaaS) at North Dakota National Guard
 - **US-SAM:991d1eb9836945da9aca9d00105e8293** · US · p=47 · deadline=2026-09-01T14:00:00+00:00 · blockers=SOURCES_SOUGHT_OR_RFI · Sources Sought � Motorola GTR 8000 Land Mobile Radio (LMR) System with OCONUS Installation in Japan
 - **US-SAM:29daee56de8744ffa8bd226a9ad8211b** · US · p=47 · deadline=2026-09-10T00:00:00+00:00 · blockers=SOLE_SOURCE_OR_OEM · eQUIP Software Licenses
 - **US-SAM:f568b8a1118a4e0b80fbf2481e8129d5** · US · p=47 · deadline=2026-09-12T00:00:00+00:00 · blockers=SOLE_SOURCE_OR_OEM · Rail Traffic Controller (RTC) License and Maintenance Plan
 - **US-SAM:7d47e10e7540427eaf95994640a417dc** · US · p=46 · deadline=2026-08-19T20:00:00+00:00 · blockers=none · 58--SYNTHESIZER,ELECTRI
 - **US-SAM:bdda7dfff2f34fb7b2531cfc00880d70** · US · p=46 · deadline=2026-08-20T15:00:00+00:00 · blockers=none · Laundry & Linen Service for Los Angeles AFB
+- **US-SAM:f2573acd22934aa598860f1fb2b3a3f1** · US · p=46 · deadline=2026-08-21T21:00:00+00:00 · blockers=none · 48--ACTUATOR,ELECTRO-ME
 - **US-SAM:7d0eabb8413f4024a3f1652737fdeddc** · US · p=46 · deadline=2026-08-22T18:00:00+00:00 · blockers=none · (2) Surgery Registered Nurse service provided to the Pine Ridge Indian Health Service Hospital
 - **US-SAM:87741a447d254f82ad888d4ea141e067** · US · p=46 · deadline=2026-08-22T21:00:00+00:00 · blockers=SOLE_SOURCE_OR_OEM,SOURCES_SOUGHT_OR_RFI · Mouse Digital Ventilated Cage (DVC) Individually Ventilated Rack System � Pilot Expansion and Software License
 - **US-SAM:388d5752e34e45bf824000249306bc09** · US · p=46 · deadline=2026-08-24T04:00:00+00:00 · blockers=none · 49--CABLE ASSY,HIGH VOL, IN REPAIR/MODIFICATION OF
@@ -167,8 +167,6 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **US-SAM:a3c1cbc0f86d463182d1ee4fcaac5854** · US · p=46 · deadline=2026-08-26T20:30:00+00:00 · blockers=none · 16--ACTUATOR,ELECTROMEC, IN REPAIR/MODIFICATION OF
 - **US-SAM:17e8df2916ef4d8296fdd36292e60ce1** · US · p=46 · deadline=2026-08-26T21:00:00+00:00 · blockers=none · NATO Business Opportunity: Commercial Cloud Service Provider Marketplace � Protected Business Network
 - **US-SAM:f71f30f8da1e4d95b1e8a868805e49bb** · US · p=46 · deadline=2026-08-31T00:00:00+00:00 · blockers=none · Construction of Fire Protection System at Building C2 at Naval Weapons Station Earle, NJ
-- **US-SAM:70f7d6b96d4c42d5b8b40d9935729e0a** · US · p=46 · deadline=2026-08-31T04:00:00+00:00 · blockers=none · 58--PROCESSOR RADAR, IN REPAIR/MODIFICATION OF
-- **US-SAM:f543748add7c4b65869a89c6f0078ba2** · US · p=46 · deadline=2026-08-31T04:00:00+00:00 · blockers=none · 66--LIQUFIER MODULE, IN REPAIR/MODIFICATION OF
 
 ## social_marketing
 - **TED:550488-2026** · FRA · p=71 · deadline=2026-09-30T02:00:00+00:00 · blockers=none · France – Advertising consultancy services – PRESTATIONS DE COMMUNICATION POUR L'EPA NICE ECOVALLEE
@@ -182,10 +180,11 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **UNGM:306507** · CANADA · p=38 · deadline=2026-08-25T00:00:00+00:00 · blockers=none · Open in a new window
 
 ## software_resale
-- **US-SAM:1739402e244d46cbb7458fed7566c269** · US · p=56 · deadline=2026-08-19T07:30:00+00:00 · blockers=none · Scanning Total Station with Extended-Range Wireless
+- **US-SAM:248b15ee8a474879a914216999cdfb96** · US · p=56 · deadline=2026-08-24T14:00:00+00:00 · blockers=none · 5965--WAYA HEALTH VR HEADSET W/SOFTWARE LICENSE
 - **US-SAM:b0006a53c0d54778a4d6841f7cf5eee2** · US · p=56 · deadline=2026-08-28T17:00:00+00:00 · blockers=none · TCG BOSS Equipment and Link-16 Related Products
 - **ZA_ETENDERS_OCDS:ocds-9t57fa-165925-2026-08-18** · ZA · p=54 · deadline=2026-08-24T11:00:00+00:00 · blockers=none · POS9919
 - **TED:570364-2026** · IRL · p=54 · deadline=2026-09-16T12:00:00+00:00 · blockers=none · Ireland – Global navigation and positioning systems (GPS or equivalent) – National Geodetic Surveying Infrastructure Upgrade for Tailte Éireann
+- **ZA_ETENDERS_OCDS:ocds-9t57fa-163870-2026-07-29** · ZA · p=50 · deadline=2026-08-20T11:00:00+00:00 · blockers=none · UIF4/2026/2027
 - **TED:460390-2026** · NOR · p=50 · deadline=2026-08-24T00:00:00+00:00 · blockers=none · Norway – Software package and information systems – Framework agreement for the procurement of software licences
 - **TED:530112-2026** · IRL · p=50 · deadline=2026-08-26T01:00:00+00:00 · blockers=none · Ireland – Business transaction and personal business software package – Self-Service Kiosk Terminals, Kiosk OS Integration, and Associated Software Licensing
 - **TED:527326-2026** · IRL · p=50 · deadline=2026-08-28T01:00:00+00:00 · blockers=none · Ireland – Desktop-publishing software package – Adobe (Acrobat Pro and Creative Cloud) Software Licensing and Product Support
@@ -194,17 +193,15 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **US-SAM:2e1bfb153fbf3e898a9cbd1b0e255ae2** · US · p=50 · deadline=UNKNOWN · blockers=none · 70--Endgame software subscription renewals
 - **US-SAM:192d177cce134254af5a5055dbfc8424** · US · p=48 · deadline=2026-08-20T00:00:00+00:00 · blockers=none · Oracle Enterprise Software License Maintenance Support - Brand Name Justification
 - **US-SAM:0377f6cba8b74cb78a9b515c8d31e9d4** · US · p=48 · deadline=2026-08-20T16:00:00+00:00 · blockers=none · MATLAB LICENSES/TOOLBOXES
+- **US-SAM:3bfe842758714e909b756e968fa45742** · US · p=48 · deadline=2026-08-20T23:00:00+00:00 · blockers=none · 5G Cellular Base Station (BRAND NAME Ericsson)
 - **CA:BPM026312/34429** · CA · p=48 · deadline=2026-08-21T14:00:00+00:00 · blockers=none · R212392 Adobe License Renewal for RCMP
+- **US-SAM:d2fe9be8ab6b4b7b8d0eefd594242c02** · US · p=48 · deadline=2026-08-21T16:00:00+00:00 · blockers=none · Quo Data - ProLab Plus Licenses
 - **CA:BPM026338/34461** · CA · p=48 · deadline=2026-08-22T14:00:00+00:00 · blockers=none · Dynatrace – Department of Employment and Social Development
 - **TED:512568-2026** · CHE · p=48 · deadline=2026-08-24T02:00:00+00:00 · blockers=none · Switzerland – Time accounting or human resources software package – Leapsome Licenses
 - **US-SAM:fd0852967918430e9244ad12923c1dc8** · US · p=48 · deadline=2026-08-24T19:00:00+00:00 · blockers=none · Berla iVe Automobile Forensic License Support
 - **US-SAM:461881533a864d538a707fcf6aa0fbc0** · US · p=48 · deadline=2026-08-27T16:00:00+00:00 · blockers=none · Monarch Software Licenses Renewal
-- **US-SAM:88169df4f9924840a9c75f85c4013203** · US · p=48 · deadline=2026-08-30T00:00:00+00:00 · blockers=none · Award Notice - USAFA Liquid Chromatography Replacement
-- **US-SAM:3f814d8a4b2e487c9e6d01ea0e80ffcf** · US · p=48 · deadline=2026-09-03T00:00:00+00:00 · blockers=none · Navisworks Manage Government Annual Subscription Renewal
-- **US-SAM:3cedfd0ad17b4f8aa5e7daefcd5ef103** · US · p=48 · deadline=2026-09-04T00:00:00+00:00 · blockers=none · Mirantis and Zimperium Software License Subscription Renewals
 
 ## transcription
-- **TED:462381-2026** · FRA · p=78 · deadline=2026-08-19T10:00:00+00:00 · blockers=none · France – Typing, word-processing and desktop publishing services – Prestations de sténotypiste, de retranscription et de transcription
 - **TED:757529-2025** · FRA · p=70 · deadline=UNKNOWN · blockers=none · France – Typing, word-processing and desktop publishing services – Prestations de reconnaissance vocale ou de sténotypie suivie de retranscription des séances du Conseil d'administration du CASVP et de ses organes consultatifs.
 - **TED:539747-2026** · FRA · p=58 · deadline=2026-09-03T22:00:00+00:00 · blockers=none · France – Word-processing services – Prestations de sténotypie et frappe de courriers ou comptes rendus médicaux
 - **US-SAM:b440523eeea948f9977b78e73d6732d6** · US · p=38 · deadline=2026-08-20T18:00:00+00:00 · blockers=none · A1: R606--RFQ: VISN16-Wide Court Reporting and Transcription - SDVOSB Set-Aside - IDC
@@ -227,7 +224,7 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **TED:380266-2024** · DNK · p=40 · deadline=2034-08-18T22:00:00+00:00 · blockers=none · Denmark – Translation services – Dynamisk indkøbssystem om oversættelsesydelser
 - **UNGM:309143** · AFGHANISTAN · p=38 · deadline=2026-08-20T00:00:00+00:00 · blockers=none · Open in a new window
 - **US-SAM:dfe85182f54e4ce9a0a05eb49e1eb847** · US · p=38 · deadline=2026-08-20T00:00:00+00:00 · blockers=none · Human Translation Services
-- **UNGM:311355** · SRI LANKA · p=38 · deadline=2026-08-27T00:00:00+00:00 · blockers=none · Open in a new window
+- **UNGM:311541** · UNITED STATES OF AMERICA · p=38 · deadline=2026-08-25T00:00:00+00:00 · blockers=none · Open in a new window
 
 ## video_media
 - **TED:567440-2026** · NOR · p=48 · deadline=2026-09-14T10:00:00+00:00 · blockers=none · Norway – Advertising campaign services – Stage 1 - Prequalification for a Framework agreement advertising, campaigns and graphic design.
@@ -242,6 +239,7 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **TED:534361-2026** · NLD · p=40 · deadline=2026-09-21T10:00:00+00:00 · blockers=none · Netherlands – Services in connection with motion-picture and video-tape production – Video en animatie
 - **UNGM:310961** · ARMENIA · p=38 · deadline=2026-08-25T00:00:00+00:00 · blockers=none · Open in a new window
 - **UNGM:311390** · SAUDI ARABIA · p=38 · deadline=2026-08-25T00:00:00+00:00 · blockers=none · Open in a new window
+- **UNGM:311625** · BOSNIA AND HERZEGOVINA · p=38 · deadline=2026-08-26T00:00:00+00:00 · blockers=none · Open in a new window
 
 ## web_cms
 - **TED:522221-2026** · FRA · p=86 · deadline=2026-09-07T02:00:00+00:00 · blockers=none · France – Graphic design services – Prestations graphiques, vidéos, podcasts, impression et rédaction
@@ -262,6 +260,6 @@ Review-order evidence only. No candidate is GREEN before DCE.
 - **TED:473281-2026** · DEU · p=59 · deadline=2026-08-26T10:00:00+00:00 · blockers=none · Germany – IT services: consulting, software development, Internet and support – Support und Relaunch der Website www.frankfurt-inklusive.de und des Stadtführers für Menschen mit Behinderungen
 - **DE-DOE:25720470:1** · DE · p=57 · deadline=UNKNOWN · blockers=none · Website-Neuentwicklung Girls'Day und Boys'Day (TYPO3)
 - **DE-DOE:4adfbe6f-ebf9-403e-953b-bb7b90ed901f:01** · DE · p=57 · deadline=UNKNOWN · blockers=none · Betreuung und Weiterentwicklung Websites
+- **US-SAM:248b15ee8a474879a914216999cdfb96** · US · p=56 · deadline=2026-08-24T14:00:00+00:00 · blockers=none · 5965--WAYA HEALTH VR HEADSET W/SOFTWARE LICENSE
 - **TED:563453-2026** · FRA · p=56 · deadline=2026-09-04T02:00:00+00:00 · blockers=none · France – World wide web (www) site design services – Création du nouveau site web de NEOMA BUSINESS SCHOOL avec accompagnement technique
-- **TED:565587-2026** · IRL · p=55 · deadline=2026-08-27T11:00:00+00:00 · blockers=none · Ireland – IT services: consulting, software development, Internet and support – Provision of a Single Party Framework for the ongoing support, maintenance, and development of YourSpace Portals, associated websites, associated systems and associated services.
 
