@@ -1,0 +1,95 @@
+name: PCS Direct V13 Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pcs-direct-v13-smoke.yml'
+      - 'pipeline/discover_uk_pcs_current_direct_v13.py'
+      - 'control/pcs_direct_v13_smoke_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          fetch-tags: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q 'playwright>=1.46,<2' beautifulsoup4
+      - name: Reuse runner Chrome
+        shell: bash
+        run: |
+          chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
+      - name: Run bounded V13 state-chain smoke
+        shell: bash
+        env:
+          DISCOVERY_OUT: pcs-v13-smoke
+          PCS_DIRECT_HARD_MAX_PAGES: '4'
+        run: |
+          set +e
+          python pipeline/discover_uk_pcs_current_direct_v13.py
+          rc=$?
+          export ADAPTER_RC="$rc"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('pcs-v13-smoke/stats.json')
+          s=json.loads(p.read_text()) if p.exists() else {'errors':[{'type':'STATS_MISSING'}]}
+          errors=s.get('errors') or []
+          non_cap=[x for x in errors if not (isinstance(x,dict) and x.get('type')=='HARD_PAGE_CAP_REACHED')]
+          payload={
+            'schema':'PCS_DIRECT_V13_STATE_CHAIN_SMOKE_V1',
+            'adapter_exit_code':int(os.environ['ADAPTER_RC']),
+            'listing_contract':s.get('listing_contract'),
+            'state_chain_bootstrap_proven':s.get('state_chain_bootstrap_proven'),
+            'pages_fetched':s.get('pages_fetched'),
+            'total_pages':s.get('total_pages'),
+            'total_reported':s.get('total_reported'),
+            'source_rows_seen':s.get('source_rows_seen'),
+            'current_materialized':s.get('current_materialized'),
+            'non_cap_errors':non_cap,
+            'expected_cap_error':any(isinstance(x,dict) and x.get('type')=='HARD_PAGE_CAP_REACHED' for x in errors),
+          }
+          payload['pass_state_chain']=(
+            payload['state_chain_bootstrap_proven'] is True
+            and int(payload['pages_fetched'] or 0)==4
+            and int(payload['total_pages'] or 0)>=4
+            and int(payload['total_reported'] or 0)>0
+            and int(payload['source_rows_seen'] or 0)>0
+            and int(payload['current_materialized'] or 0)>0
+            and not non_cap
+            and payload['expected_cap_error'] is True
+          )
+          Path('control').mkdir(exist_ok=True)
+          Path('control/pcs_direct_v13_smoke.json').write_text(json.dumps(payload,indent=2)+'\n')
+          print(json.dumps(payload,indent=2))
+          PY
+          exit 0
+      - name: Persist verdict
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f control/pcs_direct_v13_smoke.json || printf '%s\n' '{"schema":"PCS_DIRECT_V13_WORKFLOW_FAILURE","pass_state_chain":false}' > control/pcs_direct_v13_smoke.json
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add control/pcs_direct_v13_smoke.json
+          git diff --cached --quiet && exit 0
+          git commit -m "diag: persist PCS direct V13 smoke ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5 6; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
