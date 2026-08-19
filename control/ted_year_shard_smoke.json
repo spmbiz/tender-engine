@@ -1,0 +1,66 @@
+{
+  "schema": "TED_YEAR_SHARD_ARCHITECTURE_SMOKE_V1",
+  "merge_exit_code": 0,
+  "expected_years": [
+    2016,
+    2025,
+    2026
+  ],
+  "complete_years": [
+    2016,
+    2025,
+    2026
+  ],
+  "shard_count_expected": 3,
+  "shard_count_complete": 3,
+  "total_reported": 308264,
+  "source_items_seen": 308264,
+  "materialized_unique": 308264,
+  "current_materialized": 46462,
+  "open_confirmed_by_future_deadline": 44200,
+  "open_unverified_no_parseable_deadline": 2262,
+  "enumeration_complete": true,
+  "errors": [],
+  "shards": [
+    {
+      "year": 2016,
+      "query": "PD = (20160101 <> 20161231) AND form-type = competition",
+      "pages": 2,
+      "total_reported": 247,
+      "source_items_seen": 247,
+      "materialized_unique": 247,
+      "current_materialized": 247,
+      "enumeration_complete": true,
+      "errors": [],
+      "rate_limit_events": 0,
+      "malformed_json_retry_events": 0
+    },
+    {
+      "year": 2025,
+      "query": "PD = (20250101 <> 20251231) AND form-type = competition",
+      "pages": 626,
+      "total_reported": 156079,
+      "source_items_seen": 156079,
+      "materialized_unique": 156079,
+      "current_materialized": 3709,
+      "enumeration_complete": true,
+      "errors": [],
+      "rate_limit_events": 0,
+      "malformed_json_retry_events": 0
+    },
+    {
+      "year": 2026,
+      "query": "PD = (20260101 <> 20261231) AND form-type = competition",
+      "pages": 609,
+      "total_reported": 151938,
+      "source_items_seen": 151938,
+      "materialized_unique": 151938,
+      "current_materialized": 42506,
+      "enumeration_complete": true,
+      "errors": [],
+      "rate_limit_events": 0,
+      "malformed_json_retry_events": 0
+    }
+  ],
+  "pass": true
+}
