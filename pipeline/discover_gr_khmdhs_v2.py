@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote
@@ -15,11 +17,16 @@ OUT = Path(os.getenv("DISCOVERY_OUT", "discovery/global/GR_KHMDHS"))
 OUT.mkdir(parents=True, exist_ok=True)
 NOW = datetime.now(timezone.utc)
 BASE = "https://cerpp.eprocurement.gov.gr/khmdhs-opendata"
-UA = "Tender-Engine/7.1 (+official Greece KIMDIS Open Data; future-deadline shards)"
+UA = "Tender-Engine/7.2 (+official Greece KIMDIS Open Data; paced future-deadline shards)"
 WINDOW_DAYS = max(1, min(180, int(os.getenv("GR_FINAL_WINDOW_DAYS", "180"))))
 HORIZON_YEAR = max(NOW.year, min(2100, int(os.getenv("GR_FINAL_HORIZON_YEAR", "2100"))))
-WORKERS = max(1, min(5, int(os.getenv("GR_WORKERS", "3"))))
-RETRIES = max(1, min(8, int(os.getenv("GR_RETRIES", "5"))))
+WORKERS = max(1, min(5, int(os.getenv("GR_WORKERS", "2"))))
+RETRIES = max(1, min(10, int(os.getenv("GR_RETRIES", "7"))))
+MIN_REQUEST_INTERVAL = max(0.18, float(os.getenv("GR_MIN_REQUEST_INTERVAL_SECONDS", "0.45")))
+MAX_RETRY_AFTER = max(1.0, float(os.getenv("GR_MAX_RETRY_AFTER_SECONDS", "90")))
+
+_RATE_LOCK = threading.Lock()
+_NEXT_REQUEST_AT = 0.0
 
 
 def clean(value: Any) -> str:
@@ -81,6 +88,63 @@ def window_manifest() -> list[tuple[date, date]]:
     return windows
 
 
+def pace_request() -> None:
+    """Serialize request starts across worker threads below the publisher limit."""
+    global _NEXT_REQUEST_AT
+    with _RATE_LOCK:
+        now = time.monotonic()
+        if _NEXT_REQUEST_AT > now:
+            time.sleep(_NEXT_REQUEST_AT - now)
+            now = time.monotonic()
+        _NEXT_REQUEST_AT = max(now, _NEXT_REQUEST_AT) + MIN_REQUEST_INTERVAL
+
+
+def retry_after_seconds(response: requests.Response) -> float | None:
+    raw = clean(response.headers.get("Retry-After"))
+    if not raw:
+        return None
+    try:
+        return max(0.0, min(MAX_RETRY_AFTER, float(raw)))
+    except Exception:
+        pass
+    try:
+        when = parsedate_to_datetime(raw)
+        if when.tzinfo is None:
+            when = when.replace(tzinfo=timezone.utc)
+        seconds = (when - datetime.now(timezone.utc)).total_seconds()
+        return max(0.0, min(MAX_RETRY_AFTER, seconds))
+    except Exception:
+        return None
+
+
+def verified_no_data_404(response: requests.Response, page: int) -> bool:
+    """Accept 404 as an empty window only when the publisher explicitly says so."""
+    if response.status_code != 404 or page != 0:
+        return False
+    candidates: list[str] = []
+    try:
+        payload = response.json()
+        if isinstance(payload, dict):
+            for key in ("error", "message", "detail", "title"):
+                if payload.get(key) is not None:
+                    candidates.append(clean(payload.get(key)))
+        elif isinstance(payload, str):
+            candidates.append(clean(payload))
+    except Exception:
+        pass
+    candidates.append(clean(response.text))
+    haystack = " | ".join(x for x in candidates if x).lower()
+    return any(
+        phrase in haystack
+        for phrase in (
+            "no data found for the given criteria",
+            "no data found",
+            "δεν βρέθηκαν δεδομένα",
+            "δεν βρεθηκαν δεδομενα",
+        )
+    )
+
+
 def fetch_page(session: requests.Session, start: date, end: date, page: int) -> dict[str, Any]:
     payload = {
         "finalDateFrom": start.strftime("%Y-%m-%d 00:00"),
@@ -89,14 +153,33 @@ def fetch_page(session: requests.Session, start: date, end: date, page: int) -> 
     }
     last: Exception | None = None
     for attempt in range(RETRIES):
+        response: requests.Response | None = None
         try:
+            pace_request()
             response = session.post(
                 f"{BASE}/notice",
                 params={"page": page},
                 json=payload,
                 timeout=90,
             )
-            if response.status_code in {408, 425, 429, 500, 502, 503, 504}:
+            if verified_no_data_404(response, page):
+                return {
+                    "content": [],
+                    "totalPages": 0,
+                    "totalElements": 0,
+                    "last": True,
+                    "empty": True,
+                    "_verified_no_data_404": True,
+                }
+            if response.status_code == 429:
+                retry_after = retry_after_seconds(response)
+                wait = retry_after if retry_after is not None else min(60.0, 3.0 * (attempt + 1) ** 2)
+                last = RuntimeError(f"HTTP_429 retry_after={retry_after!r}")
+                if attempt + 1 < RETRIES:
+                    time.sleep(wait)
+                    continue
+                raise last
+            if response.status_code in {408, 425, 500, 502, 503, 504}:
                 raise RuntimeError(f"HTTP_{response.status_code}")
             response.raise_for_status()
             data = response.json()
@@ -106,7 +189,8 @@ def fetch_page(session: requests.Session, start: date, end: date, page: int) -> 
         except Exception as exc:
             last = exc
             if attempt + 1 < RETRIES:
-                time.sleep(min(15.0, 1.25 * (2**attempt)))
+                retry_after = retry_after_seconds(response) if response is not None else None
+                time.sleep(retry_after if retry_after is not None else min(30.0, 1.5 * (2**attempt)))
     raise RuntimeError(f"GR_KHMDHS_PAGE_FAILED {start}/{end} page={page}: {last!r}")
 
 
@@ -118,6 +202,7 @@ def harvest_window(start: date, end: date) -> dict[str, Any]:
     page_telemetry: list[dict[str, Any]] = []
     total_pages: int | None = None
     total_elements: int | None = None
+    verified_empty_404 = False
     while True:
         data = fetch_page(session, start, end, page)
         content = data.get("content")
@@ -125,6 +210,7 @@ def harvest_window(start: date, end: date) -> dict[str, Any]:
             raise RuntimeError(f"GR_KHMDHS_CONTENT_NOT_LIST {start}/{end} page={page}")
         observed_total_pages = int(data.get("totalPages") or 0)
         observed_total_elements = int(data.get("totalElements") or 0)
+        verified_empty_404 = bool(data.get("_verified_no_data_404"))
         if total_pages is None:
             total_pages = observed_total_pages
             total_elements = observed_total_elements
@@ -139,9 +225,10 @@ def harvest_window(start: date, end: date) -> dict[str, Any]:
             "total_pages": observed_total_pages,
             "total_elements": observed_total_elements,
             "last": bool(data.get("last")),
+            "verified_no_data_404": verified_empty_404,
         })
         rows.extend(x for x in content if isinstance(x, dict))
-        if data.get("last") is True or page >= max(0, observed_total_pages - 1):
+        if data.get("last") is True or observed_total_pages == 0 or page >= max(0, observed_total_pages - 1):
             break
         if not content:
             raise RuntimeError(f"GR_KHMDHS_PREMATURE_EMPTY_PAGE {start}/{end} page={page}")
@@ -156,6 +243,7 @@ def harvest_window(start: date, end: date) -> dict[str, Any]:
         "rows": rows,
         "pages": page_telemetry,
         "total_elements": total_elements or 0,
+        "verified_empty_404": verified_empty_404,
         "complete": True,
     }
 
@@ -167,7 +255,6 @@ def normalize(obj: dict[str, Any]) -> dict[str, Any] | None:
         return None
     deadline = pdt(obj.get("finalSubmissionDate"))
     if not deadline:
-        # This adapter's authoritative lane is deadline-bearing opportunities.
         return None
     cancelled = bool(obj.get("cancelled") or obj.get("cancellationDate"))
     submitted = pdt(obj.get("submissionDate"))
@@ -266,11 +353,14 @@ def main() -> None:
     write_jsonl(OUT / "current.jsonl", current)
     stats = {
         "source": "GR_KHMDHS",
-        "listing_contract": "GR_KHMDHS_FUTURE_DEADLINE_WINDOWS_V2",
+        "listing_contract": "GR_KHMDHS_FUTURE_DEADLINE_WINDOWS_V3_PACED",
         "deadline_horizon_end": f"{HORIZON_YEAR}-12-31",
         "window_days": WINDOW_DAYS,
+        "workers": WORKERS,
+        "min_request_interval_seconds": MIN_REQUEST_INTERVAL,
         "windows_expected": len(windows),
         "windows_completed": len(completed),
+        "verified_empty_404_windows": sum(1 for x in telemetry if x.get("verified_empty_404")),
         "source_rows_seen": len(source_rows),
         "raw_materialized": len(rows),
         "current_materialized": len(current),
@@ -288,9 +378,10 @@ def main() -> None:
         "official_url": BASE,
         "telemetry": telemetry,
         "semantics": (
-            "Official KIMDIS Open Data POST /notice only. The adapter enumerates contiguous future finalSubmissionDate windows, each no wider than the documented 180-day limit, from today through 2100-12-31. "
-            "Every page must reconcile exactly to the API-reported totalElements with stable totalPages/totalElements before coverage credit is allowed. Cancelled notices are excluded from current. "
-            "This is an authoritative deadline-bearing live-opportunity lane; records with no finalSubmissionDate are outside this specific live contract and may be collected separately as radar."
+            "Official KIMDIS Open Data POST /notice only. Contiguous finalSubmissionDate windows are at most 180 days. "
+            "Request starts are globally paced across workers and HTTP 429 honors Retry-After when supplied. "
+            "A page-0 HTTP 404 is accepted as an exhausted empty window only when the publisher response explicitly states that no data were found for the criteria; every other 404 remains fatal. "
+            "Non-empty windows require stable totalPages/totalElements and exact row-count reconciliation. Cancelled notices are excluded from current."
         ),
     }
     (OUT / "stats.json").write_text(json.dumps(stats, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
