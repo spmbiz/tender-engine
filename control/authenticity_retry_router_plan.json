@@ -1,41 +1,48 @@
 {
   "schema": "AUTHENTICITY_RETRY_ROUTER_PLAN_V1",
-  "generated_at": "2026-08-19T17:36:20.959795+00:00",
+  "generated_at": "2026-08-19T18:01:54.459635+00:00",
   "selected_counts": {
     "IRELAND": 0,
-    "ZA_ETENDERS": 4,
+    "ZA_ETENDERS": 5,
     "ESTONIA": 0
   },
   "selected": {
     "IRELAND": [],
     "ZA_ETENDERS": [
       {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165011-2026-08-07",
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-166097-2026-08-19",
         "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
         "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
         "prior_attempts": 0,
-        "source_dce_run_id": 32282294457
+        "source_dce_run_id": 32284744374
       },
       {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165067-2026-08-07",
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-162479-2026-07-15",
         "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
         "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
         "prior_attempts": 0,
-        "source_dce_run_id": 32282294457
+        "source_dce_run_id": 32284744374
       },
       {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165345-2026-08-12",
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-162320-2026-07-14",
         "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
         "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
         "prior_attempts": 0,
-        "source_dce_run_id": 32282294457
+        "source_dce_run_id": 32284744374
       },
       {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165057-2026-08-07",
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-163773-2026-07-28",
         "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
         "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
         "prior_attempts": 0,
-        "source_dce_run_id": 32282294457
+        "source_dce_run_id": 32284744374
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-166160-2026-08-19",
+        "selection_lane": "ZA_ETENDERS_AUTHENTICITY_EXACT_OCID_RETRY",
+        "selection_reason": "stateful exact-ID replay through canonical DCE resolver; evidence-quality and final guards remain authoritative",
+        "prior_attempts": 0,
+        "source_dce_run_id": 32284744374
       }
     ],
     "ESTONIA": []
@@ -46,9 +53,9 @@
     "ESTONIA": "queues/estonia_auth_retry_router.jsonl"
   },
   "blocked": {
-    "cooldown": 5,
+    "cooldown": 8,
     "attempt_cap": 0,
-    "unsupported": 19
+    "unsupported": 20
   },
   "policy": {
     "supported_sources": [
