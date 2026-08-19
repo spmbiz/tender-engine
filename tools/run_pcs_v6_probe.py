@@ -18,40 +18,21 @@ async def page_number(page):
     return int(match.group(1)) if match else None
 
 
-async def advance_v8(page, next_page, before_signature):
-    selector, _, labels = await base.find_page_select(page)
+async def advance_v9(page, next_page, before_signature):
+    selector, _, _ = await base.find_page_select(page)
     if selector is None:
         return False
-    label = labels.get(next_page, f"Page {next_page}")
-
-    # The real PCS pager select has an inline onchange which calls
-    # __doPostBack. Arm the navigation waiter BEFORE select_option so we do not
-    # race the native postback with a second synthetic submit/postback.
     try:
-        async with page.expect_navigation(wait_until="domcontentloaded", timeout=30000):
-            await selector.select_option(label=label)
-        await page.wait_for_timeout(base.PAGE_WAIT_MS)
-        if await page_number(page) == next_page:
-            return True
-    except Exception:
-        pass
-
-    # If a render did not fire the inline change handler, reacquire the pager
-    # and reproduce the exact public ASP.NET event once, with navigation armed.
-    try:
-        selector, _, labels = await base.find_page_select(page)
-        if selector is None:
-            return False
-        if await page_number(page) == next_page:
-            return True
-        await selector.select_option(label=labels.get(next_page, f"Page {next_page}"))
-        async with page.expect_navigation(wait_until="domcontentloaded", timeout=30000):
-            fired = await selector.evaluate("""el => {
+        # Set the exact option value without dispatching change, then perform
+        # exactly one WebForms postback while navigation is already awaited.
+        async with page.expect_navigation(wait_until="domcontentloaded", timeout=60000):
+            fired = await selector.evaluate("""(el, nextPage) => {
               const target = el.name || el.id || '';
               if (!target || typeof window.__doPostBack !== 'function') return false;
+              el.value = String(nextPage);
               window.__doPostBack(target, '');
               return true;
-            }""")
+            }""", next_page)
         if not fired:
             return False
         await page.wait_for_timeout(base.PAGE_WAIT_MS)
@@ -60,7 +41,7 @@ async def advance_v8(page, next_page, before_signature):
         return False
 
 
-base.advance = advance_v8
+base.advance = advance_v9
 base.MAX_PAGES = 5
 base.PAGE_WAIT_MS = 300
 
