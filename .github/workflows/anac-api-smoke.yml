@@ -1,0 +1,74 @@
+name: ANAC Official API Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/anac_api_smoke_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Harvest recent ANAC bandi through official API
+        env:
+          DISCOVERY_OUT: anac-smoke
+          ANAC_PVL_LOOKBACK_DAYS: '30'
+          ANAC_PVL_WINDOW_DAYS: '7'
+          ANAC_PVL_PAGE_SIZE: '100'
+          ANAC_PVL_PAGE_DELAY_SECONDS: '0'
+        shell: bash
+        run: |
+          set +e
+          python pipeline/discover_it_anac_pvl.py
+          rc=$?
+          export RC="$rc"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('anac-smoke/stats.json')
+          s=json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
+          payload={
+            'schema':'ANAC_OFFICIAL_API_SMOKE_V1',
+            'adapter_exit_code':int(os.environ.get('RC') or 0),
+            'listing_contract':s.get('listing_contract'),
+            'current_materialized':s.get('current_materialized'),
+            'with_deadline':s.get('with_deadline'),
+            'deadline_unknown':s.get('deadline_unknown'),
+            'with_document_urls':s.get('with_document_urls'),
+            'with_ted_link':s.get('with_ted_link'),
+            'pages_fetched':s.get('pages_fetched'),
+            'api_elements_seen':s.get('api_elements_seen'),
+            'publication_window_enumeration_complete':s.get('publication_window_enumeration_complete'),
+            'errors':s.get('errors') or [],
+            'pass_recall': bool((s.get('current_materialized') or 0)>0 and (s.get('api_elements_seen') or 0)>0 and not (s.get('errors') or [])),
+          }
+          Path('control/anac_api_smoke.json').write_text(json.dumps(payload,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print(json.dumps(payload,indent=2,ensure_ascii=False))
+          PY
+      - name: Persist smoke result
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f control/anac_api_smoke.json || exit 1
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add control/anac_api_smoke.json
+          git diff --cached --quiet && exit 0
+          git commit -m "diag: persist ANAC API smoke ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
