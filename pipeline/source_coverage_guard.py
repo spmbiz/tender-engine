@@ -35,6 +35,23 @@ def pcs_contract_health(obj,path,bad):
     """Validate PCS using the proof contract that actually produced the pack."""
     listing=str(obj.get("listing_contract") or "")
     source=str(obj.get("source") or "").upper()
+    if listing.startswith("PCS_CURRENT_OPPORTUNITY_REGISTRY_V5_AUTHORITATIVE_PLUS_BULK_ENRICHMENT"):
+        rec=obj.get("current_universe_reconciliation") if isinstance(obj.get("current_universe_reconciliation"),dict) else {}
+        if rec.get("direct_current_contract_complete") is not True:
+            bad.append({"path":str(path),"reason":"PCS_DIRECT_CURRENT_CONTRACT_INCOMPLETE","source":source})
+        if rec.get("coverage_complete") is not True:
+            bad.append({"path":str(path),"reason":"PCS_CURRENT_REGISTRY_COVERAGE_INCOMPLETE","source":source})
+        try:
+            direct_rows=int(rec.get("direct_current_rows"))
+            final_rows=int(rec.get("final_current_rows"))
+            reported=int(rec.get("direct_official_total_reported"))
+        except Exception:
+            direct_rows=final_rows=reported=-1
+        if direct_rows <= 0 or final_rows != direct_rows or reported != direct_rows:
+            bad.append({"path":str(path),"reason":"PCS_CURRENT_REGISTRY_COUNT_MISMATCH","source":source,"reported":rec.get("direct_official_total_reported"),"direct_rows":rec.get("direct_current_rows"),"final_rows":rec.get("final_current_rows")})
+        if obj.get("enumeration_complete") is not True or obj.get("live_coverage_credit_allowed") is not True:
+            bad.append({"path":str(path),"reason":"PCS_V5_LIVE_COVERAGE_CREDIT_MISSING","source":source})
+        return
     if listing.startswith("PCS_OFFICIAL_MONTH_TYPE_BULK_OCDS_"):
         # The primary lane enumerates official PCS month x noticeType OCDS
         # downloads. Browser-navigation/page-total proofs are irrelevant for the
