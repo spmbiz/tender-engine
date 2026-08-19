@@ -1,13 +1,13 @@
 {
   "schema": "GPT_WEB_READ_BATCH_MANIFEST_V3_PROVENANCE_REFRESH",
-  "generated_at": "2026-08-19T11:08:02.723866+00:00",
-  "source_inbox_updated_at": "2026-08-19T11:08:02.384095+00:00",
+  "generated_at": "2026-08-19T11:15:28.523390+00:00",
+  "source_inbox_updated_at": "2026-08-19T11:15:28.099119+00:00",
   "latest_source_dce_run_id": 32245477480,
-  "rich_window_count": 63,
+  "rich_window_count": 76,
   "provenance_override_count_available": 17,
   "provenance_overrides_applied_in_window": 0,
   "batch_size": 10,
-  "batch_count": 7,
+  "batch_count": 8,
   "files": [
     {
       "file": "batch-000.json",
@@ -48,8 +48,14 @@
     {
       "file": "batch-006.json",
       "start_rank": 61,
-      "end_rank": 63,
-      "count": 3
+      "end_rank": 70,
+      "count": 10
+    },
+    {
+      "file": "batch-007.json",
+      "start_rank": 71,
+      "end_rank": 76,
+      "count": 6
     }
   ],
   "contract": "Mechanical split/compaction only. New DCE snippets retain exact document provenance; exact candidate+source-run historical overrides may restore provenance from immutable canonical DCE packs. Neither mechanism changes ranking, eligibility or final verdict."
