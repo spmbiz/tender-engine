@@ -1,118 +1,14 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32282294457,
-  "total_inbox_rows": 92,
-  "dce_authenticity_rows": 28,
-  "portal_counts": {
-    "ZA_ETENDERS": 9,
-    "GR_KHMDHS": 8,
-    "SK_UVO": 6,
-    "PL_EZAMOWIENIA": 3,
-    "CYPRUS_EPPS": 1,
-    "GENERIC_PUBLIC_PAGE": 1
-  },
-  "status_counts": {
-    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 14,
-    "UNKNOWN_RETRIEVED_DOCUMENT": 14
-  },
-  "reason_counts": {
-    "NON_AUTHORITATIVE": 28
-  },
+  "latest_source_dce_run_id": 32282564096,
+  "total_inbox_rows": 0,
+  "dce_authenticity_rows": 0,
+  "portal_counts": {},
+  "status_counts": {},
+  "reason_counts": {},
   "method_counts": {},
-  "recovery_opportunities": [
-    {
-      "portal": "ZA_ETENDERS",
-      "blocked": 9,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 9
-      }
-    },
-    {
-      "portal": "GR_KHMDHS",
-      "blocked": 8,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 8
-      }
-    },
-    {
-      "portal": "SK_UVO",
-      "blocked": 6,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 6
-      }
-    },
-    {
-      "portal": "PL_EZAMOWIENIA",
-      "blocked": 3,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 3
-      }
-    },
-    {
-      "portal": "CYPRUS_EPPS",
-      "blocked": 1,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 1
-      }
-    },
-    {
-      "portal": "GENERIC_PUBLIC_PAGE",
-      "blocked": 1,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 1
-      }
-    }
-  ],
-  "samples_by_reason": {
-    "NON_AUTHORITATIVE": [
-      {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165011-2026-08-07",
-        "portal": "ZA_ETENDERS",
-        "title": "01 - 2026",
-        "buyer": "uMgungundlovu District Municipality",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165011"
-      },
-      {
-        "candidate_id": "GR-KHMDHS:26PROC019639975",
-        "portal": "GR_KHMDHS",
-        "title": "ΔΙΑΚΗΡΥΞΗ ΠΡΟΜΗΘΕΙΑΣ ΜΕΣΩΝ ΑΤΟΜΙΚΗΣ ΠΡΟΣΤΑΣΙΑΣ ΓΙΑ ΤΟ ΠΡΟΣΩΠΙΚΟ ΤΟΥ ΔΗΜΟΥ ΧΑΪΔΑΡΙΟΥ",
-        "buyer": "ΔΗΜΟΣ ΧΑΙΔΑΡΙΟΥ",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019639975"
-      },
-      {
-        "candidate_id": "SK-UVO:535737",
-        "portal": "SK_UVO",
-        "title": "Nákup CNG na pohon autobusov MHD",
-        "buyer": "Dopravný podnik Bratislava, akciová spoločnosť",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/detail/535737?cHash=74f24d9f2fb354318e63066126855135"
-      },
-      {
-        "candidate_id": "PL-BZP:08defdce-042b-9a50-b346-030001e08433",
-        "portal": "PL_EZAMOWIENIA",
-        "title": "Odczynniki laboratoryjne do mikromacierzy aCGH",
-        "buyer": "Wojewódzki Specjalistyczny Szpital Dziecięcy im. prof. Stanisława Popowskiego w Olsztynie",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defdce-042b-9a50-b346-030001e08433"
-      },
-      {
-        "candidate_id": "CY-EPPS:9099832",
-        "portal": "CYPRUS_EPPS",
-        "title": "Προμήθεια εξοπλισμού για την Ειδικότητα «Γραφικές Τέχνες» του Κλάδου των Εφαρμοσμένων Τεχνών (ΕΚΤ 10-26)",
-        "buyer": "Υπουργείο Παιδείας Αθλητισμού και Νεολαίας",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://www.eprocurement.gov.cy/epps/notices/viewPublishedContractNotice.do?resourceId=9099832&documentId=9100328&noticeType=16&extId=dcc2e643-f291-4422-ba7c-a156ffe70b55&lang=el&noticeId=9100289&isNational=false"
-      }
-    ]
-  },
+  "recovery_opportunities": [],
+  "samples_by_reason": {},
   "safety": {
     "diagnostic_only": true,
     "mutates_inbox": false,
