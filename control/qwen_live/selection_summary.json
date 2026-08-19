@@ -1,32 +1,30 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-19T14:59:22+00:00",
+  "generated_at_utc": "2026-08-19T15:11:41+00:00",
   "source_run": "32236982231",
   "state_rows": 3832,
   "ledger_rows": 122518,
   "snapshot_rows": 122518,
   "blocked_ids": 26892,
-  "durable_attempted_exact_versions_ignored": 125,
-  "valid_exact_hash_current_unattempted": 614,
-  "eligible_keep_for_dce": 389,
+  "durable_attempted_exact_versions_ignored": 156,
+  "valid_exact_hash_current_unattempted": 583,
+  "eligible_keep_for_dce": 362,
   "review_worthy_rejects_promoted_to_explore": 150,
   "stale_hash_ignored": 0,
   "missing_snapshot": 0,
   "expired_ignored": 1,
   "selected": 160,
   "selection_decisions": {
-    "FIT": 4,
-    "MAYBE": 124,
+    "MAYBE": 128,
     "REJECT_OBVIOUS": 32
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
-    "qwen-primary-coded": 3,
     "qwen-explore-coded": 48,
     "qwen-reject-audit-coded": 32,
-    "qwen-elastic-coded": 77
+    "qwen-elastic-coded": 80
   },
   "selection_freshness": {
     "material_new_or_updated": 160
@@ -53,24 +51,22 @@
       "reason": "Qwen runtime is still benchmark-blocked; spend more DCE capacity auditing MAYBE/REJECT paths to measure false negatives."
     }
   },
-  "base_candidate_pool": 464,
+  "base_candidate_pool": 433,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "FIT": 4,
-    "MAYBE": 418,
-    "REJECT_OBVIOUS": 42
+    "MAYBE": 395,
+    "REJECT_OBVIOUS": 38
   },
   "candidate_pool_lanes": {
-    "qwen-primary": 4,
     "qwen-open-world-explore": 192,
-    "qwen-reject-audit": 75,
-    "qwen-elastic": 193
+    "qwen-reject-audit": 71,
+    "qwen-elastic": 170
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
-    "noncore_code_contradictions_in_pool": 44,
+    "noncore_code_contradictions_in_pool": 43,
     "positive_code_rows_selected": 0,
-    "noncore_code_contradictions_selected": 1,
+    "noncore_code_contradictions_selected": 0,
     "policy": "priority_only_never_drop_never_eligibility",
     "candidate_pool_multiplier": 4
   }
