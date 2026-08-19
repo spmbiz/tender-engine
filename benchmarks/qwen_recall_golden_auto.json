@@ -1,14 +1,12 @@
 {
   "schema": "QWEN_RECALL_CALIBRATION_CORPUS_V1",
-  "generated_at": "2026-08-18T22:30:05+00:00",
-  "case_count": 30,
-  "positive_recall_cases": 29,
-  "frozen_input_cases": 30,
+  "generated_at": "2026-08-19T10:24:45+00:00",
+  "case_count": 39,
+  "positive_recall_cases": 38,
+  "frozen_input_cases": 39,
   "missing_input_candidate_ids": [
-    "DE-DOE:224c8e0b-518e-4e73-9d21-9eda8db13c19:01",
     "IE:8623183",
     "IE:8670172",
-    "PL-BZP:08def84e-fb8f-254e-962b-1200016e42b5",
     "US-SAM:d5c30c0b355d4a81ab4e4e2a16acbfc2"
   ],
   "targets": {
@@ -18,6 +16,54 @@
   "ready_for_destructive_filter_calibration": false,
   "policy": "Only DCE/GPT adjudicated YELLOW/GREEN or explicit manual controls become semantic truth. RED DCE verdicts are not auto-labelled as notice-level rejects because bidder/gate failures may be invisible at notice stage. Frozen notice inputs preserve historical calibration after expiry.",
   "cases": [
+    {
+      "candidate_id": "DE-DOE:224c8e0b-518e-4e73-9d21-9eda8db13c19:01",
+      "label": "Physical truck: retain for broker recall but never strong direct-digital",
+      "truth_kind": "MANUAL_POLICY_CONTROL",
+      "expected": {
+        "max_rank": "FIT",
+        "allowed_modes": [
+          "BROKER_RESELL",
+          "SUBCONTRACTABLE",
+          "MIXED",
+          "UNCLEAR"
+        ],
+        "must_not_reject": true
+      },
+      "adjudication": null,
+      "input_envelope": {
+        "canonical_notice_id": "DE-DOE:224c8e0b-518e-4e73-9d21-9eda8db13c19:01",
+        "material_fields_hash": "b46cbe08f51c6e1e325c3d5ae3fdd65c4ecdbf490f1e6173a2e7394c4be329a6",
+        "notice": {
+          "candidate_id": "DE-DOE:224c8e0b-518e-4e73-9d21-9eda8db13c19:01",
+          "source_family": "DE",
+          "source": "DE_DOE",
+          "country": "DE",
+          "buyer": "Lippeverband",
+          "title": "2-Achs LKW Allradantrieb inkl. Aufbau",
+          "description": "siehe Vergabeunterlagen",
+          "cpv_or_category": "34139000",
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-12T22:00:00+00:00",
+          "deadline": "2026-09-15T09:00:00+00:00",
+          "deadline_utc": "2026-09-15T09:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://oeffentlichevergabe.de/ui/de/search/details?noticeId=224c8e0b-518e-4e73-9d21-9eda8db13c19"
+          ],
+          "carried_forward_from_previous_snapshot": true,
+          "carry_forward_reason": "FUTURE_DEADLINE_NOT_REOBSERVED",
+          "carry_forward_previous_source_run": 32225601083
+        },
+        "calibration_input_frozen_at": "2026-08-19T10:24:45+00:00"
+      }
+    },
     {
       "candidate_id": "IE:8853905",
       "label": "DCE/GPT positive (YELLOW): IE:8853905",
@@ -110,6 +156,336 @@
           ]
         },
         "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "PL-BZP:08def84e-fb8f-254e-962b-1200016e42b5",
+      "label": "DCE-reviewed digital positive: accessible web application",
+      "truth_kind": "MANUAL_POLICY_CONTROL",
+      "expected": {
+        "min_rank": "FIT",
+        "preferred_modes": [
+          "DIRECT_DIGITAL",
+          "AI_ENABLED",
+          "MIXED",
+          "SUBCONTRACTABLE"
+        ],
+        "must_not_reject": true
+      },
+      "adjudication": null,
+      "input_envelope": {
+        "canonical_notice_id": "PL-BZP:08def84e-fb8f-254e-962b-1200016e42b5",
+        "material_fields_hash": "e8bf19f1cf971dcad8fda5ca7f1a8fbfe33ec348cef2a57a64c2f19900f4bd02",
+        "notice": {
+          "candidate_id": "PL-BZP:08def84e-fb8f-254e-962b-1200016e42b5",
+          "source_family": "PL",
+          "source": "PL_BZP",
+          "country": "PL",
+          "buyer": "POLITECHNIKA LUBELSKA",
+          "title": "Zaprojektowanie, wykonanie i uruchomienie dostępnej aplikacji web ułatwiającej wybór kierunku studiów dla Politechniki Lubelskiej",
+          "description": "<html><head><meta charset=\"UTF-8\"><style>body { font-family: \"Calibri\", sans-serif; } span.normal { font-weight: 400 } .text-center { text-align: center } .bg-light { background-color: #F2F2F2 } * { box-sizing: border-box } .h1, h1 { font-size: 1.75rem } .h3, h3 { font-size: 11pt; font-weight: 700; margin-bottom: 1.25rem } .h1, h1 { font-size: 11pt; font-family: \"Arial\",sans-serif; } .h2, h2 { font-size: 12pt; font-family: \"Arial\",sans-serif; font-weight: bold; margin-bottom: 1.25rem } .p-3 { border: solid windowtext 1.0pt; background: #BFBFBF; padding: 0cm 5.4pt 0cm 5.4pt; } .mb-0 { margin-bottom: 0 !important } .mb-1 { margin-bottom: .5rem !important } .mb-2 { margin-bottom: 1rem !important } .mb-3 { margin-bottom: 1.5rem !important } .mb-4 { margin-bottom: 2rem !important } .mb-5 { margin-bottom: 2.5rem !important } .mb-6 { margin-bottom: 3rem !important } .mb-7 { margin-bottom: 3.5rem !important } .mb-8 { margin-bottom: 4rem !important } .mb-9 { margin-bottom: 4.5rem !important } .mb-10 { margin-bottom: 5rem !important } .mb-auto { margin-bottom: auto !important } </style></head><body><header hidden><table style=\"border-bottom: 1px solid black; width:100%\"><tr><td>Ogłoszenie nr 2026/BZP 00388784 z dnia 2026-08-12</td></tr></table></header><main><!-- Version 1.0.0 --><style type=\"text/css\"> .normal { color: black; } h1.title { }</style> <h1 class=\"text-center mt-5 mb-5\">Ogłoszenie o zamówieniu<br/> Usługi<br/> Zaprojektowanie, wykonanie i uruchomienie dostępnej aplikacji web ułatwiającej wybór kierunku studiów dla Politechniki Lubelskiej </h1> <h2 class=\"bg-light p-3 mt-4\">SEKCJA I - ZAMAWIAJĄCY</h2> <h3 class=\"mb-0\">1.1.) Rola zamawiającego</h3> <p class=\"mb-0\">Postępowanie prowadzone jest samodzielnie przez zamawiającego</p> <h3 class=\"mb-0\">1.2.) Nazwa zamawiającego: <span class=\"normal\">POLITECHNIKA LUBELSKA</span></h3> <h3 class=\"mb-0\">1.4) Krajowy Numer Identyfikacyjny: <span class=\"normal\">REGON 000001726</span></h3><h3 class=\"mb-0\">1.5) Adres zamawiającego </h3> <h3 class=\"mb-0\">1.5.1.) Ulica: <span class=\"normal\">Nadbystrzycka 38D</span></h3> <h3 class=\"mb-0\">1.5.2.) Miejscowość: <span class=\"normal\">Lublin</span></h3> <h3 class=\"mb-0\">1.5.3.) Kod pocztowy: <span class=\"normal\">20-618</span></h3> <h3 class=\"mb-0\">1.5.4.) Województwo: <span class=\"normal\">lubelskie</span></h3> <h3 class=\"mb-0\">1.5.5.) Kraj: <span class=\"normal\">Polska</span></h3> <h3 class=\"mb-0\">1.5.6.) Lokalizacja NUTS 3: <span class=\"normal\">PL814 - Lubelski</span></h3> <h3 class=\"mb-0\">1.5.7.) Numer telefonu: <span class=\"normal\">81 538 4186</span></h3> <h3 class=\"mb-0\">1.5.9.) Adres poczty elektronicznej: <span class=\"normal\">bzp@pollub.pl</span></h3> <h3 class=\"mb-0\">1.5.10.) Adres strony internetowej zamawiającego: <span class=\"normal\">www.pollub.pl</span></h3> <h3 class=\"mb-0\"> 1.6.) Rodzaj zamawiającego: <span class=\"normal\">Zamawiający publiczny - jednostka sektora finansów publicznych - uczelnia publiczna</span> </h3> <h3 class=\"mb-0\"> 1.7.) Przedmiot działalności zamawiającego: <span class=\"normal\">Edukacja</span> </h3> <h2 class=\"bg-light p-3 mt-4\">SEKCJA II – INFORMACJE PODSTAWOWE</h2> <h3 class=\"mb-0\">2.1.) Ogłoszenie dotyczy: </h3> <p class=\"mb-0\"> Zamówienia publicznego </p> <h3 class=\"mb-0\">2.2.) Ogłoszenie dotyczy usług społecznych i innych szczególnych usług: <span class=\"normal\">Nie</span></h3> <h3 class=\"mb-0\">2.3.) Nazwa zamówienia albo umowy ramowej: </h3> <p class=\"mb-0\"> Zaprojektowanie, wykonanie i uruchomienie dostępnej aplikacji web ułatwiającej wybór kierunku studiów dla Politechniki Lubelskiej </p> <h3 class=\"mb-0\">2.4.) Identyfikator postępowania: <span class=\"normal\">ocds-148610-1aa074ab-adef-4fbd-863f-03fec68e8c5b</span></h3> <h3 class=\"mb-0\">2.5.) Numer ogłoszenia: <span class=\"normal\">2026/BZP 00388784</span></h3> <h3 class=\"mb-0\">2.6.) Wersja ogłoszenia: <span class=\"normal\">01</span></h3> <h3 class=\"mb-0\">2.7.) Data ogłoszenia: <span class=\"normal\">2026-08-12</span></h3> <h3 class=\"mb-0\">2.8.) Zamówienie albo umowa ramowa zostały ujęte w planie postępowań: <span class=\"normal\">Tak</span></h3> <h3 class=\"mb-0\">2.9.) Numer planu postępowań w BZP: <span class=\"normal\">2026/BZP 00044028/07/P</span></h3> <h3 class=\"mb-0\">2.10.) Identyfikator pozycji planu postępowań: </h3> <p class=\"mb-0\">1.3.24 Zaprojektowanie, wykonanie i uruchomienie dostępnej aplikacji web ulatwiającej wybór kierunku studiów.</p> <h3 class=\"mb-0\">2.11.) O udzielenie zamówienia mogą ubiegać się wyłącznie wykonawcy, o których mowa w art. 94 ustawy: <span class=\"normal\">Nie</span></h3> <h3 class=\"mb-0\">2.14.) Czy zamówienie albo umowa ramowa dotyczy projektu lub programu współfinansowanego ze środków Unii Europejskiej: <span class=\"normal\">Tak</span></h3> <h3 class=\"mb-0\">2.15.) Nazwa projektu lub programu</h3> <p class=\"mb-0\"> Projekt pn. „Otwarci dla każdego, dostępni dla wszystkich – Politechnika Lubelska uczelnia bez barier” realizowany jest w ramach programu Fundusze Europejskie dla Rozwoju Społecznego 2021-2027 współfinansowanego ze środków Europejskiego Funduszu Społecznego Plus zgodnie z umową nr FERS.03.01-IP.08-0114/24-00 </p> <h3 class=\"mb-0\">2.16.) Tryb udzielenia zamówienia wraz z podstawą prawną</h3> <p class=\"mb-0\"> Zamówienie udzielane jest w trybie podstawowym na podstawie: art. 275 pkt 1 ustawy </p> <h2 class=\"bg-light p-3 mt-4\">SEKCJA III – UDOSTĘPNIANIE DOKUMENTÓW ZAMÓWIENIA I KOMUNIKACJA</h2> <h3 class=\"mb-0\">3.1.) Adres strony internetowej prowadzonego postępowania</h3> https://platformazakupowa.pl/transakcja/1348840 <h3 class=\"mb-0\">3.2.) Zamawiający zastrzega dostęp do dokumentów zamówienia: <span class=\"normal\">Nie</span></h3> <h3 class=\"mb-0\">3.4.) Wykonawcy zobowiązani są do składania ofert, wniosków o dopuszczenie do udziału w postępowaniu, oświadczeń oraz innych dokumentów wyłącznie przy użyciu środków komunikacji elektronicznej: <span class=\"normal\">Tak</span></h3> <h3 class=\"mb-0\">3.5.) Informacje o środkach komunikacji elektronicznej, przy użyciu których zamawiający będzie komunikował się z wykonawcami - adres strony internetowej: <span class=\"normal\">https://platformazakupowa.pl/transakcja/1348840</span></h3> <h3 class=\"mb-0\">3.6.) Wymagania techniczne i organizacyjne dotyczące korespondencji elektronicznej: <span class=\"normal\">W celu skrócenia czasu udzielenia odpowiedzi na pytania komunikacja między zamawiającym a wykonawcami odbywa się za pośrednictwem platformazakupowa.pl i formularza „Wyślij wiadomość do zamawiającego”. <br/>Za datę przekazania (wpływu) oświadczeń, wniosków, zawiadomień oraz informacji przyjmuje się datę ich przesłania za pośrednictwem platformazakupowa.pl poprzez kliknięcie przycisku „Wyślij”.<br/>Zamawiający będzie przekazywał wykonawcom informacje za pośrednictwem platformazakupowa.pl. Informacje dotyczące odpowiedzi na pytania, zmiany specyfikacji, zmiany terminu składania i otwarcia ofert Zamawiający będzie zamieszczał na platformie w sekcji “Komunikaty”. Korespondencja, której zgodnie z obowiązującymi przepisami adresatem jest konkretny wykonawca, będzie przekazywana za pośrednictwem platformazakupowa.pl do konkretnego wykonawcy w wiadomości prywatnej.<br/>Wykonawca jako podmiot profesjonalny ma obowiązek sprawdzania komunikatów i wiadomości bezpośrednio na platformazakupowa.pl przesłanych przez Zamawiającego, gdyż system powiadomień może ulec awarii lub powiadomienie może trafić do folderu SPAM.<br/>Zamawiający, zgodnie z Rozporządzeniem Prezesa Rady Ministrów z dnia 30 grudnia 2020 r. w sprawie sposobu sporządzania i przekazywania informacji oraz wymagań technicznych dla dokumentów elektronicznych oraz środków komunikacji elektronicznej w postępowaniu o udzielenie zamówienia publicznego lub konkursie (Dz.U z 2020 r. poz. 2452), określa niezbędne wymagania sprzętowo - aplikacyjne umożliwiające pracę na platformazakupowa.pl, tj.:<br/>a. stały dostęp do sieci Internet o gwarantowanej przepustowości nie mniejszej niż 2 Mbit/s,<br/>b. komputer klasy PC lub MAC o następującej konfiguracji: pamięć min. 2 GB Ram, pr",
+          "cpv_or_category": "72260000-5 (Usługi w zakresie oprogramowania),72421000-7 (Usługi w zakresie rozwijania internetowych lub intranetowych aplikacji klienckich),72611000-6 (Usługi w zakresie wsparcia technicznego)",
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-12T08:52:04.177781+00:00",
+          "deadline": "2026-09-07T08:00:00+00:00",
+          "deadline_utc": "2026-09-07T08:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "1.1.1",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08def84e-fb8f-254e-962b-1200016e42b5"
+          ],
+          "carried_forward_from_previous_snapshot": true,
+          "carry_forward_reason": "FUTURE_DEADLINE_NOT_REOBSERVED",
+          "carry_forward_previous_source_run": 32225601083
+        },
+        "calibration_input_frozen_at": "2026-08-19T10:24:45+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:441757-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:441757-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 76,
+        "why": "Very strong creative/AI-assisted fit and the DCE does not prohibit AI use, but the European Parliament imposes a minimum financial/economic capacity per lot and professional-capacity evidence. Those gates are material and are not yet proven for SPM alone.",
+        "action": "VERIFY_LOT_FINANCIAL_THRESHOLD_AND_FORM_PARTNER_ROUTE_IF_NEEDED",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-hot-sweep-32240495352.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:441757-2026",
+        "material_fields_hash": "a0798d956fd47676ab558c8d2a7de98667d1eb2075bef21659120d59c6366b76",
+        "notice": {
+          "candidate_id": "TED:441757-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": "BEL",
+          "buyer": "European Parliament, COMM - Directorate-General for Communication",
+          "title": "Belgium – Graphic design services – Provision of graphic design services and image-related services",
+          "description": "Provision of graphic design services and image-related services",
+          "cpv_or_category": null,
+          "estimated_value": 4000000.0,
+          "currency": "EUR",
+          "publication_date": "2026-06-26+02:00",
+          "deadline": "2026-08-31T23:59:59+02:00",
+          "deadline_utc": "2026-08-31T21:59:59+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/441757-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-19T10:24:45+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:452120-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:452120-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 82,
+        "why": "Strong new SPM-fit audiovisual opportunity. Two lots cover video capture/production and accessible video; the scope expressly includes post-production, transfer of rushes and all versions, and motion-design/interactive integration. Participation is not reserved, capacity from other economic operators may be relied upon with written commitment, electronic tender submission is supported and payment is on a 30-day university cycle. Physical capture in Herault and remaining bidder-capacity proof keep it just below GREEN.",
+        "action": "HIGH_PRIORITY_LOCAL_VIDEO_PARTNER_AND_FINAL_REFERENCE_GATE_CHECK",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-hot-sweep-32240495352.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:452120-2026",
+        "material_fields_hash": "1caebd20bbffc9746dbc344d62bdf8cb3fe3733548c3182ac27e7cf36d498d0e",
+        "notice": {
+          "candidate_id": "TED:452120-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": "FRA",
+          "buyer": "UMPV",
+          "title": "France – Motion picture and video services – Prestations de captation vidéo, de production audiovisuelle (avec ou sans scénarisation), de post-production et de réalisation de supports vidéo accessibles pour le compte de l’université de Montpellier Paul-Valéry",
+          "description": "Prestations de captation vidéo, de production audiovisuelle (avec ou sans scénarisation), de post-production et de réalisation de supports vidéo accessibles pour le compte de l’université de Montpellier Paul-Valéry",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-07-01+02:00",
+          "deadline": "2026-09-04T02:00:00+00:00",
+          "deadline_utc": "2026-09-04T02:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/452120-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-19T10:24:45+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:482302-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:482302-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 80,
+        "why": "Directly brokerable design, printing and routing opportunity with a EUR 185,000 procedure value. The notice shows an open procedure with two lots and a EUR 55,000 maximum framework value for one exposed lot. This is commercially attractive, but supplier execution and exact qualification gates remain material dependencies.",
+        "action": "PRIORITY_PRINT_BROKER_PRICE_SHOP_AND_FINAL_GATE_CHECK",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-hot-sweep-32240495352.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:482302-2026",
+        "material_fields_hash": "d097732afa930fe408df359734a5e177aa8bd3dc9be5a8e029437cab3d75b4f0",
+        "notice": {
+          "candidate_id": "TED:482302-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": "FRA",
+          "buyer": "FILIERIS",
+          "title": "France – Graphic design services – Réalisation, impression et routage du journal interne Filieris",
+          "description": "Réalisation, impression et routage du journal interne Filieris",
+          "cpv_or_category": null,
+          "estimated_value": 185000.0,
+          "currency": "EUR",
+          "publication_date": "2026-07-13+02:00",
+          "deadline": "2026-09-04T17:00:00+02:00",
+          "deadline_utc": "2026-09-04T15:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/482302-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-19T10:24:45+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:494111-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:494111-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 79,
+        "why": "Open two-lot printing framework with unit-price ordering and long bid runway. The DCE asks for turnover information for up to the last three available financial years and technical-capacity declarations, but the compact evidence does not establish a disqualifying numeric turnover threshold. Strong print-broker candidate, but supplier economics and exact lot gates remain unresolved.",
+        "action": "PRIORITY_PRINT_BROKER_DEEP_DCE_AND_MULTI_COUNTRY_PRICE_SHOP",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-hot-sweep-32240495352.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:494111-2026",
+        "material_fields_hash": "5a1ae6f78628ddcf37a3a59c8a51e4ad3fc96ea27805dbceb86123a146523fee",
+        "notice": {
+          "candidate_id": "TED:494111-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": "FRA",
+          "buyer": "Institut de France",
+          "title": "France – Printing services – Prestations d'impression pour l'Institut de France",
+          "description": "Le présent marché, décomposé en deux (2) lots, porte sur des prestations d’impression de petits imprimés (affiches, cartes de visite, cartes de vœux, flyers et plaquettes, diplômes et bandeaux-pupitres) et d’imprimés façonnés (brochures, invitations, cartes de vœux, dépliants, kakémonos) décrites de façon détaillée dans le CCTP. Il s’agit d’un accord-cadre à bons de commande mono-attributaire de services.",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-07-17+02:00",
+          "deadline": "2026-10-12T01:00:00+00:00",
+          "deadline_utc": "2026-10-12T01:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/494111-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-19T10:24:45+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:506353-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:506353-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 74,
+        "why": "Open French framework combining communication advice, graphic/editorial design and fabrication. The framework has no minimum order amount and can run for one year with up to three renewals. Creative work is a strong fit, but physical-support/totem delivery and reference/capacity evidence prevent a clean GREEN today.",
+        "action": "DEEP_VERIFY_LOT_GATES_AND_PRICE_LOCAL_FABRICATION_PARTNER",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-hot-sweep-32240495352.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:506353-2026",
+        "material_fields_hash": "965a2b6638216404459966176ccdf48c544f431b1397711de7c1e21625ea6dc2",
+        "notice": {
+          "candidate_id": "TED:506353-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": "FRA",
+          "buyer": "Université de lille",
+          "title": "France – Graphic design services – Prestations de conseil en communication, conception graphique et editoriale, fabrication de supports et totems de communication, dans le cadre du projet ecocampus",
+          "description": "Le présent Marché a pour objet des prestations de conseil en communication, conception graphique et éditoriale ainsi que des prestations de fabrication de supports de communication (hors impression papier) dans le cadre du projet Ecocampus sur les sites de la Cité Scientifique et Pont-de-Bois de l'Université de Lille.",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-07-22+02:00",
+          "deadline": "2026-09-18T01:00:00+00:00",
+          "deadline_utc": "2026-09-18T01:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/506353-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-19T10:24:45+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:516871-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:516871-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 69,
+        "why": "Excellent web-development scope, but the DCE requires a qualifying completed web application/project of at least EUR 25,000 and specified personnel profiles, including a web project manager with at least three years of relevant experience and C1 English. Joint tendering, subcontracting and reliance on other entities are expressly available, making this a credible partner route rather than a lean-direct GREEN.",
+        "action": "PARTNER_WITH_REFERENCE_HOLDER_AND_PROFILE_TEAM_THEN_BID",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-hot-sweep-32240495352.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:516871-2026",
+        "material_fields_hash": "a8e9e355503c26d4b842257e4713000c4359dea6fbcf29d8c72de823ba420c63",
+        "notice": {
+          "candidate_id": "TED:516871-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": "IRL",
+          "buyer": "European Foundation for the Improvement of Living and Working Conditions",
+          "title": "Ireland – World wide web (www) site design services – Web development support services - 210901/7828",
+          "description": "As per Procurement Plan 2026.",
+          "cpv_or_category": null,
+          "estimated_value": 900000.0,
+          "currency": "EUR",
+          "publication_date": "2026-07-27+02:00",
+          "deadline": "2026-08-28T23:59:59+01:00",
+          "deadline_utc": "2026-08-28T22:59:59+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/516871-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-19T10:24:45+00:00"
       }
     },
     {
@@ -1045,6 +1421,53 @@
           ]
         },
         "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:574380-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:574380-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 64,
+        "why": "Native WordPress/web-maintenance scope, but the RFT asks for at least three websites designed and delivered in the last 24 months with actual references, plus large e-commerce/payment-provider and heavily customised Salesforce integration experience, multiple environments, security and adequate insurance. Partnerable, not lean-direct.",
+        "action": "ONLY_PURSUUE_WITH_WEB_AGENCY_REFERENCE_AND_SALESFORCE_PARTNER_ROUTE",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-hot-sweep-32240495352.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:574380-2026",
+        "material_fields_hash": "92026290287e50d34c89ad8e95c68ed37c20d75e3790042891b424b5cdf177a7",
+        "notice": {
+          "candidate_id": "TED:574380-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": "IRL",
+          "buyer": "Trócaire_166765",
+          "title": "Ireland – Internet services – Trócaire RFT Website Development and Maintenance Services",
+          "description": "Trócaire Ireland invites tenders for the provision of Ongoing Website Development and Maintenance Services of trocaire.org and globalvillageschools.ie. Tenderers’ must demonstrate that they have the resources and expertise to supply the goods and/or services required.",
+          "cpv_or_category": null,
+          "estimated_value": 0.0,
+          "currency": "EUR",
+          "publication_date": "2026-08-19+02:00",
+          "deadline": "2026-09-01T13:00:00+01:00",
+          "deadline_utc": "2026-09-01T12:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/574380-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-19T10:24:45+00:00"
       }
     },
     {
