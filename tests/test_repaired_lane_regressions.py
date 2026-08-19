@@ -14,14 +14,13 @@ def test_pcs_live_entrypoint_uses_official_bulk_ocds_not_browser_pagination():
     assert "bulk_main" in entry
     assert "V13 direct ASP.NET" not in entry
     assert "NoticeDownload/Download.aspx" in bulk
-    assert "PCS_OFFICIAL_MONTH_TYPE_BULK_OCDS_V1_KINGFISHER_PATTERN" in bulk
+    assert "PCS_OFFICIAL_MONTH_TYPE_BULK_OCDS_V2_REUSED_FORM_KINGFISHER_PATTERN" in bulk
     assert "rblCollectionType" in bulk
     assert "rblOutputType" in bulk
     assert "rblDownloadType" in bulk
     assert "rblNoticeTypes" in bulk
     assert "open-contracting/kingfisher-collect" in bulk
-    # Bulk rows are authoritative recall, but full current-universe coverage
-    # stays fail-closed until an independent reconciliation exists.
+    assert "_worker_context" in bulk
     assert '"enumeration_complete":False' in bulk
     assert '"live_coverage_credit_allowed":False' in bulk
 
@@ -48,5 +47,4 @@ def test_ungm_requires_empty_paged_search_proof_inside_browser_session():
     assert "browser_search" in body
     assert "total_reported" in body
     assert "user_agent=UA" not in body
-    # Missing/unknown browser UI pagination must never itself imply exhaustion.
     assert "click_next" not in body
