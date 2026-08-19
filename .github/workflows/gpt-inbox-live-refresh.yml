@@ -13,10 +13,12 @@ on:
       - 'control/qwen_dce_triage_latest.jsonl'
       - 'control/final_supergreen_bank.json'
       - 'control/gpt_web_review_ledger.json'
+      - 'control/adjudications/*.json'
       - 'pipeline/post_dce_scope_gate.py'
       - 'pipeline/final_verdict_guard.py'
       - 'pipeline/refresh_gpt_inbox_live.py'
       - 'pipeline/gpt_web_tick.py'
+      - 'pipeline/merge_gpt_adjudications_into_final_bank.py'
       - 'pipeline/rebuild_gpt_review_bank_from_release.py'
       - 'pipeline/build_gpt_review_index.py'
       - 'pipeline/build_gpt_web_read_batches.py'
@@ -98,6 +100,38 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
+            # Consume every durable GPT adjudication before rebuilding the work queue.
+            # This makes the live refresh itself authoritative even if the separate
+            # persistence workflow is delayed or starved by high-frequency main writes.
+            python pipeline/merge_gpt_adjudications_into_final_bank.py
+            python - <<'PY'
+          import json
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          applied=[]
+          for p in sorted(Path('control/adjudications').glob('*.json')):
+              try:
+                  obj=json.loads(p.read_text(encoding='utf-8'))
+              except Exception:
+                  continue
+              if not isinstance(obj,dict) or obj.get('persist_to_final_bank') is not True:
+                  continue
+              results=[x for x in (obj.get('results') or []) if isinstance(x,dict) and x.get('candidate_id')]
+              if not results:
+                  continue
+              subprocess.run([
+                  sys.executable,
+                  'pipeline/gpt_web_tick.py',
+                  '--reviews', str(p),
+                  '--ledger', 'control/gpt_web_review_ledger.json',
+                  '--pass-id', f'persisted-adjudication:{p.stem}',
+              ], check=True)
+              applied.append({'file':str(p),'results':len(results)})
+          print(json.dumps({'live_refresh_adjudications_ticked':applied},indent=2))
+          PY
+
             python pipeline/build_gpt_review_index.py \
               --release-root /tmp/dce-review-recovery \
               --existing control/gpt_review_index.json \
@@ -111,7 +145,9 @@ jobs:
               --out control/gpt_review_hot.json \
               --max-items 160
 
-            python pipeline/refresh_gpt_inbox_live.py \
+            # Force the refresh to read the just-updated LOCAL ledger rather than the
+            # stale remote copy. The durable ledger is committed below in the same run.
+            GH_TOKEN='' GITHUB_TOKEN='' python pipeline/refresh_gpt_inbox_live.py \
               --existing control/gpt_supergreen_inbox.json \
               --final-bank control/final_supergreen_bank.json \
               --hot-green control/supergreen_hot.json \
@@ -162,14 +198,20 @@ jobs:
           print(json.dumps(payload,indent=2))
           PY
 
-            git add control/gpt_review_index.json control/gpt_review_hot.json control/gpt_supergreen_inbox.json control/gpt_inbox_metrics.json
+            git add \
+              control/final_supergreen_bank.json \
+              control/gpt_web_review_ledger.json \
+              control/gpt_review_index.json \
+              control/gpt_review_hot.json \
+              control/gpt_supergreen_inbox.json \
+              control/gpt_inbox_metrics.json
             git add -A control/gpt_web_read_batches
             if git diff --cached --quiet; then
-              echo 'Persistent review index, rich bank, batches and inbox already current.'
+              echo 'Persistent GPT bank, ledger, review index, rich bank, batches and inbox already current.'
               break
             fi
 
-            git commit -m "inbox: recover GPT Web queue and read batches ${GITHUB_RUN_ID}"
+            git commit -m "inbox: consume GPT adjudications and recover review window ${GITHUB_RUN_ID}"
             if git push origin HEAD:main; then
               break
             fi
