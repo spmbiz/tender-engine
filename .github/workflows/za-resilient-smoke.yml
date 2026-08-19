@@ -1,0 +1,63 @@
+name: ZA Resilient OCDS Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/za_resilient_smoke_trigger.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Harvest 30 days through adaptive windows
+        env:
+          DISCOVERY_OUT: lane-out/ZA_ETENDERS_OCDS
+        shell: bash
+        run: |
+          set +e
+          python pipeline/discover_za_etenders_ocds_resilient.py --output "$DISCOVERY_OUT" --lookback-days 30 --window-days 7 --page-size 100
+          rc=$?
+          export ADAPTER_RC="$rc"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('lane-out/ZA_ETENDERS_OCDS/stats.json')
+          s=json.loads(p.read_text()) if p.exists() else {'errors':[{'type':'STATS_MISSING'}]}
+          t=s.get('telemetry') or []
+          payload={
+            'schema':'ZA_RESILIENT_SMOKE_V1',
+            'adapter_exit_code':int(os.environ['ADAPTER_RC']),
+            'listing_contract':s.get('listing_contract'),
+            'raw_materialized':s.get('raw_materialized'),
+            'current_materialized':s.get('current_materialized'),
+            'enumeration_complete':s.get('enumeration_complete'),
+            'bisected_windows':sum(1 for x in t if x.get('status')=='BISECT'),
+            'reduced_page_size_windows':sum(1 for x in t if x.get('status')=='REDUCE_PAGE_SIZE'),
+            'failed_single_days':sum(1 for x in t if x.get('status')=='FAILED_SINGLE_DAY'),
+            'errors':s.get('errors') or [],
+            'pass_recall':bool(s.get('current_materialized')) and not any(x.get('status')=='FAILED_SINGLE_DAY' for x in t),
+          }
+          Path('control/za_resilient_smoke.json').write_text(json.dumps(payload,indent=2)+'\n')
+          print(json.dumps(payload,indent=2))
+          PY
+          exit 0
+      - name: Persist smoke
+        run: |
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add control/za_resilient_smoke.json
+          git diff --cached --quiet && exit 0
+          git commit -m "diag: persist ZA resilient smoke ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do git pull --rebase origin main && git push origin HEAD:main && exit 0; git rebase --abort >/dev/null 2>&1 || true; sleep $((i*2)); done
+          exit 1
