@@ -1,7 +1,7 @@
 {
   "schema": "GPT_WEB_READ_BATCH_V3_PROVENANCE_REFRESH",
-  "generated_at": "2026-08-19T17:36:16.467450+00:00",
-  "source_inbox_updated_at": "2026-08-19T17:36:16.066091+00:00",
+  "generated_at": "2026-08-19T17:37:27.486555+00:00",
+  "source_inbox_updated_at": "2026-08-19T17:37:27.045154+00:00",
   "latest_source_dce_run_id": 32282294457,
   "batch_index": 7,
   "start_rank": 71,
@@ -127,6 +127,85 @@
             "source": "files/portal_page_http.txt",
             "source_url": null,
             "source_sha256": "c8050fef1995dd4c597f026574950dee96e1e9da8f71e562c28c9789a11f5bef",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ]
+      },
+      "provenance_override": null,
+      "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
+      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
+    },
+    {
+      "candidate_id": "PL-BZP:08defdc2-0e1a-8692-b346-030001e08251",
+      "title": "Badanie jakości życia mieszkańców Pomorza Zachodniego",
+      "buyer": "WOJEWÓDZTWO ZACHODNIOPOMORSKIE",
+      "portal": "PL_EZAMOWIENIA",
+      "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defdc2-0e1a-8692-b346-030001e08251",
+      "deadline": "2026-09-02T08:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "review_stage": "BUSINESS_GATES",
+      "gate_readiness": true,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "evidence_gate_coverage": 3,
+      "spm_post_dce_score": 7,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "deadline_authority_status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+      "deadline_conflict": false,
+      "authoritative_submission_date": "2026-09-02",
+      "source_dce_run_id": 32282294457,
+      "source_shard": 6,
+      "review_key": "fef846d4cc070d579921441148167dba51daee4ac5a73667ea4ab50c1ec83735",
+      "artifact_locator": {
+        "dce_run_id": 32282294457,
+        "shard": 6,
+        "candidate_id": "PL-BZP:08defdc2-0e1a-8692-b346-030001e08251",
+        "release_tag": "dce-harvest-32282294457"
+      },
+      "evidence_quality": {
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "documents_with_text": 3,
+        "text_chars": 63868,
+        "attributed_compact_snippets": 3,
+        "artifact_lookup_required_snippets": 0,
+        "all_compact_snippets_document_attributed": true
+      },
+      "evidence": {
+        "staffing_team": [
+          {
+            "text": "D AO AI AQ AG AN SA AR AM AW AU AT AZ BS BH BD BB BE BZ BJ BM BT BY MM BO BQ BA BW BR BN VG IO BG BF BI CL CN HR CW CY TD ME DK DM DJ EG EC ER EE ET FK RU FJ PH FI TF FR GA GM GH GI GR GD GL GE GU GG GY GF GP GT GN GW GQ HT HM ES NL HN HK IN ID IQ IR IE IS IL JM JP YE JE JO YU KY KH CM CA QA KZ KE KG KI CO KM CG KR KP CR CU KW LA LS LB LR LY LI LT LU LV MK MG MO MW MV MY ML MT MP MA MQ MR MU YT MX FM MD MC MN MS MZ NA NR NP DE NE NG NI NO NC NZ OM PK PW PS PA PG PY PE PF PT PR DO CZ CF CD RE ZA RW RO BL LC MF SV A…",
+            "source": "files/portal_page_http.txt",
+            "source_url": null,
+            "source_sha256": "c8bdae377f79d7e9c0f3ccfadfef0a1931a5c409ab886b2a8e7383e84c42d752",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "podpisu elektronicznego: 1) Przeglądarka internetowa Microsoft Edge, Chrome, Firefox w wersji wspieranej przez producenta. Rekomendowaną przeglądarką do złożenia oferty podpisanej elektronicznie jest Firefox w wersji wspieranej przez producenta. 2) Uruchomienie oprogramowania do składania podpisu wymaga również zainstalowania Java (licencja EPL) w wersji OpenJDK 8 lub Java (licencja Oracle) w wersji 1.8.0_202 32 bitowej oraz 64 bitowej, pozwalające na przyjmowanie przez użytkownika sesyjnych plików cookie oraz obs…",
+            "source": "files/2026_BZP 00397245_01.pdf",
+            "source_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defdc2-0e1a-8692-b346-030001e08251",
+            "source_sha256": "ee1121a5180e6bcfafdf4cf8ac072ffef4bb70993d0cdf7a57cf6eef531e63e6",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "ip_data_security": [
+          {
+            "text": "PR DO CZ CF CD RE ZA RW RO BL LC MF SV AS SM GS SN RS SC SL SG SX SK SI SO LK KN PM SZ SD SR SJ SY CH SE SH TJ TH TW TZ TP TL TG TT TN TR TM TC TV UG UA UY US UZ VU VC ST CV WF VA VE HU GB VN IT CI UM CX IM AX BV CK CC MH NU NF FO PN SB TK TO EH WS ZM ZW AE Adres email: * Temat: * Treść: * Załączniki: Inne Wpisz kod z obrazka: * Powrót --> Klucz tooltipa: PL: EN: Wszystkie Ulubione Wyszukiwarka Nazwa kategorii Opis kategorii Wyczyść Szukaj Wyszukiwarka kodów Nazwa kategorii Opis kategorii Wyczyść Szukaj Akcje Zapi…",
+            "source": "files/portal_page_http.txt",
+            "source_url": null,
+            "source_sha256": "c8bdae377f79d7e9c0f3ccfadfef0a1931a5c409ab886b2a8e7383e84c42d752",
             "source_kind": "text",
             "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
             "raw_machine_format": false,
@@ -758,93 +837,6 @@
             "source_sha256": "b87f36fcd5345e98fcf47b621e565294b7556ec8479d861fb5eee7dbf75b4421",
             "source_kind": "text",
             "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ]
-      },
-      "provenance_override": null,
-      "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
-      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
-    },
-    {
-      "candidate_id": "PL-BZP:08defdbc-75e1-d834-b346-0300019a7414",
-      "title": "Inwestycje drogowe na terenie dróg gminnych - Przebudowa ul. Zgody",
-      "buyer": "GMINA MIEJSKA JAROSŁAW",
-      "portal": "PL_EZAMOWIENIA",
-      "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defdbc-75e1-d834-b346-0300019a7414",
-      "deadline": "2026-09-03T07:00:00+00:00",
-      "estimated_value": null,
-      "currency": null,
-      "review_stage": "BUSINESS_GATES",
-      "gate_readiness": true,
-      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-      "evidence_gate_coverage": 2,
-      "spm_post_dce_score": 2,
-      "spm_fit_band": "LOW",
-      "spm_fit_reasons": [],
-      "spm_friction_signals": [],
-      "deadline_authority_status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
-      "deadline_conflict": false,
-      "authoritative_submission_date": "2026-09-03",
-      "source_dce_run_id": 32274127209,
-      "source_shard": 2,
-      "review_key": "dd007fa6cbf5686d512d844542731f43c2b7c6558850d5638510998724783004",
-      "artifact_locator": {
-        "dce_run_id": 32274127209,
-        "shard": 2,
-        "candidate_id": "PL-BZP:08defdbc-75e1-d834-b346-0300019a7414",
-        "release_tag": "dce-harvest-32274127209"
-      },
-      "evidence_quality": {
-        "raw_status": "DOWNLOADED_PUBLIC",
-        "documents_with_text": 36,
-        "text_chars": 855471,
-        "attributed_compact_snippets": 4,
-        "artifact_lookup_required_snippets": 0,
-        "all_compact_snippets_document_attributed": true
-      },
-      "evidence": {
-        "certifications_partner": [
-          {
-            "text": "z badań płytą pod naciskiem statycznym. Tabela 5.2 Grupy nośności podłoża gruntowego nawierzchni w zależności od wysadzinowości gruntu i warunków wodnych. STWiORB D-04.01.01 KORYTO WRAZ Z PROFILOWANIEM I ZAGĘSZCZENIEM PODŁOŻA Strona 9 z 24 L.p. Rodzaj gruntu podłoża nawierzchni wg Tabeli 5.3 Grupa nośności podłoża gruntowego nawierzchni, gdy warunki wodne są: dobre przeciętne złe 1. Grunty niewysadzinowe G1 G1 G1 2. Grunty wątpliwe G2 G2 G3 3. Grunty mało wysadzinowe 1) G3 G4 G4 4. Grunty bardzo wysadzinowe 1) G4 …",
-            "source": "files/Dokumentacja_unpacked/Dokumentacja/05 STWIORB/01 branża drogowa/D-04.01.01 KORYTO WRAZ Z PROFILOWANIEM I ZAGĘSZCZENIEM PODŁOŻA.pdf",
-            "source_url": null,
-            "source_sha256": "e3481bc7a74ae8116099bed8d54c299e67acbcdce924b97a7d8525574632aa14",
-            "source_kind": "pdf",
-            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "dna koryta lub podłoża,  zagęszczenie,  utrzymanie koryta lub podłoża,  przeprowadzenie pomiarów i badań laboratoryjnych, wymaganych w specyfikacji technicznej,  zawiera wszelkie inne czynności związane z prawidłowym wykonaniem robót zgodnie z wymaganiami niniejszych STWiORB. Wszystkie roboty powinny być wykonane według wy magań dokumentacji projektowej, STWiORB, specyfikacji technicznej i postanowień Inżyniera/ Inspektora Nadzoru/ Zamawiającego. STWiORB D-04.01.01 KORYTO WRAZ Z PROFILOWANIEM I ZAGĘSZCZENIEM P…",
-            "source": "files/Dokumentacja_unpacked/Dokumentacja/05 STWIORB/01 branża drogowa/D-04.01.01 KORYTO WRAZ Z PROFILOWANIEM I ZAGĘSZCZENIEM PODŁOŻA.pdf",
-            "source_url": null,
-            "source_sha256": "e3481bc7a74ae8116099bed8d54c299e67acbcdce924b97a7d8525574632aa14",
-            "source_kind": "pdf",
-            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "sla_onsite": [
-          {
-            "text": "dyrektywy 96/46/WE (ogólne rozporządzenie o ochronie danych osobowych) (Dz. Urz. UE L 119 z 04.05.2016 str. 1 z późn. zm., zwanego dalej RODO), uprzejmie informujemy, że: Administratorem Pani/Pana danych osobowych przetwarzanych w Urzędzie Miasta Jarosławia jest Burmistrz Miasta Jarosławia, adres siedziby: Rynek 1, 37-500 Jarosław. Kontakt z Administratorem za pomocą e-mail: sekretariat@um.jarosław.pl, telefonicznie: 16 624-87-01 lub pisemnie na adres siedziby Administratora; w sprawach związanych z ochroną danych…",
-            "source": "files/SWZ.docx",
-            "source_url": "https://platformazakupowa.pl/file/get_new/2dbbbdf29a51bc44db1298fea468c556.docx",
-            "source_sha256": "cf71088ce2c5f568a0b63fb4aa1da6250d4390f48835551bd8e704deddb8bc14",
-            "source_kind": "docx",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "art. 14 RODO wobec osób fizycznych, od których dane osobowe bezpośrednio lub pośrednio pozyskałem w celu ubiegania się o udzielenie zamówienia publicznego w niniejszym postępowaniu. (dot. 7.3.) Oświadczenie Wykonawcy działającego w imieniu Zamawiającego: Zobowiązuje się, do przekazania w imieniu Zamawiającego, wszystkim osobom, których dane osobowe udostępniłem Zamawiającemu w celu ubiegania się o udzielenie zamówienia publicznego w prowadzonym postępowaniu, informacji, o treści wskazanej w pkt 7.1. ( klauzuli inf…",
-            "source": "files/SWZ.docx",
-            "source_url": "https://platformazakupowa.pl/file/get_new/2dbbbdf29a51bc44db1298fea468c556.docx",
-            "source_sha256": "cf71088ce2c5f568a0b63fb4aa1da6250d4390f48835551bd8e704deddb8bc14",
-            "source_kind": "docx",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
             "raw_machine_format": false,
             "artifact_lookup_required": false
           }
