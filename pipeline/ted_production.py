@@ -61,6 +61,17 @@ def _candidate_key(row: dict[str, Any]) -> str | None:
     return f"TED:{pub}" if pub else None
 
 
+def _rows_equivalent_across_delta_lanes(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    # The same official notice can be returned by both delta queries. Each child
+    # process stamps its own collection time, so discovered_at is expected to
+    # differ and is not a content collision. All substantive fields remain strict.
+    a = dict(left)
+    b = dict(right)
+    a.pop("discovered_at", None)
+    b.pop("discovered_at", None)
+    return a == b
+
+
 def build_delta_queries(now: datetime, recent_days: int = DELTA_RECENT_DAYS) -> dict[str, str]:
     now = now.astimezone(timezone.utc)
     today = now.strftime("%Y%m%d")
@@ -181,9 +192,9 @@ def _merge_delta_lanes(results: list[dict[str, Any]], output_dir: Path, now: dat
             previous = records.get(key)
             if previous is None:
                 records[key] = row
-            elif previous != row:
+            elif not _rows_equivalent_across_delta_lanes(previous, row):
                 # The two queries overlap heavily. Preserve one authoritative-ID row
-                # but never hide a content disagreement between lanes.
+                # but never hide a substantive content disagreement between lanes.
                 errors.append({"type": "TED_DELTA_EXACT_ID_CONTENT_COLLISION", "candidate_id": key})
 
     rows = sorted(records.values(), key=lambda r: (str(r.get("publication_date") or ""), str(r.get("candidate_id") or "")))
