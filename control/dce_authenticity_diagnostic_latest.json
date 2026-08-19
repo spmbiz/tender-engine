@@ -1,30 +1,32 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32206114061,
-  "total_inbox_rows": 132,
-  "dce_authenticity_rows": 21,
+  "latest_source_dce_run_id": 32207489029,
+  "total_inbox_rows": 150,
+  "dce_authenticity_rows": 31,
   "portal_counts": {
-    "PL_EZAMOWIENIA": 12,
+    "PL_EZAMOWIENIA": 17,
     "TED": 6,
-    "ZA_ETENDERS": 2,
-    "GENERIC_PUBLIC_PAGE": 1
+    "CYPRUS_EPPS": 2,
+    "GENERIC_PUBLIC_PAGE": 2,
+    "GR_KHMDHS": 2,
+    "ZA_ETENDERS": 2
   },
   "status_counts": {
-    "UNKNOWN_RETRIEVED_DOCUMENT": 11,
-    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 10
+    "UNKNOWN_RETRIEVED_DOCUMENT": 17,
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 14
   },
   "reason_counts": {
-    "NON_AUTHORITATIVE": 20,
+    "NON_AUTHORITATIVE": 30,
     "AUTH_REQUIRED": 1
   },
   "method_counts": {},
   "recovery_opportunities": [
     {
       "portal": "PL_EZAMOWIENIA",
-      "blocked": 12,
+      "blocked": 17,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 12
+        "NON_AUTHORITATIVE": 17
       }
     },
     {
@@ -37,7 +39,7 @@
       }
     },
     {
-      "portal": "ZA_ETENDERS",
+      "portal": "CYPRUS_EPPS",
       "blocked": 2,
       "likely_public_recovery_target": 0,
       "reason_counts": {
@@ -46,10 +48,26 @@
     },
     {
       "portal": "GENERIC_PUBLIC_PAGE",
-      "blocked": 1,
+      "blocked": 2,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 1
+        "NON_AUTHORITATIVE": 2
+      }
+    },
+    {
+      "portal": "GR_KHMDHS",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
+      }
+    },
+    {
+      "portal": "ZA_ETENDERS",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
       }
     }
   ],
@@ -72,12 +90,12 @@
         "notice_url": "https://ted.europa.eu/en/notice/-/detail/476581-2026"
       },
       {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165926-2026-08-17",
-        "portal": "ZA_ETENDERS",
-        "title": "NB110/2026",
-        "buyer": "Tourism",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165926"
+        "candidate_id": "CY-EPPS:9163004",
+        "portal": "CYPRUS_EPPS",
+        "title": "Παροχή υπηρεσιών εκτύπωσης, φακελώματος και ταχυδρόμησης λογαριασμών.(64/2026)",
+        "buyer": "ΔΗΜΟΣ ΛΕΜΕΣΟΥ",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://www.eprocurement.gov.cy/epps/notices/viewPublishedContractNotice.do?resourceId=9163004&documentId=9163081&noticeType=16&extId=d47182ea-3265-4fc9-b98a-eeea06b232c6&lang=el&noticeId=9163078&isNational=true"
       },
       {
         "candidate_id": "LT-CVP:2321435",
@@ -88,12 +106,12 @@
         "notice_url": null
       },
       {
-        "candidate_id": "PL-BZP:08defd14-bb7c-cf99-962b-12000115c93c",
-        "portal": "PL_EZAMOWIENIA",
-        "title": "„Odbudowa drogi powiatowej nr 3276D [powódź - wrzesień 2024 r.] - Poręba, I etap: km 2+416 - 3+406\"",
-        "buyer": "Zarząd Dróg Powiatowych w Kłodzku",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defd14-bb7c-cf99-962b-12000115c93c"
+        "candidate_id": "GR-KHMDHS:26PROC019643321",
+        "portal": "GR_KHMDHS",
+        "title": "ΠΡΟΣΚΛΗΣΗ ΕΚΔΗΛΩΣΗΣ ΕΝΔΙΑΦΕΡΟΝΤΟΣ ΓΙΑ ΥΠΗΡΕΣΙΕΣ ΨΗΦΙΑΚΟΥ ΜΑΡΚΕΤΙΝΓΚ",
+        "buyer": "ΔΗΜΟΣ ΤΡΙΦΥΛΙΑΣ",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019643321"
       }
     ],
     "AUTH_REQUIRED": [
