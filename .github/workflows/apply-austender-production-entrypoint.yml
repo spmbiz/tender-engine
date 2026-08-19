@@ -1,10 +1,12 @@
 name: Apply AusTender Production Entrypoint
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
       - '.github/workflows/apply-austender-production-entrypoint.yml'
+      - 'control/austender_production_route_trigger.txt'
 
 permissions:
   contents: write
