@@ -1,0 +1,52 @@
+name: Apply PCS Postback V6
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/pcs_postback_v6_trigger.txt'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pcs-postback-v6
+  cancel-in-progress: false
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python tools/apply_pcs_postback_v6.py
+      - name: Validate
+        run: |
+          python -m py_compile pipeline/discover_uk_pcs_current.py
+          python - <<'PY'
+          from pathlib import Path
+          t=Path('pipeline/discover_uk_pcs_current.py').read_text(encoding='utf-8')
+          assert 'PCS_CURRENT_OPPORTUNITIES_BROWSER_V6_ASPNET_POSTBACK' in t
+          assert "window.__doPostBack(target, '')" in t
+          block=t.split('async def advance(page, next_page, before_signature):',1)[1].split('\n\nasync def main',1)[0]
+          assert 'form.submit()' not in block
+          print('PCS V6 validation OK')
+          PY
+      - name: Commit verified patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add pipeline/discover_uk_pcs_current.py
+          git diff --cached --quiet && exit 0
+          git commit -m 'discovery: use PCS ASP.NET pager postback'
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
