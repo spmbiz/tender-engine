@@ -1,0 +1,70 @@
+name: Apply AusTender Verified Bridge
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apply-austender-verified-bridge.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-test-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          fetch-tags: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q requests pytest
+      - name: Patch AusTender adapter
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('pipeline/discover_austender_browser.py')
+          s=p.read_text()
+          if 'from austender_bridge_transport import harvest_verified_bridge, load_bridge_url' not in s:
+              marker='from playwright.async_api import async_playwright\n'
+              if marker not in s: raise SystemExit('import marker missing')
+              s=s.replace(marker, marker+'from austender_bridge_transport import harvest_verified_bridge, load_bridge_url\n',1)
+          old='''BRIDGE_URL = os.getenv("AUSTENDER_BRIDGE_URL", "").strip()\nBRIDGE_TRUSTED = os.getenv("AUSTENDER_BRIDGE_TRUSTED", "0").strip().lower() in {"1", "true", "yes"}\n'''
+          new='''BRIDGE_URL, BRIDGE_URL_PROVENANCE = load_bridge_url()\nBRIDGE_TRUSTED = (\n    BRIDGE_URL_PROVENANCE == "VERIFIED_DEPLOYMENT_CONTROL"\n    or os.getenv("AUSTENDER_BRIDGE_TRUSTED", "0").strip().lower() in {"1", "true", "yes"}\n)\nBRIDGE_TOKEN = os.getenv("AUSTENDER_BRIDGE_TOKEN", "").strip() or None\n'''
+          if old in s:
+              s=s.replace(old,new,1)
+          elif 'BRIDGE_URL_PROVENANCE = load_bridge_url()' not in s:
+              raise SystemExit('bridge config marker missing')
+          start=s.index('def harvest_bridge(records: dict, telemetry: dict, warnings: list) -> bool:\n')
+          end=s.index('\n\nasync def harvest_browser',start)
+          replacement='''def harvest_bridge(records: dict, telemetry: dict, warnings: list) -> bool:\n    telemetry["bridge_url_provenance"] = BRIDGE_URL_PROVENANCE\n    if not BRIDGE_URL:\n        return False\n    if not BRIDGE_TRUSTED:\n        warnings.append({"type": "BRIDGE_CONFIGURED_BUT_NOT_TRUSTED", "url": BRIDGE_URL, "provenance": BRIDGE_URL_PROVENANCE})\n        return False\n    ok = harvest_verified_bridge(\n        BRIDGE_URL,\n        user_agent=UA,\n        records=records,\n        telemetry=telemetry,\n        warnings=warnings,\n        parse_callback=parse_rss_content,\n        token=BRIDGE_TOKEN,\n    )\n    if ok:\n        telemetry["bridge_trust_basis"] = (\n            "VERIFIED_DEPLOYMENT_CONTROL_PLUS_SHA256"\n            if BRIDGE_URL_PROVENANCE == "VERIFIED_DEPLOYMENT_CONTROL"\n            else "EXPLICIT_ENV_TRUST_PLUS_SHA256"\n        )\n    return ok\n'''
+          s=s[:start]+replacement+s[end:]
+          s=s.replace('"bridge_trusted": BRIDGE_TRUSTED,','"bridge_trusted": BRIDGE_TRUSTED,\n        "bridge_url_provenance": BRIDGE_URL_PROVENANCE,')
+          s=s.replace('An optional bridge is accepted only when explicitly marked trusted and must relay the same official RSS payload; otherwise GitHub-cloud 403 remains a visible coverage failure.','An optional bridge is accepted only from a verified deployment control record or explicit trusted environment configuration, and its official-upstream identity plus payload SHA-256 must verify before the RSS is accepted; otherwise GitHub-cloud 403 remains a visible coverage failure.')
+          p.write_text(s)
+          PY
+      - name: Tests
+        run: |
+          python -m py_compile pipeline/discover_austender_browser.py pipeline/austender_bridge_transport.py
+          pytest -q tests/test_austender_bridge_transport.py
+      - name: Commit adapter if changed
+        shell: bash
+        run: |
+          if git diff --quiet -- pipeline/discover_austender_browser.py; then
+            echo 'adapter already patched'
+            exit 0
+          fi
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add pipeline/discover_austender_browser.py
+          git commit -m 'austender: require verified bridge upstream identity and sha256'
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep $((i*2))
+          done
+          exit 1
