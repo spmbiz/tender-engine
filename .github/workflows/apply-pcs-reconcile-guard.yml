@@ -1,0 +1,63 @@
+name: Apply PCS Reconcile Guard
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apply-pcs-reconcile-guard.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-test-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          fetch-tags: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Patch reconciled PCS proof checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('pipeline/source_coverage_guard.py')
+          s=p.read_text(encoding='utf-8')
+          old='''        if not obj.get("notice_types") or 101 not in [int(x) for x in obj.get("notice_types") if str(x).isdigit()]:\n            bad.append({"path":str(path),"reason":"PCS_BULK_WEBSITE_CONTRACT_NOTICE_101_MISSING","source":source})\n        return\n'''
+          new='''        if not obj.get("notice_types") or 101 not in [int(x) for x in obj.get("notice_types") if str(x).isdigit()]:\n            bad.append({"path":str(path),"reason":"PCS_BULK_WEBSITE_CONTRACT_NOTICE_101_MISSING","source":source})\n        if "_V4_DIRECT_CURRENT_RECONCILED" in listing:\n            rec=obj.get("current_universe_reconciliation") if isinstance(obj.get("current_universe_reconciliation"),dict) else {}\n            if rec.get("coverage_complete") is not True:\n                bad.append({"path":str(path),"reason":"PCS_CURRENT_UNIVERSE_RECONCILIATION_INCOMPLETE","source":source})\n            if rec.get("direct_current_contract_complete") is not True:\n                bad.append({"path":str(path),"reason":"PCS_DIRECT_CURRENT_CONTRACT_INCOMPLETE","source":source})\n            if rec.get("all_official_current_matched_to_bulk") is not True:\n                bad.append({"path":str(path),"reason":"PCS_OFFICIAL_CURRENT_NOT_FULLY_MATCHED_TO_BULK","source":source,"missing":rec.get("direct_missing_from_bulk")})\n            try:\n                missing=int(rec.get("direct_missing_from_bulk") or 0)\n            except Exception:\n                missing=-1\n            if missing != 0:\n                bad.append({"path":str(path),"reason":"PCS_DIRECT_CURRENT_MISSING_FROM_BULK","source":source,"missing":rec.get("direct_missing_from_bulk")})\n        return\n'''
+          if old in s:
+              s=s.replace(old,new,1)
+          elif 'PCS_CURRENT_UNIVERSE_RECONCILIATION_INCOMPLETE' not in s:
+              raise SystemExit('PCS guard anchor changed; refusing blind patch')
+          s=s.replace('SOURCE_COVERAGE_GUARD_V9_PCS_CONTRACT_AWARE','SOURCE_COVERAGE_GUARD_V10_PCS_DIRECT_RECONCILE_PROOF')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Validate guard and PCS reconciler
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check -q pytest
+          python -m py_compile pipeline/source_coverage_guard.py pipeline/reconcile_uk_pcs_bulk_direct.py
+          pytest -q tests/test_pcs_bulk_direct_reconcile.py
+      - name: Publish and self-remove
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git rm .github/workflows/apply-pcs-reconcile-guard.yml
+          git add pipeline/source_coverage_guard.py
+          git commit -m "pcs: require direct current reconciliation proof for coverage"
+          for i in 1 2 3 4 5 6; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*3))
+          done
+          exit 1
