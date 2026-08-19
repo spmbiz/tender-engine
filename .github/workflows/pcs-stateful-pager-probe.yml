@@ -24,8 +24,27 @@ jobs:
         run: |
           chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
           if [ -n "$chrome" ]; then echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"; else python -m playwright install --with-deps chromium; fi
-      - run: python tools/probe_pcs_stateful_filtered_pager.py
+      - name: Run stateful filtered pager probe
+        shell: bash
+        run: |
+          set +e
+          python tools/probe_pcs_stateful_filtered_pager.py
+          rc=$?
+          if [ ! -f control/pcs_stateful_pager_probe.json ]; then
+            python - <<PY
+            import json
+            from pathlib import Path
+            Path('control/pcs_stateful_pager_probe.json').write_text(json.dumps({
+              'schema':'PCS_STATEFUL_FILTERED_PAGER_PROBE_WORKFLOW_FAILURE',
+              'runner_exit_code':$rc,
+              'progress_proven':False,
+              'stateful_filter_stable':False,
+            },indent=2)+'\n')
+            PY
+          fi
+          exit 0
       - name: Persist probe
+        if: always()
         shell: bash
         run: |
           set -euo pipefail
