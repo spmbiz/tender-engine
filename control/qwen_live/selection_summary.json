@@ -1,32 +1,23 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-19T01:45:53+00:00",
-  "source_run": "32176496082",
+  "generated_at_utc": "2026-08-19T01:47:09+00:00",
+  "source_run": "32192589684",
   "state_rows": 7669,
-  "ledger_rows": 99264,
-  "snapshot_rows": 99264,
+  "ledger_rows": 100729,
+  "snapshot_rows": 100729,
   "blocked_ids": 24183,
-  "durable_attempted_exact_versions_ignored": 45,
-  "valid_exact_hash_current_unattempted": 1543,
-  "eligible_keep_for_dce": 1428,
-  "review_worthy_rejects_promoted_to_explore": 112,
-  "stale_hash_ignored": 0,
+  "durable_attempted_exact_versions_ignored": 560,
+  "valid_exact_hash_current_unattempted": 0,
+  "eligible_keep_for_dce": 0,
+  "review_worthy_rejects_promoted_to_explore": 0,
+  "stale_hash_ignored": 1028,
   "missing_snapshot": 0,
   "expired_ignored": 0,
-  "selected": 160,
-  "selection_decisions": {
-    "MAYBE": 160
-  },
-  "selection_survival": {
-    "KEEP": 160
-  },
-  "selection_lanes": {
-    "qwen-explore-coded": 48,
-    "qwen-elastic-coded": 112
-  },
-  "selection_freshness": {
-    "material_new_or_updated": 160
-  },
+  "selected": 0,
+  "selection_decisions": {},
+  "selection_survival": {},
+  "selection_lanes": {},
+  "selection_freshness": {},
   "policy": {
     "keep_is_not_fit": true,
     "drop_is_retained_in_state_but_not_primary_dce": true,
@@ -49,23 +40,15 @@
       "reason": "Qwen runtime is still benchmark-blocked; spend more DCE capacity auditing MAYBE/REJECT paths to measure false negatives."
     }
   },
-  "base_candidate_pool": 640,
+  "base_candidate_pool": 0,
   "requested_final_limit": 160,
-  "candidate_pool_decisions": {
-    "FIT": 1,
-    "MAYBE": 639
-  },
-  "candidate_pool_lanes": {
-    "qwen-primary": 1,
-    "qwen-open-world-explore": 192,
-    "qwen-reject-audit": 3,
-    "qwen-elastic": 444
-  },
+  "candidate_pool_decisions": {},
+  "candidate_pool_lanes": {},
   "code_prior": {
-    "positive_code_rows_in_pool": 14,
-    "noncore_code_contradictions_in_pool": 394,
-    "positive_code_rows_selected": 1,
-    "noncore_code_contradictions_selected": 123,
+    "positive_code_rows_in_pool": 0,
+    "noncore_code_contradictions_in_pool": 0,
+    "positive_code_rows_selected": 0,
+    "noncore_code_contradictions_selected": 0,
     "policy": "priority_only_never_drop_never_eligibility",
     "candidate_pool_multiplier": 4
   }
