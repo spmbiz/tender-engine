@@ -1,24 +1,24 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32249901406,
-  "total_inbox_rows": 86,
-  "dce_authenticity_rows": 27,
+  "latest_source_dce_run_id": 32253437798,
+  "total_inbox_rows": 113,
+  "dce_authenticity_rows": 28,
   "portal_counts": {
     "TED": 11,
-    "GENERIC_PUBLIC_PAGE": 4,
+    "PL_EZAMOWIENIA": 4,
+    "GENERIC_PUBLIC_PAGE": 3,
     "GR_KHMDHS": 3,
     "US_SAM": 3,
-    "ZA_ETENDERS": 3,
-    "CYPRUS_EPPS": 1,
-    "PL_EZAMOWIENIA": 1,
+    "ZA_ETENDERS": 2,
+    "SK_UVO": 1,
     "WORLD_BANK": 1
   },
   "status_counts": {
-    "UNKNOWN_RETRIEVED_DOCUMENT": 18,
-    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 9
+    "UNKNOWN_RETRIEVED_DOCUMENT": 21,
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 7
   },
   "reason_counts": {
-    "NON_AUTHORITATIVE": 27
+    "NON_AUTHORITATIVE": 28
   },
   "method_counts": {},
   "recovery_opportunities": [
@@ -31,11 +31,19 @@
       }
     },
     {
-      "portal": "GENERIC_PUBLIC_PAGE",
+      "portal": "PL_EZAMOWIENIA",
       "blocked": 4,
       "likely_public_recovery_target": 0,
       "reason_counts": {
         "NON_AUTHORITATIVE": 4
+      }
+    },
+    {
+      "portal": "GENERIC_PUBLIC_PAGE",
+      "blocked": 3,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 3
       }
     },
     {
@@ -56,22 +64,14 @@
     },
     {
       "portal": "ZA_ETENDERS",
-      "blocked": 3,
+      "blocked": 2,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 3
+        "NON_AUTHORITATIVE": 2
       }
     },
     {
-      "portal": "CYPRUS_EPPS",
-      "blocked": 1,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 1
-      }
-    },
-    {
-      "portal": "PL_EZAMOWIENIA",
+      "portal": "SK_UVO",
       "blocked": 1,
       "likely_public_recovery_target": 0,
       "reason_counts": {
@@ -98,12 +98,20 @@
         "notice_url": "https://ted.europa.eu/en/notice/-/detail/204636-2026"
       },
       {
-        "candidate_id": "IT-PVL:e74d2820-dfc9-4073-b377-c3c60d436c4e",
+        "candidate_id": "PL-BZP:08defdbe-4419-10a7-b346-0300019a7449",
+        "portal": "PL_EZAMOWIENIA",
+        "title": "Dostawa 2 szt. fabrycznie nowych piaskarko-solarek na pojazd typu wywrotka/platforma na potrzeby RPZiUK Sp. z o.o. w Kielcach",
+        "buyer": "REJONOWE PRZEDSIĘBIORSTWO ZIELENI I USŁUG KOMUNALNYCH SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defdbe-4419-10a7-b346-0300019a7449"
+      },
+      {
+        "candidate_id": "IT-PVL:22eef9f2-5715-4750-8f23-b2c2631b41df",
         "portal": "GENERIC_PUBLIC_PAGE",
-        "title": "Fornitura dispositivi CHIRURGIA MINI INVASIVA",
-        "buyer": "ASL CASERTA",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/e74d2820-dfc9-4073-b377-c3c60d436c4e?ricercaArchivio=false"
+        "title": "Affidamento dei servizi di architettura e ingegneria per la redazione del progetto di fattibilità tecnico-economica (PFTE), del progetto esecutivo e per il coordinamento della sicurezza in fase di progettazione dei lavori di: “Community hub: incubatore di cittadinanza attiva – area ex kursaal”",
+        "buyer": "COMUNE DI CROTONE",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/22eef9f2-5715-4750-8f23-b2c2631b41df?ricercaArchivio=false"
       },
       {
         "candidate_id": "GR-KHMDHS:26PROC019643762",
@@ -120,14 +128,6 @@
         "buyer": "DEPT OF DEFENSE",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
         "notice_url": "https://sam.gov/opp/4592ad2fa55b4a829629ff9fe7ff0f4e/view"
-      },
-      {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165956-2026-08-18",
-        "portal": "ZA_ETENDERS",
-        "title": "E3364NTCSAMWP",
-        "buyer": "ESKOM",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165956"
       }
     ]
   },
