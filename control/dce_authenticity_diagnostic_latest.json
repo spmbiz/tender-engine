@@ -1,14 +1,118 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32270219161,
-  "total_inbox_rows": 0,
-  "dce_authenticity_rows": 0,
-  "portal_counts": {},
-  "status_counts": {},
-  "reason_counts": {},
+  "latest_source_dce_run_id": 32276950674,
+  "total_inbox_rows": 97,
+  "dce_authenticity_rows": 32,
+  "portal_counts": {
+    "GR_KHMDHS": 14,
+    "SK_UVO": 6,
+    "ZA_ETENDERS": 5,
+    "CYPRUS_EPPS": 4,
+    "PL_EZAMOWIENIA": 2,
+    "GENERIC_PUBLIC_PAGE": 1
+  },
+  "status_counts": {
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 22,
+    "UNKNOWN_RETRIEVED_DOCUMENT": 10
+  },
+  "reason_counts": {
+    "NON_AUTHORITATIVE": 32
+  },
   "method_counts": {},
-  "recovery_opportunities": [],
-  "samples_by_reason": {},
+  "recovery_opportunities": [
+    {
+      "portal": "GR_KHMDHS",
+      "blocked": 14,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 14
+      }
+    },
+    {
+      "portal": "SK_UVO",
+      "blocked": 6,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 6
+      }
+    },
+    {
+      "portal": "ZA_ETENDERS",
+      "blocked": 5,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 5
+      }
+    },
+    {
+      "portal": "CYPRUS_EPPS",
+      "blocked": 4,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 4
+      }
+    },
+    {
+      "portal": "PL_EZAMOWIENIA",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
+      }
+    },
+    {
+      "portal": "GENERIC_PUBLIC_PAGE",
+      "blocked": 1,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 1
+      }
+    }
+  ],
+  "samples_by_reason": {
+    "NON_AUTHORITATIVE": [
+      {
+        "candidate_id": "GR-KHMDHS:26PROC019641868",
+        "portal": "GR_KHMDHS",
+        "title": "Προμήθεια γραφικής ύλης, υλικών γραφείου, εποπτικού υλικού & βιβλίων των δομών του Δήμου Φλώρινας",
+        "buyer": "ΔΗΜΟΣ ΦΛΩΡΙΝΑΣ",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019641868"
+      },
+      {
+        "candidate_id": "SK-UVO:535737",
+        "portal": "SK_UVO",
+        "title": "Nákup CNG na pohon autobusov MHD",
+        "buyer": "Dopravný podnik Bratislava, akciová spoločnosť",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://www.uvo.gov.sk/vyhladavanie/vyhladavanie-zakaziek/detail/535737?cHash=74f24d9f2fb354318e63066126855135"
+      },
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-166058-2026-08-19",
+        "portal": "ZA_ETENDERS",
+        "title": "VCW27/011",
+        "buyer": "Vaal Central Water",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-166058"
+      },
+      {
+        "candidate_id": "CY-EPPS:8851275",
+        "portal": "CYPRUS_EPPS",
+        "title": "Διαγωνισμός Αρ. 15/2026: Παραχώρηση Άδειας Χρήσης / Εκμετάλλευσης Υποστατικών στο Χώρο του Παλιού Λιμανιού Λεμεσού.",
+        "buyer": "Αρχή Λιμένων Κύπρου",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://www.eprocurement.gov.cy/epps/notices/viewPublishedContractNotice.do?resourceId=8851275&documentId=8864978&noticeType=17&extId=7f59da76-5946-4306-97c3-ee7153cbc258&lang=el&noticeId=8851737&isNational=true"
+      },
+      {
+        "candidate_id": "PL-BZP:08defdce-042b-9a50-b346-030001e08433",
+        "portal": "PL_EZAMOWIENIA",
+        "title": "Odczynniki laboratoryjne do mikromacierzy aCGH",
+        "buyer": "Wojewódzki Specjalistyczny Szpital Dziecięcy im. prof. Stanisława Popowskiego w Olsztynie",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defdce-042b-9a50-b346-030001e08433"
+      }
+    ]
+  },
   "safety": {
     "diagnostic_only": true,
     "mutates_inbox": false,
