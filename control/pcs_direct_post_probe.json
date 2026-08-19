@@ -1,6 +1,6 @@
 {
-  "schema": "PCS_DIRECT_ASPNET_POST_PROBE_V1",
-  "generated_at": "2026-08-19T02:37:22.848881+00:00",
+  "schema": "PCS_DIRECT_ASPNET_POST_PROBE_V2_INDEPENDENT_JUMPS",
+  "generated_at": "2026-08-19T02:45:49.480427+00:00",
   "errors": [],
   "landing_status": 200,
   "search_telemetry": {
@@ -17,7 +17,7 @@
       "text": "Search Notices"
     }
   },
-  "page1": {
+  "browser_grid_before_direct_posts": {
     "page": 1,
     "total_pages": 1397,
     "total_items": 13970,
@@ -37,33 +37,84 @@
   "form_field_count": 31,
   "viewstate_len": 2017024,
   "eventvalidation_len": 60480,
-  "page2_post_relevant": {
-    "__EVENTTARGET": "ctl00$maincontent$PagingHelperTop$ddPageSelect",
+  "base_relevant": {
+    "__EVENTTARGET": "ctl00$maincontent$btnSearch",
     "__EVENTARGUMENT": "",
-    "ctl00$maincontent$PagingHelperTop$ddPageSelect": "2",
+    "ctl00$maincontent$PagingHelperTop$ddPageSelect": "1",
     "ctl00$maincontent$PagingHelperBottom$ddPageSelect": "1",
     "ctl00$maincontent$ddDocType": "0",
     "ctl00$maincontent$ddLocation": "-1"
   },
-  "page2_status": 200,
-  "page2_content_type": "text/html; charset=utf-8",
-  "page2_bytes": 4523827,
-  "page2": {
-    "page": 2,
-    "total_pages": 58,
-    "total_items": 575,
-    "refs": [
-      "AUG562512",
-      "AUG562509",
-      "AUG562507",
-      "AUG562483",
-      "AUG562478",
-      "AUG562475",
-      "AUG562473",
-      "AUG562469",
-      "AUG562429",
-      "AUG562423"
-    ]
-  },
-  "page2_prefix": "\r\n\r\n<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head><title>\r\n\tSearch for Notices - Public Contracts Scotland\r\n</title><meta name=\"Keywords\" content=\"Public Contracts Scotland: tenders, ojeu, ojec, public sector contract opportunities\" /><meta name=\"Description\" content=\"The Scottish Government&#39;s official national portal for public sector contract opportunities\" /><link href=\"https://fonts.googleapis.com/icon?family=Material+Icons\" rel=\"stylesheet\" /><link href=\"https://fonts.googleapis.com/css?fami"
+  "independent_jumps": [
+    {
+      "requested_page": 1,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 4745655,
+      "markers": {
+        "page": 1,
+        "total_pages": 1397,
+        "total_items": 13970,
+        "refs": [
+          "AUG562599",
+          "AUG562598",
+          "AUG562595",
+          "AUG562591",
+          "AUG562590",
+          "AUG562589",
+          "AUG562588",
+          "AUG562587",
+          "AUG562586",
+          "AUG562583"
+        ]
+      }
+    },
+    {
+      "requested_page": 2,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 4523827,
+      "markers": {
+        "page": 2,
+        "total_pages": 58,
+        "total_items": 575,
+        "refs": [
+          "AUG562512",
+          "AUG562509",
+          "AUG562507",
+          "AUG562483",
+          "AUG562478",
+          "AUG562475",
+          "AUG562473",
+          "AUG562469",
+          "AUG562429",
+          "AUG562423"
+        ]
+      }
+    },
+    {
+      "requested_page": 3,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 4523873,
+      "markers": {
+        "page": 3,
+        "total_pages": 58,
+        "total_items": 575,
+        "refs": [
+          "AUG562406",
+          "AUG562400",
+          "AUG562362",
+          "AUG562361",
+          "AUG562357",
+          "AUG562347",
+          "AUG562344",
+          "AUG562310",
+          "AUG562298",
+          "AUG562297"
+        ]
+      }
+    }
+  ],
+  "independent_jump_proven": false
 }
