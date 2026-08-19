@@ -36,12 +36,10 @@ def pcs_contract_health(obj,path,bad):
     listing=str(obj.get("listing_contract") or "")
     source=str(obj.get("source") or "").upper()
     if listing.startswith("PCS_OFFICIAL_MONTH_TYPE_BULK_OCDS_"):
-        # The new primary lane enumerates official PCS month x noticeType OCDS
-        # downloads. Browser-navigation/page-total proofs are irrelevant here.
-        # Publication completeness proves only the requested bulk partitions; full
-        # live Current Opportunity coverage still requires the adapter itself to
-        # set enumeration_complete/live_coverage_credit_allowed after independent
-        # current-universe reconciliation.
+        # The primary lane enumerates official PCS month x noticeType OCDS
+        # downloads. Browser-navigation/page-total proofs are irrelevant for the
+        # publication partition itself. A reconciled V4 pack, however, must also
+        # carry an independently proven Current Opportunity registry match.
         expected=obj.get("requests_expected")
         completed=obj.get("requests_completed")
         if obj.get("publication_window_enumeration_complete") is not True:
@@ -50,6 +48,20 @@ def pcs_contract_health(obj,path,bad):
             bad.append({"path":str(path),"reason":"PCS_BULK_REQUEST_COUNT_MISMATCH","source":source,"expected":expected,"completed":completed})
         if not obj.get("notice_types") or 101 not in [int(x) for x in obj.get("notice_types") if str(x).isdigit()]:
             bad.append({"path":str(path),"reason":"PCS_BULK_WEBSITE_CONTRACT_NOTICE_101_MISSING","source":source})
+        if "_V4_DIRECT_CURRENT_RECONCILED" in listing:
+            rec=obj.get("current_universe_reconciliation") if isinstance(obj.get("current_universe_reconciliation"),dict) else {}
+            if rec.get("coverage_complete") is not True:
+                bad.append({"path":str(path),"reason":"PCS_CURRENT_UNIVERSE_RECONCILIATION_INCOMPLETE","source":source})
+            if rec.get("direct_current_contract_complete") is not True:
+                bad.append({"path":str(path),"reason":"PCS_DIRECT_CURRENT_CONTRACT_INCOMPLETE","source":source})
+            if rec.get("all_official_current_matched_to_bulk") is not True:
+                bad.append({"path":str(path),"reason":"PCS_OFFICIAL_CURRENT_NOT_FULLY_MATCHED_TO_BULK","source":source,"missing":rec.get("direct_missing_from_bulk")})
+            try:
+                missing=int(rec.get("direct_missing_from_bulk") or 0)
+            except Exception:
+                missing=-1
+            if missing != 0:
+                bad.append({"path":str(path),"reason":"PCS_DIRECT_CURRENT_MISSING_FROM_BULK","source":source,"missing":rec.get("direct_missing_from_bulk")})
         return
 
     # Legacy browser/direct-post PCS contracts remain guarded by the old proof:
@@ -112,7 +124,7 @@ def main():
         if h["status"]!="OK":degraded.append(name)
     external_present={x.strip().upper() for x in args.external_present.split(",") if x.strip()};external_missing=[x for x in EXTERNAL_REQUIRED_LANES if x.upper() not in external_present]
     clean=not missing and not degraded and not external_missing;status="WORLD_COMPLETE" if clean else "PARTIAL_WORLD_COVERAGE"
-    payload={"contract":"SOURCE_COVERAGE_GUARD_V9_PCS_CONTRACT_AWARE","discovery_mode":args.mode,"coverage_status":status,"worldwide_claim_allowed":clean,"expected_materialized_packs":len(expected_packs),"present_materialized_packs":len(expected_packs)-len(missing),"missing_packs":missing,"degraded_packs":degraded,"external_required_lanes":EXTERNAL_REQUIRED_LANES,"external_present_lanes":sorted(external_present),"external_missing_lanes":external_missing,"strict_exhaustion_sources":sorted(STRICT_EXHAUSTION_SOURCES),"pack_health":health,"semantics":"WORLD_COMPLETE means every configured live-candidate-capable lane materialized cleanly and every adapter with an exhaustion contract proved full traversal. PCS proof checks are contract-aware: legacy browser/direct-post collectors require Current Opportunity filter and stable-page proof, while official bulk OCDS collectors require complete requested month x noticeType partitions (including Website Contract Notice 101) and still cannot receive full current-universe credit until their own independent reconciliation sets enumeration_complete/live_coverage_credit_allowed. Archive-only lanes, source caps, runtime budgets, request failures or missing exhaustion proof keep coverage PARTIAL. This still does not mean every procurement authority on Earth is configured."}
+    payload={"contract":"SOURCE_COVERAGE_GUARD_V10_PCS_DIRECT_RECONCILE_PROOF","discovery_mode":args.mode,"coverage_status":status,"worldwide_claim_allowed":clean,"expected_materialized_packs":len(expected_packs),"present_materialized_packs":len(expected_packs)-len(missing),"missing_packs":missing,"degraded_packs":degraded,"external_required_lanes":EXTERNAL_REQUIRED_LANES,"external_present_lanes":sorted(external_present),"external_missing_lanes":external_missing,"strict_exhaustion_sources":sorted(STRICT_EXHAUSTION_SOURCES),"pack_health":health,"semantics":"WORLD_COMPLETE means every configured live-candidate-capable lane materialized cleanly and every adapter with an exhaustion contract proved full traversal. PCS proof checks are contract-aware: legacy browser/direct-post collectors require Current Opportunity filter and stable-page proof; official bulk OCDS collectors require complete requested month x noticeType partitions including Website Contract Notice 101; and V4 reconciled packs additionally require a complete independent Current Opportunity traversal with every official current row exact-matched into the bulk. Archive-only lanes, source caps, runtime budgets, request failures or missing exhaustion proof keep coverage PARTIAL. This still does not mean every procurement authority on Earth is configured."}
     out=Path(args.out);out.parent.mkdir(parents=True,exist_ok=True);out.write_text(json.dumps(payload,indent=2,ensure_ascii=False),encoding="utf-8");print(json.dumps(payload,indent=2,ensure_ascii=False))
     if args.strict and not clean:raise SystemExit(3)
 if __name__=="__main__":main()
