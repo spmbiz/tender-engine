@@ -1,0 +1,69 @@
+name: ES PLACSP Retry Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'control/es_placsp_smoke_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Harvest current PLACSP Atom feeds
+        env:
+          DISCOVERY_OUT: es-smoke
+          LOOKBACK_DAYS: '3'
+          ES_MAX_PAGES: '2'
+          ES_PARSE_RETRIES: '3'
+        shell: bash
+        run: |
+          set +e
+          python pipeline/discover_es_placsp_atom.py
+          rc=$?
+          export RC="$rc"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('es-smoke/stats.json')
+          s=json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
+          payload={
+            'schema':'ES_PLACSP_RETRY_SMOKE_V1',
+            'adapter_exit_code':int(os.environ.get('RC') or 0),
+            'raw_materialized':s.get('raw_materialized'),
+            'current_materialized':s.get('current_materialized'),
+            'with_direct_document_urls':s.get('with_direct_document_urls'),
+            'parse_retries':s.get('parse_retries'),
+            'errors':s.get('errors') or [],
+            'telemetry':s.get('telemetry') or {},
+            'pass_recall': bool((s.get('current_materialized') or 0)>0 and not (s.get('errors') or [])),
+          }
+          Path('control/es_placsp_smoke.json').write_text(json.dumps(payload,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print(json.dumps(payload,indent=2,ensure_ascii=False))
+          PY
+      - name: Persist smoke result
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f control/es_placsp_smoke.json || exit 1
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add control/es_placsp_smoke.json
+          git diff --cached --quiet && exit 0
+          git commit -m "diag: persist PLACSP retry smoke ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
