@@ -1,32 +1,34 @@
 {
   "schema": "LIVE_WORLD_SNAPSHOT_POINTER_V2",
-  "source_discovery_run": 32377242255,
-  "generated_at": "2026-08-20T14:56:16.882492+00:00",
-  "snapshot_rows": 100802,
-  "current_materialized_rows": 99622,
-  "carried_forward_rows": 1180,
+  "source_discovery_run": 32396376713,
+  "generated_at": "2026-08-20T18:03:14.351511+00:00",
+  "snapshot_rows": 100422,
+  "current_materialized_rows": 98885,
+  "carried_forward_rows": 1537,
   "carried_forward_by_source": {
-    "ZA_ETENDERS_OCDS": 985,
+    "ES_PLACSP": 1262,
     "UK_PCS_OCDS": 93,
-    "FR": 37,
-    "CZ_ZAKAZKY_GOV": 33,
-    "UNGM_PUBLIC": 24,
+    "ZA_ETENDERS_OCDS": 86,
+    "CZ_ZAKAZKY_GOV": 42,
+    "UNGM_PUBLIC": 28,
+    "DK": 10,
+    "NL": 7,
     "MT": 6,
-    "NL": 2
+    "FR": 3
   },
   "open_state_counts": {
-    "OPEN_CONFIRMED_BY_DEADLINE": 94473,
-    "OPEN_UNVERIFIED_NO_PARSEABLE_DEADLINE": 6329
+    "OPEN_CONFIRMED_BY_DEADLINE": 94076,
+    "OPEN_UNVERIFIED_NO_PARSEABLE_DEADLINE": 6346
   },
-  "packet_count": 202,
+  "packet_count": 201,
   "coverage_status": "PARTIAL_WORLD_COVERAGE",
   "failed_sources": [
     "discovery-global-au-austender",
     "discovery-global-cyprus-epps",
+    "discovery-global-es-placsp",
     "discovery-global-it-anac-delta",
     "discovery-global-malta-epps",
     "discovery-global-uk-pcs-ocds",
-    "discovery-global-za-etenders-ocds",
     "discovery-ted"
   ],
   "world_exhaustive_claim_allowed": false,
@@ -34,7 +36,7 @@
   "packet_path_template": "gpt-packets/packet-XXXX.jsonl",
   "coverage_path": "discovery_coverage.json",
   "stable_release_tag": "live-world-snapshot-latest",
-  "immutable_release_tag": "live-world-snapshot-32377242255",
+  "immutable_release_tag": "live-world-snapshot-32396376713",
   "dce_request_path": "control/gpt_dce_request.json",
   "rule": "GPT selects candidate IDs semantically; GitHub retrieves DCE only after selection. Coverage gaps stay explicit even when prior still-live rows are carried forward for recall. No notice-only FINAL_SUPER_GREEN."
 }
