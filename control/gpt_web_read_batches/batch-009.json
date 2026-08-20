@@ -1,13 +1,55 @@
 {
   "schema": "GPT_WEB_READ_BATCH_V3_PROVENANCE_REFRESH",
-  "generated_at": "2026-08-20T06:32:56.934022+00:00",
-  "source_inbox_updated_at": "2026-08-20T06:32:56.114163+00:00",
-  "latest_source_dce_run_id": 32339156467,
+  "generated_at": "2026-08-20T07:04:14.395825+00:00",
+  "source_inbox_updated_at": "2026-08-20T07:04:13.921549+00:00",
+  "latest_source_dce_run_id": 32342122101,
   "batch_index": 9,
   "start_rank": 91,
   "end_rank": 100,
   "count": 10,
   "items": [
+    {
+      "candidate_id": "za_etenders_ocds:ocds-9t57fa-164050",
+      "title": null,
+      "buyer": null,
+      "portal": "ZA_ETENDERS",
+      "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-164050",
+      "deadline": null,
+      "estimated_value": null,
+      "currency": "ZAR",
+      "review_stage": "DCE_AUTHENTICITY",
+      "gate_readiness": false,
+      "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+      "evidence_gate_coverage": 0,
+      "spm_post_dce_score": 0,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "deadline_authority_status": "MISSING",
+      "deadline_conflict": false,
+      "authoritative_submission_date": null,
+      "source_dce_run_id": 32308758481,
+      "source_shard": 0,
+      "review_key": "837d97ea95c213170b534420ac37992fa85e8f44b9f3df2ae7ddaf1e99541d36",
+      "artifact_locator": {
+        "dce_run_id": 32308758481,
+        "shard": 0,
+        "candidate_id": "za_etenders_ocds:ocds-9t57fa-164050",
+        "release_tag": "dce-harvest-32308758481"
+      },
+      "evidence_quality": {
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "documents_with_text": 1,
+        "text_chars": 4265,
+        "attributed_compact_snippets": 0,
+        "artifact_lookup_required_snippets": 0,
+        "all_compact_snippets_document_attributed": false
+      },
+      "evidence": {},
+      "provenance_override": null,
+      "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
+      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
+    },
     {
       "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20317090",
       "title": "Concejalía Delegada General del Área de Hacienda, Personal y Modernización Administrativa del Ayuntamiento de Valladolid",
@@ -294,205 +336,6 @@
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
     },
     {
-      "candidate_id": "IT-PVL:e8fda46f-1009-480d-94d3-6fca73988720",
-      "title": "SERVIZI DI ARCHITETTURA E INGEGNERIA RELATIVI AI LAVORI DI COMPLETAMENTO DELLA SP 42",
-      "buyer": "PROVINCIA DEL MEDIO CAMPIDANO",
-      "portal": "GENERIC_PUBLIC_PAGE",
-      "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/e8fda46f-1009-480d-94d3-6fca73988720?ricercaArchivio=false",
-      "deadline": null,
-      "estimated_value": 490441.06,
-      "currency": "EUR",
-      "review_stage": "BUSINESS_GATES",
-      "gate_readiness": true,
-      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-      "evidence_gate_coverage": 8,
-      "spm_post_dce_score": 18,
-      "spm_fit_band": "LOW",
-      "spm_fit_reasons": [],
-      "spm_friction_signals": [],
-      "deadline_authority_status": "DCE_AUTHORITATIVE_SUBMISSION_DATE_FOUND_NOTICE_MISSING",
-      "deadline_conflict": false,
-      "authoritative_submission_date": "2026-07-28",
-      "source_dce_run_id": 32336420165,
-      "source_shard": 17,
-      "review_key": "63fe1b4cd8692eb6bcbc7b6f84480e3e9dda0bbbd0c6cf1890da8c50bbe7c76d",
-      "artifact_locator": {
-        "dce_run_id": 32336420165,
-        "shard": 17,
-        "candidate_id": "IT-PVL:e8fda46f-1009-480d-94d3-6fca73988720",
-        "release_tag": "dce-harvest-32336420165"
-      },
-      "evidence_quality": {
-        "raw_status": "DOWNLOADED_PUBLIC",
-        "documents_with_text": 11,
-        "text_chars": 90691,
-        "attributed_compact_snippets": 14,
-        "artifact_lookup_required_snippets": 0,
-        "all_compact_snippets_document_attributed": true
-      },
-      "evidence": {
-        "entity_geography": [
-          {
-            "text": "ment Document (ESPD) 5. Lot 5.1. Lot: LOT-0001 Title: SERVIZI DI ARCHITETTURA E INGEGNERIA RELATIVI AI LAVORI DI COMPLETAMENTO DELLA SP 42 450212-2026 Page 2/5 Description: SERVIZI DI ARCHITETTURA E INGEGNERIA RELATIVI AI LAVORI DI COMPLETAMENTO DELLA SP 42 Internal identifier: 1 5.1.1. Purpose Main nature of the contract: Services Main classification (cpv): 71240000 Architectural, engineering and planning services 5.1.2. Place of performance Country subdivision (NUTS): Sud Sardegna (ITG2H) Country: Italy 5.1.3. E…",
-            "source": "files/2026-OJS124-00450212-en.pdf",
-            "source_url": "https://ted.europa.eu/it/notice/-/detail/450212-2026",
-            "source_sha256": "afd4e61cb00854c290421e63a172c0d1117b0299973b3572935717e49cb03b8b",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "references_experience": [
-          {
-            "text": "relevantního profesního rejstříku Popis výběrového kritéria: Iscrizione ad un apposito albo professionale Kritérium: Zápis do obchodního rejstříku Popis výběrového kritéria: Iscrizione al registro di commercio Kritérium: Potřeba povolení nebo členství v určité organizaci pro smlouvy o službách Popis výběrového kritéria: Autorizzazione o appartenenza a una particolare organizzazione necessaria per gli appalti di servizi Kritérium: Potřeba povolení nebo členství v určité organizaci pro smlouvy o službách Popis výběr…",
-            "source": "files/2026-OJS124-00450212-cs.pdf",
-            "source_url": "https://ted.europa.eu/it/notice/-/detail/450212-2026",
-            "source_sha256": "f84836d586e881cfc39b27624509a315185e01528f4cbcbc2f855e29fc9b9dbe",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "Iscrizione ad un apposito albo professionale Kriterium: Tilmelding i et handelsregister Beskrivelse af udvælgelseskriterium: Iscrizione al registro di commercio Kriterium: Godkendelse eller medlemskab af en bestemt organisation nødvendig for servicekontrakter Beskrivelse af udvælgelseskriterium: Autorizzazione o appartenenza a una particolare organizzazione necessaria per gli appalti di servizi Kriterium: Godkendelse eller medlemskab af en bestemt organisation nødvendig for servicekontrakter Beskrivelse af udvælge…",
-            "source": "files/2026-OJS124-00450212-da.pdf",
-            "source_url": "https://ted.europa.eu/it/notice/-/detail/450212-2026",
-            "source_sha256": "03a834697c0db4a531a7b749db4749c3bd77fcc165528840877e7651544c951b",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "certifications_partner": [
-          {
-            "text": "ание на критерия за подбор: Misure di gestione ambientale Критерий: Среден годишен персонал Описание на критерия за подбор: Media annuale della forza lavoro Критерий: Брой на управленския персонал Описание на критерия за подбор: Numero di personale dirigenziale Критерий: Съответните образователни и професионални квалификации Описание на критерия за подбор: Titoli di studio e professionali pertinenti Критерий: Инструменти, заводи или техническа оборудване Описание на критерия за подбор: Strumenti, impianti o attrez…",
-            "source": "files/2026-OJS124-00450212-bg.pdf",
-            "source_url": "https://ted.europa.eu/it/notice/-/detail/450212-2026",
-            "source_sha256": "d37d232743f3a86ed18f26a5f2801be1fbc712e09b630ee36f13ca49ede320d7",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "ero di personale dirigenziale Критерий: Съответните образователни и професионални квалификации Описание на критерия за подбор: Titoli di studio e professionali pertinenti Критерий: Инструменти, заводи или техническа оборудване Описание на критерия за подбор: Strumenti, impianti o attrezzature tecniche Критерий: Сертификати от независими органи за стандарти за уверяване на качеството Описание на критерия за подбор: Certificati rilasciati da organi indipendenti riguardanti standard di assicurazione della qualità Кри…",
-            "source": "files/2026-OJS124-00450212-bg.pdf",
-            "source_url": "https://ted.europa.eu/it/notice/-/detail/450212-2026",
-            "source_sha256": "d37d232743f3a86ed18f26a5f2801be1fbc712e09b630ee36f13ca49ede320d7",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "insurance_bonds": [
-          {
-            "text": "erion: Environmental management measures Description of selection criterion: Misure di gestione ambientale Criterion: Average yearly manpower Description of selection criterion: Media annuale della forza lavoro Criterion: Number of managerial staff Description of selection criterion: Numero di personale dirigenziale Criterion: Relevant educational and professional qualifications Description of selection criterion: Titoli di studio e professionali pertinenti Criterion: Tools, plant, or technical equipment Descripti…",
-            "source": "files/2026-OJS124-00450212-en.pdf",
-            "source_url": "https://ted.europa.eu/it/notice/-/detail/450212-2026",
-            "source_sha256": "afd4e61cb00854c290421e63a172c0d1117b0299973b3572935717e49cb03b8b",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "term_value": [
-          {
-            "text": "fahren Titel: SERVIZI DI ARCHITETTURA E INGEGNERIA RELATIVI AI LAVORI DI COMPLETAMENTO DELLA SP 42 Beschreibung: SERVIZI DI ARCHITETTURA E INGEGNERIA RELATIVI AI LAVORI DI COMPLETAMENTO DELLA SP 42 Kennung des Verfahrens: bd219b35-096d-46d8-a429-440b6dc53814 Verfahrensart: Offenes Verfahren Das Verfahren wird beschleunigt: nein 2.1.1. Zweck Art des Auftrags: Dienstleistungen Haupteinstufung (cpv): 71240000 Dienstleistungen von Architektur- und Ingenieurbüros sowie planungsbezogene Leistungen 2.1.2. Erfüllungsort L…",
-            "source": "files/2026-OJS124-00450212-de.pdf",
-            "source_url": "https://ted.europa.eu/it/notice/-/detail/450212-2026",
-            "source_sha256": "c70430d66082763c6ec78c9811875b247c7ed75d45c49206c078b782d0c44699",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "ründe Quellen der Ausschlussgründe: Einheitliche Europäische Eigenerklärung (EEE) 5. Los 5.1. Los: LOT-0001 450212-2026 Page 2/5 Titel: SERVIZI DI ARCHITETTURA E INGEGNERIA RELATIVI AI LAVORI DI COMPLETAMENTO DELLA SP 42 Beschreibung: SERVIZI DI ARCHITETTURA E INGEGNERIA RELATIVI AI LAVORI DI COMPLETAMENTO DELLA SP 42 Interne Kennung: 1 5.1.1. Zweck Art des Auftrags: Dienstleistungen Haupteinstufung (cpv): 71240000 Dienstleistungen von Architektur- und Ingenieurbüros sowie planungsbezogene Leistungen 5.1.2. Erfüll…",
-            "source": "files/2026-OJS124-00450212-de.pdf",
-            "source_url": "https://ted.europa.eu/it/notice/-/detail/450212-2026",
-            "source_sha256": "c70430d66082763c6ec78c9811875b247c7ed75d45c49206c078b782d0c44699",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "award_criteria": [
-          {
-            "text": "teriums: Titoli di studio e professionali pertinenti Kriterium: Werkzeuge, Anlagen oder technische Ausrüstung Beschreibung des Eignungskriteriums: Strumenti, impianti o attrezzature tecniche Kriterium: Zertifikate von unabhängigen Stellen über Qualitätssicherungsstandards Beschreibung des Eignungskriteriums: Certificati rilasciati da organi indipendenti riguardanti standard di assicurazione della qualità Kriterium: Zertifikate von unabhängigen Stellen über Umweltmanagementsysteme oder - standards Beschreibung des …",
-            "source": "files/2026-OJS124-00450212-de.pdf",
-            "source_url": "https://ted.europa.eu/it/notice/-/detail/450212-2026",
-            "source_sha256": "c70430d66082763c6ec78c9811875b247c7ed75d45c49206c078b782d0c44699",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "ection criterion: Titoli di studio e professionali pertinenti Criterion: Tools, plant, or technical equipment Description of selection criterion: Strumenti, impianti o attrezzature tecniche Criterion: Certificates by independent bodies about quality assurance standards Description of selection criterion: Certificati rilasciati da organi indipendenti riguardanti standard di assicurazione della qualità Criterion: Certificates by independent bodies about environmental management systems or standards Description of se…",
-            "source": "files/2026-OJS124-00450212-en.pdf",
-            "source_url": "https://ted.europa.eu/it/notice/-/detail/450212-2026",
-            "source_sha256": "afd4e61cb00854c290421e63a172c0d1117b0299973b3572935717e49cb03b8b",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "forms_signatures": [
-          {
-            "text": "TURA E INGEGNERIA RELATIVI AI LAVORI DI COMPLETAMENTO DELLA SP 42 Identifikátor řízení: bd219b35-096d-46d8-a429-440b6dc53814 Typ řízení: Otevřené Řízení se zrychlí: ne 2.1.1. Účel Charakter smlouvy: Služby Hlavní klasifikace (cpv): 71240000 Architektonické, technické a plánovací služby 2.1.2. Místo plnění Nižší územní jednotka země (NUTS): Sud Sardegna (ITG2H) Země: Itálie Další informace: Informazioni supplementari 2.1.3. Hodnota Odhadovaná hodnota bez DPH: 490 441,06 EUR 2.1.4. Obecné informace Právní základ: Sm…",
-            "source": "files/2026-OJS124-00450212-cs.pdf",
-            "source_url": "https://ted.europa.eu/it/notice/-/detail/450212-2026",
-            "source_sha256": "f84836d586e881cfc39b27624509a315185e01528f4cbcbc2f855e29fc9b9dbe",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "MPLETAMENTO DELLA SP 42 Identifikator for proceduren: bd219b35-096d-46d8-a429-440b6dc53814 Udbudsprocedure: Offentligt udbud Proceduren er en hasteprocedure: nej 2.1.1. Formål Kontraktens hovedformål: Tjenesteydelser Primær klassifikation (cpv): 71240000 Arkitekt-, ingeniør- og planlægningsvirksomhed 2.1.2. Udførelsessted Landsdel (NUTS): Sud Sardegna (ITG2H) Land: Italien Yderligere oplysninger: Informazioni supplementari 2.1.3. Værdi Anslået værdi eksklusiv moms: 490 441,06 EUR 2.1.4. Generelle oplysninger Retsg…",
-            "source": "files/2026-OJS124-00450212-da.pdf",
-            "source_url": "https://ted.europa.eu/it/notice/-/detail/450212-2026",
-            "source_sha256": "03a834697c0db4a531a7b749db4749c3bd77fcc165528840877e7651544c951b",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "submission": [
-          {
-            "text": "oder - standards Beschreibung des Eignungskriteriums: Certificati rilasciati da organi indipendenti riguardanti sistemi o standard di gestione ambientale 5.1.10. Zuschlagskriterien Kriterium: Art: Qualität Beschreibung: Offerta economicamente più vantaggiosa 5.1.11. Auftragsunterlagen Frist für die Anforderung zusätzlicher Informationen: 22/07/2026 09:30:00 (UTC+02:00) Osteuropäische Zeit, Mitteleuropäische Sommerzeit Internetadresse der Auftragsunterlagen: https://sardegnacat.regione.sardegna.it/Application /Cust…",
-            "source": "files/2026-OJS124-00450212-de.pdf",
-            "source_url": "https://ted.europa.eu/it/notice/-/detail/450212-2026",
-            "source_sha256": "c70430d66082763c6ec78c9811875b247c7ed75d45c49206c078b782d0c44699",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "ng des Eignungskriteriums: Certificati rilasciati da organi indipendenti riguardanti sistemi o standard di gestione ambientale 5.1.10. Zuschlagskriterien Kriterium: Art: Qualität Beschreibung: Offerta economicamente più vantaggiosa 5.1.11. Auftragsunterlagen Frist für die Anforderung zusätzlicher Informationen: 22/07/2026 09:30:00 (UTC+02:00) Osteuropäische Zeit, Mitteleuropäische Sommerzeit Internetadresse der Auftragsunterlagen: https://sardegnacat.regione.sardegna.it/Application /CustomDoc/DettaglioProcedura.as…",
-            "source": "files/2026-OJS124-00450212-de.pdf",
-            "source_url": "https://ted.europa.eu/it/notice/-/detail/450212-2026",
-            "source_sha256": "c70430d66082763c6ec78c9811875b247c7ed75d45c49206c078b782d0c44699",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ]
-      },
-      "provenance_override": null,
-      "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
-      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
-    },
-    {
       "candidate_id": "TED:577142-2026",
       "title": "Lithuania – Software package and information systems – ES struktūrinės paramos kompiuterinės informacinės valdymo ir priežiūros sistemos 2014-2020 m. ES struktūrinių fondų posistemio analizės modulio licencijos",
       "buyer": "Lietuvos Respublikos finansų ministerija",
@@ -704,6 +547,183 @@
             "source_sha256": "356abec0efda3f1d706a952ccdf393310433a3077227bf8a059525f9ea9283d4",
             "source_kind": "text",
             "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ]
+      },
+      "provenance_override": null,
+      "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
+      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
+    },
+    {
+      "candidate_id": "IT-PVL:6556a5a0-34e4-4230-a42a-e5ab54639513",
+      "title": "Enimed S.p.a. - Servizi di ingegneria ambientale finalizzati agli iter autorizzativi di impianti esistenti, a supporto di progetti esplorativi e di sviluppo",
+      "buyer": "ENI MEDITERRANEA IDROCARBURI",
+      "portal": "GENERIC_PUBLIC_PAGE",
+      "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/6556a5a0-34e4-4230-a42a-e5ab54639513?ricercaArchivio=false",
+      "deadline": "2026-08-25T10:00:00+00:00",
+      "estimated_value": 12241000.0,
+      "currency": "EUR",
+      "review_stage": "BUSINESS_GATES",
+      "gate_readiness": true,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "evidence_gate_coverage": 7,
+      "spm_post_dce_score": 17,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "deadline_authority_status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+      "deadline_conflict": false,
+      "authoritative_submission_date": "2026-08-25",
+      "source_dce_run_id": 32339156467,
+      "source_shard": 6,
+      "review_key": "27e8a3a3bd7796d6728c4ee680e4a6be02f48d1389aa7e2a79bd19aa52305e42",
+      "artifact_locator": {
+        "dce_run_id": 32339156467,
+        "shard": 6,
+        "candidate_id": "IT-PVL:6556a5a0-34e4-4230-a42a-e5ab54639513",
+        "release_tag": "dce-harvest-32339156467"
+      },
+      "evidence_quality": {
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "documents_with_text": 11,
+        "text_chars": 65090,
+        "attributed_compact_snippets": 12,
+        "artifact_lookup_required_snippets": 0,
+        "all_compact_snippets_document_attributed": true
+      },
+      "evidence": {
+        "entity_geography": [
+          {
+            "text": "alizzati agli iter autorizzativi di impianti esistenti, a supporto di progetti esplorativi e di sviluppo 5.1.1. Purpose Main nature of the contract: Services Main classification (cpv): 71313000 Environmental engineering consultancy services 5.1.2. Place of performance Town: Gela (CL) Postcode: 93012 Country subdivision (NUTS): Caltanissetta (ITG15) Country: Italy 5.1.3. Estimated duration Duration: 36 Months 5.1.4. Renewal Maximum renewals: 2 Other information about renewals: Opzione di proroga per ulteriori 2 ann…",
+            "source": "files/2026-OJS135-00493423-en.pdf",
+            "source_url": "https://ted.europa.eu/it/notice/-/detail/493423-2026",
+            "source_sha256": "7eef4a9389fe85c8ef311e69109d7cca1d7968fc79df5534e05e7bf8374dbaed",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "certifications_partner": [
+          {
+            "text": "odice postale: 93012 Suddivisione del paese (NUTS): Caltanissetta (ITG15) Paese: Italia E-mail: alessandro.stefani@enirewind.com Telefono: +393758660828 Ruoli di questa organizzazione: Committente Organizzazione alla quale rivolgersi per informazioni complementari sulla procedura di appalto Organizzazione alla quale rivolgersi per l'accesso offline ai documenti di gara Organizzazione che riceve le domande di partecipazione Organizzazione che tratta le offerte Organizzazione competente per i ricorsi Organizzazione …",
+            "source": "files/2026-OJS135-00493423-it-ts.pdf",
+            "source_url": "https://ted.europa.eu/it/notice/-/detail/493423-2026",
+            "source_sha256": "57b2d437720d01784bc108a7de2dc4c31a5396ab8a4a9cf2d09097a6b2b8e8fc",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "in fondo ad ogni pagina del sito. Accetta tutti i cookie Accetta solo i cookie essenziali Accedi Italiano Gare d’appalto dell’UE Ted • tenders electronic daily Supplemento della Gazzetta ufficiale dell'UE Menu Cerca Altre opzioni di ricerca: Ricerca avanzata Ricerca per utenti esperti Sfoglia per argomento TED 493423-2026 - Gara Assistenza Stampa 493423-2026 - Gara Visualizzazione dell'avviso Avvisi correlati Scarica XML Mostra i link diretti Crea una notifica Invia per e-mail Richiedi traduzione 1. Committente 2.…",
+            "source": "files/portal_page.txt",
+            "source_url": null,
+            "source_sha256": "bcfd06c382d6ecf591ec7f6a8a986418bab21c510b82446e852cbc6faa1ebbab",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "subcontracting_consortium": [
+          {
+            "text": "Angebote oder Teilnahmeanträge eingereicht werden können: Italienisch Elektronischer Katalog: Nicht zulässig Beschreibung der finanziellen Sicherheit: Garanzia bancaria o assicurativa per la partecipazione alla gara Frist für den Eingang der Angebote: 25/08/2026 12:00:00 (UTC+02:00) Osteuropäische Zeit, Mitteleuropäische Sommerzeit 493423-2026 Page 3/4 Dauer, während der das Angebot gültig bleiben muss: 6 Monate Auftragsbedingungen: Die Auftragsausführung muss im Rahmen von Programmen für geschützte Beschäftigungs…",
+            "source": "files/2026-OJS135-00493423-de.pdf",
+            "source_url": "https://ted.europa.eu/it/notice/-/detail/493423-2026",
+            "source_sha256": "9608395673c4b7f6cb50b8ebcc6a6d17c0fd0e33a4ae661c1b73a66a084956bc",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "term_value": [
+          {
+            "text": "alizzati agli iter autorizzativi di impianti esistenti, a supporto di progetti esplorativi e di sviluppo Beschreibung: Enimed S.p.a. - Servizi di ingegneria ambientale finalizzati agli iter autorizzativi di impianti esistenti, a supporto di progetti esplorativi e di sviluppo Kennung des Verfahrens: 52d792c8-c695-4a1b-967e-7a1fa1aab917 Verfahrensart: Offenes Verfahren Das Verfahren wird beschleunigt: nein 2.1.1. Zweck Art des Auftrags: Dienstleistungen Haupteinstufung (cpv): 71313000 Umwelttechnische Beratung 2.1.2…",
+            "source": "files/2026-OJS135-00493423-de.pdf",
+            "source_url": "https://ted.europa.eu/it/notice/-/detail/493423-2026",
+            "source_sha256": "9608395673c4b7f6cb50b8ebcc6a6d17c0fd0e33a4ae661c1b73a66a084956bc",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "i sviluppo 493423-2026 Page 2/4 Beschreibung: Enimed S.p.a. - Servizi di ingegneria ambientale finalizzati agli iter autorizzativi di impianti esistenti, a supporto di progetti esplorativi e di sviluppo 5.1.1. Zweck Art des Auftrags: Dienstleistungen Haupteinstufung (cpv): 71313000 Umwelttechnische Beratung 5.1.2. Erfüllungsort Stadt: Gela (CL) Postleitzahl: 93012 Land, Gliederung (NUTS): Caltanissetta (ITG15) Land: Italien 5.1.3. Geschätzte Dauer Laufzeit: 36 Monate 5.1.4. Verlängerung Maximale Verlängerungen: 2 …",
+            "source": "files/2026-OJS135-00493423-de.pdf",
+            "source_url": "https://ted.europa.eu/it/notice/-/detail/493423-2026",
+            "source_sha256": "9608395673c4b7f6cb50b8ebcc6a6d17c0fd0e33a4ae661c1b73a66a084956bc",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "award_criteria": [
+          {
+            "text": ".1.2. Erfüllungsort Stadt: Gela (CL) Postleitzahl: 93012 Land, Gliederung (NUTS): Caltanissetta (ITG15) Land: Italien 5.1.3. Geschätzte Dauer Laufzeit: 36 Monate 5.1.4. Verlängerung Maximale Verlängerungen: 2 Weitere Informationen zur Verlängerung: Opzione di proroga per ulteriori 2 anni, esercitabili anche annualmente 5.1.5. Wert Geschätzter Wert ohne MwSt.: 12 241 000,00 EUR 5.1.6. Allgemeine Informationen Vorbehaltene Teilnahme: Teilnahme ist nicht vorbehalten. Die Beschaffung fällt unter das Übereinkommen über…",
+            "source": "files/2026-OJS135-00493423-de.pdf",
+            "source_url": "https://ted.europa.eu/it/notice/-/detail/493423-2026",
+            "source_sha256": "9608395673c4b7f6cb50b8ebcc6a6d17c0fd0e33a4ae661c1b73a66a084956bc",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "consultancy services 5.1.2. Place of performance Town: Gela (CL) Postcode: 93012 Country subdivision (NUTS): Caltanissetta (ITG15) Country: Italy 5.1.3. Estimated duration Duration: 36 Months 5.1.4. Renewal Maximum renewals: 2 Other information about renewals: Opzione di proroga per ulteriori 2 anni, esercitabili anche annualmente 5.1.5. Value Estimated value excluding VAT: 12 241 000,00 EUR 5.1.6. General information Reserved participation: Participation is not reserved. The procurement is covered by the Governme…",
+            "source": "files/2026-OJS135-00493423-en.pdf",
+            "source_url": "https://ted.europa.eu/it/notice/-/detail/493423-2026",
+            "source_sha256": "7eef4a9389fe85c8ef311e69109d7cca1d7968fc79df5534e05e7bf8374dbaed",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "forms_signatures": [
+          {
+            "text": "pianti esistenti, a supporto di progetti esplorativi e di sviluppo Identifikátor řízení: 52d792c8-c695-4a1b-967e-7a1fa1aab917 Typ řízení: Otevřené Řízení se zrychlí: ne 2.1.1. Účel Charakter smlouvy: Služby Hlavní klasifikace (cpv): 71313000 Poradenství v oblasti tvorby a ochrany životního prostředí 2.1.2. Místo plnění Obec: Gela (CL) PSČ: 93012 Nižší územní jednotka země (NUTS): Caltanissetta (ITG15) Země: Itálie 2.1.3. Hodnota Odhadovaná hodnota bez DPH: 12 241 000,00 EUR 2.1.4. Obecné informace Právní základ: S…",
+            "source": "files/2026-OJS135-00493423-cs.pdf",
+            "source_url": "https://ted.europa.eu/it/notice/-/detail/493423-2026",
+            "source_sha256": "ab7985f89c3493cfe75eb4bb9104b3e62b82a2b0c2be0e5562e885a597f44bdf",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "pporto di progetti esplorativi e di sviluppo Identifikator for proceduren: 52d792c8-c695-4a1b-967e-7a1fa1aab917 Udbudsprocedure: Offentligt udbud Proceduren er en hasteprocedure: nej 2.1.1. Formål Kontraktens hovedformål: Tjenesteydelser Primær klassifikation (cpv): 71313000 Rådgivning i forbindelse med miljøteknik 2.1.2. Udførelsessted By: Gela (CL) Postnummer: 93012 Landsdel (NUTS): Caltanissetta (ITG15) Land: Italien 2.1.3. Værdi Anslået værdi eksklusiv moms: 12 241 000,00 EUR 2.1.4. Generelle oplysninger Retsg…",
+            "source": "files/2026-OJS135-00493423-da.pdf",
+            "source_url": "https://ted.europa.eu/it/notice/-/detail/493423-2026",
+            "source_sha256": "8b7cf6a67ee2630cee37b20ac2f1c42725077f29888694661a9b8eb2deeef270",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "submission": [
+          {
+            "text": "t vorbehalten. Die Beschaffung fällt unter das Übereinkommen über das öffentliche Beschaffungswesen: ja 5.1.9. Eignungskriterien Quellen der Eignungskriterien: Auftragsunterlagen 5.1.10. Zuschlagskriterien Kriterium: Art: Kosten Beschreibung: Offerta Economicamente più vantaggiosa come da descrizione nei documenti di gara 5.1.11. Auftragsunterlagen Zugang zu bestimmten Auftragsunterlagen ist beschränkt Sprachen, in denen die Auftragsunterlagen offiziell verfügbar sind: Italienisch Informationen über zugangsbeschrä…",
+            "source": "files/2026-OJS135-00493423-de.pdf",
+            "source_url": "https://ted.europa.eu/it/notice/-/detail/493423-2026",
+            "source_sha256": "9608395673c4b7f6cb50b8ebcc6a6d17c0fd0e33a4ae661c1b73a66a084956bc",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "ng fällt unter das Übereinkommen über das öffentliche Beschaffungswesen: ja 5.1.9. Eignungskriterien Quellen der Eignungskriterien: Auftragsunterlagen 5.1.10. Zuschlagskriterien Kriterium: Art: Kosten Beschreibung: Offerta Economicamente più vantaggiosa come da descrizione nei documenti di gara 5.1.11. Auftragsunterlagen Zugang zu bestimmten Auftragsunterlagen ist beschränkt Sprachen, in denen die Auftragsunterlagen offiziell verfügbar sind: Italienisch Informationen über zugangsbeschränkte Dokumente einsehbar unt…",
+            "source": "files/2026-OJS135-00493423-de.pdf",
+            "source_url": "https://ted.europa.eu/it/notice/-/detail/493423-2026",
+            "source_sha256": "9608395673c4b7f6cb50b8ebcc6a6d17c0fd0e33a4ae661c1b73a66a084956bc",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
             "raw_machine_format": false,
             "artifact_lookup_required": false
           }
@@ -2124,71 +2144,6 @@
             "source": "files/Install_Shaders_Combined_Synopsis_Solicitation.pdf",
             "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/83f/83fa69bd01d94a9fba1e305d7f702cd0.pdf?response-content-disposition=attachment%3B%20filename%3DInstall%2BShaders%2BCombined%2BSynopsis%2BSolicitation.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T045146Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=51154045c1191c6e29e4e5f2cb87f3a8fd17750af8b22f05755d5bf98019cf0b",
             "source_sha256": "99533542e3fcae9bd4ce3ded64a2bff230a20ef88a9b1b0d823f94a3742b4730",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ]
-      },
-      "provenance_override": null,
-      "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
-      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
-    },
-    {
-      "candidate_id": "GR-KHMDHS:26PROC019649458",
-      "title": "ΠΡΟΣΚΛΗΣΗ ΓΙΑ ΜΕΤΑΦΟΡΑ ΦΟΙΤΗΤΩΝ ΠΑΝ. ΜΟΝΑΔΑΣ ΧΙΟΥ 2026-2027",
-      "buyer": "ΠΑΝΕΠΙΣΤΗΜΙΟ ΑΙΓΑΙΟΥ",
-      "portal": "GR_KHMDHS",
-      "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019649458",
-      "deadline": "2026-08-26T15:00:00+00:00",
-      "estimated_value": 22191.74,
-      "currency": "EUR",
-      "review_stage": "BUSINESS_GATES",
-      "gate_readiness": true,
-      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-      "evidence_gate_coverage": 1,
-      "spm_post_dce_score": 11,
-      "spm_fit_band": "LOW",
-      "spm_fit_reasons": [],
-      "spm_friction_signals": [],
-      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
-      "deadline_conflict": false,
-      "authoritative_submission_date": null,
-      "source_dce_run_id": 32334282353,
-      "source_shard": 12,
-      "review_key": "573a9c6eda3c77e193aace297b6dab3776ab55b20aae43f7941ba10eceef1b52",
-      "artifact_locator": {
-        "dce_run_id": 32334282353,
-        "shard": 12,
-        "candidate_id": "GR-KHMDHS:26PROC019649458",
-        "release_tag": "dce-harvest-32334282353"
-      },
-      "evidence_quality": {
-        "raw_status": "DOWNLOADED_PUBLIC",
-        "documents_with_text": 1,
-        "text_chars": 68919,
-        "attributed_compact_snippets": 2,
-        "artifact_lookup_required_snippets": 0,
-        "all_compact_snippets_document_attributed": true
-      },
-      "evidence": {
-        "ip_data_security": [
-          {
-            "text": "νόμου. Κατά την εκτέλεση της σύμβασης, κάθε διαφορά που προκύπτει αναφορικά με την ερμηνεία, και/ή το κύρος και/ή την εκτέλεση της παρούσας, ή εξ αφορμής της, επιλύονται σύμφωνα με το ίδιο άρθρο. Άρθρο 16: Συμμόρφωση με τον Κανονισμό ΕΕ/2016/2019 και τον ν. 4624/2019 (Α 137)2 Τα αντισυμβαλλόμενα μέρη αναλαμβάνουν να τηρούν τις υποχρεώσεις που απορρέουν από την εφαρμογή του Κανονισμού (ΕΕ) 2016/679 για την προστασία των φυσικών προσώπων έναντι της επεξεργασίας των δεδομένων προσωπικού χαρακτήρα και για την ελεύθερη…",
-            "source": "files/26PROC019649458.pdf",
-            "source_url": "https://cerpp.eprocurement.gov.gr/khmdhs-opendata/notice/attachment/26PROC019649458",
-            "source_sha256": "ab55c0f60ce9748d89afa05c2f4ecf9afeaea6701fa5fc49bd70926c24d0162e",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "σύμβασης, κάθε διαφορά που προκύπτει αναφορικά με την ερμηνεία, και/ή το κύρος και/ή την εκτέλεση της παρούσας, ή εξ αφορμής της, επιλύονται σύμφωνα με το ίδιο άρθρο. Άρθρο 16: Συμμόρφωση με τον Κανονισμό ΕΕ/2016/2019 και τον ν. 4624/2019 (Α 137)2 Τα αντισυμβαλλόμενα μέρη αναλαμβάνουν να τηρούν τις υποχρεώσεις που απορρέουν από την εφαρμογή του Κανονισμού (ΕΕ) 2016/679 για την προστασία των φυσικών προσώπων έναντι της επεξεργασίας των δεδομένων προσωπικού χαρακτήρα και για την ελεύθερη κυκλοφορία των δεδομένων αυτ…",
-            "source": "files/26PROC019649458.pdf",
-            "source_url": "https://cerpp.eprocurement.gov.gr/khmdhs-opendata/notice/attachment/26PROC019649458",
-            "source_sha256": "ab55c0f60ce9748d89afa05c2f4ecf9afeaea6701fa5fc49bd70926c24d0162e",
             "source_kind": "pdf",
             "provenance_strength": "SOURCE_URL_ATTRIBUTED",
             "raw_machine_format": false,
