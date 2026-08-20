@@ -9,6 +9,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 import pipeline.discover_gr_khmdhs_v2 as gr
+import pipeline.discover_gr_khmdhs_v3 as grv3
 
 
 def test_window_manifest_is_contiguous_and_never_wider_than_180(monkeypatch):
@@ -80,6 +81,18 @@ def test_verified_no_data_404_is_strictly_bounded_to_page_zero_and_explicit_mess
 
     html = FakeResponse(payload=ValueError("not json"), text="No data found for the given criteria")
     assert gr.verified_no_data_404(html, 0) is True
+
+
+def test_v3_accepts_only_the_observed_publisher_no_notices_message():
+    observed = FakeResponse(payload={"message": "No notices found for the given criteria", "status": 404})
+    assert grv3.verified_no_data_404(observed, 0) is True
+    assert grv3.verified_no_data_404(observed, 1) is False
+
+    wrong_status = FakeResponse(payload={"message": "No notices found for the given criteria", "status": 500})
+    assert grv3.verified_no_data_404(wrong_status, 0) is False
+
+    other_404 = FakeResponse(payload={"message": "Not Found", "status": 404})
+    assert grv3.verified_no_data_404(other_404, 0) is False
 
 
 def test_retry_after_parses_seconds(monkeypatch):
