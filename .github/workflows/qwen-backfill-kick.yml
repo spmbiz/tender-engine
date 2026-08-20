@@ -1,0 +1,76 @@
+name: Qwen Backfill Kick
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/10 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'control/qwen_live/classification_summary.json'
+      - '.github/workflows/qwen-backfill-kick.yml'
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: qwen-backfill-kick
+  cancel-in-progress: true
+
+jobs:
+  kick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - id: backlog
+        name: Read durable Qwen backlog
+        shell: bash
+        run: |
+          set -euo pipefail
+          remaining="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('control/qwen_live/classification_summary.json')
+          try:
+              payload=json.loads(p.read_text(encoding='utf-8'))
+              print(max(0,int(payload.get('remaining_classification_queue') or 0)))
+          except Exception:
+              print(0)
+          PY
+          )"
+          echo "remaining=$remaining" >> "$GITHUB_OUTPUT"
+          echo "Qwen classification backlog: $remaining"
+
+      - name: Dispatch high-throughput Qwen pass when idle
+        if: steps.backlog.outputs.remaining != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          active="$(gh run list --workflow qwen-live-classification.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
+          if [ "$active" -gt 0 ]; then
+            echo "Qwen already active/queued ($active); no duplicate dispatch."
+            exit 0
+          fi
+          gh workflow run qwen-live-classification.yml --ref main \
+            -f per_shard=480 \
+            -f auto_continue=true \
+            -f dce_limit=160
+          echo "Dispatched Qwen pass at per_shard=480; remaining=${{ steps.backlog.outputs.remaining }}"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### Qwen backfill kick" >> "$GITHUB_STEP_SUMMARY"
+          echo "- remaining classification backlog: ${{ steps.backlog.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- requested per worker when idle: 480" >> "$GITHUB_STEP_SUMMARY"
