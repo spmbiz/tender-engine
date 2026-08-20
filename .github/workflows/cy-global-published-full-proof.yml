@@ -1,0 +1,228 @@
+name: Cyprus National Published Notices Full Proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/cy-global-published-full-proof.yml'
+      - 'pipeline/discover_cy_epps_published_global.py'
+      - 'pipeline/discover_cy_epps_published_global_v2.py'
+      - 'pipeline/discover_cy_epps_published_global_v3.py'
+      - 'pipeline/merge_cy_epps_published_shards.py'
+      - 'control/cy_global_published_full_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      total_pages: ${{ steps.plan.outputs.total_pages }}
+      total_reported: ${{ steps.plan.outputs.total_reported }}
+      pager_prefix: ${{ steps.plan.outputs.pager_prefix }}
+      release_tag: ${{ steps.release.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4
+      - name: Read live publisher page-one contract
+        run: python pipeline/discover_cy_epps_published_global_v3.py --output cy-init --page-start 1 --page-end 1
+      - id: plan
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json,math
+          s=json.load(open('cy-init/stats.json'))
+          assert s.get('exact_row_reconciliation') is True,s
+          total_pages=int(s['total_pages']); total=int(s['total_reported'])
+          prefix=str(s.get('publisher_pager_prefix') or '')
+          assert total_pages>5000 and total>50000,(total_pages,total)
+          assert prefix.endswith('-p='),prefix
+          target_shards=20
+          pages_per=math.ceil(total_pages/target_shards)
+          include=[]
+          start=1; shard=0
+          while start<=total_pages:
+              end=min(total_pages,start+pages_per-1)
+              include.append({'shard':shard,'start':start,'end':end})
+              shard+=1; start=end+1
+          print('matrix='+json.dumps({'include':include},separators=(',',':')))
+          print('total_pages='+str(total_pages))
+          print('total_reported='+str(total))
+          print('pager_prefix='+prefix)
+          PY
+      - id: release
+        env: {GH_TOKEN: '${{ github.token }}'}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="cy-published-full-${GITHUB_RUN_ID}"
+          gh release create "$tag" --title "Cyprus national Published Notices full proof ${GITHUB_RUN_ID}" --notes "Publisher-pager exact traversal of the national Published Notices registry."
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  shard:
+    needs: init
+    name: cy-pages-${{ matrix.start }}-${{ matrix.end }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix: ${{ fromJson(needs.init.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4
+      - name: Enumerate exact publisher page range
+        id: run
+        env:
+          CY_EPPS_PUBLISHED_RETRIES: '6'
+          CY_EPPS_PUBLISHED_PAGE_DELAY_SECONDS: '0.18'
+        shell: bash
+        run: |
+          set +e
+          python pipeline/discover_cy_epps_published_global_v3.py --output "cy-shard-${{ matrix.shard }}" --page-start '${{ matrix.start }}' --page-end '${{ matrix.end }}'
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Enforce shard against init contract
+        env:
+          RUN_RC: ${{ steps.run.outputs.rc }}
+          EXPECTED_TOTAL: ${{ needs.init.outputs.total_reported }}
+          EXPECTED_PAGES: ${{ needs.init.outputs.total_pages }}
+          EXPECTED_PREFIX: ${{ needs.init.outputs.pager_prefix }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          p=json.load(open('cy-shard-${{ matrix.shard }}/stats.json'))
+          try: rc=int(os.environ.get('RUN_RC') or 999)
+          except Exception: rc=999
+          ok=bool(
+              rc==0
+              and p.get('listing_contract')=='CY_EPPS_NATIONAL_PUBLISHED_NOTICES_DISPLAYTAG_V3_PUBLICATION_GRAIN'
+              and p.get('shard_complete') is True
+              and p.get('exact_row_reconciliation') is True
+              and not (p.get('errors') or [])
+              and int(p.get('total_reported') or -1)==int(os.environ['EXPECTED_TOTAL'])
+              and int(p.get('total_pages') or -1)==int(os.environ['EXPECTED_PAGES'])
+          )
+          raise SystemExit(0 if ok else 3)
+          PY
+      - name: Persist shard durably
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "cy-shard-${{ matrix.shard }}/stats.json"
+          tar -czf "cy-published-shard-${{ matrix.shard }}.tar.gz" "cy-shard-${{ matrix.shard }}"
+          gh release upload "$RELEASE_TAG" "cy-published-shard-${{ matrix.shard }}.tar.gz" --clobber
+
+  merge:
+    needs: [init, shard]
+    if: always() && needs.init.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Download durable page shards
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p downloads cy-shards
+          gh release download "$RELEASE_TAG" --pattern 'cy-published-shard-*.tar.gz' --dir downloads
+          for archive in downloads/cy-published-shard-*.tar.gz; do
+            [ -e "$archive" ] || continue
+            tar -xzf "$archive" -C cy-shards
+          done
+      - name: Exact full-registry merge
+        id: merge
+        env:
+          TOTAL_PAGES: ${{ needs.init.outputs.total_pages }}
+          TOTAL_REPORTED: ${{ needs.init.outputs.total_reported }}
+          RELEASE_TAG: ${{ needs.init.outputs.release_tag }}
+        shell: bash
+        run: |
+          set +e
+          python pipeline/merge_cy_epps_published_shards.py --root cy-shards --output cy-merged --total-pages "$TOTAL_PAGES" --total-reported "$TOTAL_REPORTED"
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          s=json.load(open('cy-merged/stats.json')) if Path('cy-merged/stats.json').exists() else {}
+          passed=bool(
+              s.get('listing_contract')=='CY_EPPS_NATIONAL_PUBLISHED_NOTICES_SHARDED_V4_FULL_REGISTRY'
+              and s.get('page_manifest_complete') is True
+              and s.get('stable_official_totals') is True
+              and s.get('exact_registry_reconciliation') is True
+              and s.get('enumeration_complete') is True
+              and not (s.get('errors') or [])
+              and int(s.get('rows_materialized') or -1)==int(s.get('total_reported_official') or -2)
+          )
+          proof={
+              'schema':'CY_EPPS_NATIONAL_PUBLISHED_FULL_PROOF_V4',
+              'release_tag':os.environ.get('RELEASE_TAG'),
+              'total_pages_official':s.get('total_pages_official'),
+              'total_pages_covered':s.get('total_pages_covered'),
+              'total_reported_official':s.get('total_reported_official'),
+              'rows_materialized':s.get('rows_materialized'),
+              'unique_publication_ids':s.get('unique_publication_ids'),
+              'unique_competition_resource_ids':s.get('unique_competition_resource_ids'),
+              'page_manifest_complete':s.get('page_manifest_complete'),
+              'stable_official_totals':s.get('stable_official_totals'),
+              'exact_registry_reconciliation':s.get('exact_registry_reconciliation'),
+              'errors':s.get('errors') or [],
+              'pass':passed,
+          }
+          Path('control/cy_global_published_full_proof.json').write_text(json.dumps(proof,indent=2)+'\n')
+          print(json.dumps(proof,indent=2))
+          PY
+          exit 0
+      - name: Preserve merged registry and resource queue durably
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f control/cy_global_published_full_proof.json
+          tar -czf cy-published-full-merged.tar.gz cy-merged control/cy_global_published_full_proof.json
+          gh release upload "$RELEASE_TAG" cy-published-full-merged.tar.gz --clobber
+      - name: Persist compact verdict on main
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f control/cy_global_published_full_proof.json || printf '%s\n' '{"schema":"CY_EPPS_PUBLISHED_FULL_WORKFLOW_FAILURE","pass":false}' > control/cy_global_published_full_proof.json
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add control/cy_global_published_full_proof.json
+          git diff --cached --quiet && exit 0
+          git commit -m "diag: persist Cyprus national Published full proof ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
+      - name: Enforce full registry proof
+        if: always()
+        run: python -c "import json; p=json.load(open('control/cy_global_published_full_proof.json')); raise SystemExit(0 if p.get('pass') is True else 3)"
