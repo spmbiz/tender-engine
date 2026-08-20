@@ -1,39 +1,36 @@
 {
   "schema": "GPT_INBOX_HEALTH_V4_FAIR_SHARE_PROVENANCE",
-  "updated_at": "2026-08-20T13:46:14.599563+00:00",
+  "updated_at": "2026-08-20T14:34:45.963427+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
-  "latest_source_dce_run_id": 32376006613,
+  "latest_source_dce_run_id": 32380785230,
   "counts": {
-    "pending_gpt_web_review": 111,
+    "pending_gpt_web_review": 40,
     "reviewed_ticks_total": 485,
     "excluded_already_reviewed": 0,
     "excluded_already_in_final_bank": 0,
-    "pending_before_visible_cap": 111,
+    "pending_before_visible_cap": 40,
     "pending_by_stage": {
-      "BUSINESS_GATES": 77,
-      "DCE_AUTHENTICITY": 34
+      "BUSINESS_GATES": 25,
+      "DCE_AUTHENTICITY": 15
     },
     "pending_by_inbox_lane": {
-      "GPT_PRIORITY": 7,
-      "DCE_AUTHENTICITY_REPAIR": 20,
+      "GPT_PRIORITY": 3,
+      "DCE_AUTHENTICITY_REPAIR": 15,
       "LOW_PORTAL_SURVEILLANCE": 20,
-      "ELASTIC_FILL": 64
+      "ELASTIC_FILL": 2
     },
     "pending_by_fit_band": {
-      "GOOD": 3,
-      "MAYBE": 6,
-      "LOW": 102
+      "GOOD": 2,
+      "MAYBE": 3,
+      "LOW": 35
     },
     "pending_by_portal": {
-      "TED": 51,
+      "TED": 32,
       "US_SAM": 1,
-      "GR_KHMDHS": 18,
-      "ES_PLACSP": 15,
-      "GENERIC_PUBLIC_PAGE": 2,
-      "PL_EZAMOWIENIA": 3,
-      "SCOTLAND_PCS": 12,
-      "EE_RHR": 8,
-      "MALTA_EPPS": 1
+      "GR_KHMDHS": 3,
+      "PL_EZAMOWIENIA": 2,
+      "GENERIC_PUBLIC_PAGE": 1,
+      "SCOTLAND_PCS": 1
     }
   },
   "window_selection": {
@@ -41,115 +38,109 @@
     "authenticity_target": 20,
     "low_surveillance_target": 20,
     "selected_by_lane": {
-      "GPT_PRIORITY": 7,
-      "DCE_AUTHENTICITY_REPAIR": 20,
+      "GPT_PRIORITY": 3,
+      "DCE_AUTHENTICITY_REPAIR": 15,
       "LOW_PORTAL_SURVEILLANCE": 20,
-      "ELASTIC_FILL": 64
+      "ELASTIC_FILL": 2
     },
     "selected_by_stage": {
-      "BUSINESS_GATES": 77,
-      "DCE_AUTHENTICITY": 34
+      "BUSINESS_GATES": 25,
+      "DCE_AUTHENTICITY": 15
     },
     "selected_by_band": {
-      "GOOD": 3,
-      "MAYBE": 6,
-      "LOW": 102
+      "GOOD": 2,
+      "MAYBE": 3,
+      "LOW": 35
     },
     "selected_by_portal": {
-      "TED": 51,
+      "TED": 32,
       "US_SAM": 1,
-      "GR_KHMDHS": 18,
-      "ES_PLACSP": 15,
-      "GENERIC_PUBLIC_PAGE": 2,
-      "PL_EZAMOWIENIA": 3,
-      "SCOTLAND_PCS": 12,
-      "EE_RHR": 8,
-      "MALTA_EPPS": 1
+      "GR_KHMDHS": 3,
+      "PL_EZAMOWIENIA": 2,
+      "GENERIC_PUBLIC_PAGE": 1,
+      "SCOTLAND_PCS": 1
     }
   },
-  "review_bank_count": 119,
+  "review_bank_count": 41,
   "review_bank_schema": "GPT_REVIEW_HOT_V7_FAIR_SHARE",
   "review_bank_window_selection": {
     "priority_target": 120,
     "authenticity_target": 20,
     "low_surveillance_target": 20,
     "selected_by_lane": {
-      "SPM_PRIORITY": 8,
-      "DCE_AUTHENTICITY_REPAIR": 20,
+      "SPM_PRIORITY": 3,
+      "DCE_AUTHENTICITY_REPAIR": 15,
       "LOW_PORTAL_SURVEILLANCE": 20,
-      "ELASTIC_FILL": 71
+      "ELASTIC_FILL": 3
     },
     "selected_by_band": {
-      "GOOD": 3,
-      "MAYBE": 7,
-      "LOW": 109
+      "GOOD": 2,
+      "MAYBE": 3,
+      "LOW": 36
     },
     "selected_by_stage": {
-      "BUSINESS_GATES": 85,
-      "DCE_AUTHENTICITY": 34
+      "BUSINESS_GATES": 26,
+      "DCE_AUTHENTICITY": 15
     },
     "selected_by_portal": {
-      "TED": 53,
+      "TED": 33,
       "US_SAM": 1,
-      "GR_KHMDHS": 18,
-      "ES_PLACSP": 15,
-      "GENERIC_PUBLIC_PAGE": 2,
-      "PL_EZAMOWIENIA": 8,
-      "SCOTLAND_PCS": 12,
-      "EE_RHR": 9,
-      "MALTA_EPPS": 1
+      "GR_KHMDHS": 3,
+      "PL_EZAMOWIENIA": 2,
+      "GENERIC_PUBLIC_PAGE": 1,
+      "SCOTLAND_PCS": 1
     }
   },
-  "review_index_count": 3597,
+  "review_index_count": 3599,
   "review_index_counts": {
-    "pending_total_uncapped": 3597,
+    "pending_total_uncapped": 3599,
     "by_stage": {
-      "DCE_AUTHENTICITY": 1075,
+      "DCE_AUTHENTICITY": 1077,
       "BUSINESS_GATES": 2522
     },
     "by_spm_fit_band": {
-      "GOOD": 78,
-      "MAYBE": 189,
-      "LOW": 3330
+      "GOOD": 77,
+      "MAYBE": 187,
+      "LOW": 3335
     },
     "rich_hot_window_target": 160,
-    "overflow_beyond_hot_160": 3437,
+    "overflow_beyond_hot_160": 3439,
     "cross_portal_duplicates_collapsed": 0
   },
-  "true_pending_before_hot_cap": 3597,
-  "overflow_beyond_hot_160": 3437,
-  "assistant_read_batch_count": 12,
+  "true_pending_before_hot_cap": 3599,
+  "overflow_beyond_hot_160": 3439,
+  "assistant_read_batch_count": 4,
   "assistant_read_batch_size": 10,
   "assistant_read_batch_schema": "GPT_WEB_READ_BATCH_MANIFEST_V3_PROVENANCE_REFRESH",
   "provenance_overrides_applied_in_window": 0,
   "recovery_metrics": {
-    "shard_files_scanned": 118,
-    "adjudication_rows_scanned": 691,
-    "model_review_rows_seen": 110,
-    "dce_authenticity_rows_seen": 40,
+    "shard_files_scanned": 59,
+    "adjudication_rows_scanned": 324,
+    "model_review_rows_seen": 26,
+    "dce_authenticity_rows_seen": 15,
     "scope_auto_rejected": 0,
     "scope_auto_reject_reason_counts": {},
     "cross_portal_duplicates_collapsed": 0,
-    "uncapped_unique_pending_before_hot_window": 119,
-    "rich_hot_window_count": 119,
+    "uncapped_unique_pending_before_hot_window": 41,
+    "rich_hot_window_count": 41,
     "overflow_beyond_hot_window": 0
   },
   "index_recovery": {
-    "shard_files_scanned_this_refresh": 118,
-    "adjudication_rows_scanned_this_refresh": 691,
-    "gate_rows_seen_this_refresh": 110,
-    "authenticity_rows_seen_this_refresh": 40,
+    "shard_files_scanned_this_refresh": 59,
+    "adjudication_rows_scanned_this_refresh": 324,
+    "gate_rows_seen_this_refresh": 26,
+    "authenticity_rows_seen_this_refresh": 15,
     "source_runs_seen_this_refresh": [
+      32380785230,
+      32380132690,
+      32379520161,
+      32377203610,
+      32376635516,
       32376006613,
       32375581606,
       32372433989,
       32371311713,
-      32364283581,
-      32363822696,
-      32361728556,
-      32357205269,
-      32356261711,
-      32354004046
+      32364283581
     ]
   },
   "healthy": true,
