@@ -1,0 +1,33 @@
+name: Qwen Prime Next 480
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qwen-prime-next-480.yml'
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: qwen-prime-next-480
+  cancel-in-progress: true
+
+jobs:
+  prime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Queue explicit 480-row semantic pass behind current generation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run qwen-live-classification.yml --ref main \
+            -f per_shard=480 \
+            -f auto_continue=true \
+            -f dce_limit=160
+          echo 'Explicit 480-row Qwen generation queued; workflow concurrency will serialize it behind the current pass.'
