@@ -1,6 +1,6 @@
 {
   "schema": "GPT_INBOX_HEALTH_V4_FAIR_SHARE_PROVENANCE",
-  "updated_at": "2026-08-20T11:56:06.560380+00:00",
+  "updated_at": "2026-08-20T12:06:29.088964+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
   "latest_source_dce_run_id": 32364283581,
   "counts": {
@@ -8,10 +8,10 @@
     "reviewed_ticks_total": 485,
     "excluded_already_reviewed": 0,
     "excluded_already_in_final_bank": 0,
-    "pending_before_visible_cap": 162,
+    "pending_before_visible_cap": 164,
     "pending_by_stage": {
-      "BUSINESS_GATES": 139,
-      "DCE_AUTHENTICITY": 21
+      "BUSINESS_GATES": 140,
+      "DCE_AUTHENTICITY": 20
     },
     "pending_by_inbox_lane": {
       "GPT_PRIORITY": 61,
@@ -26,14 +26,14 @@
     },
     "pending_by_portal": {
       "TED": 86,
-      "US_SAM": 38,
+      "US_SAM": 37,
       "SCOTLAND_PCS": 3,
       "ES_PLACSP": 10,
       "ZA_ETENDERS": 2,
       "GENERIC_PUBLIC_PAGE": 6,
       "GR_KHMDHS": 5,
+      "PL_EZAMOWIENIA": 3,
       "EE_RHR": 7,
-      "PL_EZAMOWIENIA": 2,
       "MALTA_EPPS": 1
     }
   },
@@ -48,8 +48,8 @@
       "ELASTIC_FILL": 59
     },
     "selected_by_stage": {
-      "BUSINESS_GATES": 139,
-      "DCE_AUTHENTICITY": 21
+      "BUSINESS_GATES": 140,
+      "DCE_AUTHENTICITY": 20
     },
     "selected_by_band": {
       "GOOD": 17,
@@ -58,14 +58,14 @@
     },
     "selected_by_portal": {
       "TED": 86,
-      "US_SAM": 38,
+      "US_SAM": 37,
       "SCOTLAND_PCS": 3,
       "ES_PLACSP": 10,
       "ZA_ETENDERS": 2,
       "GENERIC_PUBLIC_PAGE": 6,
       "GR_KHMDHS": 5,
+      "PL_EZAMOWIENIA": 3,
       "EE_RHR": 7,
-      "PL_EZAMOWIENIA": 2,
       "MALTA_EPPS": 1
     }
   },
@@ -91,57 +91,57 @@
       "DCE_AUTHENTICITY": 23
     },
     "selected_by_portal": {
-      "TED": 89,
-      "US_SAM": 34,
+      "TED": 90,
+      "US_SAM": 33,
       "SCOTLAND_PCS": 3,
-      "ES_PLACSP": 10,
+      "ES_PLACSP": 9,
       "ZA_ETENDERS": 2,
       "GR_KHMDHS": 6,
       "GENERIC_PUBLIC_PAGE": 6,
+      "PL_EZAMOWIENIA": 3,
       "EE_RHR": 7,
-      "PL_EZAMOWIENIA": 2,
       "MALTA_EPPS": 1
     }
   },
-  "review_index_count": 3578,
+  "review_index_count": 3586,
   "review_index_counts": {
-    "pending_total_uncapped": 3578,
+    "pending_total_uncapped": 3586,
     "by_stage": {
-      "DCE_AUTHENTICITY": 1069,
-      "BUSINESS_GATES": 2509
+      "DCE_AUTHENTICITY": 1072,
+      "BUSINESS_GATES": 2514
     },
     "by_spm_fit_band": {
       "GOOD": 83,
       "MAYBE": 190,
-      "LOW": 3305
+      "LOW": 3313
     },
     "rich_hot_window_target": 160,
-    "overflow_beyond_hot_160": 3418,
+    "overflow_beyond_hot_160": 3426,
     "cross_portal_duplicates_collapsed": 0
   },
-  "true_pending_before_hot_cap": 3578,
-  "overflow_beyond_hot_160": 3418,
+  "true_pending_before_hot_cap": 3586,
+  "overflow_beyond_hot_160": 3426,
   "assistant_read_batch_count": 16,
   "assistant_read_batch_size": 10,
   "assistant_read_batch_schema": "GPT_WEB_READ_BATCH_MANIFEST_V3_PROVENANCE_REFRESH",
   "provenance_overrides_applied_in_window": 0,
   "recovery_metrics": {
-    "shard_files_scanned": 174,
-    "adjudication_rows_scanned": 1079,
-    "model_review_rows_seen": 259,
-    "dce_authenticity_rows_seen": 83,
+    "shard_files_scanned": 179,
+    "adjudication_rows_scanned": 1106,
+    "model_review_rows_seen": 264,
+    "dce_authenticity_rows_seen": 86,
     "scope_auto_rejected": 0,
     "scope_auto_reject_reason_counts": {},
     "cross_portal_duplicates_collapsed": 1,
-    "uncapped_unique_pending_before_hot_window": 310,
+    "uncapped_unique_pending_before_hot_window": 318,
     "rich_hot_window_count": 160,
-    "overflow_beyond_hot_window": 150
+    "overflow_beyond_hot_window": 158
   },
   "index_recovery": {
-    "shard_files_scanned_this_refresh": 174,
-    "adjudication_rows_scanned_this_refresh": 1079,
-    "gate_rows_seen_this_refresh": 259,
-    "authenticity_rows_seen_this_refresh": 83,
+    "shard_files_scanned_this_refresh": 179,
+    "adjudication_rows_scanned_this_refresh": 1106,
+    "gate_rows_seen_this_refresh": 264,
+    "authenticity_rows_seen_this_refresh": 86,
     "source_runs_seen_this_refresh": [
       32364283581,
       32363822696,

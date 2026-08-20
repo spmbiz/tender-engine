@@ -1,7 +1,7 @@
 {
   "schema": "GPT_WEB_READ_BATCH_V3_PROVENANCE_REFRESH",
-  "generated_at": "2026-08-20T11:56:06.146656+00:00",
-  "source_inbox_updated_at": "2026-08-20T11:56:05.306567+00:00",
+  "generated_at": "2026-08-20T12:06:28.679970+00:00",
+  "source_inbox_updated_at": "2026-08-20T12:06:27.889500+00:00",
   "latest_source_dce_run_id": 32364283581,
   "batch_index": 8,
   "start_rank": 81,
@@ -9,43 +9,56 @@
   "count": 10,
   "items": [
     {
-      "candidate_id": "US-SAM:1a5028a47a5f426b871f233ed0ba762a",
-      "title": "368 TRS Suicide Prevention Training",
-      "buyer": "DEPT OF DEFENSE",
-      "portal": "US_SAM",
-      "notice_url": "https://sam.gov/opp/1a5028a47a5f426b871f233ed0ba762a/view",
-      "deadline": "2026-08-26T19:00:00+00:00",
-      "estimated_value": null,
-      "currency": null,
+      "candidate_id": "GR-KHMDHS:26PROC019644364",
+      "title": "Ανάθεση υπηρεσιών διαφημιστικής προβολής του 49ου Διεθνούς Φεστιβάλ Ταινιών Μικρού Μήκους Δράμας σε",
+      "buyer": "ΠΟΛΙΤΙΣΤΙΚΟΣ ΟΡΓΑΝΙΣΜΟΣ ΦΕΣΤΙΒΑΛ ΤΑΙΝΙΩΝ ΜΙΚΡΟΥ ΜΗΚΟΥΣ ΔΗΜΟΥ ΔΡΑΜΑΣ",
+      "portal": "GR_KHMDHS",
+      "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019644364",
+      "deadline": "2026-08-26T00:00:00+00:00",
+      "estimated_value": 1200.0,
+      "currency": "EUR",
       "review_stage": "DCE_AUTHENTICITY",
       "gate_readiness": false,
-      "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
-      "evidence_gate_coverage": 0,
-      "spm_post_dce_score": 4,
+      "content_quality": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+      "evidence_gate_coverage": 1,
+      "spm_post_dce_score": 7,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
       "deadline_authority_status": "MISSING",
       "deadline_conflict": false,
       "authoritative_submission_date": null,
-      "source_dce_run_id": 32349068366,
+      "source_dce_run_id": 32351147289,
       "source_shard": 7,
-      "review_key": "f6dd0c489c5870d82a2fff7400d0ae07362716ca2edceaf1b22770638e505572",
+      "review_key": "2632e97db95a365924316995c8e3cc173c9c81c9702c37670be86ae8e4854360",
       "artifact_locator": {
-        "dce_run_id": 32349068366,
+        "dce_run_id": 32351147289,
         "shard": 7,
-        "candidate_id": "US-SAM:1a5028a47a5f426b871f233ed0ba762a",
-        "release_tag": "dce-harvest-32349068366"
+        "candidate_id": "GR-KHMDHS:26PROC019644364",
+        "release_tag": "dce-harvest-32351147289"
       },
       "evidence_quality": {
         "raw_status": "DOWNLOADED_PUBLIC",
-        "documents_with_text": 3,
-        "text_chars": 15576,
-        "attributed_compact_snippets": 0,
+        "documents_with_text": 1,
+        "text_chars": 7811,
+        "attributed_compact_snippets": 1,
         "artifact_lookup_required_snippets": 0,
-        "all_compact_snippets_document_attributed": false
+        "all_compact_snippets_document_attributed": true
       },
-      "evidence": {},
+      "evidence": {
+        "ip_data_security": [
+          {
+            "text": "άτωθι τρόπους: 1. Σε σφραγισμένο φάκελο, στην Οικονομική υπηρεσία, Διοικητηρίου 11, 2ος Όροφος, τις εργάσιμες μέρες και ώρες της υπηρεσίας. Στον σφραγισμένο φάκελο να αναγράφονται ευκρινώς: -Στοιχεία αποστολέα: Επωνυμία & λοιπά στοιχεία -Προς: Π.Ο.Φ.Τ.Μ.Μ. Δράμας, Οικονομική υπηρεσία, Διοικητηρίου 11, 2ος Όροφος. -Προσφορά για την υπηρεσία με τίτλο: «Ανάθεση υπηρεσιών διαφημιστικής προβολής του 49ου Διεθνούς Φεστιβάλ Ταινιών Μικρού Μήκους Δράμας σε ημερήσια τοπική εφημερίδα, έτους 2026». -Πιστοποίηση καταχώρησης σ…",
+            "source": "files/26PROC019644364.pdf",
+            "source_url": "https://cerpp.eprocurement.gov.gr/khmdhs-opendata/notice/attachment/26PROC019644364",
+            "source_sha256": "1a81fbe041e049f6cf7c1e470af3418c544c6dc31b15d386b5f9e5eaa4bc3fff",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ]
+      },
       "provenance_override": null,
       "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
