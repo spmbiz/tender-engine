@@ -1,33 +1,36 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-20T23:46:37+00:00",
+  "generated_at_utc": "2026-08-20T23:55:27+00:00",
   "source_run": "32327417448",
-  "state_rows": 19381,
+  "state_rows": 19479,
   "ledger_rows": 126459,
   "snapshot_rows": 126459,
   "blocked_ids": 30442,
-  "durable_attempted_exact_versions_ignored": 3736,
-  "valid_exact_hash_current_unattempted": 8868,
-  "eligible_keep_for_dce": 7749,
-  "review_worthy_rejects_promoted_to_explore": 900,
+  "durable_attempted_exact_versions_ignored": 3735,
+  "valid_exact_hash_current_unattempted": 8983,
+  "eligible_keep_for_dce": 7849,
+  "review_worthy_rejects_promoted_to_explore": 911,
   "stale_hash_ignored": 0,
   "missing_snapshot": 0,
-  "expired_ignored": 164,
+  "expired_ignored": 167,
   "selected": 160,
   "selection_decisions": {
-    "MAYBE": 128,
+    "FIT": 9,
+    "MAYBE": 119,
     "REJECT_OBVIOUS": 32
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
+    "qwen-primary-coded": 9,
     "qwen-explore-coded": 48,
     "qwen-reject-audit-coded": 32,
-    "qwen-elastic-coded": 80
+    "qwen-elastic-coded": 71
   },
   "selection_freshness": {
-    "recent_unseen_carryover": 160
+    "recent_unseen_carryover": 156,
+    "historical_backfill": 4
   },
   "policy": {
     "keep_is_not_fit": true,
@@ -54,19 +57,19 @@
   "base_candidate_pool": 640,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "FIT": 8,
-    "MAYBE": 560,
-    "REJECT_OBVIOUS": 72
+    "FIT": 17,
+    "MAYBE": 549,
+    "REJECT_OBVIOUS": 74
   },
   "candidate_pool_lanes": {
-    "qwen-primary": 8,
+    "qwen-primary": 17,
     "qwen-open-world-explore": 192,
     "qwen-reject-audit": 128,
-    "qwen-elastic": 312
+    "qwen-elastic": 303
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
-    "noncore_code_contradictions_in_pool": 175,
+    "noncore_code_contradictions_in_pool": 179,
     "positive_code_rows_selected": 0,
     "noncore_code_contradictions_selected": 0,
     "policy": "priority_only_never_drop_never_eligibility",
