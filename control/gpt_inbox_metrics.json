@@ -1,31 +1,31 @@
 {
   "schema": "GPT_INBOX_HEALTH_V4_FAIR_SHARE_PROVENANCE",
-  "updated_at": "2026-08-20T04:55:05.839700+00:00",
+  "updated_at": "2026-08-20T04:57:02.914110+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
   "latest_source_dce_run_id": 32333373390,
   "counts": {
-    "pending_gpt_web_review": 137,
+    "pending_gpt_web_review": 140,
     "reviewed_ticks_total": 485,
     "excluded_already_reviewed": 0,
     "excluded_already_in_final_bank": 0,
-    "pending_before_visible_cap": 137,
+    "pending_before_visible_cap": 140,
     "pending_by_stage": {
-      "BUSINESS_GATES": 100,
+      "BUSINESS_GATES": 103,
       "DCE_AUTHENTICITY": 37
     },
     "pending_by_inbox_lane": {
-      "GPT_PRIORITY": 29,
+      "GPT_PRIORITY": 31,
       "DCE_AUTHENTICITY_REPAIR": 20,
       "LOW_PORTAL_SURVEILLANCE": 20,
-      "ELASTIC_FILL": 68
+      "ELASTIC_FILL": 69
     },
     "pending_by_fit_band": {
-      "GOOD": 4,
-      "MAYBE": 26,
-      "LOW": 107
+      "GOOD": 5,
+      "MAYBE": 27,
+      "LOW": 108
     },
     "pending_by_portal": {
-      "TED": 10,
+      "TED": 13,
       "ZA_ETENDERS": 50,
       "MALTA_EPPS": 25,
       "US_SAM": 5,
@@ -40,22 +40,22 @@
     "authenticity_target": 20,
     "low_surveillance_target": 20,
     "selected_by_lane": {
-      "GPT_PRIORITY": 29,
+      "GPT_PRIORITY": 31,
       "DCE_AUTHENTICITY_REPAIR": 20,
       "LOW_PORTAL_SURVEILLANCE": 20,
-      "ELASTIC_FILL": 68
+      "ELASTIC_FILL": 69
     },
     "selected_by_stage": {
-      "BUSINESS_GATES": 100,
+      "BUSINESS_GATES": 103,
       "DCE_AUTHENTICITY": 37
     },
     "selected_by_band": {
-      "GOOD": 4,
-      "MAYBE": 26,
-      "LOW": 107
+      "GOOD": 5,
+      "MAYBE": 27,
+      "LOW": 108
     },
     "selected_by_portal": {
-      "TED": 10,
+      "TED": 13,
       "ZA_ETENDERS": 50,
       "MALTA_EPPS": 25,
       "US_SAM": 5,
@@ -65,29 +65,29 @@
       "PL_EZAMOWIENIA": 3
     }
   },
-  "review_bank_count": 137,
+  "review_bank_count": 140,
   "review_bank_schema": "GPT_REVIEW_HOT_V7_FAIR_SHARE",
   "review_bank_window_selection": {
     "priority_target": 120,
     "authenticity_target": 20,
     "low_surveillance_target": 20,
     "selected_by_lane": {
-      "SPM_PRIORITY": 29,
+      "SPM_PRIORITY": 31,
       "DCE_AUTHENTICITY_REPAIR": 20,
       "LOW_PORTAL_SURVEILLANCE": 20,
-      "ELASTIC_FILL": 68
+      "ELASTIC_FILL": 69
     },
     "selected_by_band": {
-      "GOOD": 4,
-      "MAYBE": 26,
-      "LOW": 107
+      "GOOD": 5,
+      "MAYBE": 27,
+      "LOW": 108
     },
     "selected_by_stage": {
-      "BUSINESS_GATES": 100,
+      "BUSINESS_GATES": 103,
       "DCE_AUTHENTICITY": 37
     },
     "selected_by_portal": {
-      "TED": 10,
+      "TED": 13,
       "ZA_ETENDERS": 50,
       "MALTA_EPPS": 25,
       "US_SAM": 5,
@@ -97,45 +97,45 @@
       "PL_EZAMOWIENIA": 3
     }
   },
-  "review_index_count": 2881,
+  "review_index_count": 2884,
   "review_index_counts": {
-    "pending_total_uncapped": 2881,
+    "pending_total_uncapped": 2884,
     "by_stage": {
-      "BUSINESS_GATES": 2011,
+      "BUSINESS_GATES": 2014,
       "DCE_AUTHENTICITY": 870
     },
     "by_spm_fit_band": {
       "HOT": 1,
-      "GOOD": 63,
-      "MAYBE": 116,
-      "LOW": 2701
+      "GOOD": 64,
+      "MAYBE": 117,
+      "LOW": 2702
     },
     "rich_hot_window_target": 160,
-    "overflow_beyond_hot_160": 2721,
+    "overflow_beyond_hot_160": 2724,
     "cross_portal_duplicates_collapsed": 0
   },
-  "true_pending_before_hot_cap": 2881,
-  "overflow_beyond_hot_160": 2721,
+  "true_pending_before_hot_cap": 2884,
+  "overflow_beyond_hot_160": 2724,
   "assistant_read_batch_count": 14,
   "assistant_read_batch_size": 10,
   "assistant_read_batch_schema": "GPT_WEB_READ_BATCH_MANIFEST_V3_PROVENANCE_REFRESH",
   "provenance_overrides_applied_in_window": 0,
   "recovery_metrics": {
-    "shard_files_scanned": 50,
-    "adjudication_rows_scanned": 345,
-    "model_review_rows_seen": 100,
+    "shard_files_scanned": 53,
+    "adjudication_rows_scanned": 363,
+    "model_review_rows_seen": 103,
     "dce_authenticity_rows_seen": 47,
     "scope_auto_rejected": 0,
     "scope_auto_reject_reason_counts": {},
     "cross_portal_duplicates_collapsed": 0,
-    "uncapped_unique_pending_before_hot_window": 137,
-    "rich_hot_window_count": 137,
+    "uncapped_unique_pending_before_hot_window": 140,
+    "rich_hot_window_count": 140,
     "overflow_beyond_hot_window": 0
   },
   "index_recovery": {
-    "shard_files_scanned_this_refresh": 50,
-    "adjudication_rows_scanned_this_refresh": 345,
-    "gate_rows_seen_this_refresh": 100,
+    "shard_files_scanned_this_refresh": 53,
+    "adjudication_rows_scanned_this_refresh": 363,
+    "gate_rows_seen_this_refresh": 103,
     "authenticity_rows_seen_this_refresh": 47,
     "source_runs_seen_this_refresh": [
       32333373390,
