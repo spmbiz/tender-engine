@@ -29,7 +29,6 @@ jobs:
         with:
           ref: main
           fetch-depth: 1
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -43,31 +42,25 @@ jobs:
           set -euo pipefail
           rm -rf recover
           mkdir -p recover
-
           notes="$(gh release view qwen-classification-state-latest --json body --jq '.body')"
           source_run="$(grep -oE 'source_run=[0-9]+' <<< "$notes" | head -n1 | cut -d= -f2)"
           state_run="$(grep -oE 'run=[0-9]+' <<< "$notes" | head -n1 | cut -d= -f2)"
           [[ "$source_run" =~ ^[0-9]+$ ]] || { echo 'Cannot resolve source_run from durable Qwen release' >&2; exit 1; }
           [[ "$state_run" =~ ^[0-9]+$ ]] || { echo 'Cannot resolve state run from durable Qwen release' >&2; exit 1; }
-
           gh release download qwen-classification-state-latest \
             --pattern qwen-classification-state-latest.jsonl.gz \
             --pattern qwen-classification-merge-summary-latest.json \
             --dir recover --clobber
-
           gh release download "notice-intelligence-ledger-${source_run}" \
             --pattern "notice-intelligence-ledger-${source_run}.jsonl.gz" \
             --dir recover --clobber
           mv "recover/notice-intelligence-ledger-${source_run}.jsonl.gz" recover/notice-intelligence-ledger.jsonl.gz
-
           gh release download "live-world-snapshot-${source_run}" \
             --pattern "live-open-tenders-${source_run}.jsonl.gz" \
             --dir recover --clobber
           mv "recover/live-open-tenders-${source_run}.jsonl.gz" recover/live-open-tenders.jsonl.gz
-
           git fetch origin main
           git show origin/main:control/controller_state_checkpoint.json > recover/controller_state.json 2>/dev/null || printf '{}\n' > recover/controller_state.json
-
           python pipeline/build_qwen_dce_selection.py \
             --state recover/qwen-classification-state-latest.jsonl.gz \
             --ledger recover/notice-intelligence-ledger.jsonl.gz \
@@ -77,11 +70,9 @@ jobs:
             --summary recover/selection_summary.json \
             --source-run "$source_run" \
             --limit 160
-
           selected="$(python -c "import json;print(int(json.load(open('recover/selection_summary.json')).get('selected') or 0))")"
           remaining="$(python -c "import json;print(int(json.load(open('recover/qwen-classification-merge-summary-latest.json')).get('remaining_classification_queue') or 0))")"
           cp recover/qwen-classification-merge-summary-latest.json recover/classification_summary.json
-
           echo "source_run=$source_run" >> "$GITHUB_OUTPUT"
           echo "state_run=$state_run" >> "$GITHUB_OUTPUT"
           echo "selected=$selected" >> "$GITHUB_OUTPUT"
@@ -95,76 +86,58 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           persist_file() {
-            local path="$1"
-            local file="$2"
-            local attempt sha
+            local path="$1" file="$2" attempt sha
             for attempt in 1 2 3 4 5 6; do
               sha="$(gh api "repos/${GITHUB_REPOSITORY}/contents/${path}?ref=main" --jq '.sha' 2>/dev/null || true)"
               TARGET_PATH="$path" SOURCE_FILE="$file" CURRENT_SHA="$sha" RUN_ID="$GITHUB_RUN_ID" python - <<'PY'
-          import base64, json, os
+          import base64,json,os
           from pathlib import Path
-          payload={
-              'message': f"qwen: transactional live queue refresh {os.environ['RUN_ID']}",
-              'content': base64.b64encode(Path(os.environ['SOURCE_FILE']).read_bytes()).decode('ascii'),
-              'branch': 'main',
-          }
+          payload={'message':f"qwen: transactional live queue refresh {os.environ['RUN_ID']}",'content':base64.b64encode(Path(os.environ['SOURCE_FILE']).read_bytes()).decode('ascii'),'branch':'main'}
           sha=os.environ.get('CURRENT_SHA','').strip()
-          if sha:
-              payload['sha']=sha
+          if sha: payload['sha']=sha
           Path('/tmp/qwen-content-payload.json').write_text(json.dumps(payload),encoding='utf-8')
           PY
-              if gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/${path}" --input /tmp/qwen-content-payload.json >/dev/null 2>&1; then
-                echo "Persisted $path on attempt $attempt"
-                return 0
-              fi
+              if gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/${path}" --input /tmp/qwen-content-payload.json >/dev/null 2>&1; then return 0; fi
               sleep "$((attempt * 2))"
             done
-            echo "Failed to persist $path after retries" >&2
             return 1
           }
-
           persist_file queues/qwen_live_selection_latest.jsonl recover/qwen-live-selection.jsonl
           persist_file control/qwen_live/selection_summary.json recover/selection_summary.json
           persist_file control/qwen_live/classification_summary.json recover/classification_summary.json
 
-      - name: Dispatch recovered Qwen-ranked DCE queue into free Tender slots
+      - name: Dispatch recovered Qwen-ranked DCE only after semantic capacity is claimed
         if: steps.rebuild.outputs.selected != '0'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-
-          # Prevent duplicate Qwen-DCE runs on main, while allowing the separate
-          # autonomous fleet-dce batch to keep working in parallel.
-          active_main="$(gh run list --workflow dce-fanout-v2.yml --branch main --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
-          if [ "$active_main" -gt 0 ]; then
-            echo "A Qwen/main DCE run is already active/queued ($active_main); no duplicate dispatch."
+          qwen_active="$(gh run list --workflow qwen-live-classification.yml --limit 40 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
+          if [ '${{ steps.rebuild.outputs.remaining }}' != '0' ] && [ "$qwen_active" -eq 0 ]; then
+            echo 'No Qwen semantic pass active yet; reserving free Tender slots for Qwen first.'
             exit 0
           fi
-
-          # Ask the shared admission controller for a larger bounded DCE slice.
-          # Sibling reservations and physical capacity still win; no preemption.
-          dce_parallel="$(python - <<'PY'
+          active_main="$(gh run list --workflow dce-fanout-v2.yml --branch main --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
+          [ "$active_main" -eq 0 ] || { echo "DCE already active/queued ($active_main)"; exit 0; }
+          remaining='${{ steps.rebuild.outputs.remaining }}'
+          if [ "$remaining" -ge 50000 ]; then cap=2; elif [ "$remaining" -ge 20000 ]; then cap=4; elif [ "$remaining" -ge 5000 ]; then cap=6; else cap=10; fi
+          dce_parallel="$(CAP="$cap" python - <<'PY'
+          import os
           from pipeline.global_admission import dynamic_tender_parallel
-          allowed,_=dynamic_tender_parallel(10)
-          print(max(0,min(10,int(allowed))))
+          cap=max(1,int(os.environ['CAP']))
+          allowed,_=dynamic_tender_parallel(cap)
+          print(max(0,min(cap,int(allowed))))
           PY
           )"
-          if [ "${dce_parallel:-0}" -le 0 ]; then
-            echo "No free Tender room yet; queue is durable and the scheduled drainer will retry."
-            exit 0
-          fi
-
+          [ "${dce_parallel:-0}" -gt 0 ] || { echo 'No residual Tender room for DCE'; exit 0; }
           gh workflow run dce-fanout-v2.yml --ref main \
             -f selection_path=queues/qwen_live_selection_latest.jsonl \
             -f source_discovery_run='${{ steps.rebuild.outputs.source_run }}' \
             -f max_jobs='${{ steps.rebuild.outputs.selected }}' \
             -f max_parallel="$dce_parallel" \
             -f jobs_per_shard=0
-          echo "Dispatched ${{ steps.rebuild.outputs.selected }} Qwen-ranked DCE candidates at max_parallel=$dce_parallel."
 
       - name: Continue Qwen backfill when no Qwen pass is already active
         if: steps.rebuild.outputs.remaining != '0'
@@ -173,15 +146,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          active="$(gh run list --workflow qwen-live-classification.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
+          active="$(gh run list --workflow qwen-live-classification.yml --limit 40 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
           if [ "$active" -eq 0 ]; then
             gh workflow run qwen-live-classification.yml --ref main \
-              -f per_shard=192 \
+              -f per_shard=480 \
               -f auto_continue=true \
               -f dce_limit=160
-            echo "Queued next high-throughput Qwen pass; remaining=${{ steps.rebuild.outputs.remaining }}."
+            echo "Queued next Qwen pass at per_shard=480; remaining=${{ steps.rebuild.outputs.remaining }}."
           else
-            echo "Qwen already active/queued ($active); no duplicate dispatch."
+            echo "Qwen already active/queued ($active)."
           fi
 
       - name: Recovery summary
@@ -192,4 +165,4 @@ jobs:
           echo "- source discovery: ${{ steps.rebuild.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- DCE candidates rebuilt: ${{ steps.rebuild.outputs.selected }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- classification queue remaining: ${{ steps.rebuild.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- persistence uses current Contents API SHA per file with bounded retries; no rebase conflict surface." >> "$GITHUB_STEP_SUMMARY"
+          echo "- Qwen semantic classification gets first capacity claim; DCE is backlog-capped" >> "$GITHUB_STEP_SUMMARY"
