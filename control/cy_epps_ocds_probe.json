@@ -1,0 +1,43 @@
+{
+  "schema": "CY_EPPS_OCDS_RECORD_PACKAGE_PROBE_V1",
+  "generated_at": "2026-08-20T00:11:18.265749+00:00",
+  "results": [
+    {
+      "url": "https://www.eprocurement.gov.cy/ocds/services/recordpackage/getrecordpackagelist",
+      "status": 200,
+      "final_url": "https://www.eprocurement.gov.cy/epps/home.do",
+      "content_type": "text/html;charset=utf-8",
+      "bytes": 25757,
+      "json_error": "JSONDecodeError('Expecting value: line 60 column 1 (char 60)')",
+      "body_prefix": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\t\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n<!DOCTYPE html>\n    \n        <!-- ceproc.ok -->\n    \n    \n\t<html>\n\n\n\t<head>\n\t\t<!--  -->\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n\t\t<meta http-equiv=\"Content-Script-Type\" content=\"text/javascript\">\n\t\t<meta http-equiv=\"Content-Style-Type\" content=\"text/css\" />\n\t\t<title>eProcurement - Καλώς ήρθατε στο e-PPS</title>\n        <meta name=\"Description\" content=\"e-Procurement platform home page\"/>\n\t\t<meta content=\"e-Procurement platform - Home page\" name=\"Title\"/>\n\t\t<meta content=\"57\" name=\"Type\"/>\n\t\t<meta content=\"DOCUMENTS/COMM/EN\" name=\"Reference\"/>\n\t\t<meta content=\"European Dynamics\" name=\"Creator\"/>\n\t\t<meta name=\"Language\" content=\"el\"/>\n\t\t<meta content=\"25\" name=\"Classification\"/>\n\t\t<meta content=\"tenders, e-procurement, documents, european law, legislation, economic operator, tenderer, procurement, contract, contracting authority, supplier, awarding authority, institutions, european union, eu\" name"
+    },
+    {
+      "url": "https://www.eprocurement.gov.cy/epps/ocds/services/recordpackage/getrecordpackagelist",
+      "status": 404,
+      "final_url": "https://www.eprocurement.gov.cy/epps/ocds/services/recordpackage/getrecordpackagelist",
+      "content_type": "text/html;charset=utf-8",
+      "bytes": 18146,
+      "json_error": "JSONDecodeError('Expecting value: line 60 column 1 (char 60)')",
+      "body_prefix": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\t\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n<!DOCTYPE html>\n    \n        <!-- ceproc.ok -->\n    \n    \n\t<html>\n\n\n\t<head>\n\t\t<!--  -->\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n\t\t<meta http-equiv=\"Content-Script-Type\" content=\"text/javascript\">\n\t\t<meta http-equiv=\"Content-Style-Type\" content=\"text/css\" />\n\t\t<title>eProcurement - Ελλείπουσα σελίδα</title>\n        <meta name=\"Description\" content=\"e-Procurement platform home page\"/>\n\t\t<meta content=\"e-Procurement platform - Home page\" name=\"Title\"/>\n\t\t<meta content=\"57\" name=\"Type\"/>\n\t\t<meta content=\"DOCUMENTS/COMM/EN\" name=\"Reference\"/>\n\t\t<meta content=\"European Dynamics\" name=\"Creator\"/>\n\t\t<meta name=\"Language\" content=\"el\"/>\n\t\t<meta content=\"25\" name=\"Classification\"/>\n\t\t<meta content=\"tenders, e-procurement, documents, european law, legislation, economic operator, tenderer, procurement, contract, contracting authority, supplier, awarding authority, institutions, european union, eu\" name=\"Key"
+    },
+    {
+      "url": "https://eprocurement.gov.cy/ocds/services/recordpackage/getrecordpackagelist",
+      "error": "ConnectionError(MaxRetryError('HTTPSConnectionPool(host=\\'eprocurement.gov.cy\\', port=443): Max retries exceeded with url: /ocds/services/recordpackage/getrecordpackagelist (Caused by NameResolutionError(\"HTTPSConnection(host=\\'eprocurement.gov.cy\\', port=443): Failed to resolve \\'eprocurement.gov.cy\\' ([Errno -5] No address associated with hostname)\"))'))"
+    },
+    {
+      "url": "https://eprocurement.gov.cy/epps/ocds/services/recordpackage/getrecordpackagelist",
+      "error": "ConnectionError(MaxRetryError('HTTPSConnectionPool(host=\\'eprocurement.gov.cy\\', port=443): Max retries exceeded with url: /epps/ocds/services/recordpackage/getrecordpackagelist (Caused by NameResolutionError(\"HTTPSConnection(host=\\'eprocurement.gov.cy\\', port=443): Failed to resolve \\'eprocurement.gov.cy\\' ([Errno -5] No address associated with hostname)\"))'))"
+    },
+    {
+      "url": "http://www.eprocurement.gov.cy/ocds/services/recordpackage/getrecordpackagelist",
+      "error": "ConnectionError(MaxRetryError('HTTPConnectionPool(host=\\'www.eprocurement.gov.cy\\', port=80): Max retries exceeded with url: /ocds/services/recordpackage/getrecordpackagelist (Caused by NewConnectionError(\"HTTPConnection(host=\\'www.eprocurement.gov.cy\\', port=80): Failed to establish a new connection: [Errno 111] Connection refused\"))'))"
+    },
+    {
+      "url": "http://www.eprocurement.gov.cy/epps/ocds/services/recordpackage/getrecordpackagelist",
+      "error": "ConnectionError(MaxRetryError('HTTPConnectionPool(host=\\'www.eprocurement.gov.cy\\', port=80): Max retries exceeded with url: /epps/ocds/services/recordpackage/getrecordpackagelist (Caused by NewConnectionError(\"HTTPConnection(host=\\'www.eprocurement.gov.cy\\', port=80): Failed to establish a new connection: [Errno 111] Connection refused\"))'))"
+    }
+  ],
+  "successes": [],
+  "pass": false,
+  "semantics": "Read-only probe of official Cyprus eProcurement government hosts for the public European Dynamics OCDS record-package service used by compatible ePPS deployments. No CAPTCHA interaction, authentication, form submission, or tender action is performed."
+}
