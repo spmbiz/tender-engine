@@ -1,0 +1,338 @@
+{
+  "schema": "TENDER_ENGINE_LIVE_COVERAGE_STATUS_V1",
+  "generated_at": "2026-08-20T00:39:28.673473+00:00",
+  "sources": {
+    "TED_DEEP": {
+      "selected": {
+        "path": "control/ted_production_reconcile_proof.json",
+        "present": true,
+        "schema": "TED_PRODUCTION_RECONCILE_PROOF_V1",
+        "pass": true,
+        "enumeration_complete": true,
+        "enumeration_exhausted": true,
+        "live_coverage_credit_allowed": true,
+        "current_materialized": 57189,
+        "errors": [],
+        "error_count": 0
+      },
+      "candidates": [
+        {
+          "path": "control/ted_production_reconcile_proof.json",
+          "present": true,
+          "schema": "TED_PRODUCTION_RECONCILE_PROOF_V1",
+          "pass": true,
+          "enumeration_complete": true,
+          "enumeration_exhausted": true,
+          "live_coverage_credit_allowed": true,
+          "current_materialized": 57189,
+          "errors": [],
+          "error_count": 0
+        },
+        {
+          "path": "control/ted_delta_production_proof.json",
+          "present": true,
+          "schema": "TED_DELTA_PRODUCTION_PROOF_V1",
+          "pass": true,
+          "enumeration_complete": true,
+          "enumeration_exhausted": true,
+          "live_coverage_credit_allowed": false,
+          "current_materialized": 48482,
+          "adapter_exit_code": 0,
+          "errors": [],
+          "error_count": 0
+        }
+      ]
+    },
+    "UK_PCS": {
+      "selected": {
+        "path": "control/pcs_full_reconcile_proof.json",
+        "present": true,
+        "schema": "PCS_FULL_RECONCILE_PROOF_V1",
+        "pass": true,
+        "enumeration_complete": true,
+        "live_coverage_credit_allowed": true,
+        "publication_window_enumeration_complete": true,
+        "months_requested": 48,
+        "current_materialized": 586,
+        "adapter_exit_code": 0,
+        "errors": [],
+        "error_count": 0
+      },
+      "candidates": [
+        {
+          "path": "control/pcs_full_reconcile_proof.json",
+          "present": true,
+          "schema": "PCS_FULL_RECONCILE_PROOF_V1",
+          "pass": true,
+          "enumeration_complete": true,
+          "live_coverage_credit_allowed": true,
+          "publication_window_enumeration_complete": true,
+          "months_requested": 48,
+          "current_materialized": 586,
+          "adapter_exit_code": 0,
+          "errors": [],
+          "error_count": 0
+        }
+      ]
+    },
+    "IT_ANAC_PVL": {
+      "selected": {
+        "path": "control/it_anac_pvl_full_reconcile_proof.json",
+        "present": true,
+        "schema": "IT_ANAC_PVL_FULL_HISTORY_PROOF_V4",
+        "pass": true,
+        "enumeration_complete": true,
+        "live_coverage_credit_allowed": true,
+        "publication_window_enumeration_complete": true,
+        "windows_expected": 31,
+        "windows_completed": 31,
+        "raw_materialized": 72831,
+        "current_materialized": 2715,
+        "adapter_exit_code": 0,
+        "errors": [],
+        "error_count": 0
+      },
+      "candidates": [
+        {
+          "path": "control/it_anac_pvl_full_reconcile_proof.json",
+          "present": true,
+          "schema": "IT_ANAC_PVL_FULL_HISTORY_PROOF_V4",
+          "pass": true,
+          "enumeration_complete": true,
+          "live_coverage_credit_allowed": true,
+          "publication_window_enumeration_complete": true,
+          "windows_expected": 31,
+          "windows_completed": 31,
+          "raw_materialized": 72831,
+          "current_materialized": 2715,
+          "adapter_exit_code": 0,
+          "errors": [],
+          "error_count": 0
+        }
+      ]
+    },
+    "ES_PLACSP": {
+      "selected": {
+        "path": "control/es_placsp_live_proof.json",
+        "present": true,
+        "schema": "ES_PLACSP_LIVE_ATOM_PROOF_V2",
+        "pass": true,
+        "publication_window_enumeration_complete": true,
+        "raw_materialized": 7147,
+        "current_materialized": 2561,
+        "adapter_exit_code": 0,
+        "errors": [],
+        "error_count": 0
+      },
+      "candidates": [
+        {
+          "path": "control/es_placsp_live_proof.json",
+          "present": true,
+          "schema": "ES_PLACSP_LIVE_ATOM_PROOF_V2",
+          "pass": true,
+          "publication_window_enumeration_complete": true,
+          "raw_materialized": 7147,
+          "current_materialized": 2561,
+          "adapter_exit_code": 0,
+          "errors": [],
+          "error_count": 0
+        }
+      ]
+    },
+    "GR_KHMDHS": {
+      "selected": {
+        "path": "control/gr_khmdhs_live_proof.json",
+        "present": true,
+        "schema": "GR_KHMDHS_FUTURE_DEADLINE_PROOF_V3",
+        "pass": true,
+        "enumeration_complete": true,
+        "windows_expected": 5,
+        "windows_completed": 5,
+        "current_materialized": 4932,
+        "adapter_exit_code": 0,
+        "errors": [],
+        "error_count": 0
+      },
+      "candidates": [
+        {
+          "path": "control/gr_khmdhs_live_proof.json",
+          "present": true,
+          "schema": "GR_KHMDHS_FUTURE_DEADLINE_PROOF_V3",
+          "pass": true,
+          "enumeration_complete": true,
+          "windows_expected": 5,
+          "windows_completed": 5,
+          "current_materialized": 4932,
+          "adapter_exit_code": 0,
+          "errors": [],
+          "error_count": 0
+        }
+      ]
+    },
+    "DE_DOE": {
+      "selected": {
+        "path": "control/de_doe_reconcile_proof.json",
+        "present": true,
+        "schema": "DE_DOE_FULL_RECONCILE_PROOF_V1",
+        "pass": false,
+        "enumeration_complete": null,
+        "live_coverage_credit_allowed": null,
+        "publication_window_enumeration_complete": null,
+        "months_requested": null,
+        "months_completed": null,
+        "raw_materialized": null,
+        "current_materialized": null,
+        "adapter_exit_code": 999,
+        "errors": [],
+        "error_count": 0
+      },
+      "candidates": [
+        {
+          "path": "control/de_doe_month_shards_proof.json",
+          "present": false
+        },
+        {
+          "path": "control/de_doe_reconcile_proof.json",
+          "present": true,
+          "schema": "DE_DOE_FULL_RECONCILE_PROOF_V1",
+          "pass": false,
+          "enumeration_complete": null,
+          "live_coverage_credit_allowed": null,
+          "publication_window_enumeration_complete": null,
+          "months_requested": null,
+          "months_completed": null,
+          "raw_materialized": null,
+          "current_materialized": null,
+          "adapter_exit_code": 999,
+          "errors": [],
+          "error_count": 0
+        }
+      ]
+    },
+    "CY_EPPS_PUBLISHED": {
+      "selected": {
+        "path": "control/cy_global_published_smoke_v2.json",
+        "present": true,
+        "schema": "CY_EPPS_GLOBAL_PUBLISHED_SMOKE_V2",
+        "pass": false,
+        "rows_materialized": 30,
+        "adapter_exit_code": 3,
+        "errors": [],
+        "error_count": 0
+      },
+      "candidates": [
+        {
+          "path": "control/cy_global_published_full_proof.json",
+          "present": false
+        },
+        {
+          "path": "control/cy_global_published_smoke_v2.json",
+          "present": true,
+          "schema": "CY_EPPS_GLOBAL_PUBLISHED_SMOKE_V2",
+          "pass": false,
+          "rows_materialized": 30,
+          "adapter_exit_code": 3,
+          "errors": [],
+          "error_count": 0
+        }
+      ]
+    },
+    "CY_EPPS_CURRENT": {
+      "selected": {
+        "path": "control/cy_epps_workspace_contract_probe_v2.json",
+        "present": true,
+        "schema": "CY_EPPS_PUBLIC_CFT_WORKSPACE_CONTRACT_PROBE_V1",
+        "pass": true,
+        "errors": [],
+        "error_count": 0
+      },
+      "candidates": [
+        {
+          "path": "control/cy_epps_full_current_proof.json",
+          "present": false
+        },
+        {
+          "path": "control/cy_epps_workspace_contract_probe_v2.json",
+          "present": true,
+          "schema": "CY_EPPS_PUBLIC_CFT_WORKSPACE_CONTRACT_PROBE_V1",
+          "pass": true,
+          "errors": [],
+          "error_count": 0
+        }
+      ]
+    },
+    "MT_EPPS_OCDS": {
+      "selected": {
+        "path": "control/mt_epps_ocds_reconcile_proof.json",
+        "present": true,
+        "schema": "MALTA_EPPS_OCDS_FULL_RECONCILE_PROOF_V1",
+        "pass": false,
+        "enumeration_complete": false,
+        "live_coverage_credit_allowed": false,
+        "raw_materialized": 189,
+        "current_materialized": 6,
+        "packages_requested": 41,
+        "packages_completed": 41,
+        "manifest_fresh_within_one_month": true,
+        "adapter_exit_code": 3,
+        "errors": [],
+        "error_count": 0
+      },
+      "candidates": [
+        {
+          "path": "control/mt_epps_ocds_reconcile_proof.json",
+          "present": true,
+          "schema": "MALTA_EPPS_OCDS_FULL_RECONCILE_PROOF_V1",
+          "pass": false,
+          "enumeration_complete": false,
+          "live_coverage_credit_allowed": false,
+          "raw_materialized": 189,
+          "current_materialized": 6,
+          "packages_requested": 41,
+          "packages_completed": 41,
+          "manifest_fresh_within_one_month": true,
+          "adapter_exit_code": 3,
+          "errors": [],
+          "error_count": 0
+        },
+        {
+          "path": "control/mt_epps_ocds_migration_probe.json",
+          "present": true,
+          "schema": "MALTA_EPPS_OCDS_MIGRATION_CONTINUITY_PROBE_V1",
+          "pass": false,
+          "errors": [],
+          "error_count": 0
+        }
+      ]
+    },
+    "AU_AUSTENDER": {
+      "selected": {
+        "path": "control/austender_runner_probe.json",
+        "present": true,
+        "schema": "AUSTENDER_GITHUB_RUNNER_NETWORK_PROBE_V1"
+      },
+      "candidates": [
+        {
+          "path": "control/austender_bridge_deployment.json",
+          "present": false
+        },
+        {
+          "path": "control/austender_runner_probe.json",
+          "present": true,
+          "schema": "AUSTENDER_GITHUB_RUNNER_NETWORK_PROBE_V1"
+        }
+      ]
+    },
+    "ROUTE_APPLY": {
+      "selected": {
+        "present": false
+      },
+      "candidates": [
+        {
+          "path": "control/apply_proven_live_routes_v2_status.json",
+          "present": false
+        }
+      ]
+    }
+  }
+}
