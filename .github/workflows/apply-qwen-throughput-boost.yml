@@ -1,0 +1,67 @@
+name: Apply Qwen Throughput Boost
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'control/qwen_throughput_boost_trigger.json'
+      - 'tools/apply_qwen_throughput_boost.py'
+      - '.github/workflows/apply-qwen-throughput-boost.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Patch throughput policy
+        run: python tools/apply_qwen_throughput_boost.py
+
+      - name: Validate resulting workflows
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          live=Path('.github/workflows/qwen-live-classification.yml').read_text()
+          drain=Path('.github/workflows/qwen-live-recovery-drainer.yml').read_text()
+          assert "default: '480'" in live
+          assert "REQUESTED_PER_SHARD: ${{ github.event.inputs.per_shard || '480' }}" in live
+          assert "- cron: '43 * * * *'" in live
+          assert "QWEN_WORKERS_REQUESTED: '20'" in live
+          assert "--max-runtime-seconds 7800" in live
+          assert "-f per_shard=480" in drain
+          assert 'remaining >= 50000' in drain
+          assert 'requested=2' in drain and 'requested=4' in drain and 'requested=6' in drain
+          print('throughput policy validation OK')
+          PY
+
+      - name: Commit throughput boost
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- .github/workflows/qwen-live-classification.yml .github/workflows/qwen-live-recovery-drainer.yml; then
+            echo 'Qwen throughput boost already applied'
+            exit 0
+          fi
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add .github/workflows/qwen-live-classification.yml .github/workflows/qwen-live-recovery-drainer.yml
+          git commit -m 'qwen: prioritize semantic backfill throughput'
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
