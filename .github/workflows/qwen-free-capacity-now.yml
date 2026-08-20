@@ -1,0 +1,38 @@
+name: Qwen Free Capacity Now
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qwen-free-capacity-now.yml'
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: qwen-free-capacity-now
+  cancel-in-progress: true
+
+jobs:
+  free-capacity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Cancel pre-fix DCE fanout and kick semantic backfill
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STALE_DCE_RUN: '32357205269'
+        shell: bash
+        run: |
+          set -euo pipefail
+          status="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${STALE_DCE_RUN}" --jq '.status' 2>/dev/null || echo missing)"
+          conclusion="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${STALE_DCE_RUN}" --jq '.conclusion // ""' 2>/dev/null || true)"
+          echo "stale DCE run ${STALE_DCE_RUN}: status=${status} conclusion=${conclusion}"
+          if [ "$status" != 'completed' ] && [ "$status" != 'missing' ]; then
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/actions/runs/${STALE_DCE_RUN}/cancel" || true
+            echo "Cancellation requested for pre-fix DCE run ${STALE_DCE_RUN}."
+          fi
+          gh workflow run qwen-backfill-kick.yml --ref main || true
+          echo 'Qwen backfill guardian kicked after capacity cleanup.'
