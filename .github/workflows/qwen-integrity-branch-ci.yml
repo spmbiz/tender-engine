@@ -1,0 +1,166 @@
+name: Qwen Integrity Branch CI
+
+on:
+  push:
+    branches:
+      - fix/qwen-integrity-selfheal-audit-20260820
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qwen-integrity-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -q pytest
+      - name: Compile Qwen integrity paths
+        run: |
+          python -m py_compile \
+            pipeline/qwen_notice_post_guard.py \
+            pipeline/qwen_notice_batch_selfheal_core.py \
+            pipeline/qwen_notice_batch_selfheal_rich.py \
+            pipeline/apply_qwen_state_to_ledger.py \
+            pipeline/merge_qwen_classification_state.py
+      - name: Run focused Qwen regression suite
+        run: |
+          python -m pytest -q \
+            tests/test_merge_qwen_classification_state.py \
+            tests/test_qwen_notice_post_guard.py \
+            tests/test_qwen_post_guard_recall.py \
+            tests/test_qwen_integrity_hardening.py \
+            tests/test_qwen_legacy_state_reclass.py \
+            tests/test_qwen_state_queue_recovery.py \
+            tests/test_recall_hardening_p1.py \
+            tests/test_open_world_lane_contracts.py
+
+  audit-current-state:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download current durable state, ledger, residual queue and exact matching snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf audit
+          mkdir -p audit/input audit/out
+          gh release download qwen-classification-state-latest \
+            --pattern qwen-classification-state-latest.jsonl.gz \
+            --dir audit/input --clobber
+          gh release download notice-intelligence-ledger-latest \
+            --pattern notice-intelligence-ledger-latest.jsonl.gz \
+            --pattern notice-classification-queue-latest.jsonl.gz \
+            --pattern notice-ledger-summary-latest.json \
+            --dir audit/input --clobber
+          notes="$(gh release view notice-intelligence-ledger-latest --json body --jq '.body')"
+          source_run="$(grep -oE 'run=[0-9]+' <<< "$notes" | head -n1 | cut -d= -f2)"
+          if [[ ! "$source_run" =~ ^[0-9]+$ ]]; then
+            name="$(gh release view notice-intelligence-ledger-latest --json name --jq '.name')"
+            source_run="$(grep -oE '[0-9]{8,}' <<< "$name" | tail -n1)"
+          fi
+          [[ "$source_run" =~ ^[0-9]+$ ]] || { echo 'Cannot resolve ledger source run' >&2; exit 1; }
+          gh release download "live-world-snapshot-${source_run}" \
+            --pattern "live-open-tenders-${source_run}.jsonl.gz" \
+            --dir audit/input --clobber
+          mv "audit/input/live-open-tenders-${source_run}.jsonl.gz" audit/input/live-open-tenders-latest.jsonl.gz
+          echo "QWEN_AUDIT_SOURCE_RUN=$source_run" >> "$GITHUB_ENV"
+          test -s audit/input/qwen-classification-state-latest.jsonl.gz
+          test -s audit/input/notice-intelligence-ledger-latest.jsonl.gz
+          test -s audit/input/notice-classification-queue-latest.jsonl.gz
+          test -s audit/input/live-open-tenders-latest.jsonl.gz
+      - name: Dry-run exact-context historical reclassification audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python pipeline/merge_qwen_classification_state.py \
+            --ledger audit/input/notice-intelligence-ledger-latest.jsonl.gz \
+            --classification-queue audit/input/notice-classification-queue-latest.jsonl.gz \
+            --snapshot audit/input/live-open-tenders-latest.jsonl.gz \
+            --previous-state audit/input/qwen-classification-state-latest.jsonl.gz \
+            --target-classifier-version qwen3-4b-q4km-batch-selfheal-v1 \
+            --state-out audit/out/audited-state.jsonl.gz \
+            --queue-out audit/out/reclassification-queue.jsonl.gz \
+            --summary-out audit/out/qwen-integrity-audit-summary.json
+          python - <<'PY'
+          import json,os
+          s=json.load(open('audit/out/qwen-integrity-audit-summary.json',encoding='utf-8'))
+          stats=s.get('stats') or {}
+          drift=s.get('legacy_guard_drift_requeue_ids') or []
+          forced=s.get('forced_reclassification_ids') or []
+          report={
+              'source_run':os.environ.get('QWEN_AUDIT_SOURCE_RUN'),
+              'previous_state_rows':s.get('previous_state_rows'),
+              'snapshot_context_rows':s.get('snapshot_context_rows'),
+              'state_rows_after_audit':s.get('state_rows_after_merge'),
+              'remaining_queue_after_audit':s.get('remaining_classification_queue'),
+              'legacy_rows_missing_exact_guard_provenance':stats.get('previous_missing_exact_post_guard_provenance',0),
+              'legacy_rows_exact_guard_audited':stats.get('previous_legacy_guard_audited',0),
+              'legacy_guard_context_missing':stats.get('previous_legacy_guard_audit_context_missing',0),
+              'legacy_semantic_drift_requeued':stats.get('previous_guard_semantic_drift_requeued',0),
+              'legacy_semantically_current':stats.get('previous_legacy_guard_semantically_current',0),
+              'forced_reclassification_count':len(forced),
+              'synthetic_reclassification_count':len(s.get('synthetic_integrity_requeue_ids') or []),
+              'drift_action_counts':s.get('legacy_guard_drift_actions') or {},
+              'first_drift_ids':drift[:100],
+              'first_forced_ids':forced[:100],
+          }
+          print('QWEN_LIVE_STATE_AUDIT '+json.dumps(report,sort_keys=True))
+          PY
+      - name: Dry-run ledger overlay and queue recovery impact
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp audit/input/notice-intelligence-ledger-latest.jsonl.gz audit/out/apply-ledger.jsonl.gz
+          cp audit/input/notice-classification-queue-latest.jsonl.gz audit/out/apply-queue.jsonl.gz
+          cp audit/input/notice-ledger-summary-latest.json audit/out/apply-summary.json
+          python pipeline/apply_qwen_state_to_ledger.py \
+            --ledger audit/out/apply-ledger.jsonl.gz \
+            --classification-queue audit/out/apply-queue.jsonl.gz \
+            --state audit/input/qwen-classification-state-latest.jsonl.gz \
+            --snapshot audit/input/live-open-tenders-latest.jsonl.gz \
+            --summary audit/out/apply-summary.json \
+            --classifier-version qwen3-4b-q4km-batch-selfheal-v1 | tee audit/out/apply-state-audit.log
+          python - <<'PY'
+          import json
+          s=json.load(open('audit/out/apply-summary.json',encoding='utf-8'))
+          report={
+              'state_rows_seen':s.get('qwen_state_rows_seen'),
+              'state_contract_valid':s.get('qwen_state_rows_semantic_contract_valid'),
+              'state_contract_rejected':s.get('qwen_state_rows_semantic_contract_rejected') or {},
+              'exact_hash_applied':s.get('qwen_state_exact_hash_applied'),
+              'stale_hash_ignored':s.get('qwen_state_stale_hash_ignored'),
+              'ledger_classifications_missing_authoritative_state':s.get('ledger_classifications_missing_authoritative_state'),
+              'queue_satisfied_from_state':s.get('classification_queue_satisfied_from_state'),
+              'integrity_recovery_candidates':s.get('classification_queue_integrity_recovery_candidates'),
+              'integrity_recovery_synthesized':s.get('classification_queue_integrity_recovery_synthesized'),
+              'queue_after':s.get('classification_queue'),
+          }
+          print('QWEN_LEDGER_STATE_APPLY_AUDIT '+json.dumps(report,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qwen-integrity-audit-${{ github.run_id }}
+          path: |
+            audit/out/qwen-integrity-audit-summary.json
+            audit/out/reclassification-queue.jsonl.gz
+            audit/out/apply-summary.json
+            audit/out/apply-state-audit.log
+          retention-days: 14
+          if-no-files-found: error

@@ -39,7 +39,7 @@ class InterruptAfterOnePageSession:
         self.headers = {}
         self.calls = 0
 
-    def post(self, url, data=None, timeout=None):
+    def post(self, url, data=None, timeout=None, **kwargs):
         self.calls += 1
         if self.calls == 1:
             return Response({

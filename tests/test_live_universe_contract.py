@@ -64,8 +64,10 @@ class FakeSession:
         self.headers = {}
         self.calls = []
 
-    def post(self, url, data=None, timeout=None):
-        body = json.loads(data)
+    def post(self, url, data=None, timeout=None, **kwargs):
+        body = kwargs.get("json")
+        if body is None:
+            body = json.loads(data)
         self.calls.append(body)
         return FakeResponse(self.payloads.pop(0))
 
