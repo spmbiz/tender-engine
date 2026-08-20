@@ -19,6 +19,7 @@ on:
       - 'pipeline/qwen_notice_batch_selfheal_core.py'
       - 'pipeline/qwen_notice_batch_selfheal_rich.py'
       - 'pipeline/qwen_notice_post_guard.py'
+      - 'pipeline/apply_qwen_state_to_ledger.py'
       - 'pipeline/merge_qwen_classification_state.py'
       - 'pipeline/build_qwen_calibration_corpus.py'
       - 'pipeline/evaluate_qwen_recall_golden.py'
@@ -45,9 +46,14 @@ on:
       - 'tests/test_qwen_post_guard_recall.py'
       - 'tests/test_qwen_integrity_hardening.py'
       - 'tests/test_qwen_legacy_state_reclass.py'
+      - 'tests/test_qwen_state_queue_recovery.py'
 
 permissions:
   contents: read
+
+concurrency:
+  group: recall-hardening-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   recall-regression:
@@ -77,6 +83,7 @@ jobs:
             pipeline/qwen_notice_batch_selfheal_core.py \
             pipeline/qwen_notice_batch_selfheal_rich.py \
             pipeline/qwen_notice_post_guard.py \
+            pipeline/apply_qwen_state_to_ledger.py \
             pipeline/merge_qwen_classification_state.py \
             pipeline/build_qwen_calibration_corpus.py \
             pipeline/evaluate_qwen_recall_golden.py \
@@ -126,8 +133,9 @@ jobs:
             tests/test_qwen_post_guard_recall.py \
             tests/test_qwen_integrity_hardening.py \
             tests/test_qwen_legacy_state_reclass.py \
+            tests/test_qwen_state_queue_recovery.py \
             tests/test_recall_hardening_p1.py
-      - name: Dry-run current durable Qwen state for targeted reclassification
+      - name: Download exact current Qwen state, ledger, queue and matching immutable snapshot
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -142,9 +150,26 @@ jobs:
             --pattern notice-intelligence-ledger-latest.jsonl.gz \
             --pattern notice-classification-queue-latest.jsonl.gz \
             --dir qwen-audit/input --clobber
+          notes="$(gh release view notice-intelligence-ledger-latest --json body --jq '.body')"
+          source_run="$(grep -oE 'run=[0-9]+' <<< "$notes" | head -n1 | cut -d= -f2)"
+          if [[ ! "$source_run" =~ ^[0-9]+$ ]]; then
+            name="$(gh release view notice-intelligence-ledger-latest --json name --jq '.name')"
+            source_run="$(grep -oE '[0-9]{8,}' <<< "$name" | tail -n1)"
+          fi
+          [[ "$source_run" =~ ^[0-9]+$ ]] || { echo 'Cannot resolve ledger source run' >&2; exit 1; }
+          gh release download "live-world-snapshot-${source_run}" \
+            --pattern "live-open-tenders-${source_run}.jsonl.gz" \
+            --dir qwen-audit/input --clobber
+          mv "qwen-audit/input/live-open-tenders-${source_run}.jsonl.gz" qwen-audit/input/live-open-tenders-latest.jsonl.gz
+          echo "QWEN_AUDIT_SOURCE_RUN=$source_run" >> "$GITHUB_ENV"
+      - name: Dry-run current durable Qwen state for targeted reclassification
+        shell: bash
+        run: |
+          set -euo pipefail
           python pipeline/merge_qwen_classification_state.py \
             --ledger qwen-audit/input/notice-intelligence-ledger-latest.jsonl.gz \
             --classification-queue qwen-audit/input/notice-classification-queue-latest.jsonl.gz \
+            --snapshot qwen-audit/input/live-open-tenders-latest.jsonl.gz \
             --previous-state qwen-audit/input/qwen-classification-state-latest.jsonl.gz \
             --target-classifier-version qwen3-4b-q4km-batch-selfheal-v1 \
             --state-out qwen-audit/out/audited-state.jsonl.gz \
@@ -154,17 +179,26 @@ jobs:
           import json
           s=json.load(open('qwen-audit/out/qwen-integrity-audit-summary.json',encoding='utf-8'))
           stats=s.get('stats') or {}
+          drift=s.get('legacy_guard_drift_requeue_ids') or []
+          forced=s.get('forced_reclassification_ids') or []
+          synthetic=s.get('synthetic_integrity_requeue_ids') or []
           report={
+              'source_run':__import__('os').environ.get('QWEN_AUDIT_SOURCE_RUN'),
               'previous_state_rows':s.get('previous_state_rows'),
+              'snapshot_context_rows':s.get('snapshot_context_rows'),
               'state_rows_after_audit':s.get('state_rows_after_merge'),
               'remaining_queue_after_audit':s.get('remaining_classification_queue'),
               'legacy_rows_missing_exact_guard_provenance':stats.get('previous_missing_exact_post_guard_provenance',0),
               'legacy_rows_exact_guard_audited':stats.get('previous_legacy_guard_audited',0),
+              'legacy_guard_context_missing':stats.get('previous_legacy_guard_audit_context_missing',0),
               'legacy_semantic_drift_requeued':stats.get('previous_guard_semantic_drift_requeued',0),
               'legacy_semantically_current':stats.get('previous_legacy_guard_semantically_current',0),
+              'forced_reclassification_count':len(forced),
+              'synthetic_reclassification_count':len(synthetic),
               'conflicting_candidates_requeued':stats.get('conflicting_candidates_requeued',0),
               'drift_action_counts':s.get('legacy_guard_drift_actions') or {},
-              'drift_ids':s.get('legacy_guard_drift_requeue_ids') or [],
+              'first_drift_ids':drift[:100],
+              'first_forced_ids':forced[:100],
           }
           print('QWEN_LIVE_STATE_AUDIT '+json.dumps(report,sort_keys=True))
           PY
