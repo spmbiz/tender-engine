@@ -1,16 +1,21 @@
 name: Promote Spain PLACSP V2
 
 on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Spain PLACSP Live Proof']
+    types: [completed]
   push:
     branches: [main]
     paths:
-      - 'control/es_placsp_live_proof.json'
+      - 'control/es_placsp_promote_trigger.txt'
 
 permissions:
   contents: write
 
 jobs:
   promote:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
