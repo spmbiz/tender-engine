@@ -1,13 +1,30 @@
 {
   "schema": "ES_PLACSP_LIVE_ATOM_PROOF_V2",
-  "adapter_exit_code": 999,
-  "listing_contract": null,
-  "lookback_days": null,
-  "raw_materialized": null,
-  "current_materialized": null,
-  "repaired_pages": null,
-  "publication_window_enumeration_complete": null,
-  "lane_proofs": {},
+  "adapter_exit_code": 0,
+  "listing_contract": "ES_PLACSP_OFFICIAL_ATOM_V2_RECOVERABLE_XML_EXHAUSTION",
+  "lookback_days": 5,
+  "raw_materialized": 7147,
+  "current_materialized": 2561,
+  "repaired_pages": 0,
+  "publication_window_enumeration_complete": true,
+  "lane_proofs": {
+    "hosted": {
+      "feed": "hosted",
+      "pages_fetched": 13,
+      "stop_reason": "PUBLICATION_CUTOFF_REACHED",
+      "publication_window_complete": true,
+      "hard_page_cap": null,
+      "runtime_seconds": 144.068
+    },
+    "aggregated": {
+      "feed": "aggregated",
+      "pages_fetched": 4,
+      "stop_reason": "PUBLICATION_CUTOFF_REACHED",
+      "publication_window_complete": true,
+      "hard_page_cap": null,
+      "runtime_seconds": 13.445
+    }
+  },
   "errors": [],
-  "pass": false
+  "pass": true
 }
