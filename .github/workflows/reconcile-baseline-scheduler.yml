@@ -1,0 +1,35 @@
+name: Reconcile Baseline Scheduler
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 1 * * *'
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - name: Refresh Germany baseline daily
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run de-doe-month-shards-proof.yml --ref main
+      - name: Refresh Cyprus baseline Monday and Thursday
+        shell: bash
+        run: |
+          set -euo pipefail
+          dow="$(date -u +%u)"
+          if [ "$dow" = 1 ] || [ "$dow" = 4 ]; then
+            gh workflow run cy-global-published-full-proof.yml --ref main
+          else
+            echo "Cyprus full reconcile not scheduled for UTC weekday $dow"
+          fi
