@@ -1,0 +1,276 @@
+name: Qwen Stall Watchdog
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/10 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qwen-stall-watchdog.yml'
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: qwen-stall-watchdog
+  cancel-in-progress: true
+
+env:
+  QUEUED_STALE_MINUTES: '30'
+  IN_PROGRESS_IDLE_MINUTES: '180'
+  PROGRESS_STALE_MINUTES: '35'
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - id: inspect
+        name: Detect stale Qwen blockers and semantic progress
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work
+
+          # The stable release is authoritative. Never use the conveyor's
+          # incremental summary to decide whether the one-time backfill is done.
+          if gh release download qwen-classification-state-latest \
+            --pattern qwen-classification-merge-summary-latest.json \
+            --dir work --clobber >/dev/null 2>&1; then
+            cp work/qwen-classification-merge-summary-latest.json work/authoritative-summary.json
+          elif [ -s control/qwen_live/classification_summary.json ]; then
+            cp control/qwen_live/classification_summary.json work/authoritative-summary.json
+          else
+            printf '%s\n' '{"remaining_classification_queue":0,"generated_at":null}' > work/authoritative-summary.json
+          fi
+
+          gh run list --workflow qwen-live-classification.yml --limit 40 \
+            --json databaseId,status,conclusion,createdAt,updatedAt,event,url > work/qwen-runs.json
+
+          python - <<'PY'
+          import datetime as dt
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          repo = os.environ['REPO']
+          queued_limit = int(os.environ.get('QUEUED_STALE_MINUTES') or 30)
+          idle_limit = int(os.environ.get('IN_PROGRESS_IDLE_MINUTES') or 180)
+          progress_limit = int(os.environ.get('PROGRESS_STALE_MINUTES') or 35)
+          now = dt.datetime.now(dt.timezone.utc)
+
+          def parse_ts(value):
+              if not value:
+                  return None
+              value = str(value).replace('Z', '+00:00')
+              try:
+                  return dt.datetime.fromisoformat(value).astimezone(dt.timezone.utc)
+              except Exception:
+                  return None
+
+          def age_minutes(ts):
+              if not ts:
+                  return None
+              return max(0.0, (now - ts).total_seconds() / 60.0)
+
+          def gh_json(endpoint, fallback):
+              p = subprocess.run(['gh', 'api', endpoint], text=True, capture_output=True)
+              if p.returncode != 0:
+                  return fallback
+              try:
+                  return json.loads(p.stdout)
+              except Exception:
+                  return fallback
+
+          summary = json.loads(Path('work/authoritative-summary.json').read_text(encoding='utf-8'))
+          remaining = max(0, int(summary.get('remaining_classification_queue') or 0))
+          summary_ts = parse_ts(summary.get('generated_at'))
+          runs = json.loads(Path('work/qwen-runs.json').read_text(encoding='utf-8'))
+
+          queueish = {'queued', 'pending', 'waiting', 'requested'}
+          stale = []
+          healthy = []
+          newest_result_ts = None
+          newest_result_run = None
+
+          for run in runs:
+              rid = int(run.get('databaseId') or 0)
+              if not rid:
+                  continue
+              status = str(run.get('status') or '')
+              created = parse_ts(run.get('createdAt'))
+              details = gh_json(f'repos/{repo}/actions/runs/{rid}/jobs?per_page=100', {})
+              jobs = details.get('jobs') or []
+              live_jobs = [j for j in jobs if j.get('status') == 'in_progress']
+              queued_jobs = [j for j in jobs if j.get('status') in queueish]
+
+              artifacts = gh_json(f'repos/{repo}/actions/runs/{rid}/artifacts?per_page=100', {})
+              result_artifacts = [
+                  a for a in (artifacts.get('artifacts') or [])
+                  if str(a.get('name') or '').startswith('qwen-live-result-') and not a.get('expired')
+              ]
+              artifact_times = [parse_ts(a.get('updated_at') or a.get('created_at')) for a in result_artifacts]
+              artifact_times = [x for x in artifact_times if x]
+              last_artifact = max(artifact_times) if artifact_times else None
+              if last_artifact and (newest_result_ts is None or last_artifact > newest_result_ts):
+                  newest_result_ts = last_artifact
+                  newest_result_run = rid
+
+              created_age = age_minutes(created)
+              heartbeat = last_artifact or created
+              heartbeat_age = age_minutes(heartbeat)
+
+              if status in queueish:
+                  if created_age is not None and created_age >= queued_limit:
+                      stale.append({'id': rid, 'status': status, 'reason': 'queued_or_pending_too_long', 'age_minutes': round(created_age, 1)})
+                  else:
+                      healthy.append({'id': rid, 'status': status, 'reason': 'fresh_queue_reservation'})
+                  continue
+
+              if status == 'in_progress':
+                  # Never kill a run that has a worker actively executing. A run
+                  # is stale only when it has no live job and no result heartbeat
+                  # for a very conservative hard-idle window.
+                  if live_jobs:
+                      healthy.append({'id': rid, 'status': status, 'reason': 'live_worker', 'live_jobs': len(live_jobs)})
+                  elif heartbeat_age is not None and heartbeat_age >= idle_limit:
+                      stale.append({
+                          'id': rid,
+                          'status': status,
+                          'reason': 'in_progress_without_live_job_or_artifact_heartbeat',
+                          'idle_minutes': round(heartbeat_age, 1),
+                          'queued_jobs': len(queued_jobs),
+                      })
+                  else:
+                      healthy.append({'id': rid, 'status': status, 'reason': 'recent_in_progress_heartbeat', 'queued_jobs': len(queued_jobs)})
+
+          summary_age = age_minutes(summary_ts)
+          artifact_age = age_minutes(newest_result_ts)
+          no_recent_artifact = artifact_age is None or artifact_age >= progress_limit
+          authoritative_stale = summary_age is None or summary_age >= progress_limit
+          stalled_signal = bool(remaining > 0 and no_recent_artifact and authoritative_stale)
+
+          plan = {
+              'schema': 'QWEN_STALL_WATCHDOG_V1',
+              'captured_at': now.replace(microsecond=0).isoformat(),
+              'remaining_classification_queue': remaining,
+              'authoritative_summary_generated_at': summary.get('generated_at'),
+              'authoritative_summary_age_minutes': None if summary_age is None else round(summary_age, 1),
+              'newest_result_artifact_at': None if newest_result_ts is None else newest_result_ts.replace(microsecond=0).isoformat(),
+              'newest_result_artifact_run': newest_result_run,
+              'newest_result_artifact_age_minutes': None if artifact_age is None else round(artifact_age, 1),
+              'stalled_signal': stalled_signal,
+              'healthy_blockers': healthy,
+              'stale_runs': stale,
+              'policy': {
+                  'queued_stale_minutes': queued_limit,
+                  'in_progress_hard_idle_minutes': idle_limit,
+                  'progress_stale_minutes': progress_limit,
+                  'never_cancel_run_with_live_worker': True,
+                  'authoritative_backlog_source': 'qwen-classification-state-latest release',
+              },
+          }
+          Path('work/watchdog-plan.json').write_text(json.dumps(plan, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          print(json.dumps(plan, indent=2, sort_keys=True))
+          PY
+
+          remaining="$(jq -r '.remaining_classification_queue' work/watchdog-plan.json)"
+          stale_count="$(jq -r '.stale_runs | length' work/watchdog-plan.json)"
+          stalled="$(jq -r '.stalled_signal' work/watchdog-plan.json)"
+          echo "remaining=$remaining" >> "$GITHUB_OUTPUT"
+          echo "stale_count=$stale_count" >> "$GITHUB_OUTPUT"
+          echo "stalled=$stalled" >> "$GITHUB_OUTPUT"
+
+      - id: recover
+        name: Cancel stale blockers and prime a fresh reserved generation
+        if: steps.inspect.outputs.remaining != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cancelled=0
+          while IFS= read -r rid; do
+            [ -n "$rid" ] || continue
+            if gh run cancel "$rid" >/dev/null 2>&1; then
+              echo "Cancelled stale Qwen run $rid"
+              cancelled=$((cancelled + 1))
+            else
+              echo "Stale Qwen run $rid was already terminal or could not be cancelled."
+            fi
+          done < <(jq -r '.stale_runs[].id' work/watchdog-plan.json)
+
+          # Re-read after stale cancellation. A fresh queue reservation or a live
+          # worker is a real blocker; cancelled/failed/completed generations are not.
+          sleep 2
+          active="$(gh run list --workflow qwen-live-classification.yml --limit 40 --json status,createdAt \
+            --jq '[.[] | select(.status=="queued" or .status=="pending" or .status=="waiting" or .status=="requested" or .status=="in_progress")] | length')"
+          dispatched=false
+          if [ "$active" -eq 0 ]; then
+            gh workflow run qwen-live-classification.yml --ref main \
+              -f per_shard=480 \
+              -f auto_continue=true \
+              -f dce_limit=160
+            dispatched=true
+            echo 'Dispatched fresh Qwen semantic generation with reservation floor enabled.'
+          else
+            echo "Qwen has $active fresh/live blocker(s); no duplicate dispatch."
+          fi
+
+          echo "cancelled=$cancelled" >> "$GITHUB_OUTPUT"
+          echo "dispatched=$dispatched" >> "$GITHUB_OUTPUT"
+
+      - name: Persist watchdog incident state only when action or stall exists
+        if: steps.inspect.outputs.stalled == 'true' || steps.inspect.outputs.stale_count != '0' || steps.recover.outputs.dispatched == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          CANCELLED: ${{ steps.recover.outputs.cancelled }}
+          DISPATCHED: ${{ steps.recover.outputs.dispatched }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p=Path('work/watchdog-plan.json')
+          d=json.loads(p.read_text(encoding='utf-8'))
+          d['action']={
+              'stale_runs_cancelled': int(os.environ.get('CANCELLED') or 0),
+              'fresh_generation_dispatched': str(os.environ.get('DISPATCHED') or '').lower() == 'true',
+          }
+          p.write_text(json.dumps(d,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+          PY
+
+          path='control/qwen_live/watchdog_state.json'
+          content="$(base64 -w0 work/watchdog-plan.json)"
+          for attempt in 1 2 3 4 5; do
+            sha="$(gh api "repos/$REPO/contents/$path?ref=main" --jq '.sha' 2>/dev/null || true)"
+            args=(--method PUT "repos/$REPO/contents/$path" -f message="qwen: persist stall watchdog ${GITHUB_RUN_ID}" -f content="$content" -f branch=main)
+            [ -n "$sha" ] && args+=(-f sha="$sha")
+            if gh api "${args[@]}" >/dev/null 2>&1; then exit 0; fi
+            sleep "$((attempt*2))"
+          done
+          exit 1
+
+      - name: Watchdog summary
+        if: always()
+        shell: bash
+        run: |
+          echo '### Qwen stall watchdog' >> "$GITHUB_STEP_SUMMARY"
+          echo "- authoritative backlog: ${{ steps.inspect.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- stale run blockers: ${{ steps.inspect.outputs.stale_count }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- stalled progress signal: ${{ steps.inspect.outputs.stalled }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- stale runs cancelled: ${{ steps.recover.outputs.cancelled }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- fresh generation dispatched: ${{ steps.recover.outputs.dispatched }}" >> "$GITHUB_STEP_SUMMARY"
