@@ -1,32 +1,32 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-20T13:50:35+00:00",
+  "generated_at_utc": "2026-08-20T13:56:28+00:00",
   "source_run": "32327417448",
   "state_rows": 10904,
   "ledger_rows": 126459,
   "snapshot_rows": 126459,
   "blocked_ids": 30199,
-  "durable_attempted_exact_versions_ignored": 792,
-  "valid_exact_hash_current_unattempted": 4292,
-  "eligible_keep_for_dce": 3710,
+  "durable_attempted_exact_versions_ignored": 949,
+  "valid_exact_hash_current_unattempted": 4135,
+  "eligible_keep_for_dce": 3583,
   "review_worthy_rejects_promoted_to_explore": 418,
   "stale_hash_ignored": 0,
   "missing_snapshot": 0,
   "expired_ignored": 54,
   "selected": 160,
   "selection_decisions": {
-    "FIT": 2,
-    "MAYBE": 126,
+    "FIT": 1,
+    "MAYBE": 127,
     "REJECT_OBVIOUS": 32
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
-    "qwen-primary-coded": 2,
+    "qwen-primary-coded": 1,
     "qwen-explore-coded": 48,
     "qwen-reject-audit-coded": 32,
-    "qwen-elastic-coded": 78
+    "qwen-elastic-coded": 79
   },
   "selection_freshness": {
     "recent_unseen_carryover": 160
@@ -56,15 +56,15 @@
   "base_candidate_pool": 640,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "FIT": 9,
-    "MAYBE": 508,
-    "REJECT_OBVIOUS": 123
+    "FIT": 8,
+    "MAYBE": 511,
+    "REJECT_OBVIOUS": 121
   },
   "candidate_pool_lanes": {
-    "qwen-primary": 9,
+    "qwen-primary": 8,
     "qwen-open-world-explore": 192,
     "qwen-reject-audit": 128,
-    "qwen-elastic": 311
+    "qwen-elastic": 312
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
