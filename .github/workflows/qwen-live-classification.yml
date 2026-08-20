@@ -45,6 +45,7 @@ concurrency:
 
 env:
   QWEN_WORKERS_REQUESTED: '20'
+  QWEN_RESERVED_WORKERS: '8'
   QWEN_BATCH_SIZE: '8'
   QWEN_CLASSIFIER_VERSION: 'qwen3-4b-q4km-batch-selfheal-v1'
 
@@ -161,7 +162,39 @@ jobs:
           print(json.dumps(report,indent=2,sort_keys=True))
           PY
           allowed="$(python -c "import json;print(int(json.load(open('input/qwen-capacity-admission.json')).get('allowed') or 0))")"
-          if [ "$remaining" = '0' ]; then allowed=0; fi
+          if [ "$remaining" = '0' ]; then
+            allowed=0
+          else
+            admitted="$allowed"
+            reserved_floor="$(REMAINING="$remaining" PER_SHARD="$per_shard" python - <<'PY'
+          import math, os
+          remaining=max(0,int(os.environ.get('REMAINING') or 0))
+          per_shard=max(1,int(os.environ.get('PER_SHARD') or 1))
+          configured=max(1,min(20,int(os.environ.get('QWEN_RESERVED_WORKERS') or 8)))
+          needed=max(1,math.ceil(remaining/per_shard)) if remaining else 0
+          print(min(configured,needed))
+          PY
+          )"
+            if [ "$allowed" -lt "$reserved_floor" ]; then
+              allowed="$reserved_floor"
+              echo "Qwen reservation floor raised admitted workers ${admitted}->${allowed}; queued workers reserve future semantic capacity."
+            fi
+            ADMITTED="$admitted" RESERVED="$reserved_floor" EFFECTIVE="$allowed" python - <<'PY'
+          import json, os
+          p='input/qwen-capacity-admission.json'
+          d=json.load(open(p,encoding='utf-8'))
+          d['reservation']={
+              'configured_floor': int(os.environ['RESERVED']),
+              'admitted_now': int(os.environ['ADMITTED']),
+              'effective_workers': int(os.environ['EFFECTIVE']),
+              'queue_reservation_enabled': True,
+              'reason': 'Qwen semantic backfill keeps a bounded worker floor queued even when instantaneous free-slot admission is lower',
+          }
+          with open(p,'w',encoding='utf-8') as f:
+              json.dump(d,f,indent=2,sort_keys=True)
+              f.write('\n')
+          PY
+          fi
 
           if [ "$allowed" -gt 0 ]; then
             python pipeline/build_qwen_shadow_shards.py \
@@ -222,7 +255,8 @@ jobs:
         run: |
           echo "Source discovery: ${{ steps.plan.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Exact-hash queue remaining before this pass: ${{ steps.plan.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Workers admitted: ${{ steps.plan.outputs.allowed_workers }}; max notices/worker: ${{ steps.plan.outputs.per_shard }}; batch size: ${{ steps.plan.outputs.batch_size }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Workers admitted/reserved: ${{ steps.plan.outputs.allowed_workers }}; max notices/worker: ${{ steps.plan.outputs.per_shard }}; batch size: ${{ steps.plan.outputs.batch_size }}" >> "$GITHUB_STEP_SUMMARY"
+          echo 'A bounded semantic worker floor is queued while backlog remains, so transient slot pressure cannot turn a pass into a zero-worker no-op.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Recovery drainer owns durable Qwen→DCE publication and continuation after this workflow completes.' >> "$GITHUB_STEP_SUMMARY"
 
   classify:
