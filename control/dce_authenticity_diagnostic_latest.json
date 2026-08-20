@@ -1,14 +1,112 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32318928852,
-  "total_inbox_rows": 0,
-  "dce_authenticity_rows": 0,
-  "portal_counts": {},
-  "status_counts": {},
-  "reason_counts": {},
+  "latest_source_dce_run_id": 32333373390,
+  "total_inbox_rows": 160,
+  "dce_authenticity_rows": 27,
+  "portal_counts": {
+    "ZA_ETENDERS": 17,
+    "GENERIC_PUBLIC_PAGE": 5,
+    "TED": 4,
+    "CYPRUS_EPPS": 1
+  },
+  "status_counts": {
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 17,
+    "UNKNOWN_RETRIEVED_DOCUMENT": 10
+  },
+  "reason_counts": {
+    "NON_AUTHORITATIVE": 26,
+    "AUTH_REQUIRED": 1
+  },
   "method_counts": {},
-  "recovery_opportunities": [],
-  "samples_by_reason": {},
+  "recovery_opportunities": [
+    {
+      "portal": "ZA_ETENDERS",
+      "blocked": 17,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 16,
+        "AUTH_REQUIRED": 1
+      }
+    },
+    {
+      "portal": "GENERIC_PUBLIC_PAGE",
+      "blocked": 5,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 5
+      }
+    },
+    {
+      "portal": "TED",
+      "blocked": 4,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 4
+      }
+    },
+    {
+      "portal": "CYPRUS_EPPS",
+      "blocked": 1,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 1
+      }
+    }
+  ],
+  "samples_by_reason": {
+    "NON_AUTHORITATIVE": [
+      {
+        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164502-2026-08-04",
+        "portal": "ZA_ETENDERS",
+        "title": "00399/26",
+        "buyer": "JOBURG THEATRE (SOC) LTD",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-164502"
+      },
+      {
+        "candidate_id": "IT-PVL:3b8048c2-2a4f-4eb5-96a3-da3b65f76a5d",
+        "portal": "GENERIC_PUBLIC_PAGE",
+        "title": "PROCEDURA TELEMATICA APERTA SOTTOSOGLIA COMUNITARIA, PER L’AFFIDAMENTO IN GESTIONE DELL’ATTIVITA’ DEL NIDO D’INFANZIA DENOMINATO “COCCO & DRILLI” SITO IN LUGAGNANO VAL D’ARDA, PER IL PERIODO DAL 14 SETTEMBRE 2026 AL 31 LUGLIO 2030",
+        "buyer": "COMUNE DI LUGAGNANO VAL D'ARDA",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/3b8048c2-2a4f-4eb5-96a3-da3b65f76a5d?ricercaArchivio=false"
+      },
+      {
+        "candidate_id": "TED:578082-2026",
+        "portal": "TED",
+        "title": "Germany – IT services: consulting, software development, Internet and support – SV-KWA-260819-002, Weiterentwicklung Unternehmenswebsite",
+        "buyer": "Stadtwerke München GmbH",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ted.europa.eu/en/notice/-/detail/578082-2026"
+      },
+      {
+        "candidate_id": "CY-EPPS:9160498",
+        "portal": "CYPRUS_EPPS",
+        "title": "Προμήθεια αυτόματων ταϊστρών και ποτιστρών αιγοπροβάτων στην Πειραματική Έπαυλη Αθαλάσσας",
+        "buyer": "Ινστιτούτο Γεωργικών Ερευνών",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://www.eprocurement.gov.cy/epps/notices/viewPublishedContractNotice.do?resourceId=9160498&documentId=9160597&noticeType=16&extId=a3d2dda1-8b85-4253-8fed-b73d19007e30&lang=el&noticeId=9160591&isNational=false"
+      },
+      {
+        "candidate_id": "IT-PVL:fb961a40-0af6-4c17-9924-89f598b0042a",
+        "portal": "GENERIC_PUBLIC_PAGE",
+        "title": "COMUNE DI BARDONECCHIA – AFFIDAMENTO IN CONCESSIONE DEL SERVIZIO DI GESTIONE DEL COMPLESSO SPORTIVO COMUNALE E DEL BAR RISTORO",
+        "buyer": "UNIONE MONTANA VALLE SUSA",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/fb961a40-0af6-4c17-9924-89f598b0042a?ricercaArchivio=false"
+      }
+    ],
+    "AUTH_REQUIRED": [
+      {
+        "candidate_id": "za_etenders_ocds:ocds-9t57fa-160095",
+        "portal": "ZA_ETENDERS",
+        "title": null,
+        "buyer": null,
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-160095"
+      }
+    ]
+  },
   "safety": {
     "diagnostic_only": true,
     "mutates_inbox": false,
