@@ -5,12 +5,12 @@ import argparse
 import datetime as dt
 import gzip
 import json
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Iterable
 
 STATE_SCHEMA = "NOTICE_CLASSIFICATION_STATE_V1"
-SUMMARY_SCHEMA = "NOTICE_CLASSIFICATION_STATE_MERGE_SUMMARY_V2_PROMPT_LOCK"
+SUMMARY_SCHEMA = "NOTICE_CLASSIFICATION_STATE_MERGE_SUMMARY_V3_CONFLICT_SAFE"
 BUSINESS_CALIBRATION_VERSION = "spm-business-fit-v2"
 REQUIRED_PROMPT_VERSION = "qwen-batch-high-recall-business-fit-v3-rich"
 
@@ -50,7 +50,7 @@ def write_jsonl(path: Path, rows: Iterable[dict[str, Any]]) -> None:
 
 def cid(row: dict[str, Any]) -> str:
     n = row.get("notice") if isinstance(row.get("notice"), dict) else {}
-    return str(row.get("canonical_notice_id") or row.get("candidate_id") or row.get("id") or n.get("candidate_id") or "").strip()
+    return str(row.get("canonical_notice_id") or row.get("candidate_id") or row.get("id") or n.get("candidate_id") or n.get("i") or "").strip()
 
 
 def material_hash(row: dict[str, Any]) -> str:
@@ -92,6 +92,33 @@ def is_valid_result(row: dict[str, Any], expected_hash: str, target_version: str
     return True, "accepted"
 
 
+def semantic_signature(row: dict[str, Any]) -> tuple[Any, ...]:
+    """Fields that can materially change routing/DCE priority.
+
+    Duplicate inference artifacts with the same material hash are benign only if
+    they agree on this full routing decision. Conflicts are requeued instead of
+    being resolved by artifact order.
+    """
+    flags = tuple(sorted(str(x).upper() for x in (row.get("friction_flags") or []) if x is not None))
+    return (
+        str(row.get("classification") or row.get("decision") or "").upper(),
+        str(row.get("lean_attractiveness") or "").upper(),
+        str(row.get("delivery_mode") or row.get("possible_delivery_route") or "").upper(),
+        flags,
+        bool(row.get("novelty_or_unusual_flag", row.get("unusual_or_novel", False))),
+        bool(row.get("needs_gpt_review")),
+        str(row.get("survival_decision") or "KEEP").upper(),
+        bool(row.get("dce_eligible", True)),
+    )
+
+
+def deterministic_result_key(row: dict[str, Any]) -> tuple[str, str]:
+    return (
+        str(row.get("classified_at_utc") or row.get("classified_at") or ""),
+        json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")),
+    )
+
+
 def state_record(row: dict[str, Any], accepted_at: str) -> dict[str, Any]:
     return {
         "schema": STATE_SCHEMA,
@@ -114,6 +141,22 @@ def state_record(row: dict[str, Any], accepted_at: str) -> dict[str, Any]:
         "classified_at_utc": row.get("classified_at_utc") or row.get("classified_at") or accepted_at,
         "source_ledger_generation": row.get("source_ledger_generation"),
         "source_result_schema": row.get("schema"),
+        # Additive provenance: old state remains readable, while every newly
+        # accepted row becomes auditable back to self-heal/guard behavior.
+        "classifier_run_id": row.get("classifier_run_id") or row.get("run_id"),
+        "classifier_worker_id": row.get("classifier_worker_id") or row.get("worker"),
+        "initial_batch_size": row.get("initial_batch_size"),
+        "effective_batch_size": row.get("effective_batch_size"),
+        "self_heal_depth": row.get("self_heal_depth"),
+        "recovered_after_split": row.get("recovered_after_split"),
+        "deterministic_guard_actions": row.get("deterministic_guard_actions") if isinstance(row.get("deterministic_guard_actions"), list) else [],
+        "post_guard_schema": row.get("post_guard_schema"),
+        "post_guard_actions": row.get("post_guard_actions") if isinstance(row.get("post_guard_actions"), list) else [],
+        "post_guard_applied": bool(row.get("post_guard_applied", False)),
+        "post_guard_notice_context_used": row.get("post_guard_notice_context_used"),
+        "post_guard_context_source": row.get("post_guard_context_source"),
+        "pre_post_guard_classification": row.get("pre_post_guard_classification"),
+        "pre_post_guard_delivery_mode": row.get("pre_post_guard_delivery_mode"),
         "accepted_into_state_at": accepted_at,
     }
 
@@ -160,6 +203,7 @@ def merge(
         stats["previous_carried"] += 1
 
     reject_reasons = Counter()
+    valid_by_candidate: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for group in result_groups:
         for row in group:
             candidate = cid(row)
@@ -170,8 +214,30 @@ def merge(
             if not ok:
                 reject_reasons[reason] += 1
                 continue
-            state[candidate] = state_record(row, accepted_at)
-            stats["results_accepted"] += 1
+            valid_by_candidate[candidate].append(row)
+            stats["valid_result_rows"] += 1
+
+    conflicting_ids: list[str] = []
+    for candidate in sorted(valid_by_candidate):
+        rows = valid_by_candidate[candidate]
+        if len(rows) > 1:
+            stats["duplicate_valid_result_rows"] += len(rows) - 1
+        signatures = {semantic_signature(row) for row in rows}
+        if len(signatures) > 1:
+            # Artifact order, confidence and label optimism are not truth. Remove
+            # any carried decision for this exact current material so the queue
+            # deterministically asks Qwen to classify it again.
+            state.pop(candidate, None)
+            conflicting_ids.append(candidate)
+            stats["conflicting_candidates_requeued"] += 1
+            stats["conflicting_result_rows"] += len(rows)
+            reject_reasons["conflicting_valid_results"] += len(rows)
+            continue
+        if len(rows) > 1:
+            stats["duplicate_equivalent_candidates_collapsed"] += 1
+        chosen = max(rows, key=deterministic_result_key)
+        state[candidate] = state_record(chosen, accepted_at)
+        stats["results_accepted"] += 1
 
     filtered_queue: list[dict[str, Any]] = []
     queue_seen: set[str] = set()
@@ -201,6 +267,7 @@ def merge(
         "input_queue_rows": len(queue_rows),
         "remaining_classification_queue": len(filtered_queue),
         "classified_fraction_of_ledger": round(len(state_rows) / len(current_hash), 8) if current_hash else 0.0,
+        "conflicting_candidate_ids": conflicting_ids,
         "stats": dict(sorted(stats.items())),
         "rejected_result_reasons": dict(sorted(reject_reasons.items())),
         "safety": {
@@ -210,6 +277,9 @@ def merge(
             "parse_or_fallback_result_marks_classified": False,
             "wrong_classifier_version_marks_classified": False,
             "stale_result_can_overwrite_updated_notice": False,
+            "conflicting_valid_results_are_requeued": True,
+            "artifact_order_resolves_semantic_conflict": False,
+            "new_state_preserves_guard_and_selfheal_provenance": True,
             "classification_is_not_dce_or_eligibility_truth": True,
         },
     }
