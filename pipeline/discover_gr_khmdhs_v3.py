@@ -16,9 +16,14 @@ try:
 except ModuleNotFoundError:
     import discover_gr_khmdhs_v2 as base
 
+# Capture the already-tested V2 classifier BEFORE monkeypatching the module.
+# Calling ``base.verified_no_data_404`` after the patch would recurse back into
+# this wrapper forever.
+_ORIGINAL_VERIFIED_NO_DATA_404 = base.verified_no_data_404
+
 
 def verified_no_data_404(response, page: int) -> bool:
-    if base.verified_no_data_404(response, page):
+    if _ORIGINAL_VERIFIED_NO_DATA_404(response, page):
         return True
     if response.status_code != 404 or page != 0:
         return False
