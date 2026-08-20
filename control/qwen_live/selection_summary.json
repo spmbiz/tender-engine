@@ -1,36 +1,37 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-20T04:21:04+00:00",
-  "source_run": "32287945844",
+  "generated_at_utc": "2026-08-20T04:34:25+00:00",
+  "source_run": "32327417448",
   "state_rows": 7727,
-  "ledger_rows": 123253,
-  "snapshot_rows": 123253,
+  "ledger_rows": 126502,
+  "snapshot_rows": 126502,
   "blocked_ids": 28380,
-  "durable_attempted_exact_versions_ignored": 68,
-  "valid_exact_hash_current_unattempted": 2832,
-  "eligible_keep_for_dce": 2250,
-  "review_worthy_rejects_promoted_to_explore": 377,
-  "stale_hash_ignored": 0,
+  "durable_attempted_exact_versions_ignored": 15,
+  "valid_exact_hash_current_unattempted": 1280,
+  "eligible_keep_for_dce": 1130,
+  "review_worthy_rejects_promoted_to_explore": 89,
+  "stale_hash_ignored": 1746,
   "missing_snapshot": 0,
-  "expired_ignored": 141,
+  "expired_ignored": 0,
   "selected": 160,
   "selection_decisions": {
-    "FIT": 47,
-    "MAYBE": 81,
+    "FIT": 44,
+    "MAYBE": 84,
     "REJECT_OBVIOUS": 32
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
-    "qwen-primary-coded": 47,
+    "qwen-primary-coded": 42,
     "qwen-explore-coded": 48,
     "qwen-reject-audit-coded": 32,
-    "qwen-elastic-coded": 33
+    "qwen-elastic-coded": 38
   },
   "selection_freshness": {
-    "material_new_or_updated": 119,
-    "historical_backfill": 41
+    "recent_unseen_carryover": 92,
+    "historical_backfill": 67,
+    "material_new_or_updated": 1
   },
   "policy": {
     "keep_is_not_fit": true,
@@ -57,21 +58,21 @@
   "base_candidate_pool": 640,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "FIT": 56,
-    "MAYBE": 458,
-    "REJECT_OBVIOUS": 126
+    "FIT": 51,
+    "MAYBE": 530,
+    "REJECT_OBVIOUS": 59
   },
   "candidate_pool_lanes": {
-    "qwen-primary": 56,
+    "qwen-primary": 51,
     "qwen-open-world-explore": 192,
-    "qwen-reject-audit": 128,
-    "qwen-elastic": 264
+    "qwen-reject-audit": 61,
+    "qwen-elastic": 336
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
-    "noncore_code_contradictions_in_pool": 32,
+    "noncore_code_contradictions_in_pool": 140,
     "positive_code_rows_selected": 0,
-    "noncore_code_contradictions_selected": 0,
+    "noncore_code_contradictions_selected": 30,
     "policy": "priority_only_never_drop_never_eligibility",
     "candidate_pool_multiplier": 4
   }
