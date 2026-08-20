@@ -274,7 +274,7 @@ jobs:
             echo "Failed to persist $path" >&2
             return 1
           }
-          persist_file control/qwen_live/classification_summary.json work/publish/classification_summary.json "qwen: persist cumulative incremental classification ${GITHUB_RUN_ID}"
+          persist_file control/qwen_live/incremental_classification_summary.json work/publish/classification_summary.json "qwen: persist cumulative incremental classification ${GITHUB_RUN_ID}"
           persist_file control/qwen_live/selection_summary.json work/publish/selection_summary.json "qwen: persist cumulative incremental selection ${GITHUB_RUN_ID}"
           persist_file queues/qwen_live_selection_latest.jsonl work/publish/qwen_live_selection_latest.jsonl "qwen: persist cumulative live selection ${GITHUB_RUN_ID}"
           persist_file control/qwen_live/incremental_processed.json work/marker.json "qwen: persist cumulative artifact marker ${GITHUB_RUN_ID}"
@@ -288,7 +288,30 @@ jobs:
           set -euo pipefail
           remaining="${REMAINING:-0}"
           if [ "$remaining" -le 0 ]; then exit 0; fi
-          active="$(gh run list --workflow qwen-live-classification.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
+          runs_json="$(gh run list --workflow qwen-live-classification.yml --limit 30 --json status,createdAt)"
+          active="$(RUNS_JSON="$runs_json" python - <<'PY'
+          import datetime as dt,json,os
+          now=dt.datetime.now(dt.timezone.utc)
+          try:runs=json.loads(os.environ.get('RUNS_JSON') or '[]')
+          except Exception:runs=[]
+          queueish={'queued','pending','waiting','requested'}
+          n=0
+          for r in runs:
+              status=str(r.get('status') or '')
+              if status=='in_progress':
+                  n+=1
+                  continue
+              if status not in queueish:
+                  continue
+              try:
+                  created=dt.datetime.fromisoformat(str(r.get('createdAt') or '').replace('Z','+00:00')).astimezone(dt.timezone.utc)
+              except Exception:
+                  continue
+              if (now-created).total_seconds() < 30*60:
+                  n+=1
+          print(n)
+          PY
+          )"
           if [ "$active" -eq 0 ]; then
             gh workflow run qwen-live-classification.yml --ref main \
               -f per_shard=480 \
@@ -296,7 +319,7 @@ jobs:
               -f dce_limit=160
             echo "Queued next explicit 480-row Qwen generation; remaining=$remaining"
           else
-            echo "Semantic lane already has $active active/queued generation(s); no duplicate and no preemption."
+            echo "Semantic lane has $active fresh/live generation(s); stale queue ghosts do not block continuation."
           fi
 
       - name: Dispatch bounded DCE only after semantic lane is protected
@@ -317,6 +340,7 @@ jobs:
           echo "- source generation: ${{ steps.select.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- newly discovered result artifacts: ${{ steps.select.outputs.new_count }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- cumulative state rows: ${{ steps.merge.outputs.state_rows }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- classification queue remaining: ${{ steps.merge.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- incremental classification queue remaining: ${{ steps.merge.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- DCE selection rows: ${{ steps.selection.outputs.selected }}" >> "$GITHUB_STEP_SUMMARY"
+          echo '- incremental summary is written separately; control/qwen_live/classification_summary.json remains authoritative/durable.' >> "$GITHUB_STEP_SUMMARY"
           echo '- active run preferred; only completed/success is a fallback; cancelled/failed runs cannot mask healthy inference.' >> "$GITHUB_STEP_SUMMARY"
