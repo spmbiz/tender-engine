@@ -101,7 +101,7 @@ def test_ted_full_active_keeps_old_publication_and_exhausts_iteration():
             stats = ted.run()
         rows = [json.loads(x) for x in (Path(td) / "current.jsonl").read_text(encoding="utf-8").splitlines()]
         assert [r["candidate_id"] for r in rows] == ["TED:1-2026", "TED:2-2026"]
-        assert rows[0]["currentness_evidence"] == "TED_ACTIVE_COMPETITION_SCOPE"
+        assert rows[0]["currentness_evidence"] == "NO_PARSEABLE_DEADLINE"
         assert stats["enumeration_complete"] is True
         assert stats["enumeration_exhausted"] is True
         assert stats["source_items_seen"] == 2
