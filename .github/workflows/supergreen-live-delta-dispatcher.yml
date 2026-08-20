@@ -1,0 +1,38 @@
+name: SuperGreen Hourly Live Delta Dispatcher
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '7 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/supergreen-live-delta-dispatcher.yml'
+      - 'control/supergreen_live_delta_trigger.json'
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: supergreen-live-delta-dispatcher
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Dispatch one delta generation only when global discovery is idle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          active="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow supergreen-discovery-v2.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
+          if [ "$active" -gt 0 ]; then
+            echo "SuperGreen discovery already active/queued ($active); skip hourly delta rather than stack generations."
+            exit 0
+          fi
+          gh workflow run supergreen-discovery-v2.yml --repo "$GITHUB_REPOSITORY" --ref main -f mode=delta
+          echo 'Dispatched hourly SuperGreen delta.'
