@@ -1,10 +1,10 @@
 {
   "schema": "GPT_REVIEW_HOT_V3",
-  "updated_at": "2026-08-20T04:54:29.178662+00:00",
+  "updated_at": "2026-08-20T04:54:32.418243+00:00",
   "latest_dce_run_id": 32333373390,
-  "latest_shard": 0,
+  "latest_shard": 5,
   "generation_reset": false,
-  "count": 10,
+  "count": 12,
   "items": [
     {
       "candidate_id": "TED:537867-2026",
@@ -1877,6 +1877,453 @@
       "source_dce_run_id": 32333373390,
       "source_shard": 1,
       "hot_ready_at": "2026-08-20T04:51:58.409481+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 25,
+      "spm_fit_band": "MAYBE",
+      "spm_fit_reasons": [
+        "workshop"
+      ],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
+      "candidate_id": "TED:486031-2026",
+      "title": "Slovenia – Business services: law, marketing, consulting, recruitment, printing and security – Zagotavljanje dela delavcev uporabniku",
+      "buyer": "NUKLEARNA ELEKTRARNA KRŠKO d.o.o.",
+      "portal": "TED",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/486031-2026",
+      "deadline": "2026-08-24T08:00:00+02:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 82,
+      "priority_score": 82,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-24T08:00:00+02:00",
+        "notice_deadline_date": "2026-08-24",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 8,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "SERVICES</ProcurementTypeCode> <ns3:MainCommodityClassification> <ItemClassificationCode>(79000000) Poslovne storitve: pravo, trženje, svetovanje, zaposlovanje, tiskanje in varnost</ItemClassificationCode> </ns3:MainCommodityClassification> </ns3:ProcurementProject> <ns3:TenderingCriterion> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">63adb07d-db1b-4ef0-a14e-a99785cf8cf6</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CRITERION.EXCLUSION.NATIONAL.OTHER</CriterionTypeCode> <Name>Purely national exclusion grounds</Name> <Description>Do the purely national grounds of exclusion, which are specified in the relevant notice or in the procurement documents, apply?</Description> <ns3:Legislation> <Title>Public Procurement Directive 2014/24/EU</Title> <Description>Directive 2014/24/EU of the European Parliament and of the Council of 26 February 2014 on public procurement and repealing Directive 2004/18/EC</Description> <JurisdictionLevel>eu</JurisdictionLevel> <Article>Article 57(3)</Article> <URI>http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=uriserv:OJ.L_.2014.094.01.0065.01.EN",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 3251,
+            "corpus_end": 4568,
+            "match": "exclusion grounds"
+          },
+          {
+            "text": "</ns3:SubsidiaryTenderingCriterionPropertyGroup> </ns3:SubsidiaryTenderingCriterionPropertyGroup> </ns3:TenderingCriterionPropertyGroup> </ns3:TenderingCriterion> <ns3:TenderingCriterion> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">612a1625-118d-4ea4-a6db-413184e7c0a8</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.MANAGEMENT.SUBCONTRACTING_PROPORTION</CriterionTypeCode> <Name>Subcontracting proportion</Name> <Description>The economic operator intends possibly to subcontract the following proportion (i.e. percentage) of the contract. Please note that if the economic operator has decided to subcontract a part of the contract and relies on the subcontractor’s capacities to perform that part, then please fill in a separate ESPD for such subcontractors, see Part II, Section C above.</Description> <ns3:Legislation> <Title>Public Procurement Directive 2014/24/EU</Title> <Description>Directive 2014/24/EU of the European Parliament and of the Council of 26 February 2014 on public procurement and repealing Directive 2004/18/EC</Description> <Juri",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 21180,
+            "corpus_end": 22497,
+            "match": "economic operator"
+          },
+          {
+            "text": "</ns3:TenderingCriterionPropertyGroup> </ns3:TenderingCriterion> <ns3:TenderingCriterion> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">612a1625-118d-4ea4-a6db-413184e7c0a8</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.MANAGEMENT.SUBCONTRACTING_PROPORTION</CriterionTypeCode> <Name>Subcontracting proportion</Name> <Description>The economic operator intends possibly to subcontract the following proportion (i.e. percentage) of the contract. Please note that if the economic operator has decided to subcontract a part of the contract and relies on the subcontractor’s capacities to perform that part, then please fill in a separate ESPD for such subcontractors, see Part II, Section C above.</Description> <ns3:Legislation> <Title>Public Procurement Directive 2014/24/EU</Title> <Description>Directive 2014/24/EU of the European Parliament and of the Council of 26 February 2014 on public procurement and repealing Directive 2004/18/EC</Description> <JurisdictionLevel>eu</JurisdictionLevel> <Article>Article 58(4)</Article> <URI>http://eur-lex.europa.eu/legal-cont",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 21314,
+            "corpus_end": 22631,
+            "match": "economic operator"
+          },
+          {
+            "text": "eDataTypeCode> </ns3:TenderingCriterionProperty> </ns3:SubsidiaryTenderingCriterionPropertyGroup> </ns3:TenderingCriterionPropertyGroup> </ns3:TenderingCriterion> <ns3:TenderingCriterion> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">2043338f-a38a-490b-b3ec-2607cb25a017</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CRITERION.OTHER.EO_DATA.SHELTERED_WORKSHOP</CriterionTypeCode> <Name>EO is a sheltered workshop</Name> <Description>Only in case the procurement is reserved: is the economic operator a sheltered workshop, a 'social business' or will it provide for the performance of the contract in the context of sheltered employment programmes?</Description> <ns3:TenderingCriterionPropertyGroup> <ID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">6febbe4a-e715-427c-a2b1-19cfabadaef0</ID> <PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">ON*</PropertyGroupTypeCode> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">1b8db39c-ddcc-4a55-97f4-81eb7247e69a</ID>",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 25354,
+            "corpus_end": 26671,
+            "match": "economic operator"
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "tration or certification is available electronically, please state where</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">QUESTION</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">URL</ValueDataTypeCode> </ns3:TenderingCriterionProperty> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">0c57bcf3-0144-4ac6-b98f-d9c72a628cca</ID> <Description>Please state the references on which the registration or certification is based, and, where applicable, the classification obtained in the official list</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">QUESTION</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">DESCRIPTION</ValueDataTypeCode> </ns3:TenderingCriterionProperty> <ns3:SubsidiaryTenderingCriterionPropertyGroup> <ID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">92e44d3b-af8e-4a29-91a8-24d27aa27fee</ID>",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 33478,
+            "corpus_end": 34788,
+            "match": "references"
+          },
+          {
+            "text": "schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">efb56a12-bee3-478f-8ab2-c4b35106aa71</ID> <Description>Maximum number of lots that may be awarded to one tenderer</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">REQUIREMENT</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">QUANTITY_INTEGER</ValueDataTypeCode> </ns3:TenderingCriterionProperty> </ns3:TenderingCriterionPropertyGroup> </ns3:TenderingCriterion> <ns3:AdditionalDocumentReference> <ID schemeAgencyID=\"EU-COM-GROW\" schemeAgencyName=\"DG GROW (European Commission)\" schemeVersionID=\"1.1\">0000/S 000-000000</ID> <DocumentTypeCode listID=\"ReferencesTypeCodes\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\"></DocumentTypeCode> <ns3:Attachment> <ns3:ExternalReference> <URI></URI> <FileName>Zagotavljanje dela delavcev uporabniku </FileName> <Description>Zagotavljanje dela delavcev uporabniku </Description> <Description></Description> </ns3:ExternalReference> </ns3:Attachment> </ns3:AdditionalDocumentRefer",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 59245,
+            "corpus_end": 60554,
+            "match": "Reference"
+          },
+          {
+            "text": "may be awarded to one tenderer</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">REQUIREMENT</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">QUANTITY_INTEGER</ValueDataTypeCode> </ns3:TenderingCriterionProperty> </ns3:TenderingCriterionPropertyGroup> </ns3:TenderingCriterion> <ns3:AdditionalDocumentReference> <ID schemeAgencyID=\"EU-COM-GROW\" schemeAgencyName=\"DG GROW (European Commission)\" schemeVersionID=\"1.1\">0000/S 000-000000</ID> <DocumentTypeCode listID=\"ReferencesTypeCodes\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\"></DocumentTypeCode> <ns3:Attachment> <ns3:ExternalReference> <URI></URI> <FileName>Zagotavljanje dela delavcev uporabniku </FileName> <Description>Zagotavljanje dela delavcev uporabniku </Description> <Description></Description> </ns3:ExternalReference> </ns3:Attachment> </ns3:AdditionalDocumentReference> </ns4:QualificationApplicationRequest>",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 59425,
+            "corpus_end": 60600,
+            "match": "References"
+          },
+          {
+            "text": "D=\"2.1.1\">REQUIREMENT</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">QUANTITY_INTEGER</ValueDataTypeCode> </ns3:TenderingCriterionProperty> </ns3:TenderingCriterionPropertyGroup> </ns3:TenderingCriterion> <ns3:AdditionalDocumentReference> <ID schemeAgencyID=\"EU-COM-GROW\" schemeAgencyName=\"DG GROW (European Commission)\" schemeVersionID=\"1.1\">0000/S 000-000000</ID> <DocumentTypeCode listID=\"ReferencesTypeCodes\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\"></DocumentTypeCode> <ns3:Attachment> <ns3:ExternalReference> <URI></URI> <FileName>Zagotavljanje dela delavcev uporabniku </FileName> <Description>Zagotavljanje dela delavcev uporabniku </Description> <Description></Description> </ns3:ExternalReference> </ns3:Attachment> </ns3:AdditionalDocumentReference> </ns4:QualificationApplicationRequest>",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 59565,
+            "corpus_end": 60600,
+            "match": "Reference"
+          }
+        ],
+        "certifications_partner": [
+          {
+            "text": "diaryTenderingCriterionPropertyGroup> </ns3:TenderingCriterionPropertyGroup> </ns3:TenderingCriterion> <ns3:TenderingCriterion> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">9b19e869-6c89-4cc4-bd6c-ac9ca8602165</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CRITERION.OTHER.EO_DATA.REGISTERED_IN_OFFICIAL_LIST</CriterionTypeCode> <Name>EO registered in a PQS</Name> <Description>If applicable, is the economic operator registered on an official list of approved economic operators or does it have an equivalent certificate (e.g. under a national (pre)qualification system)?</Description> <ns3:TenderingCriterionPropertyGroup> <ID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">ecb5127b-9018-4fb8-8327-a6a7a2c73195</ID> <PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">ON*</PropertyGroupTypeCode> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">4990d3c4-7d28-442e-b1ce-dc876c5c630e</ID> <Description>Your answer?</Description> <TypeCode listID=\"CriterionE",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 30635,
+            "corpus_end": 31946,
+            "match": "certificate"
+          },
+          {
+            "text": "eDataTypeCode> </ns3:TenderingCriterionProperty> <ns3:SubsidiaryTenderingCriterionPropertyGroup> <ID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">dc4acf0c-c761-40d0-b031-4ee1f224be5c</ID> <PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">ONTRUE</PropertyGroupTypeCode> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">9f359664-dd47-46f5-bb20-508c726c250d</ID> <Description>Please provide the name of the list or certificate and the relevant registration or certification number, if applicable</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">QUESTION</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">DESCRIPTION</ValueDataTypeCode> </ns3:TenderingCriterionProperty> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">364d0b66-68d3-4589-92a6-e8d2a7609d32</ID> <Description>If the certi",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 32152,
+            "corpus_end": 33463,
+            "match": "certificate"
+          },
+          {
+            "text": "terionProperty> <ns3:SubsidiaryTenderingCriterionPropertyGroup> <ID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">dc4acf0c-c761-40d0-b031-4ee1f224be5c</ID> <PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">ONTRUE</PropertyGroupTypeCode> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">9f359664-dd47-46f5-bb20-508c726c250d</ID> <Description>Please provide the name of the list or certificate and the relevant registration or certification number, if applicable</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">QUESTION</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">DESCRIPTION</ValueDataTypeCode> </ns3:TenderingCriterionProperty> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">364d0b66-68d3-4589-92a6-e8d2a7609d32</ID> <Description>If the certificate of registration or certification is avai",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 32197,
+            "corpus_end": 33510,
+            "match": "certification"
+          },
+          {
+            "text": "icate and the relevant registration or certification number, if applicable</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">QUESTION</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">DESCRIPTION</ValueDataTypeCode> </ns3:TenderingCriterionProperty> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">364d0b66-68d3-4589-92a6-e8d2a7609d32</ID> <Description>If the certificate of registration or certification is available electronically, please state where</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">QUESTION</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">URL</ValueDataTypeCode> </ns3:TenderingCriterionProperty> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">0c57bcf3-0144-4ac6-b98f-d9c72a628cca</ID> <Description>Please s",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 32808,
+            "corpus_end": 34119,
+            "match": "certificate"
+          }
+        ],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [
+          {
+            "text": "</ns3:SubsidiaryTenderingCriterionPropertyGroup> </ns3:SubsidiaryTenderingCriterionPropertyGroup> </ns3:SubsidiaryTenderingCriterionPropertyGroup> </ns3:SubsidiaryTenderingCriterionPropertyGroup> </ns3:TenderingCriterionPropertyGroup> </ns3:TenderingCriterion> <ns3:TenderingCriterion> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">612a1625-118d-4ea4-a6db-413184e7c0a8</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.MANAGEMENT.SUBCONTRACTING_PROPORTION</CriterionTypeCode> <Name>Subcontracting proportion</Name> <Description>The economic operator intends possibly to subcontract the following proportion (i.e. percentage) of the contract. Please note that if the economic operator has decided to subcontract a part of the contract and relies on the subcontractor’s capacities to perform that part, then please fill in a separate ESPD for such subcontractors, see Part II, Section C above.</Description> <ns3:Legislation> <Title>Public Procurement Directive 2014/24/EU</Title> <Description>Directive 2014/24/EU of the European Parliament and",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 21062,
+            "corpus_end": 22373,
+            "match": "SUBCONTRACT"
+          },
+          {
+            "text": "</ns3:SubsidiaryTenderingCriterionPropertyGroup> </ns3:SubsidiaryTenderingCriterionPropertyGroup> </ns3:SubsidiaryTenderingCriterionPropertyGroup> </ns3:TenderingCriterionPropertyGroup> </ns3:TenderingCriterion> <ns3:TenderingCriterion> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">612a1625-118d-4ea4-a6db-413184e7c0a8</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.MANAGEMENT.SUBCONTRACTING_PROPORTION</CriterionTypeCode> <Name>Subcontracting proportion</Name> <Description>The economic operator intends possibly to subcontract the following proportion (i.e. percentage) of the contract. Please note that if the economic operator has decided to subcontract a part of the contract and relies on the subcontractor’s capacities to perform that part, then please fill in a separate ESPD for such subcontractors, see Part II, Section C above.</Description> <ns3:Legislation> <Title>Public Procurement Directive 2014/24/EU</Title> <Description>Directive 2014/24/EU of the European Parliament and of the Council of 26 February 2014 on public procurement an",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 21122,
+            "corpus_end": 22433,
+            "match": "Subcontract"
+          },
+          {
+            "text": "ringCriterionPropertyGroup> </ns3:SubsidiaryTenderingCriterionPropertyGroup> </ns3:TenderingCriterionPropertyGroup> </ns3:TenderingCriterion> <ns3:TenderingCriterion> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">612a1625-118d-4ea4-a6db-413184e7c0a8</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.MANAGEMENT.SUBCONTRACTING_PROPORTION</CriterionTypeCode> <Name>Subcontracting proportion</Name> <Description>The economic operator intends possibly to subcontract the following proportion (i.e. percentage) of the contract. Please note that if the economic operator has decided to subcontract a part of the contract and relies on the subcontractor’s capacities to perform that part, then please fill in a separate ESPD for such subcontractors, see Part II, Section C above.</Description> <ns3:Legislation> <Title>Public Procurement Directive 2014/24/EU</Title> <Description>Directive 2014/24/EU of the European Parliament and of the Council of 26 February 2014 on public procurement and repealing Directive 2004/18/EC</Description> <JurisdictionLevel>eu</JurisdictionLe",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 21218,
+            "corpus_end": 22529,
+            "match": "subcontract"
+          },
+          {
+            "text": "Group> </ns3:TenderingCriterion> <ns3:TenderingCriterion> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">612a1625-118d-4ea4-a6db-413184e7c0a8</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.MANAGEMENT.SUBCONTRACTING_PROPORTION</CriterionTypeCode> <Name>Subcontracting proportion</Name> <Description>The economic operator intends possibly to subcontract the following proportion (i.e. percentage) of the contract. Please note that if the economic operator has decided to subcontract a part of the contract and relies on the subcontractor’s capacities to perform that part, then please fill in a separate ESPD for such subcontractors, see Part II, Section C above.</Description> <ns3:Legislation> <Title>Public Procurement Directive 2014/24/EU</Title> <Description>Directive 2014/24/EU of the European Parliament and of the Council of 26 February 2014 on public procurement and repealing Directive 2004/18/EC</Description> <JurisdictionLevel>eu</JurisdictionLevel> <Article>Article 58(4)</Article> <URI>http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=uriserv:OJ.",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 21347,
+            "corpus_end": 22658,
+            "match": "subcontract"
+          }
+        ],
+        "deliverables_scope": [
+          {
+            "text": "===== FILE: files/RD_unpacked/RD.pdf ===== ===== FILE: files/RD_unpacked/espd_request.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <ns4:QualificationApplicationRequest xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:ns2=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\" xmlns:ns3=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:ns4=\"urn:oasis:names:specification:ubl:schema:xsd:QualificationApplicationRequest-2\"> <UBLVersionID schemeAgencyID=\"OASIS-UBL-TC\">2.2</UBLVersionID> <CustomizationID schemeName=\"CustomizationID\" schemeAgencyID=\"CEN-BII\" schemeVersionID=\"3.0\">urn:www.cenbii.eu:transaction:biitrdm070:ver3.0</CustomizationID> <ProfileID schemeAgencyID=\"CEN-BII\">4.1</ProfileID> <ProfileExecutionID schemeAgencyID=\"EU-COM-GROW\" schemeVe",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 0,
+            "corpus_end": 1011,
+            "match": "specification"
+          },
+          {
+            "text": "onPropertyGroup> </ns3:TenderingCriterion> <ns3:TenderingCriterion> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">07301031-2270-41af-8e7e-66fe0c777107</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.TECHNICAL.PROFESSIONAL_QUALIFICATIONS</CriterionTypeCode> <Name>Educational and professional qualifications</Name> <Description>The following educational and professional qualifications are held by the service provider or the contractor itself, and/or (depending on the requirements set out in the relevant notice or the in the ESPD, the relevant notice or by its managerial staff.</Description> <ns3:TenderingCriterionPropertyGroup> <ID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">d2cadc29-07e0-46b2-a74a-a0dc4bd2e5c2</ID> <PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">ON*</PropertyGroupTypeCode> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">3bbdd106-8f61-4663-bec3-8be3fbfc587a</ID> <Description>This criterion will be",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 9525,
+            "corpus_end": 10837,
+            "match": "requirements"
+          },
+          {
+            "text": "e listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">LOT_IDENTIFIER</ValueDataTypeCode> </ns3:TenderingCriterionProperty> </ns3:TenderingCriterionPropertyGroup> </ns3:TenderingCriterion> <ns3:TenderingCriterion> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">6a21c421-5c1e-46f4-9762-116fbcd33097</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CRITERION.OTHER.CA_DATA.LOTS_SUBMISSION</CriterionTypeCode> <Name>CA Lots</Name> <Description>Please take into account the following requirements regarding the lots of this procurement procedure:</Description> <ns3:TenderingCriterionPropertyGroup> <ID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">03cff8d1-4d22-4435-82fa-d6361af84be6</ID> <PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">ON*</PropertyGroupTypeCode> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">36f925b9-24b3-4ce4-8152-84f7b0098a76</ID> <Description>Tenders may be submitted for</Description> <TypeCode lis",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 57013,
+            "corpus_end": 58325,
+            "match": "requirements"
+          },
+          {
+            "text": "ataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CODE</ValueDataTypeCode> </ns3:TenderingCriterionProperty> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">ff49bc67-bb08-4bfe-9df2-fbbb3d27f1dc</ID> <Description>Maximum number of lots</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">REQUIREMENT</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">QUANTITY_INTEGER</ValueDataTypeCode> </ns3:TenderingCriterionProperty> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">efb56a12-bee3-478f-8ab2-c4b35106aa71</ID> <Description>Maximum number of lots that may be awarded to one tenderer</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">REQUIREMENT</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">QUANTITY_INTEGER</ValueDataTypeCode>",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 58447,
+            "corpus_end": 59755,
+            "match": "QUANTITY"
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "mClassificationCode> </ns3:MainCommodityClassification> </ns3:ProcurementProject> <ns3:TenderingCriterion> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">63adb07d-db1b-4ef0-a14e-a99785cf8cf6</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CRITERION.EXCLUSION.NATIONAL.OTHER</CriterionTypeCode> <Name>Purely national exclusion grounds</Name> <Description>Do the purely national grounds of exclusion, which are specified in the relevant notice or in the procurement documents, apply?</Description> <ns3:Legislation> <Title>Public Procurement Directive 2014/24/EU</Title> <Description>Directive 2014/24/EU of the European Parliament and of the Council of 26 February 2014 on public procurement and repealing Directive 2004/18/EC</Description> <JurisdictionLevel>eu</JurisdictionLevel> <Article>Article 57(3)</Article> <URI>http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=uriserv:OJ.L_.2014.094.01.0065.01.ENG</URI> </ns3:Legislation> <ns3:TenderingCriterionPropertyGroup> <ID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">8d79d5f7-dc21-45e9-b188-e02008b854e0</ID>",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 3456,
+            "corpus_end": 4759,
+            "match": "sla"
+          },
+          {
+            "text": "on>Do the purely national grounds of exclusion, which are specified in the relevant notice or in the procurement documents, apply?</Description> <ns3:Legislation> <Title>Public Procurement Directive 2014/24/EU</Title> <Description>Directive 2014/24/EU of the European Parliament and of the Council of 26 February 2014 on public procurement and repealing Directive 2004/18/EC</Description> <JurisdictionLevel>eu</JurisdictionLevel> <Article>Article 57(3)</Article> <URI>http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=uriserv:OJ.L_.2014.094.01.0065.01.ENG</URI> </ns3:Legislation> <ns3:TenderingCriterionPropertyGroup> <ID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">8d79d5f7-dc21-45e9-b188-e02008b854e0</ID> <PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">ON*</PropertyGroupTypeCode> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">4a8f8580-c9c5-4e42-98e3-73f4955a0823</ID> <Description></Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CAPTION</Ty",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 3944,
+            "corpus_end": 5247,
+            "match": "sla"
+          },
+          {
+            "text": "ode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.MANAGEMENT.SUBCONTRACTING_PROPORTION</CriterionTypeCode> <Name>Subcontracting proportion</Name> <Description>The economic operator intends possibly to subcontract the following proportion (i.e. percentage) of the contract. Please note that if the economic operator has decided to subcontract a part of the contract and relies on the subcontractor’s capacities to perform that part, then please fill in a separate ESPD for such subcontractors, see Part II, Section C above.</Description> <ns3:Legislation> <Title>Public Procurement Directive 2014/24/EU</Title> <Description>Directive 2014/24/EU of the European Parliament and of the Council of 26 February 2014 on public procurement and repealing Directive 2004/18/EC</Description> <JurisdictionLevel>eu</JurisdictionLevel> <Article>Article 58(4)</Article> <URI>http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=uriserv:OJ.L_.2014.094.01.0065.01.ENG</URI> </ns3:Legislation> <ns3:TenderingCriterionPropertyGroup> <ID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">575f7550-8a2d-4bad-b9d8-be07ab570076</ID>",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 21571,
+            "corpus_end": 22874,
+            "match": "sla"
+          },
+          {
+            "text": "ctor’s capacities to perform that part, then please fill in a separate ESPD for such subcontractors, see Part II, Section C above.</Description> <ns3:Legislation> <Title>Public Procurement Directive 2014/24/EU</Title> <Description>Directive 2014/24/EU of the European Parliament and of the Council of 26 February 2014 on public procurement and repealing Directive 2004/18/EC</Description> <JurisdictionLevel>eu</JurisdictionLevel> <Article>Article 58(4)</Article> <URI>http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=uriserv:OJ.L_.2014.094.01.0065.01.ENG</URI> </ns3:Legislation> <ns3:TenderingCriterionPropertyGroup> <ID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">575f7550-8a2d-4bad-b9d8-be07ab570076</ID> <PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">ON*</PropertyGroupTypeCode> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">c88aa0a3-0018-4ef0-a366-3aade2fe2a5a</ID> <Description>Please specify</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 22059,
+            "corpus_end": 23362,
+            "match": "sla"
+          }
+        ],
+        "term_value": [
+          {
+            "text": "===== FILE: files/RD_unpacked/RD.pdf ===== ===== FILE: files/RD_unpacked/espd_request.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <ns4:QualificationApplicationRequest xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:ns2=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\" xmlns:ns3=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:ns4=\"urn:oasis:names:specification:ubl:schema:xsd:QualificationApplicationRequest-2\"> <UBLVersionID schemeAgencyID=\"OASIS-UBL-TC\">2.2</UBLVersionID> <CustomizationID schemeName=\"CustomizationID\" schemeAgencyID=\"CEN-BII\" schemeVersionID=\"3.0\">urn:www.cenbii.eu:transaction:biitrdm070:ver3.0</CustomizationID> <ProfileID schemeAgencyID=\"CEN-BII\">4.1</ProfileID> <ProfileExecutionID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">ESPD-EDMv2.1.1-EXTENDED</ProfileExecutionID> <ID schemeID=\"ISO/IEC 9834-8:2008 - 4UUID\" sche",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 0,
+            "corpus_end": 1123,
+            "match": "Extension"
+          }
+        ],
+        "award_criteria": [],
+        "forms_signatures": [
+          {
+            "text": "===== FILE: files/RD_unpacked/RD.pdf ===== ===== FILE: files/RD_unpacked/espd_request.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <ns4:QualificationApplicationRequest xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:ns2=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\" xmlns:ns3=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:ns4=\"urn:oasis:names:specification:ubl:schema:xsd:QualificationApplicationRequest-2\"> <UBLVersionID schemeAgencyID=\"OASIS-UBL-TC\">2.2</UBLVersionID> <CustomizationID schemeName=\"CustomizationID\" schemeAgencyID=\"CEN-BII\" schemeVersionID=\"3.0\">urn:www.cenbii.eu:transaction:biitr",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 0,
+            "corpus_end": 863,
+            "match": "espd"
+          },
+          {
+            "text": "CommonBasicComponents-2\" xmlns:ns2=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\" xmlns:ns3=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:ns4=\"urn:oasis:names:specification:ubl:schema:xsd:QualificationApplicationRequest-2\"> <UBLVersionID schemeAgencyID=\"OASIS-UBL-TC\">2.2</UBLVersionID> <CustomizationID schemeName=\"CustomizationID\" schemeAgencyID=\"CEN-BII\" schemeVersionID=\"3.0\">urn:www.cenbii.eu:transaction:biitrdm070:ver3.0</CustomizationID> <ProfileID schemeAgencyID=\"CEN-BII\">4.1</ProfileID> <ProfileExecutionID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">ESPD-EDMv2.1.1-EXTENDED</ProfileExecutionID> <ID schemeID=\"ISO/IEC 9834-8:2008 - 4UUID\" schemeAgencyID=\"DGPE\">2af889d1-4099-4066-b70e-5c2a63b6cd44</ID> <CopyIndicator>false</CopyIndicator> <UUID schemeID=\"ISO/IEC 9834-8:2008 - 4UUID\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"4\">8c4c4b21-fc00-4e39-a271-cc29ec67144a</UUID> <ContractFolderID schemeAgencyID=\"DGPE\">Sklep št.203/26</ContractFolderID> <IssueDate>2026-07-13</IssueDate> <IssueTime>07:41:26.808</IssueTime> <VersionID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">1.0</VersionID> <ProcedureCode listID=\"ProcedureType\" listAgencyID=\"EU-COM-OP\" listAge",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 377,
+            "corpus_end": 1681,
+            "match": "ESPD"
+          },
+          {
+            "text": "nderingCriterion> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">07301031-2270-41af-8e7e-66fe0c777107</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.TECHNICAL.PROFESSIONAL_QUALIFICATIONS</CriterionTypeCode> <Name>Educational and professional qualifications</Name> <Description>The following educational and professional qualifications are held by the service provider or the contractor itself, and/or (depending on the requirements set out in the relevant notice or the in the ESPD, the relevant notice or by its managerial staff.</Description> <ns3:TenderingCriterionPropertyGroup> <ID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">d2cadc29-07e0-46b2-a74a-a0dc4bd2e5c2</ID> <PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">ON*</PropertyGroupTypeCode> <ns3:TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.1.1\">3bbdd106-8f61-4663-bec3-8be3fbfc587a</ID> <Description>This criterion will be weighted</Description> <TypeCode",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 9583,
+            "corpus_end": 10887,
+            "match": "ESPD"
+          },
+          {
+            "text": "\" schemeVersionID=\"2.1.1\">612a1625-118d-4ea4-a6db-413184e7c0a8</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.1.1\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.MANAGEMENT.SUBCONTRACTING_PROPORTION</CriterionTypeCode> <Name>Subcontracting proportion</Name> <Description>The economic operator intends possibly to subcontract the following proportion (i.e. percentage) of the contract. Please note that if the economic operator has decided to subcontract a part of the contract and relies on the subcontractor’s capacities to perform that part, then please fill in a separate ESPD for such subcontractors, see Part II, Section C above.</Description> <ns3:Legislation> <Title>Public Procurement Directive 2014/24/EU</Title> <Description>Directive 2014/24/EU of the European Parliament and of the Council of 26 February 2014 on public procurement and repealing Directive 2004/18/EC</Description> <JurisdictionLevel>eu</JurisdictionLevel> <Article>Article 58(4)</Article> <URI>http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=uriserv:OJ.L_.2014.094.01.0065.01.ENG</URI> </ns3:Legislation> <ns3:TenderingCriterionPropertyGroup> <ID sche",
+            "source": "files/RD_unpacked/espd_request.xml",
+            "source_url": null,
+            "source_sha256": "ff467a08b69d74604d558be23afae3171caf83f595d36bb354511869e223182a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 21480,
+            "corpus_end": 22784,
+            "match": "ESPD"
+          }
+        ],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32333373390,
+      "source_shard": 5,
+      "hot_ready_at": "2026-08-20T04:54:29.381596+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 25,
       "spm_fit_band": "MAYBE",
@@ -5574,6 +6021,301 @@
       "hot_ready_at": "2026-08-20T04:53:46.746834+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 10,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY"
+    },
+    {
+      "candidate_id": "UK_PCS_OCDS:rls-50-JUL560717",
+      "title": "Civil Engineering Associate Trainers",
+      "buyer": "Fife College",
+      "portal": "SCOTLAND_PCS",
+      "notice_url": "https://www.publiccontractsscotland.gov.uk/NoticeDownload/Download.aspx",
+      "deadline": "2026-08-21T12:00:00+00:00",
+      "estimated_value": 150000.0,
+      "currency": "GBP",
+      "preliminary_score": 34,
+      "priority_score": 34,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "NOTICE_DATE_FOUND_BUT_UNLABELLED_IN_DCE_REVIEW_REQUIRED",
+        "conflict": true,
+        "notice_deadline_raw": "2026-08-21T12:00:00+00:00",
+        "notice_deadline_date": "2026-08-21",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [
+          "2013-05-09",
+          "2026-07-22",
+          "2026-08-21"
+        ],
+        "labelled_evidence": [],
+        "evidence": [
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \n\nhe postbox and you will receive an onscreen \nconfirmation of your unique response ID. You will also receive an e-mail confirming "
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "e note: Your response has been submitted after the postbox deadline and \nmay not be\nsponse \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "--------------------------------------  ------------------ \n  \n The postbox will not be unlocked until the deadline has passed. The awarding authority \nwill \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": " \n  \n The postbox will not be unlocked until the deadline has passed. The awarding authority \nwill contact you in due course with the results of the competition.  \n  \n Response Details - \n  \n Reference: 159 \n  Received: 09 May 2013 13:23 \n  \n Your Contact Details - \n  \n    Name: DWD plant hire \n Address: Cardiff \n Contact: John Cardiff \n   Email: info@dwdpl\nire \n Address: Cardiff \n Contact: John Cardiff \n   Email: info@dwdplanthireltd.com \n  \n Com"
+          },
+          {
+            "date": "2026-07-22",
+            "match": "22/07/2026",
+            "context": "Notice Details\nIntroduction\nFull Notice Text\nFurther Info\nContact Info\nCoding\nTitle:\tCivil Engineering Associate Trainers\nReference No:\tJUL560717\nOCID:\tocds-r6ebe6-0000838144\nPublished by:\tFife College\nPublication Date:\t22/07/2026\nDeadline Date:\t21/08/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\t1.1 The Authority is seeking a Contractor(s) for C"
+          },
+          {
+            "date": "2026-08-21",
+            "match": "21/08/2026",
+            "context": "n\nFull Notice Text\nFurther Info\nContact Info\nCoding\nTitle:\tCivil Engineering Associate Trainers\nReference No:\tJUL560717\nOCID:\tocds-r6ebe6-0000838144\nPublished by:\tFife College\nPublication Date:\t22/07/2026\nDeadline Date:\t21/08/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\t1.1 The Authority is seeking a Contractor(s) for Civil Engineering Associate"
+          },
+          {
+            "date": "2026-07-22",
+            "match": "22/07/2026",
+            "context": "Notice Details\nIntroduction\nFull Notice Text\nFurther Info\nContact Info\nCoding\nTitle:\tCivil Engineering Associate Trainers\nReference No:\tJUL560717\nOCID:\tocds-r6ebe6-0000838144\nPublished by:\tFife College\nPublication Date:\t22/07/2026\nDeadline Date:\t21/08/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\t1.1 The Authority is seeking a Contractor(s) for C"
+          },
+          {
+            "date": "2026-08-21",
+            "match": "21/08/2026",
+            "context": "n\nFull Notice Text\nFurther Info\nContact Info\nCoding\nTitle:\tCivil Engineering Associate Trainers\nReference No:\tJUL560717\nOCID:\tocds-r6ebe6-0000838144\nPublished by:\tFife College\nPublication Date:\t22/07/2026\nDeadline Date:\t21/08/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\t1.1 The Authority is seeking a Contractor(s) for Civil Engineering Associate"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": " \n  \n The postbox will not be unlocked until the deadline has passed. The awarding authority \nwill contact you in due course with the results of the competition.  \n  \n Response Details - \n  \n Reference: 159 \n  Received: 09 May 2013 13:23 \n  \n Your Contact Details - \n  \n    Name: DWD plant hire \n Address: Cardiff \n Contact: John Cardiff \n   Email: info@dwdplanthireltd.com \n  \n Comments - \n                                         Supplier User Guide"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": " \n  \n The postbox will not be unlocked until the deadline has passed. The awarding authority \nwill contact you in due course with the results of the competition.  \n  \n Response Details - \n  \n Reference: 159 \n  Received: 09 May 2013 13:23 \n  \n Your Contact Details - \n  \n    Name: DWD plant hire \n Address: Cardiff \n Contact: John Cardiff \n   Email: info@dwdplanthireltd.com \n  \n Comments - \n                                         Supplier User Guide"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "her they accept or reject any late submission. You should provide the reference of your late response to the \nbuyer in any discussion on thi\n of the competition.  \n  \n Response Details - \n  \n Reference: 159 \n  Received: 09 May 2013 13:23 \n  \n Your Contact Details - \n  \n    Name: DWD plant hire \n Address: Cardiff \n Contact: John Cardiff \n   Email: info@dwdplanthireltd.com \n  \n Comments - \n                                         Supplier User Guide"
+          },
+          {
+            "date": "2026-07-22",
+            "match": "22/07/2026",
+            "context": "Notice Details\nIntroduction\nFull Notice Text\nFurther Info\nContact Info\nCoding\nTitle:\tCivil Engineering Associate Trainers\nReference No:\tJUL560717\nOCID:\tocds-r6ebe6-0000838144\nPublished by:\tFife College\nPublication Date:\t22/07/2026\nDeadline Date:\t21/08/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\t1.1 The Authority is seeking a Contractor(s) for C"
+          },
+          {
+            "date": "2026-08-21",
+            "match": "21/08/2026",
+            "context": "n\nFull Notice Text\nFurther Info\nContact Info\nCoding\nTitle:\tCivil Engineering Associate Trainers\nReference No:\tJUL560717\nOCID:\tocds-r6ebe6-0000838144\nPublished by:\tFife College\nPublication Date:\t22/07/2026\nDeadline Date:\t21/08/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\t1.1 The Authority is seeking a Contractor(s) for Civil Engineering Associate"
+          },
+          {
+            "date": "2026-07-22",
+            "match": "22/07/2026",
+            "context": "Notice Details\nIntroduction\nFull Notice Text\nFurther Info\nContact Info\nCoding\nTitle:\tCivil Engineering Associate Trainers\nReference No:\tJUL560717\nOCID:\tocds-r6ebe6-0000838144\nPublished by:\tFife College\nPublication Date:\t22/07/2026\nDeadline Date:\t21/08/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\t1.1 The Authority is seeking a Contractor(s) for C"
+          },
+          {
+            "date": "2026-08-21",
+            "match": "21/08/2026",
+            "context": "n\nFull Notice Text\nFurther Info\nContact Info\nCoding\nTitle:\tCivil Engineering Associate Trainers\nReference No:\tJUL560717\nOCID:\tocds-r6ebe6-0000838144\nPublished by:\tFife College\nPublication Date:\t22/07/2026\nDeadline Date:\t21/08/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\t1.1 The Authority is seeking a Contractor(s) for Civil Engineering Associate"
+          }
+        ],
+        "context_stats": {
+          "gate_contexts": 52,
+          "corpus_contexts": 21,
+          "unique_contexts": 45
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "NOTICE_DATE_FOUND_BUT_UNLABELLED_IN_DCE_REVIEW_REQUIRED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 3,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "as usual to the postbox and you will receive an onscreen confirmation of your unique response ID. You will also receive an e-mail confirming the response. Both will include the message “Please note: Your response has been submitted after the postbox deadline and may not be accepted by the buyer. Please contact the buyer for clarification.” Confirmation of late electronic response Ref: MAY045421 Title: Plant hire Authority: The Bay improvements Deadline: 09 May 2013 Your response to the above notice has been successfully submitted to the Submission Postbox and allocated the reference 159. Details of your submission and documents uploaded are recorded below. ------------------------------------------------------------------------------ Please note: Your response has been submitted after the postbox deadline and may not be accepted by the buyer. Please contact the buyer for clarification. ----------------------------------------------------------- ------------------ The postbox will not be unlocked until the deadline has passed. The awarding authority will contact you in due course with the results of the competition. Response Details - Reference: 159 Received: 09 May 2013 13:23 Your",
+            "source": "files/Postbox_20-_20Supplier_20Guide.pdf",
+            "source_url": "https://www.millstream.eu/guides/en-gb/Scotland/Postbox%20-%20Supplier%20Guide.pdf",
+            "source_sha256": "7f53f78c34a12bb6a2dacb60c910a46552ea4335ffa08536cea5818ffe411018",
+            "source_kind": "pdf",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 9393,
+            "corpus_end": 10702,
+            "match": "reference"
+          },
+          {
+            "text": "to the Submission Postbox and allocated the reference 159. Details of your submission and documents uploaded are recorded below. ------------------------------------------------------------------------------ Please note: Your response has been submitted after the postbox deadline and may not be accepted by the buyer. Please contact the buyer for clarification. ----------------------------------------------------------- ------------------ The postbox will not be unlocked until the deadline has passed. The awarding authority will contact you in due course with the results of the competition. Response Details - Reference: 159 Received: 09 May 2013 13:23 Your Contact Details - Name: DWD plant hire Address: Cardiff Contact: John Cardiff Email: info@dwdplanthireltd.com Comments - Supplier User Guide - Postbox Page | 13 Note: If you submit a late postbox response it is advisable that you contact the buyer as it is at the buyer’s discretion as to whether they accept or reject any late submission. You should provide the reference of your late response to the buyer in any discussion on this point. Notes: Deadline: Submissions can be created , edited and submitted",
+            "source": "files/Postbox_20-_20Supplier_20Guide.pdf",
+            "source_url": "https://www.millstream.eu/guides/en-gb/Scotland/Postbox%20-%20Supplier%20Guide.pdf",
+            "source_sha256": "7f53f78c34a12bb6a2dacb60c910a46552ea4335ffa08536cea5818ffe411018",
+            "source_kind": "pdf",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 9997,
+            "corpus_end": 11306,
+            "match": "Reference"
+          },
+          {
+            "text": "until the deadline has passed. The awarding authority will contact you in due course with the results of the competition. Response Details - Reference: 159 Received: 09 May 2013 13:23 Your Contact Details - Name: DWD plant hire Address: Cardiff Contact: John Cardiff Email: info@dwdplanthireltd.com Comments - Supplier User Guide - Postbox Page | 13 Note: If you submit a late postbox response it is advisable that you contact the buyer as it is at the buyer’s discretion as to whether they accept or reject any late submission. You should provide the reference of your late response to the buyer in any discussion on this point. Notes: Deadline: Submissions can be created , edited and submitted up to the stated tender deadline. Once the deadline has passed submissions can neither be created , edited or submitted. It is not advisable for suppliers to wait until the last moment before creating and dispatching a response in case of any last minute problems. Postbox Security: Postbox submissions cannot be accessed by anyone, including Millstream, until the deadline has passed. Once a response has been submitted it cannot be recalled or edited. If a supplier realises they have m",
+            "source": "files/Postbox_20-_20Supplier_20Guide.pdf",
+            "source_url": "https://www.millstream.eu/guides/en-gb/Scotland/Postbox%20-%20Supplier%20Guide.pdf",
+            "source_sha256": "7f53f78c34a12bb6a2dacb60c910a46552ea4335ffa08536cea5818ffe411018",
+            "source_kind": "pdf",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 10494,
+            "corpus_end": 11803,
+            "match": "reference"
+          },
+          {
+            "text": "ease contact the support team using the contact details provided on the site home page. ===== FILE: files/portal_page.txt ===== We use cookies to make the site simpler. Accept Cookie Settings Skip to main content Contact Us Website Technical Support 0800 222 9003 Opening hours: 08:30 - 17:00 Home Search Notices Search Buyers Suppliers Area Buyers Area Information & Support Register Log-in View Notice Home > View Notice Do you wish to record an interest in this notice? Do you require any additional documents? Notice Details Introduction Full Notice Text Further Info Contact Info Coding Title: Civil Engineering Associate Trainers Reference No: JUL560717 OCID: ocds-r6ebe6-0000838144 Published by: Fife College Publication Date: 22/07/2026 Deadline Date: 21/08/2026 Deadline Time: 12:00 Notice Type: 02 Contract Notice (below FTS threshold or call offs of any value) Has Documents: Yes Has SPD: Yes Abstract: 1.1 The Authority is seeking a Contractor(s) for Civil Engineering Associate Trainers. A maximum of 3 Associate Trainers will be appointed to deliver and develop high quality training for Civil/Structural Engineering courses and assessments to external clients. CPV: 80000000, 80500000, 80510000, 80530000, 80531000, 80531100, 80531200. Print or Save this Notice Download PDF Downl",
+            "source": "files/portal_page.txt",
+            "source_url": null,
+            "source_sha256": "d3dd758591d4bd3984e810f33f34a4b6860e405485c70ca7e6cf4f278e62c98a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 14256,
+            "corpus_end": 15565,
+            "match": "Reference"
+          }
+        ],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [
+          {
+            "text": "..... ........ 3 Postbox Response Creation ................................ ................................ ................................ ............ 7 Late Postbox Submissions................................ ................................ ................................ ............. 12 Supplier User Guide - Postbox Page | 3 What is the Postbox? The Postbox is an online submission facility which allows buyers to receive responses from suppliers electronically in a secure environment. Responses are submitted through the portal and held in the secure Postbox until the deadline for responses has expired. Nominated members of the buyer organisation then unlock the Postbox to access the submissions. The Postbox can be used for the receipt of PQQs, tender responses, Quick Quote submissions and all supporting documents. A full audit trail is kept of all access to the Postbox and a complete record of all supplier submissions is stored. Please note: Before you can use the postbox you must record your interest in a notice. In the case of a Quick Quote or the second stage of a dual stage procedure you must have been invited by the buyer to submit a response. Postbox Response Workspace All postbox re",
+            "source": "files/Postbox_20-_20Supplier_20Guide.pdf",
+            "source_url": "https://www.millstream.eu/guides/en-gb/Scotland/Postbox%20-%20Supplier%20Guide.pdf",
+            "source_sha256": "7f53f78c34a12bb6a2dacb60c910a46552ea4335ffa08536cea5818ffe411018",
+            "source_kind": "pdf",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 505,
+            "corpus_end": 1813,
+            "match": "deadline"
+          },
+          {
+            "text": "Supplier Control Panel. Supplier Control Panel It can also be accessed by clicking the “Go to Postbox” button when viewing the notice in your interest list or Quick Quote list. Supplier User Guide - Postbox Page | 4 Notice Details – Interest List The Response Workspace is provided in two tabs – Notice Response List and Dispatched List. The Notice Response List shows all the current notices – contract notices, stage 2 notices, quick quotes – associated with your registration, which have the Postbox option activated. Notices will appear on this list until the deadline for submissions has passed. Response Workspace – Notice Response List The Notice Details column provides the title, publisher and deadline of the notice. Clicking on the title of the notice allows you to view the notice. The Response Status column provides the status of your response to this notice. The three response statuses are: Not Created – You have not yet created a response for this notice. Supplier User Guide - Postbox Page | 5 Not Dispatched – You have created a response which you have not yet dispatched to the postbox. Dispatched – You have dispatched a",
+            "source": "files/Postbox_20-_20Supplier_20Guide.pdf",
+            "source_url": "https://www.millstream.eu/guides/en-gb/Scotland/Postbox%20-%20Supplier%20Guide.pdf",
+            "source_sha256": "7f53f78c34a12bb6a2dacb60c910a46552ea4335ffa08536cea5818ffe411018",
+            "source_kind": "pdf",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 1912,
+            "corpus_end": 3220,
+            "match": "deadline"
+          },
+          {
+            "text": "interest list or Quick Quote list. Supplier User Guide - Postbox Page | 4 Notice Details – Interest List The Response Workspace is provided in two tabs – Notice Response List and Dispatched List. The Notice Response List shows all the current notices – contract notices, stage 2 notices, quick quotes – associated with your registration, which have the Postbox option activated. Notices will appear on this list until the deadline for submissions has passed. Response Workspace – Notice Response List The Notice Details column provides the title, publisher and deadline of the notice. Clicking on the title of the notice allows you to view the notice. The Response Status column provides the status of your response to this notice. The three response statuses are: Not Created – You have not yet created a response for this notice. Supplier User Guide - Postbox Page | 5 Not Dispatched – You have created a response which you have not yet dispatched to the postbox. Dispatched – You have dispatched a response to the postbox . Note: to view your dispatched response click on the “Dispatched List” tab. The Response Actions column provides the action",
+            "source": "files/Postbox_20-_20Supplier_20Guide.pdf",
+            "source_url": "https://www.millstream.eu/guides/en-gb/Scotland/Postbox%20-%20Supplier%20Guide.pdf",
+            "source_sha256": "7f53f78c34a12bb6a2dacb60c910a46552ea4335ffa08536cea5818ffe411018",
+            "source_kind": "pdf",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 2066,
+            "corpus_end": 3374,
+            "match": "deadline"
+          },
+          {
+            "text": "Supplier User Guide - Postbox Page | 5 Not Dispatched – You have created a response which you have not yet dispatched to the postbox. Dispatched – You have dispatched a response to the postbox . Note: to view your dispatched response click on the “Dispatched List” tab. The Response Actions column provides the actions you are required to carry out. The actions are: Create – You have not yet created a response. Click this link to create a new response. Edit/Dispatch – You have created a response but not submitted it to the postbox. Click this link to edit or dispatch your response. Note: Once the deadline has passed this option will disappear. Delete – You have created a response but not subm itted it to the postbox. Click this link to delete the response from your response list. In doing so you will receive an e-mail to confirm you have deleted a response. Respond Again – You have dispatched a response to the postbox for this notice. This opt ion is provided in case you are required to create and dispatch a supplementary or replacement response. Click this link if you wish to do so. View – You have created a response but not submitted it to the postbox and the deadline for submissions has now passed. This option is provided for your",
+            "source": "files/Postbox_20-_20Supplier_20Guide.pdf",
+            "source_url": "https://www.millstream.eu/guides/en-gb/Scotland/Postbox%20-%20Supplier%20Guide.pdf",
+            "source_sha256": "7f53f78c34a12bb6a2dacb60c910a46552ea4335ffa08536cea5818ffe411018",
+            "source_kind": "pdf",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 3016,
+            "corpus_end": 4324,
+            "match": "deadline"
+          }
+        ],
+        "ip_data_security": [
+          {
+            "text": "17) Further Instructions The Buyer has attached further instructions with this notice. Please read these carefully and take the necessary action(s). Record your interest Postbox Q & A Additional Documents Record your interest in this notice and you will be automatically sent clarifications and deadline date changes etc. Please note that recording your interest does not automatically enter you into the tender process for this notice, you still have to submit your response by the deadline stated. To record an interest in this notice and add it to your interests list please click the Record your interest now button at the top of the page. Copyright © Public Contracts Scotland Contact Us Website Technical Support 0800 222 9003 Opening hours: 08:30 - 17:00 Home Search Notices Search Buyers Suppliers Area Buyers Area Register News & Events About Us Information & Support Accessibility Contact Us Login Terms & Conditions | Privacy Policy & Cookies | Sitemap | ©2023 Proactis",
+            "source": "files/portal_page.txt",
+            "source_url": null,
+            "source_sha256": "d3dd758591d4bd3984e810f33f34a4b6860e405485c70ca7e6cf4f278e62c98a",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 15587,
+            "corpus_end": 16578,
+            "match": "Copyright"
+          }
+        ]
+      },
+      "source_dce_run_id": 32333373390,
+      "source_shard": 5,
+      "hot_ready_at": "2026-08-20T04:54:29.381596+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 7,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
