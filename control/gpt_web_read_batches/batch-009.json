@@ -1,7 +1,7 @@
 {
   "schema": "GPT_WEB_READ_BATCH_V3_PROVENANCE_REFRESH",
-  "generated_at": "2026-08-20T10:19:21.880824+00:00",
-  "source_inbox_updated_at": "2026-08-20T10:19:21.035699+00:00",
+  "generated_at": "2026-08-20T10:26:30.315398+00:00",
+  "source_inbox_updated_at": "2026-08-20T10:26:29.731747+00:00",
   "latest_source_dce_run_id": 32357205269,
   "batch_index": 9,
   "start_rank": 91,
@@ -665,6 +665,141 @@
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
     },
     {
+      "candidate_id": "US-SAM:9316188cfba24987be206375683e227d",
+      "title": "Household Goods Moving, Shipping, Transportation, and Storage Service Providers Software Integration Request for Information",
+      "buyer": "DEPT OF DEFENSE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/opp/9316188cfba24987be206375683e227d/view",
+      "deadline": "2026-09-15T21:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "review_stage": "BUSINESS_GATES",
+      "gate_readiness": true,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "evidence_gate_coverage": 4,
+      "spm_post_dce_score": 18,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [
+        "software-development"
+      ],
+      "spm_friction_signals": [
+        "cmmc"
+      ],
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_conflict": false,
+      "authoritative_submission_date": null,
+      "source_dce_run_id": 32349068366,
+      "source_shard": 17,
+      "review_key": "d9dc2fe1979c3196e3c22b0a96208184505a14577b93921ec5af12c8cc600ca5",
+      "artifact_locator": {
+        "dce_run_id": 32349068366,
+        "shard": 17,
+        "candidate_id": "US-SAM:9316188cfba24987be206375683e227d",
+        "release_tag": "dce-harvest-32349068366"
+      },
+      "evidence_quality": {
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "documents_with_text": 2,
+        "text_chars": 8922,
+        "attributed_compact_snippets": 8,
+        "artifact_lookup_required_snippets": 0,
+        "all_compact_snippets_document_attributed": true
+      },
+      "evidence": {
+        "certifications_partner": [
+          {
+            "text": "on to pursue any acquisition alternative based on this RFI, and the Government will not compensate respondents fo r any information received. All submissions will be kept confidential, will become the property of the U.S. Government, and will not be returned. II. BACKGROUND This background section details the requirements for a transportation service provider (TSP)’s system. A. TSP systems bottom-line : To interface with the central Government API, the TSP will utilize a proprietary or commercial system that utili…",
+            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
+            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
+            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "alternative based on this RFI, and the Government will not compensate respondents fo r any information received. All submissions will be kept confidential, will become the property of the U.S. Government, and will not be returned. II. BACKGROUND This background section details the requirements for a transportation service provider (TSP)’s system. A. TSP systems bottom-line : To interface with the central Government API, the TSP will utilize a proprietary or commercial system that utilizes RESTful JSON web services…",
+            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
+            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
+            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "deliverables_scope": [
+          {
+            "text": "ect household goods (HHG) moving, shipping, transportation, and storage service providers. Accordingly, the PPA invites industry partners and service providers to submit detailed information regarding integrati on costs, associated software development timelines, standard industry practices, and recommendations for test ing and risk mitigation when connecting their internal software systems to a central Government platform. This Request for Information (RFI) enables industry stakeholders to provide direct feedback…",
+            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
+            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
+            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "ms and operations, helping to shape future technical requirements and acquisition decisions. This RFI is issued solely for informational and planning purposes and does not constitute a solicitation for proposals. Responses to this notice are not offers and cannot form a binding contract. The PPA is not under any obligation to pursue any acquisition alternative based on this RFI, and the Government will not compensate respondents fo r any information received. All submissions will be kept confidential, will become …",
+            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
+            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
+            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "forms_signatures": [
+          {
+            "text": "a proprietary or commercial system that utilizes RESTful JSON web services secured by Mutual TLS (mTLS) with active, Depart ment of War (DoW)-approved External Certificate Authority (ECA) certificates. Th e TSP system must automatically process shipment awards, update shipment lifecycle statuses, upload required transit documentation, and submit electronic paymen t requests directly to the central government platform. Furthermore, the TSP’s system must strictly adhere to NIST SP 800-171 cybersecurity standards for…",
+            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
+            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
+            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "The shipment and transaction data gene rated by the Government contains the Personally Identifiable Information (P II) and official movement orders—both classified as Controlled Unclassified Info rmation (CUI)—of the Service member or DoW civilian, all TSP information technology (IT) systems proces sing, storing, or transmitting this data are strictly regul ated. To host the central Government API connection, the TSP's IT system must achieve and maintain a Cybersecurity Maturity Model Certification (CMMC) Level 2 …",
+            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
+            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
+            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "ip_data_security": [
+          {
+            "text": "a transportation service provider (TSP)’s system. A. TSP systems bottom-line : To interface with the central Government API, the TSP will utilize a proprietary or commercial system that utilizes RESTful JSON web services secured by Mutual TLS (mTLS) with active, Depart ment of War (DoW)-approved External Certificate Authority (ECA) certificates. Th e TSP system must automatically process shipment awards, update shipment lifecycle statuses, upload required transit documentation, and submit electronic paymen t reque…",
+            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
+            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
+            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "and accessorial charges to trigger the Third-Party Payment System (TPPS / Syncada) or Defense Finance and Accounting Service (DFAS). 3. Security and Compliance Requirements 3 The shipment and transaction data gene rated by the Government contains the Personally Identifiable Information (P II) and official movement orders—both classified as Controlled Unclassified Info rmation (CUI)—of the Service member or DoW civilian, all TSP information technology (IT) systems proces sing, storing, or transmitting this data are…",
+            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
+            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
+            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ]
+      },
+      "provenance_override": null,
+      "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
+      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
+    },
+    {
       "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20317607",
       "title": "Gerencia de Fraternidad Muprespa - Mútua Colaboradora con la Seguridad Social nº 275",
       "buyer": null,
@@ -896,141 +1031,6 @@
             "source": "files/DOC20260814140507PCAP RM 33742 FIRMADO.pdf",
             "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=5h5u2jizy1VP2NHddwJ9yy2lQ838ZAo0jtoUM6jg8cx2wSOVQIuq6%2Bh17V5WytPf8FJg3BmCcX659MxAOj7DmYx2/sX20EMOlOtW2QMvRpVt/o8fNevwsujgRzaBbugn",
             "source_sha256": "2af5b06b7a0a9b685c6ad464f93ee07885772c5f506943e57b3df026a51c6820",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ]
-      },
-      "provenance_override": null,
-      "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
-      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
-    },
-    {
-      "candidate_id": "US-SAM:9316188cfba24987be206375683e227d",
-      "title": "Household Goods Moving, Shipping, Transportation, and Storage Service Providers Software Integration Request for Information",
-      "buyer": "DEPT OF DEFENSE",
-      "portal": "US_SAM",
-      "notice_url": "https://sam.gov/opp/9316188cfba24987be206375683e227d/view",
-      "deadline": "2026-09-15T21:00:00+00:00",
-      "estimated_value": null,
-      "currency": null,
-      "review_stage": "BUSINESS_GATES",
-      "gate_readiness": true,
-      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-      "evidence_gate_coverage": 4,
-      "spm_post_dce_score": 18,
-      "spm_fit_band": "LOW",
-      "spm_fit_reasons": [
-        "software-development"
-      ],
-      "spm_friction_signals": [
-        "cmmc"
-      ],
-      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
-      "deadline_conflict": false,
-      "authoritative_submission_date": null,
-      "source_dce_run_id": 32349068366,
-      "source_shard": 17,
-      "review_key": "d9dc2fe1979c3196e3c22b0a96208184505a14577b93921ec5af12c8cc600ca5",
-      "artifact_locator": {
-        "dce_run_id": 32349068366,
-        "shard": 17,
-        "candidate_id": "US-SAM:9316188cfba24987be206375683e227d",
-        "release_tag": "dce-harvest-32349068366"
-      },
-      "evidence_quality": {
-        "raw_status": "DOWNLOADED_PUBLIC",
-        "documents_with_text": 2,
-        "text_chars": 8922,
-        "attributed_compact_snippets": 8,
-        "artifact_lookup_required_snippets": 0,
-        "all_compact_snippets_document_attributed": true
-      },
-      "evidence": {
-        "certifications_partner": [
-          {
-            "text": "on to pursue any acquisition alternative based on this RFI, and the Government will not compensate respondents fo r any information received. All submissions will be kept confidential, will become the property of the U.S. Government, and will not be returned. II. BACKGROUND This background section details the requirements for a transportation service provider (TSP)’s system. A. TSP systems bottom-line : To interface with the central Government API, the TSP will utilize a proprietary or commercial system that utili…",
-            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
-            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
-            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "alternative based on this RFI, and the Government will not compensate respondents fo r any information received. All submissions will be kept confidential, will become the property of the U.S. Government, and will not be returned. II. BACKGROUND This background section details the requirements for a transportation service provider (TSP)’s system. A. TSP systems bottom-line : To interface with the central Government API, the TSP will utilize a proprietary or commercial system that utilizes RESTful JSON web services…",
-            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
-            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
-            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "deliverables_scope": [
-          {
-            "text": "ect household goods (HHG) moving, shipping, transportation, and storage service providers. Accordingly, the PPA invites industry partners and service providers to submit detailed information regarding integrati on costs, associated software development timelines, standard industry practices, and recommendations for test ing and risk mitigation when connecting their internal software systems to a central Government platform. This Request for Information (RFI) enables industry stakeholders to provide direct feedback…",
-            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
-            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
-            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "ms and operations, helping to shape future technical requirements and acquisition decisions. This RFI is issued solely for informational and planning purposes and does not constitute a solicitation for proposals. Responses to this notice are not offers and cannot form a binding contract. The PPA is not under any obligation to pursue any acquisition alternative based on this RFI, and the Government will not compensate respondents fo r any information received. All submissions will be kept confidential, will become …",
-            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
-            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
-            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "forms_signatures": [
-          {
-            "text": "a proprietary or commercial system that utilizes RESTful JSON web services secured by Mutual TLS (mTLS) with active, Depart ment of War (DoW)-approved External Certificate Authority (ECA) certificates. Th e TSP system must automatically process shipment awards, update shipment lifecycle statuses, upload required transit documentation, and submit electronic paymen t requests directly to the central government platform. Furthermore, the TSP’s system must strictly adhere to NIST SP 800-171 cybersecurity standards for…",
-            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
-            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
-            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "The shipment and transaction data gene rated by the Government contains the Personally Identifiable Information (P II) and official movement orders—both classified as Controlled Unclassified Info rmation (CUI)—of the Service member or DoW civilian, all TSP information technology (IT) systems proces sing, storing, or transmitting this data are strictly regul ated. To host the central Government API connection, the TSP's IT system must achieve and maintain a Cybersecurity Maturity Model Certification (CMMC) Level 2 …",
-            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
-            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
-            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "ip_data_security": [
-          {
-            "text": "a transportation service provider (TSP)’s system. A. TSP systems bottom-line : To interface with the central Government API, the TSP will utilize a proprietary or commercial system that utilizes RESTful JSON web services secured by Mutual TLS (mTLS) with active, Depart ment of War (DoW)-approved External Certificate Authority (ECA) certificates. Th e TSP system must automatically process shipment awards, update shipment lifecycle statuses, upload required transit documentation, and submit electronic paymen t reque…",
-            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
-            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
-            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "and accessorial charges to trigger the Third-Party Payment System (TPPS / Syncada) or Defense Finance and Accounting Service (DFAS). 3. Security and Compliance Requirements 3 The shipment and transaction data gene rated by the Government contains the Personally Identifiable Information (P II) and official movement orders—both classified as Controlled Unclassified Info rmation (CUI)—of the Service member or DoW civilian, all TSP information technology (IT) systems proces sing, storing, or transmitting this data are…",
-            "source": "files/HHG_Moving_Shipping_Transportation_and_Storage_Service_Providers_Software_Integration_RFI.pdf",
-            "source_url": "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/fb4/fb46c19bd2714ec08493966fc0296f3a.pdf?response-content-disposition=attachment%3B%20filename%3DHHG%2BMoving_Shipping_Transportation%2Band%2BStorage%2BService%2BProviders%2BSoftware%2BIntegration%2BRFI.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260820T083309Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260820%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4f03c15e01d2a76a1fe81048149b3ad0510a8362c8c859711d27b88dff54af6f",
-            "source_sha256": "45c1705a6c27488bf5930c3af29a169e4c898453a08b0a793fff262809018946",
             "source_kind": "pdf",
             "provenance_strength": "SOURCE_URL_ATTRIBUTED",
             "raw_machine_format": false,
