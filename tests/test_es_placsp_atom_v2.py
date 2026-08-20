@@ -5,8 +5,9 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+for candidate in (ROOT, ROOT / "pipeline"):
+    if str(candidate) not in sys.path:
+        sys.path.insert(0, str(candidate))
 
 from pipeline.discover_es_placsp_atom_v2 import parse_xml_content, repair_xml_bytes
 
