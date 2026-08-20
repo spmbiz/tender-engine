@@ -1,30 +1,30 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-20T14:32:14+00:00",
+  "generated_at_utc": "2026-08-20T14:37:40+00:00",
   "source_run": "32327417448",
   "state_rows": 10904,
   "ledger_rows": 126459,
   "snapshot_rows": 126459,
   "blocked_ids": 30207,
-  "durable_attempted_exact_versions_ignored": 1352,
-  "valid_exact_hash_current_unattempted": 3722,
-  "eligible_keep_for_dce": 3264,
+  "durable_attempted_exact_versions_ignored": 1487,
+  "valid_exact_hash_current_unattempted": 3587,
+  "eligible_keep_for_dce": 3158,
   "review_worthy_rejects_promoted_to_explore": 418,
   "stale_hash_ignored": 0,
   "missing_snapshot": 0,
   "expired_ignored": 56,
   "selected": 160,
   "selection_decisions": {
-    "MAYBE": 130,
-    "REJECT_OBVIOUS": 30
+    "MAYBE": 159,
+    "REJECT_OBVIOUS": 1
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
     "qwen-explore-coded": 48,
-    "qwen-reject-audit-coded": 30,
-    "qwen-elastic-coded": 82
+    "qwen-reject-audit-coded": 1,
+    "qwen-elastic-coded": 111
   },
   "selection_freshness": {
     "recent_unseen_carryover": 160
@@ -55,20 +55,20 @@
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
     "FIT": 7,
-    "MAYBE": 603,
-    "REJECT_OBVIOUS": 30
+    "MAYBE": 632,
+    "REJECT_OBVIOUS": 1
   },
   "candidate_pool_lanes": {
     "qwen-primary": 7,
     "qwen-open-world-explore": 192,
-    "qwen-reject-audit": 40,
-    "qwen-elastic": 401
+    "qwen-reject-audit": 11,
+    "qwen-elastic": 430
   },
   "code_prior": {
-    "positive_code_rows_in_pool": 0,
-    "noncore_code_contradictions_in_pool": 56,
-    "positive_code_rows_selected": 0,
-    "noncore_code_contradictions_selected": 7,
+    "positive_code_rows_in_pool": 1,
+    "noncore_code_contradictions_in_pool": 50,
+    "positive_code_rows_selected": 1,
+    "noncore_code_contradictions_selected": 0,
     "policy": "priority_only_never_drop_never_eligibility",
     "candidate_pool_multiplier": 4
   }
