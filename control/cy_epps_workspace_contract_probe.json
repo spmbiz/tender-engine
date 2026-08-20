@@ -1,0 +1,21 @@
+{
+  "schema": "CY_EPPS_PUBLIC_CFT_WORKSPACE_CONTRACT_PROBE_V1",
+  "generated_at": "2026-08-20T00:28:25.829113+00:00",
+  "total_pages": 5020,
+  "publisher_pager_prefix": "d-446978-p=",
+  "resource_ids_probed": [],
+  "listing_samples": [],
+  "workspaces": [],
+  "workspaces_accessible": 0,
+  "workspaces_with_deadline": 0,
+  "workspaces_with_status_or_terminal_text": 0,
+  "workspaces_with_captcha": 0,
+  "errors": [
+    {
+      "stage": "listing",
+      "error": "RuntimeError('CY_EPPS_PUBLISHED_PAGE_SELECTION_CONTRACT_MISSING')"
+    }
+  ],
+  "pass": false,
+  "semantics": "Read-only probe of public Cyprus ePPS CfT workspaces for resourceIds sampled from the first and publisher-reported last national Published Notices pages. It records deadline/status evidence and verifies that workspace viewing itself is public and CAPTCHA-free. A passing probe establishes transport/access only; it does not claim all resourceIds can be classified current without a full reconciliation."
+}
