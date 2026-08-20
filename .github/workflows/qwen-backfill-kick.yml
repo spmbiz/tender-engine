@@ -47,44 +47,18 @@ jobs:
           echo "remaining=$remaining" >> "$GITHUB_OUTPUT"
           echo "Qwen classification backlog: $remaining"
 
-      - name: Recover stale queue and dispatch high-throughput Qwen when idle
+      - name: Dispatch high-throughput Qwen when the semantic lane is idle
         if: steps.backlog.outputs.remaining != '0'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-
-          # Never preempt healthy inference. A genuinely running Qwen pass owns
-          # semantic capacity until it completes.
-          in_progress="$(gh run list --workflow qwen-live-classification.yml --limit 40 --json status --jq '[.[] | select(.status=="in_progress")] | length')"
-          if [ "$in_progress" -gt 0 ]; then
-            echo "Qwen has $in_progress healthy in-progress pass(es); no duplicate dispatch."
+          active="$(gh run list --workflow qwen-live-classification.yml --limit 40 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
+          if [ "$active" -gt 0 ]; then
+            echo "Qwen already has $active active/queued generation(s); no duplicate dispatch and no preemption."
             exit 0
           fi
-
-          # A queued/waiting run with no in-progress sibling can become a zombie
-          # when an older concurrency generation or runner-starvation event never
-          # advances it. Do not let such a run block the backfill forever.
-          now_epoch="$(date -u +%s)"
-          mapfile -t waiting_runs < <(gh run list --workflow qwen-live-classification.yml --limit 40 --json databaseId,status,createdAt --jq '.[] | select(.status=="queued" or .status=="waiting" or .status=="pending") | "\(.databaseId)|\(.createdAt)"')
-          for entry in "${waiting_runs[@]}"; do
-            rid="${entry%%|*}"
-            created="${entry#*|}"
-            created_epoch="$(date -u -d "$created" +%s 2>/dev/null || echo "$now_epoch")"
-            age="$((now_epoch-created_epoch))"
-            if [ "$age" -gt 2700 ]; then
-              echo "Cancelling stale queued Qwen run $rid age=${age}s"
-              gh run cancel "$rid" || true
-            fi
-          done
-
-          queued="$(gh run list --workflow qwen-live-classification.yml --limit 40 --json status --jq '[.[] | select(.status=="queued" or .status=="waiting" or .status=="pending")] | length')"
-          if [ "$queued" -gt 0 ]; then
-            echo "Qwen already has $queued fresh queued pass(es); no duplicate dispatch."
-            exit 0
-          fi
-
           gh workflow run qwen-live-classification.yml --ref main \
             -f per_shard=480 \
             -f auto_continue=true \
@@ -97,4 +71,4 @@ jobs:
           echo "### Qwen backfill kick" >> "$GITHUB_STEP_SUMMARY"
           echo "- remaining classification backlog: ${{ steps.backlog.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- requested max notices per worker when idle: 480" >> "$GITHUB_STEP_SUMMARY"
-          echo "- stale queued/waiting/pending runs older than 45m are cancelled only when no Qwen pass is in progress" >> "$GITHUB_STEP_SUMMARY"
+          echo "- preemption: none; queued/in-progress semantic generations complete naturally" >> "$GITHUB_STEP_SUMMARY"
