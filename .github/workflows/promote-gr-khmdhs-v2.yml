@@ -1,16 +1,21 @@
 name: Promote Greece KIMDIS V3
 
 on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Greece KIMDIS Future Deadline Proof']
+    types: [completed]
   push:
     branches: [main]
     paths:
-      - 'control/gr_khmdhs_live_proof.json'
+      - 'control/gr_khmdhs_promote_trigger.txt'
 
 permissions:
   contents: write
 
 jobs:
   promote:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
