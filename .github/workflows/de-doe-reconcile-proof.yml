@@ -5,6 +5,10 @@ on:
   push:
     branches: [main]
     paths:
+      - '.github/workflows/de-doe-reconcile-proof.yml'
+      - 'pipeline/discover_de_doe_ocds.py'
+      - 'pipeline/ocds_release_normalizer.py'
+      - 'tests/test_de_doe_ocds.py'
       - 'control/de_doe_reconcile_trigger.txt'
 
 permissions:
@@ -29,9 +33,9 @@ jobs:
           pytest -q tests/test_de_doe_ocds.py
       - name: Create durable proof Release
         id: release
+        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-        shell: bash
         run: |
           set -euo pipefail
           tag="de-doe-reconcile-proof-${GITHUB_RUN_ID}"
@@ -53,10 +57,10 @@ jobs:
           exit 0
       - name: Build compact fail-closed verdict
         if: always()
+        shell: bash
         env:
           RUN_RC: ${{ steps.run.outputs.rc }}
           RELEASE_TAG: ${{ steps.release.outputs.tag }}
-        shell: bash
         run: |
           python - <<'PY'
           import json,os
@@ -102,10 +106,10 @@ jobs:
           PY
       - name: Preserve proof pack durably
         if: always()
+        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ steps.release.outputs.tag }}
-        shell: bash
         run: |
           set -euo pipefail
           test -f de-reconcile/stats.json
