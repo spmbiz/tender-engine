@@ -1,0 +1,54 @@
+name: Qwen DCE Backlog Arbiter
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '7,27,47 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'control/qwen_live/classification_summary.json'
+      - 'tools/tune_dce_for_qwen_backlog.py'
+      - '.github/workflows/qwen-dce-backlog-arbiter.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: qwen-dce-backlog-arbiter
+  cancel-in-progress: true
+
+jobs:
+  tune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Tune DCE depth to Qwen backlog
+        run: python tools/tune_dce_for_qwen_backlog.py
+
+      - name: Persist policy only when changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- control/desired_state.json; then
+            echo 'DCE/Qwen arbitration already at desired level.'
+            exit 0
+          fi
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add control/desired_state.json
+          git commit -m 'ops: tune DCE depth to Qwen backlog [skip ci]'
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
