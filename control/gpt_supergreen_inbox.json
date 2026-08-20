@@ -1,7 +1,7 @@
 {
   "schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
-  "updated_at": "2026-08-20T06:17:52.532532+00:00",
-  "latest_source_dce_run_id": 32336420165,
+  "updated_at": "2026-08-20T06:22:08.529883+00:00",
+  "latest_source_dce_run_id": 32339156467,
   "review_queue": [
     {
       "candidate_id": "TED:508381-2026",
@@ -776,7 +776,7 @@
       "gpt_priority_score": 18,
       "upstream_signal": "DCE_REVIEW_READY",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
-      "inbox_live_source": "control/gpt_review_hot.json",
+      "inbox_live_source": "existing_inbox",
       "evidence_locator": {
         "dce_run_id": 32336420165,
         "shard": 17,
@@ -1278,7 +1278,7 @@
       "gpt_priority_score": 10,
       "upstream_signal": "DCE_REVIEW_READY",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
-      "inbox_live_source": "control/gpt_review_hot.json",
+      "inbox_live_source": "existing_inbox",
       "evidence_locator": {
         "dce_run_id": 32336420165,
         "shard": 16,
@@ -2018,11 +2018,341 @@
       "gpt_priority_score": 15,
       "upstream_signal": "DCE_REVIEW_READY",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
-      "inbox_live_source": "control/gpt_review_hot.json",
+      "inbox_live_source": "existing_inbox",
       "evidence_locator": {
         "dce_run_id": 32336420165,
         "shard": 16,
         "candidate_id": "IT-PVL:e5343496-4a15-4c00-8de6-ab54751f972f",
+        "release_tag": null
+      },
+      "upstream_review_lane": "SPM_PRIORITY",
+      "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
+    },
+    {
+      "candidate_id": "TED:575578-2026",
+      "title": "Romania – Renal dialysis consumables – consumabile dializa",
+      "buyer": "Spitalul Clinic Judetean de Urgenta\"Sfantul Apostol Andrei\"",
+      "portal": "TED",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/575578-2026",
+      "deadline": "2026-09-14T03:00:00+00:00",
+      "estimated_value": 1875638.4,
+      "currency": "RON",
+      "preliminary_score": null,
+      "priority_score": 0,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-09-14T03:00:00+00:00",
+        "notice_deadline_date": "2026-09-14",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 7,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "rionProperty> <SubsidiaryTenderingCriterionPropertyGroup> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">74e6c7b4-757b-4b40-ada6-fad6a997c310</ID> <PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">ONTRUE</PropertyGroupTypeCode> <TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">df83933a-0c1d-49df-8990-62eea24968a5</ID> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Vă rugăm să le descrieți</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">QUESTION</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">DESCRIPTION</ValueDataTypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </SubsidiaryTenderingCriterionPropertyGroup> </SubsidiaryTende",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 11400,
+            "corpus_end": 12703,
+            "match": "eea"
+          },
+          {
+            "text": "R</ValueDataTypeCode> </TenderingCriterionProperty> <SubsidiaryTenderingCriterionPropertyGroup> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">41dd2e9b-1bfd-44c7-93ee-56bd74a4334b</ID> <PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">ONTRUE</PropertyGroupTypeCode> <TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">53eea629-9f22-4c4d-9f17-ada0911e121e</ID> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Dovezi furnizate</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">QUESTION</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EVIDENCE_IDENTIFIER</ValueDataTypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <Tender",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 24698,
+            "corpus_end": 26001,
+            "match": "eea"
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "rd:CommonBasic\">EVIDENCE_IDENTIFIER</ValueDataTypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <TenderingCriterion xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">3a18a175-1863-4b1d-baef-588ce61960ca</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.REFERENCES.SUPPLIES_DELIVERY_PERFORMANCE</CriterionTypeCode> <Name xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Pentru contractele de achizitie de bunuri: executarea de livrari de tipul specificat</Name> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Numai pentru contractele de achiziții publice de servicii: În perioada de referință, operatorul economic a furnizat următoarele servicii principale de tipul specificat. Autoritățile contractante pot solicita experiență de până la trei ani și pot accepta experiența acumulată în urmă cu peste trei ani</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 237968,
+            "corpus_end": 239278,
+            "match": "REFERENCES"
+          },
+          {
+            "text": "a086-448c-40f0-9b60-1bc1c9630e0e</ID> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">URL</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">QUESTION</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EVIDENCE_IDENTIFIER</ValueDataTypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <AdditionalDocumentReference xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeAgencyID=\"EU-COM-OP\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">2017/S 142-293520</ID> <DocumentTypeCode listID=\"DocRefContentType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">TED_CN</DocumentTypeCode> <Attachment> <ExternalReference> <URI schemeAgencyID=\"EU-COM-OP\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">http://ted.europa.eu/udl?uri%3DTED:NOTICE:293520-2017:TEXT:EN:HTML%026src%3D0</URI> <FileName xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Spain-Aljaraque: Repair and maintenance services</Fi",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 251682,
+            "corpus_end": 252991,
+            "match": "Reference"
+          },
+          {
+            "text": "GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EVIDENCE_IDENTIFIER</ValueDataTypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <AdditionalDocumentReference xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeAgencyID=\"EU-COM-OP\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">2017/S 142-293520</ID> <DocumentTypeCode listID=\"DocRefContentType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">TED_CN</DocumentTypeCode> <Attachment> <ExternalReference> <URI schemeAgencyID=\"EU-COM-OP\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">http://ted.europa.eu/udl?uri%3DTED:NOTICE:293520-2017:TEXT:EN:HTML%026src%3D0</URI> <FileName xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Spain-Aljaraque: Repair and maintenance services</FileName> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">293520-2017</Description> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Repair and maintenance services. Real estate services.</Description> </ExternalReference> </Attachment> </AdditionalDocumentReference> <AdditionalDocumentReference xmlns=\"urn:X-test:UB",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 252046,
+            "corpus_end": 253355,
+            "match": "Reference"
+          },
+          {
+            "text": "xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">TED_CN</DocumentTypeCode> <Attachment> <ExternalReference> <URI schemeAgencyID=\"EU-COM-OP\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">http://ted.europa.eu/udl?uri%3DTED:NOTICE:293520-2017:TEXT:EN:HTML%026src%3D0</URI> <FileName xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Spain-Aljaraque: Repair and maintenance services</FileName> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">293520-2017</Description> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Repair and maintenance services. Real estate services.</Description> </ExternalReference> </Attachment> </AdditionalDocumentReference> <AdditionalDocumentReference xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeAgencyID=\"EU-COM-OP\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">3.17/20830.0160</ID> <DocumentTypeCode listID=\"DocRefContentType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">NOJCN</DocumentTypeCode> <Attachment> <ExternalReference> <URI schemeAgencyID=\"PLACE\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">https://contrataciondelestado.es/wps/portal/!ut/p/b1/pY_LDoIwEEW_hQ8wM5S2wJKH5REUVEDbjenCGI3Axvj9gmFrMXF2Nzkncy8okDahHD2XMA",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 252592,
+            "corpus_end": 253901,
+            "match": "Reference"
+          }
+        ],
+        "certifications_partner": [
+          {
+            "text": "rd:CommonBasic\">EVIDENCE_IDENTIFIER</ValueDataTypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <TenderingCriterion xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">d726bac9-e153-4e75-bfca-c5385587766d</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.CERTIFICATES.QUALITY_ASSURANCE.QA_INDEPENDENT_CERTIFICATE</CriterionTypeCode> <Name xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Certificate emise de organisme independente cu privire la standardele de asigurare a calitatii</Name> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Operatorul economic va putea sa prezinte certificate Intocmite de organisme independente care sa ateste ca operatorul economic respecta standardele de asigurare a calitatii cerute, inclusiv privind accesibilitatea pentru persoanele cu handicap?</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 245452,
+            "corpus_end": 246763,
+            "match": "CERTIFICATE"
+          },
+          {
+            "text": "TypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <TenderingCriterion xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">d726bac9-e153-4e75-bfca-c5385587766d</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.CERTIFICATES.QUALITY_ASSURANCE.QA_INDEPENDENT_CERTIFICATE</CriterionTypeCode> <Name xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Certificate emise de organisme independente cu privire la standardele de asigurare a calitatii</Name> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Operatorul economic va putea sa prezinte certificate Intocmite de organisme independente care sa ateste ca operatorul economic respecta standardele de asigurare a calitatii cerute, inclusiv privind accesibilitatea pentru persoanele cu handicap?</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasi",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 245498,
+            "corpus_end": 246809,
+            "match": "CERTIFICATE"
+          },
+          {
+            "text": "pertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <TenderingCriterion xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">d726bac9-e153-4e75-bfca-c5385587766d</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.CERTIFICATES.QUALITY_ASSURANCE.QA_INDEPENDENT_CERTIFICATE</CriterionTypeCode> <Name xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Certificate emise de organisme independente cu privire la standardele de asigurare a calitatii</Name> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Operatorul economic va putea sa prezinte certificate Intocmite de organisme independente care sa ateste ca operatorul economic respecta standardele de asigurare a calitatii cerute, inclusiv privind accesibilitatea pentru persoanele cu handicap?</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">422fc1fd-9bfe-4881-bc05-008d1620ea66</ID> <Title xmlns=\"urn:X-test:UBL:Pre-awa",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 245585,
+            "corpus_end": 246896,
+            "match": "Certificate"
+          },
+          {
+            "text": "-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">d726bac9-e153-4e75-bfca-c5385587766d</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.CERTIFICATES.QUALITY_ASSURANCE.QA_INDEPENDENT_CERTIFICATE</CriterionTypeCode> <Name xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Certificate emise de organisme independente cu privire la standardele de asigurare a calitatii</Name> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Operatorul economic va putea sa prezinte certificate Intocmite de organisme independente care sa ateste ca operatorul economic respecta standardele de asigurare a calitatii cerute, inclusiv privind accesibilitatea pentru persoanele cu handicap?</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">422fc1fd-9bfe-4881-bc05-008d1620ea66</ID> <Title xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation title]</Title> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation description]</Description> <JurisdictionLevel xmlns=\"urn:X-test:UBL:Pre-award:",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 245790,
+            "corpus_end": 247101,
+            "match": "certificate"
+          }
+        ],
+        "staffing_team": [],
+        "insurance_bonds": [
+          {
+            "text": "NCE_IDENTIFIER</ValueDataTypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <TenderingCriterion xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">d726bac9-e153-4e75-bfca-c5385587766d</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.CERTIFICATES.QUALITY_ASSURANCE.QA_INDEPENDENT_CERTIFICATE</CriterionTypeCode> <Name xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Certificate emise de organisme independente cu privire la standardele de asigurare a calitatii</Name> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Operatorul economic va putea sa prezinte certificate Intocmite de organisme independente care sa ateste ca operatorul economic respecta standardele de asigurare a calitatii cerute, inclusiv privind accesibilitatea pentru persoanele cu handicap?</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-te",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 245473,
+            "corpus_end": 246782,
+            "match": "ASSURANCE"
+          }
+        ],
+        "subcontracting_consortium": [
+          {
+            "text": "de organisme independente cu privire la standardele de asigurare a calității Criteriu selectie: Certificate emise de organisme independente despre standarde de asigurare a calității Modalitatea de indeplinire: Prezentare dovezii implementarii unui sistem de management al calitatii in conformitate cu SR EN ISO 13485/2016 sau echivalent care sa permita atat prezentarea unui certificate emis de un organism de certificare cat si alte documente care probeaza in mod concludent indeplinirea cerintei. Modalitate de demonstrare a indeplinirii cerintei : se va completa DUAE de catre operatorii paticipanti la procedura( ofertanti, terti sustinatori, subcontractanti). Documentele justificative care probeaza indeplinirea celor asumate prin completarea DUAE urmeaza a fi prezentate , la solicitarea autoritatii contractante , doar de catre ofertantul clasat pe locul I in clasament in urma finalizarii evaluarii ofertelor. Loturile la care se aplica: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28 III.1.5) Informatii privind contractele rezervate: Nu III.1.6) Depozite valorice si garantii solicitate: III.1.6.a) Garantie de participare: conform sectiunii loturi III.1.6.b) Garantie de buna executie: 5% din valoatrea fara TVA a contractului subsecven",
+            "source": "files/CN1094712_unpacked/Instructiuni_ofertanti_FisaDate_DF1276231.pdf",
+            "source_url": "https://e-licitatie.ro/pub/notices/c-notice/v2/view/100210198",
+            "source_sha256": "5fe7728a9393357ed359c222b88133eb16cd2a2113f519e517c255e7dac28211",
+            "source_kind": "pdf",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 356658,
+            "corpus_end": 357969,
+            "match": "subcontract"
+          },
+          {
+            "text": "ul trebuie sa faca dovada ca a livrat produse similare in ultimii 3 ani , pana la data limita de depunere , de valoare cumulata cel putin egala cu valoarea estimata fara TVA a celui mai mare contract subsecvent . Prezentare dovezii implementarii unui sistem de management al calitatii in conformitate cu SR EN ISO 13485/2016 sau echivalent care sa permita atat prezentarea unui certificate emis de un organism de certificare cat si alte documente care probeaza in mod concludent indeplinirea cerintei. Modalitate de demonstrare a indeplinirii cerintei : se va completa DUAE de catre operatorii paticipanti la procedura( ofertanti, terti sustinatori, subcontractanti). Documentele justificative care probeaza indeplinirea celor asumate prin completarea DUAE urmeaza a fi prezentate , la solicitarea autoritatii contractante , doar de catre ofertantul clasat pe locul I in clasament in urma finalizarii evaluarii ofertelor. III.1.5) Informatii privind contractele rezervate: Contractul este rezervat atelierelor protejate si operatorilor economici al caror scop este integrarea sociala si profesionala a persoanelor cu handicap sau defavorizate:Nu Contractul poate fi executat numai in cadrul unor programe de angajare protejata:Nu III.2) Conditii referitoare la contract III.2.1) Informatii privind o anumita p",
+            "source": "files/portal_page.txt",
+            "source_url": null,
+            "source_sha256": "d2647fbe57cea6882bc8752f19fe827168c49fb98903353ba7774d75b9c74c80",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 490490,
+            "corpus_end": 491801,
+            "match": "subcontract"
+          }
+        ],
+        "deliverables_scope": [],
+        "sla_onsite": [
+          {
+            "text": "e membru al organismului de administrare, de conducere sau de supraveghere al acestuia sau care are putere de reprezentare, de decizie sau de control In cadrul acestuia a facut obiectul unei condamnari pronuntate printr-o hotarare definitiva pentru participare la o organizatie criminala, printr-o condamnare pronuntata cu cel mult cinci ani In urma sau In care continua sa se aplice o perioada de excludere prevazuta In mod direct In condamnare? Astfel cum este definita la articolul 2 din Decizia-cadru 2008/841/JAI a Consiliului din 24 octombrie 2008 privind lupta Impotriva crimei organizate (JO L 300, 11.11.2008, p. 42).</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">c6a11472-b4c4-44b2-95dc-10d81253d0c6</ID> <Title xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation title]</Title> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation Description]</Description> <JurisdictionLevel xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EU</JurisdictionLevel> <Article xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Article, e.g. Article 2.I.a]</Article> <URI xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">http://eur-lex.europa.eu/</",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 4392,
+            "corpus_end": 5695,
+            "match": "sla"
+          },
+          {
+            "text": "articipare la o organizatie criminala, printr-o condamnare pronuntata cu cel mult cinci ani In urma sau In care continua sa se aplice o perioada de excludere prevazuta In mod direct In condamnare? Astfel cum este definita la articolul 2 din Decizia-cadru 2008/841/JAI a Consiliului din 24 octombrie 2008 privind lupta Impotriva crimei organizate (JO L 300, 11.11.2008, p. 42).</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">c6a11472-b4c4-44b2-95dc-10d81253d0c6</ID> <Title xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation title]</Title> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation Description]</Description> <JurisdictionLevel xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EU</JurisdictionLevel> <Article xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Article, e.g. Article 2.I.a]</Article> <URI xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">http://eur-lex.europa.eu/</URI> <Language> <LocaleCode listID=\"LanguageCodeEU\" listAgencyName=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EN</LocaleCode> </Language> </Legislation> <TenderingCriterionPropertyGrou",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 4642,
+            "corpus_end": 5945,
+            "match": "sla"
+          },
+          {
+            "text": "In urma sau In care continua sa se aplice o perioada de excludere prevazuta In mod direct In condamnare? Astfel cum este definita la articolul 2 din Decizia-cadru 2008/841/JAI a Consiliului din 24 octombrie 2008 privind lupta Impotriva crimei organizate (JO L 300, 11.11.2008, p. 42).</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">c6a11472-b4c4-44b2-95dc-10d81253d0c6</ID> <Title xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation title]</Title> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation Description]</Description> <JurisdictionLevel xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EU</JurisdictionLevel> <Article xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Article, e.g. Article 2.I.a]</Article> <URI xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">http://eur-lex.europa.eu/</URI> <Language> <LocaleCode listID=\"LanguageCodeEU\" listAgencyName=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EN</LocaleCode> </Language> </Legislation> <TenderingCriterionPropertyGroup> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 4734,
+            "corpus_end": 6037,
+            "match": "sla"
+          },
+          {
+            "text": "n:X-test:UBL:Pre-award:CommonBasic\">[Legislation title]</Title> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation Description]</Description> <JurisdictionLevel xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EU</JurisdictionLevel> <Article xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Article, e.g. Article 2.I.a]</Article> <URI xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">http://eur-lex.europa.eu/</URI> <Language> <LocaleCode listID=\"LanguageCodeEU\" listAgencyName=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EN</LocaleCode> </Language> </Legislation> <TenderingCriterionPropertyGroup> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">7c637c0c-7703-4389-ba52-02997a055bd7</ID> <PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">ON*</PropertyGroupTypeCode> <TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">69d28a69-75c1-4c10-be10-6308eb32f7fd</ID> <Description xmlns=\"urn:X-t",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 5251,
+            "corpus_end": 6554,
+            "match": "sla"
+          }
+        ],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [
+          {
+            "text": "\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:X-test:UBL:Pre-award:QualificationApplicationRequest\"> <UBLVersionID schemeAgencyID=\"OASIS-UBL-TC\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">2.2</UBLVersionID> <CustomizationID schemeAgencyID=\"CEN-BII\" schemeVersionID=\"1.0\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">urn:www.cenbii.eu:transaction:biitrdm070:ver3.0</CustomizationID> <ProfileID schemeAgencyID=\"CEN-BII\" schemeVersionID=\"1.0\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">4.1</ProfileID> <ProfileExecutionID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">ESPD-EDMv2.0.2-REGULATED</ProfileExecutionID> <ID schemeAgencyID=\"DGPE\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">ESPDREQ-DGPE-378481</ID> <CopyIndicator xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">false</CopyIndicator> <UUID schemeID=\"ISO/IEC 9834-8:2008 - 4UUID\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">1d867235-b43e-4ca4-af2e-98297527ec82</UUID> <ContractFolderID schemeAgencyID=\"DGPE\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">PAAP1106182 </ContractFolderID> <IssueDate xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">2026-07-15</IssueDate> <VersionID schemeAgencyID=\"EU-COM-GRO",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 182,
+            "corpus_end": 1486,
+            "match": "ESPD"
+          },
+          {
+            "text": "\"> <UBLVersionID schemeAgencyID=\"OASIS-UBL-TC\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">2.2</UBLVersionID> <CustomizationID schemeAgencyID=\"CEN-BII\" schemeVersionID=\"1.0\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">urn:www.cenbii.eu:transaction:biitrdm070:ver3.0</CustomizationID> <ProfileID schemeAgencyID=\"CEN-BII\" schemeVersionID=\"1.0\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">4.1</ProfileID> <ProfileExecutionID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">ESPD-EDMv2.0.2-REGULATED</ProfileExecutionID> <ID schemeAgencyID=\"DGPE\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">ESPDREQ-DGPE-378481</ID> <CopyIndicator xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">false</CopyIndicator> <UUID schemeID=\"ISO/IEC 9834-8:2008 - 4UUID\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">1d867235-b43e-4ca4-af2e-98297527ec82</UUID> <ContractFolderID schemeAgencyID=\"DGPE\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">PAAP1106182 </ContractFolderID> <IssueDate xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">2026-07-15</IssueDate> <VersionID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">1.0</VersionID> <ProcedureCode listID=\"Procedur",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 301,
+            "corpus_end": 1605,
+            "match": "ESPD"
+          }
+        ],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32339156467,
+      "source_shard": 2,
+      "hot_ready_at": "2026-08-20T06:22:06.667465+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 7,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY",
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "6143193a4d3f9f4b1e5a4478e3308a75491f6d48ba793f163ccbe2476f44b0c8",
+      "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
+      "gpt_priority_score": 7,
+      "upstream_signal": "DCE_REVIEW_READY",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32339156467,
+        "shard": 2,
+        "candidate_id": "TED:575578-2026",
         "release_tag": null
       },
       "upstream_review_lane": "SPM_PRIORITY",
@@ -2803,7 +3133,7 @@
       "gpt_priority_score": 18,
       "upstream_signal": "DCE_REVIEW_READY",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
-      "inbox_live_source": "control/gpt_review_hot.json",
+      "inbox_live_source": "existing_inbox",
       "evidence_locator": {
         "dce_run_id": 32336420165,
         "shard": 17,
@@ -3305,7 +3635,7 @@
       "gpt_priority_score": 10,
       "upstream_signal": "DCE_REVIEW_READY",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
-      "inbox_live_source": "control/gpt_review_hot.json",
+      "inbox_live_source": "existing_inbox",
       "evidence_locator": {
         "dce_run_id": 32336420165,
         "shard": 16,
@@ -4045,11 +4375,341 @@
       "gpt_priority_score": 15,
       "upstream_signal": "DCE_REVIEW_READY",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
-      "inbox_live_source": "control/gpt_review_hot.json",
+      "inbox_live_source": "existing_inbox",
       "evidence_locator": {
         "dce_run_id": 32336420165,
         "shard": 16,
         "candidate_id": "IT-PVL:e5343496-4a15-4c00-8de6-ab54751f972f",
+        "release_tag": null
+      },
+      "upstream_review_lane": "SPM_PRIORITY",
+      "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
+    },
+    {
+      "candidate_id": "TED:575578-2026",
+      "title": "Romania – Renal dialysis consumables – consumabile dializa",
+      "buyer": "Spitalul Clinic Judetean de Urgenta\"Sfantul Apostol Andrei\"",
+      "portal": "TED",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/575578-2026",
+      "deadline": "2026-09-14T03:00:00+00:00",
+      "estimated_value": 1875638.4,
+      "currency": "RON",
+      "preliminary_score": null,
+      "priority_score": 0,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-09-14T03:00:00+00:00",
+        "notice_deadline_date": "2026-09-14",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 7,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "rionProperty> <SubsidiaryTenderingCriterionPropertyGroup> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">74e6c7b4-757b-4b40-ada6-fad6a997c310</ID> <PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">ONTRUE</PropertyGroupTypeCode> <TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">df83933a-0c1d-49df-8990-62eea24968a5</ID> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Vă rugăm să le descrieți</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">QUESTION</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">DESCRIPTION</ValueDataTypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </SubsidiaryTenderingCriterionPropertyGroup> </SubsidiaryTende",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 11400,
+            "corpus_end": 12703,
+            "match": "eea"
+          },
+          {
+            "text": "R</ValueDataTypeCode> </TenderingCriterionProperty> <SubsidiaryTenderingCriterionPropertyGroup> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">41dd2e9b-1bfd-44c7-93ee-56bd74a4334b</ID> <PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">ONTRUE</PropertyGroupTypeCode> <TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">53eea629-9f22-4c4d-9f17-ada0911e121e</ID> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Dovezi furnizate</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">QUESTION</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EVIDENCE_IDENTIFIER</ValueDataTypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <Tender",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 24698,
+            "corpus_end": 26001,
+            "match": "eea"
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "rd:CommonBasic\">EVIDENCE_IDENTIFIER</ValueDataTypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <TenderingCriterion xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">3a18a175-1863-4b1d-baef-588ce61960ca</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.REFERENCES.SUPPLIES_DELIVERY_PERFORMANCE</CriterionTypeCode> <Name xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Pentru contractele de achizitie de bunuri: executarea de livrari de tipul specificat</Name> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Numai pentru contractele de achiziții publice de servicii: În perioada de referință, operatorul economic a furnizat următoarele servicii principale de tipul specificat. Autoritățile contractante pot solicita experiență de până la trei ani și pot accepta experiența acumulată în urmă cu peste trei ani</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 237968,
+            "corpus_end": 239278,
+            "match": "REFERENCES"
+          },
+          {
+            "text": "a086-448c-40f0-9b60-1bc1c9630e0e</ID> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">URL</Description> <TypeCode listID=\"CriterionElementType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">QUESTION</TypeCode> <ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EVIDENCE_IDENTIFIER</ValueDataTypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <AdditionalDocumentReference xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeAgencyID=\"EU-COM-OP\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">2017/S 142-293520</ID> <DocumentTypeCode listID=\"DocRefContentType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">TED_CN</DocumentTypeCode> <Attachment> <ExternalReference> <URI schemeAgencyID=\"EU-COM-OP\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">http://ted.europa.eu/udl?uri%3DTED:NOTICE:293520-2017:TEXT:EN:HTML%026src%3D0</URI> <FileName xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Spain-Aljaraque: Repair and maintenance services</Fi",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 251682,
+            "corpus_end": 252991,
+            "match": "Reference"
+          },
+          {
+            "text": "GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EVIDENCE_IDENTIFIER</ValueDataTypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <AdditionalDocumentReference xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeAgencyID=\"EU-COM-OP\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">2017/S 142-293520</ID> <DocumentTypeCode listID=\"DocRefContentType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">TED_CN</DocumentTypeCode> <Attachment> <ExternalReference> <URI schemeAgencyID=\"EU-COM-OP\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">http://ted.europa.eu/udl?uri%3DTED:NOTICE:293520-2017:TEXT:EN:HTML%026src%3D0</URI> <FileName xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Spain-Aljaraque: Repair and maintenance services</FileName> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">293520-2017</Description> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Repair and maintenance services. Real estate services.</Description> </ExternalReference> </Attachment> </AdditionalDocumentReference> <AdditionalDocumentReference xmlns=\"urn:X-test:UB",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 252046,
+            "corpus_end": 253355,
+            "match": "Reference"
+          },
+          {
+            "text": "xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">TED_CN</DocumentTypeCode> <Attachment> <ExternalReference> <URI schemeAgencyID=\"EU-COM-OP\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">http://ted.europa.eu/udl?uri%3DTED:NOTICE:293520-2017:TEXT:EN:HTML%026src%3D0</URI> <FileName xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Spain-Aljaraque: Repair and maintenance services</FileName> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">293520-2017</Description> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Repair and maintenance services. Real estate services.</Description> </ExternalReference> </Attachment> </AdditionalDocumentReference> <AdditionalDocumentReference xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeAgencyID=\"EU-COM-OP\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">3.17/20830.0160</ID> <DocumentTypeCode listID=\"DocRefContentType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">NOJCN</DocumentTypeCode> <Attachment> <ExternalReference> <URI schemeAgencyID=\"PLACE\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">https://contrataciondelestado.es/wps/portal/!ut/p/b1/pY_LDoIwEEW_hQ8wM5S2wJKH5REUVEDbjenCGI3Axvj9gmFrMXF2Nzkncy8okDahHD2XMA",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 252592,
+            "corpus_end": 253901,
+            "match": "Reference"
+          }
+        ],
+        "certifications_partner": [
+          {
+            "text": "rd:CommonBasic\">EVIDENCE_IDENTIFIER</ValueDataTypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <TenderingCriterion xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">d726bac9-e153-4e75-bfca-c5385587766d</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.CERTIFICATES.QUALITY_ASSURANCE.QA_INDEPENDENT_CERTIFICATE</CriterionTypeCode> <Name xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Certificate emise de organisme independente cu privire la standardele de asigurare a calitatii</Name> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Operatorul economic va putea sa prezinte certificate Intocmite de organisme independente care sa ateste ca operatorul economic respecta standardele de asigurare a calitatii cerute, inclusiv privind accesibilitatea pentru persoanele cu handicap?</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 245452,
+            "corpus_end": 246763,
+            "match": "CERTIFICATE"
+          },
+          {
+            "text": "TypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <TenderingCriterion xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">d726bac9-e153-4e75-bfca-c5385587766d</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.CERTIFICATES.QUALITY_ASSURANCE.QA_INDEPENDENT_CERTIFICATE</CriterionTypeCode> <Name xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Certificate emise de organisme independente cu privire la standardele de asigurare a calitatii</Name> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Operatorul economic va putea sa prezinte certificate Intocmite de organisme independente care sa ateste ca operatorul economic respecta standardele de asigurare a calitatii cerute, inclusiv privind accesibilitatea pentru persoanele cu handicap?</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasi",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 245498,
+            "corpus_end": 246809,
+            "match": "CERTIFICATE"
+          },
+          {
+            "text": "pertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <TenderingCriterion xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">d726bac9-e153-4e75-bfca-c5385587766d</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.CERTIFICATES.QUALITY_ASSURANCE.QA_INDEPENDENT_CERTIFICATE</CriterionTypeCode> <Name xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Certificate emise de organisme independente cu privire la standardele de asigurare a calitatii</Name> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Operatorul economic va putea sa prezinte certificate Intocmite de organisme independente care sa ateste ca operatorul economic respecta standardele de asigurare a calitatii cerute, inclusiv privind accesibilitatea pentru persoanele cu handicap?</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">422fc1fd-9bfe-4881-bc05-008d1620ea66</ID> <Title xmlns=\"urn:X-test:UBL:Pre-awa",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 245585,
+            "corpus_end": 246896,
+            "match": "Certificate"
+          },
+          {
+            "text": "-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">d726bac9-e153-4e75-bfca-c5385587766d</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.CERTIFICATES.QUALITY_ASSURANCE.QA_INDEPENDENT_CERTIFICATE</CriterionTypeCode> <Name xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Certificate emise de organisme independente cu privire la standardele de asigurare a calitatii</Name> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Operatorul economic va putea sa prezinte certificate Intocmite de organisme independente care sa ateste ca operatorul economic respecta standardele de asigurare a calitatii cerute, inclusiv privind accesibilitatea pentru persoanele cu handicap?</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">422fc1fd-9bfe-4881-bc05-008d1620ea66</ID> <Title xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation title]</Title> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation description]</Description> <JurisdictionLevel xmlns=\"urn:X-test:UBL:Pre-award:",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 245790,
+            "corpus_end": 247101,
+            "match": "certificate"
+          }
+        ],
+        "staffing_team": [],
+        "insurance_bonds": [
+          {
+            "text": "NCE_IDENTIFIER</ValueDataTypeCode> </TenderingCriterionProperty> </SubsidiaryTenderingCriterionPropertyGroup> </TenderingCriterionPropertyGroup> </TenderingCriterion> <TenderingCriterion xmlns=\"urn:X-test:UBL:Pre-award:CommonAggregate\"> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">d726bac9-e153-4e75-bfca-c5385587766d</ID> <CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.CERTIFICATES.QUALITY_ASSURANCE.QA_INDEPENDENT_CERTIFICATE</CriterionTypeCode> <Name xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Certificate emise de organisme independente cu privire la standardele de asigurare a calitatii</Name> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">Operatorul economic va putea sa prezinte certificate Intocmite de organisme independente care sa ateste ca operatorul economic respecta standardele de asigurare a calitatii cerute, inclusiv privind accesibilitatea pentru persoanele cu handicap?</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-te",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 245473,
+            "corpus_end": 246782,
+            "match": "ASSURANCE"
+          }
+        ],
+        "subcontracting_consortium": [
+          {
+            "text": "de organisme independente cu privire la standardele de asigurare a calității Criteriu selectie: Certificate emise de organisme independente despre standarde de asigurare a calității Modalitatea de indeplinire: Prezentare dovezii implementarii unui sistem de management al calitatii in conformitate cu SR EN ISO 13485/2016 sau echivalent care sa permita atat prezentarea unui certificate emis de un organism de certificare cat si alte documente care probeaza in mod concludent indeplinirea cerintei. Modalitate de demonstrare a indeplinirii cerintei : se va completa DUAE de catre operatorii paticipanti la procedura( ofertanti, terti sustinatori, subcontractanti). Documentele justificative care probeaza indeplinirea celor asumate prin completarea DUAE urmeaza a fi prezentate , la solicitarea autoritatii contractante , doar de catre ofertantul clasat pe locul I in clasament in urma finalizarii evaluarii ofertelor. Loturile la care se aplica: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28 III.1.5) Informatii privind contractele rezervate: Nu III.1.6) Depozite valorice si garantii solicitate: III.1.6.a) Garantie de participare: conform sectiunii loturi III.1.6.b) Garantie de buna executie: 5% din valoatrea fara TVA a contractului subsecven",
+            "source": "files/CN1094712_unpacked/Instructiuni_ofertanti_FisaDate_DF1276231.pdf",
+            "source_url": "https://e-licitatie.ro/pub/notices/c-notice/v2/view/100210198",
+            "source_sha256": "5fe7728a9393357ed359c222b88133eb16cd2a2113f519e517c255e7dac28211",
+            "source_kind": "pdf",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 356658,
+            "corpus_end": 357969,
+            "match": "subcontract"
+          },
+          {
+            "text": "ul trebuie sa faca dovada ca a livrat produse similare in ultimii 3 ani , pana la data limita de depunere , de valoare cumulata cel putin egala cu valoarea estimata fara TVA a celui mai mare contract subsecvent . Prezentare dovezii implementarii unui sistem de management al calitatii in conformitate cu SR EN ISO 13485/2016 sau echivalent care sa permita atat prezentarea unui certificate emis de un organism de certificare cat si alte documente care probeaza in mod concludent indeplinirea cerintei. Modalitate de demonstrare a indeplinirii cerintei : se va completa DUAE de catre operatorii paticipanti la procedura( ofertanti, terti sustinatori, subcontractanti). Documentele justificative care probeaza indeplinirea celor asumate prin completarea DUAE urmeaza a fi prezentate , la solicitarea autoritatii contractante , doar de catre ofertantul clasat pe locul I in clasament in urma finalizarii evaluarii ofertelor. III.1.5) Informatii privind contractele rezervate: Contractul este rezervat atelierelor protejate si operatorilor economici al caror scop este integrarea sociala si profesionala a persoanelor cu handicap sau defavorizate:Nu Contractul poate fi executat numai in cadrul unor programe de angajare protejata:Nu III.2) Conditii referitoare la contract III.2.1) Informatii privind o anumita p",
+            "source": "files/portal_page.txt",
+            "source_url": null,
+            "source_sha256": "d2647fbe57cea6882bc8752f19fe827168c49fb98903353ba7774d75b9c74c80",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 490490,
+            "corpus_end": 491801,
+            "match": "subcontract"
+          }
+        ],
+        "deliverables_scope": [],
+        "sla_onsite": [
+          {
+            "text": "e membru al organismului de administrare, de conducere sau de supraveghere al acestuia sau care are putere de reprezentare, de decizie sau de control In cadrul acestuia a facut obiectul unei condamnari pronuntate printr-o hotarare definitiva pentru participare la o organizatie criminala, printr-o condamnare pronuntata cu cel mult cinci ani In urma sau In care continua sa se aplice o perioada de excludere prevazuta In mod direct In condamnare? Astfel cum este definita la articolul 2 din Decizia-cadru 2008/841/JAI a Consiliului din 24 octombrie 2008 privind lupta Impotriva crimei organizate (JO L 300, 11.11.2008, p. 42).</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">c6a11472-b4c4-44b2-95dc-10d81253d0c6</ID> <Title xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation title]</Title> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation Description]</Description> <JurisdictionLevel xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EU</JurisdictionLevel> <Article xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Article, e.g. Article 2.I.a]</Article> <URI xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">http://eur-lex.europa.eu/</",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 4392,
+            "corpus_end": 5695,
+            "match": "sla"
+          },
+          {
+            "text": "articipare la o organizatie criminala, printr-o condamnare pronuntata cu cel mult cinci ani In urma sau In care continua sa se aplice o perioada de excludere prevazuta In mod direct In condamnare? Astfel cum este definita la articolul 2 din Decizia-cadru 2008/841/JAI a Consiliului din 24 octombrie 2008 privind lupta Impotriva crimei organizate (JO L 300, 11.11.2008, p. 42).</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">c6a11472-b4c4-44b2-95dc-10d81253d0c6</ID> <Title xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation title]</Title> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation Description]</Description> <JurisdictionLevel xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EU</JurisdictionLevel> <Article xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Article, e.g. Article 2.I.a]</Article> <URI xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">http://eur-lex.europa.eu/</URI> <Language> <LocaleCode listID=\"LanguageCodeEU\" listAgencyName=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EN</LocaleCode> </Language> </Legislation> <TenderingCriterionPropertyGrou",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 4642,
+            "corpus_end": 5945,
+            "match": "sla"
+          },
+          {
+            "text": "In urma sau In care continua sa se aplice o perioada de excludere prevazuta In mod direct In condamnare? Astfel cum este definita la articolul 2 din Decizia-cadru 2008/841/JAI a Consiliului din 24 octombrie 2008 privind lupta Impotriva crimei organizate (JO L 300, 11.11.2008, p. 42).</Description> <Legislation> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">c6a11472-b4c4-44b2-95dc-10d81253d0c6</ID> <Title xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation title]</Title> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation Description]</Description> <JurisdictionLevel xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EU</JurisdictionLevel> <Article xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Article, e.g. Article 2.I.a]</Article> <URI xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">http://eur-lex.europa.eu/</URI> <Language> <LocaleCode listID=\"LanguageCodeEU\" listAgencyName=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EN</LocaleCode> </Language> </Legislation> <TenderingCriterionPropertyGroup> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 4734,
+            "corpus_end": 6037,
+            "match": "sla"
+          },
+          {
+            "text": "n:X-test:UBL:Pre-award:CommonBasic\">[Legislation title]</Title> <Description xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Legislation Description]</Description> <JurisdictionLevel xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EU</JurisdictionLevel> <Article xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">[Article, e.g. Article 2.I.a]</Article> <URI xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">http://eur-lex.europa.eu/</URI> <Language> <LocaleCode listID=\"LanguageCodeEU\" listAgencyName=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">EN</LocaleCode> </Language> </Legislation> <TenderingCriterionPropertyGroup> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">7c637c0c-7703-4389-ba52-02997a055bd7</ID> <PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">ON*</PropertyGroupTypeCode> <TenderingCriterionProperty> <ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">69d28a69-75c1-4c10-be10-6308eb32f7fd</ID> <Description xmlns=\"urn:X-t",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 5251,
+            "corpus_end": 6554,
+            "match": "sla"
+          }
+        ],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [
+          {
+            "text": "\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:X-test:UBL:Pre-award:QualificationApplicationRequest\"> <UBLVersionID schemeAgencyID=\"OASIS-UBL-TC\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">2.2</UBLVersionID> <CustomizationID schemeAgencyID=\"CEN-BII\" schemeVersionID=\"1.0\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">urn:www.cenbii.eu:transaction:biitrdm070:ver3.0</CustomizationID> <ProfileID schemeAgencyID=\"CEN-BII\" schemeVersionID=\"1.0\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">4.1</ProfileID> <ProfileExecutionID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">ESPD-EDMv2.0.2-REGULATED</ProfileExecutionID> <ID schemeAgencyID=\"DGPE\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">ESPDREQ-DGPE-378481</ID> <CopyIndicator xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">false</CopyIndicator> <UUID schemeID=\"ISO/IEC 9834-8:2008 - 4UUID\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">1d867235-b43e-4ca4-af2e-98297527ec82</UUID> <ContractFolderID schemeAgencyID=\"DGPE\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">PAAP1106182 </ContractFolderID> <IssueDate xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">2026-07-15</IssueDate> <VersionID schemeAgencyID=\"EU-COM-GRO",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 182,
+            "corpus_end": 1486,
+            "match": "ESPD"
+          },
+          {
+            "text": "\"> <UBLVersionID schemeAgencyID=\"OASIS-UBL-TC\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">2.2</UBLVersionID> <CustomizationID schemeAgencyID=\"CEN-BII\" schemeVersionID=\"1.0\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">urn:www.cenbii.eu:transaction:biitrdm070:ver3.0</CustomizationID> <ProfileID schemeAgencyID=\"CEN-BII\" schemeVersionID=\"1.0\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">4.1</ProfileID> <ProfileExecutionID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">ESPD-EDMv2.0.2-REGULATED</ProfileExecutionID> <ID schemeAgencyID=\"DGPE\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">ESPDREQ-DGPE-378481</ID> <CopyIndicator xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">false</CopyIndicator> <UUID schemeID=\"ISO/IEC 9834-8:2008 - 4UUID\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">1d867235-b43e-4ca4-af2e-98297527ec82</UUID> <ContractFolderID schemeAgencyID=\"DGPE\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">PAAP1106182 </ContractFolderID> <IssueDate xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">2026-07-15</IssueDate> <VersionID schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0\" xmlns=\"urn:X-test:UBL:Pre-award:CommonBasic\">1.0</VersionID> <ProcedureCode listID=\"Procedur",
+            "source": "files/CN1094712_unpacked/DUAE_CERERE_378481.xml",
+            "source_url": null,
+            "source_sha256": "92a95b73b1016785b383348532764347970750abd7ffe6b2aa5fc34559df9055",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 301,
+            "corpus_end": 1605,
+            "match": "ESPD"
+          }
+        ],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32339156467,
+      "source_shard": 2,
+      "hot_ready_at": "2026-08-20T06:22:06.667465+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 7,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY",
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "6143193a4d3f9f4b1e5a4478e3308a75491f6d48ba793f163ccbe2476f44b0c8",
+      "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
+      "gpt_priority_score": 7,
+      "upstream_signal": "DCE_REVIEW_READY",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32339156467,
+        "shard": 2,
+        "candidate_id": "TED:575578-2026",
         "release_tag": null
       },
       "upstream_review_lane": "SPM_PRIORITY",
@@ -4062,39 +4722,39 @@
     "low_surveillance_target": 20,
     "selected_by_lane": {
       "GPT_PRIORITY": 3,
-      "LOW_PORTAL_SURVEILLANCE": 3
+      "LOW_PORTAL_SURVEILLANCE": 4
     },
     "selected_by_stage": {
-      "BUSINESS_GATES": 6
+      "BUSINESS_GATES": 7
     },
     "selected_by_band": {
       "UNKNOWN": 3,
-      "LOW": 3
+      "LOW": 4
     },
     "selected_by_portal": {
-      "TED": 4,
+      "TED": 5,
       "GENERIC_PUBLIC_PAGE": 2
     }
   },
   "counts": {
-    "pending_gpt_web_review": 6,
+    "pending_gpt_web_review": 7,
     "reviewed_ticks_total": 485,
     "excluded_already_reviewed": 0,
     "excluded_already_in_final_bank": 0,
-    "pending_before_visible_cap": 6,
+    "pending_before_visible_cap": 7,
     "pending_by_stage": {
-      "BUSINESS_GATES": 6
+      "BUSINESS_GATES": 7
     },
     "pending_by_inbox_lane": {
       "GPT_PRIORITY": 3,
-      "LOW_PORTAL_SURVEILLANCE": 3
+      "LOW_PORTAL_SURVEILLANCE": 4
     },
     "pending_by_fit_band": {
       "UNKNOWN": 3,
-      "LOW": 3
+      "LOW": 4
     },
     "pending_by_portal": {
-      "TED": 4,
+      "TED": 5,
       "GENERIC_PUBLIC_PAGE": 2
     }
   },
