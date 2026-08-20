@@ -1,0 +1,135 @@
+name: Malta ePPS OCDS Full Reconcile Proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/mt-epps-ocds-reconcile-proof.yml'
+      - 'pipeline/discover_mt_epps_ocds.py'
+      - 'tests/test_mt_epps_ocds.py'
+      - 'control/mt_epps_ocds_reconcile_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests pytest
+      - name: Unit and syntax gate
+        run: |
+          python -m py_compile pipeline/discover_mt_epps_ocds.py pipeline/ocds_release_normalizer.py
+          pytest -q tests/test_mt_epps_ocds.py
+      - name: Create durable proof Release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="mt-epps-ocds-proof-${GITHUB_RUN_ID}"
+          gh release create "$tag" --title "Malta ePPS OCDS reconcile ${GITHUB_RUN_ID}" --notes "Official European Dynamics OCDS record-package manifest and all monthly packages from 2019-10 through the freshest publisher month."
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+      - name: Exhaust publisher record-package manifest
+        id: run
+        env:
+          DISCOVERY_MODE: reconcile
+          DISCOVERY_OUT: mt-epps-reconcile
+          MT_EPPS_OCDS_WORKERS: '4'
+          MT_EPPS_OCDS_RETRIES: '6'
+        shell: bash
+        run: |
+          set +e
+          python pipeline/discover_mt_epps_ocds.py
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Build fail-closed verdict
+        if: always()
+        env:
+          RUN_RC: ${{ steps.run.outputs.rc }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('mt-epps-reconcile/stats.json')
+          s=json.loads(p.read_text()) if p.exists() else {}
+          try: rc=int(os.environ.get('RUN_RC') or 999)
+          except Exception: rc=999
+          passed=bool(
+              rc==0
+              and s.get('listing_contract')=='MALTA_EPPS_EUROPEAN_DYNAMICS_OCDS_RECORD_PACKAGES_V1'
+              and s.get('full_publication_history_requested') is True
+              and s.get('publication_partitions_complete') is True
+              and s.get('manifest_fresh_within_one_month') is True
+              and s.get('enumeration_complete') is True
+              and s.get('enumeration_exhausted') is True
+              and s.get('live_coverage_credit_allowed') is True
+              and s.get('packages_requested')==s.get('packages_completed')
+              and not (s.get('errors') or [])
+              and int(s.get('current_materialized') or 0)>0
+          )
+          proof={
+              'schema':'MALTA_EPPS_OCDS_FULL_RECONCILE_PROOF_V1',
+              'release_tag':os.environ.get('RELEASE_TAG'),
+              'adapter_exit_code':rc,
+              'listing_contract':s.get('listing_contract'),
+              'selected_official_base':s.get('selected_official_base'),
+              'earliest_offered_month':s.get('earliest_offered_month'),
+              'latest_offered_month':s.get('latest_offered_month'),
+              'manifest_fresh_within_one_month':s.get('manifest_fresh_within_one_month'),
+              'packages_requested':s.get('packages_requested'),
+              'packages_completed':s.get('packages_completed'),
+              'record_ocids_latest':s.get('record_ocids_latest'),
+              'raw_materialized':s.get('raw_materialized'),
+              'current_materialized':s.get('current_materialized'),
+              'deadline_unknown_radar':s.get('deadline_unknown_radar'),
+              'publication_partitions_complete':s.get('publication_partitions_complete'),
+              'enumeration_complete':s.get('enumeration_complete'),
+              'live_coverage_credit_allowed':s.get('live_coverage_credit_allowed'),
+              'errors':s.get('errors') or [],
+              'pass':passed,
+          }
+          Path('control/mt_epps_ocds_reconcile_proof.json').write_text(json.dumps(proof,indent=2)+'\n')
+          print(json.dumps(proof,indent=2))
+          PY
+      - name: Preserve proof pack durably
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f mt-epps-reconcile/stats.json
+          tar -czf mt-epps-ocds-full-reconcile.tar.gz mt-epps-reconcile/stats.json mt-epps-reconcile/current.jsonl mt-epps-reconcile/radar_unknown_deadline.jsonl control/mt_epps_ocds_reconcile_proof.json
+          gh release upload "$RELEASE_TAG" mt-epps-ocds-full-reconcile.tar.gz --clobber
+      - name: Persist compact verdict
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f control/mt_epps_ocds_reconcile_proof.json || printf '%s\n' '{"schema":"MALTA_EPPS_OCDS_RECONCILE_WORKFLOW_FAILURE","pass":false}' > control/mt_epps_ocds_reconcile_proof.json
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add control/mt_epps_ocds_reconcile_proof.json
+          git diff --cached --quiet && exit 0
+          git commit -m "diag: persist Malta ePPS OCDS reconcile ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
+      - name: Enforce verdict
+        if: always()
+        run: python -c "import json; p=json.load(open('control/mt_epps_ocds_reconcile_proof.json')); raise SystemExit(0 if p.get('pass') is True else 3)"
