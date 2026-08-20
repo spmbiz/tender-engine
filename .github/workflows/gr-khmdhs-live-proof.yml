@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/gr-khmdhs-live-proof.yml'
       - 'pipeline/discover_gr_khmdhs_v2.py'
+      - 'pipeline/discover_gr_khmdhs_v3.py'
       - 'tests/test_gr_khmdhs_v2.py'
       - 'control/gr_khmdhs_live_trigger.txt'
 
@@ -25,7 +26,7 @@ jobs:
       - run: python -m pip install --disable-pip-version-check -q requests pytest
       - name: Unit and syntax gate
         run: |
-          python -m py_compile pipeline/discover_gr_khmdhs_v2.py
+          python -m py_compile pipeline/discover_gr_khmdhs_v2.py pipeline/discover_gr_khmdhs_v3.py
           pytest -q tests/test_gr_khmdhs_v2.py
       - name: Enumerate future deadline windows
         id: run
@@ -40,7 +41,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          python pipeline/discover_gr_khmdhs_v2.py
+          python pipeline/discover_gr_khmdhs_v3.py
           rc=$?
           echo "rc=$rc" >> "$GITHUB_OUTPUT"
           exit 0
