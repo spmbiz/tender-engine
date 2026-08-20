@@ -29,7 +29,7 @@ def result(cid="TED:1", h="h1", **kw):
         "input_material_fields_hash": h,
         "classifier_model": "Qwen3-4B",
         "classifier_quant": "Q4_K_M",
-        "classifier_prompt_version": "p1",
+        "classifier_prompt_version": mod.REQUIRED_PROMPT_VERSION,
         "classifier_version": VERSION,
         "business_calibration_version": BUSINESS_CALIBRATION_VERSION,
         "classification": "FIT",
@@ -39,6 +39,11 @@ def result(cid="TED:1", h="h1", **kw):
         "friction_flags": [],
         "classified_at_utc": NOW,
         "parse_error": None,
+        "post_guard_schema": "QWEN_NOTICE_POST_GUARD_V5_EXACT_CONTEXT",
+        "post_guard_actions": [],
+        "post_guard_applied": False,
+        "post_guard_notice_context_used": True,
+        "post_guard_context_source": "explicit_queue",
     }
     row.update(kw)
     return row
@@ -55,7 +60,7 @@ def test_matching_hash_accepts_and_removes_from_queue():
     assert state[0]["classification"] == "FIT"
     assert state[0]["lean_attractiveness"] == "HIGH"
     assert state[0]["business_calibration_version"] == BUSINESS_CALIBRATION_VERSION
-    assert summary["results_accepted"] == 1 if "results_accepted" in summary else summary["stats"]["results_accepted"] == 1
+    assert summary["stats"]["results_accepted"] == 1
 
 
 def test_stale_hash_never_marks_updated_notice_classified():
@@ -77,6 +82,13 @@ def test_wrong_classifier_version_remains_in_queue():
     assert state == []
     assert len(remaining) == 1
     assert summary["rejected_result_reasons"]["wrong_classifier_version"] == 1
+
+
+def test_wrong_prompt_version_remains_in_queue():
+    state, remaining, summary = run([ledger()], [queue()], groups=[[result(classifier_prompt_version="old-thin-prompt")]])
+    assert state == []
+    assert len(remaining) == 1
+    assert summary["rejected_result_reasons"]["wrong_classifier_prompt_version"] == 1
 
 
 def test_wrong_business_calibration_version_remains_in_queue():
@@ -111,10 +123,46 @@ def test_previous_state_is_invalidated_when_business_calibration_changes():
     assert summary["stats"]["previous_wrong_business_calibration_dropped"] == 1
 
 
-def test_later_result_group_replaces_same_hash_state_deterministically():
+def test_conflicting_valid_results_are_requeued_not_resolved_by_order():
     first = result(classification="MAYBE", confidence=0.4)
     second = result(classification="FIT", confidence=0.8)
-    state, remaining, _ = run([ledger()], [queue()], groups=[[first], [second]])
+    state, remaining, summary = run([ledger()], [queue()], groups=[[first], [second]])
+    assert state == []
+    assert len(remaining) == 1
+    assert summary["conflicting_candidate_ids"] == ["TED:1"]
+    assert summary["stats"]["conflicting_candidates_requeued"] == 1
+    assert summary["rejected_result_reasons"]["conflicting_valid_results"] == 2
+
+
+def test_equivalent_duplicate_results_collapse_deterministically():
+    first = result(classified_at_utc="2026-08-16T02:19:00+00:00", classifier_run_id="run-a")
+    second = result(classified_at_utc="2026-08-16T02:20:00+00:00", classifier_run_id="run-b")
+    state, remaining, summary = run([ledger()], [queue()], groups=[[first], [second]])
     assert remaining == []
-    assert state[0]["classification"] == "FIT"
-    assert state[0]["confidence"] == 0.8
+    assert len(state) == 1
+    assert state[0]["classifier_run_id"] == "run-b"
+    assert summary["stats"]["duplicate_equivalent_candidates_collapsed"] == 1
+
+
+def test_new_state_preserves_guard_and_selfheal_provenance():
+    row = result(
+        classifier_run_id="123",
+        classifier_worker_id="7",
+        initial_batch_size=8,
+        effective_batch_size=4,
+        self_heal_depth=1,
+        recovered_after_split=True,
+        deterministic_guard_actions=["physical_fit_to_maybe"],
+        post_guard_actions=["possible_heavy_equipment_risk"],
+        pre_post_guard_classification="STRONG_FIT",
+    )
+    state, remaining, _ = run([ledger()], [queue()], groups=[[row]])
+    assert remaining == []
+    saved = state[0]
+    assert saved["classifier_run_id"] == "123"
+    assert saved["classifier_worker_id"] == "7"
+    assert saved["self_heal_depth"] == 1
+    assert saved["recovered_after_split"] is True
+    assert saved["deterministic_guard_actions"] == ["physical_fit_to_maybe"]
+    assert saved["post_guard_actions"] == ["possible_heavy_equipment_risk"]
+    assert saved["pre_post_guard_classification"] == "STRONG_FIT"

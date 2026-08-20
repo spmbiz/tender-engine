@@ -4,6 +4,8 @@ from __future__ import annotations
 import copy
 import json
 import os
+import time
+import urllib.error
 
 import qwen_notice_batch_selfheal_core as base
 
@@ -13,6 +15,9 @@ RICH_PROMPT_VERSION = "qwen-batch-high-recall-business-fit-v3-rich"
 RICH_CLASSIFIER_VERSION = "qwen3-4b-q4km-batch-selfheal-v1"
 MIN_CONTEXT_CHARS = max(1200, int(os.getenv("QWEN_RICH_MIN_CONTEXT_CHARS", "2200")))
 MAX_FIELD_CHARS = max(120, int(os.getenv("QWEN_RICH_FIELD_CHARS", "320")))
+TRANSPORT_RETRIES = max(0, min(3, int(os.getenv("QWEN_TRANSPORT_RETRIES", "1"))))
+TRANSPORT_RETRY_BASE_SECONDS = max(0.0, min(5.0, float(os.getenv("QWEN_TRANSPORT_RETRY_BASE_SECONDS", "0.5"))))
+TRANSIENT_HTTP = {408, 409, 425, 429, 500, 502, 503, 504}
 
 
 def compact_text(value, limit: int, *, preserve_tail: bool = False) -> str:
@@ -80,6 +85,7 @@ def rich_compact(row, description_chars: int):
 
 
 _original_guard = base.deterministic_guard
+_original_post_json = base.post_json
 
 
 def rich_guard(decoded, row):
@@ -95,10 +101,58 @@ def rich_guard(decoded, row):
     return _original_guard(decoded, clone)
 
 
+def _retryable_transport_error(exc: Exception) -> bool:
+    if isinstance(exc, urllib.error.HTTPError):
+        return int(getattr(exc, "code", 0) or 0) in TRANSIENT_HTTP
+    return isinstance(
+        exc,
+        (
+            urllib.error.URLError,
+            TimeoutError,
+            ConnectionError,
+            json.JSONDecodeError,
+        ),
+    )
+
+
+def retrying_post_json(url: str, payload: dict, timeout: int):
+    """Retry transient server/transport failures before recursive batch splitting.
+
+    A one-off timeout on an 8-row request used to immediately create an entire
+    binary split tree. One bounded retry is dramatically cheaper than 2N-1
+    follow-up requests while preserving the core self-heal fallback if the retry
+    still fails. Permanent HTTP errors are never retried.
+    """
+    for retry_index in range(TRANSPORT_RETRIES + 1):
+        try:
+            return _original_post_json(url, payload, timeout)
+        except Exception as exc:
+            if retry_index >= TRANSPORT_RETRIES or not _retryable_transport_error(exc):
+                raise
+            delay = TRANSPORT_RETRY_BASE_SECONDS * (2**retry_index)
+            print(
+                "QWEN_TRANSPORT_RETRY "
+                + json.dumps(
+                    {
+                        "retry": retry_index + 1,
+                        "max_retries": TRANSPORT_RETRIES,
+                        "error": type(exc).__name__,
+                        "delay_seconds": round(delay, 3),
+                    },
+                    separators=(",", ":"),
+                ),
+                flush=True,
+            )
+            if delay:
+                time.sleep(delay)
+    raise AssertionError("unreachable transport retry loop")
+
+
 base.PROMPT_VERSION = RICH_PROMPT_VERSION
 base.CLASSIFIER_VERSION = RICH_CLASSIFIER_VERSION
 base.compact = rich_compact
 base.deterministic_guard = rich_guard
+base.post_json = retrying_post_json
 
 if __name__ == "__main__":
     base.main()

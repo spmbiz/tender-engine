@@ -26,6 +26,7 @@ class Response:
     def __init__(self, payload):
         self.payload = payload
         self.text = json.dumps(payload)
+        self.content = self.text.encode("utf-8")
 
     def raise_for_status(self):
         return None
@@ -39,7 +40,7 @@ class InterruptAfterOnePageSession:
         self.headers = {}
         self.calls = 0
 
-    def post(self, url, data=None, timeout=None):
+    def post(self, url, data=None, timeout=None, **kwargs):
         self.calls += 1
         if self.calls == 1:
             return Response({

@@ -7,9 +7,9 @@ import json
 import re
 from collections import Counter
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
-SCHEMA = "QWEN_NOTICE_POST_GUARD_V4"
+SCHEMA = "QWEN_NOTICE_POST_GUARD_V5_EXACT_CONTEXT"
 PERSONAL_SERVICE = re.compile(r"\bpersonal services? contract\b", re.I)
 LICENSED_ROLE = re.compile(r"\b(security officer|licensed|certified professional|physician|nurse|engineer of record)\b", re.I)
 EQUIPMENT_RISK = re.compile(
@@ -45,6 +45,7 @@ def candidate_id(row: dict[str, Any]) -> str:
         or n.get("candidate_id")
         or n.get("notice_id")
         or n.get("id")
+        or n.get("i")
         or ""
     ).strip()
 
@@ -55,51 +56,89 @@ def _open_queue(path: Path):
     return path.open("r", encoding="utf-8")
 
 
-def load_notice_context(path: Path | None) -> dict[str, dict[str, Any]]:
-    """Index the exact shard queue by canonical candidate identity.
+def _iter_rows(path: Path) -> Iterable[dict[str, Any]]:
+    with _open_queue(path) as fh:
+        for lineno, raw in enumerate(fh, start=1):
+            raw = raw.strip()
+            if not raw:
+                continue
+            try:
+                row = json.loads(raw)
+            except Exception as exc:
+                raise SystemExit(f"invalid JSON in post-guard input {path}:{lineno}: {type(exc).__name__}") from exc
+            if not isinstance(row, dict):
+                raise SystemExit(f"non-object JSON row in post-guard input {path}:{lineno}")
+            yield row
 
-    No fuzzy aliases are permitted here. The post-guard may use scope text only
-    when the classifier result ID exactly matches one and only one source row.
-    Duplicate IDs fail closed because attaching the wrong notice text could
-    incorrectly change routing priority.
+
+def load_notice_context(path: Path | None) -> dict[str, dict[str, Any]]:
+    """Index one exact shard queue by canonical candidate identity.
+
+    No fuzzy aliases are permitted here. Duplicate IDs fail closed because
+    attaching the wrong notice text could incorrectly change routing priority.
     """
     if path is None:
         return {}
     index: dict[str, dict[str, Any]] = {}
-    with _open_queue(path) as fh:
-        for raw in fh:
-            raw = raw.strip()
-            if not raw:
-                continue
-            row = json.loads(raw)
-            if not isinstance(row, dict):
-                continue
-            cid = candidate_id(row)
-            if not cid:
-                continue
-            if cid in index:
-                raise SystemExit(f"duplicate candidate id in post-guard queue context: {cid}")
-            index[cid] = row
+    for row in _iter_rows(path):
+        cid = candidate_id(row)
+        if not cid:
+            raise SystemExit(f"missing candidate id in post-guard queue context: {path}")
+        if cid in index:
+            raise SystemExit(f"duplicate candidate id in post-guard queue context: {cid}")
+        index[cid] = row
     return index
 
 
-def notice_text(row: dict[str, Any], context: dict[str, Any] | None = None) -> tuple[str, str]:
-    """Return title/scope text from the exact source context when available.
+def discover_notice_context(root: Path, wanted_ids: set[str]) -> tuple[dict[str, dict[str, Any]], int]:
+    """Recover exact source rows from the downloaded production shard set.
 
-    Qwen raw results intentionally contain classification fields, not the full
-    notice. Production shards created by build_qwen_shadow_shards.py are compact
-    top-level notice records, so support both nested and top-level shapes.
+    The live workflow historically omitted ``--queue`` when invoking this guard.
+    Instead of silently applying semantic rescue rules to truncated classifier
+    echoes, find the source shard deterministically by exact candidate ID. Every
+    matching row across every shard is scanned so duplicate identities fail
+    closed rather than being hidden by filesystem order.
+    """
+    if not root.exists() or not root.is_dir():
+        return {}, 0
+    files = sorted(
+        p for p in root.rglob("qwen-shadow-*.jsonl*")
+        if p.is_file() and (p.name.endswith(".jsonl") or p.name.endswith(".jsonl.gz"))
+    )
+    index: dict[str, dict[str, Any]] = {}
+    for path in files:
+        for row in _iter_rows(path):
+            cid = candidate_id(row)
+            if not cid or cid not in wanted_ids:
+                continue
+            if cid in index:
+                raise SystemExit(f"duplicate candidate id across post-guard shard context: {cid}")
+            index[cid] = row
+    return index, len(files)
+
+
+def notice_text(row: dict[str, Any], context: dict[str, Any] | None = None) -> tuple[str, str]:
+    """Return title/scope text from exact context, with compact aliases supported.
+
+    Raw Qwen results embed a compact notice echo. Production source shards carry
+    full top-level fields. ``k`` and ``p`` are the compact aliases for category
+    and procedure and must remain usable for standalone fixtures/fallbacks.
     """
     source = context if isinstance(context, dict) else row
     n = source.get("notice") if isinstance(source.get("notice"), dict) else source
     title = str(n.get("title") or n.get("t") or "")
     desc = str(n.get("description") or n.get("d") or "")
-    category = str(n.get("cpv_or_category") or n.get("category") or "")
-    procedure = str(n.get("procedure") or "")
+    category = str(n.get("cpv_or_category") or n.get("category") or n.get("k") or "")
+    procedure = str(n.get("procedure") or n.get("p") or "")
     return title, " ".join(x for x in (title, desc, category, procedure) if x)
 
 
-def guard(row: dict[str, Any], notice_context: dict[str, Any] | None = None) -> dict[str, Any]:
+def guard(
+    row: dict[str, Any],
+    notice_context: dict[str, Any] | None = None,
+    *,
+    context_source: str = "embedded_result",
+) -> dict[str, Any]:
     out = dict(row)
     _title, text = notice_text(row, notice_context)
     flags = list(out.get("friction_flags") or []) if isinstance(out.get("friction_flags"), list) else []
@@ -180,6 +219,7 @@ def guard(row: dict[str, Any], notice_context: dict[str, Any] | None = None) -> 
     out["post_guard_actions"] = actions
     out["post_guard_applied"] = bool(actions)
     out["post_guard_notice_context_used"] = bool(notice_context)
+    out["post_guard_context_source"] = context_source if notice_context else "embedded_result"
     return out
 
 
@@ -189,45 +229,72 @@ def main() -> None:
     ap.add_argument("--output", required=True)
     ap.add_argument("--summary", required=True)
     ap.add_argument("--queue", help="Exact source shard/fixture used by Qwen; joined by exact candidate ID only.")
+    ap.add_argument(
+        "--queue-root",
+        help="Directory of source shards for exact-ID auto-discovery. If omitted, work/shards is used when present.",
+    )
     args = ap.parse_args()
 
-    context = load_notice_context(Path(args.queue)) if args.queue else {}
+    input_rows = list(_iter_rows(Path(args.input)))
+    seen_result_ids: set[str] = set()
+    for row in input_rows:
+        cid = candidate_id(row)
+        if not cid:
+            raise SystemExit("missing candidate id in post-guard results")
+        if cid in seen_result_ids:
+            raise SystemExit(f"duplicate candidate id in post-guard results: {cid}")
+        seen_result_ids.add(cid)
+
+    context: dict[str, dict[str, Any]] = {}
+    context_source = "embedded_result"
+    context_files = 0
+    context_required = False
+    if args.queue:
+        context = load_notice_context(Path(args.queue))
+        context_source = "explicit_queue"
+        context_files = 1
+        context_required = True
+    else:
+        root = Path(args.queue_root) if args.queue_root else Path("work/shards")
+        if args.queue_root or root.exists():
+            context, context_files = discover_notice_context(root, seen_result_ids)
+            if context_files == 0:
+                raise SystemExit(f"post-guard queue root contains no Qwen shard files: {root}")
+            context_source = "auto_discovered_queue"
+            context_required = True
+
     rows: list[dict[str, Any]] = []
     changed = 0
     context_matches = 0
     context_misses = 0
-    seen_result_ids: set[str] = set()
-    with open(args.input, encoding="utf-8") as fh:
-        for raw in fh:
-            raw = raw.strip()
-            if not raw:
-                continue
-            row = json.loads(raw)
-            cid = candidate_id(row)
-            if cid:
-                if cid in seen_result_ids:
-                    raise SystemExit(f"duplicate candidate id in post-guard results: {cid}")
-                seen_result_ids.add(cid)
-            source = context.get(cid) if cid else None
-            if args.queue:
-                if source is not None:
-                    context_matches += 1
-                else:
-                    context_misses += 1
-            guarded = guard(row, source)
-            changed += int(guarded.get("post_guard_applied", False))
-            rows.append(guarded)
+    for row in input_rows:
+        cid = candidate_id(row)
+        source = context.get(cid)
+        if context_required:
+            if source is not None:
+                context_matches += 1
+            else:
+                context_misses += 1
+        guarded = guard(row, source, context_source=context_source)
+        changed += int(guarded.get("post_guard_applied", False))
+        rows.append(guarded)
+
+    if context_required and context_misses:
+        raise SystemExit(f"post-guard exact context join failed for {context_misses} result rows")
 
     Path(args.output).write_text(
         "".join(json.dumps(x, ensure_ascii=False, separators=(",", ":")) + "\n" for x in rows),
         encoding="utf-8",
     )
     summary = {
-        "schema": "QWEN_NOTICE_POST_GUARD_SUMMARY_V4",
+        "schema": "QWEN_NOTICE_POST_GUARD_SUMMARY_V5_EXACT_CONTEXT",
         "input_rows": len(rows),
         "output_rows": len(rows),
         "rows_changed": changed,
         "queue_context_rows": len(context),
+        "queue_context_files": context_files,
+        "context_source": context_source,
+        "context_required": context_required,
         "context_matches": context_matches,
         "context_misses": context_misses,
         "classification_counts": dict(sorted(Counter(str(x.get("classification")) for x in rows).items())),
@@ -238,7 +305,9 @@ def main() -> None:
             "automatic_final_rejection_enabled": False,
             "queue_context_join_is_exact_candidate_id_only": True,
             "duplicate_queue_or_result_ids_fail_closed": True,
-            "context_miss_does_not_guess": True,
+            "production_context_auto_discovery_enabled": True,
+            "production_context_miss_fails_closed": True,
+            "compact_k_p_aliases_supported": True,
             "reject_rescue_requires_survival_keep": True,
             "maybe_to_fit_requires_core_high_direct_keep": True,
             "rescued_rows_still_require_dce_for_truth": True,
@@ -247,8 +316,6 @@ def main() -> None:
     Path(args.summary).write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     if summary["input_rows"] != summary["output_rows"]:
         raise SystemExit("post-guard row conservation failed")
-    if args.queue and context_misses:
-        raise SystemExit(f"post-guard exact context join failed for {context_misses} result rows")
     print(json.dumps(summary, indent=2, ensure_ascii=False))
 
 

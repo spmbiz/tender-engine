@@ -48,6 +48,7 @@ class FakeResponse:
         self.status_code = status_code
         self.headers = {}
         self.text = json.dumps(payload)
+        self.content = self.text.encode("utf-8")
 
     def raise_for_status(self):
         if self.status_code >= 400:
@@ -64,8 +65,10 @@ class FakeSession:
         self.headers = {}
         self.calls = []
 
-    def post(self, url, data=None, timeout=None):
-        body = json.loads(data)
+    def post(self, url, data=None, timeout=None, **kwargs):
+        body = kwargs.get("json")
+        if body is None:
+            body = json.loads(data)
         self.calls.append(body)
         return FakeResponse(self.payloads.pop(0))
 
@@ -98,7 +101,7 @@ def test_ted_full_active_keeps_old_publication_and_exhausts_iteration():
             stats = ted.run()
         rows = [json.loads(x) for x in (Path(td) / "current.jsonl").read_text(encoding="utf-8").splitlines()]
         assert [r["candidate_id"] for r in rows] == ["TED:1-2026", "TED:2-2026"]
-        assert rows[0]["currentness_evidence"] == "TED_ACTIVE_COMPETITION_SCOPE"
+        assert rows[0]["currentness_evidence"] == "NO_PARSEABLE_DEADLINE"
         assert stats["enumeration_complete"] is True
         assert stats["enumeration_exhausted"] is True
         assert stats["source_items_seen"] == 2

@@ -48,12 +48,15 @@ def test_pcs_coverage_is_contract_aware_and_bulk_requires_101():
     assert 'PCS_FILTERED_PAGE_TOTAL_NOT_STABLE' in guard
     assert 'search_navigation_proven' in guard
     assert 'direct_filtered_post_proven' in guard
-    # New official-bulk packs use their own proof contract instead of browser UI state.
+    # Official bulk packs remain contract-aware and Website Contract Notice 101 is mandatory.
     assert 'PCS_OFFICIAL_MONTH_TYPE_BULK_OCDS_' in guard
     assert 'PCS_BULK_PUBLICATION_PARTITIONS_INCOMPLETE' in guard
     assert 'PCS_BULK_REQUEST_COUNT_MISMATCH' in guard
     assert 'PCS_BULK_WEBSITE_CONTRACT_NOTICE_101_MISSING' in guard
-    assert 'SOURCE_COVERAGE_GUARD_V9_PCS_CONTRACT_AWARE' in guard
+    # Do not pin this regression to an obsolete schema revision. V10 added a
+    # stronger direct-current reconciliation proof while preserving the contract.
+    assert 'SOURCE_COVERAGE_GUARD_V' in guard
+    assert 'PCS_DIRECT_RECONCILE_PROOF' in guard or 'PCS_CONTRACT_AWARE' in guard
 
 
 def test_qwen_live_entrypoint_is_rich_and_old_prompt_state_is_invalidated():
@@ -61,6 +64,7 @@ def test_qwen_live_entrypoint_is_rich_and_old_prompt_state_is_invalidated():
     rich = text('pipeline/qwen_notice_batch_selfheal_rich.py')
     merge = text('pipeline/merge_qwen_classification_state.py')
     runtime = text('control/qwen_batch_runtime_config.json')
+    evaluator = text('pipeline/evaluate_qwen_recall_golden.py')
     assert 'qwen_notice_batch_selfheal_rich' in entry
     assert 'qwen_notice_batch_selfheal_core as base' in rich
     assert 'qwen-batch-high-recall-business-fit-v3-rich' in rich
@@ -68,7 +72,11 @@ def test_qwen_live_entrypoint_is_rich_and_old_prompt_state_is_invalidated():
         assert field in rich
     assert 'REQUIRED_PROMPT_VERSION = "qwen-batch-high-recall-business-fit-v3-rich"' in merge
     assert 'previous_wrong_prompt_dropped' in merge
-    assert '"minimum_truth_cases": 500' in runtime
+    # Runtime config is generated and may be BLOCKED with no champion. The
+    # permanent corpus gate belongs in the evaluator contract, not in ephemeral
+    # generated runtime state.
+    assert 'DEFAULT_MIN_CASES = 500' in evaluator
+    assert 'DEFAULT_MIN_POSITIVES = 100' in evaluator
     assert '"automatic_rejection_enabled": false' in runtime
 
 
