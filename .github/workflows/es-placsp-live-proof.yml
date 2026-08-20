@@ -5,6 +5,10 @@ on:
   push:
     branches: [main]
     paths:
+      - '.github/workflows/es-placsp-live-proof.yml'
+      - 'pipeline/discover_es_placsp_atom_v2.py'
+      - 'pipeline/placsp_atom.py'
+      - 'tests/test_es_placsp_atom_v2.py'
       - 'control/es_placsp_live_trigger.txt'
 
 permissions:
