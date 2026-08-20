@@ -1,14 +1,82 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32397077703,
-  "total_inbox_rows": 0,
-  "dce_authenticity_rows": 0,
-  "portal_counts": {},
-  "status_counts": {},
-  "reason_counts": {},
+  "latest_source_dce_run_id": 32405199717,
+  "total_inbox_rows": 22,
+  "dce_authenticity_rows": 5,
+  "portal_counts": {
+    "GR_KHMDHS": 3,
+    "GENERIC_PUBLIC_PAGE": 2
+  },
+  "status_counts": {
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 4,
+    "UNKNOWN_RETRIEVED_DOCUMENT": 1
+  },
+  "reason_counts": {
+    "NON_AUTHORITATIVE": 5
+  },
   "method_counts": {},
-  "recovery_opportunities": [],
-  "samples_by_reason": {},
+  "recovery_opportunities": [
+    {
+      "portal": "GR_KHMDHS",
+      "blocked": 3,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 3
+      }
+    },
+    {
+      "portal": "GENERIC_PUBLIC_PAGE",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
+      }
+    }
+  ],
+  "samples_by_reason": {
+    "NON_AUTHORITATIVE": [
+      {
+        "candidate_id": "GR-KHMDHS:26PROC019645139",
+        "portal": "GR_KHMDHS",
+        "title": "ΠΡΟΣΚΛΗΣΗ ΕΚΔΗΛΩΣΗΣ ΕΝΔΙΑΦΕΡΟΝΤΟΣ ΓΙΑ ΠΡΟΜΗΘΕΙΑ ΛΑΠΑΡΟΣΚΟΠΙΚΩΝ",
+        "buyer": "ΝΟΜ.ΓΕΝ. ΝΟΣΟΚΟΜΕΙΟ ΚΑΛΑΜΑΤΑΣ",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019645139"
+      },
+      {
+        "candidate_id": "IT-PVL:7bcfe036-8070-4a3e-9ef6-4cfc010bb548",
+        "portal": "GENERIC_PUBLIC_PAGE",
+        "title": "FONDO SPORT E PERIFERIE 2023 - \\\"Intervento di miglioramento e completamento del centro sportivo comunale, sito in c.da Spina\\\", dell'importo complessivo pari ad € 1.175.000,00.",
+        "buyer": "COMUNE DI ARADEO",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/7bcfe036-8070-4a3e-9ef6-4cfc010bb548?ricercaArchivio=false"
+      },
+      {
+        "candidate_id": "GR-KHMDHS:26PROC019646061",
+        "portal": "GR_KHMDHS",
+        "title": "ΠΡΟΜΗΘΕΙΑ ΣΧΟΛΙΚΩΝ ΣΑΚΙΔΙΩΝ ΚΑΙ ΚΑΣΕΤΙΝΩΝ ΓΙΑ ΤΟΥΣ ΜΑΘΗΤΕΣ ΤΗΣ Α ΔΗΜΟΤΙΚΟΥ ΤΟΥ ΔΗΜΟΥ ΤΗΣ ΑΓΙΑΣ ΠΑΡΑΣ",
+        "buyer": "ΔΗΜΟΣ ΑΓΙΑΣ ΠΑΡΑΣΚΕΥΗΣ",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019646061"
+      },
+      {
+        "candidate_id": "IT-PVL:daf4cd38-0093-4b72-8af1-15777fbf24e1",
+        "portal": "GENERIC_PUBLIC_PAGE",
+        "title": "Fornitura di adeguamento del sistema di simulazione sala macchine esistente - Progetto 'Laboratori Accademia', CUP: D94D23002030006,",
+        "buyer": "ACCADEMIA NAUTICA DELL'ADRIATICO",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/daf4cd38-0093-4b72-8af1-15777fbf24e1?ricercaArchivio=false"
+      },
+      {
+        "candidate_id": "GR-KHMDHS:26PROC019646917",
+        "portal": "GR_KHMDHS",
+        "title": "ΑΝΑΔΕΙΞΗ ΑΝΑΔΟΧΟΥ ΠΑΡΟΧΗΣ ΥΠΗΡΕΣΙΩΝ ΚΑΘΑΡΙΟΤΗΤΑΣ",
+        "buyer": "ΠΕΡ.ΓΕΝ. ΝΟΣΟΚΟΜΕΙΟ ΝΟΣΗΜΑΤΩΝ ΘΩΡΑΚΑ ΑΘΗΝΩΝ 'Η ΣΩΤΗΡΙΑ",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019646917"
+      }
+    ]
+  },
   "safety": {
     "diagnostic_only": true,
     "mutates_inbox": false,
