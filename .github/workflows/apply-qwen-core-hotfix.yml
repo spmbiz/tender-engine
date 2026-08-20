@@ -1,0 +1,63 @@
+name: Apply Qwen Core Hotfix
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/qwen_core_hotfix.py'
+      - '.github/workflows/apply-qwen-core-hotfix.yml'
+      - 'control/qwen_core_hotfix_trigger.json'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: apply-qwen-core-hotfix
+  cancel-in-progress: true
+
+jobs:
+  hotfix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply core hotfix
+        run: python tools/qwen_core_hotfix.py
+      - name: Validate
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -F "default: '480'" .github/workflows/qwen-live-classification.yml
+          grep -F -- "- cron: '43 * * * *'" .github/workflows/qwen-live-classification.yml
+          grep -F 'cap=2 if remaining >= 50000' .github/workflows/dce-fanout-v2.yml
+          grep -F 'per_shard=480' .github/workflows/qwen-live-conveyor.yml
+          grep -F "ensure_qwen_running" .github/workflows/qwen-live-conveyor.yml
+      - name: Commit runtime hotfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          paths=(.github/workflows/qwen-live-classification.yml .github/workflows/dce-fanout-v2.yml .github/workflows/qwen-live-conveyor.yml)
+          if git diff --quiet -- "${paths[@]}"; then echo 'Already hotfixed'; exit 0; fi
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add -- "${paths[@]}"
+          git commit -m 'qwen: hotfix core backfill scheduling'
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
+      - name: Kick Qwen guardian
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run qwen-backfill-kick.yml --ref main || true
