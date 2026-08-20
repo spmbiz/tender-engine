@@ -1,0 +1,99 @@
+name: Qwen Runtime Doctor
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qwen-runtime-doctor.yml'
+      - 'control/qwen_runtime_doctor_trigger.json'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: qwen-runtime-doctor
+  cancel-in-progress: true
+
+jobs:
+  doctor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - name: Capture Qwen and DCE runtime state
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/qwen-doctor
+          gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 20 \
+            --json databaseId,status,conclusion,createdAt,updatedAt,event,headSha,url > /tmp/qwen-doctor/qwen-runs.json
+          gh run list --repo "$REPO" --workflow dce-fanout-v2.yml --limit 20 \
+            --json databaseId,status,conclusion,createdAt,updatedAt,event,headSha,url > /tmp/qwen-doctor/dce-runs.json
+
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          repo=os.environ['REPO']
+          qwen=json.load(open('/tmp/qwen-doctor/qwen-runs.json'))
+          details=[]
+          for r in qwen[:8]:
+              rid=r['databaseId']
+              p=subprocess.run(['gh','api',f'repos/{repo}/actions/runs/{rid}/jobs?per_page=100'],text=True,capture_output=True)
+              try: jobs=json.loads(p.stdout).get('jobs',[]) if p.returncode==0 else []
+              except Exception: jobs=[]
+              details.append({
+                  **r,
+                  'jobs':[{
+                      'id':j.get('id'),'name':j.get('name'),'status':j.get('status'),'conclusion':j.get('conclusion'),
+                      'started_at':j.get('started_at'),'completed_at':j.get('completed_at')
+                  } for j in jobs]
+              })
+          dce=json.load(open('/tmp/qwen-doctor/dce-runs.json'))
+          summary={}
+          try: summary=json.load(open('control/qwen_live/classification_summary.json'))
+          except Exception: pass
+          release={}
+          p=subprocess.run(['gh','release','view','qwen-classification-state-latest','--repo',repo,'--json','body,name,publishedAt,tagName,assets'],text=True,capture_output=True)
+          if p.returncode==0:
+              try:
+                  raw=json.loads(p.stdout)
+                  release={k:raw.get(k) for k in ('body','name','publishedAt','tagName')}
+                  release['assets']=[a.get('name') for a in raw.get('assets',[])]
+              except Exception: release={'error':'parse-failed'}
+          else: release={'error':p.stderr[-1000:]}
+          out={
+              'schema':'QWEN_RUNTIME_HEALTH_V1',
+              'captured_at':subprocess.check_output(['date','-u','+%Y-%m-%dT%H:%M:%SZ'],text=True).strip(),
+              'durable_summary':summary,
+              'qwen_runs':details,
+              'dce_runs':dce,
+              'qwen_state_release':release,
+          }
+          Path('/tmp/qwen-doctor/runtime_health.json').write_text(json.dumps(out,indent=2,sort_keys=True),encoding='utf-8')
+          PY
+
+      - name: Persist doctor report transactionally
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          path='control/qwen_live/runtime_health.json'
+          content="$(base64 -w0 /tmp/qwen-doctor/runtime_health.json)"
+          for attempt in 1 2 3 4 5; do
+            sha="$(gh api "repos/$REPO/contents/$path?ref=main" --jq '.sha' 2>/dev/null || true)"
+            args=(--method PUT "repos/$REPO/contents/$path" -f message="qwen: publish runtime doctor ${GITHUB_RUN_ID}" -f content="$content" -f branch=main)
+            [ -n "$sha" ] && args+=(-f sha="$sha")
+            if gh api "${args[@]}" >/dev/null; then exit 0; fi
+            sleep "$((attempt*2))"
+          done
+          exit 1
