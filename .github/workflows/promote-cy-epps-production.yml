@@ -1,0 +1,86 @@
+name: Promote Cyprus ePPS Production
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Cyprus Public CfT Workspaces Full Proof']
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - 'control/cy_epps_production_promote_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4
+      - name: Require green Cyprus full current proof
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('control/cy_epps_full_current_proof.json'))
+          assert p.get('schema')=='CY_EPPS_FULL_CURRENT_UNIVERSE_PROOF_V1',p
+          assert p.get('pass') is True,p
+          assert p.get('exact_transport_reconciliation') is True,p
+          assert p.get('currentness_complete') is True,p
+          assert p.get('enumeration_complete') is True,p
+          assert p.get('live_coverage_credit_allowed') is True,p
+          assert int(p.get('unknown_currentness') or 0)==0,p
+          PY
+      - name: Validate proof-backed incremental production adapter
+        env:
+          DISCOVERY_OUT: cy-production-smoke
+          CY_EPPS_BASELINE_MAX_AGE_HOURS: '240'
+          CY_EPPS_DELTA_MAX_PAGES: '120'
+          CY_EPPS_DELTA_PAGE_DELAY_SECONDS: '0.12'
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -m py_compile pipeline/github_release_cache.py pipeline/discover_cy_epps_published_global.py pipeline/discover_cy_epps_published_global_v2.py pipeline/discover_cy_epps_published_global_v3.py pipeline/resolve_cy_epps_workspaces.py pipeline/discover_cy_epps_production.py
+          python pipeline/discover_cy_epps_production.py
+          python - <<'PY'
+          import json
+          s=json.load(open('cy-production-smoke/stats.json'))
+          assert s.get('listing_contract')=='CY_EPPS_PROVEN_FULL_BASELINE_PLUS_PUBLISHED_DELTA_V2',s
+          assert s.get('enumeration_complete') is True,s
+          assert s.get('live_coverage_credit_allowed') is True,s
+          assert int(s.get('unknown_currentness') or 0)==0,s
+          assert not (s.get('errors') or []),s
+          assert int(s.get('current_materialized') or 0)>0,s
+          PY
+      - name: Preserve legacy ePPS adapter and dispatch Cyprus to proven production lane
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          old=Path('pipeline/discover_epps_public.py')
+          legacy=Path('pipeline/discover_epps_public_legacy.py')
+          if not legacy.exists():
+              legacy.write_text(old.read_text())
+          old.write_text('''from __future__ import annotations\n\nimport os\n\ndef main() -> None:\n    market=os.getenv("MARKET", "").strip().upper()\n    if market == "CYPRUS_EPPS":\n        try:\n            from pipeline.discover_cy_epps_production import main as cy_main\n        except ModuleNotFoundError:\n            from discover_cy_epps_production import main as cy_main\n        cy_main()\n        return\n    try:\n        from pipeline.discover_epps_public_legacy import main as legacy_main\n    except ModuleNotFoundError:\n        from discover_epps_public_legacy import main as legacy_main\n    legacy_main()\n\nif __name__ == "__main__":\n    main()\n''')
+          PY
+          python -m py_compile pipeline/discover_epps_public.py pipeline/discover_epps_public_legacy.py pipeline/discover_cy_epps_production.py
+      - name: Commit stable Cyprus dispatch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add pipeline/discover_epps_public.py pipeline/discover_epps_public_legacy.py
+          git diff --cached --quiet && exit 0
+          git commit -m 'cy: promote proof-backed national Published plus CfT production lane'
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
