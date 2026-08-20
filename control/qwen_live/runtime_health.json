@@ -1,14 +1,24 @@
 {
-  "captured_at": "2026-08-20T10:11:47Z",
+  "captured_at": "2026-08-20T11:06:51Z",
   "dce_runs": [
     {
-      "conclusion": "",
+      "conclusion": "success",
+      "createdAt": "2026-08-20T11:00:52Z",
+      "databaseId": 32361728556,
+      "event": "workflow_dispatch",
+      "headSha": "680d49854d57c1ca79b4c3275dfcf2dc50ad463b",
+      "status": "completed",
+      "updatedAt": "2026-08-20T11:03:19Z",
+      "url": "https://github.com/walidgdg1-ai/tender-engine/actions/runs/32361728556"
+    },
+    {
+      "conclusion": "failure",
       "createdAt": "2026-08-20T10:05:40Z",
       "databaseId": 32357205269,
       "event": "workflow_dispatch",
       "headSha": "fda47b345bfec7ca8765a349c3145d06934d1b09",
-      "status": "queued",
-      "updatedAt": "2026-08-20T10:06:29Z",
+      "status": "completed",
+      "updatedAt": "2026-08-20T10:55:50Z",
       "url": "https://github.com/walidgdg1-ai/tender-engine/actions/runs/32357205269"
     },
     {
@@ -190,16 +200,6 @@
       "status": "completed",
       "updatedAt": "2026-08-20T01:00:44Z",
       "url": "https://github.com/walidgdg1-ai/tender-engine/actions/runs/32319380633"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-08-20T00:52:14Z",
-      "databaseId": 32318928852,
-      "event": "workflow_dispatch",
-      "headSha": "ebb7b57b6f635353ba32ec33b557ffa087a96f43",
-      "status": "completed",
-      "updatedAt": "2026-08-20T01:06:22Z",
-      "url": "https://github.com/walidgdg1-ai/tender-engine/actions/runs/32318928852"
     }
   ],
   "durable_summary": {
@@ -231,6 +231,17 @@
     "target_classifier_version": "qwen3-4b-q4km-batch-selfheal-v1"
   },
   "qwen_runs": [
+    {
+      "conclusion": "",
+      "createdAt": "2026-08-20T11:01:02Z",
+      "databaseId": 32361742115,
+      "event": "push",
+      "headSha": "f12f5cf75e3222dad5bbc7b624dd464764e6daa1",
+      "jobs": [],
+      "status": "pending",
+      "updatedAt": "2026-08-20T11:01:03Z",
+      "url": "https://github.com/walidgdg1-ai/tender-engine/actions/runs/32361742115"
+    },
     {
       "conclusion": "",
       "createdAt": "2026-08-20T10:05:17Z",
@@ -562,42 +573,6 @@
       "status": "completed",
       "updatedAt": "2026-08-20T07:58:27Z",
       "url": "https://github.com/walidgdg1-ai/tender-engine/actions/runs/32343967836"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-08-20T05:20:58Z",
-      "databaseId": 32335259801,
-      "event": "workflow_run",
-      "headSha": "7db605f78f6f9ccb2799f6c4d186912ee532fdb8",
-      "jobs": [
-        {
-          "completed_at": "2026-08-20T06:25:49Z",
-          "conclusion": "success",
-          "id": 96335571985,
-          "name": "plan",
-          "started_at": "2026-08-20T06:25:07Z",
-          "status": "completed"
-        },
-        {
-          "completed_at": "2026-08-20T07:55:43Z",
-          "conclusion": "success",
-          "id": 96335725957,
-          "name": "classify (0, 001)",
-          "started_at": "2026-08-20T06:25:53Z",
-          "status": "completed"
-        },
-        {
-          "completed_at": "2026-08-20T07:56:28Z",
-          "conclusion": "success",
-          "id": 96355656490,
-          "name": "aggregate",
-          "started_at": "2026-08-20T07:55:47Z",
-          "status": "completed"
-        }
-      ],
-      "status": "completed",
-      "updatedAt": "2026-08-20T07:56:29Z",
-      "url": "https://github.com/walidgdg1-ai/tender-engine/actions/runs/32335259801"
     }
   ],
   "qwen_state_release": {
