@@ -1,0 +1,212 @@
+name: Germany DOE Monthly Shards Proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/de-doe-month-shards-proof.yml'
+      - 'pipeline/discover_de_doe_month_shard.py'
+      - 'pipeline/merge_de_doe_month_shards.py'
+      - 'control/de_doe_month_shards_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      months_csv: ${{ steps.plan.outputs.months_csv }}
+      release_tag: ${{ steps.release.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - id: plan
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from datetime import datetime, timezone
+          y,m=2022,12
+          now=datetime.now(timezone.utc)
+          months=[]
+          while (y,m) <= (now.year,now.month):
+              months.append(f'{y:04d}-{m:02d}')
+              if m==12: y,m=y+1,1
+              else: m+=1
+          print('matrix='+json.dumps({'include':[{'month':x} for x in months]},separators=(',',':')))
+          print('months_csv='+','.join(months))
+          PY
+      - id: release
+        env: {GH_TOKEN: '${{ github.token }}'}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="de-doe-month-shards-${GITHUB_RUN_ID}"
+          gh release create "$tag" --title "Germany DOE monthly shards ${GITHUB_RUN_ID}" --notes "Independent official monthly OCDS ZIP shards from 2022-12 through current month."
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  shard:
+    needs: init
+    name: de-month-${{ matrix.month }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix: ${{ fromJson(needs.init.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests
+      - name: Fetch exact official month
+        id: run
+        env:
+          DE_MONTH: ${{ matrix.month }}
+          DISCOVERY_OUT: month-${{ matrix.month }}
+          DE_DOE_RETRIES: '6'
+        shell: bash
+        run: |
+          set +e
+          python pipeline/discover_de_doe_month_shard.py
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Persist month durably in Release
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "month-${{ matrix.month }}/stats.json"
+          tar -czf "de-doe-month-${{ matrix.month }}.tar.gz" "month-${{ matrix.month }}"
+          gh release upload "$RELEASE_TAG" "de-doe-month-${{ matrix.month }}.tar.gz" --clobber
+      - name: Enforce month verdict
+        if: always()
+        env:
+          RUN_RC: ${{ steps.run.outputs.rc }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          p=json.load(open('month-${{ matrix.month }}/stats.json'))
+          try: rc=int(os.environ.get('RUN_RC') or 999)
+          except Exception: rc=999
+          ok=bool(rc==0 and p.get('enumeration_complete') is True and not (p.get('errors') or []) and p.get('month')=='${{ matrix.month }}')
+          raise SystemExit(0 if ok else 3)
+          PY
+
+  merge:
+    needs: [init, shard]
+    if: always() && needs.init.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Download every durable month shard
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p downloads de-shards
+          gh release download "$RELEASE_TAG" --pattern 'de-doe-month-*.tar.gz' --dir downloads
+          count=0
+          for archive in downloads/de-doe-month-*.tar.gz; do
+            [ -e "$archive" ] || continue
+            tar -xzf "$archive" -C de-shards
+            count=$((count+1))
+          done
+          echo "downloaded_month_shards=$count"
+      - name: Merge exact month manifest and build verdict
+        id: merge
+        env:
+          EXPECTED_MONTHS: ${{ needs.init.outputs.months_csv }}
+          RELEASE_TAG: ${{ needs.init.outputs.release_tag }}
+        shell: bash
+        run: |
+          set +e
+          python pipeline/merge_de_doe_month_shards.py --root de-shards --output de-merged --expected-months "$EXPECTED_MONTHS"
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('de-merged/stats.json')
+          s=json.loads(p.read_text()) if p.exists() else {}
+          try: rc=int('${{ steps.merge.outputs.rc }}')
+          except Exception: rc=999
+          # The shell-step output is not available inside its own body, so derive
+          # final pass from the merged stats and let the next step enforce it.
+          passed=bool(
+              s.get('listing_contract')=='DE_DOE_OFFICIAL_MONTHLY_OCDS_SHARDED_V2'
+              and s.get('months_requested')==s.get('months_completed')
+              and s.get('publication_window_enumeration_complete') is True
+              and s.get('enumeration_complete') is True
+              and s.get('live_coverage_credit_allowed') is True
+              and not (s.get('errors') or [])
+              and int(s.get('current_materialized') or 0)>0
+          )
+          proof={
+              'schema':'DE_DOE_MONTH_SHARDS_FULL_PROOF_V2',
+              'release_tag':os.environ.get('RELEASE_TAG'),
+              'listing_contract':s.get('listing_contract'),
+              'first_official_month':s.get('first_official_month'),
+              'last_requested_month':s.get('last_requested_month'),
+              'months_requested':s.get('months_requested'),
+              'months_completed':s.get('months_completed'),
+              'source_releases_seen_sum':s.get('source_releases_seen_sum'),
+              'raw_materialized':s.get('raw_materialized'),
+              'current_materialized':s.get('current_materialized'),
+              'enumeration_complete':s.get('enumeration_complete'),
+              'live_coverage_credit_allowed':s.get('live_coverage_credit_allowed'),
+              'errors':s.get('errors') or [],
+              'pass':passed,
+          }
+          Path('control/de_doe_month_shards_proof.json').write_text(json.dumps(proof,indent=2)+'\n')
+          print(json.dumps(proof,indent=2))
+          PY
+          exit 0
+      - name: Persist merged proof durably
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.init.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f control/de_doe_month_shards_proof.json
+          tar -czf de-doe-month-shards-merged.tar.gz de-merged control/de_doe_month_shards_proof.json
+          gh release upload "$RELEASE_TAG" de-doe-month-shards-merged.tar.gz --clobber
+      - name: Persist compact verdict on main
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f control/de_doe_month_shards_proof.json || printf '%s\n' '{"schema":"DE_DOE_MONTH_SHARDS_WORKFLOW_FAILURE","pass":false}' > control/de_doe_month_shards_proof.json
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add control/de_doe_month_shards_proof.json
+          git diff --cached --quiet || git commit -m "diag: persist Germany monthly-shard proof ${GITHUB_RUN_ID}"
+          if ! git diff HEAD^ --quiet -- control/de_doe_month_shards_proof.json 2>/dev/null; then
+            for i in 1 2 3 4 5; do
+              git pull --rebase origin main && git push origin HEAD:main && break
+              git rebase --abort >/dev/null 2>&1 || true
+              sleep $((i*2))
+            done
+          fi
+      - name: Enforce full proof
+        if: always()
+        run: python -c "import json; p=json.load(open('control/de_doe_month_shards_proof.json')); raise SystemExit(0 if p.get('pass') is True else 3)"
