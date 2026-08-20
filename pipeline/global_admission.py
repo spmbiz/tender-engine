@@ -5,6 +5,7 @@ import os
 import urllib.parse
 import urllib.request
 from collections import Counter
+from pathlib import Path
 
 API = "https://api.github.com"
 GLOBAL_REPO = "walidgdg1-ai/evergreenleadminer"
@@ -20,7 +21,7 @@ DEFAULT_POLICY = {
 
 
 def _request(url: str):
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/2.1"})
+    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/2.2"})
     tok = os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")
     if tok:
         req.add_header("Authorization", f"Bearer {tok}")
@@ -57,12 +58,7 @@ def _classify(repo: str, name: str, path: str) -> str:
 
 
 def _per_page(url: str, n: int = 100) -> str:
-    """Return a GitHub REST URL with an explicit high first-page bound.
-
-    Current workflow designs stay below 100 jobs/run. Raising the bound from the
-    GitHub default/30 prevents silent under-counting as the number of independent
-    tender lanes grows. We still fail conservative at the physical account cap.
-    """
+    """Return a GitHub REST URL with an explicit high first-page bound."""
     if not url:
         return url
     parts = urllib.parse.urlsplit(url)
@@ -147,11 +143,7 @@ def _spm_curated_fast_lane() -> bool:
 
 
 def _qwen_live_streaming_lane() -> bool:
-    """Identify Qwen work for observability only.
-
-    Qwen remains normal Tender work. It can use idle Tender burst capacity but
-    never bypasses sibling reservations or physical hosted-runner capacity.
-    """
+    """Identify Qwen-related work for observability."""
     flag = str(os.getenv("DCE_QWEN_LIVE_STREAMING_LANE") or "").strip().lower()
     if flag in {"1", "true", "yes"}:
         return True
@@ -161,17 +153,83 @@ def _qwen_live_streaming_lane() -> bool:
     return "qwen live notice classification" in workflow
 
 
+def _semantic_qwen_lane() -> bool:
+    """True only for the semantic notice-classification workers themselves."""
+    workflow = str(os.getenv("GITHUB_WORKFLOW") or "").strip().lower()
+    return "qwen live notice classification" in workflow
+
+
+def _dce_lane() -> bool:
+    if _semantic_qwen_lane():
+        return False
+    flag = str(os.getenv("DCE_BACKFILL_CAP_LANE") or "").strip().lower()
+    if flag in {"1", "true", "yes"}:
+        return True
+    workflow = str(os.getenv("GITHUB_WORKFLOW") or "").strip().lower()
+    return "dce" in workflow or bool(_workflow_selection_path())
+
+
+def _qwen_backlog_remaining() -> int:
+    """Read the durable semantic backlog conservatively.
+
+    Local main is preferred because every Tender workflow has it after checkout.
+    The raw-main fallback keeps admission correct for unusual callers. Failure to
+    read the metric returns 0 rather than inventing backlog.
+    """
+    raw = str(os.getenv("QWEN_BACKLOG_REMAINING") or "").strip()
+    if raw:
+        try:
+            return max(0, int(raw))
+        except Exception:
+            pass
+    p = Path("control/qwen_live/classification_summary.json")
+    try:
+        if p.exists():
+            payload = json.loads(p.read_text(encoding="utf-8"))
+            return max(0, int(payload.get("remaining_classification_queue") or 0))
+    except Exception:
+        pass
+    payload = _json(f"https://raw.githubusercontent.com/{TENDER_REPO}/main/control/qwen_live/classification_summary.json", {})
+    try:
+        return max(0, int((payload or {}).get("remaining_classification_queue") or 0))
+    except Exception:
+        return 0
+
+
+def _dce_cap_for_qwen_backlog(remaining: int) -> int:
+    if remaining >= 50_000:
+        return 2
+    if remaining >= 20_000:
+        return 4
+    if remaining >= 5_000:
+        return 6
+    return 10
+
+
 def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     requested = max(0, int(requested))
+    requested_before_backfill_cap = requested
+    qwen_remaining = _qwen_backlog_remaining()
+    dce_backfill_cap = None
+
+    # During the one-time semantic backfill, DCE may keep progressing but cannot
+    # seize the fleet ahead of Qwen. This clamp lives in the shared admission
+    # layer, so forgotten/legacy dispatchers cannot bypass it by requesting 24/60.
+    if _dce_lane() and not _spm_curated_fast_lane():
+        dce_backfill_cap = _dce_cap_for_qwen_backlog(qwen_remaining)
+        requested = min(requested, dce_backfill_cap)
 
     if _controller_preauthorized():
         hard_cap = 20
         allowed = min(requested, hard_cap)
         return allowed, {
             "mode": "controller-preauthorized-budget",
-            "requested": requested,
+            "requested": requested_before_backfill_cap,
+            "requested_after_qwen_backfill_cap": requested,
             "allowed": allowed,
             "hard_cap": hard_cap,
+            "qwen_remaining": qwen_remaining,
+            "dce_backfill_cap": dce_backfill_cap,
             "authority": "fleet_controller",
             "reason": "controller already performed capacity admission; consume only the preapproved budget",
             "preemption": "none; consume only the controller-approved budget",
@@ -182,9 +240,12 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
         allowed = min(requested, hard_cap)
         return allowed, {
             "mode": "disabled-but-physical-hard-cap",
-            "requested": requested,
+            "requested": requested_before_backfill_cap,
+            "requested_after_qwen_backfill_cap": requested,
             "allowed": allowed,
             "hard_cap": hard_cap,
+            "qwen_remaining": qwen_remaining,
+            "dce_backfill_cap": dce_backfill_cap,
         }
 
     policy = _policy()
@@ -231,9 +292,10 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
         return allowed, {
             "mode": "spm-curated-free-slot-fast-lane",
             "capacity": total,
-            "requested": requested,
+            "requested": requested_before_backfill_cap,
             "allowed": allowed,
             "fast_lane_cap": cap,
+            "qwen_remaining": qwen_remaining,
             "active_commitments": dict(active),
             "queued_backlog": dict(queued),
             "active_total": active_total,
@@ -262,9 +324,12 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     report = {
         "mode": "active-slot-fair-share-admission",
         "capacity": total,
-        "requested": requested,
+        "requested": requested_before_backfill_cap,
+        "requested_after_qwen_backfill_cap": requested,
         "allowed": allowed,
-        "sublane": "qwen" if _qwen_live_streaming_lane() else "tender-general",
+        "sublane": "qwen-semantic" if _semantic_qwen_lane() else ("qwen-related" if _qwen_live_streaming_lane() else "tender-general"),
+        "qwen_remaining": qwen_remaining,
+        "dce_backfill_cap": dce_backfill_cap,
         "active_commitments": dict(active),
         "queued_backlog": dict(queued),
         "active_total": active_total,
