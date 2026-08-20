@@ -10,6 +10,7 @@ on:
       - 'queues/spm_rescue_selection_latest.jsonl'
       - 'queues/qwen_live_selection_latest.jsonl'
       - 'control/dce_attempt_ledger.jsonl'
+      - 'control/qwen_live/classification_summary.json'
       - 'pipeline/authority_conflicts.py'
       - 'pipeline/auto_adjudicate_dce.py'
       - 'pipeline/materialize_dce_selection.py'
@@ -32,9 +33,47 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - id: semantic
+        name: Resolve semantic-backfill DCE budget
+        shell: bash
+        run: |
+          set -euo pipefail
+          read -r remaining cap jobs_cap < <(python - <<'PY'
+          import json
+          from pathlib import Path
+          remaining=0
+          p=Path('control/qwen_live/classification_summary.json')
+          try:
+              remaining=max(0,int(json.loads(p.read_text(encoding='utf-8')).get('remaining_classification_queue') or 0))
+          except Exception:
+              pass
+          if remaining >= 50000:
+              cap,jobs=2,4
+          elif remaining >= 20000:
+              cap,jobs=4,16
+          elif remaining >= 5000:
+              cap,jobs=6,48
+          elif remaining > 0:
+              cap,jobs=10,80
+          else:
+              cap,jobs=20,160
+          print(remaining,cap,jobs)
+          PY
+          )
+          echo "remaining=$remaining" >> "$GITHUB_OUTPUT"
+          echo "parallel_cap=$cap" >> "$GITHUB_OUTPUT"
+          echo "jobs_cap=$jobs_cap" >> "$GITHUB_OUTPUT"
+          echo "Semantic backlog=$remaining => DCE parallel cap=$cap jobs cap=$jobs_cap"
+
       - name: Dispatch freshest unseen DCE work when fleet is free
         env:
           GH_TOKEN: ${{ github.token }}
+          DCE_BACKFILL_PARALLEL_CAP: ${{ steps.semantic.outputs.parallel_cap }}
+          DCE_BACKFILL_JOBS_CAP: ${{ steps.semantic.outputs.jobs_cap }}
         shell: bash
         run: |
           set -euo pipefail
@@ -73,7 +112,6 @@ jobs:
               gh workflow run dce-progress-ledger.yml --ref main -f dce_run_id="$latest_durable"
               exit 0
             fi
-            echo "Latest durable DCE run is fully represented in the exact-version ledger. Anti-repeat barrier passed."
           fi
 
           source_run_for() {
@@ -94,10 +132,7 @@ jobs:
 
           rescue='queues/spm_rescue_selection_latest.jsonl'
           qwen='queues/qwen_live_selection_latest.jsonl'
-          rescue_run=''
-          qwen_run=''
-          rescue_unseen=0
-          qwen_unseen=0
+          rescue_run=''; qwen_run=''; rescue_unseen=0; qwen_unseen=0
           if [ -s "$rescue" ]; then
             rescue_run="$(source_run_for "$rescue")"
             rescue_unseen="$(unseen_for "$rescue")"
@@ -106,33 +141,19 @@ jobs:
             qwen_run="$(source_run_for "$qwen")"
             qwen_unseen="$(unseen_for "$qwen")"
           fi
-
           echo "Unseen queue state: qwen=$qwen_unseen rescue=$rescue_unseen"
 
-          path=''
-          unseen=0
-          max_jobs=0
-          reason=''
-
+          path=''; unseen=0; max_jobs=0; reason=''
           if [ "$qwen_unseen" -gt 0 ] && [[ "$qwen_run" =~ ^[0-9]+$ ]]; then
             if [ "$rescue_unseen" -eq 0 ] || ! [[ "$rescue_run" =~ ^[0-9]+$ ]] || [ "$qwen_run" -ge "$rescue_run" ]; then
-              path="$qwen"
-              unseen="$qwen_unseen"
-              max_jobs=160
-              reason="fresh-qwen-unseen-first"
+              path="$qwen"; unseen="$qwen_unseen"; max_jobs=160; reason="fresh-qwen-unseen-first"
             fi
           fi
           if [ -z "$path" ] && [ "$rescue_unseen" -gt 0 ]; then
-            path="$rescue"
-            unseen="$rescue_unseen"
-            max_jobs=60
-            reason="curated-rescue-unseen-fallback"
+            path="$rescue"; unseen="$rescue_unseen"; max_jobs=60; reason="curated-rescue-unseen-fallback"
           fi
           if [ -z "$path" ] && [ "$qwen_unseen" -gt 0 ]; then
-            path="$qwen"
-            unseen="$qwen_unseen"
-            max_jobs=160
-            reason="qwen-unseen-fallback"
+            path="$qwen"; unseen="$qwen_unseen"; max_jobs=160; reason="qwen-unseen-fallback"
           fi
           if [ -z "$path" ]; then
             echo 'No unseen persisted DCE work. Waiting for the next Qwen/live selection refresh.'
@@ -144,16 +165,19 @@ jobs:
           rows="$(grep -cve '^\s*$' "$path" || true)"
           jobs="$unseen"
           if [ "$jobs" -gt "$max_jobs" ]; then jobs="$max_jobs"; fi
+          if [ "$jobs" -gt "$DCE_BACKFILL_JOBS_CAP" ]; then jobs="$DCE_BACKFILL_JOBS_CAP"; fi
           if [ "$jobs" -lt 1 ]; then exit 0; fi
 
-          dce_parallel="$(DCE_SELECTION_PATH="$path" python - <<'PYADMIT'
+          dce_parallel="$(DCE_SELECTION_PATH="$path" REQUESTED_CAP="$DCE_BACKFILL_PARALLEL_CAP" python - <<'PYADMIT'
+          import os
           from pipeline.global_admission import dynamic_tender_parallel
-          allowed,_=dynamic_tender_parallel(60)
-          print(allowed)
+          cap=max(1,int(os.environ.get('REQUESTED_CAP') or 2))
+          allowed,_=dynamic_tender_parallel(cap)
+          print(max(0,min(cap,int(allowed))))
           PYADMIT
           )"
           if [ "${dce_parallel:-0}" -le 0 ]; then
-            echo "No shared Tender capacity available; persisted unseen DCE work remains queued for the next drainer tick."
+            echo "No shared Tender capacity available; persisted unseen DCE work remains queued."
             exit 0
           fi
 
@@ -164,4 +188,4 @@ jobs:
             -f max_parallel="$dce_parallel" \
             -f max_shards=80 \
             -f jobs_per_shard=0
-          echo "Dispatched $jobs unseen candidate versions from $path (rows=$rows unseen=$unseen source=$source_run policy=$reason shared_tender_parallel=$dce_parallel)."
+          echo "Dispatched $jobs unseen versions from $path (policy=$reason parallel=$dce_parallel semantic_backlog=${{ steps.semantic.outputs.remaining }})."
