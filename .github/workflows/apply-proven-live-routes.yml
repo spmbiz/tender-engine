@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/apply-proven-live-routes.yml'
+      - 'control/apply_proven_live_routes_trigger.txt'
 
 permissions:
   contents: write
@@ -62,7 +63,6 @@ jobs:
                   s=s.replace(old,new,1)
               elif new not in s:
                   raise SystemExit(f'global route marker missing: {old}')
-          # Assert already-correct routes rather than rewriting them.
           required=(
               'UK_PCS_OCDS) python pipeline/discover_uk_pcs_current.py ;;',
               'ZA_ETENDERS_OCDS) if [ "$DISCOVERY_MODE" = reconcile ]; then days=365; pages=80; else days=90; pages=20; fi; python pipeline/discover_za_etenders_ocds.py',
