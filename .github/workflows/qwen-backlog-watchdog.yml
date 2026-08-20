@@ -1,0 +1,122 @@
+name: Qwen Backlog Watchdog
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Qwen Live Notice Classification", "Qwen Live Continuous Conveyor"]
+    types: [completed]
+  schedule:
+    - cron: '*/5 * * * *'
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: qwen-backlog-watchdog
+  cancel-in-progress: true
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - id: inspect
+        name: Inspect durable backlog and semantic-lane liveness
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Read the durable summary from main, never from the event checkout.
+          summary_json="$(gh api "repos/${REPO}/contents/control/qwen_live/classification_summary.json?ref=main" --jq '.content' 2>/dev/null | tr -d '\n' | base64 -d 2>/dev/null || true)"
+
+          remaining="$(SUMMARY="$summary_json" python - <<'PY'
+          import json, os
+          raw=os.environ.get('SUMMARY','').strip()
+          if not raw:
+              print('unknown')
+              raise SystemExit
+          try:
+              d=json.loads(raw)
+              v=int(d.get('remaining_classification_queue'))
+              print(max(0,v))
+          except Exception:
+              print('unknown')
+          PY
+          )"
+
+          runs_json="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 50 --json databaseId,status,conclusion,createdAt,updatedAt,url)"
+          active="$(jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length' <<< "$runs_json")"
+          latest_id="$(jq -r 'sort_by(.createdAt) | reverse | .[0].databaseId // empty' <<< "$runs_json")"
+          latest_status="$(jq -r 'sort_by(.createdAt) | reverse | .[0].status // "none"' <<< "$runs_json")"
+          latest_conclusion="$(jq -r 'sort_by(.createdAt) | reverse | .[0].conclusion // "none"' <<< "$runs_json")"
+
+          echo "remaining=$remaining" >> "$GITHUB_OUTPUT"
+          echo "active=$active" >> "$GITHUB_OUTPUT"
+          echo "latest_id=$latest_id" >> "$GITHUB_OUTPUT"
+          echo "latest_status=$latest_status" >> "$GITHUB_OUTPUT"
+          echo "latest_conclusion=$latest_conclusion" >> "$GITHUB_OUTPUT"
+
+          echo "Durable backlog=$remaining; active Qwen generations=$active; latest=$latest_id/$latest_status/$latest_conclusion"
+
+      - name: Restart Qwen when backlog is non-empty and semantic lane is dead
+        if: steps.inspect.outputs.active == '0' && steps.inspect.outputs.remaining != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          REMAINING: ${{ steps.inspect.outputs.remaining }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Fail open on a missing/corrupt summary: the classification planner is
+          # authoritative and safely no-ops when the exact-hash queue is empty.
+          # Re-check immediately before dispatch so overlapping triggers cannot
+          # create a semantic-run storm.
+          active_now="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length')"
+          if [ "$active_now" -ne 0 ]; then
+            echo "Qwen became active during watchdog inspection; refusing duplicate dispatch."
+            exit 0
+          fi
+
+          gh workflow run qwen-live-classification.yml --repo "$REPO" --ref main \
+            -f per_shard=480 \
+            -f auto_continue=true \
+            -f dce_limit=160
+
+          echo "Qwen watchdog dispatched a fresh 480-row semantic generation; durable remaining=${REMAINING}."
+
+      - name: Confirm wake-up became visible
+        if: steps.inspect.outputs.active == '0' && steps.inspect.outputs.remaining != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for _ in $(seq 1 12); do
+            active="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 20 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length')"
+            if [ "$active" -gt 0 ]; then
+              echo "Wake-up confirmed: $active Qwen generation(s) queued or active."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Watchdog dispatch was not visible after 60s; fail loudly so the watchdog itself cannot look healthy while Qwen is dead." >&2
+          exit 1
+
+      - name: Watchdog summary
+        if: always()
+        run: |
+          echo '### Qwen backlog watchdog' >> "$GITHUB_STEP_SUMMARY"
+          echo "- durable remaining: ${{ steps.inspect.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- active generations before action: ${{ steps.inspect.outputs.active }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- latest observed run: ${{ steps.inspect.outputs.latest_id }} / ${{ steps.inspect.outputs.latest_status }} / ${{ steps.inspect.outputs.latest_conclusion }}" >> "$GITHUB_STEP_SUMMARY"
