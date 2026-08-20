@@ -1,17 +1,17 @@
 {
   "schema": "NOTICE_CLASSIFICATION_STATE_MERGE_SUMMARY_V5_REQUEUE_SAFE",
-  "generated_at": "2026-08-20T23:19:55+00:00",
+  "generated_at": "2026-08-20T23:45:38+00:00",
   "target_classifier_version": "qwen3-4b-q4km-batch-selfheal-v1",
   "required_classifier_prompt_version": "qwen-batch-high-recall-business-fit-v3-rich",
   "required_business_calibration_version": "spm-business-fit-v2",
   "ledger_notices": 126459,
   "snapshot_context_rows": 126459,
   "previous_state_rows": 19381,
-  "result_rows_seen": 0,
-  "state_rows_after_merge": 19344,
+  "result_rows_seen": 192,
+  "state_rows_after_merge": 19479,
   "input_queue_rows": 98632,
-  "remaining_classification_queue": 98632,
-  "classified_fraction_of_ledger": 0.15296657,
+  "remaining_classification_queue": 98497,
+  "classified_fraction_of_ledger": 0.15403411,
   "legacy_guard_drift_requeue_ids": [
     "CA:W6431-260232/A",
     "DE-DOE:25724734:1",
@@ -68,12 +68,10 @@
     "TED:240150-2024",
     "TED:388104-2026",
     "TED:514512-2026",
-    "TED:771128-2025",
     "US-SAM:13a23f99b58f42db9bd05eba406452e1",
     "US-SAM:15cdfd8229db46dfbf7026b9e6adc1c5",
     "US-SAM:1aacfb2c5ee44675adfc8af842b0aacd",
     "US-SAM:2a75a999cab14f0c880ecffee7a2cac2",
-    "US-SAM:2eb71b4cc17948c0aae4d4a22f4476e5",
     "US-SAM:3565414a87e74dc6983cb126e7ea3207",
     "US-SAM:419d54e48c8445458813e7358fa7735a",
     "US-SAM:428b7fd3cc6148c39e0bdb1b2c93ee3b",
@@ -88,7 +86,6 @@
     "US-SAM:863b0b20ce19406aab9dc6be4acce8cf",
     "US-SAM:86cf1f7f849940fba7ceb7f9aaf3692a",
     "US-SAM:9447bbf6cb8b48cc87e0c623a83c3cd7",
-    "US-SAM:9d4976b073874efb973fc83fb1630ab7",
     "US-SAM:a21ca6e97de84eaaa9f957845df09dce",
     "US-SAM:b53a06ef890b46dbacbaac237ee18b51",
     "US-SAM:bb54981f2363441ba7335f3bb41744b5",
@@ -125,9 +122,6 @@
     "TED:514512-2026": [
       "legacy_exact_context_guard_drift"
     ],
-    "TED:771128-2025": [
-      "legacy_exact_context_guard_drift"
-    ],
     "US-SAM:13a23f99b58f42db9bd05eba406452e1": [
       "legacy_exact_context_guard_drift"
     ],
@@ -138,9 +132,6 @@
       "legacy_exact_context_guard_drift"
     ],
     "US-SAM:2a75a999cab14f0c880ecffee7a2cac2": [
-      "legacy_exact_context_guard_drift"
-    ],
-    "US-SAM:2eb71b4cc17948c0aae4d4a22f4476e5": [
       "legacy_exact_context_guard_drift"
     ],
     "US-SAM:3565414a87e74dc6983cb126e7ea3207": [
@@ -185,9 +176,6 @@
     "US-SAM:9447bbf6cb8b48cc87e0c623a83c3cd7": [
       "legacy_exact_context_guard_drift"
     ],
-    "US-SAM:9d4976b073874efb973fc83fb1630ab7": [
-      "legacy_exact_context_guard_drift"
-    ],
     "US-SAM:a21ca6e97de84eaaa9f957845df09dce": [
       "legacy_exact_context_guard_drift"
     ],
@@ -217,9 +205,14 @@
     "previous_legacy_guard_audited": 19381,
     "previous_legacy_guard_semantically_current": 19344,
     "previous_missing_exact_post_guard_provenance": 19381,
-    "queue_remaining": 98632
+    "queue_already_classified": 135,
+    "queue_remaining": 98497,
+    "results_accepted": 135,
+    "valid_result_rows": 135
   },
-  "rejected_result_reasons": {},
+  "rejected_result_reasons": {
+    "parse_or_fallback_error": 57
+  },
   "safety": {
     "exact_material_hash_required": true,
     "exact_prompt_version_required": true,
