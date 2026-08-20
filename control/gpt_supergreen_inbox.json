@@ -1,6 +1,6 @@
 {
   "schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
-  "updated_at": "2026-08-20T05:55:58.743878+00:00",
+  "updated_at": "2026-08-20T05:57:06.944900+00:00",
   "latest_source_dce_run_id": 32336420165,
   "review_queue": [
     {
@@ -2565,6 +2565,96 @@
         "dce_run_id": 32336420165,
         "shard": 7,
         "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20317429",
+        "release_tag": null
+      },
+      "upstream_review_lane": "SPM_PRIORITY",
+      "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
+    },
+    {
+      "candidate_id": "IT-PVL:66f95a3f-5d1f-4245-a90a-7f996d241d4f",
+      "title": "Procedura aperta per l’affidamento del Servizio di trasporto di prodotti biologici per le esigenze dell’Azienda Ospedaliera S. Camillo – Forlanini, ivi compresa la CATENA DI CUSTODIA per accertamenti tossicologici articolo 186 e 187 c.p. e omicidi stradali legge 41/2016 per un periodo di 2 anni, a decorrere dal 01/02/2027, per un importo biennale a base d’asta pari a € 150.000,00 + IVA.",
+      "buyer": "AZIENDA OSPEDALIERA SAN CAMILLO FORLANINI",
+      "portal": "GENERIC_PUBLIC_PAGE",
+      "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/66f95a3f-5d1f-4245-a90a-7f996d241d4f?ricercaArchivio=false",
+      "deadline": "2026-09-30T07:00:00+00:00",
+      "estimated_value": 180000.0,
+      "currency": "EUR",
+      "preliminary_score": 80,
+      "priority_score": 80,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-09-30T07:00:00+00:00",
+        "notice_deadline_date": "2026-09-30",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 2,
+          "unique_contexts": 2
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 1,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [
+          {
+            "text": "rtale Internet Portale Internet Punto di erogazione dei servizi web per gli utenti esterni ANAC Servizi ANAC Servizi ANAC Nucleo centralizzato di servizi che contengono la logica di Business dell’Autorità. PVL Pubblicità a valore legale Tabella 1 - Definizioni e acronimi 2 Obiettivo del documento Il presente documento contiene le informazioni necessarie al corretto utilizzo dell’applicazione “Nuova Piattaforma di Pubblicità legale”; la piattaforma attua gli articoli 27,84 e 85 del D.Lgs. 36/2023, secondo quanto disposto dalla delibera ANAC n.236 del 20 giugno 2023. Il nuovo Codice dei contratti pubblici (CCP), istituito con decreto legislativo n. 36 del 31 marzo 2023, che all'articolo 27, “Pubblicità legale degli atti”, assegna la responsabilità della pubblicazione degli atti relativi ai contratti pubblici alla Banca dati nazionale dei contratti pubblici (BDNCP) e assegna ad ANAC la responsabilità di definire le modalità di attuazione (si veda delibera ANAC n. 263 del 23 giugno 2023). Il CCP all’Art. 22 delinea l’Ecosistema nazionale di approvvigionamento digitale (e-procurement), che permetterà la gestione dell’intero ciclo di vita dei contratti. L’Ecosistema è costituito dalle piattaforme e dai servizi digitali in uso alle Stazioni appaltanti, dalla BDNCP e dal",
+            "source": "files/manuale_utente_pvl.pdf",
+            "source_url": "https://pubblicitalegale.anticorruzione.it/assets/manuale_utente_pvl.pdf",
+            "source_sha256": "c88c2434a363dc55007fab6a9a21c0a4035d6cc01dfe07805fed25f8d2017956",
+            "source_kind": "pdf",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 3014,
+            "corpus_end": 4317,
+            "match": "sla"
+          }
+        ],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32336420165,
+      "source_shard": 8,
+      "hot_ready_at": "2026-08-20T05:57:04.625940+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 11,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY",
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "199f37944e9dd5f917a2c6771c1c42a1e1dc133cbd0fb5336aef61b591cfeb17",
+      "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
+      "gpt_priority_score": 11,
+      "upstream_signal": "DCE_REVIEW_READY",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32336420165,
+        "shard": 8,
+        "candidate_id": "IT-PVL:66f95a3f-5d1f-4245-a90a-7f996d241d4f",
         "release_tag": null
       },
       "upstream_review_lane": "SPM_PRIORITY",
@@ -7359,6 +7449,96 @@
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     },
     {
+      "candidate_id": "IT-PVL:66f95a3f-5d1f-4245-a90a-7f996d241d4f",
+      "title": "Procedura aperta per l’affidamento del Servizio di trasporto di prodotti biologici per le esigenze dell’Azienda Ospedaliera S. Camillo – Forlanini, ivi compresa la CATENA DI CUSTODIA per accertamenti tossicologici articolo 186 e 187 c.p. e omicidi stradali legge 41/2016 per un periodo di 2 anni, a decorrere dal 01/02/2027, per un importo biennale a base d’asta pari a € 150.000,00 + IVA.",
+      "buyer": "AZIENDA OSPEDALIERA SAN CAMILLO FORLANINI",
+      "portal": "GENERIC_PUBLIC_PAGE",
+      "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/66f95a3f-5d1f-4245-a90a-7f996d241d4f?ricercaArchivio=false",
+      "deadline": "2026-09-30T07:00:00+00:00",
+      "estimated_value": 180000.0,
+      "currency": "EUR",
+      "preliminary_score": 80,
+      "priority_score": 80,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-09-30T07:00:00+00:00",
+        "notice_deadline_date": "2026-09-30",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 2,
+          "unique_contexts": 2
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 1,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [
+          {
+            "text": "rtale Internet Portale Internet Punto di erogazione dei servizi web per gli utenti esterni ANAC Servizi ANAC Servizi ANAC Nucleo centralizzato di servizi che contengono la logica di Business dell’Autorità. PVL Pubblicità a valore legale Tabella 1 - Definizioni e acronimi 2 Obiettivo del documento Il presente documento contiene le informazioni necessarie al corretto utilizzo dell’applicazione “Nuova Piattaforma di Pubblicità legale”; la piattaforma attua gli articoli 27,84 e 85 del D.Lgs. 36/2023, secondo quanto disposto dalla delibera ANAC n.236 del 20 giugno 2023. Il nuovo Codice dei contratti pubblici (CCP), istituito con decreto legislativo n. 36 del 31 marzo 2023, che all'articolo 27, “Pubblicità legale degli atti”, assegna la responsabilità della pubblicazione degli atti relativi ai contratti pubblici alla Banca dati nazionale dei contratti pubblici (BDNCP) e assegna ad ANAC la responsabilità di definire le modalità di attuazione (si veda delibera ANAC n. 263 del 23 giugno 2023). Il CCP all’Art. 22 delinea l’Ecosistema nazionale di approvvigionamento digitale (e-procurement), che permetterà la gestione dell’intero ciclo di vita dei contratti. L’Ecosistema è costituito dalle piattaforme e dai servizi digitali in uso alle Stazioni appaltanti, dalla BDNCP e dal",
+            "source": "files/manuale_utente_pvl.pdf",
+            "source_url": "https://pubblicitalegale.anticorruzione.it/assets/manuale_utente_pvl.pdf",
+            "source_sha256": "c88c2434a363dc55007fab6a9a21c0a4035d6cc01dfe07805fed25f8d2017956",
+            "source_kind": "pdf",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 3014,
+            "corpus_end": 4317,
+            "match": "sla"
+          }
+        ],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32336420165,
+      "source_shard": 8,
+      "hot_ready_at": "2026-08-20T05:57:04.625940+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 11,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY",
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "199f37944e9dd5f917a2c6771c1c42a1e1dc133cbd0fb5336aef61b591cfeb17",
+      "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
+      "gpt_priority_score": 11,
+      "upstream_signal": "DCE_REVIEW_READY",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32336420165,
+        "shard": 8,
+        "candidate_id": "IT-PVL:66f95a3f-5d1f-4245-a90a-7f996d241d4f",
+        "release_tag": null
+      },
+      "upstream_review_lane": "SPM_PRIORITY",
+      "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
+    },
+    {
       "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_19900324",
       "title": "Consejo de Administración de EMAYA, Empresa Municipal d'Aigües i Clavegueram, S.A.",
       "buyer": null,
@@ -9584,42 +9764,44 @@
     "low_surveillance_target": 20,
     "selected_by_lane": {
       "GPT_PRIORITY": 16,
-      "LOW_PORTAL_SURVEILLANCE": 9
+      "LOW_PORTAL_SURVEILLANCE": 10
     },
     "selected_by_stage": {
-      "BUSINESS_GATES": 25
+      "BUSINESS_GATES": 26
     },
     "selected_by_band": {
       "MAYBE": 1,
       "UNKNOWN": 15,
-      "LOW": 9
+      "LOW": 10
     },
     "selected_by_portal": {
       "TED": 16,
-      "ES_PLACSP": 9
+      "ES_PLACSP": 9,
+      "GENERIC_PUBLIC_PAGE": 1
     }
   },
   "counts": {
-    "pending_gpt_web_review": 25,
+    "pending_gpt_web_review": 26,
     "reviewed_ticks_total": 485,
     "excluded_already_reviewed": 0,
     "excluded_already_in_final_bank": 0,
-    "pending_before_visible_cap": 25,
+    "pending_before_visible_cap": 26,
     "pending_by_stage": {
-      "BUSINESS_GATES": 25
+      "BUSINESS_GATES": 26
     },
     "pending_by_inbox_lane": {
       "GPT_PRIORITY": 16,
-      "LOW_PORTAL_SURVEILLANCE": 9
+      "LOW_PORTAL_SURVEILLANCE": 10
     },
     "pending_by_fit_band": {
       "MAYBE": 1,
       "UNKNOWN": 15,
-      "LOW": 9
+      "LOW": 10
     },
     "pending_by_portal": {
       "TED": 16,
-      "ES_PLACSP": 9
+      "ES_PLACSP": 9,
+      "GENERIC_PUBLIC_PAGE": 1
     }
   },
   "review_contract": "This file is only the visible GPT Web work window. It uses 75% priority, 12.5% DCE-authenticity repair, and 12.5% portal-diverse LOW surveillance with elastic fill. The durable uncapped backlog remains control/gpt_review_index.json; no candidate is deleted by this visible cap.",
