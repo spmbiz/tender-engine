@@ -21,7 +21,7 @@
     "minimum_retrieval_priority": 0,
     "minimum_free_github_slots": 3,
     "latency_policy": {
-      "goal": "prioritize Qwen semantic backfill while preserving a thin continuous DCE lane; automatically restore deeper DCE throughput as classification backlog falls",
+      "goal": "prioritize Qwen semantic backfill while preserving a bounded continuous DCE lane; automatically restore deeper DCE throughput as classification backlog falls",
       "target_candidates_per_batch": 4,
       "expected_github_parallel_slots": 2,
       "target_browser_candidates_per_shard": 2,
@@ -33,7 +33,7 @@
       "previous_batch_gate_ready": 100,
       "previous_runner_minutes_exact": 16.883333,
       "previous_useful_per_runner_minute_exact": 5.923001,
-      "decision": "temporarily_throttle_dce_for_qwen_backfill"
+      "decision": "auto_qwen_backlog_110877_dce_candidates_4"
     }
   },
   "circleci": {
