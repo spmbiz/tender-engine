@@ -1,21 +1,22 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32344996396,
+  "latest_source_dce_run_id": 32349068366,
   "total_inbox_rows": 160,
   "dce_authenticity_rows": 20,
   "portal_counts": {
-    "TED": 4,
-    "GENERIC_PUBLIC_PAGE": 4,
-    "GR_KHMDHS": 4,
     "ES_PLACSP": 3,
+    "GENERIC_PUBLIC_PAGE": 3,
+    "GR_KHMDHS": 3,
+    "TED": 3,
+    "US_SAM": 3,
     "ZA_ETENDERS": 2,
     "CYPRUS_EPPS": 1,
     "DE_DOE": 1,
     "WORLD_BANK": 1
   },
   "status_counts": {
-    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 14,
-    "UNKNOWN_RETRIEVED_DOCUMENT": 6
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 11,
+    "UNKNOWN_RETRIEVED_DOCUMENT": 9
   },
   "reason_counts": {
     "NON_AUTHORITATIVE": 20
@@ -23,31 +24,39 @@
   "method_counts": {},
   "recovery_opportunities": [
     {
-      "portal": "GENERIC_PUBLIC_PAGE",
-      "blocked": 4,
+      "portal": "ES_PLACSP",
+      "blocked": 3,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 4
+        "NON_AUTHORITATIVE": 3
+      }
+    },
+    {
+      "portal": "GENERIC_PUBLIC_PAGE",
+      "blocked": 3,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 3
       }
     },
     {
       "portal": "GR_KHMDHS",
-      "blocked": 4,
+      "blocked": 3,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 4
+        "NON_AUTHORITATIVE": 3
       }
     },
     {
       "portal": "TED",
-      "blocked": 4,
+      "blocked": 3,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 4
+        "NON_AUTHORITATIVE": 3
       }
     },
     {
-      "portal": "ES_PLACSP",
+      "portal": "US_SAM",
       "blocked": 3,
       "likely_public_recovery_target": 0,
       "reason_counts": {
@@ -90,20 +99,20 @@
   "samples_by_reason": {
     "NON_AUTHORITATIVE": [
       {
-        "candidate_id": "TED:578082-2026",
-        "portal": "TED",
-        "title": "Germany – IT services: consulting, software development, Internet and support – SV-KWA-260819-002, Weiterentwicklung Unternehmenswebsite",
-        "buyer": "Stadtwerke München GmbH",
+        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20317238",
+        "portal": "ES_PLACSP",
+        "title": "Gerencia de Sermubeniel, S.A.",
+        "buyer": null,
         "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ted.europa.eu/en/notice/-/detail/578082-2026"
+        "notice_url": "https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&idEvl=hpnx8LahRPQZDGvgaZEVxQ%3D%3D"
       },
       {
-        "candidate_id": "IT-PVL:fcaa4e9e-ce02-46e3-bf3e-f2bc4b6d6188",
+        "candidate_id": "IT-PVL:9bad8803-97fb-4b16-97f6-25a2e6cccd9d",
         "portal": "GENERIC_PUBLIC_PAGE",
-        "title": "FORNITURA DI POLIELETTRLITA",
-        "buyer": "A.C.A. S.P.A. IN HOUSE PROVIDING",
+        "title": "PROCEDURA APERTA PER L’AFFIDAMENTO DEI LAVORI DI “REALIZZAZIONE NUOVA ROTATORIA TRA VIA PIO XII, VIA PIZZO CAMINO E VIA MONTE SABOTINO”",
+        "buyer": "COMUNE DI DALMINE",
         "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/fcaa4e9e-ce02-46e3-bf3e-f2bc4b6d6188?ricercaArchivio=false"
+        "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/9bad8803-97fb-4b16-97f6-25a2e6cccd9d?ricercaArchivio=false"
       },
       {
         "candidate_id": "GR-KHMDHS:26PROC019648392",
@@ -114,20 +123,20 @@
         "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019648392"
       },
       {
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20317238",
-        "portal": "ES_PLACSP",
-        "title": "Gerencia de Sermubeniel, S.A.",
-        "buyer": null,
+        "candidate_id": "TED:578082-2026",
+        "portal": "TED",
+        "title": "Germany – IT services: consulting, software development, Internet and support – SV-KWA-260819-002, Weiterentwicklung Unternehmenswebsite",
+        "buyer": "Stadtwerke München GmbH",
         "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&idEvl=hpnx8LahRPQZDGvgaZEVxQ%3D%3D"
+        "notice_url": "https://ted.europa.eu/en/notice/-/detail/578082-2026"
       },
       {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-163930-2026-07-30",
-        "portal": "ZA_ETENDERS",
-        "title": "RW10414743/25 R",
-        "buyer": "Rand Water",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-163930"
+        "candidate_id": "US-SAM:08a05cf5f1434384b559b7b0c336d24e",
+        "portal": "US_SAM",
+        "title": "AN/BYG-1 Applications",
+        "buyer": "DEPT OF DEFENSE",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://sam.gov/opp/08a05cf5f1434384b559b7b0c336d24e/view"
       }
     ]
   },
