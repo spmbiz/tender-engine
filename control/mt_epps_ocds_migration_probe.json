@@ -1,0 +1,18 @@
+{
+  "schema": "MALTA_EPPS_OCDS_MIGRATION_CONTINUITY_PROBE_V1",
+  "generated_at": "2026-08-20T00:16:21.054294+00:00",
+  "deployment_boundary": "2023-01-16T00:00:00+00:00",
+  "selected_official_base": "https://www.etenders.gov.mt",
+  "manifest_first_month": "2023-01",
+  "manifest_last_month": "2026-08",
+  "january_2023_offered": true,
+  "january_2023_record_count": 3,
+  "predeployment_compiled_records": 0,
+  "predeployment_tender_start_records": 0,
+  "active_across_deployment_records": 0,
+  "active_across_deployment_sample": [],
+  "predeployment_start_sample": [],
+  "errors": [],
+  "pass": false,
+  "semantics": "Read-only continuity probe for the production Malta ePPS OCDS January 2023 record package. It tests whether the first production OCDS package contains tenders whose tender period began before the 16 January 2023 new-ePPS deployment and remained open across that boundary. A positive result demonstrates migration continuity for active legacy procedures; it does not by itself grant full live-universe coverage."
+}
