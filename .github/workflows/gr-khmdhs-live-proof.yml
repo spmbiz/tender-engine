@@ -13,7 +13,7 @@ permissions:
 jobs:
   proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with: {ref: main, fetch-depth: 1, fetch-tags: false}
@@ -30,8 +30,10 @@ jobs:
           DISCOVERY_OUT: gr-live-proof
           GR_FINAL_HORIZON_YEAR: '2028'
           GR_FINAL_WINDOW_DAYS: '180'
-          GR_WORKERS: '2'
-          GR_RETRIES: '5'
+          GR_WORKERS: '1'
+          GR_RETRIES: '7'
+          GR_MIN_REQUEST_INTERVAL_SECONDS: '0.50'
+          GR_MAX_RETRY_AFTER_SECONDS: '90'
         shell: bash
         run: |
           set +e
@@ -54,7 +56,7 @@ jobs:
           except Exception: rc=999
           passed=bool(
               rc==0
-              and s.get('listing_contract')=='GR_KHMDHS_FUTURE_DEADLINE_WINDOWS_V2'
+              and s.get('listing_contract')=='GR_KHMDHS_FUTURE_DEADLINE_WINDOWS_V3_PACED'
               and s.get('enumeration_complete') is True
               and s.get('enumeration_exhausted') is True
               and s.get('live_coverage_credit_allowed') is True
@@ -63,13 +65,16 @@ jobs:
               and int(s.get('current_materialized') or 0)>0
           )
           proof={
-              'schema':'GR_KHMDHS_FUTURE_DEADLINE_PROOF_V2',
+              'schema':'GR_KHMDHS_FUTURE_DEADLINE_PROOF_V3',
               'adapter_exit_code':rc,
               'listing_contract':s.get('listing_contract'),
               'deadline_horizon_end':s.get('deadline_horizon_end'),
               'window_days':s.get('window_days'),
+              'workers':s.get('workers'),
+              'min_request_interval_seconds':s.get('min_request_interval_seconds'),
               'windows_expected':s.get('windows_expected'),
               'windows_completed':s.get('windows_completed'),
+              'verified_empty_404_windows':s.get('verified_empty_404_windows'),
               'source_rows_seen':s.get('source_rows_seen'),
               'current_materialized':s.get('current_materialized'),
               'enumeration_complete':s.get('enumeration_complete'),
