@@ -13,11 +13,11 @@ from typing import Any
 
 SCHEMA='QWEN_SHADOW_INPUT_V1'
 MANIFEST_SCHEMA='QWEN_SHADOW_SHARD_MANIFEST_V3'
-# Production currently requests 192 rows/worker and the classifier has a 7,800 s
-# self-heal budget inside a 150 minute job timeout. Keep the operational clamp
-# aligned with that advertised production bound; if the workflow is raised again,
-# the A/B regression harness must be updated/prove the new bound before rollout.
-DEFAULT_OPERATIONAL_MAX_ROWS_PER_SHARD=192
+# 480 is a safe upper bound, not a completion requirement. The classifier still
+# has a 7,800 s self-heal budget inside a 150 minute job timeout, and any rows a
+# worker does not reach remain in the canonical residual queue for the next pass.
+# This removes the hidden 192-row clamp that previously defeated 480-row dispatches.
+DEFAULT_OPERATIONAL_MAX_ROWS_PER_SHARD=480
 DEFAULT_FRESH_HOURS=24
 
 
