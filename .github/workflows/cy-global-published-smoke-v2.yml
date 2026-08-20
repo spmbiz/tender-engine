@@ -1,0 +1,88 @@
+name: Cyprus Global Published Notices Smoke V2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/cy-global-published-smoke-v2.yml'
+      - 'pipeline/discover_cy_epps_published_global_v2.py'
+      - 'control/cy_global_published_smoke_v2_trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1, fetch-tags: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4
+      - name: Enumerate exact publisher pages 1-3 with relaxed pager metadata
+        id: run
+        shell: bash
+        run: |
+          set +e
+          python pipeline/discover_cy_epps_published_global_v2.py --output cy-smoke-v2 --page-start 1 --page-end 3
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Build compact verdict
+        if: always()
+        env: {RUN_RC: '${{ steps.run.outputs.rc }}'}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          s=json.load(open('cy-smoke-v2/stats.json')) if Path('cy-smoke-v2/stats.json').exists() else {}
+          try: rc=int(os.environ.get('RUN_RC') or 999)
+          except Exception: rc=999
+          passed=bool(
+              rc==0 and s.get('pages_requested')==3 and s.get('pages_completed')==3
+              and s.get('shard_complete') is True and s.get('exact_row_reconciliation') is True
+              and not (s.get('errors') or []) and int(s.get('total_reported') or 0)>50000
+              and int(s.get('rows_materialized') or 0)==30
+          )
+          proof={
+              'schema':'CY_EPPS_GLOBAL_PUBLISHED_SMOKE_V2',
+              'adapter_exit_code':rc,
+              'total_reported':s.get('total_reported'),
+              'total_pages':s.get('total_pages'),
+              'publisher_pager_prefix':s.get('publisher_pager_prefix'),
+              'pages_completed':s.get('pages_completed'),
+              'rows_materialized':s.get('rows_materialized'),
+              'unique_notice_ids':s.get('unique_notice_ids'),
+              'competition_rows':s.get('competition_rows'),
+              'competition_rows_without_resource_id':s.get('competition_rows_without_resource_id'),
+              'exact_row_reconciliation':s.get('exact_row_reconciliation'),
+              'errors':s.get('errors') or [],
+              'pass':passed,
+          }
+          Path('control/cy_global_published_smoke_v2.json').write_text(json.dumps(proof,indent=2)+'\n')
+          print(json.dumps(proof,indent=2))
+          PY
+      - name: Persist smoke verdict
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f control/cy_global_published_smoke_v2.json || printf '%s\n' '{"schema":"CY_EPPS_GLOBAL_PUBLISHED_SMOKE_V2_WORKFLOW_FAILURE","pass":false}' > control/cy_global_published_smoke_v2.json
+          git config user.name tender-engine-bot
+          git config user.email tender-engine-bot@users.noreply.github.com
+          git add control/cy_global_published_smoke_v2.json
+          git diff --cached --quiet && exit 0
+          git commit -m "diag: persist Cyprus national Published smoke V2 ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort >/dev/null 2>&1 || true
+            sleep $((i*2))
+          done
+          exit 1
+      - name: Enforce verdict
+        if: always()
+        run: python -c "import json; p=json.load(open('control/cy_global_published_smoke_v2.json')); raise SystemExit(0 if p.get('pass') is True else 3)"
