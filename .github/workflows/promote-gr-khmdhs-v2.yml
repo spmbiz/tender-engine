@@ -33,27 +33,31 @@ jobs:
           assert proof.get('pass') is True,proof
           assert proof.get('enumeration_complete') is True,proof
           PY
+          python -m py_compile pipeline/discover_gr_khmdhs_v2.py pipeline/discover_gr_khmdhs_v3.py
           pytest -q tests/test_gr_khmdhs_v2.py
-      - name: Route global Greece lane to paced V3
+      - name: Route global Greece lane to proven V3 wrapper
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
           p=Path('.github/workflows/supergreen-discovery-v2.yml')
           s=p.read_text()
-          old='GR_KHMDHS) python pipeline/discover_gr_khmdhs.py ;;'
-          old_v2="GR_KHMDHS) export GR_FINAL_HORIZON_YEAR=2100; python pipeline/discover_gr_khmdhs_v2.py ;;"
-          new="GR_KHMDHS) export GR_FINAL_HORIZON_YEAR=2100 GR_WORKERS=1 GR_RETRIES=7 GR_MIN_REQUEST_INTERVAL_SECONDS=0.50; python pipeline/discover_gr_khmdhs_v2.py ;;"
-          if old in s:
-              s=s.replace(old,new,1)
-              p.write_text(s)
-          elif old_v2 in s:
-              s=s.replace(old_v2,new,1)
-              p.write_text(s)
-          elif new not in s:
-              raise SystemExit('Greece route marker missing')
+          candidates=[
+              'GR_KHMDHS) python pipeline/discover_gr_khmdhs.py ;;',
+              'GR_KHMDHS) export GR_FINAL_HORIZON_YEAR=2100; python pipeline/discover_gr_khmdhs_v2.py ;;',
+              'GR_KHMDHS) export GR_FINAL_HORIZON_YEAR=2100 GR_WORKERS=1 GR_RETRIES=7 GR_MIN_REQUEST_INTERVAL_SECONDS=0.50; python pipeline/discover_gr_khmdhs_v2.py ;;',
+          ]
+          new='GR_KHMDHS) export GR_FINAL_HORIZON_YEAR=2100 GR_WORKERS=1 GR_RETRIES=7 GR_MIN_REQUEST_INTERVAL_SECONDS=0.50; python pipeline/discover_gr_khmdhs_v3.py ;;'
+          if new not in s:
+              for old in candidates:
+                  if old in s:
+                      s=s.replace(old,new,1)
+                      p.write_text(s)
+                      break
+              else:
+                  raise SystemExit('Greece route marker missing')
           PY
-          grep -F 'GR_KHMDHS) export GR_FINAL_HORIZON_YEAR=2100 GR_WORKERS=1 GR_RETRIES=7 GR_MIN_REQUEST_INTERVAL_SECONDS=0.50; python pipeline/discover_gr_khmdhs_v2.py ;;' .github/workflows/supergreen-discovery-v2.yml
+          grep -F 'GR_KHMDHS) export GR_FINAL_HORIZON_YEAR=2100 GR_WORKERS=1 GR_RETRIES=7 GR_MIN_REQUEST_INTERVAL_SECONDS=0.50; python pipeline/discover_gr_khmdhs_v3.py ;;' .github/workflows/supergreen-discovery-v2.yml
       - name: Commit promotion
         shell: bash
         run: |
@@ -61,7 +65,7 @@ jobs:
           git config user.name tender-engine-bot
           git config user.email tender-engine-bot@users.noreply.github.com
           git add .github/workflows/supergreen-discovery-v2.yml
-          git commit -m 'gr: promote paced future-deadline KIMDIS lane after live proof'
+          git commit -m 'gr: promote proven KIMDIS V3 lane'
           for i in 1 2 3 4 5; do
             git pull --rebase origin main && git push origin HEAD:main && exit 0
             git rebase --abort >/dev/null 2>&1 || true
