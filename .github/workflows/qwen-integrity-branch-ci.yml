@@ -47,7 +47,7 @@ jobs:
 
   audit-current-state:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -67,6 +67,7 @@ jobs:
           gh release download notice-intelligence-ledger-latest \
             --pattern notice-intelligence-ledger-latest.jsonl.gz \
             --pattern notice-classification-queue-latest.jsonl.gz \
+            --pattern notice-ledger-summary-latest.json \
             --dir audit/input --clobber
           notes="$(gh release view notice-intelligence-ledger-latest --json body --jq '.body')"
           source_run="$(grep -oE 'run=[0-9]+' <<< "$notes" | head -n1 | cut -d= -f2)"
@@ -122,11 +123,44 @@ jobs:
           }
           print('QWEN_LIVE_STATE_AUDIT '+json.dumps(report,sort_keys=True))
           PY
+      - name: Dry-run ledger overlay and queue recovery impact
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp audit/input/notice-intelligence-ledger-latest.jsonl.gz audit/out/apply-ledger.jsonl.gz
+          cp audit/input/notice-classification-queue-latest.jsonl.gz audit/out/apply-queue.jsonl.gz
+          cp audit/input/notice-ledger-summary-latest.json audit/out/apply-summary.json
+          python pipeline/apply_qwen_state_to_ledger.py \
+            --ledger audit/out/apply-ledger.jsonl.gz \
+            --classification-queue audit/out/apply-queue.jsonl.gz \
+            --state audit/input/qwen-classification-state-latest.jsonl.gz \
+            --snapshot audit/input/live-open-tenders-latest.jsonl.gz \
+            --summary audit/out/apply-summary.json \
+            --classifier-version qwen3-4b-q4km-batch-selfheal-v1 | tee audit/out/apply-state-audit.log
+          python - <<'PY'
+          import json
+          s=json.load(open('audit/out/apply-summary.json',encoding='utf-8'))
+          report={
+              'state_rows_seen':s.get('qwen_state_rows_seen'),
+              'state_contract_valid':s.get('qwen_state_rows_semantic_contract_valid'),
+              'state_contract_rejected':s.get('qwen_state_rows_semantic_contract_rejected') or {},
+              'exact_hash_applied':s.get('qwen_state_exact_hash_applied'),
+              'stale_hash_ignored':s.get('qwen_state_stale_hash_ignored'),
+              'ledger_classifications_missing_authoritative_state':s.get('ledger_classifications_missing_authoritative_state'),
+              'queue_satisfied_from_state':s.get('classification_queue_satisfied_from_state'),
+              'integrity_recovery_candidates':s.get('classification_queue_integrity_recovery_candidates'),
+              'integrity_recovery_synthesized':s.get('classification_queue_integrity_recovery_synthesized'),
+              'queue_after':s.get('classification_queue'),
+          }
+          print('QWEN_LEDGER_STATE_APPLY_AUDIT '+json.dumps(report,sort_keys=True))
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: qwen-integrity-audit-${{ github.run_id }}
           path: |
             audit/out/qwen-integrity-audit-summary.json
             audit/out/reclassification-queue.jsonl.gz
+            audit/out/apply-summary.json
+            audit/out/apply-state-audit.log
           retention-days: 14
           if-no-files-found: error
