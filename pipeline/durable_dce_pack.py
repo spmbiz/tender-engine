@@ -8,6 +8,7 @@ import tarfile
 from pathlib import Path
 
 from authority_conflicts import process as process_authority_conflicts
+from build_gpt_dce_read_layer import build_candidate_layer
 
 METADATA_FILES = {
     "candidate.json",
@@ -74,6 +75,20 @@ def add_file(tar: tarfile.TarFile, path: Path, arcname: str, inventory: list[dic
     )
 
 
+def add_gpt_read_layer(tar: tarfile.TarFile, candidate_root: Path, inventory: list[dict]) -> int:
+    gpt_read = candidate_root / "gpt_read"
+    if not gpt_read.is_dir():
+        return 0
+    count = 0
+    for path in sorted(gpt_read.rglob("*")):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(candidate_root)
+        add_file(tar, path, str(rel), inventory, "gpt_read_layer")
+        count += 1
+    return count
+
+
 def build_candidate_pack(candidate_root: Path, out_dir: Path) -> dict:
     manifest_path = candidate_root / "manifest.json"
     manifest = load_json(manifest_path) or {}
@@ -87,19 +102,30 @@ def build_candidate_pack(candidate_root: Path, out_dir: Path) -> dict:
     inventory: list[dict] = []
     originals = selected_originals(candidate_root, manifest)
 
+    # The Markdown layer is derivative and additive. If it cannot be generated,
+    # canonical originals/evidence still pack normally.
+    gpt_read_error = None
+    try:
+        build_candidate_layer(candidate_root)
+    except Exception as exc:
+        gpt_read_error = repr(exc)
+
     with tarfile.open(archive, "w:gz", compresslevel=6) as tar:
         for name in sorted(METADATA_FILES):
             p = candidate_root / name
             if p.is_file():
                 add_file(tar, p, name, inventory, "metadata_or_extracted_evidence")
+        gpt_read_file_count = add_gpt_read_layer(tar, candidate_root, inventory)
         for p in originals:
             add_file(tar, p, str(Path("originals") / p.name), inventory, "original_download")
 
         deadline = authority.get("deadline") if isinstance(authority, dict) else {}
         payload = {
-            "contract": "CANONICAL_DCE_RELEASE_PACK_V3",
+            "contract": "CANONICAL_DCE_RELEASE_PACK_V4_GPT_READ",
             "candidate_id": cid,
             "original_download_count": len(originals),
+            "gpt_read_file_count": gpt_read_file_count,
+            "gpt_read_error": gpt_read_error,
             "inventory_count": len(inventory),
             "evidence_quality": evidence.get("content_quality"),
             "gate_readiness": evidence.get("gate_readiness", False),
@@ -107,7 +133,7 @@ def build_candidate_pack(candidate_root: Path, out_dir: Path) -> dict:
             "deadline_authority_status": deadline.get("status") if isinstance(deadline, dict) else None,
             "deadline_conflict": bool(deadline.get("conflict")) if isinstance(deadline, dict) else False,
             "inventory": inventory,
-            "note": "Original downloaded procurement files + normalized evidence + evidence-quality verdict + authority-conflict record. Recursive unpack duplicates excluded because reconstructible from originals.",
+            "note": "Original downloaded procurement files + normalized evidence + GPT-readable Markdown navigation + evidence-quality verdict + authority-conflict record. Recursive unpack duplicates excluded because reconstructible from originals.",
         }
         raw = json.dumps(payload, indent=2, ensure_ascii=False).encode("utf-8")
         info = tarfile.TarInfo("_canonical_pack_manifest.json")
@@ -124,6 +150,8 @@ def build_candidate_pack(candidate_root: Path, out_dir: Path) -> dict:
         "archive_size": archive.stat().st_size,
         "archive_sha256": sha256_file(archive),
         "original_download_count": len(originals),
+        "gpt_read_file_count": gpt_read_file_count,
+        "gpt_read_error": gpt_read_error,
         "inventory_count": len(inventory),
         "evidence_quality": evidence.get("content_quality"),
         "gate_readiness": evidence.get("gate_readiness", False),
@@ -151,11 +179,14 @@ def main():
         if p.is_file():
             batch_payload[name] = load_json(p)
     index = {
-        "contract": "CANONICAL_DCE_RELEASE_INDEX_V3",
+        "contract": "CANONICAL_DCE_RELEASE_INDEX_V4_GPT_READ",
         "candidate_count": len(packs),
         "gate_ready_count": sum(1 for p in packs if p.get("gate_readiness")),
         "gate_blocked_count": sum(1 for p in packs if not p.get("gate_readiness")),
         "deadline_conflict_count": sum(1 for p in packs if p.get("deadline_conflict")),
+        "gpt_read_candidate_count": sum(1 for p in packs if p.get("gpt_read_file_count")),
+        "gpt_read_file_count": sum(int(p.get("gpt_read_file_count") or 0) for p in packs),
+        "gpt_read_error_count": sum(1 for p in packs if p.get("gpt_read_error")),
         "original_download_count": sum(p["original_download_count"] for p in packs),
         "total_archive_bytes": sum(p["archive_size"] for p in packs),
         "packs": packs,
