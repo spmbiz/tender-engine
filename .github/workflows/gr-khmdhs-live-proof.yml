@@ -5,6 +5,9 @@ on:
   push:
     branches: [main]
     paths:
+      - '.github/workflows/gr-khmdhs-live-proof.yml'
+      - 'pipeline/discover_gr_khmdhs_v2.py'
+      - 'tests/test_gr_khmdhs_v2.py'
       - 'control/gr_khmdhs_live_trigger.txt'
 
 permissions:
