@@ -1,16 +1,22 @@
 name: Promote Italy ANAC PVL V4
 
 on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Italy ANAC PVL Full Reconcile Proof']
+    types: [completed]
   push:
     branches: [main]
     paths:
       - 'control/it_anac_pvl_full_reconcile_proof.json'
+      - 'control/it_anac_pvl_promote_trigger.txt'
 
 permissions:
   contents: write
 
 jobs:
   promote:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
