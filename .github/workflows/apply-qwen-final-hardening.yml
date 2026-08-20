@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/apply-qwen-final-hardening.yml'
+      - 'control/qwen_final_hardening_trigger.json'
 
 permissions:
   contents: write
@@ -50,11 +51,8 @@ jobs:
           q = Path('.github/workflows/qwen-live-classification.yml')
           s = q.read_text(encoding='utf-8')
           before = s
-          # workflow_dispatch default
           s = s.replace("default: '192'", "default: '480'", 1)
-          # safety heartbeat: guardian/recovery remain primary continuation paths
           s = s.replace("- cron: '43 */6 * * *'", "- cron: '43 * * * *'")
-          # event-input fallback and parser fallback
           s = s.replace("REQUESTED_PER_SHARD: ${{ github.event.inputs.per_shard || '192' }}", "REQUESTED_PER_SHARD: ${{ github.event.inputs.per_shard || '480' }}")
           s = s.replace("or 192)", "or 480)")
           s = s.replace("except Exception: n=192", "except Exception: n=480")
