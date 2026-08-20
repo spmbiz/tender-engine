@@ -26,6 +26,7 @@ class Response:
     def __init__(self, payload):
         self.payload = payload
         self.text = json.dumps(payload)
+        self.content = self.text.encode("utf-8")
 
     def raise_for_status(self):
         return None
