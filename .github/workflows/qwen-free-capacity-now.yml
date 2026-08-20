@@ -20,19 +20,26 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Cancel pre-fix DCE fanout and kick semantic backfill
+      - name: Cancel pre-fix work and kick corrected semantic backfill
         env:
           GH_TOKEN: ${{ github.token }}
           STALE_DCE_RUN: '32357205269'
+          STALE_PENDING_QWEN_RUN: '32361742115'
         shell: bash
         run: |
           set -euo pipefail
-          status="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${STALE_DCE_RUN}" --jq '.status' 2>/dev/null || echo missing)"
-          conclusion="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${STALE_DCE_RUN}" --jq '.conclusion // ""' 2>/dev/null || true)"
-          echo "stale DCE run ${STALE_DCE_RUN}: status=${status} conclusion=${conclusion}"
-          if [ "$status" != 'completed' ] && [ "$status" != 'missing' ]; then
-            gh api --method POST "repos/${GITHUB_REPOSITORY}/actions/runs/${STALE_DCE_RUN}/cancel" || true
-            echo "Cancellation requested for pre-fix DCE run ${STALE_DCE_RUN}."
-          fi
+          cancel_if_nonterminal() {
+            local rid="$1" label="$2"
+            local status conclusion
+            status="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${rid}" --jq '.status' 2>/dev/null || echo missing)"
+            conclusion="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${rid}" --jq '.conclusion // ""' 2>/dev/null || true)"
+            echo "$label run $rid: status=$status conclusion=$conclusion"
+            if [ "$status" != 'completed' ] && [ "$status" != 'missing' ]; then
+              gh api --method POST "repos/${GITHUB_REPOSITORY}/actions/runs/${rid}/cancel" || true
+              echo "Cancellation requested for $label run $rid."
+            fi
+          }
+          cancel_if_nonterminal "$STALE_DCE_RUN" 'pre-fix DCE'
+          cancel_if_nonterminal "$STALE_PENDING_QWEN_RUN" 'stale pending 192-row Qwen'
           gh workflow run qwen-backfill-kick.yml --ref main || true
-          echo 'Qwen backfill guardian kicked after capacity cleanup.'
+          echo 'Corrected Qwen backfill guardian kicked after queue cleanup.'
