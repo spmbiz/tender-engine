@@ -1,11 +1,12 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32477444243,
-  "total_inbox_rows": 70,
+  "latest_source_dce_run_id": 32478820706,
+  "total_inbox_rows": 63,
   "dce_authenticity_rows": 11,
   "portal_counts": {
     "GR_KHMDHS": 6,
-    "TED": 3,
+    "TED": 2,
+    "ES_PLACSP": 1,
     "PL_EZAMOWIENIA": 1,
     "ZA_ETENDERS": 1
   },
@@ -28,10 +29,18 @@
     },
     {
       "portal": "TED",
-      "blocked": 3,
+      "blocked": 2,
       "likely_public_recovery_target": 0,
       "reason_counts": {
-        "NON_AUTHORITATIVE": 3
+        "NON_AUTHORITATIVE": 2
+      }
+    },
+    {
+      "portal": "ES_PLACSP",
+      "blocked": 1,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 1
       }
     },
     {
@@ -62,12 +71,20 @@
         "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019646459"
       },
       {
-        "candidate_id": "TED:690247-2025",
+        "candidate_id": "TED:573884-2026",
         "portal": "TED",
-        "title": "Germany – Load-bearing structure design services – Fachplanung Tragwerksplanung: Erweiterung der Grundschule Pastetten",
-        "buyer": "Gemeinde Pastetten",
+        "title": "Estonia – Medicinal products for dermatology – Dermatoloogilised ravimid ja haavahooldusvahendid",
+        "buyer": "Aktsiaselts Ida-Tallinna Keskhaigla",
         "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ted.europa.eu/en/notice/-/detail/690247-2025"
+        "notice_url": "https://ted.europa.eu/en/notice/-/detail/573884-2026"
+      },
+      {
+        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_PlataformasAgregadasSinMenores_20318889",
+        "portal": "ES_PLACSP",
+        "title": "Canal de Isabel II, S.A.",
+        "buyer": null,
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://contratos-publicos.comunidad.madrid/contrato-publico/suministro-reactivo-policloruro-aluminio-solucion-edar-termino-municipal-caceres"
       },
       {
         "candidate_id": "PL-BZP:08deff60-6ea5-0ada-b346-0300010ce114",
@@ -84,14 +101,6 @@
         "buyer": "Perishable Products Export Control Board",
         "status": "UNKNOWN_RETRIEVED_DOCUMENT",
         "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-164106"
-      },
-      {
-        "candidate_id": "GR-KHMDHS:26PROC019644770",
-        "portal": "GR_KHMDHS",
-        "title": "Μικρά υδραυλικά έργα ΔΕ Καποδίστρια",
-        "buyer": "ΔΗΜΟΤΙΚΗ ΕΠΙΧΕΙΡΗΣΗ ΥΔΡΕΥΣΗΣ ΑΠΟΧΕΤΕΥΣΗΣ (Δ.Ε.Υ.Α.) ΛΑΜΙΑΣ",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019644770"
       }
     ]
   },
