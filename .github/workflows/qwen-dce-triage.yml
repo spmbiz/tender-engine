@@ -1,9 +1,6 @@
 name: Qwen DCE Gate Triage
 
 on:
-  workflow_run:
-    workflows: ["DCE Fanout V2"]
-    types: [completed]
   workflow_dispatch:
     inputs:
       dce_run_id:
@@ -24,7 +21,7 @@ concurrency:
 
 jobs:
   plan:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 12
     outputs:
@@ -45,11 +42,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [ '${{ github.event_name }}' = 'workflow_run' ]; then
-            rid='${{ github.event.workflow_run.id }}'
-          else
-            rid="$INPUT_RUN"
-          fi
+          rid="$INPUT_RUN"
           [[ "$rid" =~ ^[0-9]+$ ]] || { echo "invalid DCE run id: $rid" >&2; exit 1; }
           tag="dce-harvest-$rid"
           asset="dce-deep-review-$rid.tar.gz"
@@ -77,11 +70,17 @@ jobs:
           )"
           workers="$(GATE_READY="$gate_ready" python - <<'PY'
           import os
+          from pipeline.global_admission import dynamic_tender_parallel
           g=int(os.environ['GATE_READY'])
           try:w=int(os.environ.get('REQUESTED_WORKERS') or 4)
           except Exception:w=4
           w=max(1,min(6,w))
-          print(0 if g==0 else min(w,g))
+          requested=0 if g==0 else min(w,g)
+          if requested <= 0:
+              print(0)
+          else:
+              allowed,_=dynamic_tender_parallel(requested)
+              print(max(0,min(requested,int(allowed))))
           PY
           )"
           matrix="$(WORKERS="$workers" python - <<'PY'

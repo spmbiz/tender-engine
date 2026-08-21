@@ -7,6 +7,13 @@ on:
       - 'pipeline/freshness_conveyor_watchdog.py'
       - 'tests/test_qwen_semantic_controller.py'
       - 'tools/apply_qwen_control_plane_audit_v3.py'
+      - '.github/workflows/qwen-live-classification.yml'
+      - '.github/workflows/qwen-live-conveyor.yml'
+      - '.github/workflows/qwen-dce-triage.yml'
+      - '.github/workflows/dce-fanout-v2.yml'
+      - '.github/workflows/qwen-dce-kick-now.yml'
+      - '.github/workflows/qwen-batch-autotune-selfheal.yml'
+      - '.github/workflows/pipeline-ab-live-canary-v2.yml'
       - '.github/workflows/qwen-backlog-watchdog.yml'
       - '.github/workflows/qwen-backfill-kick.yml'
       - '.github/workflows/qwen-live-recovery-drainer.yml'
@@ -20,37 +27,49 @@ on:
   push:
     branches: [main]
     paths:
+      - 'pipeline/qwen_semantic_controller.py'
       - 'tools/apply_qwen_control_plane_audit_v3.py'
+      - '.github/workflows/qwen-live-classification.yml'
+      - '.github/workflows/qwen-live-conveyor.yml'
+      - '.github/workflows/qwen-dce-triage.yml'
+      - '.github/workflows/dce-fanout-v2.yml'
+      - '.github/workflows/qwen-dce-kick-now.yml'
+      - '.github/workflows/qwen-batch-autotune-selfheal.yml'
+      - '.github/workflows/pipeline-ab-live-canary-v2.yml'
       - '.github/workflows/apply-qwen-control-plane-audit-v3.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: apply-qwen-control-plane-audit-v3
+  group: apply-qwen-control-plane-audit-v3-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  validate-and-apply:
+  validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'main' }}
-          fetch-depth: 0
+          fetch-depth: 1
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Apply deterministic migration in the worktree
-        run: python tools/apply_qwen_control_plane_audit_v3.py
+      - name: Prove migration is canonical and idempotent
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/apply_qwen_control_plane_audit_v3.py
+          python tools/apply_qwen_control_plane_audit_v3.py
 
       - name: Run semantic-controller regression tests
         run: python -m unittest tests.test_qwen_semantic_controller -v
 
-      - name: Enforce migration invariants
+      - name: Enforce control-plane invariants
         shell: bash
         run: |
           set -euo pipefail
@@ -66,13 +85,24 @@ jobs:
           ! grep -q "default: '192'" .github/workflows/qwen-live-classification.yml
           ! grep -q 'min(480,n)' .github/workflows/qwen-live-classification.yml
 
-          # Qwen DCE: drainer is the dispatch owner and workers share fleet admission.
+          # Qwen DCE: drainer is the only dispatch owner and workers share fleet admission.
           ! grep -q 'workflows: \["DCE Fanout V2"\]' .github/workflows/qwen-dce-triage.yml
           ! grep -q 'gh workflow run qwen-dce-triage.yml' .github/workflows/dce-fanout-v2.yml
           ! grep -q 'gh workflow run qwen-dce-triage.yml' .github/workflows/auto-dce-adjudication.yml
           grep -q 'gh workflow run qwen-dce-drainer.yml' .github/workflows/dce-fanout-v2.yml
           grep -q 'gh workflow run qwen-dce-drainer.yml' .github/workflows/auto-dce-adjudication.yml
           grep -q 'dynamic_tender_parallel' .github/workflows/qwen-dce-triage.yml
+          ! grep -q 'gh workflow run dce-fanout-v2.yml' .github/workflows/qwen-dce-kick-now.yml
+          grep -q 'gh workflow run qwen-dce-drainer.yml' .github/workflows/qwen-dce-kick-now.yml
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/qwen-dce-kick-now.yml')
+          trigger=p.read_text(encoding='utf-8').split('permissions:',1)[0]
+          assert 'workflow_dispatch:' in trigger
+          assert 'push:' not in trigger
+          assert 'schedule:' not in trigger
+          assert 'workflow_run:' not in trigger
+          PY
 
           # CPU benchmarks are engineering-only while the semantic backlog drains.
           python - <<'PY'
@@ -83,6 +113,7 @@ jobs:
               assert 'workflow_dispatch:' in trigger
               assert 'schedule:' not in trigger
               assert 'push:' not in trigger
+              assert 'workflow_run:' not in trigger
           PY
 
           # Legacy patch writers cannot resurrect obsolete control-plane code.
@@ -104,33 +135,17 @@ jobs:
 
           echo 'QWEN_CONTROL_PLANE_INVARIANTS_PASS'
 
-      - name: Persist migration to main after merge
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+      - name: Reject unmaterialized migration drift
         shell: bash
         run: |
           set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add \
+          # The patcher may diagnose exact legacy state, but CI never rewrites workflow
+          # refs. Any worktree mutation means the branch is not actually canonical.
+          git diff --exit-code -- \
             .github/workflows/qwen-live-classification.yml \
             .github/workflows/qwen-live-conveyor.yml \
             .github/workflows/qwen-dce-triage.yml \
             .github/workflows/dce-fanout-v2.yml \
             .github/workflows/qwen-batch-autotune-selfheal.yml \
             .github/workflows/pipeline-ab-live-canary-v2.yml
-          if git diff --cached --quiet; then
-            echo 'Control-plane migration already present on main.'
-            exit 0
-          fi
-          git commit -m 'qwen: enforce audited single-owner control plane'
-          for attempt in 1 2 3 4 5 6; do
-            if git pull --rebase origin main && git push origin HEAD:main; then
-              exit 0
-            fi
-            git rebase --abort >/dev/null 2>&1 || true
-            sleep "$((attempt * 2))"
-          done
-          echo 'Failed to persist audited control-plane migration.' >&2
-          exit 1
-
-# forced materialization marker: 2026-08-21T18:00Z
+          echo 'QWEN_CONTROL_PLANE_CANONICAL_NO_DIFF'

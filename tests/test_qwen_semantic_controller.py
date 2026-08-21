@@ -96,6 +96,33 @@ class QwenSemanticControllerTests(unittest.TestCase):
         self.assertIn(11, out["cancel_ids"])
         self.assertFalse(out["need_dispatch"])
 
+    def test_non_dispatch_queued_generation_is_never_keeper(self):
+        out = decide(
+            now=NOW,
+            remaining=95000,
+            ledger_source=200,
+            semantic_source=200,
+            runs=[run(10, "queued", 1, event="schedule")],
+            heartbeats={},
+        )
+        self.assertIsNone(out["queued_keeper"])
+        self.assertIn(10, out["cancel_ids"])
+        self.assertTrue(out["need_dispatch"])
+
+    def test_non_dispatch_running_generation_is_never_keeper_even_with_fresh_heartbeat(self):
+        out = decide(
+            now=NOW,
+            remaining=95000,
+            ledger_source=200,
+            semantic_source=200,
+            runs=[run(42, "in_progress", 5, event="workflow_run")],
+            heartbeats={42: {"state": "ok", "age_minutes": 1}},
+        )
+        self.assertIsNone(out["running_keeper"])
+        self.assertIn(42, out["cancel_ids"])
+        self.assertTrue(out["need_dispatch"])
+        self.assertFalse(out["running"][0]["controller_authorized"])
+
     def test_queued_debt_is_purged_when_worker_running(self):
         out = decide(
             now=NOW,
@@ -119,6 +146,21 @@ class QwenSemanticControllerTests(unittest.TestCase):
         )
         self.assertEqual(out["running_keeper"]["id"], 2)
         self.assertIn(1, out["cancel_ids"])
+
+    def test_authorized_worker_beats_legacy_worker_even_when_legacy_heartbeat_is_fresher(self):
+        out = decide(
+            now=NOW,
+            remaining=95000,
+            ledger_source=200,
+            semantic_source=200,
+            runs=[
+                run(1, "in_progress", 20, event="workflow_dispatch"),
+                run(2, "in_progress", 10, event="push"),
+            ],
+            heartbeats={1: {"state": "ok", "age_minutes": 4}, 2: {"state": "ok", "age_minutes": 1}},
+        )
+        self.assertEqual(out["running_keeper"]["id"], 1)
+        self.assertIn(2, out["cancel_ids"])
 
     def test_newer_ledger_forces_new_generation_even_if_old_backlog_zero(self):
         out = decide(

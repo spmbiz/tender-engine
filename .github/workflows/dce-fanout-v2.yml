@@ -371,16 +371,14 @@ jobs:
           done
           echo "Durable canonical release: $RELEASE_TAG" >> "$GITHUB_STEP_SUMMARY"
           cat "dce-summary-${GITHUB_RUN_ID}.json" >> "$GITHUB_STEP_SUMMARY"
-      - name: Dispatch Qwen DCE gate triage immediately after durable persistence
+      - name: Wake the canonical Qwen DCE triage controller after durable persistence
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          gh workflow run qwen-dce-triage.yml --ref main \
-            -f dce_run_id="$GITHUB_RUN_ID" \
-            -f workers=4
-          echo "Direct Qwen DCE handoff dispatched for durable DCE run $GITHUB_RUN_ID" >> "$GITHUB_STEP_SUMMARY"
+          gh workflow run qwen-dce-drainer.yml --ref main
+          echo "Canonical Qwen DCE drainer woken for durable DCE run $GITHUB_RUN_ID" >> "$GITHUB_STEP_SUMMARY"
       - name: Persist this exact attempt set and continue the unseen DCE queue immediately
         env:
           GH_TOKEN: ${{ github.token }}

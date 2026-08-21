@@ -1,35 +1,29 @@
-name: Qwen DCE Kick Now
+name: Qwen DCE Kick Now (Controller Wake)
 
+# Legacy operator shortcut retained only as a manual wake. Candidate selection,
+# source generation, backlog caps and DCE admission are owned by the canonical
+# Qwen DCE drainer; this workflow must never dispatch DCE Fanout directly.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/qwen-dce-kick-now.yml'
+  workflow_dispatch:
 
 permissions:
   actions: write
   contents: read
 
+concurrency:
+  group: qwen-dce-kick-controller-wake
+  cancel-in-progress: true
+
 jobs:
-  dispatch:
+  wake:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 3
     steps:
-      - name: Dispatch persisted Qwen semantic DCE lane if free
+      - name: Wake canonical Qwen DCE controller
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          active="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow dce-fanout-v2.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
-          if [ "$active" -gt 0 ]; then
-            echo "DCE fleet busy ($active); refusing duplicate dispatch"
-            exit 0
-          fi
-          gh workflow run dce-fanout-v2.yml --repo "$GITHUB_REPOSITORY" --ref main \
-            -f selection_path=queues/qwen_live_selection_latest.jsonl \
-            -f source_discovery_run=31923649637 \
-            -f max_jobs=120 \
-            -f max_parallel=6 \
-            -f jobs_per_shard=0
-          echo "DISPATCHED_QWEN_DCE selection=queues/qwen_live_selection_latest.jsonl max_jobs=120 max_parallel=6 source=31923649637"
+          gh workflow run qwen-dce-drainer.yml --repo "$GITHUB_REPOSITORY" --ref main
+          echo 'Canonical Qwen DCE drainer woken. No direct DCE Fanout dispatch occurred.'

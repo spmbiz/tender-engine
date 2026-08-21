@@ -11,8 +11,13 @@ def read(path: str) -> str:
     return (ROOT / path).read_text(encoding="utf-8")
 
 
-def write(path: str, text: str) -> None:
-    (ROOT / path).write_text(text, encoding="utf-8")
+def write(path: str, text: str) -> bool:
+    p = ROOT / path
+    before = p.read_text(encoding="utf-8")
+    if before == text:
+        return False
+    p.write_text(text, encoding="utf-8")
+    return True
 
 
 def replace_once(text: str, old: str, new: str, label: str) -> str:
@@ -22,13 +27,75 @@ def replace_once(text: str, old: str, new: str, label: str) -> str:
     return text.replace(old, new, 1)
 
 
-def patch_semantic_workflow() -> None:
+def trigger_block(text: str, path: str) -> str:
+    if "permissions:" not in text:
+        raise SystemExit(f"{path}: permissions block missing")
+    return text.split("permissions:", 1)[0]
+
+
+def manual_only_trigger(text: str, path: str) -> bool:
+    trigger = trigger_block(text, path)
+    return (
+        "workflow_dispatch:" in trigger
+        and "workflow_run:" not in trigger
+        and "schedule:" not in trigger
+        and "push:" not in trigger
+    )
+
+
+def semantic_v3(text: str) -> bool:
+    path = ".github/workflows/qwen-live-classification.yml"
+    return (
+        manual_only_trigger(text, path)
+        and "default: '96'" in text
+        and "default: '192'" not in text
+        and "REQUESTED_PER_SHARD: ${{ github.event.inputs.per_shard || '96' }}" in text
+        and "if: github.event_name == 'workflow_dispatch'" in text
+        and "or 96)\n          except Exception: n=96" in text
+        and "print(max(16,min(96,n)))" in text
+        and "min(480,n)" not in text
+        and "semantic controller owns continuation" in text
+    )
+
+
+def conveyor_v3(text: str) -> bool:
+    return (
+        "gh workflow run qwen-live-classification.yml" not in text
+        and "Semantic continuation is owned by the canonical controller" in text
+        and "Qwen Backlog Watchdog is the single semantic dispatch owner." in text
+    )
+
+
+def qwen_dce_triage_v3(text: str) -> bool:
+    path = ".github/workflows/qwen-dce-triage.yml"
+    return (
+        manual_only_trigger(text, path)
+        and 'workflows: ["DCE Fanout V2"]' not in text
+        and "if: github.event_name == 'workflow_dispatch'" in text
+        and 'rid="$INPUT_RUN"' in text
+        and "dynamic_tender_parallel" in text
+    )
+
+
+def dce_fanout_v3(text: str) -> bool:
+    return (
+        "gh workflow run qwen-dce-triage.yml" not in text
+        and "gh workflow run qwen-dce-drainer.yml --ref main" in text
+        and "Wake the canonical Qwen DCE triage controller after durable persistence" in text
+    )
+
+
+def patch_semantic_workflow() -> bool:
     path = ".github/workflows/qwen-live-classification.yml"
     text = read(path)
+    if semantic_v3(text):
+        return False
 
+    # Only transform the exact legacy topology. Anything partly migrated or
+    # otherwise unexpected fails closed instead of being guessed into shape.
     m = re.search(r"(?ms)^on:\n(?P<dispatch>  workflow_dispatch:\n.*?)(?=^  workflow_run:).*?^permissions:\n", text)
     if not m:
-        raise SystemExit("qwen-live-classification: cannot isolate trigger block")
+        raise SystemExit("qwen-live-classification: neither canonical V3 nor exact legacy trigger topology")
     text = text[: m.start()] + "on:\n" + m.group("dispatch") + "\npermissions:\n" + text[m.end() :]
 
     text = replace_once(text, "default: '192'", "default: '96'", "semantic manual default")
@@ -66,17 +133,17 @@ def patch_semantic_workflow() -> None:
         "Qwen persistence is delegated to the continuous conveyor; continuation is delegated to the backlog watchdog.",
     )
 
-    trigger = text.split("permissions:", 1)[0]
-    if "  workflow_run:" in trigger or "  schedule:" in trigger or "  push:" in trigger:
-        raise SystemExit("semantic workflow still has non-controller triggers")
-    if "default: '192'" in text or "min(480,n)" in text:
-        raise SystemExit("semantic workflow still exposes old shard sizing")
-    write(path, text)
+    if not semantic_v3(text):
+        raise SystemExit("qwen-live-classification: V3 postcondition failed")
+    return write(path, text)
 
 
-def patch_conveyor() -> None:
+def patch_conveyor() -> bool:
     path = ".github/workflows/qwen-live-conveyor.yml"
     text = read(path)
+    if conveyor_v3(text):
+        return False
+
     pattern = re.compile(
         r"(?ms)^      - name: Ensure semantic backfill remains continuously primed before DCE\n.*?(?=^      - name: )"
     )
@@ -89,15 +156,18 @@ def patch_conveyor() -> None:
     )
     text, n = pattern.subn(replacement, text, count=1)
     if n != 1:
-        raise SystemExit(f"qwen-live-conveyor: continuation step replacement count={n}")
-    if "gh workflow run qwen-live-classification.yml" in text:
-        raise SystemExit("qwen-live-conveyor still directly dispatches semantic Qwen")
-    write(path, text)
+        raise SystemExit("qwen-live-conveyor: neither canonical V3 nor exact legacy continuation step")
+    if not conveyor_v3(text):
+        raise SystemExit("qwen-live-conveyor: V3 postcondition failed")
+    return write(path, text)
 
 
-def patch_qwen_dce_triage() -> None:
+def patch_qwen_dce_triage() -> bool:
     path = ".github/workflows/qwen-dce-triage.yml"
     text = read(path)
+    if qwen_dce_triage_v3(text):
+        return False
+
     text = replace_once(
         text,
         'on:\n  workflow_run:\n    workflows: ["DCE Fanout V2"]\n    types: [completed]\n  workflow_dispatch:\n',
@@ -145,16 +215,17 @@ def patch_qwen_dce_triage() -> None:
           )"
 """
     text = replace_once(text, old_workers, new_workers, "Qwen DCE shared admission")
-    if "workflows: [\"DCE Fanout V2\"]" in text:
-        raise SystemExit("qwen-dce-triage still auto-triggers from DCE Fanout")
-    if "dynamic_tender_parallel" not in text:
-        raise SystemExit("qwen-dce-triage does not use shared capacity admission")
-    write(path, text)
+    if not qwen_dce_triage_v3(text):
+        raise SystemExit("qwen-dce-triage: V3 postcondition failed")
+    return write(path, text)
 
 
-def patch_dce_fanout() -> None:
+def patch_dce_fanout() -> bool:
     path = ".github/workflows/dce-fanout-v2.yml"
     text = read(path)
+    if dce_fanout_v3(text):
+        return False
+
     pattern = re.compile(
         r"(?ms)^      - name: Dispatch Qwen DCE gate triage immediately after durable persistence\n.*?(?=^      - name: Persist this exact attempt set and continue the unseen DCE queue immediately)"
     )
@@ -169,38 +240,45 @@ def patch_dce_fanout() -> None:
 """
     text, n = pattern.subn(replacement, text, count=1)
     if n != 1:
-        raise SystemExit(f"dce-fanout: Qwen DCE handoff replacement count={n}")
-    if "gh workflow run qwen-dce-triage.yml" in text:
-        raise SystemExit("DCE Fanout still directly dispatches Qwen DCE triage")
-    write(path, text)
+        raise SystemExit("dce-fanout: neither canonical V3 nor exact legacy Qwen DCE handoff")
+    if not dce_fanout_v3(text):
+        raise SystemExit("dce-fanout: V3 postcondition failed")
+    return write(path, text)
 
 
-def make_cpu_benchmark_manual_only(path: str) -> None:
+def make_cpu_benchmark_manual_only(path: str) -> bool:
     text = read(path)
+    if manual_only_trigger(text, path):
+        return False
     m = re.search(r"(?ms)^on:\n.*?^permissions:\n", text)
     if not m:
         raise SystemExit(f"{path}: cannot isolate trigger block")
     text = text[: m.start()] + "on:\n  workflow_dispatch:\n\npermissions:\n" + text[m.end() :]
-    trigger = text.split("permissions:", 1)[0]
-    if "schedule:" in trigger or "push:" in trigger or "workflow_run:" in trigger:
-        raise SystemExit(f"{path}: automatic CPU benchmark trigger survived")
-    write(path, text)
+    if not manual_only_trigger(text, path):
+        raise SystemExit(f"{path}: manual-only postcondition failed")
+    return write(path, text)
 
 
-def patch_cpu_benchmarks() -> None:
+def patch_cpu_benchmarks() -> int:
     # These launch llama.cpp CPU workers and must not steal hosted runners from the
-    # 95k+ semantic backfill. They remain available explicitly for engineering use.
-    make_cpu_benchmark_manual_only(".github/workflows/qwen-batch-autotune-selfheal.yml")
-    make_cpu_benchmark_manual_only(".github/workflows/pipeline-ab-live-canary-v2.yml")
+    # semantic backfill. They remain available explicitly for engineering use.
+    changed = 0
+    changed += int(make_cpu_benchmark_manual_only(".github/workflows/qwen-batch-autotune-selfheal.yml"))
+    changed += int(make_cpu_benchmark_manual_only(".github/workflows/pipeline-ab-live-canary-v2.yml"))
+    return changed
 
 
 def main() -> None:
-    patch_semantic_workflow()
-    patch_conveyor()
-    patch_qwen_dce_triage()
-    patch_dce_fanout()
-    patch_cpu_benchmarks()
-    print("QWEN_CONTROL_PLANE_AUDIT_V3_APPLIED")
+    changed = 0
+    changed += int(patch_semantic_workflow())
+    changed += int(patch_conveyor())
+    changed += int(patch_qwen_dce_triage())
+    changed += int(patch_dce_fanout())
+    changed += patch_cpu_benchmarks()
+    if changed:
+        print(f"QWEN_CONTROL_PLANE_AUDIT_V3_APPLIED changed_files={changed}")
+    else:
+        print("QWEN_CONTROL_PLANE_AUDIT_V3_ALREADY_APPLIED changed_files=0")
 
 
 if __name__ == "__main__":
