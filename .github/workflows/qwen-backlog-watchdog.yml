@@ -3,7 +3,10 @@ name: Qwen Backlog Watchdog
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["Qwen Live Notice Classification", "Qwen Live Continuous Conveyor"]
+    workflows:
+      - "Notice Intelligence Ledger"
+      - "Qwen Live Notice Classification"
+      - "Qwen Live Continuous Conveyor"
     types: [completed]
   schedule:
     - cron: '*/5 * * * *'
@@ -11,6 +14,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/qwen-backlog-watchdog.yml'
+      - 'pipeline/qwen_semantic_controller.py'
 
 permissions:
   actions: write
@@ -22,10 +26,6 @@ concurrency:
 
 env:
   QWEN_PER_SHARD: '96'
-  HEARTBEAT_FRESH_MINUTES: '30'
-  STARTUP_HEARTBEAT_GRACE_MINUTES: '20'
-  FRESH_QUEUED_GRACE_MINUTES: '10'
-  HARD_RUN_MAX_MINUTES: '60'
 
 jobs:
   watchdog:
@@ -36,9 +36,12 @@ jobs:
         with:
           ref: main
           fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
       - id: inspect
-        name: Enforce one real Qwen generation and zero stale queue debt
+        name: Inspect semantic lane with tested controller
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -46,152 +49,19 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/qwen-watchdog
-
-          gh api "repos/${REPO}/contents/control/qwen_live/classification_summary.json?ref=main" \
-            --jq '.content' 2>/dev/null | tr -d '\n' | base64 -d > /tmp/qwen-watchdog/current.json 2>/dev/null || true
-
-          gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 100 \
-            --json databaseId,status,conclusion,createdAt,updatedAt,event,url > /tmp/qwen-watchdog/runs.json
-
-          python - <<'PY' > /tmp/qwen-watchdog/decision.json
-          import datetime as dt
-          import json
-          import os
-          import subprocess
-          from pathlib import Path
-
-          repo=os.environ['REPO']
-          heartbeat_fresh=float(os.environ.get('HEARTBEAT_FRESH_MINUTES','30'))
-          startup_grace=float(os.environ.get('STARTUP_HEARTBEAT_GRACE_MINUTES','20'))
-          queued_grace=float(os.environ.get('FRESH_QUEUED_GRACE_MINUTES','10'))
-          hard_max=float(os.environ.get('HARD_RUN_MAX_MINUTES','60'))
-          now=dt.datetime.now(dt.timezone.utc)
-
-          def parse_dt(value):
-              if not value:
-                  return None
-              try:
-                  return dt.datetime.fromisoformat(str(value).replace('Z','+00:00'))
-              except Exception:
-                  return None
-
-          try:
-              cur=json.loads(Path('/tmp/qwen-watchdog/current.json').read_text())
-              remaining=max(0,int(cur.get('remaining_classification_queue')))
-              generated=parse_dt(cur.get('generated_at'))
-          except Exception:
-              remaining=None
-              generated=None
-
-          runs=json.loads(Path('/tmp/qwen-watchdog/runs.json').read_text())
-          running=[r for r in runs if r.get('status') == 'in_progress']
-          queued=[r for r in runs if r.get('status') in {'queued','waiting','pending','requested'}]
-
-          def rid(r):
-              try:return int(r.get('databaseId'))
-              except Exception:return None
-
-          def age_minutes(r):
-              created=parse_dt(r.get('createdAt'))
-              return ((now-created).total_seconds()/60.0) if created else 1e9
-
-          def heartbeat_age(run_id):
-              p=subprocess.run(
-                  ['gh','api',f'repos/{repo}/releases/tags/qwen-live-progress-{run_id}'],
-                  text=True,capture_output=True
-              )
-              if p.returncode != 0:
-                  return None
-              try: rel=json.loads(p.stdout)
-              except Exception:return None
-              stamps=[]
-              for asset in rel.get('assets') or []:
-                  stamp=parse_dt(asset.get('updated_at') or asset.get('created_at'))
-                  if stamp: stamps.append(stamp)
-              if not stamps:return None
-              return (now-max(stamps)).total_seconds()/60.0
-
-          running_info=[]
-          for r in running:
-              run_id=rid(r)
-              if run_id is None: continue
-              age=age_minutes(r)
-              hb_age=heartbeat_age(run_id)
-              heartbeat_ok=hb_age is not None and hb_age <= heartbeat_fresh
-              startup_ok=hb_age is None and age < startup_grace
-              healthy=age < hard_max and (heartbeat_ok or startup_ok)
-              running_info.append({
-                  'id':run_id,
-                  'age_minutes':round(age,1),
-                  'heartbeat_age_minutes':round(hb_age,1) if hb_age is not None else None,
-                  'heartbeat_ok':heartbeat_ok,
-                  'startup_grace':startup_ok,
-                  'healthy':healthy,
-              })
-
-          # Keep at most ONE healthy in-progress generation. Prefer a real heartbeat,
-          # then the youngest run. Everything else is stale/duplicate and is cancelled.
-          healthy_runs=[x for x in running_info if x['healthy']]
-          healthy_runs.sort(key=lambda x:(not x['heartbeat_ok'], x['heartbeat_age_minutes'] if x['heartbeat_age_minutes'] is not None else 1e9, x['age_minutes']))
-          keeper=healthy_runs[0] if healthy_runs else None
-          running_cancel=[x['id'] for x in running_info if not keeper or x['id'] != keeper['id']]
-
-          queued_info=[]
-          for r in queued:
-              run_id=rid(r)
-              if run_id is None: continue
-              queued_info.append({
-                  'id':run_id,
-                  'event':str(r.get('event') or ''),
-                  'age_minutes':round(age_minutes(r),1),
-              })
-
-          # Queued work is NEVER semantic-lane health. If a worker is already running,
-          # all queued generations are debt. If no worker is running, only one very
-          # fresh workflow_dispatch is allowed to wait for GitHub capacity.
-          queued_keep=None
-          if keeper is None:
-              fresh_dispatch=[x for x in queued_info if x['event']=='workflow_dispatch' and x['age_minutes'] < queued_grace]
-              fresh_dispatch.sort(key=lambda x:x['age_minutes'])
-              if fresh_dispatch:
-                  queued_keep=fresh_dispatch[0]
-          queued_cancel=[x['id'] for x in queued_info if not queued_keep or x['id'] != queued_keep['id']]
-
-          has_backlog=(remaining is None or remaining > 0)
-          covered=keeper is not None or queued_keep is not None
-          need_dispatch=bool(has_backlog and not covered)
-          cancel_ids=running_cancel + queued_cancel
-
-          out={
-              'remaining': remaining if remaining is not None else 'unknown',
-              'summary_generated_at': generated.isoformat() if generated else None,
-              'running': running_info,
-              'running_keeper': keeper,
-              'queued': queued_info,
-              'queued_keeper': queued_keep,
-              'cancel_ids': cancel_ids,
-              'cancel_count': len(cancel_ids),
-              'need_dispatch': need_dispatch,
-              'lane_covered': covered,
-              'policy': {
-                  'single_running_generation': True,
-                  'queued_is_health': False,
-                  'heartbeat_fresh_minutes': heartbeat_fresh,
-                  'startup_heartbeat_grace_minutes': startup_grace,
-                  'fresh_queued_workflow_dispatch_grace_minutes': queued_grace,
-                  'hard_run_max_minutes': hard_max,
-              },
-          }
-          print(json.dumps(out,indent=2,sort_keys=True))
-          PY
-
-          cat /tmp/qwen-watchdog/decision.json
+          python pipeline/qwen_semantic_controller.py \
+            --repo "$REPO" \
+            --summary control/qwen_live/classification_summary.json \
+            --out /tmp/qwen-watchdog/decision.json
           echo "remaining=$(jq -r '.remaining' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
+          echo "ledger_source=$(jq -r '.ledger_source // "unknown"' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
+          echo "semantic_source=$(jq -r '.semantic_source // "unknown"' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
+          echo "source_gap=$(jq -r '.source_gap' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
           echo "cancel_count=$(jq -r '.cancel_count' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
           echo "need_dispatch=$(jq -r '.need_dispatch' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
           echo "lane_covered=$(jq -r '.lane_covered' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
 
-      - name: Purge stale, duplicate and queued Qwen generations
+      - name: Purge stale, duplicate and queued semantic generations
         if: steps.inspect.outputs.cancel_count != '0'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -201,12 +71,12 @@ jobs:
           set -euo pipefail
           mapfile -t ids < <(jq -r '.cancel_ids[]' /tmp/qwen-watchdog/decision.json)
           for run_id in "${ids[@]}"; do
-            echo "Cancelling Qwen queue debt/stale generation $run_id"
+            echo "Cancelling stale/duplicate semantic generation $run_id"
             gh api --method POST "repos/${REPO}/actions/runs/${run_id}/cancel" >/dev/null 2>&1 || true
           done
 
       - id: recover
-        name: Dispatch exactly one fresh Qwen generation from current main
+        name: Dispatch exactly one fresh semantic generation
         if: steps.inspect.outputs.need_dispatch == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -214,9 +84,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
-          # Do not stack a replacement behind cancellation debt. Wait briefly for the
-          # lane to clear; if GitHub propagation is slow the next 5-minute cycle retries.
+          # Never stack a replacement behind cancellation propagation. The next
+          # five-minute cycle retries if GitHub still exposes old active state.
           for _ in $(seq 1 18); do
             active="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 100 --json status --jq '[.[] | select(.status=="queued" or .status=="waiting" or .status=="pending" or .status=="requested" or .status=="in_progress")] | length')"
             if [ "$active" -eq 0 ]; then
@@ -225,13 +94,12 @@ jobs:
                 -f auto_continue=true \
                 -f dce_limit=160
               echo 'dispatched=true' >> "$GITHUB_OUTPUT"
-              echo "Dispatched one fresh Qwen generation from current main at per_shard=$QWEN_PER_SHARD."
+              echo "Dispatched one current-main Qwen generation at per_shard=$QWEN_PER_SHARD."
               exit 0
             fi
             sleep 5
           done
-
-          echo 'Cancellation still propagating; no duplicate replacement queued. Next watchdog cycle will retry.'
+          echo 'Cancellation still propagating; refusing duplicate dispatch. Next watchdog cycle retries.'
           echo 'dispatched=false' >> "$GITHUB_OUTPUT"
 
       - name: Confirm replacement is visible
@@ -245,20 +113,25 @@ jobs:
           for _ in $(seq 1 12); do
             fresh="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 20 --json status,event,createdAt --jq '[.[] | select(.event=="workflow_dispatch") | select(.status=="queued" or .status=="waiting" or .status=="pending" or .status=="requested" or .status=="in_progress")] | length')"
             if [ "$fresh" -gt 0 ]; then
-              echo "Fresh Qwen generation visible."
+              echo 'Fresh semantic generation visible.'
               exit 0
             fi
             sleep 5
           done
-          echo 'Fresh Qwen dispatch was not visible after 60s.' >&2
+          echo 'Fresh semantic dispatch was not visible after 60s.' >&2
           exit 1
 
-      - name: Watchdog summary
+      - name: Controller summary
         if: always()
         run: |
-          echo '### Qwen single-generation watchdog' >> "$GITHUB_STEP_SUMMARY"
+          echo '### Qwen semantic controller' >> "$GITHUB_STEP_SUMMARY"
           echo "- durable remaining: ${{ steps.inspect.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- lane covered by one healthy running/fresh queued generation: ${{ steps.inspect.outputs.lane_covered }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- stale/duplicate queue debt cancelled: ${{ steps.inspect.outputs.cancel_count }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- fresh replacement dispatched: ${{ steps.recover.outputs.dispatched }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- latest ledger source: ${{ steps.inspect.outputs.ledger_source }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- stable semantic source: ${{ steps.inspect.outputs.semantic_source }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- newer ledger waiting: ${{ steps.inspect.outputs.source_gap }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- lane covered: ${{ steps.inspect.outputs.lane_covered }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- stale/duplicate runs cancelled: ${{ steps.inspect.outputs.cancel_count }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- replacement dispatched: ${{ steps.recover.outputs.dispatched }}" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
           cat /tmp/qwen-watchdog/decision.json >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
