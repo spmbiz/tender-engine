@@ -15,6 +15,7 @@ STARTUP_GRACE_MINUTES = 35.0
 API_UNKNOWN_GRACE_MINUTES = 145.0
 FRESH_QUEUED_GRACE_MINUTES = 10.0
 ACTIVE_QUEUE_STATES = {"queued", "waiting", "pending", "requested"}
+AUTHORIZED_SEMANTIC_EVENT = "workflow_dispatch"
 
 
 def parse_dt(value: object) -> dt.datetime | None:
@@ -56,10 +57,12 @@ def decide(
 ) -> dict[str, Any]:
     """Pure semantic-lane decision logic.
 
-    A queued workflow is never health. One healthy in-progress generation is kept.
-    Fresh heartbeat always wins over elapsed age. API uncertainty fails safe close
-    to the worker timeout. A newer ledger generation counts as backlog even when
-    the prior semantic summary says zero.
+    A queued workflow is never health. One healthy controller-authorized in-progress
+    generation is kept. Legacy schedule/push/workflow_run generations can never own
+    the lane even if they have a fresh heartbeat. Fresh heartbeat always wins over
+    elapsed age for an authorized generation. API uncertainty fails safe close to
+    the worker timeout. A newer ledger generation counts as backlog even when the
+    prior semantic summary says zero.
     """
     running = [r for r in runs if r.get("status") == "in_progress"]
     queued = [r for r in runs if r.get("status") in ACTIVE_QUEUE_STATES]
@@ -69,6 +72,8 @@ def decide(
         run_id = _rid(row)
         if run_id is None:
             continue
+        event = str(row.get("event") or "")
+        controller_authorized = event == AUTHORIZED_SEMANTIC_EVENT
         age = age_minutes(row.get("createdAt"), now)
         hb = heartbeats.get(run_id) or {"state": "missing", "age_minutes": None}
         hb_state = str(hb.get("state") or "missing")
@@ -80,10 +85,13 @@ def decide(
         heartbeat_stale = hb_state == "ok" and hb_age is not None and hb_age > heartbeat_fresh_minutes
         startup_ok = hb_state == "missing" and age < startup_grace_minutes
         api_unknown_ok = hb_state == "unknown" and age < api_unknown_grace_minutes
-        healthy = heartbeat_ok or startup_ok or api_unknown_ok
+        runtime_healthy = heartbeat_ok or startup_ok or api_unknown_ok
+        healthy = controller_authorized and runtime_healthy
         running_info.append(
             {
                 "id": run_id,
+                "event": event,
+                "controller_authorized": controller_authorized,
                 "age_minutes": round(age, 1),
                 "heartbeat_state": hb_state,
                 "heartbeat_age_minutes": round(hb_age, 1) if hb_age is not None else None,
@@ -91,6 +99,7 @@ def decide(
                 "heartbeat_stale": heartbeat_stale,
                 "startup_grace": startup_ok,
                 "api_unknown_grace": api_unknown_ok,
+                "runtime_healthy": runtime_healthy,
                 "healthy": healthy,
             }
         )
@@ -124,7 +133,7 @@ def decide(
         candidates = [
             x
             for x in queued_info
-            if x["event"] == "workflow_dispatch" and x["age_minutes"] < queued_grace_minutes
+            if x["event"] == AUTHORIZED_SEMANTIC_EVENT and x["age_minutes"] < queued_grace_minutes
         ]
         candidates.sort(key=lambda x: x["age_minutes"])
         if candidates:
@@ -155,6 +164,8 @@ def decide(
         "lane_covered": covered,
         "policy": {
             "single_running_generation": True,
+            "semantic_dispatch_event": AUTHORIZED_SEMANTIC_EVENT,
+            "legacy_trigger_can_own_lane": False,
             "queued_is_health": False,
             "newer_ledger_is_backlog": True,
             "fresh_heartbeat_overrides_elapsed_age": True,
