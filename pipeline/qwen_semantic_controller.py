@@ -16,6 +16,10 @@ API_UNKNOWN_GRACE_MINUTES = 145.0
 FRESH_QUEUED_GRACE_MINUTES = 10.0
 ACTIVE_QUEUE_STATES = {"queued", "waiting", "pending", "requested"}
 AUTHORIZED_SEMANTIC_EVENT = "workflow_dispatch"
+MIN_CONTROL_PLANE_SHA = os.getenv(
+    "QWEN_SEMANTIC_MIN_CONTROL_PLANE_SHA",
+    "5448b04fa70e8432b7884d5a74fd7957110cd441",
+).strip()
 
 
 def parse_dt(value: object) -> dt.datetime | None:
@@ -42,6 +46,16 @@ def _rid(row: dict[str, Any]) -> int | None:
         return None
 
 
+def _control_plane_state(row: dict[str, Any]) -> str:
+    state = str(row.get("control_plane_state") or "").strip().lower()
+    if state in {"current", "legacy", "unknown"}:
+        return state
+    current = row.get("control_plane_current")
+    if current is False:
+        return "legacy"
+    return "current"
+
+
 def decide(
     *,
     now: dt.datetime,
@@ -58,11 +72,15 @@ def decide(
     """Pure semantic-lane decision logic.
 
     A queued workflow is never health. One healthy controller-authorized in-progress
-    generation is kept. Legacy schedule/push/workflow_run generations can never own
-    the lane even if they have a fresh heartbeat. Fresh heartbeat always wins over
-    elapsed age for an authorized generation. API uncertainty fails safe close to
-    the worker timeout. A newer ledger generation counts as backlog even when the
-    prior semantic summary says zero.
+    generation is kept. Authorization requires both the workflow_dispatch event and
+    a run head that is not known to predate the canonical control plane. A definite
+    legacy head can never own the lane even if its heartbeat is fresh. An ancestry
+    API failure is reported as unknown and fails safe-open for the existing runtime
+    health window rather than killing healthy compute on a transient GitHub error.
+
+    Fresh heartbeat wins over elapsed age for an authorized generation. API
+    uncertainty fails safe close to the worker timeout. A newer ledger generation
+    counts as backlog even when the prior semantic summary says zero.
     """
     running = [r for r in runs if r.get("status") == "in_progress"]
     queued = [r for r in runs if r.get("status") in ACTIVE_QUEUE_STATES]
@@ -73,7 +91,9 @@ def decide(
         if run_id is None:
             continue
         event = str(row.get("event") or "")
-        controller_authorized = event == AUTHORIZED_SEMANTIC_EVENT
+        cp_state = _control_plane_state(row)
+        control_plane_eligible = cp_state != "legacy"
+        controller_authorized = event == AUTHORIZED_SEMANTIC_EVENT and control_plane_eligible
         age = age_minutes(row.get("createdAt"), now)
         hb = heartbeats.get(run_id) or {"state": "missing", "age_minutes": None}
         hb_state = str(hb.get("state") or "missing")
@@ -91,6 +111,9 @@ def decide(
             {
                 "id": run_id,
                 "event": event,
+                "head_sha": str(row.get("headSha") or ""),
+                "control_plane_state": cp_state,
+                "control_plane_eligible": control_plane_eligible,
                 "controller_authorized": controller_authorized,
                 "age_minutes": round(age, 1),
                 "heartbeat_state": hb_state,
@@ -120,10 +143,17 @@ def decide(
         run_id = _rid(row)
         if run_id is None:
             continue
+        event = str(row.get("event") or "")
+        cp_state = _control_plane_state(row)
+        control_plane_eligible = cp_state != "legacy"
         queued_info.append(
             {
                 "id": run_id,
-                "event": str(row.get("event") or ""),
+                "event": event,
+                "head_sha": str(row.get("headSha") or ""),
+                "control_plane_state": cp_state,
+                "control_plane_eligible": control_plane_eligible,
+                "controller_authorized": event == AUTHORIZED_SEMANTIC_EVENT and control_plane_eligible,
                 "age_minutes": round(age_minutes(row.get("createdAt"), now), 1),
             }
         )
@@ -133,7 +163,7 @@ def decide(
         candidates = [
             x
             for x in queued_info
-            if x["event"] == AUTHORIZED_SEMANTIC_EVENT and x["age_minutes"] < queued_grace_minutes
+            if x["controller_authorized"] and x["age_minutes"] < queued_grace_minutes
         ]
         candidates.sort(key=lambda x: x["age_minutes"])
         if candidates:
@@ -165,6 +195,9 @@ def decide(
         "policy": {
             "single_running_generation": True,
             "semantic_dispatch_event": AUTHORIZED_SEMANTIC_EVENT,
+            "minimum_control_plane_sha": MIN_CONTROL_PLANE_SHA,
+            "legacy_control_plane_run_can_own_lane": False,
+            "control_plane_ancestry_unknown_fails_safe_open": True,
             "legacy_trigger_can_own_lane": False,
             "queued_is_health": False,
             "newer_ledger_is_backlog": True,
@@ -229,6 +262,52 @@ def heartbeat_probe(repo: str, run_id: int, now: dt.datetime) -> dict[str, Any]:
     }
 
 
+def control_plane_probe(repo: str, head_sha: object) -> dict[str, Any]:
+    """Return whether a run head contains the canonical control-plane merge."""
+    head = str(head_sha or "").strip()
+    minimum = MIN_CONTROL_PLANE_SHA
+    if not minimum:
+        return {"state": "current", "minimum_sha": "", "head_sha": head, "reason": "guard_disabled"}
+    if not head:
+        return {"state": "unknown", "minimum_sha": minimum, "head_sha": head, "reason": "missing_head_sha"}
+    if head == minimum:
+        return {"state": "current", "minimum_sha": minimum, "head_sha": head, "compare_status": "identical"}
+
+    proc = gh("api", f"repos/{repo}/compare/{minimum}...{head}", allow_failure=True)
+    if proc.returncode:
+        return {
+            "state": "unknown",
+            "minimum_sha": minimum,
+            "head_sha": head,
+            "reason": "compare_api_error",
+            "error": (proc.stderr or "")[-500:],
+        }
+    try:
+        payload = json.loads(proc.stdout)
+    except Exception:
+        return {
+            "state": "unknown",
+            "minimum_sha": minimum,
+            "head_sha": head,
+            "reason": "invalid_compare_json",
+        }
+    status = str(payload.get("status") or "").lower()
+    if status in {"ahead", "identical"}:
+        state = "current"
+    elif status in {"behind", "diverged"}:
+        state = "legacy"
+    else:
+        state = "unknown"
+    return {
+        "state": state,
+        "minimum_sha": minimum,
+        "head_sha": head,
+        "compare_status": status or None,
+        "ahead_by": payload.get("ahead_by"),
+        "behind_by": payload.get("behind_by"),
+    }
+
+
 def inspect(repo: str, summary_path: Path) -> dict[str, Any]:
     now = dt.datetime.now(dt.timezone.utc)
     remaining = None
@@ -244,15 +323,23 @@ def inspect(repo: str, summary_path: Path) -> dict[str, Any]:
     semantic_source = release_source(repo, "qwen-classification-state-latest", "source_run")
     proc = gh(
         "run", "list", "--repo", repo, "--workflow", "qwen-live-classification.yml",
-        "--limit", "100", "--json", "databaseId,status,conclusion,createdAt,updatedAt,event,url",
+        "--limit", "100", "--json",
+        "databaseId,status,conclusion,createdAt,updatedAt,event,headSha,url",
     )
     runs = json.loads(proc.stdout or "[]")
     heartbeats: dict[int, dict[str, Any]] = {}
+    control_plane: dict[int, dict[str, Any]] = {}
     for row in runs:
-        if row.get("status") != "in_progress":
+        if row.get("status") != "in_progress" and row.get("status") not in ACTIVE_QUEUE_STATES:
             continue
         run_id = _rid(row)
-        if run_id is not None:
+        if run_id is None:
+            continue
+        cp = control_plane_probe(repo, row.get("headSha"))
+        control_plane[run_id] = cp
+        row["control_plane_state"] = cp.get("state")
+        row["control_plane_current"] = cp.get("state") == "current"
+        if row.get("status") == "in_progress":
             heartbeats[run_id] = heartbeat_probe(repo, run_id, now)
 
     out = decide(
@@ -266,6 +353,7 @@ def inspect(repo: str, summary_path: Path) -> dict[str, Any]:
     out["inspected_at"] = now.isoformat()
     out["summary_generated_at"] = generated_at
     out["heartbeats"] = heartbeats
+    out["control_plane_probes"] = control_plane
     return out
 
 
