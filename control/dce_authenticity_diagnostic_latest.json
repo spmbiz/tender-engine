@@ -1,14 +1,49 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32464987584,
-  "total_inbox_rows": 3,
-  "dce_authenticity_rows": 0,
-  "portal_counts": {},
-  "status_counts": {},
-  "reason_counts": {},
+  "latest_source_dce_run_id": 32467870384,
+  "total_inbox_rows": 29,
+  "dce_authenticity_rows": 2,
+  "portal_counts": {
+    "TED": 2
+  },
+  "status_counts": {
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 1,
+    "UNKNOWN_RETRIEVED_DOCUMENT": 1
+  },
+  "reason_counts": {
+    "NON_AUTHORITATIVE": 2
+  },
   "method_counts": {},
-  "recovery_opportunities": [],
-  "samples_by_reason": {},
+  "recovery_opportunities": [
+    {
+      "portal": "TED",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
+      }
+    }
+  ],
+  "samples_by_reason": {
+    "NON_AUTHORITATIVE": [
+      {
+        "candidate_id": "TED:690247-2025",
+        "portal": "TED",
+        "title": "Germany – Load-bearing structure design services – Fachplanung Tragwerksplanung: Erweiterung der Grundschule Pastetten",
+        "buyer": "Gemeinde Pastetten",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ted.europa.eu/en/notice/-/detail/690247-2025"
+      },
+      {
+        "candidate_id": "TED:735746-2025",
+        "portal": "TED",
+        "title": "Greece – Installation services of electrical equipment – ΠΑΡΑΧΩΡΗΣΗ ΤΗΣ ΑΝΑΠΤΥΞΗΣ, ΔΙΑΧΕΙΡΙΣΗΣ ΚΑΙ ΛΕΙΤΟΥΡΓΙΑΣ ΔΗΜΟΣΙΩΣ ΠΡΟΣΒΑΣΙΜΩΝ ΥΠΟΔΟΜΩΝ ΕΠΑΝΑΦΟΡΤΙΣΗΣ ΠΟΥ ΠΕΡΙΛΑΜΒΑΝΟΝΤΑΙ ΣΕ ΣΧΕΔΙΑ ΦΟΡΤΙΣΗΣ ΗΛΕΚΤΡΙΚΩΝ ΟΧΗΜΑΤΩΝ",
+        "buyer": "ΔΗΜΟΣ ΚΗΦΙΣΙΑΣ",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://ted.europa.eu/en/notice/-/detail/735746-2025"
+      }
+    ]
+  },
   "safety": {
     "diagnostic_only": true,
     "mutates_inbox": false,
