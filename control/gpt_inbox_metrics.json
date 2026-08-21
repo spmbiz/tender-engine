@@ -1,32 +1,31 @@
 {
   "schema": "GPT_INBOX_HEALTH_V4_FAIR_SHARE_PROVENANCE",
-  "updated_at": "2026-08-21T07:46:46.295369+00:00",
+  "updated_at": "2026-08-21T08:30:38.888406+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
-  "latest_source_dce_run_id": 32459986640,
+  "latest_source_dce_run_id": 32463339302,
   "counts": {
-    "pending_gpt_web_review": 39,
+    "pending_gpt_web_review": 38,
     "reviewed_ticks_total": 485,
     "excluded_already_reviewed": 0,
     "excluded_already_in_final_bank": 0,
-    "pending_before_visible_cap": 39,
+    "pending_before_visible_cap": 38,
     "pending_by_stage": {
       "BUSINESS_GATES": 21,
-      "DCE_AUTHENTICITY": 18
+      "DCE_AUTHENTICITY": 17
     },
     "pending_by_inbox_lane": {
       "GPT_PRIORITY": 2,
-      "DCE_AUTHENTICITY_REPAIR": 18,
+      "DCE_AUTHENTICITY_REPAIR": 17,
       "LOW_PORTAL_SURVEILLANCE": 19
     },
     "pending_by_fit_band": {
       "UNKNOWN": 2,
-      "LOW": 37
+      "LOW": 36
     },
     "pending_by_portal": {
       "TED": 15,
       "GR_KHMDHS": 11,
       "GENERIC_PUBLIC_PAGE": 3,
-      "DE_DOE": 1,
       "ES_PLACSP": 4,
       "SCOTLAND_PCS": 3,
       "CA_CANADABUYS": 1,
@@ -39,50 +38,48 @@
     "low_surveillance_target": 20,
     "selected_by_lane": {
       "GPT_PRIORITY": 2,
-      "DCE_AUTHENTICITY_REPAIR": 18,
+      "DCE_AUTHENTICITY_REPAIR": 17,
       "LOW_PORTAL_SURVEILLANCE": 19
     },
     "selected_by_stage": {
       "BUSINESS_GATES": 21,
-      "DCE_AUTHENTICITY": 18
+      "DCE_AUTHENTICITY": 17
     },
     "selected_by_band": {
       "UNKNOWN": 2,
-      "LOW": 37
+      "LOW": 36
     },
     "selected_by_portal": {
       "TED": 15,
       "GR_KHMDHS": 11,
       "GENERIC_PUBLIC_PAGE": 3,
-      "DE_DOE": 1,
       "ES_PLACSP": 4,
       "SCOTLAND_PCS": 3,
       "CA_CANADABUYS": 1,
       "WORLD_BANK": 1
     }
   },
-  "review_bank_count": 38,
+  "review_bank_count": 37,
   "review_bank_schema": "GPT_REVIEW_HOT_V7_FAIR_SHARE",
   "review_bank_window_selection": {
     "priority_target": 120,
     "authenticity_target": 20,
     "low_surveillance_target": 20,
     "selected_by_lane": {
-      "DCE_AUTHENTICITY_REPAIR": 18,
+      "DCE_AUTHENTICITY_REPAIR": 17,
       "LOW_PORTAL_SURVEILLANCE": 20
     },
     "selected_by_band": {
-      "LOW": 38
+      "LOW": 37
     },
     "selected_by_stage": {
-      "DCE_AUTHENTICITY": 18,
+      "DCE_AUTHENTICITY": 17,
       "BUSINESS_GATES": 20
     },
     "selected_by_portal": {
       "GR_KHMDHS": 12,
       "TED": 13,
       "GENERIC_PUBLIC_PAGE": 3,
-      "DE_DOE": 1,
       "ES_PLACSP": 4,
       "SCOTLAND_PCS": 3,
       "CA_CANADABUYS": 1,
@@ -113,33 +110,33 @@
   "assistant_read_batch_schema": "GPT_WEB_READ_BATCH_MANIFEST_V3_PROVENANCE_REFRESH",
   "provenance_overrides_applied_in_window": 0,
   "recovery_metrics": {
-    "shard_files_scanned": 32,
-    "adjudication_rows_scanned": 137,
+    "shard_files_scanned": 34,
+    "adjudication_rows_scanned": 136,
     "model_review_rows_seen": 20,
-    "dce_authenticity_rows_seen": 18,
+    "dce_authenticity_rows_seen": 17,
     "scope_auto_rejected": 0,
     "scope_auto_reject_reason_counts": {},
     "cross_portal_duplicates_collapsed": 0,
-    "uncapped_unique_pending_before_hot_window": 38,
-    "rich_hot_window_count": 38,
+    "uncapped_unique_pending_before_hot_window": 37,
+    "rich_hot_window_count": 37,
     "overflow_beyond_hot_window": 0
   },
   "index_recovery": {
-    "shard_files_scanned_this_refresh": 32,
-    "adjudication_rows_scanned_this_refresh": 137,
+    "shard_files_scanned_this_refresh": 34,
+    "adjudication_rows_scanned_this_refresh": 136,
     "gate_rows_seen_this_refresh": 20,
-    "authenticity_rows_seen_this_refresh": 18,
+    "authenticity_rows_seen_this_refresh": 17,
     "source_runs_seen_this_refresh": [
+      32463339302,
+      32462901665,
+      32460374317,
       32459986640,
       32459317355,
       32458876893,
       32458462508,
       32457170077,
       32456489127,
-      32456071954,
-      32455618483,
-      32455209647,
-      32454935891
+      32456071954
     ]
   },
   "healthy": true,
