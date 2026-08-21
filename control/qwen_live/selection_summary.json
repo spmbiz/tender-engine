@@ -1,36 +1,36 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-21T00:02:23+00:00",
+  "generated_at_utc": "2026-08-21T00:08:06+00:00",
   "source_run": "32327417448",
   "state_rows": 19593,
   "ledger_rows": 126459,
   "snapshot_rows": 126459,
   "blocked_ids": 30442,
-  "durable_attempted_exact_versions_ignored": 3729,
-  "valid_exact_hash_current_unattempted": 9076,
-  "eligible_keep_for_dce": 7936,
+  "durable_attempted_exact_versions_ignored": 3875,
+  "valid_exact_hash_current_unattempted": 8930,
+  "eligible_keep_for_dce": 7820,
   "review_worthy_rejects_promoted_to_explore": 913,
   "stale_hash_ignored": 0,
   "missing_snapshot": 0,
   "expired_ignored": 186,
   "selected": 160,
   "selection_decisions": {
-    "FIT": 11,
-    "MAYBE": 117,
+    "FIT": 1,
+    "MAYBE": 127,
     "REJECT_OBVIOUS": 32
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
-    "qwen-primary-coded": 11,
+    "qwen-primary-coded": 1,
     "qwen-explore-coded": 48,
     "qwen-reject-audit-coded": 32,
-    "qwen-elastic-coded": 69
+    "qwen-elastic-coded": 79
   },
   "selection_freshness": {
-    "recent_unseen_carryover": 156,
-    "historical_backfill": 4
+    "recent_unseen_carryover": 159,
+    "historical_backfill": 1
   },
   "policy": {
     "keep_is_not_fit": true,
@@ -57,21 +57,21 @@
   "base_candidate_pool": 640,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "FIT": 19,
-    "MAYBE": 547,
-    "REJECT_OBVIOUS": 74
+    "FIT": 9,
+    "MAYBE": 579,
+    "REJECT_OBVIOUS": 52
   },
   "candidate_pool_lanes": {
-    "qwen-primary": 19,
+    "qwen-primary": 9,
     "qwen-open-world-explore": 192,
     "qwen-reject-audit": 128,
-    "qwen-elastic": 301
+    "qwen-elastic": 311
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
     "noncore_code_contradictions_in_pool": 180,
     "positive_code_rows_selected": 0,
-    "noncore_code_contradictions_selected": 0,
+    "noncore_code_contradictions_selected": 9,
     "policy": "priority_only_never_drop_never_eligibility",
     "candidate_pool_multiplier": 4
   }
