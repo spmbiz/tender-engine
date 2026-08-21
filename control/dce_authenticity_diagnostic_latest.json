@@ -1,14 +1,40 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32445357220,
-  "total_inbox_rows": 0,
-  "dce_authenticity_rows": 0,
-  "portal_counts": {},
-  "status_counts": {},
-  "reason_counts": {},
+  "latest_source_dce_run_id": 32448546714,
+  "total_inbox_rows": 13,
+  "dce_authenticity_rows": 1,
+  "portal_counts": {
+    "GENERIC_PUBLIC_PAGE": 1
+  },
+  "status_counts": {
+    "UNKNOWN_RETRIEVED_DOCUMENT": 1
+  },
+  "reason_counts": {
+    "NON_AUTHORITATIVE": 1
+  },
   "method_counts": {},
-  "recovery_opportunities": [],
-  "samples_by_reason": {},
+  "recovery_opportunities": [
+    {
+      "portal": "GENERIC_PUBLIC_PAGE",
+      "blocked": 1,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 1
+      }
+    }
+  ],
+  "samples_by_reason": {
+    "NON_AUTHORITATIVE": [
+      {
+        "candidate_id": "IT-PVL:28c5f5ec-1dd2-4af8-8db0-db0425a75159",
+        "portal": "GENERIC_PUBLIC_PAGE",
+        "title": "AFFIDAMENTO SERVIZI DI REFEZIONE SCOLASTICA E DEI SERVIZI DI ACCOMPAGNAMENTO E ASSISTENZA SU SCUOLABUS DI ALUNNI TRASPORTATI E SORVEGLIANZA PRESSO I PLESSI SCOLASTICI FREQUENTATI DAGLI ALUNNI DEL COMUNE DI CASCIA A.S. 2026-2027",
+        "buyer": "COMUNE DI CASCIA",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/28c5f5ec-1dd2-4af8-8db0-db0425a75159?ricercaArchivio=false"
+      }
+    ]
+  },
   "safety": {
     "diagnostic_only": true,
     "mutates_inbox": false,
