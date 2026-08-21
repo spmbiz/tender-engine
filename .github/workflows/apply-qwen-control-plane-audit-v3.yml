@@ -104,8 +104,10 @@ jobs:
 
           echo 'QWEN_CONTROL_PLANE_INVARIANTS_PASS'
 
-      - name: Persist migration to main after merge
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+      - name: Persist validated migration to the same-repo target branch
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          TARGET_BRANCH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || 'main' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -119,18 +121,22 @@ jobs:
             .github/workflows/qwen-batch-autotune-selfheal.yml \
             .github/workflows/pipeline-ab-live-canary-v2.yml
           if git diff --cached --quiet; then
-            echo 'Control-plane migration already present on main.'
+            echo "Control-plane migration already materialized on $TARGET_BRANCH."
             exit 0
           fi
-          git commit -m 'qwen: enforce audited single-owner control plane'
+          git commit -m 'qwen: materialize audited single-owner control plane'
           for attempt in 1 2 3 4 5 6; do
-            if git pull --rebase origin main && git push origin HEAD:main; then
+            if git push origin HEAD:"$TARGET_BRANCH"; then
+              echo "Validated generated control plane persisted to $TARGET_BRANCH."
               exit 0
             fi
-            git rebase --abort >/dev/null 2>&1 || true
+            git fetch origin "$TARGET_BRANCH"
+            if ! git rebase "origin/$TARGET_BRANCH"; then
+              git rebase --abort >/dev/null 2>&1 || true
+            fi
             sleep "$((attempt * 2))"
           done
-          echo 'Failed to persist audited control-plane migration.' >&2
+          echo "Failed to persist audited control-plane migration to $TARGET_BRANCH." >&2
           exit 1
 
 # forced materialization marker: 2026-08-21T18:00Z
