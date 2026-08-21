@@ -1,15 +1,15 @@
 {
   "schema": "NOTICE_CLASSIFICATION_STATE_MERGE_SUMMARY_V5_REQUEUE_SAFE",
-  "generated_at": "2026-08-21T14:52:37+00:00",
+  "generated_at": "2026-08-21T16:04:39+00:00",
   "target_classifier_version": "qwen3-4b-q4km-batch-selfheal-v1",
   "required_classifier_prompt_version": "qwen-batch-high-recall-business-fit-v3-rich",
   "required_business_calibration_version": "spm-business-fit-v2",
   "ledger_notices": 126459,
   "snapshot_context_rows": 126459,
-  "previous_state_rows": 21926,
-  "result_rows_seen": 864,
+  "previous_state_rows": 22743,
+  "result_rows_seen": 0,
   "state_rows_after_merge": 22743,
-  "input_queue_rows": 96049,
+  "input_queue_rows": 95232,
   "remaining_classification_queue": 95232,
   "classified_fraction_of_ledger": 0.17984485,
   "legacy_guard_drift_requeue_ids": [],
@@ -19,18 +19,13 @@
   "forced_reclassification_reasons": {},
   "synthetic_integrity_requeue_ids": [],
   "stats": {
-    "previous_carried": 21926,
+    "previous_carried": 22743,
     "previous_legacy_guard_audited": 19344,
     "previous_legacy_guard_semantically_current": 19344,
     "previous_missing_exact_post_guard_provenance": 19344,
-    "queue_already_classified": 817,
-    "queue_remaining": 95232,
-    "results_accepted": 817,
-    "valid_result_rows": 817
+    "queue_remaining": 95232
   },
-  "rejected_result_reasons": {
-    "parse_or_fallback_error": 47
-  },
+  "rejected_result_reasons": {},
   "safety": {
     "exact_material_hash_required": true,
     "exact_prompt_version_required": true,
@@ -47,8 +42,8 @@
     "malformed_jsonl_is_silently_skipped": false,
     "classification_is_not_dce_or_eligibility_truth": true
   },
-  "requested_classification_queue": "work/input/notice-classification-queue-latest.jsonl.gz",
-  "effective_classification_queue": "work/input/qwen-work-queue.jsonl.gz",
+  "requested_classification_queue": "work/run/input/notice-classification-queue-latest.jsonl.gz",
+  "effective_classification_queue": "work/run/input/qwen-work-queue.jsonl.gz",
   "classification_queue_source": "plan_prefilter_qwen_work_queue",
-  "snapshot_source": "work/input/live-open-tenders-latest.jsonl.gz"
+  "snapshot_source": "work/run/input/live-open-tenders-latest.jsonl.gz"
 }
