@@ -98,11 +98,7 @@ jobs:
 
           threshold=float(os.environ.get('STALL_MINUTES','20'))
           backlog_nonempty=(remaining is None or remaining > 0)
-          # Stateful stall: no durable queue/state progress for threshold.
           stale_progress=backlog_nonempty and bool(active) and stalled_for >= threshold
-          # Cold-start protection: if watchdog state is new but an old Qwen run has
-          # produced zero currently visible results, recycle it instead of granting
-          # another full threshold window.
           cold_stale=(not prev and backlog_nonempty and bool(active) and oldest_active_age >= threshold and result_rows_seen == 0 and results_accepted == 0)
           stalled=stale_progress or cold_stale
           dead=backlog_nonempty and not active
@@ -154,14 +150,13 @@ jobs:
             gh api --method POST "repos/${REPO}/actions/runs/${rid}/cancel" >/dev/null 2>&1 || true
           done < /tmp/qwen-watchdog/active.txt
 
-          # Do not dispatch behind a zombie in the workflow concurrency group.
           for _ in $(seq 1 24); do
             active="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 40 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length')"
             [ "$active" -eq 0 ] && exit 0
             sleep 5
           done
-          echo 'Stalled Qwen generation did not clear after cancellation window.' >&2
-          exit 1
+          echo 'WARNING: zombie cancellation is still propagating; continuation will queue a replacement rather than killing the watchdog.' >&2
+          exit 0
 
       - id: restart
         name: Ensure exactly one Qwen generation exists while backlog is non-empty
@@ -170,6 +165,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           REMAINING: ${{ steps.inspect.outputs.remaining }}
+          WAS_STALLED: ${{ steps.inspect.outputs.stalled }}
         shell: bash
         run: |
           set -euo pipefail
@@ -181,9 +177,25 @@ jobs:
               -f dce_limit=160
             echo 'dispatched=true' >> "$GITHUB_OUTPUT"
             echo "Qwen watchdog dispatched replacement generation; durable remaining=${REMAINING}."
+          elif [ "$WAS_STALLED" = 'true' ]; then
+            # Cancellation can remain visible for a short period. Queue exactly one
+            # replacement behind it; the classification concurrency group prevents
+            # overlap and starts this pass as soon as the zombie clears.
+            queued="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 40 --json status,event --jq '[.[] | select(.status=="queued" or .status=="waiting" or .status=="pending" or .status=="requested")] | length')"
+            if [ "$queued" -eq 0 ]; then
+              gh workflow run qwen-live-classification.yml --repo "$REPO" --ref main \
+                -f per_shard=480 \
+                -f auto_continue=true \
+                -f dce_limit=160
+              echo 'dispatched=true' >> "$GITHUB_OUTPUT"
+              echo "Queued one replacement behind cancelling zombie; durable remaining=${REMAINING}."
+            else
+              echo 'dispatched=false' >> "$GITHUB_OUTPUT"
+              echo "Replacement already queued ($queued); refusing duplicate."
+            fi
           else
             echo 'dispatched=false' >> "$GITHUB_OUTPUT"
-            echo "A healthy/replacement Qwen generation already exists ($active_now); refusing duplicate."
+            echo "A Qwen generation already exists ($active_now); refusing duplicate."
           fi
 
       - name: Confirm replacement became visible
