@@ -7,11 +7,12 @@ from pipeline.qwen_semantic_controller import decide
 NOW = dt.datetime(2026, 8, 21, 16, 30, tzinfo=dt.timezone.utc)
 
 
-def run(run_id, status, age, event="workflow_dispatch"):
+def run(run_id, status, age, event="workflow_dispatch", control_plane_state="current"):
     return {
         "databaseId": run_id,
         "status": status,
         "event": event,
+        "control_plane_state": control_plane_state,
         "createdAt": (NOW - dt.timedelta(minutes=age)).isoformat(),
     }
 
@@ -123,6 +124,48 @@ class QwenSemanticControllerTests(unittest.TestCase):
         self.assertTrue(out["need_dispatch"])
         self.assertFalse(out["running"][0]["controller_authorized"])
 
+    def test_pre_v4_dispatch_is_never_keeper_even_with_fresh_heartbeat(self):
+        out = decide(
+            now=NOW,
+            remaining=95000,
+            ledger_source=200,
+            semantic_source=200,
+            runs=[run(77, "in_progress", 8, control_plane_state="legacy")],
+            heartbeats={77: {"state": "ok", "age_minutes": 1}},
+        )
+        self.assertIsNone(out["running_keeper"])
+        self.assertIn(77, out["cancel_ids"])
+        self.assertTrue(out["need_dispatch"])
+        self.assertFalse(out["running"][0]["control_plane_eligible"])
+        self.assertFalse(out["running"][0]["controller_authorized"])
+
+    def test_current_control_plane_beats_fresher_pre_v4_dispatch(self):
+        out = decide(
+            now=NOW,
+            remaining=95000,
+            ledger_source=200,
+            semantic_source=200,
+            runs=[
+                run(1, "in_progress", 12, control_plane_state="current"),
+                run(2, "in_progress", 5, control_plane_state="legacy"),
+            ],
+            heartbeats={1: {"state": "ok", "age_minutes": 4}, 2: {"state": "ok", "age_minutes": 1}},
+        )
+        self.assertEqual(out["running_keeper"]["id"], 1)
+        self.assertIn(2, out["cancel_ids"])
+
+    def test_unknown_control_plane_probe_fails_safe_open(self):
+        out = decide(
+            now=NOW,
+            remaining=95000,
+            ledger_source=200,
+            semantic_source=200,
+            runs=[run(9, "in_progress", 40, control_plane_state="unknown")],
+            heartbeats={9: {"state": "ok", "age_minutes": 2}},
+        )
+        self.assertEqual(out["running_keeper"]["id"], 9)
+        self.assertTrue(out["running"][0]["control_plane_eligible"])
+
     def test_queued_debt_is_purged_when_worker_running(self):
         out = decide(
             now=NOW,
@@ -147,7 +190,7 @@ class QwenSemanticControllerTests(unittest.TestCase):
         self.assertEqual(out["running_keeper"]["id"], 2)
         self.assertIn(1, out["cancel_ids"])
 
-    def test_authorized_worker_beats_legacy_worker_even_when_legacy_heartbeat_is_fresher(self):
+    def test_authorized_worker_beats_legacy_trigger_even_when_legacy_heartbeat_is_fresher(self):
         out = decide(
             now=NOW,
             remaining=95000,
