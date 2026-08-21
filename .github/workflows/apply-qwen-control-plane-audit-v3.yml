@@ -4,11 +4,18 @@ on:
   pull_request:
     paths:
       - 'pipeline/qwen_semantic_controller.py'
+      - 'pipeline/freshness_conveyor_watchdog.py'
       - 'tests/test_qwen_semantic_controller.py'
       - 'tools/apply_qwen_control_plane_audit_v3.py'
       - '.github/workflows/qwen-backlog-watchdog.yml'
       - '.github/workflows/qwen-backfill-kick.yml'
       - '.github/workflows/qwen-live-recovery-drainer.yml'
+      - '.github/workflows/auto-dce-adjudication.yml'
+      - '.github/workflows/apply-qwen-core-hotfix.yml'
+      - '.github/workflows/apply-qwen-blockers-v2.yml'
+      - '.github/workflows/apply-qwen-final-hardening.yml'
+      - '.github/workflows/apply-qwen-throughput-boost.yml'
+      - '.github/workflows/apply-qwen-conveyor-selector-fix.yml'
       - '.github/workflows/apply-qwen-control-plane-audit-v3.yml'
   push:
     branches: [main]
@@ -27,7 +34,7 @@ concurrency:
 jobs:
   validate-and-apply:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,11 +55,53 @@ jobs:
         run: |
           set -euo pipefail
           git diff --check
+
+          # Semantic classification: exactly one production dispatch owner.
           ! grep -q 'gh workflow run qwen-live-classification.yml' .github/workflows/qwen-live-conveyor.yml
+          ! grep -q 'qwen-live-classification.yml' .github/workflows/qwen-backfill-kick.yml
+          ! grep -q 'qwen-live-classification.yml' .github/workflows/qwen-live-recovery-drainer.yml
+          ! grep -q 'QWEN_WORKFLOW = "qwen-live-classification.yml"' pipeline/freshness_conveyor_watchdog.py
+          grep -q 'QWEN_CONTROLLER_WORKFLOW = "qwen-backlog-watchdog.yml"' pipeline/freshness_conveyor_watchdog.py
+          grep -q "default: '96'" .github/workflows/qwen-live-classification.yml
+          ! grep -q "default: '192'" .github/workflows/qwen-live-classification.yml
+          ! grep -q 'min(480,n)' .github/workflows/qwen-live-classification.yml
+
+          # Qwen DCE: drainer is the dispatch owner and workers share fleet admission.
           ! grep -q 'workflows: \["DCE Fanout V2"\]' .github/workflows/qwen-dce-triage.yml
           ! grep -q 'gh workflow run qwen-dce-triage.yml' .github/workflows/dce-fanout-v2.yml
-          grep -q "default: '96'" .github/workflows/qwen-live-classification.yml
+          ! grep -q 'gh workflow run qwen-dce-triage.yml' .github/workflows/auto-dce-adjudication.yml
+          grep -q 'gh workflow run qwen-dce-drainer.yml' .github/workflows/dce-fanout-v2.yml
+          grep -q 'gh workflow run qwen-dce-drainer.yml' .github/workflows/auto-dce-adjudication.yml
           grep -q 'dynamic_tender_parallel' .github/workflows/qwen-dce-triage.yml
+
+          # CPU benchmarks are engineering-only while the semantic backlog drains.
+          python - <<'PY'
+          from pathlib import Path
+          for name in ('qwen-batch-autotune-selfheal.yml','pipeline-ab-live-canary-v2.yml'):
+              text=Path('.github/workflows',name).read_text(encoding='utf-8')
+              trigger=text.split('permissions:',1)[0]
+              assert 'workflow_dispatch:' in trigger
+              assert 'schedule:' not in trigger
+              assert 'push:' not in trigger
+          PY
+
+          # Legacy patch writers cannot resurrect obsolete control-plane code.
+          python - <<'PY'
+          from pathlib import Path
+          names=(
+              'apply-qwen-core-hotfix.yml',
+              'apply-qwen-blockers-v2.yml',
+              'apply-qwen-final-hardening.yml',
+              'apply-qwen-throughput-boost.yml',
+              'apply-qwen-conveyor-selector-fix.yml',
+          )
+          for name in names:
+              text=Path('.github/workflows',name).read_text(encoding='utf-8')
+              assert 'contents: write' not in text, name
+              assert 'push:' not in text.split('permissions:',1)[0], name
+              assert 'workflow_dispatch:' in text, name
+          PY
+
           echo 'QWEN_CONTROL_PLANE_INVARIANTS_PASS'
 
       - name: Persist migration to main after merge
@@ -66,7 +115,9 @@ jobs:
             .github/workflows/qwen-live-classification.yml \
             .github/workflows/qwen-live-conveyor.yml \
             .github/workflows/qwen-dce-triage.yml \
-            .github/workflows/dce-fanout-v2.yml
+            .github/workflows/dce-fanout-v2.yml \
+            .github/workflows/qwen-batch-autotune-selfheal.yml \
+            .github/workflows/pipeline-ab-live-canary-v2.yml
           if git diff --cached --quiet; then
             echo 'Control-plane migration already present on main.'
             exit 0
