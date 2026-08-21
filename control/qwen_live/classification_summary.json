@@ -1,6 +1,6 @@
 {
   "schema": "NOTICE_CLASSIFICATION_STATE_MERGE_SUMMARY_V5_REQUEUE_SAFE",
-  "generated_at": "2026-08-21T09:32:00+00:00",
+  "generated_at": "2026-08-21T10:14:44+00:00",
   "target_classifier_version": "qwen3-4b-q4km-batch-selfheal-v1",
   "required_classifier_prompt_version": "qwen-batch-high-recall-business-fit-v3-rich",
   "required_business_calibration_version": "spm-business-fit-v2",
@@ -42,8 +42,8 @@
     "malformed_jsonl_is_silently_skipped": false,
     "classification_is_not_dce_or_eligibility_truth": true
   },
-  "requested_classification_queue": "work/input/notice-classification-queue-latest.jsonl.gz",
-  "effective_classification_queue": "work/input/qwen-work-queue.jsonl.gz",
+  "requested_classification_queue": "work/run/input/notice-classification-queue-latest.jsonl.gz",
+  "effective_classification_queue": "work/run/input/qwen-work-queue.jsonl.gz",
   "classification_queue_source": "plan_prefilter_qwen_work_queue",
-  "snapshot_source": "work/input/live-open-tenders-latest.jsonl.gz"
+  "snapshot_source": "work/run/input/live-open-tenders-latest.jsonl.gz"
 }
