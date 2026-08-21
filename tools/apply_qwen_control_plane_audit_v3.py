@@ -50,7 +50,12 @@ def patch_semantic_workflow() -> None:
         "REQUESTED_PER_SHARD: ${{ github.event.inputs.per_shard || '96' }}",
         "semantic requested per shard",
     )
-    text = replace_once(text, "or 192)\n          except Exception: n=192", "or 96)\n          except Exception: n=96", "semantic planner fallback")
+    text = replace_once(
+        text,
+        "or 192)\n          except Exception: n=192",
+        "or 96)\n          except Exception: n=96",
+        "semantic planner fallback",
+    )
     text = replace_once(text, "print(max(16,min(480,n)))", "print(max(16,min(96,n)))", "semantic planner cap")
     text = text.replace(
         "Recovery drainer owns durable Qwen→DCE publication and continuation after this workflow completes.",
@@ -61,7 +66,8 @@ def patch_semantic_workflow() -> None:
         "Qwen persistence is delegated to the continuous conveyor; continuation is delegated to the backlog watchdog.",
     )
 
-    if "  workflow_run:" in text.split("permissions:", 1)[0] or "  schedule:" in text.split("permissions:", 1)[0] or "  push:" in text.split("permissions:", 1)[0]:
+    trigger = text.split("permissions:", 1)[0]
+    if "  workflow_run:" in trigger or "  schedule:" in trigger or "  push:" in trigger:
         raise SystemExit("semantic workflow still has non-controller triggers")
     if "default: '192'" in text or "min(480,n)" in text:
         raise SystemExit("semantic workflow still exposes old shard sizing")
@@ -130,8 +136,11 @@ def patch_qwen_dce_triage() -> None:
           except Exception:w=4
           w=max(1,min(6,w))
           requested=0 if g==0 else min(w,g)
-          allowed,_=dynamic_tender_parallel(requested)
-          print(max(0,min(requested,int(allowed))))
+          if requested <= 0:
+              print(0)
+          else:
+              allowed,_=dynamic_tender_parallel(requested)
+              print(max(0,min(requested,int(allowed))))
           PY
           )"
 """
@@ -166,11 +175,31 @@ def patch_dce_fanout() -> None:
     write(path, text)
 
 
+def make_cpu_benchmark_manual_only(path: str) -> None:
+    text = read(path)
+    m = re.search(r"(?ms)^on:\n.*?^permissions:\n", text)
+    if not m:
+        raise SystemExit(f"{path}: cannot isolate trigger block")
+    text = text[: m.start()] + "on:\n  workflow_dispatch:\n\npermissions:\n" + text[m.end() :]
+    trigger = text.split("permissions:", 1)[0]
+    if "schedule:" in trigger or "push:" in trigger or "workflow_run:" in trigger:
+        raise SystemExit(f"{path}: automatic CPU benchmark trigger survived")
+    write(path, text)
+
+
+def patch_cpu_benchmarks() -> None:
+    # These launch llama.cpp CPU workers and must not steal hosted runners from the
+    # 95k+ semantic backfill. They remain available explicitly for engineering use.
+    make_cpu_benchmark_manual_only(".github/workflows/qwen-batch-autotune-selfheal.yml")
+    make_cpu_benchmark_manual_only(".github/workflows/pipeline-ab-live-canary-v2.yml")
+
+
 def main() -> None:
     patch_semantic_workflow()
     patch_conveyor()
     patch_qwen_dce_triage()
     patch_dce_fanout()
+    patch_cpu_benchmarks()
     print("QWEN_CONTROL_PLANE_AUDIT_V3_APPLIED")
 
 
