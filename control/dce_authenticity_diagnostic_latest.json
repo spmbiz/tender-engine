@@ -1,14 +1,91 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32503581142,
-  "total_inbox_rows": 0,
-  "dce_authenticity_rows": 0,
-  "portal_counts": {},
-  "status_counts": {},
-  "reason_counts": {},
+  "latest_source_dce_run_id": 32507604872,
+  "total_inbox_rows": 66,
+  "dce_authenticity_rows": 17,
+  "portal_counts": {
+    "TED": 14,
+    "US_SAM": 2,
+    "GR_KHMDHS": 1
+  },
+  "status_counts": {
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 10,
+    "UNKNOWN_RETRIEVED_DOCUMENT": 7
+  },
+  "reason_counts": {
+    "NON_AUTHORITATIVE": 17
+  },
   "method_counts": {},
-  "recovery_opportunities": [],
-  "samples_by_reason": {},
+  "recovery_opportunities": [
+    {
+      "portal": "TED",
+      "blocked": 14,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 14
+      }
+    },
+    {
+      "portal": "US_SAM",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
+      }
+    },
+    {
+      "portal": "GR_KHMDHS",
+      "blocked": 1,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 1
+      }
+    }
+  ],
+  "samples_by_reason": {
+    "NON_AUTHORITATIVE": [
+      {
+        "candidate_id": "TED:576447-2026",
+        "portal": "TED",
+        "title": "Germany – Special-purpose motor vehicles – Abrollkipperfahrzeug",
+        "buyer": "Abfallwirtschaftsbetrieb Böblingen",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ted.europa.eu/en/notice/-/detail/576447-2026"
+      },
+      {
+        "candidate_id": "US-SAM:acd53ff2639e4f0182032382d5463de2",
+        "portal": "US_SAM",
+        "title": "6515--FY26 Hemodynamic Monitoring Devices",
+        "buyer": "VETERANS AFFAIRS, DEPARTMENT OF",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://sam.gov/opp/acd53ff2639e4f0182032382d5463de2/view"
+      },
+      {
+        "candidate_id": "GR-KHMDHS:26PROC019639195",
+        "portal": "GR_KHMDHS",
+        "title": "Προμήθεια στεγανωτικών και συναφών ειδών σχολικών μονάδων δευτεροβάθμιας εκπαίδευσης",
+        "buyer": "ΔΗΜΟΣ ΣΠΑΤΩΝ - ΑΡΤΕΜΙΔΟΣ",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019639195"
+      },
+      {
+        "candidate_id": "TED:536939-2026",
+        "portal": "TED",
+        "title": "Germany – Telephone and data transmission services – Telekommunikationsdienstleistung - Mobilfunkkommunikation",
+        "buyer": "Märkischer Kreis - Der Landrat",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://ted.europa.eu/en/notice/-/detail/536939-2026"
+      },
+      {
+        "candidate_id": "US-SAM:d66a98b21309455bae1a9bcf0e1cb643",
+        "portal": "US_SAM",
+        "title": "MTY VEHICLE MINIVAN",
+        "buyer": "STATE, DEPARTMENT OF",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://sam.gov/opp/d66a98b21309455bae1a9bcf0e1cb643/view"
+      }
+    ]
+  },
   "safety": {
     "diagnostic_only": true,
     "mutates_inbox": false,
