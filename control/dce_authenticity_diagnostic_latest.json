@@ -1,109 +1,14 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32478820706,
-  "total_inbox_rows": 63,
-  "dce_authenticity_rows": 11,
-  "portal_counts": {
-    "GR_KHMDHS": 6,
-    "TED": 2,
-    "ES_PLACSP": 1,
-    "PL_EZAMOWIENIA": 1,
-    "ZA_ETENDERS": 1
-  },
-  "status_counts": {
-    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 8,
-    "UNKNOWN_RETRIEVED_DOCUMENT": 3
-  },
-  "reason_counts": {
-    "NON_AUTHORITATIVE": 11
-  },
+  "latest_source_dce_run_id": 32485053734,
+  "total_inbox_rows": 2,
+  "dce_authenticity_rows": 0,
+  "portal_counts": {},
+  "status_counts": {},
+  "reason_counts": {},
   "method_counts": {},
-  "recovery_opportunities": [
-    {
-      "portal": "GR_KHMDHS",
-      "blocked": 6,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 6
-      }
-    },
-    {
-      "portal": "TED",
-      "blocked": 2,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 2
-      }
-    },
-    {
-      "portal": "ES_PLACSP",
-      "blocked": 1,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 1
-      }
-    },
-    {
-      "portal": "PL_EZAMOWIENIA",
-      "blocked": 1,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 1
-      }
-    },
-    {
-      "portal": "ZA_ETENDERS",
-      "blocked": 1,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 1
-      }
-    }
-  ],
-  "samples_by_reason": {
-    "NON_AUTHORITATIVE": [
-      {
-        "candidate_id": "GR-KHMDHS:26PROC019646459",
-        "portal": "GR_KHMDHS",
-        "title": "Συνδρομή σε εφημερίδες και περιοδικά και ηλεκτρονικά μέσα. (Συνδρομή Δήμου στη διαδικτυακή βάση δεδο",
-        "buyer": "ΔΗΜΟΣ ΗΡΑΚΛΕΙΑΣ",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019646459"
-      },
-      {
-        "candidate_id": "TED:573884-2026",
-        "portal": "TED",
-        "title": "Estonia – Medicinal products for dermatology – Dermatoloogilised ravimid ja haavahooldusvahendid",
-        "buyer": "Aktsiaselts Ida-Tallinna Keskhaigla",
-        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
-        "notice_url": "https://ted.europa.eu/en/notice/-/detail/573884-2026"
-      },
-      {
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_PlataformasAgregadasSinMenores_20318889",
-        "portal": "ES_PLACSP",
-        "title": "Canal de Isabel II, S.A.",
-        "buyer": null,
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://contratos-publicos.comunidad.madrid/contrato-publico/suministro-reactivo-policloruro-aluminio-solucion-edar-termino-municipal-caceres"
-      },
-      {
-        "candidate_id": "PL-BZP:08deff60-6ea5-0ada-b346-0300010ce114",
-        "portal": "PL_EZAMOWIENIA",
-        "title": "Druk katalogu zbiorów MNP - Anna Krzymańska. Medale i plakiety.",
-        "buyer": "Muzeum Narodowe w Poznaniu",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08deff60-6ea5-0ada-b346-0300010ce114"
-      },
-      {
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-164106-2026-07-31",
-        "portal": "ZA_ETENDERS",
-        "title": "RFP/CEO/ Branding Materials /2026/07",
-        "buyer": "Perishable Products Export Control Board",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-164106"
-      }
-    ]
-  },
+  "recovery_opportunities": [],
+  "samples_by_reason": {},
   "safety": {
     "diagnostic_only": true,
     "mutates_inbox": false,
