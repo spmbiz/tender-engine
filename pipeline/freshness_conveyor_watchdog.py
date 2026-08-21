@@ -16,19 +16,18 @@ TOKEN = os.getenv("GITHUB_TOKEN", "")
 HEADERS = {
     "Accept": "application/vnd.github+json",
     "X-GitHub-Api-Version": "2022-11-28",
-    "User-Agent": "tender-freshness-watchdog/1.0",
+    "User-Agent": "tender-freshness-watchdog/1.1",
     **({"Authorization": f"Bearer {TOKEN}"} if TOKEN else {}),
 }
 
 DISCOVERY_WORKFLOW = "supergreen-discovery-v2.yml"
 SNAPSHOT_WORKFLOW = "live-world-snapshot.yml"
 LEDGER_WORKFLOW = "notice-intelligence-ledger.yml"
-QWEN_WORKFLOW = "qwen-live-classification.yml"
+QWEN_CONTROLLER_WORKFLOW = "qwen-backlog-watchdog.yml"
 ACTIVE_RUN_STATES = {"in_progress", "queued", "waiting", "pending", "requested"}
 MAX_ACTIVE_AGE_BY_WORKFLOW = {
     SNAPSHOT_WORKFLOW: 60,
     LEDGER_WORKFLOW: 45,
-    QWEN_WORKFLOW: 210,
 }
 DEFAULT_MAX_ACTIVE_AGE_MINUTES = 90
 
@@ -171,6 +170,7 @@ def cancel_run(run_id: object) -> bool:
 
 
 def workflow_active(workflow: str) -> bool:
+    """Used only for Snapshot/Ledger repair, never semantic Qwen lifecycle."""
     data = api_json(f"/repos/{REPO}/actions/workflows/{workflow}/runs?per_page=30")
     now = datetime.now(timezone.utc)
     max_age = int(MAX_ACTIVE_AGE_BY_WORKFLOW.get(workflow, DEFAULT_MAX_ACTIVE_AGE_MINUTES))
@@ -223,9 +223,6 @@ def decide(state: StageState) -> tuple[str, str | None]:
         return "LEDGER", state.discovery
     if state.qwen != state.discovery:
         return "QWEN", state.discovery
-    # Publishing the current source generation is not enough: an interrupted pass
-    # can publish a zero-progress state pointer. Keep Qwen hot until the durable
-    # residual queue is empty; workflow_active() prevents duplicate workers.
     if state.qwen_remaining is not None and state.qwen_remaining > 0:
         return "QWEN", state.discovery
     return "HEALTHY", state.discovery
@@ -235,7 +232,7 @@ def main() -> None:
     state = current_state()
     action, target = decide(state)
     report: dict[str, Any] = {
-        "schema": "FRESHNESS_CONVEYOR_WATCHDOG_V2",
+        "schema": "FRESHNESS_CONVEYOR_WATCHDOG_V3_SINGLE_OWNER_QWEN",
         "state": state.__dict__,
         "decision": action,
         "target_generation": target,
@@ -255,11 +252,12 @@ def main() -> None:
             dispatch(LEDGER_WORKFLOW)
             report["dispatched"] = True
     elif action == "QWEN" and target:
-        if workflow_active(QWEN_WORKFLOW):
-            report["decision"] = "QWEN_ACTIVE_WAIT"
-        else:
-            dispatch(QWEN_WORKFLOW, {"per_shard": "192", "auto_continue": "true", "dce_limit": "160"})
-            report["dispatched"] = True
+        # Single-owner invariant: freshness repair NEVER starts/cancels semantic
+        # workers. It only wakes the source-aware semantic controller, which owns
+        # dedupe, heartbeat health, queue debt and exact one-run dispatch.
+        dispatch(QWEN_CONTROLLER_WORKFLOW)
+        report["decision"] = "QWEN_CONTROLLER_WAKE"
+        report["dispatched"] = True
 
     print(json.dumps(report, indent=2, sort_keys=True))
 
