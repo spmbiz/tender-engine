@@ -1,30 +1,32 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-21T23:19:04+00:00",
+  "generated_at_utc": "2026-08-21T23:43:11+00:00",
   "source_run": "32327417448",
-  "state_rows": 24793,
+  "state_rows": 25079,
   "ledger_rows": 126459,
   "snapshot_rows": 126459,
   "blocked_ids": 32210,
-  "durable_attempted_exact_versions_ignored": 12513,
-  "valid_exact_hash_current_unattempted": 2498,
-  "eligible_keep_for_dce": 1065,
-  "review_worthy_rejects_promoted_to_explore": 1090,
+  "durable_attempted_exact_versions_ignored": 12578,
+  "valid_exact_hash_current_unattempted": 2652,
+  "eligible_keep_for_dce": 1203,
+  "review_worthy_rejects_promoted_to_explore": 1100,
   "stale_hash_ignored": 0,
   "missing_snapshot": 0,
-  "expired_ignored": 609,
+  "expired_ignored": 631,
   "selected": 160,
   "selection_decisions": {
-    "MAYBE": 159,
-    "REJECT_OBVIOUS": 1
+    "FIT": 1,
+    "MAYBE": 157,
+    "REJECT_OBVIOUS": 2
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
+    "qwen-primary-coded": 1,
     "qwen-explore-coded": 48,
-    "qwen-reject-audit-coded": 1,
-    "qwen-elastic-coded": 111
+    "qwen-reject-audit-coded": 2,
+    "qwen-elastic-coded": 109
   },
   "selection_freshness": {
     "historical_backfill": 160
@@ -54,19 +56,21 @@
   "base_candidate_pool": 640,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "MAYBE": 639,
-    "REJECT_OBVIOUS": 1
+    "FIT": 1,
+    "MAYBE": 637,
+    "REJECT_OBVIOUS": 2
   },
   "candidate_pool_lanes": {
+    "qwen-primary": 1,
     "qwen-open-world-explore": 192,
     "qwen-reject-audit": 128,
-    "qwen-elastic": 320
+    "qwen-elastic": 319
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
-    "noncore_code_contradictions_in_pool": 80,
+    "noncore_code_contradictions_in_pool": 90,
     "positive_code_rows_selected": 0,
-    "noncore_code_contradictions_selected": 0,
+    "noncore_code_contradictions_selected": 7,
     "policy": "priority_only_never_drop_never_eligibility",
     "candidate_pool_multiplier": 4
   }
