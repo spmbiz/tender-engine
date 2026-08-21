@@ -13,11 +13,11 @@ from typing import Any
 
 SCHEMA='QWEN_SHADOW_INPUT_V1'
 MANIFEST_SCHEMA='QWEN_SHADOW_SHARD_MANIFEST_V3'
-# 480 is a safe upper bound, not a completion requirement. The classifier still
-# has a 7,800 s self-heal budget inside a 150 minute job timeout, and any rows a
-# worker does not reach remain in the canonical residual queue for the next pass.
-# This removes the hidden 192-row clamp that previously defeated 480-row dispatches.
-DEFAULT_OPERATIONAL_MAX_ROWS_PER_SHARD=480
+# Keep automatic semantic passes short enough to publish durable results frequently.
+# Dispatchers may still request a larger per_shard value, but live requests inherit
+# REQUESTED_PER_SHARD and are clamped here to this operational bound. Rows not reached
+# remain in the canonical residual queue and are picked up by the next pass.
+DEFAULT_OPERATIONAL_MAX_ROWS_PER_SHARD=96
 DEFAULT_FRESH_HOURS=24
 
 
