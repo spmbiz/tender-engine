@@ -11,6 +11,7 @@ on:
       - '.github/workflows/qwen-live-conveyor.yml'
       - '.github/workflows/qwen-dce-triage.yml'
       - '.github/workflows/dce-fanout-v2.yml'
+      - '.github/workflows/qwen-dce-kick-now.yml'
       - '.github/workflows/qwen-batch-autotune-selfheal.yml'
       - '.github/workflows/pipeline-ab-live-canary-v2.yml'
       - '.github/workflows/qwen-backlog-watchdog.yml'
@@ -32,6 +33,7 @@ on:
       - '.github/workflows/qwen-live-conveyor.yml'
       - '.github/workflows/qwen-dce-triage.yml'
       - '.github/workflows/dce-fanout-v2.yml'
+      - '.github/workflows/qwen-dce-kick-now.yml'
       - '.github/workflows/qwen-batch-autotune-selfheal.yml'
       - '.github/workflows/pipeline-ab-live-canary-v2.yml'
       - '.github/workflows/apply-qwen-control-plane-audit-v3.yml'
@@ -83,13 +85,24 @@ jobs:
           ! grep -q "default: '192'" .github/workflows/qwen-live-classification.yml
           ! grep -q 'min(480,n)' .github/workflows/qwen-live-classification.yml
 
-          # Qwen DCE: drainer is the dispatch owner and workers share fleet admission.
+          # Qwen DCE: drainer is the only dispatch owner and workers share fleet admission.
           ! grep -q 'workflows: \["DCE Fanout V2"\]' .github/workflows/qwen-dce-triage.yml
           ! grep -q 'gh workflow run qwen-dce-triage.yml' .github/workflows/dce-fanout-v2.yml
           ! grep -q 'gh workflow run qwen-dce-triage.yml' .github/workflows/auto-dce-adjudication.yml
           grep -q 'gh workflow run qwen-dce-drainer.yml' .github/workflows/dce-fanout-v2.yml
           grep -q 'gh workflow run qwen-dce-drainer.yml' .github/workflows/auto-dce-adjudication.yml
           grep -q 'dynamic_tender_parallel' .github/workflows/qwen-dce-triage.yml
+          ! grep -q 'gh workflow run dce-fanout-v2.yml' .github/workflows/qwen-dce-kick-now.yml
+          grep -q 'gh workflow run qwen-dce-drainer.yml' .github/workflows/qwen-dce-kick-now.yml
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/qwen-dce-kick-now.yml')
+          trigger=p.read_text(encoding='utf-8').split('permissions:',1)[0]
+          assert 'workflow_dispatch:' in trigger
+          assert 'push:' not in trigger
+          assert 'schedule:' not in trigger
+          assert 'workflow_run:' not in trigger
+          PY
 
           # CPU benchmarks are engineering-only while the semantic backlog drains.
           python - <<'PY'
