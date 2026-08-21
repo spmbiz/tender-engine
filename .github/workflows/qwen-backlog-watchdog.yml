@@ -10,16 +10,20 @@ on:
 
 permissions:
   actions: write
-  contents: read
+  contents: write
 
 concurrency:
   group: qwen-backlog-watchdog
   cancel-in-progress: true
 
+env:
+  STALL_MINUTES: '20'
+  STATE_PATH: control/qwen_live/watchdog_state.json
+
 jobs:
   watchdog:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,48 +31,141 @@ jobs:
           fetch-depth: 1
 
       - id: inspect
-        name: Inspect durable backlog and semantic-lane liveness
+        name: Inspect durable progress, not merely process liveness
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
         shell: bash
         run: |
           set -euo pipefail
+          mkdir -p /tmp/qwen-watchdog
 
-          # Read the durable summary from main, never from the event checkout.
           summary_json="$(gh api "repos/${REPO}/contents/control/qwen_live/classification_summary.json?ref=main" --jq '.content' 2>/dev/null | tr -d '\n' | base64 -d 2>/dev/null || true)"
+          state_json="$(gh api "repos/${REPO}/contents/${STATE_PATH}?ref=main" --jq '.content' 2>/dev/null | tr -d '\n' | base64 -d 2>/dev/null || true)"
+          gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 50 \
+            --json databaseId,status,conclusion,createdAt,updatedAt,url > /tmp/qwen-watchdog/runs.json
 
-          remaining="$(SUMMARY="$summary_json" python - <<'PY'
+          SUMMARY="$summary_json" STATE="$state_json" RUNS=/tmp/qwen-watchdog/runs.json STALL_MINUTES="$STALL_MINUTES" python - <<'PY'
           import json, os
-          raw=os.environ.get('SUMMARY','').strip()
-          if not raw:
-              print('unknown')
-              raise SystemExit
-          try:
-              d=json.loads(raw)
-              v=int(d.get('remaining_classification_queue'))
-              print(max(0,v))
-          except Exception:
-              print('unknown')
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          now=datetime.now(timezone.utc)
+          def dt(s):
+              if not s: return None
+              try: return datetime.fromisoformat(str(s).replace('Z','+00:00'))
+              except Exception: return None
+          def load(raw):
+              try: return json.loads(raw) if raw.strip() else {}
+              except Exception: return {}
+
+          summary=load(os.environ.get('SUMMARY',''))
+          prev=load(os.environ.get('STATE',''))
+          runs=json.load(open(os.environ['RUNS']))
+          active_states={'queued','in_progress','waiting','pending','requested'}
+          active=[r for r in runs if r.get('status') in active_states]
+
+          try: remaining=max(0,int(summary.get('remaining_classification_queue')))
+          except Exception: remaining=None
+          try: state_rows=max(0,int(summary.get('state_rows_after_merge')))
+          except Exception: state_rows=None
+          stats=summary.get('stats') if isinstance(summary.get('stats'),dict) else {}
+          try: result_rows_seen=int(stats.get('result_rows_seen', summary.get('result_rows_seen',0)) or 0)
+          except Exception: result_rows_seen=0
+          try: results_accepted=int(stats.get('results_accepted',0) or 0)
+          except Exception: results_accepted=0
+
+          prev_remaining=prev.get('last_remaining')
+          prev_rows=prev.get('last_state_rows')
+          progress=False
+          if remaining is not None and isinstance(prev_remaining,int) and remaining < prev_remaining:
+              progress=True
+          if state_rows is not None and isinstance(prev_rows,int) and state_rows > prev_rows:
+              progress=True
+
+          last_progress=dt(prev.get('last_progress_at'))
+          if last_progress is None or progress:
+              last_progress=now
+          stalled_for=(now-last_progress).total_seconds()/60.0
+
+          oldest_active_age=0.0
+          if active:
+              ages=[]
+              for r in active:
+                  created=dt(r.get('createdAt'))
+                  if created: ages.append((now-created).total_seconds()/60.0)
+              oldest_active_age=max(ages or [0.0])
+
+          threshold=float(os.environ.get('STALL_MINUTES','20'))
+          backlog_nonempty=(remaining is None or remaining > 0)
+          # Stateful stall: no durable queue/state progress for threshold.
+          stale_progress=backlog_nonempty and bool(active) and stalled_for >= threshold
+          # Cold-start protection: if watchdog state is new but an old Qwen run has
+          # produced zero currently visible results, recycle it instead of granting
+          # another full threshold window.
+          cold_stale=(not prev and backlog_nonempty and bool(active) and oldest_active_age >= threshold and result_rows_seen == 0 and results_accepted == 0)
+          stalled=stale_progress or cold_stale
+          dead=backlog_nonempty and not active
+          should_restart=dead or stalled
+
+          out={
+              'schema':'QWEN_BACKLOG_WATCHDOG_V2',
+              'checked_at':now.isoformat().replace('+00:00','Z'),
+              'last_remaining':remaining,
+              'last_state_rows':state_rows,
+              'last_progress_at':last_progress.isoformat().replace('+00:00','Z'),
+              'stalled_for_minutes':round(stalled_for,2),
+              'oldest_active_age_minutes':round(oldest_active_age,2),
+              'active_run_ids':[int(r['databaseId']) for r in active if r.get('databaseId')],
+              'result_rows_seen':result_rows_seen,
+              'results_accepted':results_accepted,
+              'dead':dead,
+              'stalled':stalled,
+              'should_restart':should_restart,
+              'restart_count':int(prev.get('restart_count') or 0),
+              'last_restart_at':prev.get('last_restart_at'),
+          }
+          Path('/tmp/qwen-watchdog/state.json').write_text(json.dumps(out,indent=2,sort_keys=True)+'\n')
+          Path('/tmp/qwen-watchdog/active.txt').write_text('\n'.join(str(x) for x in out['active_run_ids'])+'\n')
+          Path('/tmp/qwen-watchdog/outputs.txt').write_text(
+              f"remaining={remaining if remaining is not None else 'unknown'}\n"
+              f"state_rows={state_rows if state_rows is not None else 'unknown'}\n"
+              f"active={len(active)}\n"
+              f"stalled={'true' if stalled else 'false'}\n"
+              f"dead={'true' if dead else 'false'}\n"
+              f"should_restart={'true' if should_restart else 'false'}\n"
+              f"stalled_for={stalled_for:.2f}\n"
+          )
+          print(json.dumps(out,indent=2,sort_keys=True))
           PY
-          )"
+          cat /tmp/qwen-watchdog/outputs.txt >> "$GITHUB_OUTPUT"
 
-          runs_json="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 50 --json databaseId,status,conclusion,createdAt,updatedAt,url)"
-          active="$(jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length' <<< "$runs_json")"
-          latest_id="$(jq -r 'sort_by(.createdAt) | reverse | .[0].databaseId // empty' <<< "$runs_json")"
-          latest_status="$(jq -r 'sort_by(.createdAt) | reverse | .[0].status // "none"' <<< "$runs_json")"
-          latest_conclusion="$(jq -r 'sort_by(.createdAt) | reverse | .[0].conclusion // "none"' <<< "$runs_json")"
+      - name: Cancel zombie Qwen generations after durable-progress stall
+        if: steps.inspect.outputs.stalled == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r rid; do
+            [[ "$rid" =~ ^[0-9]+$ ]] || continue
+            echo "Cancelling stalled Qwen run $rid"
+            gh api --method POST "repos/${REPO}/actions/runs/${rid}/cancel" >/dev/null 2>&1 || true
+          done < /tmp/qwen-watchdog/active.txt
 
-          echo "remaining=$remaining" >> "$GITHUB_OUTPUT"
-          echo "active=$active" >> "$GITHUB_OUTPUT"
-          echo "latest_id=$latest_id" >> "$GITHUB_OUTPUT"
-          echo "latest_status=$latest_status" >> "$GITHUB_OUTPUT"
-          echo "latest_conclusion=$latest_conclusion" >> "$GITHUB_OUTPUT"
+          # Do not dispatch behind a zombie in the workflow concurrency group.
+          for _ in $(seq 1 24); do
+            active="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 40 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length')"
+            [ "$active" -eq 0 ] && exit 0
+            sleep 5
+          done
+          echo 'Stalled Qwen generation did not clear after cancellation window.' >&2
+          exit 1
 
-          echo "Durable backlog=$remaining; active Qwen generations=$active; latest=$latest_id/$latest_status/$latest_conclusion"
-
-      - name: Restart Qwen when backlog is non-empty and semantic lane is dead
-        if: steps.inspect.outputs.active == '0' && steps.inspect.outputs.remaining != '0'
+      - id: restart
+        name: Ensure exactly one Qwen generation exists while backlog is non-empty
+        if: steps.inspect.outputs.should_restart == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -76,26 +173,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
-          # Fail open on a missing/corrupt summary: the classification planner is
-          # authoritative and safely no-ops when the exact-hash queue is empty.
-          # Re-check immediately before dispatch so overlapping triggers cannot
-          # create a semantic-run storm.
-          active_now="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length')"
-          if [ "$active_now" -ne 0 ]; then
-            echo "Qwen became active during watchdog inspection; refusing duplicate dispatch."
-            exit 0
+          active_now="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 40 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length')"
+          if [ "$active_now" -eq 0 ]; then
+            gh workflow run qwen-live-classification.yml --repo "$REPO" --ref main \
+              -f per_shard=480 \
+              -f auto_continue=true \
+              -f dce_limit=160
+            echo 'dispatched=true' >> "$GITHUB_OUTPUT"
+            echo "Qwen watchdog dispatched replacement generation; durable remaining=${REMAINING}."
+          else
+            echo 'dispatched=false' >> "$GITHUB_OUTPUT"
+            echo "A healthy/replacement Qwen generation already exists ($active_now); refusing duplicate."
           fi
 
-          gh workflow run qwen-live-classification.yml --repo "$REPO" --ref main \
-            -f per_shard=480 \
-            -f auto_continue=true \
-            -f dce_limit=160
-
-          echo "Qwen watchdog dispatched a fresh 480-row semantic generation; durable remaining=${REMAINING}."
-
-      - name: Confirm wake-up became visible
-        if: steps.inspect.outputs.active == '0' && steps.inspect.outputs.remaining != '0'
+      - name: Confirm replacement became visible
+        if: steps.restart.outputs.dispatched == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -105,18 +197,52 @@ jobs:
           for _ in $(seq 1 12); do
             active="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 20 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length')"
             if [ "$active" -gt 0 ]; then
-              echo "Wake-up confirmed: $active Qwen generation(s) queued or active."
+              echo "Replacement confirmed: $active Qwen generation(s) queued/active."
               exit 0
             fi
             sleep 5
           done
-          echo "Watchdog dispatch was not visible after 60s; fail loudly so the watchdog itself cannot look healthy while Qwen is dead." >&2
+          echo 'Replacement dispatch was not visible after 60s.' >&2
+          exit 1
+
+      - name: Persist watchdog progress state transactionally
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          DISPATCHED: ${{ steps.restart.outputs.dispatched }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s /tmp/qwen-watchdog/state.json || exit 0
+          if [ "${DISPATCHED:-false}" = 'true' ]; then
+            python - <<'PY'
+          import json
+          from datetime import datetime,timezone
+          p='/tmp/qwen-watchdog/state.json'
+          d=json.load(open(p))
+          d['restart_count']=int(d.get('restart_count') or 0)+1
+          d['last_restart_at']=datetime.now(timezone.utc).isoformat().replace('+00:00','Z')
+          open(p,'w').write(json.dumps(d,indent=2,sort_keys=True)+'\n')
+          PY
+          fi
+          content="$(base64 -w0 /tmp/qwen-watchdog/state.json)"
+          for attempt in 1 2 3 4 5 6; do
+            sha="$(gh api "repos/${REPO}/contents/${STATE_PATH}?ref=main" --jq '.sha' 2>/dev/null || true)"
+            args=(--method PUT "repos/${REPO}/contents/${STATE_PATH}" -f message="qwen: persist watchdog progress ${GITHUB_RUN_ID}" -f content="$content" -f branch=main)
+            [ -n "$sha" ] && args+=(-f sha="$sha")
+            if gh api "${args[@]}" >/dev/null 2>&1; then exit 0; fi
+            sleep "$((attempt*2))"
+          done
+          echo 'Failed to persist watchdog state.' >&2
           exit 1
 
       - name: Watchdog summary
         if: always()
         run: |
-          echo '### Qwen backlog watchdog' >> "$GITHUB_STEP_SUMMARY"
+          echo '### Qwen backlog watchdog v2' >> "$GITHUB_STEP_SUMMARY"
           echo "- durable remaining: ${{ steps.inspect.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- durable state rows: ${{ steps.inspect.outputs.state_rows }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- active generations before action: ${{ steps.inspect.outputs.active }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- latest observed run: ${{ steps.inspect.outputs.latest_id }} / ${{ steps.inspect.outputs.latest_status }} / ${{ steps.inspect.outputs.latest_conclusion }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- stalled: ${{ steps.inspect.outputs.stalled }} (${{ steps.inspect.outputs.stalled_for }} min without durable progress)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- replacement dispatched: ${{ steps.restart.outputs.dispatched }}" >> "$GITHUB_STEP_SUMMARY"
