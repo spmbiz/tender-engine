@@ -1,79 +1,17 @@
-name: Apply Qwen Conveyor Selector Fix
+name: Apply Qwen Conveyor Selector Fix (Legacy Retired)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/apply-qwen-conveyor-selector-fix.yml'
-      - 'control/qwen_conveyor_selector_fix_trigger.json'
 
 permissions:
-  contents: write
-
-concurrency:
-  group: apply-qwen-conveyor-selector-fix
-  cancel-in-progress: true
+  contents: read
 
 jobs:
-  patch:
+  retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Patch selector, 480 dispatch and Qwen-first ordering
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('.github/workflows/qwen-live-conveyor.yml')
-          s=p.read_text(encoding='utf-8')
-          before=s
-          s=s.replace('per_shard=192','per_shard=480')
-          s=s.replace('192-row bounded Qwen realtime pass','480-row bounded Qwen realtime pass')
-          s=s.replace(
-              '          refresh_selection\n          ensure_qwen_running\n\n          # Poll completed worker artifacts.',
-              '          ensure_qwen_running\n          refresh_selection\n\n          # Poll completed worker artifacts.'
-          )
-          old='''            rid="$(gh run list --workflow qwen-live-classification.yml --limit 8 --json databaseId,status,createdAt --jq '[.[] | select(.status=="in_progress" or .status=="completed")] | sort_by(.createdAt) | reverse | .[0].databaseId // empty')"'''
-          new='''            rid="$(gh run list --workflow qwen-live-classification.yml --limit 12 --json databaseId,status,conclusion,createdAt --jq '([.[] | select(.status=="in_progress")] | sort_by(.createdAt) | reverse | .[0].databaseId) // ([.[] | select(.status=="completed" and .conclusion=="success")] | sort_by(.createdAt) | reverse | .[0].databaseId) // empty')"'''
-          if old not in s:
-              raise SystemExit('legacy Qwen run selector not found exactly')
-          s=s.replace(old,new,1)
-          if s==before:
-              raise SystemExit('conveyor patch produced no change')
-          assert 'per_shard=192' not in s
-          assert 'select(.status=="in_progress" or .status=="completed")' not in s
-          assert 'select(.status=="in_progress")' in s
-          assert '.conclusion=="success"' in s
-          p.write_text(s,encoding='utf-8')
-          PY
-          git diff --check
-          git diff -- .github/workflows/qwen-live-conveyor.yml
-      - name: Persist repair transactionally
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .github/workflows/qwen-live-conveyor.yml
-          if git diff --cached --quiet; then
-            echo 'Qwen conveyor selector repair already present.'
-            exit 0
-          fi
-          git commit -m 'qwen: prefer active successful runs in artifact conveyor'
-          for attempt in 1 2 3 4 5 6; do
-            if git pull --rebase origin main && git push origin HEAD:main; then
-              exit 0
-            fi
-            git rebase --abort >/dev/null 2>&1 || true
-            sleep "$((attempt*2))"
-          done
-          exit 1
+      - run: |
+          echo 'QWEN_CONVEYOR_SELECTOR_FIX_RETIRED'
+          echo 'The audited Qwen V3 control plane is canonical.'
+          echo 'This legacy workflow cannot restore direct semantic dispatch or 480-row conveyor behavior.'
