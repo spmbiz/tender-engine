@@ -1,92 +1,17 @@
-name: Apply Qwen Blocker Repair V2
+name: Apply Qwen Blocker Repair V2 (Legacy Retired)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'control/qwen_blocker_repair_v2_trigger.json'
-      - 'tools/fix_qwen_blockers_v2.py'
-      - '.github/workflows/apply-qwen-blockers-v2.yml'
 
 permissions:
-  contents: write
-  actions: write
-
-concurrency:
-  group: apply-qwen-blockers-v2
-  cancel-in-progress: true
+  contents: read
 
 jobs:
-  repair:
+  retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Apply blocker repair
-        run: python tools/fix_qwen_blockers_v2.py
-
-      - name: Validate repaired policies
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          fan=Path('.github/workflows/dce-fanout-v2.yml').read_text()
-          live=Path('.github/workflows/qwen-live-classification.yml').read_text()
-          rec=Path('.github/workflows/qwen-live-recovery-drainer.yml').read_text()
-          kick=Path('.github/workflows/qwen-backfill-kick.yml').read_text()
-          tri=Path('.github/workflows/qwen-dce-drainer.yml').read_text()
-          assert 'backfill_cap=2' in fan and 'remaining >= 50000' in fan
-          assert "default: '480'" in live
-          assert "- cron: '43 * * * *'" in live
-          assert "REQUESTED_PER_SHARD: ${{ github.event.inputs.per_shard || '480' }}" in live
-          assert '-f per_shard=480' in rec
-          assert 'reserving free Tender slots for Qwen first' in rec
-          assert 'cap=2 if remaining >= 50000' in rec
-          assert 'Cancelling stale queued Qwen run' in kick
-          assert 'workers="$workers"' in tri
-          print('Qwen blocker repair validation OK')
-          PY
-
-      - name: Commit repaired runtime
-        shell: bash
-        run: |
-          set -euo pipefail
-          paths=(
-            .github/workflows/dce-fanout-v2.yml
-            .github/workflows/qwen-live-classification.yml
-            .github/workflows/qwen-live-recovery-drainer.yml
-            .github/workflows/qwen-backfill-kick.yml
-            .github/workflows/qwen-dce-drainer.yml
-          )
-          if git diff --quiet -- "${paths[@]}"; then
-            echo 'Qwen blocker repair already materialized.'
-            exit 0
-          fi
-          git config user.name tender-engine-bot
-          git config user.email tender-engine-bot@users.noreply.github.com
-          git add -- "${paths[@]}"
-          git commit -m 'qwen: fix starvation and stale-run blockers'
-          for i in 1 2 3 4 5; do
-            git pull --rebase origin main && git push origin HEAD:main && exit 0
-            git rebase --abort >/dev/null 2>&1 || true
-            sleep $((i*2))
-          done
-          exit 1
-
-      - name: Kick repaired Qwen guardian
-        if: success()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          gh workflow run qwen-backfill-kick.yml --ref main || true
+      - run: |
+          echo 'QWEN_BLOCKER_REPAIR_V2_RETIRED'
+          echo 'The audited Qwen V3 control plane is canonical.'
+          echo 'This legacy workflow has no write permission and cannot reintroduce direct 480-row dispatchers.'
