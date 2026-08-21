@@ -1,17 +1,17 @@
 {
   "schema": "NOTICE_CLASSIFICATION_STATE_MERGE_SUMMARY_V5_REQUEUE_SAFE",
-  "generated_at": "2026-08-21T00:26:08+00:00",
+  "generated_at": "2026-08-21T00:30:21+00:00",
   "target_classifier_version": "qwen3-4b-q4km-batch-selfheal-v1",
   "required_classifier_prompt_version": "qwen-batch-high-recall-business-fit-v3-rich",
   "required_business_calibration_version": "spm-business-fit-v2",
   "ledger_notices": 126459,
   "snapshot_context_rows": 126459,
-  "previous_state_rows": 19725,
-  "result_rows_seen": 192,
-  "state_rows_after_merge": 19879,
+  "previous_state_rows": 19344,
+  "result_rows_seen": 1920,
+  "state_rows_after_merge": 20613,
   "input_queue_rows": 98632,
-  "remaining_classification_queue": 98097,
-  "classified_fraction_of_ledger": 0.15719719,
+  "remaining_classification_queue": 97363,
+  "classified_fraction_of_ledger": 0.16300145,
   "legacy_guard_drift_requeue_ids": [],
   "legacy_guard_drift_actions": {},
   "conflicting_candidate_ids": [],
@@ -19,17 +19,17 @@
   "forced_reclassification_reasons": {},
   "synthetic_integrity_requeue_ids": [],
   "stats": {
-    "previous_carried": 19725,
+    "previous_carried": 19344,
     "previous_legacy_guard_audited": 19344,
     "previous_legacy_guard_semantically_current": 19344,
     "previous_missing_exact_post_guard_provenance": 19344,
-    "queue_already_classified": 535,
-    "queue_remaining": 98097,
-    "results_accepted": 154,
-    "valid_result_rows": 154
+    "queue_already_classified": 1269,
+    "queue_remaining": 97363,
+    "results_accepted": 1269,
+    "valid_result_rows": 1269
   },
   "rejected_result_reasons": {
-    "parse_or_fallback_error": 38
+    "parse_or_fallback_error": 651
   },
   "safety": {
     "exact_material_hash_required": true,
@@ -47,8 +47,8 @@
     "malformed_jsonl_is_silently_skipped": false,
     "classification_is_not_dce_or_eligibility_truth": true
   },
-  "requested_classification_queue": "work/run/input/notice-classification-queue-latest.jsonl.gz",
-  "effective_classification_queue": "work/run/input/qwen-work-queue.jsonl.gz",
+  "requested_classification_queue": "work/input/notice-classification-queue-latest.jsonl.gz",
+  "effective_classification_queue": "work/input/qwen-work-queue.jsonl.gz",
   "classification_queue_source": "plan_prefilter_qwen_work_queue",
-  "snapshot_source": "work/run/input/live-open-tenders-latest.jsonl.gz"
+  "snapshot_source": "work/input/live-open-tenders-latest.jsonl.gz"
 }
