@@ -1,32 +1,30 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-21T20:07:50+00:00",
+  "generated_at_utc": "2026-08-21T20:13:36+00:00",
   "source_run": "32327417448",
   "state_rows": 24170,
   "ledger_rows": 126459,
   "snapshot_rows": 126459,
   "blocked_ids": 32154,
-  "durable_attempted_exact_versions_ignored": 11037,
-  "valid_exact_hash_current_unattempted": 3563,
-  "eligible_keep_for_dce": 2173,
+  "durable_attempted_exact_versions_ignored": 11182,
+  "valid_exact_hash_current_unattempted": 3418,
+  "eligible_keep_for_dce": 2029,
   "review_worthy_rejects_promoted_to_explore": 1074,
   "stale_hash_ignored": 0,
   "missing_snapshot": 0,
   "expired_ignored": 529,
   "selected": 160,
   "selection_decisions": {
-    "FIT": 7,
-    "MAYBE": 151,
-    "REJECT_OBVIOUS": 2
+    "MAYBE": 159,
+    "REJECT_OBVIOUS": 1
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
-    "qwen-primary-coded": 7,
     "qwen-explore-coded": 48,
-    "qwen-reject-audit-coded": 2,
-    "qwen-elastic-coded": 103
+    "qwen-reject-audit-coded": 1,
+    "qwen-elastic-coded": 111
   },
   "selection_freshness": {
     "historical_backfill": 160
@@ -56,21 +54,19 @@
   "base_candidate_pool": 640,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "FIT": 7,
-    "MAYBE": 631,
-    "REJECT_OBVIOUS": 2
+    "MAYBE": 639,
+    "REJECT_OBVIOUS": 1
   },
   "candidate_pool_lanes": {
-    "qwen-primary": 7,
     "qwen-open-world-explore": 192,
     "qwen-reject-audit": 128,
-    "qwen-elastic": 313
+    "qwen-elastic": 320
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
     "noncore_code_contradictions_in_pool": 175,
     "positive_code_rows_selected": 0,
-    "noncore_code_contradictions_selected": 0,
+    "noncore_code_contradictions_selected": 37,
     "policy": "priority_only_never_drop_never_eligibility",
     "candidate_pool_multiplier": 4
   }
