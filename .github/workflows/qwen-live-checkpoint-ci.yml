@@ -1,0 +1,60 @@
+name: Qwen Live Checkpoint CI
+
+on:
+  pull_request:
+    paths:
+      - 'pipeline/qwen_live_checkpoint_publisher.py'
+      - 'pipeline/qwen_notice_batch_selfheal.py'
+      - 'tests/test_qwen_live_checkpoint_publisher.py'
+      - '.github/workflows/qwen-live-checkpoint-conveyor.yml'
+      - '.github/workflows/qwen-live-checkpoint-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qwen-live-checkpoint-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checkpoint-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install validation dependencies
+        run: python -m pip install --disable-pip-version-check -q pytest pyyaml
+      - name: Compile checkpoint runtime
+        run: |
+          python -m py_compile \
+            pipeline/qwen_live_checkpoint_publisher.py \
+            pipeline/qwen_notice_batch_selfheal.py
+      - name: Run checkpoint conservation tests
+        run: python -m pytest -q tests/test_qwen_live_checkpoint_publisher.py
+      - name: Validate workflow YAML
+        run: |
+          python - <<'PY'
+          import yaml
+          from pathlib import Path
+          for name in ('qwen-live-checkpoint-conveyor.yml','qwen-live-checkpoint-ci.yml'):
+              data=yaml.safe_load(Path('.github/workflows',name).read_text(encoding='utf-8'))
+              assert isinstance(data,dict) and 'jobs' in data, name
+          PY
+      - name: Enforce checkpoint lane invariants
+        run: |
+          set -euo pipefail
+          f=.github/workflows/qwen-live-checkpoint-conveyor.yml
+          ! grep -q 'gh workflow run qwen-live-classification.yml' "$f"
+          ! grep -q 'gh workflow run dce-' "$f"
+          grep -q 'group: qwen-live-continuous-conveyor' "$f"
+          grep -q 'python pipeline/qwen_semantic_controller.py' "$f"
+          grep -q 'worker_live_checkpoint_exact_shard' pipeline/qwen_live_checkpoint_publisher.py
+          grep -q 'post_guard_notice_context_used' tests/test_qwen_live_checkpoint_publisher.py
+          echo QWEN_LIVE_CHECKPOINT_INVARIANTS_PASS
