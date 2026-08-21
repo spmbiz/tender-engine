@@ -21,8 +21,13 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  # Durable backlog can remain flat for a long time while CPU workers are healthy.
+  # qwen_notice_batch_selfheal_core.py publishes qwen-live-progress-<run_id>
+  # checkpoints after every completed model request, so those checkpoints are the
+  # authoritative liveness signal for an active semantic generation.
   STALL_WINDOW_MINUTES: '25'
-  FRESH_RECOVERY_GRACE_MINUTES: '18'
+  HEARTBEAT_FRESH_MINUTES: '30'
+  NO_HEARTBEAT_GRACE_MINUTES: '140'
 
 jobs:
   watchdog:
@@ -35,7 +40,7 @@ jobs:
           fetch-depth: 1
 
       - id: inspect
-        name: Inspect durable backlog progress and semantic-lane liveness
+        name: Inspect durable progress plus live Qwen worker heartbeats
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -50,25 +55,35 @@ jobs:
           gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 50 \
             --json databaseId,status,conclusion,createdAt,updatedAt,url > /tmp/qwen-watchdog/runs.json
 
-          # Pull the durable-summary commit history. We deliberately measure backlog
-          # movement, not workflow activity: a run that stays green/active while the
-          # queue is flat is a zombie for recovery purposes.
           gh api "repos/${REPO}/commits?path=control/qwen_live/classification_summary.json&per_page=40" \
             > /tmp/qwen-watchdog/commits.json
 
           python - <<'PY' > /tmp/qwen-watchdog/decision.json
-          import base64, datetime as dt, json, os, subprocess
+          import base64
+          import datetime as dt
+          import json
+          import os
+          import subprocess
           from pathlib import Path
 
           repo=os.environ['REPO']
           stall_window=int(os.environ.get('STALL_WINDOW_MINUTES','25'))
-          grace=int(os.environ.get('FRESH_RECOVERY_GRACE_MINUTES','18'))
+          heartbeat_fresh_minutes=int(os.environ.get('HEARTBEAT_FRESH_MINUTES','30'))
+          no_heartbeat_grace_minutes=int(os.environ.get('NO_HEARTBEAT_GRACE_MINUTES','140'))
           now=dt.datetime.now(dt.timezone.utc)
+
+          def parse_dt(value):
+              if not value:
+                  return None
+              try:
+                  return dt.datetime.fromisoformat(str(value).replace('Z','+00:00'))
+              except Exception:
+                  return None
 
           try:
               cur=json.loads(Path('/tmp/qwen-watchdog/current.json').read_text())
               remaining=max(0,int(cur.get('remaining_classification_queue')))
-              generated=dt.datetime.fromisoformat(str(cur.get('generated_at')).replace('Z','+00:00'))
+              generated=parse_dt(cur.get('generated_at'))
           except Exception:
               cur={}
               remaining=None
@@ -78,27 +93,57 @@ jobs:
           active_states={'queued','in_progress','waiting','pending','requested'}
           active=[r for r in runs if r.get('status') in active_states]
           active_ids=[int(r['databaseId']) for r in active if str(r.get('databaseId','')).isdigit()]
+
           active_ages=[]
+          run_age={}
           for r in active:
-              try:
-                  created=dt.datetime.fromisoformat(str(r.get('createdAt')).replace('Z','+00:00'))
-                  active_ages.append((now-created).total_seconds()/60)
-              except Exception:
-                  pass
+              rid=int(r['databaseId']) if str(r.get('databaseId','')).isdigit() else None
+              created=parse_dt(r.get('createdAt'))
+              if rid is not None and created:
+                  age=(now-created).total_seconds()/60.0
+                  active_ages.append(age)
+                  run_age[rid]=age
           youngest_active_age=min(active_ages) if active_ages else None
           oldest_active_age=max(active_ages) if active_ages else None
+
+          # Read the external progress releases emitted from inside the long-running
+          # classifier step. Artifact updated_at is a real worker heartbeat and avoids
+          # mistaking "no durable merge yet" for "Qwen is dead".
+          heartbeat_by_run={}
+          for rid in active_ids:
+              p=subprocess.run(
+                  ['gh','api',f'repos/{repo}/releases/tags/qwen-live-progress-{rid}'],
+                  text=True,capture_output=True
+              )
+              if p.returncode != 0:
+                  continue
+              try:
+                  rel=json.loads(p.stdout)
+              except Exception:
+                  continue
+              stamps=[]
+              for asset in rel.get('assets') or []:
+                  stamp=parse_dt(asset.get('updated_at') or asset.get('created_at'))
+                  if stamp:
+                      stamps.append(stamp)
+              if stamps:
+                  heartbeat_by_run[rid]=max(stamps)
+
+          latest_heartbeat=max(heartbeat_by_run.values()) if heartbeat_by_run else None
+          heartbeat_age_minutes=(now-latest_heartbeat).total_seconds()/60.0 if latest_heartbeat else None
+          heartbeat_seen=latest_heartbeat is not None
+          heartbeat_fresh=bool(heartbeat_seen and heartbeat_age_minutes <= heartbeat_fresh_minutes)
 
           samples=[]
           for c in json.loads(Path('/tmp/qwen-watchdog/commits.json').read_text()):
               sha=c.get('sha')
-              try:
-                  commit_time=dt.datetime.fromisoformat(c['commit']['committer']['date'].replace('Z','+00:00'))
-              except Exception:
+              commit_time=parse_dt(((c.get('commit') or {}).get('committer') or {}).get('date'))
+              if not sha or not commit_time:
                   continue
               if (now-commit_time).total_seconds() > 3*3600:
                   continue
               p=subprocess.run(
-                  ['gh','api',f'repos/{repo}/contents/control/qwen_live/classification_summary.json?ref={sha}', '--jq','.content'],
+                  ['gh','api',f'repos/{repo}/contents/control/qwen_live/classification_summary.json?ref={sha}','--jq','.content'],
                   text=True,capture_output=True
               )
               if p.returncode:
@@ -107,8 +152,9 @@ jobs:
                   raw=base64.b64decode(''.join(p.stdout.split())).decode()
                   d=json.loads(raw)
                   value=max(0,int(d.get('remaining_classification_queue')))
-                  gen=dt.datetime.fromisoformat(str(d.get('generated_at')).replace('Z','+00:00'))
-                  samples.append((gen,value,sha))
+                  gen=parse_dt(d.get('generated_at'))
+                  if gen:
+                      samples.append((gen,value,sha))
               except Exception:
                   continue
 
@@ -120,19 +166,27 @@ jobs:
               if older:
                   reference=max(older,key=lambda x:x[0])
 
-          stale_summary = bool(generated and (now-generated).total_seconds() >= stall_window*60)
+          stale_summary=bool(generated and (now-generated).total_seconds() >= stall_window*60)
           no_progress_window=False
           delta=None
           if remaining is not None and reference:
               delta=reference[1]-remaining
-              no_progress_window = delta <= 0
+              no_progress_window=delta <= 0
+          durable_stall=bool(remaining and (stale_summary or no_progress_window))
 
-          durable_stall = bool(remaining and (stale_summary or no_progress_window))
-          # Grace is valid only when every active generation is fresh. A new queued
-          # replacement must never hide an older zombie that still owns concurrency.
-          fresh_recovery = bool(oldest_active_age is not None and oldest_active_age < grace)
-          recycle = bool(durable_stall and active_ids and not fresh_recovery)
-          wake = bool((remaining is None or remaining > 0) and not active_ids)
+          # Important invariant:
+          # - a fresh external heartbeat ALWAYS protects an active generation;
+          # - if a heartbeat existed and then goes stale, recycle after the durable
+          #   no-progress window;
+          # - if external heartbeat publication is unavailable altogether, do not
+          #   kill a healthy opaque CPU run before its own 150-minute job bound.
+          no_heartbeat_grace=bool(
+              active_ids and not heartbeat_seen and oldest_active_age is not None
+              and oldest_active_age < no_heartbeat_grace_minutes
+          )
+          protected_active=heartbeat_fresh or no_heartbeat_grace
+          recycle=bool(durable_stall and active_ids and not protected_active)
+          wake=bool((remaining is None or remaining > 0) and not active_ids)
 
           out={
               'remaining': remaining if remaining is not None else 'unknown',
@@ -147,7 +201,15 @@ jobs:
               'active_count': len(active_ids),
               'youngest_active_age_minutes': round(youngest_active_age,1) if youngest_active_age is not None else None,
               'oldest_active_age_minutes': round(oldest_active_age,1) if oldest_active_age is not None else None,
-              'fresh_recovery_grace': fresh_recovery,
+              'heartbeat_seen': heartbeat_seen,
+              'heartbeat_run_ids': sorted(heartbeat_by_run),
+              'latest_heartbeat_at': latest_heartbeat.isoformat() if latest_heartbeat else None,
+              'heartbeat_age_minutes': round(heartbeat_age_minutes,1) if heartbeat_age_minutes is not None else None,
+              'heartbeat_fresh': heartbeat_fresh,
+              'heartbeat_fresh_minutes': heartbeat_fresh_minutes,
+              'no_heartbeat_grace': no_heartbeat_grace,
+              'no_heartbeat_grace_minutes': no_heartbeat_grace_minutes,
+              'protected_active': protected_active,
               'recycle': recycle,
               'wake': wake,
               'stall_window_minutes': stall_window,
@@ -159,15 +221,21 @@ jobs:
           remaining="$(jq -r '.remaining' /tmp/qwen-watchdog/decision.json)"
           active="$(jq -r '.active_count' /tmp/qwen-watchdog/decision.json)"
           stalled="$(jq -r '.durable_stall' /tmp/qwen-watchdog/decision.json)"
+          heartbeat_fresh="$(jq -r '.heartbeat_fresh' /tmp/qwen-watchdog/decision.json)"
+          heartbeat_age="$(jq -r '.heartbeat_age_minutes // "none"' /tmp/qwen-watchdog/decision.json)"
+          protected="$(jq -r '.protected_active' /tmp/qwen-watchdog/decision.json)"
           recycle="$(jq -r '.recycle' /tmp/qwen-watchdog/decision.json)"
           wake="$(jq -r '.wake' /tmp/qwen-watchdog/decision.json)"
           echo "remaining=$remaining" >> "$GITHUB_OUTPUT"
           echo "active=$active" >> "$GITHUB_OUTPUT"
           echo "stalled=$stalled" >> "$GITHUB_OUTPUT"
+          echo "heartbeat_fresh=$heartbeat_fresh" >> "$GITHUB_OUTPUT"
+          echo "heartbeat_age=$heartbeat_age" >> "$GITHUB_OUTPUT"
+          echo "protected=$protected" >> "$GITHUB_OUTPUT"
           echo "recycle=$recycle" >> "$GITHUB_OUTPUT"
           echo "wake=$wake" >> "$GITHUB_OUTPUT"
 
-      - name: Cancel zombie semantic generations after durable no-progress window
+      - name: Cancel only when durable stall is not protected by a worker heartbeat
         if: steps.inspect.outputs.recycle == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -177,13 +245,10 @@ jobs:
           set -euo pipefail
           mapfile -t ids < <(jq -r '.active_ids[]' /tmp/qwen-watchdog/decision.json)
           for rid in "${ids[@]}"; do
-            echo "Cancelling stalled Qwen generation $rid"
+            echo "Cancelling genuinely stalled Qwen generation $rid"
             gh api --method POST "repos/${REPO}/actions/runs/${rid}/cancel" >/dev/null 2>&1 || true
           done
 
-          # Give cancellation time to clear, but never let slow propagation kill the
-          # watchdog. The recovery step can safely queue one replacement behind the
-          # cancelling concurrency holder.
           for _ in $(seq 1 18); do
             active="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length')"
             [ "$active" -eq 0 ] && exit 0
@@ -193,7 +258,7 @@ jobs:
           exit 0
 
       - id: recover
-        name: Force a fresh Qwen generation when dead or durably stalled
+        name: Force a fresh Qwen generation when dead or genuinely stalled
         if: steps.inspect.outputs.wake == 'true' || steps.inspect.outputs.recycle == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -264,10 +329,12 @@ jobs:
       - name: Watchdog summary
         if: always()
         run: |
-          echo '### Qwen progress-aware backlog watchdog' >> "$GITHUB_STEP_SUMMARY"
+          echo '### Qwen heartbeat-aware backlog watchdog' >> "$GITHUB_STEP_SUMMARY"
           echo "- durable remaining: ${{ steps.inspect.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- active generations before action: ${{ steps.inspect.outputs.active }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- durable stall detected: ${{ steps.inspect.outputs.stalled }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- durable stall signal: ${{ steps.inspect.outputs.stalled }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- worker heartbeat fresh: ${{ steps.inspect.outputs.heartbeat_fresh }} (age=${{ steps.inspect.outputs.heartbeat_age }} min)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- active run protected from false recycle: ${{ steps.inspect.outputs.protected }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- zombie recycle requested: ${{ steps.inspect.outputs.recycle }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- dead-lane wake requested: ${{ steps.inspect.outputs.wake }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- replacement dispatched: ${{ steps.recover.outputs.dispatched }}" >> "$GITHUB_STEP_SUMMARY"
