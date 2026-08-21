@@ -21,18 +21,16 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # Durable backlog can remain flat for a long time while CPU workers are healthy.
-  # qwen_notice_batch_selfheal_core.py publishes qwen-live-progress-<run_id>
-  # checkpoints after every completed model request, so those checkpoints are the
-  # authoritative liveness signal for an active semantic generation.
-  STALL_WINDOW_MINUTES: '25'
+  QWEN_PER_SHARD: '96'
   HEARTBEAT_FRESH_MINUTES: '30'
-  NO_HEARTBEAT_GRACE_MINUTES: '140'
+  STARTUP_HEARTBEAT_GRACE_MINUTES: '20'
+  FRESH_QUEUED_GRACE_MINUTES: '10'
+  HARD_RUN_MAX_MINUTES: '60'
 
 jobs:
   watchdog:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,7 +38,7 @@ jobs:
           fetch-depth: 1
 
       - id: inspect
-        name: Inspect durable progress plus live Qwen worker heartbeats
+        name: Enforce one real Qwen generation and zero stale queue debt
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -52,14 +50,10 @@ jobs:
           gh api "repos/${REPO}/contents/control/qwen_live/classification_summary.json?ref=main" \
             --jq '.content' 2>/dev/null | tr -d '\n' | base64 -d > /tmp/qwen-watchdog/current.json 2>/dev/null || true
 
-          gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 50 \
-            --json databaseId,status,conclusion,createdAt,updatedAt,url > /tmp/qwen-watchdog/runs.json
-
-          gh api "repos/${REPO}/commits?path=control/qwen_live/classification_summary.json&per_page=40" \
-            > /tmp/qwen-watchdog/commits.json
+          gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 100 \
+            --json databaseId,status,conclusion,createdAt,updatedAt,event,url > /tmp/qwen-watchdog/runs.json
 
           python - <<'PY' > /tmp/qwen-watchdog/decision.json
-          import base64
           import datetime as dt
           import json
           import os
@@ -67,9 +61,10 @@ jobs:
           from pathlib import Path
 
           repo=os.environ['REPO']
-          stall_window=int(os.environ.get('STALL_WINDOW_MINUTES','25'))
-          heartbeat_fresh_minutes=int(os.environ.get('HEARTBEAT_FRESH_MINUTES','30'))
-          no_heartbeat_grace_minutes=int(os.environ.get('NO_HEARTBEAT_GRACE_MINUTES','140'))
+          heartbeat_fresh=float(os.environ.get('HEARTBEAT_FRESH_MINUTES','30'))
+          startup_grace=float(os.environ.get('STARTUP_HEARTBEAT_GRACE_MINUTES','20'))
+          queued_grace=float(os.environ.get('FRESH_QUEUED_GRACE_MINUTES','10'))
+          hard_max=float(os.environ.get('HARD_RUN_MAX_MINUTES','60'))
           now=dt.datetime.now(dt.timezone.utc)
 
           def parse_dt(value):
@@ -85,226 +80,161 @@ jobs:
               remaining=max(0,int(cur.get('remaining_classification_queue')))
               generated=parse_dt(cur.get('generated_at'))
           except Exception:
-              cur={}
               remaining=None
               generated=None
 
           runs=json.loads(Path('/tmp/qwen-watchdog/runs.json').read_text())
-          active_states={'queued','in_progress','waiting','pending','requested'}
-          active=[r for r in runs if r.get('status') in active_states]
-          active_ids=[int(r['databaseId']) for r in active if str(r.get('databaseId','')).isdigit()]
+          running=[r for r in runs if r.get('status') == 'in_progress']
+          queued=[r for r in runs if r.get('status') in {'queued','waiting','pending','requested'}]
 
-          active_ages=[]
-          run_age={}
-          for r in active:
-              rid=int(r['databaseId']) if str(r.get('databaseId','')).isdigit() else None
+          def rid(r):
+              try:return int(r.get('databaseId'))
+              except Exception:return None
+
+          def age_minutes(r):
               created=parse_dt(r.get('createdAt'))
-              if rid is not None and created:
-                  age=(now-created).total_seconds()/60.0
-                  active_ages.append(age)
-                  run_age[rid]=age
-          youngest_active_age=min(active_ages) if active_ages else None
-          oldest_active_age=max(active_ages) if active_ages else None
+              return ((now-created).total_seconds()/60.0) if created else 1e9
 
-          # Read the external progress releases emitted from inside the long-running
-          # classifier step. Artifact updated_at is a real worker heartbeat and avoids
-          # mistaking "no durable merge yet" for "Qwen is dead".
-          heartbeat_by_run={}
-          for rid in active_ids:
+          def heartbeat_age(run_id):
               p=subprocess.run(
-                  ['gh','api',f'repos/{repo}/releases/tags/qwen-live-progress-{rid}'],
+                  ['gh','api',f'repos/{repo}/releases/tags/qwen-live-progress-{run_id}'],
                   text=True,capture_output=True
               )
               if p.returncode != 0:
-                  continue
-              try:
-                  rel=json.loads(p.stdout)
-              except Exception:
-                  continue
+                  return None
+              try: rel=json.loads(p.stdout)
+              except Exception:return None
               stamps=[]
               for asset in rel.get('assets') or []:
                   stamp=parse_dt(asset.get('updated_at') or asset.get('created_at'))
-                  if stamp:
-                      stamps.append(stamp)
-              if stamps:
-                  heartbeat_by_run[rid]=max(stamps)
+                  if stamp: stamps.append(stamp)
+              if not stamps:return None
+              return (now-max(stamps)).total_seconds()/60.0
 
-          latest_heartbeat=max(heartbeat_by_run.values()) if heartbeat_by_run else None
-          heartbeat_age_minutes=(now-latest_heartbeat).total_seconds()/60.0 if latest_heartbeat else None
-          heartbeat_seen=latest_heartbeat is not None
-          heartbeat_fresh=bool(heartbeat_seen and heartbeat_age_minutes <= heartbeat_fresh_minutes)
+          running_info=[]
+          for r in running:
+              run_id=rid(r)
+              if run_id is None: continue
+              age=age_minutes(r)
+              hb_age=heartbeat_age(run_id)
+              heartbeat_ok=hb_age is not None and hb_age <= heartbeat_fresh
+              startup_ok=hb_age is None and age < startup_grace
+              healthy=age < hard_max and (heartbeat_ok or startup_ok)
+              running_info.append({
+                  'id':run_id,
+                  'age_minutes':round(age,1),
+                  'heartbeat_age_minutes':round(hb_age,1) if hb_age is not None else None,
+                  'heartbeat_ok':heartbeat_ok,
+                  'startup_grace':startup_ok,
+                  'healthy':healthy,
+              })
 
-          samples=[]
-          for c in json.loads(Path('/tmp/qwen-watchdog/commits.json').read_text()):
-              sha=c.get('sha')
-              commit_time=parse_dt(((c.get('commit') or {}).get('committer') or {}).get('date'))
-              if not sha or not commit_time:
-                  continue
-              if (now-commit_time).total_seconds() > 3*3600:
-                  continue
-              p=subprocess.run(
-                  ['gh','api',f'repos/{repo}/contents/control/qwen_live/classification_summary.json?ref={sha}','--jq','.content'],
-                  text=True,capture_output=True
-              )
-              if p.returncode:
-                  continue
-              try:
-                  raw=base64.b64decode(''.join(p.stdout.split())).decode()
-                  d=json.loads(raw)
-                  value=max(0,int(d.get('remaining_classification_queue')))
-                  gen=parse_dt(d.get('generated_at'))
-                  if gen:
-                      samples.append((gen,value,sha))
-              except Exception:
-                  continue
+          # Keep at most ONE healthy in-progress generation. Prefer a real heartbeat,
+          # then the youngest run. Everything else is stale/duplicate and is cancelled.
+          healthy_runs=[x for x in running_info if x['healthy']]
+          healthy_runs.sort(key=lambda x:(not x['heartbeat_ok'], x['heartbeat_age_minutes'] if x['heartbeat_age_minutes'] is not None else 1e9, x['age_minutes']))
+          keeper=healthy_runs[0] if healthy_runs else None
+          running_cancel=[x['id'] for x in running_info if not keeper or x['id'] != keeper['id']]
 
-          samples.sort(key=lambda x:x[0], reverse=True)
-          reference=None
-          if remaining is not None:
-              cutoff=now-dt.timedelta(minutes=stall_window)
-              older=[s for s in samples if s[0] <= cutoff]
-              if older:
-                  reference=max(older,key=lambda x:x[0])
+          queued_info=[]
+          for r in queued:
+              run_id=rid(r)
+              if run_id is None: continue
+              queued_info.append({
+                  'id':run_id,
+                  'event':str(r.get('event') or ''),
+                  'age_minutes':round(age_minutes(r),1),
+              })
 
-          stale_summary=bool(generated and (now-generated).total_seconds() >= stall_window*60)
-          no_progress_window=False
-          delta=None
-          if remaining is not None and reference:
-              delta=reference[1]-remaining
-              no_progress_window=delta <= 0
-          durable_stall=bool(remaining and (stale_summary or no_progress_window))
+          # Queued work is NEVER semantic-lane health. If a worker is already running,
+          # all queued generations are debt. If no worker is running, only one very
+          # fresh workflow_dispatch is allowed to wait for GitHub capacity.
+          queued_keep=None
+          if keeper is None:
+              fresh_dispatch=[x for x in queued_info if x['event']=='workflow_dispatch' and x['age_minutes'] < queued_grace]
+              fresh_dispatch.sort(key=lambda x:x['age_minutes'])
+              if fresh_dispatch:
+                  queued_keep=fresh_dispatch[0]
+          queued_cancel=[x['id'] for x in queued_info if not queued_keep or x['id'] != queued_keep['id']]
 
-          # Important invariant:
-          # - a fresh external heartbeat ALWAYS protects an active generation;
-          # - if a heartbeat existed and then goes stale, recycle after the durable
-          #   no-progress window;
-          # - if external heartbeat publication is unavailable altogether, do not
-          #   kill a healthy opaque CPU run before its own 150-minute job bound.
-          no_heartbeat_grace=bool(
-              active_ids and not heartbeat_seen and oldest_active_age is not None
-              and oldest_active_age < no_heartbeat_grace_minutes
-          )
-          protected_active=heartbeat_fresh or no_heartbeat_grace
-          recycle=bool(durable_stall and active_ids and not protected_active)
-          wake=bool((remaining is None or remaining > 0) and not active_ids)
+          has_backlog=(remaining is None or remaining > 0)
+          covered=keeper is not None or queued_keep is not None
+          need_dispatch=bool(has_backlog and not covered)
+          cancel_ids=running_cancel + queued_cancel
 
           out={
               'remaining': remaining if remaining is not None else 'unknown',
               'summary_generated_at': generated.isoformat() if generated else None,
-              'reference_remaining': reference[1] if reference else None,
-              'reference_generated_at': reference[0].isoformat() if reference else None,
-              'progress_delta': delta,
-              'stale_summary': stale_summary,
-              'no_progress_window': no_progress_window,
-              'durable_stall': durable_stall,
-              'active_ids': active_ids,
-              'active_count': len(active_ids),
-              'youngest_active_age_minutes': round(youngest_active_age,1) if youngest_active_age is not None else None,
-              'oldest_active_age_minutes': round(oldest_active_age,1) if oldest_active_age is not None else None,
-              'heartbeat_seen': heartbeat_seen,
-              'heartbeat_run_ids': sorted(heartbeat_by_run),
-              'latest_heartbeat_at': latest_heartbeat.isoformat() if latest_heartbeat else None,
-              'heartbeat_age_minutes': round(heartbeat_age_minutes,1) if heartbeat_age_minutes is not None else None,
-              'heartbeat_fresh': heartbeat_fresh,
-              'heartbeat_fresh_minutes': heartbeat_fresh_minutes,
-              'no_heartbeat_grace': no_heartbeat_grace,
-              'no_heartbeat_grace_minutes': no_heartbeat_grace_minutes,
-              'protected_active': protected_active,
-              'recycle': recycle,
-              'wake': wake,
-              'stall_window_minutes': stall_window,
+              'running': running_info,
+              'running_keeper': keeper,
+              'queued': queued_info,
+              'queued_keeper': queued_keep,
+              'cancel_ids': cancel_ids,
+              'cancel_count': len(cancel_ids),
+              'need_dispatch': need_dispatch,
+              'lane_covered': covered,
+              'policy': {
+                  'single_running_generation': True,
+                  'queued_is_health': False,
+                  'heartbeat_fresh_minutes': heartbeat_fresh,
+                  'startup_heartbeat_grace_minutes': startup_grace,
+                  'fresh_queued_workflow_dispatch_grace_minutes': queued_grace,
+                  'hard_run_max_minutes': hard_max,
+              },
           }
           print(json.dumps(out,indent=2,sort_keys=True))
           PY
 
           cat /tmp/qwen-watchdog/decision.json
-          remaining="$(jq -r '.remaining' /tmp/qwen-watchdog/decision.json)"
-          active="$(jq -r '.active_count' /tmp/qwen-watchdog/decision.json)"
-          stalled="$(jq -r '.durable_stall' /tmp/qwen-watchdog/decision.json)"
-          heartbeat_fresh="$(jq -r '.heartbeat_fresh' /tmp/qwen-watchdog/decision.json)"
-          heartbeat_age="$(jq -r '.heartbeat_age_minutes // "none"' /tmp/qwen-watchdog/decision.json)"
-          protected="$(jq -r '.protected_active' /tmp/qwen-watchdog/decision.json)"
-          recycle="$(jq -r '.recycle' /tmp/qwen-watchdog/decision.json)"
-          wake="$(jq -r '.wake' /tmp/qwen-watchdog/decision.json)"
-          echo "remaining=$remaining" >> "$GITHUB_OUTPUT"
-          echo "active=$active" >> "$GITHUB_OUTPUT"
-          echo "stalled=$stalled" >> "$GITHUB_OUTPUT"
-          echo "heartbeat_fresh=$heartbeat_fresh" >> "$GITHUB_OUTPUT"
-          echo "heartbeat_age=$heartbeat_age" >> "$GITHUB_OUTPUT"
-          echo "protected=$protected" >> "$GITHUB_OUTPUT"
-          echo "recycle=$recycle" >> "$GITHUB_OUTPUT"
-          echo "wake=$wake" >> "$GITHUB_OUTPUT"
+          echo "remaining=$(jq -r '.remaining' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
+          echo "cancel_count=$(jq -r '.cancel_count' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
+          echo "need_dispatch=$(jq -r '.need_dispatch' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
+          echo "lane_covered=$(jq -r '.lane_covered' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
 
-      - name: Cancel only when durable stall is not protected by a worker heartbeat
-        if: steps.inspect.outputs.recycle == 'true'
+      - name: Purge stale, duplicate and queued Qwen generations
+        if: steps.inspect.outputs.cancel_count != '0'
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
         shell: bash
         run: |
           set -euo pipefail
-          mapfile -t ids < <(jq -r '.active_ids[]' /tmp/qwen-watchdog/decision.json)
-          for rid in "${ids[@]}"; do
-            echo "Cancelling genuinely stalled Qwen generation $rid"
-            gh api --method POST "repos/${REPO}/actions/runs/${rid}/cancel" >/dev/null 2>&1 || true
+          mapfile -t ids < <(jq -r '.cancel_ids[]' /tmp/qwen-watchdog/decision.json)
+          for run_id in "${ids[@]}"; do
+            echo "Cancelling Qwen queue debt/stale generation $run_id"
+            gh api --method POST "repos/${REPO}/actions/runs/${run_id}/cancel" >/dev/null 2>&1 || true
           done
-
-          for _ in $(seq 1 18); do
-            active="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length')"
-            [ "$active" -eq 0 ] && exit 0
-            sleep 5
-          done
-          echo 'WARNING: stalled Qwen generation still visible after 90s; recovery will queue one replacement behind it.' >&2
-          exit 0
 
       - id: recover
-        name: Force a fresh Qwen generation when dead or genuinely stalled
-        if: steps.inspect.outputs.wake == 'true' || steps.inspect.outputs.recycle == 'true'
+        name: Dispatch exactly one fresh Qwen generation from current main
+        if: steps.inspect.outputs.need_dispatch == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          REMAINING: ${{ steps.inspect.outputs.remaining }}
-          RECYCLE: ${{ steps.inspect.outputs.recycle }}
         shell: bash
         run: |
           set -euo pipefail
 
-          gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 50 \
-            --json databaseId,status > /tmp/qwen-watchdog/pre-recovery-runs.json
-
-          active_now="$(jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length' /tmp/qwen-watchdog/pre-recovery-runs.json)"
-          if [ "$active_now" -ne 0 ]; then
-            if [ "$RECYCLE" != 'true' ]; then
-              echo "A Qwen generation became active during recovery; refusing duplicate dispatch."
-              echo 'dispatched=false' >> "$GITHUB_OUTPUT"
+          # Do not stack a replacement behind cancellation debt. Wait briefly for the
+          # lane to clear; if GitHub propagation is slow the next 5-minute cycle retries.
+          for _ in $(seq 1 18); do
+            active="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 100 --json status --jq '[.[] | select(.status=="queued" or .status=="waiting" or .status=="pending" or .status=="requested" or .status=="in_progress")] | length')"
+            if [ "$active" -eq 0 ]; then
+              gh workflow run qwen-live-classification.yml --repo "$REPO" --ref main \
+                -f per_shard="$QWEN_PER_SHARD" \
+                -f auto_continue=true \
+                -f dce_limit=160
+              echo 'dispatched=true' >> "$GITHUB_OUTPUT"
+              echo "Dispatched one fresh Qwen generation from current main at per_shard=$QWEN_PER_SHARD."
               exit 0
             fi
+            sleep 5
+          done
 
-            stale_ids="$(jq '.active_ids' /tmp/qwen-watchdog/decision.json)"
-            queued_now="$(jq --argjson stale "$stale_ids" '[.[] | select(.status=="queued" or .status=="waiting" or .status=="pending" or .status=="requested") | .databaseId as $id | select(($stale | index($id)) == null)] | length' /tmp/qwen-watchdog/pre-recovery-runs.json)"
-            if [ "$queued_now" -ne 0 ]; then
-              echo "A non-zombie replacement is already queued ($queued_now); refusing duplicate dispatch."
-              echo 'dispatched=false' >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
+          echo 'Cancellation still propagating; no duplicate replacement queued. Next watchdog cycle will retry.'
+          echo 'dispatched=false' >> "$GITHUB_OUTPUT"
 
-            gh workflow run qwen-live-classification.yml --repo "$REPO" --ref main \
-              -f per_shard=480 \
-              -f auto_continue=true \
-              -f dce_limit=160
-            echo 'dispatched=true' >> "$GITHUB_OUTPUT"
-            echo "Queued exactly one replacement behind cancelling zombie; durable remaining=${REMAINING}."
-            exit 0
-          fi
-
-          gh workflow run qwen-live-classification.yml --repo "$REPO" --ref main \
-            -f per_shard=480 \
-            -f auto_continue=true \
-            -f dce_limit=160
-          echo 'dispatched=true' >> "$GITHUB_OUTPUT"
-          echo "Forced fresh Qwen generation; durable remaining=${REMAINING}."
-
-      - name: Confirm recovery generation is genuinely visible
+      - name: Confirm replacement is visible
         if: steps.recover.outputs.dispatched == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -312,30 +242,23 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          before="$(jq '[.[].databaseId]' /tmp/qwen-watchdog/pre-recovery-runs.json)"
           for _ in $(seq 1 12); do
-            gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 50 \
-              --json databaseId,status > /tmp/qwen-watchdog/post-recovery-runs.json
-            new_active="$(jq --argjson before "$before" '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested") | .databaseId as $id | select(($before | index($id)) == null)] | length' /tmp/qwen-watchdog/post-recovery-runs.json)"
-            if [ "$new_active" -gt 0 ]; then
-              echo "Recovery confirmed: $new_active new Qwen generation(s) queued or active."
+            fresh="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 20 --json status,event,createdAt --jq '[.[] | select(.event=="workflow_dispatch") | select(.status=="queued" or .status=="waiting" or .status=="pending" or .status=="requested" or .status=="in_progress")] | length')"
+            if [ "$fresh" -gt 0 ]; then
+              echo "Fresh Qwen generation visible."
               exit 0
             fi
             sleep 5
           done
-          echo 'Recovery dispatch did not produce a new visible Qwen run after 60s.' >&2
+          echo 'Fresh Qwen dispatch was not visible after 60s.' >&2
           exit 1
 
       - name: Watchdog summary
         if: always()
         run: |
-          echo '### Qwen heartbeat-aware backlog watchdog' >> "$GITHUB_STEP_SUMMARY"
+          echo '### Qwen single-generation watchdog' >> "$GITHUB_STEP_SUMMARY"
           echo "- durable remaining: ${{ steps.inspect.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- active generations before action: ${{ steps.inspect.outputs.active }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- durable stall signal: ${{ steps.inspect.outputs.stalled }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- worker heartbeat fresh: ${{ steps.inspect.outputs.heartbeat_fresh }} (age=${{ steps.inspect.outputs.heartbeat_age }} min)" >> "$GITHUB_STEP_SUMMARY"
-          echo "- active run protected from false recycle: ${{ steps.inspect.outputs.protected }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- zombie recycle requested: ${{ steps.inspect.outputs.recycle }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- dead-lane wake requested: ${{ steps.inspect.outputs.wake }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- replacement dispatched: ${{ steps.recover.outputs.dispatched }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- lane covered by one healthy running/fresh queued generation: ${{ steps.inspect.outputs.lane_covered }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- stale/duplicate queue debt cancelled: ${{ steps.inspect.outputs.cancel_count }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- fresh replacement dispatched: ${{ steps.recover.outputs.dispatched }}" >> "$GITHUB_STEP_SUMMARY"
           cat /tmp/qwen-watchdog/decision.json >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
