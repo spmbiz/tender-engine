@@ -1,8 +1,8 @@
 {
   "schema": "GPT_WEB_READ_BATCH_V3_PROVENANCE_REFRESH",
-  "generated_at": "2026-08-21T12:44:14.249976+00:00",
-  "source_inbox_updated_at": "2026-08-21T12:44:13.960902+00:00",
-  "latest_source_dce_run_id": 32481227683,
+  "generated_at": "2026-08-21T13:25:15.548748+00:00",
+  "source_inbox_updated_at": "2026-08-21T13:25:15.261409+00:00",
+  "latest_source_dce_run_id": 32486519288,
   "batch_index": 4,
   "start_rank": 41,
   "end_rank": 50,
@@ -28,14 +28,14 @@
       "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
       "deadline_conflict": false,
       "authoritative_submission_date": null,
-      "source_dce_run_id": 32478820706,
+      "source_dce_run_id": 32481227683,
       "source_shard": 15,
-      "review_key": "604448d1a5db3405d9fa375dc499a6954b6dd90a5d9b98af7528bd6c9d0ad8e9",
+      "review_key": "b7bf6c0d9d173cecf44f7ddb1d400645b8a85a2093d396ad19b2755f7806e7d2",
       "artifact_locator": {
-        "dce_run_id": 32478820706,
+        "dce_run_id": 32481227683,
         "shard": 15,
         "candidate_id": "TED:762205-2025",
-        "release_tag": "dce-harvest-32478820706"
+        "release_tag": "dce-harvest-32481227683"
       },
       "evidence_quality": {
         "raw_status": "DOWNLOADED_PUBLIC",
@@ -240,6 +240,237 @@
             "source_sha256": "57b9f964f8d73195cbc4d5db29d1f8251be6f3d6011e41afa0a7438150b4185f",
             "source_kind": "xlsx",
             "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ]
+      },
+      "provenance_override": null,
+      "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
+      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
+    },
+    {
+      "candidate_id": "TED:573830-2026",
+      "title": "Poland – Laboratory, optical and precision equipments (excl. glasses) – „Dostawa wyposażenia dla Zakładu Farmakogenetyki oraz Dostawa aparatury medycznej dla Oddziału Toksykologii z Ośrodkiem Ostrych Zatruć celem pogłębienia diagnostyki i leczenia osób uzależnionych od alkoholu.”",
+      "buyer": "Wojewódzki Szpital Specjalistyczny nr 5 im. Św. Barbary w Sosnowcu",
+      "portal": "TED",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/573830-2026",
+      "deadline": "2026-09-18T02:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "review_stage": "BUSINESS_GATES",
+      "gate_readiness": true,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "evidence_gate_coverage": 9,
+      "spm_post_dce_score": 14,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "deadline_authority_status": "DCE_MULTIPLE_SUBMISSION_DEADLINES_REVIEW_REQUIRED",
+      "deadline_conflict": true,
+      "authoritative_submission_date": null,
+      "source_dce_run_id": 32481227683,
+      "source_shard": 2,
+      "review_key": "62ebdf5cae285165fb2d7987fedd372e25059a1ee79d8410b237f566daa9819f",
+      "artifact_locator": {
+        "dce_run_id": 32481227683,
+        "shard": 2,
+        "candidate_id": "TED:573830-2026",
+        "release_tag": "dce-harvest-32481227683"
+      },
+      "evidence_quality": {
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "documents_with_text": 16,
+        "text_chars": 486668,
+        "attributed_compact_snippets": 17,
+        "artifact_lookup_required_snippets": 0,
+        "all_compact_snippets_document_attributed": true
+      },
+      "evidence": {
+        "entity_geography": [
+          {
+            "text": "talAddress> 0 005eb9ed-1347-4ca3-bb29-9bc0db64e1ab CRITERION.EXCLUSION.CONVICTIONS.PARTICIPATION_IN_CRIMINAL_ORGANISATION Participation in a criminal organisation Has the economic operator itself or any person who is a member of its administrative, management or supervisory body or has powers of representation, decision or control therein been the subject of a conviction by final judgment for participation in a criminal organisation, by a conviction rendered at the most five years ago or in which an exclusion peri…",
+            "source": "files/32 - Za_cznik nr 2 do SWZ  - JEDZ_unpacked/espd-request.xml",
+            "source_url": null,
+            "source_sha256": "4b3ba86a6f7fbd376213cbc4da0d7cf37864e7005aaae90c9e65d71a2d2f4ce4",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "EU-COM-GROW\" schemeVersionID=\"1.0\">c3ccfa31-0c5e-4e3a-a3fd-db9fb83d78d4 Issuer c27b7c4e-c837-4529-b867-ed55ce639db5 CRITERION.EXCLUSION.CONVICTIONS.CORRUPTION Corruption Has the economic operator itself or any person who is a member of its administrative, management or supervisory body or has powers of representation, decision or control therein been the subject of a conviction by final judgment for corruption, by a conviction rendered at the most five years ago or in which an exclusion period set out directly in …",
+            "source": "files/32 - Za_cznik nr 2 do SWZ  - JEDZ_unpacked/espd-request.xml",
+            "source_url": null,
+            "source_sha256": "4b3ba86a6f7fbd376213cbc4da0d7cf37864e7005aaae90c9e65d71a2d2f4ce4",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "artifact_lookup_required": false
+          }
+        ],
+        "references_experience": [
+          {
+            "text": ":Name> Has the economic operator itself or any person who is a member of its administrative, management or supervisory body or has powers of representation, decision or control therein been the subject of a conviction by final judgment for participation in a criminal organisation, by a conviction rendered at the most five years ago or in which an exclusion period set out directly in the conviction continues to be applicable? As defined in Article 2 of Council Framework Decision 2008/841/JHA of 24 October 2008 on t…",
+            "source": "files/32 - Za_cznik nr 2 do SWZ  - JEDZ_unpacked/espd-request.xml",
+            "source_url": null,
+            "source_sha256": "4b3ba86a6f7fbd376213cbc4da0d7cf37864e7005aaae90c9e65d71a2d2f4ce4",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "cription> DIRECTIVE 2014/24/EU OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL of 26 February 2014 on public procurement and repealing Directive 2004/18/EC Directive 2014/24/EU EU_DIRECTIVE 57(1) http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=celex:32014L0024 7c637c0c-7703-4389-ba52-02997a055bd7 974c8196-9d1c-419c-9ca9-45bb9f5fd59a Your answer? f5276600-a2b6-4ff6-a90e-b31fe19dae41",
+            "source": "files/32 - Za_cznik nr 2 do SWZ  - JEDZ_unpacked/espd-request.xml",
+            "source_url": null,
+            "source_sha256": "4b3ba86a6f7fbd376213cbc4da0d7cf37864e7005aaae90c9e65d71a2d2f4ce4",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "artifact_lookup_required": false
+          }
+        ],
+        "certifications_partner": [
+          {
+            "text": "ption> 9b19e869-6c89-4cc4-bd6c-ac9ca8602165 CRITERION.OTHER.EO_DATA.REGISTERED_IN_OFFICIAL_LIST EO registered If applicable, is the economic operator registered on an official list of approved economic operators or does it have an equivalent certificate (e.g. under a national (pre)qualification system)? 64162276-7014-408f-a9af-080426bfe1fd ecb5127b-9018-4fb8-8327-a6a7a2c73195 7f18c64e-ae09-4646-9400-f3666d50af51 <cbc:De",
+            "source": "files/32 - Za_cznik nr 2 do SWZ  - JEDZ_unpacked/espd-request.xml",
+            "source_url": null,
+            "source_sha256": "4b3ba86a6f7fbd376213cbc4da0d7cf37864e7005aaae90c9e65d71a2d2f4ce4",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "-ae09-4646-9400-f3666d50af51 Your answer dc4acf0c-c761-40d0-b031-4ee1f224be5c 30064ad3-fc11-4579-8528-fdd0b9a5ba75 a) Please provide the relevant registration or certification number, if applicable: b3403349-cbc0-4d84-879e-fc0f2d90ecbd b) If the certificate of registration or certification is available electronically, please state: <cbc:ID schemeID=\"CriterionRelatedIDs\" schemeAgency",
+            "source": "files/32 - Za_cznik nr 2 do SWZ  - JEDZ_unpacked/espd-request.xml",
+            "source_url": null,
+            "source_sha256": "4b3ba86a6f7fbd376213cbc4da0d7cf37864e7005aaae90c9e65d71a2d2f4ce4",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "artifact_lookup_required": false
+          }
+        ],
+        "subcontracting_consortium": [
+          {
+            "text": "c) Where applicable, name of the participating group: 0d62c6ed-f074-4fcf-8e9f-f691351d52ad CRITERION.OTHER.EO_DATA.RELIES_ON_OTHER_CAPACITIES EO relies capacities Does the economic operator rely on the capacities of other entities in order to meet the selection criteria set out under Part IV and the criteria and rules (if any) set out under Part V below? e688f7d6-dcef-4726-bc61-052e63ead60f 7f18c64e-ae09-4646-9400-f3666d50af51 Your answer",
+            "source": "files/32 - Za_cznik nr 2 do SWZ  - JEDZ_unpacked/espd-request.xml",
+            "source_url": null,
+            "source_sha256": "4b3ba86a6f7fbd376213cbc4da0d7cf37864e7005aaae90c9e65d71a2d2f4ce4",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "ead60f 7f18c64e-ae09-4646-9400-f3666d50af51 Your answer 72c0c4b1-ca50-4667-9487-461f3eed4ed7 CRITERION.OTHER.EO_DATA.SUBCONTRACTS_WITH_THIRD_PARTIES Subcontracting third parties Does the economic operator intend to subcontract any share of the contract to third parties? d5fe5a71-7fd3-4910-b6f4-5cd2a4d23524 7f18c64e-ae09-4646-9400-f3666d50af51 Your answer</cbc:Description",
+            "source": "files/32 - Za_cznik nr 2 do SWZ  - JEDZ_unpacked/espd-request.xml",
+            "source_url": null,
+            "source_sha256": "4b3ba86a6f7fbd376213cbc4da0d7cf37864e7005aaae90c9e65d71a2d2f4ce4",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "artifact_lookup_required": false
+          }
+        ],
+        "deliverables_scope": [
+          {
+            "text": "ca oficjalnie wyraża zgodę na to, aby instytucja zamawiająca lub podmiot zamawiający określone w części I uzyskał(-a)(-o) dostęp do dokumentów potwierdzających informacje, które zostały przedstawione w części III i IV niniejszego jednolitego europejskiego dokumentu zamówienia na potrzeby postępowanie o udzielenie zamówienia określonego w części I. Data, miejscowość oraz – jeżeli jest to wymagane lub konieczne – podpis(-y): data - Miejsce - Podpis -22- ===== FILE: files/32 - Za_cznik nr 2 do SWZ - JEDZ_unpacked/esp…",
+            "source": "files/32 - Za_cznik nr 2 do SWZ  - JEDZ_unpacked/espd-request.xml",
+            "source_url": null,
+            "source_sha256": "4b3ba86a6f7fbd376213cbc4da0d7cf37864e7005aaae90c9e65d71a2d2f4ce4",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "kreślone w części I uzyskał(-a)(-o) dostęp do dokumentów potwierdzających informacje, które zostały przedstawione w części III i IV niniejszego jednolitego europejskiego dokumentu zamówienia na potrzeby postępowanie o udzielenie zamówienia określonego w części I. Data, miejscowość oraz – jeżeli jest to wymagane lub konieczne – podpis(-y): data - Miejsce - Podpis -22- ===== FILE: files/32 - Za_cznik nr 2 do SWZ - JEDZ_unpacked/espd-request.xml ===== <espd-req:ESPDRequest xmlns:espd-cbc=\"urn:grow:names:specification…",
+            "source": "files/32 - Za_cznik nr 2 do SWZ  - JEDZ_unpacked/espd-request.xml",
+            "source_url": null,
+            "source_sha256": "4b3ba86a6f7fbd376213cbc4da0d7cf37864e7005aaae90c9e65d71a2d2f4ce4",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "artifact_lookup_required": false
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "on Has the economic operator itself or any person who is a member of its administrative, management or supervisory body or has powers of representation, decision or control therein been the subject of a conviction by final judgment for participation in a criminal organisation, by a conviction rendered at the most five years ago or in which an exclusion period set out directly in the conviction continues to be applicable? As defined in Article 2 of Council Framework Decision 2008/841/JHA of 24 October 2008 on the f…",
+            "source": "files/32 - Za_cznik nr 2 do SWZ  - JEDZ_unpacked/espd-request.xml",
+            "source_url": null,
+            "source_sha256": "4b3ba86a6f7fbd376213cbc4da0d7cf37864e7005aaae90c9e65d71a2d2f4ce4",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "cbc:Description> DIRECTIVE 2014/24/EU OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL of 26 February 2014 on public procurement and repealing Directive 2004/18/EC Directive 2014/24/EU EU_DIRECTIVE 57(1) http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=celex:32014L0024 7c637c0c-7703-4389-ba52-02997a055bd7 974c8196-9d1c-419c-9ca9-45bb9f5fd59a Your answer? f5276600-a2b6-4ff6-a90e-b31fe19dae41</cbc:",
+            "source": "files/32 - Za_cznik nr 2 do SWZ  - JEDZ_unpacked/espd-request.xml",
+            "source_url": null,
+            "source_sha256": "4b3ba86a6f7fbd376213cbc4da0d7cf37864e7005aaae90c9e65d71a2d2f4ce4",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "artifact_lookup_required": false
+          }
+        ],
+        "term_value": [
+          {
+            "text": "dostęp do dokumentów potwierdzających informacje, które zostały przedstawione w części III i IV niniejszego jednolitego europejskiego dokumentu zamówienia na potrzeby postępowanie o udzielenie zamówienia określonego w części I. Data, miejscowość oraz – jeżeli jest to wymagane lub konieczne – podpis(-y): data - Miejsce - Podpis -22- ===== FILE: files/32 - Za_cznik nr 2 do SWZ - JEDZ_unpacked/espd-request.xml ===== <espd-req:ESPDRequest xmlns:espd-cbc=\"urn:grow:names:specification:ubl:schema:xsd:ESPD-CommonBasicComp…",
+            "source": "files/32 - Za_cznik nr 2 do SWZ  - JEDZ_unpacked/espd-request.xml",
+            "source_url": null,
+            "source_sha256": "4b3ba86a6f7fbd376213cbc4da0d7cf37864e7005aaae90c9e65d71a2d2f4ce4",
+            "source_kind": "text",
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "artifact_lookup_required": false
+          }
+        ],
+        "forms_signatures": [
+          {
+            "text": "STARCZYĆ WYKONAWCY W CELU WYKAZANIA BRAKU PODSTAW WYKLUCZENIA ORAZ POTWIERDZENIA SPEŁNIANIA WARUNKÓW UDZIAŁU W POSTĘPOWANIU 1. Do oferty Wykonawca zobowiązany jest dołączyć aktu alne na dzień składania ofert oświadczenie, że nie podlega wykluczeniu oraz spełnia warunki udziału w postępowaniu. Przedmiotowe oświadczenie Wykonawca składa w formie Jednolitego Europejskiego Dokumentu Zamówienia (ESP D) , stanowiącego Załącznik nr 2 do Rozporządzenia Wykonawczego Komisji (EU) 2016/7 z dnia 5 stycznia 2016 r. ustanawiają…",
+            "source": "files/32 - SWZ.pdf",
+            "source_url": "https://platformazakupowa.pl/file/get_new/746fd478bb48f276b6b6173b29d7f458.pdf",
+            "source_sha256": "1cc3c8d72f2a9a82945a47198d2170e855f24940d422e09d1e14c08dd1732aa3",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "niu. Wykonawca, który zamierza posługiwać się certyfikat em Wykonawcy zamówień publicznych, powinien wskazać informację o certyfikacie w JEDZ, w szczególności w części II sekcji A, w polu dotyczącym wpisu do urzędowego wykazu zatwierdzonych Wykonawców albo posiadania równoważnego certyfikatu. Wykonawca powinien podać dane umożliwiające identyfikację certyfikatu, ustalenie podmiotu certyfikującego, okresu ważności certyfikacji oraz zakresu, w jakim zamierza posługiwać się certyfikatem w niniejszym postępowaniu. DEZ…",
+            "source": "files/32 - SWZ.pdf",
+            "source_url": "https://platformazakupowa.pl/file/get_new/746fd478bb48f276b6b6173b29d7f458.pdf",
+            "source_sha256": "1cc3c8d72f2a9a82945a47198d2170e855f24940d422e09d1e14c08dd1732aa3",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "ip_data_security": [
+          {
+            "text": "zej Umowy jest prawo polskie. 9. Umowę sporządzono w dwóch jednobrzmiących egzem plarzach po jednym dla każdej ze Stron. 10. Zmiany Umowy wymagają dla swej ważności formy pisemnej. 11. Zamawiający oświadcza, że jest dużym przedsiębiorcą w rozumieniu przepisów ustawy z dnia 8 marca 2013 r. o przeciwdziałaniu nadmiernym opóźnieniom w transakcjach handlowych. 12. Integralną część Umowy stanowią następujące załączniki: Załącznik nr 1 – Specyfikacja urządzeń; Załącznik nr 2 – Protokół zdawczo-odbiorczy dostawy urządzeń…",
+            "source": "files/32 -Za_cznik nr 8 do SWZ - Projekt umowy dostawy i umowy powierzenia danych.pdf",
+            "source_url": "https://platformazakupowa.pl/file/get_new/61691f729d60cbec77300b8184c15012.pdf",
+            "source_sha256": "247d809a58ad16f09d94971a8fc62549d68b9a79663718e514b9bef1e3845a92",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "tj. podania indywidualnego identyfikato ra i hasła? 33 Jeśli tak, to czy zastosowano systemowe mechanizmy wymuszające okresowe zmiany haseł użytkowników? Lista Zaakceptowanych Podprzetwarzających Załącznik nr 2 do umowy powierzenia danych osobowych nr: DEZP.261.43.2025 z dnia: …………………………… r. L.p. Nazwa i dane kontaktowe podmiotu podprzetwarzającego Dane kontaktowe inspektora ochrony danych Cel podpowierzenia Zakres podpowierzenia 1 2 3 4 5 6 7 8 Załącznik nr 4 do umowy do umowy nr DEZP.261.32.2026 Szczególne wymag…",
+            "source": "files/32 -Za_cznik nr 8 do SWZ - Projekt umowy dostawy i umowy powierzenia danych.pdf",
+            "source_url": "https://platformazakupowa.pl/file/get_new/61691f729d60cbec77300b8184c15012.pdf",
+            "source_sha256": "247d809a58ad16f09d94971a8fc62549d68b9a79663718e514b9bef1e3845a92",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
             "raw_machine_format": false,
             "artifact_lookup_required": false
           }
@@ -901,6 +1132,193 @@
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
     },
     {
+      "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20317372",
+      "title": "Consell Executiu del Consell Insular d'Eivissa",
+      "buyer": null,
+      "portal": "ES_PLACSP",
+      "notice_url": "https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&idEvl=7luQGYP1Ljx9PLkba5eRog%3D%3D",
+      "deadline": "2026-09-04T00:00:00+00:00",
+      "estimated_value": "128341.2",
+      "currency": "EUR",
+      "review_stage": "BUSINESS_GATES",
+      "gate_readiness": true,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "evidence_gate_coverage": 7,
+      "spm_post_dce_score": 12,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_conflict": false,
+      "authoritative_submission_date": null,
+      "source_dce_run_id": 32474114669,
+      "source_shard": 1,
+      "review_key": "37248eabdcbf324a7a27eb3fa8834dca9ea71b51d4f5753a379b2acd46aa08ab",
+      "artifact_locator": {
+        "dce_run_id": 32474114669,
+        "shard": 1,
+        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20317372",
+        "release_tag": "dce-harvest-32474114669"
+      },
+      "evidence_quality": {
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "documents_with_text": 5,
+        "text_chars": 461290,
+        "attributed_compact_snippets": 13,
+        "artifact_lookup_required_snippets": 0,
+        "all_compact_snippets_document_attributed": true
+      },
+      "evidence": {
+        "entity_geography": [
+          {
+            "text": "n de Contratos) 79212100-4 Servicios de auditoría financiera Departament de Presidència, Hisenda, Gestió Econòmica i Esports Contractació av. d'Espanya 49 07800 Eivissa (Illes Balears) tel. 971 195423 - fax 971 195446 contractacio@conselldeivissa.es www.conselldeivissa.es Documento firmado electrónicamente (RD 1671/2009). La autenticidad de este documento puede ser comprobada mediante el CSV: 16340666004034426251 en https://seu.conselldeivissa.es Pág. 4 de 132 –CPA (Clasificación de Productos por Actividades) Nome…",
+            "source": "files/DOC20260817135128PCAP.pdf",
+            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=NBgtra1Y4crwh5zPrIsm/wdb4QVMNTxbctm8DxKTOvNI5Dsioixxs561%2BO5ue%2BiVdPIH2mGEawTYNEv41bUR/gWj6E%2Bwfe544SC/hNOcq9wC1/zDIE0Kw/PWNnLS0Z0z",
+            "source_sha256": "9b3546161f29bd0b4ef41f69b77cc9e1ac55c7e398a4d73af6871e3e6d9d612e",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "ditoría financiera Departament de Presidència, Hisenda, Gestió Econòmica i Esports Contractació av. d'Espanya 49 07800 Eivissa (Illes Balears) tel. 971 195423 - fax 971 195446 contractacio@conselldeivissa.es www.conselldeivissa.es Documento firmado electrónicamente (RD 1671/2009). La autenticidad de este documento puede ser comprobada mediante el CSV: 16340666004034426251 en https://seu.conselldeivissa.es Pág. 4 de 132 –CPA (Clasificación de Productos por Actividades) Nomenclatura principal Nomenclatura complement…",
+            "source": "files/DOC20260817135128PCAP.pdf",
+            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=NBgtra1Y4crwh5zPrIsm/wdb4QVMNTxbctm8DxKTOvNI5Dsioixxs561%2BO5ue%2BiVdPIH2mGEawTYNEv41bUR/gWj6E%2Bwfe544SC/hNOcq9wC1/zDIE0Kw/PWNnLS0Z0z",
+            "source_sha256": "9b3546161f29bd0b4ef41f69b77cc9e1ac55c7e398a4d73af6871e3e6d9d612e",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "certifications_partner": [
+          {
+            "text": "………………………………………………………………  Otros (especificar cuáles): ………………………………………………….…………………. Asimismo, durante toda la vida del contrato, asume la obligación de comunicar cualquier cambio que se produzca respecto a la información facilitada en la presente declaración. Y para que conste a los efectos oportunos, expido y firmo la presente declaración en ………… (firmar electrónicamente). ¹Este apartado solo se rellenará cuando de acuerdo con la letra X.3 del cuadro de características del contrato la ejecución implique el tratam…",
+            "source": "files/DOC20260817144121Certificat acord.pdf",
+            "source_url": "https://contrataciondelestado.es/wps/wcm/connect/PLACE_es/Site/area/docAccCmpnt?srv=cmpnt&cmpntname=GetDocumentsById&source=library&DocumentIdParam=2026-5d7b5162-5c04-4c88-be77-b61eabcf5ed0",
+            "source_sha256": "3a2501e195efdaa979487b5819e37d5f933e93be0c79422e0a4d617beedb22b0",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "de l’expedient de contractació i adjudicar el contracte pel procediment obert simplificat. Quart. Que es compleixin tots els altres tràmits preceptius d’impuls fins a la formalització de l’oportú contracte. En data 7 de agosto de 2026 la Intervenció del Consell Insular d’Eivissa ha fiscalitzat la proposta, amb núm. de referència 2026/1627 i amb resultat de fiscalització de conformitat. El Consell Executiu fa seua la proposta, i l'aprova per unanimitat dels membres presents (6). (...)\" I perquè així consti a l’expe…",
+            "source": "files/DOC20260817144121Certificat acord.pdf",
+            "source_url": "https://contrataciondelestado.es/wps/wcm/connect/PLACE_es/Site/area/docAccCmpnt?srv=cmpnt&cmpntname=GetDocumentsById&source=library&DocumentIdParam=2026-5d7b5162-5c04-4c88-be77-b61eabcf5ed0",
+            "source_sha256": "3a2501e195efdaa979487b5819e37d5f933e93be0c79422e0a4d617beedb22b0",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "deliverables_scope": [
+          {
+            "text": "anya 49 07800 Eivissa (Illes Balears) tel. 971 195423 - fax 971 195446 contractacio@conselldeivissa.es www.conselldeivissa.es Documento firmado electrónicamente (RD 1671/2009). La autenticidad de este documento puede ser comprobada mediante el CSV: 16340666004034426251 en https://seu.conselldeivissa.es Pág. 11 de 132 F.0 OBLIGACIÓN DE ACREDITAR SOLVENCIA SÍ F.1 CLASIFICACIÓN DE LOS CONTRATISTAS (NO OBLIGATORIA) Grupo Subgrupo Categoría Denominación F.2 SOLVENCIA ECONÓMICA Y FINANCIERA. Art. 87 LCSP De acuerdo con …",
+            "source": "files/DOC20260817135128PCAP.pdf",
+            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=NBgtra1Y4crwh5zPrIsm/wdb4QVMNTxbctm8DxKTOvNI5Dsioixxs561%2BO5ue%2BiVdPIH2mGEawTYNEv41bUR/gWj6E%2Bwfe544SC/hNOcq9wC1/zDIE0Kw/PWNnLS0Z0z",
+            "source_sha256": "9b3546161f29bd0b4ef41f69b77cc9e1ac55c7e398a4d73af6871e3e6d9d612e",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "vissa.es Documento firmado electrónicamente (RD 1671/2009). La autenticidad de este documento puede ser comprobada mediante el CSV: 16340666004034426251 en https://seu.conselldeivissa.es Pág. 11 de 132 F.0 OBLIGACIÓN DE ACREDITAR SOLVENCIA SÍ F.1 CLASIFICACIÓN DE LOS CONTRATISTAS (NO OBLIGATORIA) Grupo Subgrupo Categoría Denominación F.2 SOLVENCIA ECONÓMICA Y FINANCIERA. Art. 87 LCSP De acuerdo con el artículo 87.1 de la LCSP, la solvencia económica y financiera del empresario deberá acreditarse de la siguiente ma…",
+            "source": "files/DOC20260817135128PCAP.pdf",
+            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=NBgtra1Y4crwh5zPrIsm/wdb4QVMNTxbctm8DxKTOvNI5Dsioixxs561%2BO5ue%2BiVdPIH2mGEawTYNEv41bUR/gWj6E%2Bwfe544SC/hNOcq9wC1/zDIE0Kw/PWNnLS0Z0z",
+            "source_sha256": "9b3546161f29bd0b4ef41f69b77cc9e1ac55c7e398a4d73af6871e3e6d9d612e",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "ada mediante el CSV: 16340665144763535511 en https://seu.conselldeivissa.es Pág. 14 de 17 Departament de Presidència, Gestió Econòmica i Esports Intervenció General av. Espanya 49 07800 Eivissa (Illes Balears) 971 19 59 00 intervencion@conselldeivissa.es www.conselldeivissa.es Documento firmado electrónicamente (RD 1671/2009). La autenticidad de este documento puede ser comprobada mediante el CSV: 16340665144763535511 en https://seu.conselldeivissa.es Pág. 15 de 17 CUESTIONARIO DE LA AUTOVALUACIÓN DE LA PROTECCIÓN…",
+            "source": "files/DOC20260803133201PPT.pdf",
+            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=N%2B0AfReln0vY4L2bP21%2B1f0ild8gAIOrIm7Go1hb6Y3bQmEX79WGsqqok7kn45/UQGsALxJJNb5I89nrMknQYopF4frKu7o4FBhrdG3Befpt/o8fNevwsujgRzaBbugn",
+            "source_sha256": "9f51339084c1e369271440db7ea7dfd88a5609666ba3a8443bb818efc919d09c",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "conselldeivissa.es www.conselldeivissa.es Documento firmado electrónicamente (RD 1671/2009). La autenticidad de este documento puede ser comprobada mediante el CSV: 16340665144763535511 en https://seu.conselldeivissa.es Pág. 15 de 17 CUESTIONARIO DE LA AUTOVALUACIÓN DE LA PROTECCIÓN DE LA INDEPENDENCIA Y LA INCOMPATIBILIDAD Situación no sí N/A 1 ¿Se encuentra en alguna de las situaciones que prevé la legislación general sobre independencia e incompatibilidad que se halla incluida en el anexo II de la instrucción d…",
+            "source": "files/DOC20260803133201PPT.pdf",
+            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=N%2B0AfReln0vY4L2bP21%2B1f0ild8gAIOrIm7Go1hb6Y3bQmEX79WGsqqok7kn45/UQGsALxJJNb5I89nrMknQYopF4frKu7o4FBhrdG3Befpt/o8fNevwsujgRzaBbugn",
+            "source_sha256": "9f51339084c1e369271440db7ea7dfd88a5609666ba3a8443bb818efc919d09c",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "term_value": [
+          {
+            "text": "de la Instrucción de la ONA 1/2018? 6 ¿Existe riesgo de independencia considerando el anexo I puntos A.4 a A.7 de la Instrucción de la ONA 1/2018? 7 ¿Existe alguna circunstancia de incompatibilidad recogida en la disposición quinta de la Resolución y de acuerdo con las definiciones que figuran en el anexo I puntos A.11 a A.16 de la Instrucción de la ONA 1/2018? 8 ¿Existe alguna circunstancia que amenace a la independencia del auditor público a que se refiere la disposición sexta apartado 1 de la Resolución, que de…",
+            "source": "files/DOC20260803133201PPT.pdf",
+            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=N%2B0AfReln0vY4L2bP21%2B1f0ild8gAIOrIm7Go1hb6Y3bQmEX79WGsqqok7kn45/UQGsALxJJNb5I89nrMknQYopF4frKu7o4FBhrdG3Befpt/o8fNevwsujgRzaBbugn",
+            "source_sha256": "9f51339084c1e369271440db7ea7dfd88a5609666ba3a8443bb818efc919d09c",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "onsiderando el anexo I puntos A.4 a A.7 de la Instrucción de la ONA 1/2018? 7 ¿Existe alguna circunstancia de incompatibilidad recogida en la disposición quinta de la Resolución y de acuerdo con las definiciones que figuran en el anexo I puntos A.11 a A.16 de la Instrucción de la ONA 1/2018? 8 ¿Existe alguna circunstancia que amenace a la independencia del auditor público a que se refiere la disposición sexta apartado 1 de la Resolución, que desarrolla la Instrucción de la ONA 1/2018 en el punto II.1 y en el anexo…",
+            "source": "files/DOC20260803133201PPT.pdf",
+            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=N%2B0AfReln0vY4L2bP21%2B1f0ild8gAIOrIm7Go1hb6Y3bQmEX79WGsqqok7kn45/UQGsALxJJNb5I89nrMknQYopF4frKu7o4FBhrdG3Befpt/o8fNevwsujgRzaBbugn",
+            "source_sha256": "9f51339084c1e369271440db7ea7dfd88a5609666ba3a8443bb818efc919d09c",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "forms_signatures": [
+          {
+            "text": "último párrafo de la cláusula 14.1.2 de este Pliego. Esta documentación deberá ir firmada. 14.1.4.- Si el licitador no aporta la documentación relativa a alguno de los criterios de adjudicación, que deberá estar firmada, o la misma no contiene todos los requisitos exigidos, la proposición de dicho licitador no será valorada respecto del criterio de que se trate. La documentación relativa a los criterios de adjudicación que sean evaluables de forma automática mediante la aplicación de fórmulas no debe incluirse en …",
+            "source": "files/DOC20260817135128PCAP.pdf",
+            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=NBgtra1Y4crwh5zPrIsm/wdb4QVMNTxbctm8DxKTOvNI5Dsioixxs561%2BO5ue%2BiVdPIH2mGEawTYNEv41bUR/gWj6E%2Bwfe544SC/hNOcq9wC1/zDIE0Kw/PWNnLS0Z0z",
+            "source_sha256": "9b3546161f29bd0b4ef41f69b77cc9e1ac55c7e398a4d73af6871e3e6d9d612e",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ],
+        "ip_data_security": [
+          {
+            "text": "ulio de 2017 El cumplimiento de las condiciones especiales de ejecución en materia de medio ambiente podrá verificarse mediante la aportación, cuando así lo requiera el responsable del contrato y antes de la finalización del mismo, de la siguiente documentación: - Documentación acreditativa en relación a la comunicación con el Consell d'Eivissa: Punto 1.1: Facturas originales y ficha técnica del papel reciclado comprado, si es el caso. Protección de datos de carácter personal El contratista está obligado a respeta…",
+            "source": "files/DOC20260817135128PCAP.pdf",
+            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=NBgtra1Y4crwh5zPrIsm/wdb4QVMNTxbctm8DxKTOvNI5Dsioixxs561%2BO5ue%2BiVdPIH2mGEawTYNEv41bUR/gWj6E%2Bwfe544SC/hNOcq9wC1/zDIE0Kw/PWNnLS0Z0z",
+            "source_sha256": "9b3546161f29bd0b4ef41f69b77cc9e1ac55c7e398a4d73af6871e3e6d9d612e",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "desarrolla la Ley Orgánica 15/1999, de 13 de diciembre, de Departament de Presidència, Hisenda, Gestió Econòmica i Esports Contractació av. d'Espanya 49 07800 Eivissa (Illes Balears) tel. 971 195423 - fax 971 195446 contractacio@conselldeivissa.es www.conselldeivissa.es Documento firmado electrónicamente (RD 1671/2009). La autenticidad de este documento puede ser comprobada mediante el CSV: 16340666004034426251 en https://seu.conselldeivissa.es Pág. 30 de 132 Protección de Datos de Carácter Personal, aprobado por …",
+            "source": "files/DOC20260817135128PCAP.pdf",
+            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=NBgtra1Y4crwh5zPrIsm/wdb4QVMNTxbctm8DxKTOvNI5Dsioixxs561%2BO5ue%2BiVdPIH2mGEawTYNEv41bUR/gWj6E%2Bwfe544SC/hNOcq9wC1/zDIE0Kw/PWNnLS0Z0z",
+            "source_sha256": "9b3546161f29bd0b4ef41f69b77cc9e1ac55c7e398a4d73af6871e3e6d9d612e",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ]
+      },
+      "provenance_override": null,
+      "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
+      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
+    },
+    {
       "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20317527",
       "title": "Dirección Gerencia de Mutua Balear, Mutua de Accidentes de Trabajo y Enfermedades Profesionales de la Seguridad Social Nº 183",
       "buyer": null,
@@ -1262,14 +1680,14 @@
       "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
       "deadline_conflict": false,
       "authoritative_submission_date": null,
-      "source_dce_run_id": 32478820706,
+      "source_dce_run_id": 32481227683,
       "source_shard": 15,
-      "review_key": "1bde1577e04bebf1cdbad4fa4cf5f52bd3d1fbb326bf2eb09135c800b382ef78",
+      "review_key": "c95a4d969a6e7558beafa137fbdc9ae14e39ac88cf5d53f09be6ff38ebe59148",
       "artifact_locator": {
-        "dce_run_id": 32478820706,
+        "dce_run_id": 32481227683,
         "shard": 15,
         "candidate_id": "TED:188661-2024",
-        "release_tag": "dce-harvest-32478820706"
+        "release_tag": "dce-harvest-32481227683"
       },
       "evidence_quality": {
         "raw_status": "DOWNLOADED_PUBLIC",
@@ -1561,314 +1979,6 @@
             "source": "files/4. Projecte_executiu_Fase_2.pdf",
             "source_url": "https://contractaciopublica.cat/portal-api/descarrega-document/302529429/9EA4748ED399DAA6151027B54A7014CB",
             "source_sha256": "469e8b6065b71c9dbd010a46b7d68a847f580208ff27fde27b9f46b8cd97a628",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ]
-      },
-      "provenance_override": null,
-      "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
-      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
-    },
-    {
-      "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20317129",
-      "title": "Consejería de Hacienda, Justicia y Asuntos Europeos del Principado de Asturias",
-      "buyer": null,
-      "portal": "ES_PLACSP",
-      "notice_url": "https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&idEvl=9pQapaSTvBFVYjgxA4nMUw%3D%3D",
-      "deadline": "2026-09-07T00:00:00+00:00",
-      "estimated_value": "570000",
-      "currency": "EUR",
-      "review_stage": "BUSINESS_GATES",
-      "gate_readiness": true,
-      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-      "evidence_gate_coverage": 6,
-      "spm_post_dce_score": 11,
-      "spm_fit_band": "LOW",
-      "spm_fit_reasons": [],
-      "spm_friction_signals": [],
-      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
-      "deadline_conflict": false,
-      "authoritative_submission_date": null,
-      "source_dce_run_id": 32474114669,
-      "source_shard": 3,
-      "review_key": "6dbd625fb0dc8855e6616844108fe33262132aec3490a60fbf4d07e82b3d4926",
-      "artifact_locator": {
-        "dce_run_id": 32474114669,
-        "shard": 3,
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20317129",
-        "release_tag": "dce-harvest-32474114669"
-      },
-      "evidence_quality": {
-        "raw_status": "DOWNLOADED_PUBLIC",
-        "documents_with_text": 5,
-        "text_chars": 258798,
-        "attributed_compact_snippets": 11,
-        "artifact_lookup_required_snippets": 0,
-        "all_compact_snippets_document_attributed": true
-      },
-      "evidence": {
-        "entity_geography": [
-          {
-            "text": "al Principado de Asturias de las funciones de la Administración General del Estado en materia de provisión de medios materiales y económicos para el funcionamiento de la Administración de Justicia. En el citado RD 966/2006, de 1 de septiembre, se recoge en su apartado B.1.a) qué es objeto de traspaso: “(…) a) La planificación, programación, control administrativo y provisión de los medios materiales previstos para la actuación de los Tribunales de Justicia, de las Fiscalías y del Instituto de Medicina Legal en la …",
-            "source": "files/DOC20260817135545Informe de insuficiencia de medios.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=sdKbdXh2wfMct8pXnX012zXcQTNUvv67vmwvoDsuRhbE88j7XeMA6eQoiBJ7XVbWdyNRJgqy2rYXPgAcvR0x43c4LhUwlsCG6vFc6jiAUNaB0nvVKRzfe4rpHcnlPhSZ",
-            "source_sha256": "33d637ead2ba2021c2246b342719d274702e58a73fe97d29e392f4db42fc2ea7",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "ico del Principado de Asturias, éste emite informe favorable con fecha 14 de julio de 2026 (núm. 265/2026). FUNDAMENTOS DE DERECHO Primero.- Los titulares de las Consejerías, dentro de sus respectivas competencias, son los órganos de contratación de la Administración del Principado de Asturias, conforme establece el artículo 37.1 de la Ley del Principado de Asturias 2/1995, de 13 de marzo sobre Régimen Jurídico de la Administración. El órgano competente para dictar la presente resolución es la persona titular de l…",
-            "source": "files/DOC20260817135554Resolucion Autorizacion Gasto.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=bRMmN0nY6B45uid6eNy5xv9Wk5Ru7WUm4XWf35MvUT5D6U2pH%2Bzh8iP4c%2BBLVhUqq%2BHyXaA4LrWLaQl39Yz/6DNzb0Qks3LzGlh2Em/uIATfdyQgZAdTm3EfcUAC7CJ6",
-            "source_sha256": "9a3d76825009a68bf68cda3d28b4584ab50daaa191f37d4f9924cb4b57f1f1b9",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "deliverables_scope": [
-          {
-            "text": "atos del Sector Público. 3.- La capacidad de obrar y la no concurrencia de prohibición de contratar se acreditarán por cualquiera de los medios documentales recogidos en los artículos 84 y 85 de la LCSP. Gobierno del Principado de Asturias CONSEJERÍA DE HACIENDA, JUSTICIA Y ASUNTOS EUROPEOS Estado del documento Original Página 12 de 25 Dirección electrónica de validación CSV https://consultaCVS.asturias.es Código Seguro de Verificación (CSV) 16350511012413104541 10.2.- Solvencia económica y financiera: La solvenci…",
-            "source": "files/DOC20260817135549Memoria justificativa .pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=ZVCGsDoQh0q4lOu3LYtwcjIzcDF12j/k6EHxSu8QqtMMQvf8KrXVy32h6mpWq9A93DxcmZZfhYOltDujyS8MPcnz5w/4Fm1htzFyRilwKtB7QB3HKyQaFUExmUVQCerk",
-            "source_sha256": "9e6b1a6dc8b3110c5c0925eafabf177603a9341b9a3816bf71e5d559f47dfa78",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "riores la empresa deberá comunicar al órgano de contratación la circunstancia que se hubiere producido. CLÁUSULA 8. SOLVENCIA. Podrán optar a la adjudicación del presente contrato las personas naturales o jurídicas, españolas o extranjeras, a título individual o en unión temporal de empresarios, que tengan plena capacidad de obrar, que no estén incursas en alguna prohibición de contratar y que acrediten su solvencia económica y financiera, técnica y profesional. 8.1.- Solvencia económica y financiera La solvencia …",
-            "source": "files/DOC20260817135551PCAP.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=kaWRYJWNJv5vm4Ulf%2B5/kGP5eG5VSgry9VDh/Ioy3l0lCkRCzMoehXc9QRAauP0NJjgQFvtQd1O1c2RBMd4ovyD9ejurtIZUp%2Bgw0EbGVLyB0nvVKRzfe4rpHcnlPhSZ",
-            "source_sha256": "86b02a3574b5f0f30aaef703dc0eddc1be86331e23e69a665c84fc7d163f62ba",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "sla_onsite": [
-          {
-            "text": "Europeo y del Consejo 2014/23/UE y 2014/24/UE, de 26 de febrero de Gobierno del Principado de Asturias CONSEJERÍA DE HACIENDA, JUSTICIA Y ASUNTOS EUROPEOS Estado del documento Original Página 2 de 2 Dirección electrónica de validación CSV https://consultaCVS.asturias.es Código Seguro de Verificación (CSV) 16340665442346124303 2014, las entidades del sector público no podrán celebrar otros contratos que aquellos que sean necesarios para el cumplimiento y realización de sus fines institucionales. La necesidad admini…",
-            "source": "files/DOC20260817135545Informe de insuficiencia de medios.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=sdKbdXh2wfMct8pXnX012zXcQTNUvv67vmwvoDsuRhbE88j7XeMA6eQoiBJ7XVbWdyNRJgqy2rYXPgAcvR0x43c4LhUwlsCG6vFc6jiAUNaB0nvVKRzfe4rpHcnlPhSZ",
-            "source_sha256": "33d637ead2ba2021c2246b342719d274702e58a73fe97d29e392f4db42fc2ea7",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "sente memoria, teniendo en cuenta su importe, está sujeto a regulación armonizada de conformidad con lo dispuesto en el artículo 22.1.b) de la Ley 9/2017, de 8 de noviembre, de la LCSP, toda vez que el valor estimado del contrato, supera la cantidad allí señalada. Gobierno del Principado de Asturias CONSEJERÍA DE HACIENDA, JUSTICIA Y ASUNTOS EUROPEOS Estado del documento Original Página 2 de 25 Dirección electrónica de validación CSV https://consultaCVS.asturias.es Código Seguro de Verificación (CSV) 1635051101241…",
-            "source": "files/DOC20260817135549Memoria justificativa .pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=ZVCGsDoQh0q4lOu3LYtwcjIzcDF12j/k6EHxSu8QqtMMQvf8KrXVy32h6mpWq9A93DxcmZZfhYOltDujyS8MPcnz5w/4Fm1htzFyRilwKtB7QB3HKyQaFUExmUVQCerk",
-            "source_sha256": "9e6b1a6dc8b3110c5c0925eafabf177603a9341b9a3816bf71e5d559f47dfa78",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "term_value": [
-          {
-            "text": "l sea la documentación afectada, las consecuencias jurídicas que se deriven de la imposibilidad de acceder a su contenido, respecto de la participación del licitador en el procedimiento. En el caso de que se trate de documentos imprescindibles para conocer la oferta, se podrá acordar la exclusión del licitador. Los formatos de documentos electrónicos admisibles para la elaboración de las ofertas son todos, excepción de los archivos ejecutables (.exe). Las ofertas que contengan este tipo de archivos prohibidos no p…",
-            "source": "files/DOC20260817135551PCAP.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=kaWRYJWNJv5vm4Ulf%2B5/kGP5eG5VSgry9VDh/Ioy3l0lCkRCzMoehXc9QRAauP0NJjgQFvtQd1O1c2RBMd4ovyD9ejurtIZUp%2Bgw0EbGVLyB0nvVKRzfe4rpHcnlPhSZ",
-            "source_sha256": "86b02a3574b5f0f30aaef703dc0eddc1be86331e23e69a665c84fc7d163f62ba",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "forms_signatures": [
-          {
-            "text": "y documentos. En todos los casos en que más de una persona sea miembro del órgano de administración, de dirección o de supervisión de un licitador o tenga poderes de representación, decisión o control en él, cada una de ellas tendrá que firmar el mismo DEUC. Cuando se recurra a la solvencia y medios de otras empresas de conformidad con el artículo 75 LCSP, cada una de ellas deberán presentar la declaración responsable debidamente cumplimentada y firmada, cuyo modelo consiste en el documento europeo único de contra…",
-            "source": "files/DOC20260817135551PCAP.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=kaWRYJWNJv5vm4Ulf%2B5/kGP5eG5VSgry9VDh/Ioy3l0lCkRCzMoehXc9QRAauP0NJjgQFvtQd1O1c2RBMd4ovyD9ejurtIZUp%2Bgw0EbGVLyB0nvVKRzfe4rpHcnlPhSZ",
-            "source_sha256": "86b02a3574b5f0f30aaef703dc0eddc1be86331e23e69a665c84fc7d163f62ba",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "de datos. Sólo en el supuesto de autorizar a la Administración a consultar mediante el sistema tecnológico de comprobación y verificación automática, los datos que figuran en el Anexo I del presente pliego. 3. Integración de la solvencia con medios externos. Cuando se recurra a la solvencia y medios de otras empresas de conformidad con el artículo 75 LCSP, cada una de ellas deberán presentar la declaración responsable debidamente cumplimentada y firmada, cuyo modelo consiste en el documento europeo único de contra…",
-            "source": "files/DOC20260817135551PCAP.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=kaWRYJWNJv5vm4Ulf%2B5/kGP5eG5VSgry9VDh/Ioy3l0lCkRCzMoehXc9QRAauP0NJjgQFvtQd1O1c2RBMd4ovyD9ejurtIZUp%2Bgw0EbGVLyB0nvVKRzfe4rpHcnlPhSZ",
-            "source_sha256": "86b02a3574b5f0f30aaef703dc0eddc1be86331e23e69a665c84fc7d163f62ba",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "ip_data_security": [
-          {
-            "text": "rias.es Código Seguro de Verificación (CSV) 16350511012413104541 valoración de estos daños ser verificará por la Administración en resolución motivada atendiendo, entre otros factores, al retraso que implique para la inversión proyectada y a los mayores gastos económicos y administrativos que ocasionen a la Administración. 21.- PROTECCIÓN DE DATOS DE CARÁCTER PERSONAL El tratamiento de los datos de carácter personal deberá respetar en su integridad el Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo d…",
-            "source": "files/DOC20260817135549Memoria justificativa .pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=ZVCGsDoQh0q4lOu3LYtwcjIzcDF12j/k6EHxSu8QqtMMQvf8KrXVy32h6mpWq9A93DxcmZZfhYOltDujyS8MPcnz5w/4Fm1htzFyRilwKtB7QB3HKyQaFUExmUVQCerk",
-            "source_sha256": "9e6b1a6dc8b3110c5c0925eafabf177603a9341b9a3816bf71e5d559f47dfa78",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "ULA 28. PROTECCION DE DATOS DE CARÁCTER PERSONAL. 1.1- Normativa. De conformidad con la Disposición adicional 25ª de la Ley 9/2017, de 8 de noviembre, de Contratos del Sector Público, por la que se transponen al ordenamiento jurídico español las Directivas del Parlamento Europeo y del Consejo 2014/23/UE y 2014/24/UE, de 26 de febrero de 2014, los contratos que impliquen el tratamiento de datos de carácter personal deberán respetar en su integridad el Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo de…",
-            "source": "files/DOC20260817135551PCAP.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=kaWRYJWNJv5vm4Ulf%2B5/kGP5eG5VSgry9VDh/Ioy3l0lCkRCzMoehXc9QRAauP0NJjgQFvtQd1O1c2RBMd4ovyD9ejurtIZUp%2Bgw0EbGVLyB0nvVKRzfe4rpHcnlPhSZ",
-            "source_sha256": "86b02a3574b5f0f30aaef703dc0eddc1be86331e23e69a665c84fc7d163f62ba",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ]
-      },
-      "provenance_override": null,
-      "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
-      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
-    },
-    {
-      "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20317122",
-      "title": "Sociedad Pública de Infraestructuras y Medio Ambiente de Castilla y León S.A.",
-      "buyer": null,
-      "portal": "ES_PLACSP",
-      "notice_url": "https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&idEvl=44rcczVZTMLkY6rls5tG9A%3D%3D",
-      "deadline": "2026-09-18T00:00:00+00:00",
-      "estimated_value": "357036",
-      "currency": "EUR",
-      "review_stage": "BUSINESS_GATES",
-      "gate_readiness": true,
-      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-      "evidence_gate_coverage": 5,
-      "spm_post_dce_score": 10,
-      "spm_fit_band": "LOW",
-      "spm_fit_reasons": [],
-      "spm_friction_signals": [],
-      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
-      "deadline_conflict": false,
-      "authoritative_submission_date": null,
-      "source_dce_run_id": 32481227683,
-      "source_shard": 3,
-      "review_key": "5a2b87c4fa6cf57f1b84c3553e49a7cb2fa49d5e8e8e608103db01d30c02cf72",
-      "artifact_locator": {
-        "dce_run_id": 32481227683,
-        "shard": 3,
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20317122",
-        "release_tag": "dce-harvest-32481227683"
-      },
-      "evidence_quality": {
-        "raw_status": "DOWNLOADED_PUBLIC",
-        "documents_with_text": 3,
-        "text_chars": 286344,
-        "attributed_compact_snippets": 9,
-        "artifact_lookup_required_snippets": 0,
-        "all_compact_snippets_document_attributed": true
-      },
-      "evidence": {
-        "entity_geography": [
-          {
-            "text": "han tenido en cuenta los valores de mercado de portes y gestión obtenidos en contrataciones anteriores, así como la ubicación, tipo de instalaciones, distancias, posibilidades de cargado de las cenizas atendiendo a las instalaciones de cada lote y al volumen estimado de cenizas que ha de gestionarse. Plazo y lugar de ejecución (ambos lotes): Plazo Total: 1 año Prórroga: SI Procede. 1 año (Hasta un máximo total de 2 años). Plazos Parciales: NO Recepciones parciales: NO Lugar de ejecución: Según las instalaciones co…",
-            "source": "files/DOC20260819145330DOCUMENTO DE INICIO DEL EXPEDIENTE CS 2026 36 fdo.pdf",
-            "source_url": "https://contrataciondelestado.es/wps/wcm/connect/PLACE_es/Site/area/docAccCmpnt?srv=cmpnt&cmpntname=GetDocumentsById&source=library&DocumentIdParam=2026-f4d396dc-a50c-4dfb-aaa1-6360d288d44d",
-            "source_sha256": "a12489719688254369510ddbd8842666b704615aeb5020167e08f720b457fe16",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "deliverables_scope": [
-          {
-            "text": "á de un máximo de dos días laborables desde el aviso para llevar a cabo la retirada de las cenizas. Se emplearán camiones portacontenedores de cadenas, gancho, bañera o similar. Página 6 de 13 Artículo 7.- CONTROL DEL PESAJE El pesaje de los camiones se realizará de la siguiente manera: - Durante la carga del camión estará presente el encargado u operario de la gestión de la planta en la que se retira el contenedor de cenizas, que deberá firmar de forma reconocible el albarán de carga. - En el albarán de carga deb…",
-            "source": "files/DOC20260817150927PPTP CS-2026-36 GESTION CENIZAS REDES CALOR  BIOMASA.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=TTjBsy9i6z6uCW9CegetiC5EWcFVf8MmgBCoJ25hkCfMjzX/gvAQgONzNfzAXaw4Kwsmswco%2B22353IWw08sNIWGKHKZVDc8rvyqrU2l3s4C1/zDIE0Kw/PWNnLS0Z0z",
-            "source_sha256": "4e87f528e97aa56a7cadfc4ceeeb3aaf002832faa8511f970f33599d015cc00d",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "del contrato, a la vista de los trabajos realmente ejecutados y de los precios contratados, redactará las correspondientes valoraciones, las cuales se efectuarán siempre al origen, concretándose los trabajos realizados en el periodo de tiempo de que se trate. Las certificaciones para el abono de los trabajos efectuados se expedirán tomando como base la valoración correspondiente y se tramitarán por el responsable del contrato dentro de los diez días siguientes al período de tiempo a que correspondan, no pudiend o …",
-            "source": "files/DOC20260818091804PCAP CS-2026-36 GESTION CENIZAS REDES CALOR.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=6Uu2lxtd6uBFG3PSHH4dt8bLtf8owZsgnTkn/egQ2KzF9E5e/6NA8YfPaHpikAyzeq9spU%2BhPMXGpcu1H1qnazRylUeP0/%2B/9Word77eR6MZyAJWGsSt0OzTSTyw9JAs",
-            "source_sha256": "135ef0dc5243029212d06b78893ba696b7c47374010ddd6b3e0faf507c5e5583",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "sla_onsite": [
-          {
-            "text": "acceso superior al contenedor. Página 5 de 13 El adjudicatario deberá mantener en buen estado de conservación y limpieza todos los contenedores utilizados en la prestación del servicio, tanto los de su propiedad como los aportados por el contratante, debiendo devolver estos últimos en las mismas condi ciones en que fueron recibidos. Los daños o pérdidas ocasionados sobre los contenedores propiedad del contratante serán responsabilidad del adjudicatario, quien deberá repararlos o reponerlos a su costa. El adjudicat…",
-            "source": "files/DOC20260817150927PPTP CS-2026-36 GESTION CENIZAS REDES CALOR  BIOMASA.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=TTjBsy9i6z6uCW9CegetiC5EWcFVf8MmgBCoJ25hkCfMjzX/gvAQgONzNfzAXaw4Kwsmswco%2B22353IWw08sNIWGKHKZVDc8rvyqrU2l3s4C1/zDIE0Kw/PWNnLS0Z0z",
-            "source_sha256": "4e87f528e97aa56a7cadfc4ceeeb3aaf002832faa8511f970f33599d015cc00d",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "os en la prestación del servicio, tanto los de su propiedad como los aportados por el contratante, debiendo devolver estos últimos en las mismas condi ciones en que fueron recibidos. Los daños o pérdidas ocasionados sobre los contenedores propiedad del contratante serán responsabilidad del adjudicatario, quien deberá repararlos o reponerlos a su costa. El adjudicatario facilitará el contrato de tratamiento de los residuos conforme establece la normativa previa al inicio de los traslados. El contenido de dicho cont…",
-            "source": "files/DOC20260817150927PPTP CS-2026-36 GESTION CENIZAS REDES CALOR  BIOMASA.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=TTjBsy9i6z6uCW9CegetiC5EWcFVf8MmgBCoJ25hkCfMjzX/gvAQgONzNfzAXaw4Kwsmswco%2B22353IWw08sNIWGKHKZVDc8rvyqrU2l3s4C1/zDIE0Kw/PWNnLS0Z0z",
-            "source_sha256": "4e87f528e97aa56a7cadfc4ceeeb3aaf002832faa8511f970f33599d015cc00d",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "forms_signatures": [
-          {
-            "text": "de presentación de ofertas y subsistir en el momento de perfección del contrato. Los sobres se dividen de la siguiente forma: - SOBRE A ( DOCUMENTACIÓN ACREDITATIVA DEL CUMPLIM IENTO DE LOS REQUISITOS PREVIOS) Dentro del sobre relativo a la “Documentación acreditativa del cumplimiento de requisitos previos”, los licitadores deberán incluir: 1. Declaración responsable de conformidad con lo dispuesto en el artículo 140 de la LCSP, cuyo modelo consiste en el documento europeo único de contratación (DEUC), según el mo…",
-            "source": "files/DOC20260818091804PCAP CS-2026-36 GESTION CENIZAS REDES CALOR.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=6Uu2lxtd6uBFG3PSHH4dt8bLtf8owZsgnTkn/egQ2KzF9E5e/6NA8YfPaHpikAyzeq9spU%2BhPMXGpcu1H1qnazRylUeP0/%2B/9Word77eR6MZyAJWGsSt0OzTSTyw9JAs",
-            "source_sha256": "135ef0dc5243029212d06b78893ba696b7c47374010ddd6b3e0faf507c5e5583",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "DEL DOCUMENTO EUROPEO ÚNICO DE CONTRATACIÓN Artículo 140 de la LCSP y Reglamento de Ejecución (UE) 2016/7 de la Comisión, de 5 de enero de 2016 (DOUE de 6 de enero) En el presente contrato los licitadores deberán presentar el Documento Europeo Único de Contratación en sustitución de los documentos y certificados expedidos por las autoridades públicas o por terceros que confirmen que cumple las condiciones exigidas para contratar. El modelo de Documento Europeo Único de Contratación figura en el Anexo II de este Pl…",
-            "source": "files/DOC20260818091804PCAP CS-2026-36 GESTION CENIZAS REDES CALOR.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=6Uu2lxtd6uBFG3PSHH4dt8bLtf8owZsgnTkn/egQ2KzF9E5e/6NA8YfPaHpikAyzeq9spU%2BhPMXGpcu1H1qnazRylUeP0/%2B/9Word77eR6MZyAJWGsSt0OzTSTyw9JAs",
-            "source_sha256": "135ef0dc5243029212d06b78893ba696b7c47374010ddd6b3e0faf507c5e5583",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "ip_data_security": [
-          {
-            "text": "de acceso, cotejo o interconexión, limitación, supresión o destrucción. En la medida en que la prestación y el cumplimiento del presente contrato implique el acceso de adjudicatario a datos de carácter personal de los que sea responsable la SOCIEDAD, el adjudicatario será considerado encargado de tratamiento, en los términos del artículo 4.8) y 28 del Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo de 27 de abril de 2016 relativo a la protección de las personas físicas en lo que respect a al tratamie…",
-            "source": "files/DOC20260818091804PCAP CS-2026-36 GESTION CENIZAS REDES CALOR.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=6Uu2lxtd6uBFG3PSHH4dt8bLtf8owZsgnTkn/egQ2KzF9E5e/6NA8YfPaHpikAyzeq9spU%2BhPMXGpcu1H1qnazRylUeP0/%2B/9Word77eR6MZyAJWGsSt0OzTSTyw9JAs",
-            "source_sha256": "135ef0dc5243029212d06b78893ba696b7c47374010ddd6b3e0faf507c5e5583",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "personales a un tercer país o una organización internacional, salvo que esté obligado a ello en virtud del Derecho de la Unión o de los Estados miembros que se aplique al encargado; en tal caso, el encargado informará al responsable de esa exigencia legal previa al tratamiento, salvo que tal Derecho lo prohíba por razones importantes de interés público; b) Garantizará que las personas autorizadas para tratar datos personales se hayan comprometido a respetar la confidencialidad o estén sujetas a una obligación de c…",
-            "source": "files/DOC20260818091804PCAP CS-2026-36 GESTION CENIZAS REDES CALOR.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=6Uu2lxtd6uBFG3PSHH4dt8bLtf8owZsgnTkn/egQ2KzF9E5e/6NA8YfPaHpikAyzeq9spU%2BhPMXGpcu1H1qnazRylUeP0/%2B/9Word77eR6MZyAJWGsSt0OzTSTyw9JAs",
-            "source_sha256": "135ef0dc5243029212d06b78893ba696b7c47374010ddd6b3e0faf507c5e5583",
             "source_kind": "pdf",
             "provenance_strength": "SOURCE_URL_ATTRIBUTED",
             "raw_machine_format": false,
