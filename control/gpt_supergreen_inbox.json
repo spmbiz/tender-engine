@@ -1,6 +1,6 @@
 {
   "schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
-  "updated_at": "2026-08-21T09:13:24.818365+00:00",
+  "updated_at": "2026-08-21T09:13:52.039131+00:00",
   "latest_source_dce_run_id": 32464987584,
   "review_queue": [
     {
@@ -320,7 +320,7 @@
       },
       "source_dce_run_id": 32464987584,
       "source_shard": 3,
-      "hot_ready_at": "2026-08-21T08:59:52.290379+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 37,
       "spm_fit_band": "MAYBE",
@@ -768,7 +768,7 @@
       },
       "source_dce_run_id": 32464987584,
       "source_shard": 12,
-      "hot_ready_at": "2026-08-21T09:13:20.314118+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 37,
       "spm_fit_band": "MAYBE",
@@ -776,20 +776,128 @@
         "software-development"
       ],
       "spm_friction_signals": [],
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32464987584,
+        "shard": 12,
+        "candidate_id": "TED:621780-2025",
+        "release_tag": "dce-harvest-32464987584"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "TED:621780-2025",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 1522355,
+        "documents_indexed": 24,
+        "documents_with_text": 24,
+        "source_urls": [
+          "https://www.gruppoa2a.it/sites/default/files/2022-07/Split-Payment-societa-controllate-a2a.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2026-03/condizioni-generali-fornitura-marzo-2026.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2026-03/condizioni-generali-servizi-vari-marzo-2026.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2026-03/condizioni-generali-appalto-marzo-2026.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2026-03/condizioni-generali-prestazioni-professionali-marzo-2026.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2026-03/condizioni-generali-contratti-beni-ervizi-IT-marzo-2026.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2025-02/condizioni-generali-fornitura-feb-2025.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2025-02/condizioni-generali-servizi-vari-feb-2025.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2025-02/condizioni-generali-appalto-feb-2025.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2025-02/condizioni-generali-prestazioni-professionali-feb-2025.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2025-02/condizioni-generali-contratti-beni-servizi-feb-2025.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2025-11/criteri-valutazione-requisiti-onorabilita-previsti-subappalto.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2022-07/separazione-funzionale-unbundling.PDF",
+          "https://www.gruppoa2a.it/sites/default/files/2024-12/a2a-condizioni-contrattuali-cyber.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2024-01/condizioni-generali-sponsorizzazioni.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2023-03/Condizioni%20generali%20per%20contratti%20di%20beni%20e%20servizi%20IT%20-%20Marzo%202023.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2023-03/Condizioni%20generali%20di%20appalto%20-%20Marzo%202023.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2023-03/Condizioni%20generali%20per%20servizi%20vari%20-%20Marzo%202023.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2023-03/Condizioni%20generali%20di%20fornitura%20-%20Marzo%202023.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2023-03/Condizioni%20generali%20per%20prestazioni%20professionali%20-%20Marzo%202023.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2022-07/Condizioni%20generali%20per%20servizi%20vari%20-%20Novembre%202021.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2022-07/Condizioni%20generali%20di%20appalto%20-%20Giugno%202020.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2022-07/CondizioniGenerali-fornitura-Giugno-2020.pdf"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [
+          "registrazione dell’evento Visualizza FAQ: progetto Responsible Procurement PDF (47.13 Kb) Scarica Download Torna in cima alla pagina Risorse utili Servizi e imp"
+        ],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "2013",
+            "apparecchi",
+            "diodi",
+            "electric",
+            "equipment",
+            "fornitura",
+            "illuminanti",
+            "illuminazione",
+            "italy",
+            "lamps",
+            "lighting",
+            "luminosa",
+            "pubblica",
+            "qualificazione",
+            "rinnovo",
+            "sistema",
+            "sorgente"
+          ],
+          "hits": [
+            "2013",
+            "apparecchi",
+            "fornitura",
+            "illuminazione",
+            "pubblica",
+            "qualificazione",
+            "rinnovo",
+            "sistema",
+            "sorgente"
+          ],
+          "ratio": 0.5294
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 20,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
       "review_lane": "SPM_PRIORITY",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "81420135597068c8194cfb9abcc550fc7d247495132a408792e43180384079ea",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 37,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32464987584,
         "shard": 12,
         "candidate_id": "TED:621780-2025",
-        "release_tag": null
+        "release_tag": "dce-harvest-32464987584"
       },
       "upstream_review_lane": "SPM_PRIORITY",
       "inbox_lane": "GPT_PRIORITY"
@@ -1171,7 +1279,7 @@
       },
       "source_dce_run_id": 32464987584,
       "source_shard": 4,
-      "hot_ready_at": "2026-08-21T08:59:52.290379+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 13,
       "spm_fit_band": "LOW",
@@ -1255,7 +1363,7 @@
         "all_review_snippets_attributed": true
       },
       "procedure_aliases": [],
-      "review_lane": "SPM_PRIORITY",
+      "review_lane": "DCE_AUTHENTICITY_REPAIR",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "6d012de1b3a3059687b10a912bad797c5d0319e18dae45f8b869c9de4ae8b503",
@@ -1270,7 +1378,7 @@
         "candidate_id": "TED:690247-2025",
         "release_tag": "dce-harvest-32464987584"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "DCE_AUTHENTICITY_REPAIR",
       "inbox_lane": "DCE_AUTHENTICITY_REPAIR"
     },
     {
@@ -2104,28 +2212,104 @@
       },
       "source_dce_run_id": 32464987584,
       "source_shard": 12,
-      "hot_ready_at": "2026-08-21T09:13:20.314118+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 18,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32464987584,
+        "shard": 12,
+        "candidate_id": "TED:701264-2024",
+        "release_tag": "dce-harvest-32464987584"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "TED:701264-2024",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 141326,
+        "documents_indexed": 14,
+        "documents_with_text": 13,
+        "source_urls": [
+          "https://www.etenders.gov.ie/epps/cft/downloadCftResourceItems.do?resourceId=4692377&resourceType=ContractDocument"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "invitation to submit",
+          "award criteria",
+          "selection criteria"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "electrical",
+            "equipment",
+            "ireland",
+            "network",
+            "power",
+            "systems"
+          ],
+          "hits": [
+            "electrical",
+            "equipment",
+            "ireland",
+            "network",
+            "power",
+            "systems"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 55,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [
+        "ie_resource:4692377"
+      ],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "8bc4c79dc5e7694f0fab4ae2a15dac803188500680ddc18063d1387b452e9e45",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 18,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32464987584,
         "shard": 12,
         "candidate_id": "TED:701264-2024",
-        "release_tag": null
+        "release_tag": "dce-harvest-32464987584"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     },
     {
@@ -2362,7 +2546,7 @@
       },
       "source_dce_run_id": 32459986640,
       "source_shard": 0,
-      "hot_ready_at": "2026-08-21T08:59:52.290379+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 13,
       "spm_fit_band": "LOW",
@@ -2440,7 +2624,7 @@
         "all_review_snippets_attributed": true
       },
       "procedure_aliases": [],
-      "review_lane": "SPM_PRIORITY",
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "7af8d6b4a009d1d6173c2b145d934d46210aa19edde714fff1899d65fd10556e",
@@ -2455,7 +2639,7 @@
         "candidate_id": "CA:WS5549871993",
         "release_tag": "dce-harvest-32459986640"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     },
     {
@@ -3314,28 +3498,113 @@
       },
       "source_dce_run_id": 32464987584,
       "source_shard": 8,
-      "hot_ready_at": "2026-08-21T09:00:16.442447+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 18,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32464987584,
+        "shard": 8,
+        "candidate_id": "TED:551563-2024",
+        "release_tag": "dce-harvest-32464987584"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "TED:551563-2024",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 204144,
+        "documents_indexed": 10,
+        "documents_with_text": 8,
+        "source_urls": [
+          "https://www.etenders.gov.ie/epps/cft/downloadCftResourceItems.do?resourceId=4029782&resourceType=ContractDocument"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "invitation to submit",
+          "award criteria",
+          "selection criteria",
+          "minimum turnover"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "fleet",
+            "ireland",
+            "maintenance",
+            "management",
+            "related",
+            "repair",
+            "requirements",
+            "supply",
+            "uisce",
+            "éireann"
+          ],
+          "hits": [
+            "fleet",
+            "ireland",
+            "maintenance",
+            "management",
+            "related",
+            "repair",
+            "requirements",
+            "supply",
+            "uisce",
+            "éireann"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 54,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [
+        "ie_resource:4029782"
+      ],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "93764f2e59f1493690645d9470b1d2fa9d889372b31743cea14c7e2d287f4227",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 18,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32464987584,
         "shard": 8,
         "candidate_id": "TED:551563-2024",
-        "release_tag": null
+        "release_tag": "dce-harvest-32464987584"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     },
     {
@@ -4170,28 +4439,126 @@
       },
       "source_dce_run_id": 32464987584,
       "source_shard": 11,
-      "hot_ready_at": "2026-08-21T09:11:19.258310+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 18,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32464987584,
+        "shard": 11,
+        "candidate_id": "TED:601278-2024",
+        "release_tag": "dce-harvest-32464987584"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "TED:601278-2024",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "MIXED_SUBSTANTIVE_AND_GUIDE",
+        "gate_readiness": true,
+        "text_chars": 349732,
+        "documents_indexed": 10,
+        "documents_with_text": 9,
+        "source_urls": [
+          "https://www.publicprocurement.be/publication-workspaces/d030ca71-c5f7-4edc-a243-1cdcfb5a5bad/documents"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [
+          "Guide d'utilisation",
+          "créer un compte"
+        ],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "selection criteria",
+          "CAHIER DES CHARGES",
+          "CRITERES D’ATTRIBUTION",
+          "critères de sélection",
+          "date limite de réception",
+          "MÉMOIRE TECHNIQUE"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "ayant",
+            "bastogne",
+            "belgium",
+            "bornes",
+            "concession",
+            "control",
+            "distribution",
+            "electricity",
+            "equipment",
+            "exploitation",
+            "installation",
+            "marché",
+            "objet",
+            "pour",
+            "recharge",
+            "territoire"
+          ],
+          "hits": [
+            "ayant",
+            "bastogne",
+            "belgium",
+            "bornes",
+            "concession",
+            "control",
+            "distribution",
+            "exploitation",
+            "installation",
+            "marché",
+            "objet",
+            "pour",
+            "recharge",
+            "territoire"
+          ],
+          "ratio": 0.875
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 54,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "00d090591e29b67923883227433fa2c7b2fdfab1b15c84a6f065250c87d15314",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 18,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32464987584,
         "shard": 11,
         "candidate_id": "TED:601278-2024",
-        "release_tag": null
+        "release_tag": "dce-harvest-32464987584"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     },
     {
@@ -5286,28 +5653,148 @@
       },
       "source_dce_run_id": 32464987584,
       "source_shard": 11,
-      "hot_ready_at": "2026-08-21T09:11:19.258310+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 18,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32464987584,
+        "shard": 11,
+        "candidate_id": "TED:588206-2025",
+        "release_tag": "dce-harvest-32464987584"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "TED:588206-2025",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 16541947,
+        "documents_indexed": 646,
+        "documents_with_text": 597,
+        "source_urls": [
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Teilnahmebedingungen_Niederspannungsmanagementsystem.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Ausschreibungsunterlagen_Kanalreinigung_und_TV-Inspektion_EKVO_LOS_1_Cornberg.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Ausschreibungsunterlagen_Kanalreinigung_und_TV-Inspektion_EKVO_LOS_2_Herleshausen.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Ausschreibungsunterlagen_Kanalreinigung_und_TV-Inspektion_EKVO_LOS_3_Nentershausen.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Ausschreibungsunterlagen_Kanalreinigung_und_TV-Inspektion_EKVO_LOS_4_Hohenroda.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Ausschreibungsunterlagen_Kanalreinigung_und_TV-Inspektion_EKVO_LOS_5_Philippsthal.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Ausschreibungsunterlagen_Kanalreinigung_und_TV-Inspektion_EKVO_LOS_6_Schenklengsfeld.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Teilnahmebedingungen_Unterhaltsreinigung_Liegenschaften_Kassel_Baunatal.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Lieferantenerklaerung_an_EAM.pdf",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/E-rechnungen.pdf",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ-_Grundstueckspflegearbeiten_an_Betriebsliegenschaften.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Bau_Dienstleistungen.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Bau_Dienstleistungen_Vermessung__u_Trassierung.pdf",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-02_Kabeltechnik.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_m-37-22_-_DC_Lader.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-01_Kabel_01.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08-13_Hausanschlusssaeulen.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08-12_Kabelhausanschlusskasten.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08-14_NH-Sicherungs-Lastschaltleisten.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08-15_Zaehler_und_Wandlerschraenke.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08-16_NH-HH-Sicherungseinsaetze.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08-17_ZAS__Zaehleranschlusssaeule_.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08_Niederspannungsverteilung.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08-11_Kabelverteilerschrank.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-03-11_-_Verteilungstransformatoren__bis_20_kV_.zip"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "Anlage 2.4_Erklärung zum Datenschutz und zur Verschwiegenheit.pdf"
+        ],
+        "access_guide_hits": [
+          "Registrierung im Vergabeportal"
+        ],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "Leistungsbeschreibung",
+          "Vergabeunterlagen",
+          "Zuschlagskriterien",
+          "Angebotsfrist",
+          "Vertragsbedingungen"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "dimensional",
+            "germany",
+            "präqualifikationsverfahren",
+            "surveying",
+            "trassierung",
+            "vermessung"
+          ],
+          "hits": [
+            "germany",
+            "präqualifikationsverfahren",
+            "trassierung",
+            "vermessung"
+          ],
+          "ratio": 0.6667
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 51,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "d30dc62668c2abe7dc70b66f1c4578b331a747338ebff7d05c536db66f41c7b6",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 18,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32464987584,
         "shard": 11,
         "candidate_id": "TED:588206-2025",
-        "release_tag": null
+        "release_tag": "dce-harvest-32464987584"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     }
   ],
@@ -5629,7 +6116,7 @@
       },
       "source_dce_run_id": 32464987584,
       "source_shard": 3,
-      "hot_ready_at": "2026-08-21T08:59:52.290379+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 37,
       "spm_fit_band": "MAYBE",
@@ -6077,7 +6564,7 @@
       },
       "source_dce_run_id": 32464987584,
       "source_shard": 12,
-      "hot_ready_at": "2026-08-21T09:13:20.314118+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 37,
       "spm_fit_band": "MAYBE",
@@ -6085,20 +6572,128 @@
         "software-development"
       ],
       "spm_friction_signals": [],
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32464987584,
+        "shard": 12,
+        "candidate_id": "TED:621780-2025",
+        "release_tag": "dce-harvest-32464987584"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "TED:621780-2025",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 1522355,
+        "documents_indexed": 24,
+        "documents_with_text": 24,
+        "source_urls": [
+          "https://www.gruppoa2a.it/sites/default/files/2022-07/Split-Payment-societa-controllate-a2a.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2026-03/condizioni-generali-fornitura-marzo-2026.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2026-03/condizioni-generali-servizi-vari-marzo-2026.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2026-03/condizioni-generali-appalto-marzo-2026.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2026-03/condizioni-generali-prestazioni-professionali-marzo-2026.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2026-03/condizioni-generali-contratti-beni-ervizi-IT-marzo-2026.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2025-02/condizioni-generali-fornitura-feb-2025.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2025-02/condizioni-generali-servizi-vari-feb-2025.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2025-02/condizioni-generali-appalto-feb-2025.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2025-02/condizioni-generali-prestazioni-professionali-feb-2025.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2025-02/condizioni-generali-contratti-beni-servizi-feb-2025.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2025-11/criteri-valutazione-requisiti-onorabilita-previsti-subappalto.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2022-07/separazione-funzionale-unbundling.PDF",
+          "https://www.gruppoa2a.it/sites/default/files/2024-12/a2a-condizioni-contrattuali-cyber.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2024-01/condizioni-generali-sponsorizzazioni.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2023-03/Condizioni%20generali%20per%20contratti%20di%20beni%20e%20servizi%20IT%20-%20Marzo%202023.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2023-03/Condizioni%20generali%20di%20appalto%20-%20Marzo%202023.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2023-03/Condizioni%20generali%20per%20servizi%20vari%20-%20Marzo%202023.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2023-03/Condizioni%20generali%20di%20fornitura%20-%20Marzo%202023.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2023-03/Condizioni%20generali%20per%20prestazioni%20professionali%20-%20Marzo%202023.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2022-07/Condizioni%20generali%20per%20servizi%20vari%20-%20Novembre%202021.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2022-07/Condizioni%20generali%20di%20appalto%20-%20Giugno%202020.pdf",
+          "https://www.gruppoa2a.it/sites/default/files/2022-07/CondizioniGenerali-fornitura-Giugno-2020.pdf"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [
+          "registrazione dell’evento Visualizza FAQ: progetto Responsible Procurement PDF (47.13 Kb) Scarica Download Torna in cima alla pagina Risorse utili Servizi e imp"
+        ],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "2013",
+            "apparecchi",
+            "diodi",
+            "electric",
+            "equipment",
+            "fornitura",
+            "illuminanti",
+            "illuminazione",
+            "italy",
+            "lamps",
+            "lighting",
+            "luminosa",
+            "pubblica",
+            "qualificazione",
+            "rinnovo",
+            "sistema",
+            "sorgente"
+          ],
+          "hits": [
+            "2013",
+            "apparecchi",
+            "fornitura",
+            "illuminazione",
+            "pubblica",
+            "qualificazione",
+            "rinnovo",
+            "sistema",
+            "sorgente"
+          ],
+          "ratio": 0.5294
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 20,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
       "review_lane": "SPM_PRIORITY",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "81420135597068c8194cfb9abcc550fc7d247495132a408792e43180384079ea",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 37,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32464987584,
         "shard": 12,
         "candidate_id": "TED:621780-2025",
-        "release_tag": null
+        "release_tag": "dce-harvest-32464987584"
       },
       "upstream_review_lane": "SPM_PRIORITY",
       "inbox_lane": "GPT_PRIORITY"
@@ -6480,7 +7075,7 @@
       },
       "source_dce_run_id": 32464987584,
       "source_shard": 4,
-      "hot_ready_at": "2026-08-21T08:59:52.290379+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 13,
       "spm_fit_band": "LOW",
@@ -6564,7 +7159,7 @@
         "all_review_snippets_attributed": true
       },
       "procedure_aliases": [],
-      "review_lane": "SPM_PRIORITY",
+      "review_lane": "DCE_AUTHENTICITY_REPAIR",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "6d012de1b3a3059687b10a912bad797c5d0319e18dae45f8b869c9de4ae8b503",
@@ -6579,7 +7174,7 @@
         "candidate_id": "TED:690247-2025",
         "release_tag": "dce-harvest-32464987584"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "DCE_AUTHENTICITY_REPAIR",
       "inbox_lane": "DCE_AUTHENTICITY_REPAIR"
     },
     {
@@ -7413,28 +8008,104 @@
       },
       "source_dce_run_id": 32464987584,
       "source_shard": 12,
-      "hot_ready_at": "2026-08-21T09:13:20.314118+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 18,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32464987584,
+        "shard": 12,
+        "candidate_id": "TED:701264-2024",
+        "release_tag": "dce-harvest-32464987584"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "TED:701264-2024",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 141326,
+        "documents_indexed": 14,
+        "documents_with_text": 13,
+        "source_urls": [
+          "https://www.etenders.gov.ie/epps/cft/downloadCftResourceItems.do?resourceId=4692377&resourceType=ContractDocument"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "invitation to submit",
+          "award criteria",
+          "selection criteria"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "electrical",
+            "equipment",
+            "ireland",
+            "network",
+            "power",
+            "systems"
+          ],
+          "hits": [
+            "electrical",
+            "equipment",
+            "ireland",
+            "network",
+            "power",
+            "systems"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 55,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [
+        "ie_resource:4692377"
+      ],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "8bc4c79dc5e7694f0fab4ae2a15dac803188500680ddc18063d1387b452e9e45",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 18,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32464987584,
         "shard": 12,
         "candidate_id": "TED:701264-2024",
-        "release_tag": null
+        "release_tag": "dce-harvest-32464987584"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     },
     {
@@ -7671,7 +8342,7 @@
       },
       "source_dce_run_id": 32459986640,
       "source_shard": 0,
-      "hot_ready_at": "2026-08-21T08:59:52.290379+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 13,
       "spm_fit_band": "LOW",
@@ -7749,7 +8420,7 @@
         "all_review_snippets_attributed": true
       },
       "procedure_aliases": [],
-      "review_lane": "SPM_PRIORITY",
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "7af8d6b4a009d1d6173c2b145d934d46210aa19edde714fff1899d65fd10556e",
@@ -7764,7 +8435,7 @@
         "candidate_id": "CA:WS5549871993",
         "release_tag": "dce-harvest-32459986640"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     },
     {
@@ -8623,28 +9294,113 @@
       },
       "source_dce_run_id": 32464987584,
       "source_shard": 8,
-      "hot_ready_at": "2026-08-21T09:00:16.442447+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 18,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32464987584,
+        "shard": 8,
+        "candidate_id": "TED:551563-2024",
+        "release_tag": "dce-harvest-32464987584"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "TED:551563-2024",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 204144,
+        "documents_indexed": 10,
+        "documents_with_text": 8,
+        "source_urls": [
+          "https://www.etenders.gov.ie/epps/cft/downloadCftResourceItems.do?resourceId=4029782&resourceType=ContractDocument"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "invitation to submit",
+          "award criteria",
+          "selection criteria",
+          "minimum turnover"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "fleet",
+            "ireland",
+            "maintenance",
+            "management",
+            "related",
+            "repair",
+            "requirements",
+            "supply",
+            "uisce",
+            "éireann"
+          ],
+          "hits": [
+            "fleet",
+            "ireland",
+            "maintenance",
+            "management",
+            "related",
+            "repair",
+            "requirements",
+            "supply",
+            "uisce",
+            "éireann"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 54,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [
+        "ie_resource:4029782"
+      ],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "93764f2e59f1493690645d9470b1d2fa9d889372b31743cea14c7e2d287f4227",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 18,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32464987584,
         "shard": 8,
         "candidate_id": "TED:551563-2024",
-        "release_tag": null
+        "release_tag": "dce-harvest-32464987584"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     },
     {
@@ -9479,28 +10235,126 @@
       },
       "source_dce_run_id": 32464987584,
       "source_shard": 11,
-      "hot_ready_at": "2026-08-21T09:11:19.258310+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 18,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32464987584,
+        "shard": 11,
+        "candidate_id": "TED:601278-2024",
+        "release_tag": "dce-harvest-32464987584"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "TED:601278-2024",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "MIXED_SUBSTANTIVE_AND_GUIDE",
+        "gate_readiness": true,
+        "text_chars": 349732,
+        "documents_indexed": 10,
+        "documents_with_text": 9,
+        "source_urls": [
+          "https://www.publicprocurement.be/publication-workspaces/d030ca71-c5f7-4edc-a243-1cdcfb5a5bad/documents"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [
+          "Guide d'utilisation",
+          "créer un compte"
+        ],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "selection criteria",
+          "CAHIER DES CHARGES",
+          "CRITERES D’ATTRIBUTION",
+          "critères de sélection",
+          "date limite de réception",
+          "MÉMOIRE TECHNIQUE"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "ayant",
+            "bastogne",
+            "belgium",
+            "bornes",
+            "concession",
+            "control",
+            "distribution",
+            "electricity",
+            "equipment",
+            "exploitation",
+            "installation",
+            "marché",
+            "objet",
+            "pour",
+            "recharge",
+            "territoire"
+          ],
+          "hits": [
+            "ayant",
+            "bastogne",
+            "belgium",
+            "bornes",
+            "concession",
+            "control",
+            "distribution",
+            "exploitation",
+            "installation",
+            "marché",
+            "objet",
+            "pour",
+            "recharge",
+            "territoire"
+          ],
+          "ratio": 0.875
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 54,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "00d090591e29b67923883227433fa2c7b2fdfab1b15c84a6f065250c87d15314",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 18,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32464987584,
         "shard": 11,
         "candidate_id": "TED:601278-2024",
-        "release_tag": null
+        "release_tag": "dce-harvest-32464987584"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     },
     {
@@ -10595,28 +11449,148 @@
       },
       "source_dce_run_id": 32464987584,
       "source_shard": 11,
-      "hot_ready_at": "2026-08-21T09:11:19.258310+00:00",
+      "hot_ready_at": "2026-08-21T09:13:51.717804+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 18,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32464987584,
+        "shard": 11,
+        "candidate_id": "TED:588206-2025",
+        "release_tag": "dce-harvest-32464987584"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "TED:588206-2025",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 16541947,
+        "documents_indexed": 646,
+        "documents_with_text": 597,
+        "source_urls": [
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Teilnahmebedingungen_Niederspannungsmanagementsystem.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Ausschreibungsunterlagen_Kanalreinigung_und_TV-Inspektion_EKVO_LOS_1_Cornberg.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Ausschreibungsunterlagen_Kanalreinigung_und_TV-Inspektion_EKVO_LOS_2_Herleshausen.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Ausschreibungsunterlagen_Kanalreinigung_und_TV-Inspektion_EKVO_LOS_3_Nentershausen.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Ausschreibungsunterlagen_Kanalreinigung_und_TV-Inspektion_EKVO_LOS_4_Hohenroda.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Ausschreibungsunterlagen_Kanalreinigung_und_TV-Inspektion_EKVO_LOS_5_Philippsthal.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Ausschreibungsunterlagen_Kanalreinigung_und_TV-Inspektion_EKVO_LOS_6_Schenklengsfeld.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Teilnahmebedingungen_Unterhaltsreinigung_Liegenschaften_Kassel_Baunatal.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/Lieferantenerklaerung_an_EAM.pdf",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/E-rechnungen.pdf",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ-_Grundstueckspflegearbeiten_an_Betriebsliegenschaften.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Bau_Dienstleistungen.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Bau_Dienstleistungen_Vermessung__u_Trassierung.pdf",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-02_Kabeltechnik.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_m-37-22_-_DC_Lader.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-01_Kabel_01.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08-13_Hausanschlusssaeulen.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08-12_Kabelhausanschlusskasten.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08-14_NH-Sicherungs-Lastschaltleisten.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08-15_Zaehler_und_Wandlerschraenke.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08-16_NH-HH-Sicherungseinsaetze.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08-17_ZAS__Zaehleranschlusssaeule_.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08_Niederspannungsverteilung.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-08-11_Kabelverteilerschrank.zip",
+          "https://www.eam.de/fileadmin/user_upload/ausschreibungen/PQ_Mat_m-03-11_-_Verteilungstransformatoren__bis_20_kV_.zip"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "2.4_Eigenerklärung_zum_Datenschutz_und_zur_Verschwiegenheit.pdf",
+          "Anlage 2.4_Erklärung zum Datenschutz und zur Verschwiegenheit.pdf"
+        ],
+        "access_guide_hits": [
+          "Registrierung im Vergabeportal"
+        ],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "Leistungsbeschreibung",
+          "Vergabeunterlagen",
+          "Zuschlagskriterien",
+          "Angebotsfrist",
+          "Vertragsbedingungen"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "dimensional",
+            "germany",
+            "präqualifikationsverfahren",
+            "surveying",
+            "trassierung",
+            "vermessung"
+          ],
+          "hits": [
+            "germany",
+            "präqualifikationsverfahren",
+            "trassierung",
+            "vermessung"
+          ],
+          "ratio": 0.6667
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 51,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "d30dc62668c2abe7dc70b66f1c4578b331a747338ebff7d05c536db66f41c7b6",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 18,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32464987584,
         "shard": 11,
         "candidate_id": "TED:588206-2025",
-        "release_tag": null
+        "release_tag": "dce-harvest-32464987584"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     }
   ],
