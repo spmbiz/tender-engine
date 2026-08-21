@@ -4,11 +4,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '*/10 * * * *'
-  push:
-    branches: [main]
-    paths:
-      - 'control/qwen_live/classification_summary.json'
-      - '.github/workflows/qwen-backfill-kick.yml'
 
 permissions:
   actions: write
@@ -21,54 +16,20 @@ concurrency:
 jobs:
   kick:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 3
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 1
-
-      - id: backlog
-        name: Read durable Qwen backlog
-        shell: bash
-        run: |
-          set -euo pipefail
-          remaining="$(python - <<'PY'
-          import json
-          from pathlib import Path
-          p=Path('control/qwen_live/classification_summary.json')
-          try:
-              payload=json.loads(p.read_text(encoding='utf-8'))
-              print(max(0,int(payload.get('remaining_classification_queue') or 0)))
-          except Exception:
-              print(0)
-          PY
-          )"
-          echo "remaining=$remaining" >> "$GITHUB_OUTPUT"
-          echo "Qwen classification backlog: $remaining"
-
-      - name: Dispatch high-throughput Qwen when the semantic lane is idle
-        if: steps.backlog.outputs.remaining != '0'
+      - name: Wake the canonical Qwen semantic controller
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          active="$(gh run list --workflow qwen-live-classification.yml --limit 40 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
-          if [ "$active" -gt 0 ]; then
-            echo "Qwen already has $active active/queued generation(s); no duplicate dispatch and no preemption."
-            exit 0
-          fi
-          gh workflow run qwen-live-classification.yml --ref main \
-            -f per_shard=480 \
-            -f auto_continue=true \
-            -f dce_limit=160
-          echo "Dispatched Qwen pass at per_shard=480; remaining=${{ steps.backlog.outputs.remaining }}"
+          gh workflow run qwen-backlog-watchdog.yml --ref main
+          echo 'Qwen Backfill Kick no longer dispatches semantic workers directly.'
+          echo 'The tested backlog watchdog is the single dispatch owner.'
 
       - name: Summary
-        if: always()
         run: |
-          echo "### Qwen backfill kick" >> "$GITHUB_STEP_SUMMARY"
-          echo "- remaining classification backlog: ${{ steps.backlog.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- requested max notices per worker when idle: 480" >> "$GITHUB_STEP_SUMMARY"
-          echo "- preemption: none; queued/in-progress semantic generations complete naturally" >> "$GITHUB_STEP_SUMMARY"
+          echo '### Qwen backfill safety wake' >> "$GITHUB_STEP_SUMMARY"
+          echo '- semantic worker dispatch owner: Qwen Backlog Watchdog only' >> "$GITHUB_STEP_SUMMARY"
+          echo '- this workflow is a redundant 10-minute controller wake, not a worker dispatcher' >> "$GITHUB_STEP_SUMMARY"
