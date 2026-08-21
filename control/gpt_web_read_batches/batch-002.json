@@ -1,7 +1,7 @@
 {
   "schema": "GPT_WEB_READ_BATCH_V3_PROVENANCE_REFRESH",
-  "generated_at": "2026-08-21T11:04:05.194254+00:00",
-  "source_inbox_updated_at": "2026-08-21T11:04:04.901814+00:00",
+  "generated_at": "2026-08-21T11:17:06.037302+00:00",
+  "source_inbox_updated_at": "2026-08-21T11:17:05.714512+00:00",
   "latest_source_dce_run_id": 32474114669,
   "batch_index": 2,
   "start_rank": 21,
@@ -275,6 +275,71 @@
             "source_sha256": "00372372adcc7aeae5267383ccef1249f16404399ac0adff6b1df029d1c9cd88",
             "source_kind": "text",
             "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          }
+        ]
+      },
+      "provenance_override": null,
+      "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
+      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
+    },
+    {
+      "candidate_id": "PL-BZP:08defe28-e6ab-3287-b346-030001e08c3b",
+      "title": "Dostawa zestawów do badania napędów wodorowych",
+      "buyer": "ZESPÓŁ SZKÓŁ TECHNICZNYCH W RYBNIKU",
+      "portal": "PL_EZAMOWIENIA",
+      "notice_url": "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08defe28-e6ab-3287-b346-030001e08c3b",
+      "deadline": "2026-08-27T10:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "review_stage": "BUSINESS_GATES",
+      "gate_readiness": true,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "evidence_gate_coverage": 1,
+      "spm_post_dce_score": 6,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "deadline_authority_status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+      "deadline_conflict": false,
+      "authoritative_submission_date": "2026-08-27",
+      "source_dce_run_id": 32474114669,
+      "source_shard": 12,
+      "review_key": "6ce22c60500ffc119dfd9120ff3038f09648b6cf2c0b78cc249f4fd90b68f082",
+      "artifact_locator": {
+        "dce_run_id": 32474114669,
+        "shard": 12,
+        "candidate_id": "PL-BZP:08defe28-e6ab-3287-b346-030001e08c3b",
+        "release_tag": "dce-harvest-32474114669"
+      },
+      "evidence_quality": {
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "documents_with_text": 10,
+        "text_chars": 186295,
+        "attributed_compact_snippets": 2,
+        "artifact_lookup_required_snippets": 0,
+        "all_compact_snippets_document_attributed": true
+      },
+      "evidence": {
+        "ip_data_security": [
+          {
+            "text": "uje unieważnienie postępowania, jeśli środki publiczne, które zamierzał przeznaczyć na sfinansowanie całości lub części zamówienia nie zostały przyznane: Nie SEKCJA VII - PROJEKTOWANE POSTANOWIENIA UMOWY 7.1.) Zamawiający przewiduje udzielenia zaliczek: Nie 7.3.) Zamawiający przewiduje zmiany umowy: Tak 7.4.) Rodzaj i zakres zmian umowy oraz warunki ich wprowadzenia: 1. Zamawiający dopuszcza zmianę sposobu realizacji umowy, w tym zmianę produktu ICT, usługi ICT albo procesu ICT wykorzystywanego przy realizacji zam…",
+            "source": "files/08defce7-d9af-7f2c-68d1-700001d6bf13.pdf",
+            "source_url": "https://ezamowienia.gov.pl/mp-readmodels/api/Tender/DownloadDocument/ocds-148610-23e0fa8a-8ec1-4de2-b565-67b2b8ff03de/ocds-148610-23e0fa8a-8ec1-4de2-b565-67b2b8ff03de_1",
+            "source_sha256": "d447e926437a1d5f9ebfc39a17918d99895a1a901a79d37e9e27702cd35fa882",
+            "source_kind": "pdf",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": false,
+            "artifact_lookup_required": false
+          },
+          {
+            "text": "aby Wykonawca przedstawił w ofercie dowody równoważności. Zamawiający wskazuje, że obowiązek zgłoszenia w ofercie rozwiązań równoważnych w stosunku do opisanych w SWZ i wykazania równoważności leży po stronie Wykonawcy. Zamawiający wymaga, aby oferowane świadczenie, w tym wszystkie produkty ICT, usługi ICT oraz procesy ICT wykorzystywane do realizacji zamówienia, zarówno jako elementy główne, jak i komponenty, elementy środowiska świadczenia usługi lub rozwiązania towarzyszące, nie obejmowało: produktów ICT, usług…",
+            "source": "files/Specyfikacja Warunk_w Zam_wienia.docx",
+            "source_url": "https://ezamowienia.gov.pl/mp-readmodels/api/Tender/DownloadDocument/ocds-148610-23e0fa8a-8ec1-4de2-b565-67b2b8ff03de/ocds-148610-23e0fa8a-8ec1-4de2-b565-67b2b8ff03de_2",
+            "source_sha256": "3558d12d811bcfb9ff95ff4603274bd81f98c086d4c3810cd1446aa23d09ee84",
+            "source_kind": "docx",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
             "raw_machine_format": false,
             "artifact_lookup_required": false
           }
@@ -1856,139 +1921,6 @@
             "source_sha256": "d4a4c3bd0e4cfb85f7678d61b21464dbf86d4f28172c932e8f8a4f04c548d173",
             "source_kind": "docx",
             "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ]
-      },
-      "provenance_override": null,
-      "evidence_instruction": "A compact snippet without document path+SHA is navigation evidence only. Follow artifact_locator before resolving a mandatory gate from legacy/unattributed material. Raw machine-format text is display-cleaned but must still be checked against its source artifact.",
-      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE"
-    },
-    {
-      "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20317392",
-      "title": "Alcaldía del Ayuntamiento de Dolores",
-      "buyer": null,
-      "portal": "ES_PLACSP",
-      "notice_url": "https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&idEvl=gGJQZFu2Y6A36J9Lctlsuw%3D%3D",
-      "deadline": "2026-09-03T00:00:00+00:00",
-      "estimated_value": "125241.64",
-      "currency": "EUR",
-      "review_stage": "BUSINESS_GATES",
-      "gate_readiness": true,
-      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-      "evidence_gate_coverage": 5,
-      "spm_post_dce_score": 10,
-      "spm_fit_band": "LOW",
-      "spm_fit_reasons": [],
-      "spm_friction_signals": [],
-      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
-      "deadline_conflict": false,
-      "authoritative_submission_date": null,
-      "source_dce_run_id": 32474114669,
-      "source_shard": 1,
-      "review_key": "2c19fea482e17eef8b4bfadfae223cbbe78f31a2171ddb3d6e5ca53df622722a",
-      "artifact_locator": {
-        "dce_run_id": 32474114669,
-        "shard": 1,
-        "candidate_id": "ES-PLACSP:https:_contrataciondelestado.es_sindicacion_licitacionesPerfilContratante_20317392",
-        "release_tag": "dce-harvest-32474114669"
-      },
-      "evidence_quality": {
-        "raw_status": "DOWNLOADED_PUBLIC",
-        "documents_with_text": 11,
-        "text_chars": 190715,
-        "attributed_compact_snippets": 8,
-        "artifact_lookup_required_snippets": 0,
-        "all_compact_snippets_document_attributed": true
-      },
-      "evidence": {
-        "entity_geography": [
-          {
-            "text": "de 8 de noviembre, de Contratos del Sector Público. SÉPTIMO. Publicar en el perfil de contratante toda la documentación integrante del expediente de contratación, en particular la Memoria Justificativa actualizada, el Pliego de Cláusulas Administrativas Particulares y el Pliego de Prescripciones Técnicas actualizados. La documentación necesaria para la presentación de las ofertas deberá estar disponible el mismo día de publicación del anuncio de licitación. OCTAVO. Designar a los miembros de la Mesa de Contratació…",
-            "source": "files/DOC20260819115747aprobacion 952.pdf",
-            "source_url": "https://contrataciondelestado.es/wps/wcm/connect/PLACE_es/Site/area/docAccCmpnt?srv=cmpnt&cmpntname=GetDocumentsById&source=library&DocumentIdParam=2026-2ec5ddb8-e7df-4dde-84ca-064d9491d27c",
-            "source_sha256": "6036e3d540f22f7916727e324a47d8e3af285adc78832b59dd7550dabe8ddfff",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "certifications_partner": [
-          {
-            "text": "cula a la prevención de derrames y contaminación, la reducción de embalajes, la agrupación de entregas, la gestión de envases y residuos y el control del cumplimiento ambiental durante el almacenamiento y transporte. Los certificados aportan un medio objetivo y verificable de acreditación; se admitirán certificados equivalentes y otras medidas equivalentes suficientemente acreditadas. La ponderación conjunta de 10 puntos se considera proporcionada a la naturaleza, duración y riesgos del suministro y no impide la p…",
-            "source": "files/DOC20260727103856Memoria justificativa modificada.pdf",
-            "source_url": "https://contrataciondelestado.es/wps/wcm/connect/PLACE_es/Site/area/docAccCmpnt?srv=cmpnt&cmpntname=GetDocumentsById&source=library&DocumentIdParam=2026-a4f5e657-ad25-41de-a657-c96e131583b8",
-            "source_sha256": "8824d12486e4101e1d00848b1b65e3643a198f637c7a213fb8f7d734c54686d1",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "balajes, la agrupación de entregas, la gestión de envases y residuos y el control del cumplimiento ambiental durante el almacenamiento y transporte. Los certificados aportan un medio objetivo y verificable de acreditación; se admitirán certificados equivalentes y otras medidas equivalentes suficientemente acreditadas. La ponderación conjunta de 10 puntos se considera proporcionada a la naturaleza, duración y riesgos del suministro y no impide la participación de empresas que no dispongan de estos certificados. Com…",
-            "source": "files/DOC20260727103856Memoria justificativa modificada.pdf",
-            "source_url": "https://contrataciondelestado.es/wps/wcm/connect/PLACE_es/Site/area/docAccCmpnt?srv=cmpnt&cmpntname=GetDocumentsById&source=library&DocumentIdParam=2026-a4f5e657-ad25-41de-a657-c96e131583b8",
-            "source_sha256": "8824d12486e4101e1d00848b1b65e3643a198f637c7a213fb8f7d734c54686d1",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "deliverables_scope": [
-          {
-            "text": "euros aplicable a las entidades locales desde el 1 de enero de 2026 y superior al límite de 60.000 euros del procedimiento abreviado. Al superar 100.000 euros, los actos legalmente previstos serán susceptibles de recurso especial en materia de contratación. 9.2. Clasificación No procede exigir clasificación empresarial, al tratarse de un contrato de suministro, sin perjuicio de la obligación de acreditar la solvencia económica y financiera y la solvencia técnica en los términos establecidos en los pliegos. 9.3. Cr…",
-            "source": "files/DOC20260727103856Memoria justificativa modificada.pdf",
-            "source_url": "https://contrataciondelestado.es/wps/wcm/connect/PLACE_es/Site/area/docAccCmpnt?srv=cmpnt&cmpntname=GetDocumentsById&source=library&DocumentIdParam=2026-a4f5e657-ad25-41de-a657-c96e131583b8",
-            "source_sha256": "8824d12486e4101e1d00848b1b65e3643a198f637c7a213fb8f7d734c54686d1",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "LISTADO DE PRODUCTOS, CONSUMOS ANUALES Y PRECIOS UNITARIOS MÁXIMOS N.º Descripción del producto Unidades estimadas anuales Precio unitario máximo (€) Importe estimado sin IVA (€) Importe estimado con IVA (€) 1 AGUA FUERTE 1,5 LT. - tapón seguridad niños 38 1,64 € 62,32 € 75,41 € 2 Ambientador Frescor 5 Lt 5 12,95 € 64,75 € 78,35 € 3 Ambientador Ropa Limpia 5 Lt 2 21,14 € 42,28 € 51,16 € 4 Amoniaco 1,5 L. 10 1,39 € 13,90 € 16,82 € 5 Amoniaco Clásico Centauro 1 Lt 18 0,99 € 17,82 € 21,56 € 6 Amoniaco Perfumado 1,5 L…",
-            "source": "files/DOC20260727103856Memoria justificativa modificada.pdf",
-            "source_url": "https://contrataciondelestado.es/wps/wcm/connect/PLACE_es/Site/area/docAccCmpnt?srv=cmpnt&cmpntname=GetDocumentsById&source=library&DocumentIdParam=2026-a4f5e657-ad25-41de-a657-c96e131583b8",
-            "source_sha256": "8824d12486e4101e1d00848b1b65e3643a198f637c7a213fb8f7d734c54686d1",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "sla_onsite": [
-          {
-            "text": "de servicios, sin que ello altere la naturaleza del contrato. El suministro se realizará mediante pedidos parciales formulados por el responsable municipal del contrato o por las personas autorizadas. Cada pedido deberá indicar, al menos, productos, cantidades, lugar de entrega y, en su caso, plazo o prioridad. 5. Insuficiencia de medios El Ayuntamiento de Dolores no dispone de medios materiales propios suficientes para fabricar, almacenar en grandes cantidades o garantizar con recursos propios la reposición conti…",
-            "source": "files/DOC20260727103856Memoria justificativa modificada.pdf",
-            "source_url": "https://contrataciondelestado.es/wps/wcm/connect/PLACE_es/Site/area/docAccCmpnt?srv=cmpnt&cmpntname=GetDocumentsById&source=library&DocumentIdParam=2026-a4f5e657-ad25-41de-a657-c96e131583b8",
-            "source_sha256": "8824d12486e4101e1d00848b1b65e3643a198f637c7a213fb8f7d734c54686d1",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          },
-          {
-            "text": "nstancia que la motiva, el incremento de consumo Cód. Validación: A4GRN2WDSDFFPRK6Y65NN4CGX Verificación: https://dolores.sedelectronica.es/ Documento firmado electrónicamente desde la plataforma esPublico Gestiona | Página 11 de 17 previsto, los productos afectados y su valoración económica. Asimismo, requerirá la existencia de crédito adecuado y suficiente, la fiscalización que corresponda y la aprobación del órgano de contratación, previa tramitación del procedimiento legalmente establecido. La modificación deb…",
-            "source": "files/DOC20260727103856Memoria justificativa modificada.pdf",
-            "source_url": "https://contrataciondelestado.es/wps/wcm/connect/PLACE_es/Site/area/docAccCmpnt?srv=cmpnt&cmpntname=GetDocumentsById&source=library&DocumentIdParam=2026-a4f5e657-ad25-41de-a657-c96e131583b8",
-            "source_sha256": "8824d12486e4101e1d00848b1b65e3643a198f637c7a213fb8f7d734c54686d1",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
-            "raw_machine_format": false,
-            "artifact_lookup_required": false
-          }
-        ],
-        "ip_data_security": [
-          {
-            "text": "información municipal no pública. La obligación subsistirá tras finalizar el contrato y la información solo podrá utilizarse para su ejecución. 30.2. Tratamiento de datos en la ejecución La ejecución ordinaria no implica tratamiento de datos personales por cuenta del Ayuntamiento. Los datos de contacto profesionales de personas autorizadas se utilizarán exclusivamente para gestionar pedidos, entregas, incidencias y facturación, con acceso limitado y medidas adecuadas. Si surgiera una prestación que implicase trata…",
-            "source": "files/DOC20260727123105pcap limpieza.pdf",
-            "source_url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=ifvZusxlXbq5gMTfJH7oGyIEyw7nahd3ofcUpb9LtpU%2BHyDSX2pMwFf0naAnb8n%2BluZJ7FNeq9HwGumXq88%2BzO7yxlVZEdKNzCmUh2cUkZy1aXEvq3KHa/AEHgtDrQw0",
-            "source_sha256": "8f540294b7df7dfc9245e55876c58a8d272d8630e4dbe6f8694d84198390c418",
-            "source_kind": "pdf",
-            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
             "raw_machine_format": false,
             "artifact_lookup_required": false
           }
