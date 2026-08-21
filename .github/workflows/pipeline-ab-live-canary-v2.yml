@@ -2,19 +2,6 @@ name: Pipeline A/B Live Canary V2
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/pipeline-ab-live-canary-v2.yml'
-      - 'pipeline/materialize_qwen_ab_golden_fixture.py'
-      - 'pipeline/qwen_notice_batch_selfheal.py'
-      - 'pipeline/qwen_notice_post_guard.py'
-      - 'pipeline/evaluate_qwen_recall_golden.py'
-      - 'tests/test_qwen_post_guard_recall.py'
-      - 'benchmarks/qwen_batch_recall_golden_v1.json'
-      - 'control/pipeline_ab_canary_v2_trigger.json'
-  schedule:
-    - cron: '23 */4 * * *'
 
 permissions:
   actions: read

@@ -279,25 +279,11 @@ jobs:
           persist_file queues/qwen_live_selection_latest.jsonl work/publish/qwen_live_selection_latest.jsonl "qwen: persist cumulative live selection ${GITHUB_RUN_ID}"
           persist_file control/qwen_live/incremental_processed.json work/marker.json "qwen: persist cumulative artifact marker ${GITHUB_RUN_ID}"
 
-      - name: Ensure semantic backfill remains continuously primed before DCE
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REMAINING: ${{ steps.merge.outputs.remaining }}
+      - name: Semantic continuation is owned by the canonical controller
         shell: bash
         run: |
-          set -euo pipefail
-          remaining="${REMAINING:-0}"
-          if [ "$remaining" -le 0 ]; then exit 0; fi
-          active="$(gh run list --workflow qwen-live-classification.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending")] | length')"
-          if [ "$active" -eq 0 ]; then
-            gh workflow run qwen-live-classification.yml --ref main \
-              -f per_shard=480 \
-              -f auto_continue=true \
-              -f dce_limit=160
-            echo "Queued next explicit 480-row Qwen generation; remaining=$remaining"
-          else
-            echo "Semantic lane already has $active active/queued generation(s); no duplicate and no preemption."
-          fi
+          echo 'No semantic worker is dispatched from the conveyor.'
+          echo 'Qwen Backlog Watchdog is the single semantic dispatch owner.'
 
       - name: Dispatch bounded DCE only after semantic lane is protected
         if: steps.select.outputs.usable == 'true' && steps.selection.outputs.selected != '0'

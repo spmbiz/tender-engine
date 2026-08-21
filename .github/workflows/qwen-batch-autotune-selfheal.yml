@@ -2,16 +2,6 @@ name: Qwen Batch Autotune Self-Heal
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '17 * * * *'
-  push:
-    branches: [main]
-    paths:
-      - 'control/qwen_batch_autotune_trigger.json'
-      - 'pipeline/qwen_notice_batch_selfheal.py'
-      - 'pipeline/qwen_notice_post_guard.py'
-      - 'pipeline/select_qwen_batch_champion.py'
-      - '.github/workflows/qwen-batch-autotune-selfheal.yml'
 
 permissions:
   actions: read

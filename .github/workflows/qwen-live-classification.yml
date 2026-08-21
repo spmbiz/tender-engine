@@ -6,32 +6,15 @@ on:
       per_shard:
         description: Maximum notices classified by each worker in this pass
         required: false
-        default: '192'
+        default: '96'
       auto_continue:
-        description: Retained for compatibility; recovery drainer owns continuation
+        description: Retained for compatibility; semantic controller owns continuation
         required: false
         default: 'true'
       dce_limit:
         description: Retained for compatibility; recovery drainer owns DCE handoff
         required: false
         default: '160'
-  workflow_run:
-    workflows: ["Notice Intelligence Ledger"]
-    types: [completed]
-  schedule:
-    - cron: '43 */6 * * *'
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/qwen-live-classification.yml'
-      - 'pipeline/global_admission.py'
-      - 'pipeline/apply_qwen_state_to_ledger.py'
-      - 'pipeline/build_qwen_dce_selection.py'
-      - 'pipeline/build_qwen_shadow_shards.py'
-      - 'pipeline/merge_qwen_classification_state.py'
-      - 'pipeline/qwen_notice_batch_selfheal.py'
-      - 'pipeline/qwen_notice_post_guard.py'
-      - 'control/qwen_batch_runtime_config.json'
 
 permissions:
   actions: write
@@ -50,7 +33,7 @@ env:
 
 jobs:
   plan:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     outputs:
@@ -118,7 +101,7 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          REQUESTED_PER_SHARD: ${{ github.event.inputs.per_shard || '192' }}
+          REQUESTED_PER_SHARD: ${{ github.event.inputs.per_shard || '96' }}
         run: |
           set -euo pipefail
           source_run="$LEDGER_SOURCE_RUN"
@@ -145,9 +128,9 @@ jobs:
           )"
           per_shard="$(python - <<'PY'
           import os
-          try: n=int(os.environ.get('REQUESTED_PER_SHARD') or 192)
-          except Exception: n=192
-          print(max(16,min(480,n)))
+          try: n=int(os.environ.get('REQUESTED_PER_SHARD') or 96)
+          except Exception: n=96
+          print(max(16,min(96,n)))
           PY
           )"
 
@@ -223,7 +206,7 @@ jobs:
           echo "Source discovery: ${{ steps.plan.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Exact-hash queue remaining before this pass: ${{ steps.plan.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Workers admitted: ${{ steps.plan.outputs.allowed_workers }}; max notices/worker: ${{ steps.plan.outputs.per_shard }}; batch size: ${{ steps.plan.outputs.batch_size }}" >> "$GITHUB_STEP_SUMMARY"
-          echo 'Recovery drainer owns durable Qwen→DCE publication and continuation after this workflow completes.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Continuous conveyor owns durable Qwen publication; backlog watchdog owns continuation.' >> "$GITHUB_STEP_SUMMARY"
 
   classify:
     needs: plan
@@ -446,5 +429,5 @@ jobs:
           echo "- accepted this pass: ${{ steps.merge.outputs.accepted }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- remaining exact-hash queue: ${{ steps.merge.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- cumulative classified state rows: ${{ steps.merge.outputs.state_rows }}" >> "$GITHUB_STEP_SUMMARY"
-          echo '- Qwen→DCE persistence, DCE dispatch and continuation are delegated to Qwen Live Recovery Drainer.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Qwen persistence is delegated to the continuous conveyor; continuation is delegated to the backlog watchdog.' >> "$GITHUB_STEP_SUMMARY"
           echo '- safety: no semantic result is a final bid verdict; authoritative DCE remains the truth gate.' >> "$GITHUB_STEP_SUMMARY"
