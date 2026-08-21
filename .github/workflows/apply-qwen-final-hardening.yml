@@ -1,91 +1,17 @@
-name: Apply Qwen Final Hardening
+name: Apply Qwen Final Hardening (Legacy Retired)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/apply-qwen-final-hardening.yml'
-      - 'control/qwen_final_hardening_trigger.json'
 
 permissions:
-  contents: write
-
-concurrency:
-  group: apply-qwen-final-hardening
-  cancel-in-progress: true
+  contents: read
 
 jobs:
-  patch:
+  retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Patch remaining semantic starvation paths
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-
-          conveyor = Path('.github/workflows/qwen-live-conveyor.yml')
-          s = conveyor.read_text(encoding='utf-8')
-          before = s
-          s = s.replace('per_shard=192', 'per_shard=480')
-          s = s.replace('192-row bounded Qwen realtime pass', '480-row bounded Qwen realtime pass')
-          old_order = '          refresh_selection\n          ensure_qwen_running\n\n          # Poll completed worker artifacts.'
-          new_order = '          ensure_qwen_running\n          refresh_selection\n\n          # Poll completed worker artifacts.'
-          s = s.replace(old_order, new_order)
-          if s == before:
-              raise SystemExit('conveyor patch produced no change')
-          if 'per_shard=192' in s:
-              raise SystemExit('conveyor still contains per_shard=192')
-          if new_order not in s:
-              raise SystemExit('Qwen-first ordering not established')
-          conveyor.write_text(s, encoding='utf-8')
-
-          q = Path('.github/workflows/qwen-live-classification.yml')
-          s = q.read_text(encoding='utf-8')
-          before = s
-          s = s.replace("default: '192'", "default: '480'", 1)
-          s = s.replace("- cron: '43 */6 * * *'", "- cron: '43 * * * *'")
-          s = s.replace("|| '192' }}", "|| '480' }}")
-          s = s.replace("or 192)", "or 480)")
-          s = s.replace("except Exception: n=192", "except Exception: n=480")
-          if s == before:
-              raise SystemExit('classification patch produced no change')
-          if "default: '192'" in s or "'43 */6 * * *'" in s or "|| '192' }}" in s:
-              raise SystemExit('classification still contains legacy semantic defaults')
-          q.write_text(s, encoding='utf-8')
-          PY
-          python -m py_compile pipeline/global_admission.py
-          git diff --check
-          git diff -- .github/workflows/qwen-live-conveyor.yml .github/workflows/qwen-live-classification.yml
-      - name: Commit transactionally to latest main
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .github/workflows/qwen-live-conveyor.yml .github/workflows/qwen-live-classification.yml
-          if git diff --cached --quiet; then
-            echo 'Final Qwen hardening already present.'
-            exit 0
-          fi
-          git commit -m 'qwen: harden 480-row Qwen-first continuous backfill'
-          for attempt in 1 2 3 4 5 6; do
-            if git pull --rebase origin main && git push origin HEAD:main; then
-              echo 'Qwen final hardening committed.'
-              exit 0
-            fi
-            git rebase --abort >/dev/null 2>&1 || true
-            sleep "$((attempt * 2))"
-          done
-          echo 'Could not persist Qwen final hardening after bounded retries' >&2
-          exit 1
+      - run: |
+          echo 'QWEN_FINAL_HARDENING_RETIRED'
+          echo 'The audited Qwen V3 control plane is canonical.'
+          echo 'This legacy workflow cannot rewrite semantic scheduling or restore 480-row settings.'
