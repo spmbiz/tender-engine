@@ -86,6 +86,7 @@ jobs:
               except Exception:
                   pass
           youngest_active_age=min(active_ages) if active_ages else None
+          oldest_active_age=max(active_ages) if active_ages else None
 
           samples=[]
           for c in json.loads(Path('/tmp/qwen-watchdog/commits.json').read_text()):
@@ -127,7 +128,9 @@ jobs:
               no_progress_window = delta <= 0
 
           durable_stall = bool(remaining and (stale_summary or no_progress_window))
-          fresh_recovery = bool(youngest_active_age is not None and youngest_active_age < grace)
+          # Grace is valid only when every active generation is fresh. A new queued
+          # replacement must never hide an older zombie that still owns concurrency.
+          fresh_recovery = bool(oldest_active_age is not None and oldest_active_age < grace)
           recycle = bool(durable_stall and active_ids and not fresh_recovery)
           wake = bool((remaining is None or remaining > 0) and not active_ids)
 
@@ -143,6 +146,7 @@ jobs:
               'active_ids': active_ids,
               'active_count': len(active_ids),
               'youngest_active_age_minutes': round(youngest_active_age,1) if youngest_active_age is not None else None,
+              'oldest_active_age_minutes': round(oldest_active_age,1) if oldest_active_age is not None else None,
               'fresh_recovery_grace': fresh_recovery,
               'recycle': recycle,
               'wake': wake,
@@ -211,9 +215,10 @@ jobs:
               exit 0
             fi
 
-            queued_now="$(jq '[.[] | select(.status=="queued" or .status=="waiting" or .status=="pending" or .status=="requested")] | length' /tmp/qwen-watchdog/pre-recovery-runs.json)"
+            stale_ids="$(jq '.active_ids' /tmp/qwen-watchdog/decision.json)"
+            queued_now="$(jq --argjson stale "$stale_ids" '[.[] | select(.status=="queued" or .status=="waiting" or .status=="pending" or .status=="requested") | .databaseId as $id | select(($stale | index($id)) == null)] | length' /tmp/qwen-watchdog/pre-recovery-runs.json)"
             if [ "$queued_now" -ne 0 ]; then
-              echo "A replacement is already queued ($queued_now); refusing duplicate dispatch."
+              echo "A non-zombie replacement is already queued ($queued_now); refusing duplicate dispatch."
               echo 'dispatched=false' >> "$GITHUB_OUTPUT"
               exit 0
             fi
