@@ -7,6 +7,10 @@ on:
     types: [completed]
   schedule:
     - cron: '*/5 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qwen-backlog-watchdog.yml'
 
 permissions:
   actions: write
@@ -82,6 +86,7 @@ jobs:
               except Exception:
                   pass
           youngest_active_age=min(active_ages) if active_ages else None
+          oldest_active_age=max(active_ages) if active_ages else None
 
           samples=[]
           for c in json.loads(Path('/tmp/qwen-watchdog/commits.json').read_text()):
@@ -123,7 +128,9 @@ jobs:
               no_progress_window = delta <= 0
 
           durable_stall = bool(remaining and (stale_summary or no_progress_window))
-          fresh_recovery = bool(youngest_active_age is not None and youngest_active_age < grace)
+          # Grace is valid only when every active generation is fresh. A new queued
+          # replacement must never hide an older zombie that still owns concurrency.
+          fresh_recovery = bool(oldest_active_age is not None and oldest_active_age < grace)
           recycle = bool(durable_stall and active_ids and not fresh_recovery)
           wake = bool((remaining is None or remaining > 0) and not active_ids)
 
@@ -139,6 +146,7 @@ jobs:
               'active_ids': active_ids,
               'active_count': len(active_ids),
               'youngest_active_age_minutes': round(youngest_active_age,1) if youngest_active_age is not None else None,
+              'oldest_active_age_minutes': round(oldest_active_age,1) if oldest_active_age is not None else None,
               'fresh_recovery_grace': fresh_recovery,
               'recycle': recycle,
               'wake': wake,
@@ -173,16 +181,16 @@ jobs:
             gh api --method POST "repos/${REPO}/actions/runs/${rid}/cancel" >/dev/null 2>&1 || true
           done
 
-          # Do not dispatch behind a zombie concurrency holder. Wait until the old
-          # generation is actually no longer active; otherwise fail loudly and retry
-          # next watchdog cycle rather than queueing an illusion of recovery.
+          # Give cancellation time to clear, but never let slow propagation kill the
+          # watchdog. The recovery step can safely queue one replacement behind the
+          # cancelling concurrency holder.
           for _ in $(seq 1 18); do
             active="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length')"
             [ "$active" -eq 0 ] && exit 0
             sleep 5
           done
-          echo 'Stalled Qwen generation did not release concurrency within 90s.' >&2
-          exit 1
+          echo 'WARNING: stalled Qwen generation still visible after 90s; recovery will queue one replacement behind it.' >&2
+          exit 0
 
       - id: recover
         name: Force a fresh Qwen generation when dead or durably stalled
@@ -191,13 +199,36 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           REMAINING: ${{ steps.inspect.outputs.remaining }}
+          RECYCLE: ${{ steps.inspect.outputs.recycle }}
         shell: bash
         run: |
           set -euo pipefail
 
-          active_now="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 30 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length')"
+          gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 50 \
+            --json databaseId,status > /tmp/qwen-watchdog/pre-recovery-runs.json
+
+          active_now="$(jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length' /tmp/qwen-watchdog/pre-recovery-runs.json)"
           if [ "$active_now" -ne 0 ]; then
-            echo "A Qwen generation became active during recovery; refusing duplicate dispatch."
+            if [ "$RECYCLE" != 'true' ]; then
+              echo "A Qwen generation became active during recovery; refusing duplicate dispatch."
+              echo 'dispatched=false' >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            stale_ids="$(jq '.active_ids' /tmp/qwen-watchdog/decision.json)"
+            queued_now="$(jq --argjson stale "$stale_ids" '[.[] | select(.status=="queued" or .status=="waiting" or .status=="pending" or .status=="requested") | .databaseId as $id | select(($stale | index($id)) == null)] | length' /tmp/qwen-watchdog/pre-recovery-runs.json)"
+            if [ "$queued_now" -ne 0 ]; then
+              echo "A non-zombie replacement is already queued ($queued_now); refusing duplicate dispatch."
+              echo 'dispatched=false' >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            gh workflow run qwen-live-classification.yml --repo "$REPO" --ref main \
+              -f per_shard=480 \
+              -f auto_continue=true \
+              -f dce_limit=160
+            echo 'dispatched=true' >> "$GITHUB_OUTPUT"
+            echo "Queued exactly one replacement behind cancelling zombie; durable remaining=${REMAINING}."
             exit 0
           fi
 
@@ -216,15 +247,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          before="$(jq '[.[].databaseId]' /tmp/qwen-watchdog/pre-recovery-runs.json)"
           for _ in $(seq 1 12); do
-            active="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 20 --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested")] | length')"
-            if [ "$active" -gt 0 ]; then
-              echo "Recovery confirmed: $active Qwen generation(s) queued or active."
+            gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 50 \
+              --json databaseId,status > /tmp/qwen-watchdog/post-recovery-runs.json
+            new_active="$(jq --argjson before "$before" '[.[] | select(.status=="queued" or .status=="in_progress" or .status=="waiting" or .status=="pending" or .status=="requested") | .databaseId as $id | select(($before | index($id)) == null)] | length' /tmp/qwen-watchdog/post-recovery-runs.json)"
+            if [ "$new_active" -gt 0 ]; then
+              echo "Recovery confirmed: $new_active new Qwen generation(s) queued or active."
               exit 0
             fi
             sleep 5
           done
-          echo 'Recovery dispatch was not visible after 60s.' >&2
+          echo 'Recovery dispatch did not produce a new visible Qwen run after 60s.' >&2
           exit 1
 
       - name: Watchdog summary
@@ -236,4 +270,5 @@ jobs:
           echo "- durable stall detected: ${{ steps.inspect.outputs.stalled }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- zombie recycle requested: ${{ steps.inspect.outputs.recycle }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- dead-lane wake requested: ${{ steps.inspect.outputs.wake }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- replacement dispatched: ${{ steps.recover.outputs.dispatched }}" >> "$GITHUB_STEP_SUMMARY"
           cat /tmp/qwen-watchdog/decision.json >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
