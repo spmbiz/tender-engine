@@ -17,12 +17,12 @@ permissions:
 
 concurrency:
   group: auto-dce-adjudication-${{ github.event.inputs.dce_run_id || github.sha }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   route-to-qwen:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,12 +41,15 @@ jobs:
           fi
           [[ "$rid" =~ ^[0-9]+$ ]] || { echo "Invalid DCE run id: $rid" >&2; exit 1; }
           echo "id=$rid" >> "$GITHUB_OUTPUT"
-      - name: Dispatch API-free local Qwen DCE gate triage
+      - name: Wake canonical Qwen DCE drainer
         env:
           GH_TOKEN: ${{ github.token }}
           RID: ${{ steps.resolve.outputs.id }}
         shell: bash
         run: |
           set -euo pipefail
-          gh workflow run qwen-dce-triage.yml --ref main -f dce_run_id="$RID" -f workers=4
-          echo "Legacy adjudication request routed to Qwen DCE triage for run $RID. No OpenAI API is used." >> "$GITHUB_STEP_SUMMARY"
+          # Single-owner invariant: legacy requests no longer dispatch Qwen DCE
+          # workers themselves. The drainer dedupes completed DCE runs, applies
+          # shared fleet admission, and dispatches the missing triage pass.
+          gh workflow run qwen-dce-drainer.yml --ref main
+          echo "Legacy adjudication request for DCE run $RID routed through canonical Qwen DCE drainer." >> "$GITHUB_STEP_SUMMARY"
