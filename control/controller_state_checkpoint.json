@@ -31373,11 +31373,24 @@
   ],
   "last_discovery_dispatch_at": "2026-08-21T09:17:47.066968+00:00",
   "last_circleci_tick_at": "2026-08-14T21:41:04.485184+00:00",
-  "updated_at": "2026-08-21T09:55:36.063500+00:00",
+  "updated_at": "2026-08-21T10:20:05.938300+00:00",
   "enabled": true,
   "mode": "maximum",
   "active_discovery_run_id": "32467216373",
-  "pending_dce_batch": null,
+  "pending_dce_batch": {
+    "candidate_ids": [
+      "ZA_ETENDERS_OCDS:ocds-9t57fa-164106-2026-07-31",
+      "TED:578426-2026",
+      "TED:579668-2026",
+      "PL-BZP:08deff60-6ea5-0ada-b346-0300010ce114"
+    ],
+    "source_run": "32467216373",
+    "selection_path": "queues/auto_selection_32472135805.jsonl",
+    "queue_commit_sha": "3df7f7ce54d36590a4e5c3850dd0cce1b45efc9f",
+    "commit_message": "Autonomous DCE batch 32472135805 from discovery 32467216373",
+    "dispatched_at": "2026-08-21T10:20:05.938300+00:00",
+    "max_parallel": 5
+  },
   "legacy_dispatched_candidate_ids": [
     "TED:545556-2026",
     "TED:543796-2026",
