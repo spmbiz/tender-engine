@@ -26,10 +26,6 @@ concurrency:
 env:
   QWEN_PER_SHARD: '480'
   QWEN_SEMANTIC_MIN_CONTROL_PLANE_SHA: '7aa7dcff7de9122800632193f558095df8e05f0d'
-  # Rollout epoch for the simplified singleton/single-writer pipeline. Any
-  # semantic generation created before this repair must yield the lane so the
-  # corrected runtime becomes live immediately after merge.
-  QWEN_SEMANTIC_MIN_CREATED_AT: '2026-08-22T03:27:00Z'
 
 jobs:
   watchdog:
@@ -44,44 +40,11 @@ jobs:
         with:
           python-version: '3.12'
 
-      - id: epoch
-        name: Purge pre-repair semantic generations without compare API
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p /tmp/qwen-watchdog
-          gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 100 \
-            --json databaseId,status,createdAt,event,headSha > /tmp/qwen-watchdog/preflight-runs.json
-          mapfile -t ids < <(CUTOFF="$QWEN_SEMANTIC_MIN_CREATED_AT" python - <<'PY'
-          import datetime as dt,json,os
-          cutoff=dt.datetime.fromisoformat(os.environ['CUTOFF'].replace('Z','+00:00'))
-          active={'queued','waiting','pending','requested','in_progress'}
-          for row in json.load(open('/tmp/qwen-watchdog/preflight-runs.json',encoding='utf-8')):
-              if row.get('status') not in active: continue
-              try: created=dt.datetime.fromisoformat(str(row.get('createdAt') or '').replace('Z','+00:00'))
-              except Exception: continue
-              if created < cutoff: print(int(row['databaseId']))
-          PY
-          )
-          if [ "${#ids[@]}" -eq 0 ]; then
-            echo 'purged=false' >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          echo 'purged=true' >> "$GITHUB_OUTPUT"
-          for run_id in "${ids[@]}"; do
-            echo "Cancelling pre-repair semantic generation $run_id"
-            gh api --method POST "repos/${REPO}/actions/runs/${run_id}/cancel" >/dev/null 2>&1 || true
-          done
-
       - id: inspect
         name: Inspect semantic lane with tested controller
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          PRE_EPOCH_PURGED: ${{ steps.epoch.outputs.purged }}
         shell: bash
         run: |
           set -euo pipefail
@@ -90,53 +53,40 @@ jobs:
             --repo "$REPO" \
             --summary control/qwen_live/classification_summary.json \
             --out /tmp/qwen-watchdog/decision.json
-          remaining="$(jq -r '.remaining' /tmp/qwen-watchdog/decision.json)"
-          need_dispatch="$(jq -r '.need_dispatch' /tmp/qwen-watchdog/decision.json)"
-          if [ "$PRE_EPOCH_PURGED" = 'true' ] && [ "$remaining" != '0' ]; then need_dispatch=true; fi
-          echo "remaining=$remaining" >> "$GITHUB_OUTPUT"
+          echo "remaining=$(jq -r '.remaining' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
           echo "ledger_source=$(jq -r '.ledger_source // "unknown"' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
           echo "semantic_source=$(jq -r '.semantic_source // "unknown"' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
           echo "source_gap=$(jq -r '.source_gap' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
-          echo "cancel_count=$(jq -r '.cancel_count' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
-          echo "need_dispatch=$need_dispatch" >> "$GITHUB_OUTPUT"
+          echo "superseded_count=$(jq -r '.cancel_count' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
+          echo "authorized_queued=$(jq '[.queued[] | select(.controller_authorized == true)] | length' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
+          echo "need_dispatch=$(jq -r '.need_dispatch' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
           echo "lane_covered=$(jq -r '.lane_covered' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
 
-      - name: Purge stale, duplicate and queued semantic generations
-        if: steps.inspect.outputs.cancel_count != '0'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          mapfile -t ids < <(jq -r '.cancel_ids[]' /tmp/qwen-watchdog/decision.json)
-          for run_id in "${ids[@]}"; do
-            echo "Cancelling stale/duplicate semantic generation $run_id"
-            gh api --method POST "repos/${REPO}/actions/runs/${run_id}/cancel" >/dev/null 2>&1 || true
-          done
-
       - id: recover
-        name: Dispatch exactly one fresh semantic generation
+        name: Queue exactly one fresh replacement without preempting compute
         if: steps.inspect.outputs.need_dispatch == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
+          AUTHORIZED_QUEUED: ${{ steps.inspect.outputs.authorized_queued }}
         shell: bash
         run: |
           set -euo pipefail
-          for _ in $(seq 1 18); do
-            active="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 100 --json status --jq '[.[] | select(.status=="queued" or .status=="waiting" or .status=="pending" or .status=="requested" or .status=="in_progress")] | length')"
-            if [ "$active" -eq 0 ]; then
-              gh workflow run qwen-live-classification.yml --repo "$REPO" --ref main \
-                -f per_shard="$QWEN_PER_SHARD" \
-                -f auto_continue=true \
-                -f dce_limit=160
-              echo 'dispatched=true' >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            sleep 5
-          done
-          echo 'dispatched=false' >> "$GITHUB_OUTPUT"
+          # Never kill a running or queued semantic generation. If the controller
+          # says the lane is unhealthy/stale, enqueue one current replacement and
+          # let workflow concurrency (cancel-in-progress:false) start it naturally.
+          if [ "${AUTHORIZED_QUEUED:-0}" -gt 0 ]; then
+            echo 'A controller-authorized replacement is already queued; no duplicate dispatch.'
+            echo 'dispatched=false' >> "$GITHUB_OUTPUT"
+            echo 'replacement_already_queued=true' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          gh workflow run qwen-live-classification.yml --repo "$REPO" --ref main \
+            -f per_shard="$QWEN_PER_SHARD" \
+            -f auto_continue=true \
+            -f dce_limit=160
+          echo 'dispatched=true' >> "$GITHUB_OUTPUT"
+          echo 'replacement_already_queued=false' >> "$GITHUB_OUTPUT"
 
       - name: Confirm replacement is visible
         if: steps.recover.outputs.dispatched == 'true'
@@ -162,5 +112,7 @@ jobs:
           echo "- latest ledger source: ${{ steps.inspect.outputs.ledger_source }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- stable semantic source: ${{ steps.inspect.outputs.semantic_source }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- lane covered: ${{ steps.inspect.outputs.lane_covered }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- superseded/stale runs observed (not cancelled): ${{ steps.inspect.outputs.superseded_count }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- replacement dispatched: ${{ steps.recover.outputs.dispatched }}" >> "$GITHUB_STEP_SUMMARY"
-          echo '- productivity heartbeat is now the guarded checkpoint asset; split/log churn cannot fake health.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- recovery is non-preemptive: stale/duplicate runs are observed but never cancelled by this watchdog.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- productivity heartbeat is the guarded checkpoint asset; split/log churn cannot fake health.' >> "$GITHUB_STEP_SUMMARY"
