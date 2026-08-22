@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/gpt-web-full-batch-compact.yml'
+      - 'control/gpt_full_batch_trigger.json'
   workflow_dispatch:
 
 permissions:
@@ -11,7 +12,7 @@ permissions:
 
 concurrency:
   group: gpt-web-full-batch-compact
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   compact:
@@ -20,106 +21,73 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-      - name: Build compact adjudication batch
+          ref: main
+          fetch-depth: 1
+      - name: Build uncapped compact adjudication catalogs from durable index
         shell: bash
         run: |
+          set -euo pipefail
           python - <<'PY'
-          import json, pathlib, re
+          import json, pathlib
+          from collections import Counter
           from datetime import datetime, timezone
 
-          src = pathlib.Path('control/gpt_supergreen_inbox.json')
-          data = json.loads(src.read_text(encoding='utf-8'))
-          queue = data.get('review_queue') or []
+          src=pathlib.Path('control/gpt_review_index.json')
+          data=json.loads(src.read_text(encoding='utf-8'))
+          rows=[x for x in (data.get('items') or []) if isinstance(x,dict) and x.get('candidate_id')]
+          expected=int(data.get('count') or len(rows))
+          assert len(rows)==expected,(len(rows),expected)
+          ids=[str(x['candidate_id']).strip().casefold() for x in rows]
+          assert len(ids)==len(set(ids)), 'duplicate candidate IDs in durable index'
 
-          def clip(s, n=360):
-              s = re.sub(r'\s+', ' ', str(s or '')).strip()
-              return s if len(s) <= n else s[:n-1] + '…'
-
-          gates_keep = [
-              'entity_geography','turnover_financial','references_experience',
-              'certifications_partner','staffing_team','insurance_bonds',
-              'subcontracting_consortium','deliverables_scope','sla_onsite',
-              'term_value','award_criteria','forms_signatures','submission','ip_data_security'
+          keep=[
+            'candidate_id','title','buyer','portal','notice_url','deadline','estimated_value','currency',
+            'review_stage','gate_readiness','content_quality','deadline_resolved','deadline_authority_status',
+            'evidence_gate_coverage','priority_score','spm_post_dce_score','spm_fit_band','spm_fit_reasons',
+            'spm_friction_signals','source_dce_run_id','source_shard','procedure_aliases','artifact_locator','hot_ready_at'
           ]
-          rows=[]
-          for q in queue:
-              ev=q.get('evidence_by_gate') or {}
-              gate_digest={}
-              for gate in gates_keep:
-                  vals=ev.get(gate) or []
-                  if vals:
-                      gate_digest[gate]=[clip((v or {}).get('text'), 360) for v in vals[:2]]
-              da=q.get('deadline_authority') or {}
-              eq=q.get('evidence_quality_summary') or {}
-              rows.append({
-                  'candidate_id': q.get('candidate_id'),
-                  'title': q.get('title'),
-                  'buyer': q.get('buyer'),
-                  'portal': q.get('portal'),
-                  'notice_url': q.get('notice_url'),
-                  'deadline': q.get('deadline'),
-                  'estimated_value': q.get('estimated_value'),
-                  'currency': q.get('currency'),
-                  'priority_score': q.get('priority_score'),
-                  'gpt_priority_score': q.get('gpt_priority_score'),
-                  'review_stage': q.get('review_stage'),
-                  'spm_post_dce_score': q.get('spm_post_dce_score'),
-                  'spm_fit_band': q.get('spm_fit_band'),
-                  'spm_fit_reasons': q.get('spm_fit_reasons') or [],
-                  'spm_friction_signals': q.get('spm_friction_signals') or [],
-                  'upstream_classification': q.get('upstream_classification'),
-                  'content_quality': q.get('content_quality'),
-                  'gate_readiness': q.get('gate_readiness'),
-                  'evidence_gate_coverage': q.get('evidence_gate_coverage'),
-                  'deadline_authority_status': q.get('deadline_authority_status'),
-                  'deadline_conflict': bool(da.get('conflict')),
-                  'authoritative_submission_date': da.get('authoritative_submission_date'),
-                  'dce_deadline_candidates': da.get('dce_deadline_candidates') or [],
-                  'source_dce_run_id': q.get('source_dce_run_id'),
-                  'source_shard': q.get('source_shard'),
-                  'review_key': q.get('review_key'),
-                  'raw_status': eq.get('raw_status'),
-                  'documents_with_text': eq.get('documents_with_text'),
-                  'text_chars': eq.get('text_chars'),
-                  'evidence': gate_digest,
-              })
-
+          compact=[{k:r.get(k) for k in keep} for r in rows]
+          priority=[r for r in compact if str(r.get('spm_fit_band') or '').upper() in {'HOT','GOOD','MAYBE'}]
+          now=datetime.now(timezone.utc).isoformat()
           meta={
-              'schema':'GPT_WEB_FULL_BATCH_COMPACT_V1',
-              'generated_at':datetime.now(timezone.utc).isoformat(),
-              'source_inbox_updated_at':data.get('updated_at'),
-              'latest_source_dce_run_id':data.get('latest_source_dce_run_id'),
-              'count':len(rows),
+            'schema':'GPT_WEB_UNCAPPED_INDEX_COMPACT_V2',
+            'generated_at':now,
+            'source_index_updated_at':data.get('updated_at'),
+            'count':len(compact),
+            'priority_count':len(priority),
+            'by_stage':dict(Counter(str(r.get('review_stage') or 'UNKNOWN') for r in compact)),
+            'by_band':dict(Counter(str(r.get('spm_fit_band') or 'UNKNOWN') for r in compact)),
+            'contract':'Exact uncapped durable GPT review index. No hot-window cap. Presence is work, never a GREEN verdict.'
           }
-          p=pathlib.Path('control/gpt_web_full_batch_compact.json')
-          p.write_text(json.dumps({**meta,'items':rows},ensure_ascii=False,indent=2),encoding='utf-8')
 
-          idx=pathlib.Path('control/gpt_web_full_batch_index.jsonl')
-          with idx.open('w',encoding='utf-8') as f:
-              f.write(json.dumps({'_meta':meta},ensure_ascii=False,separators=(',',':'))+'\n')
-              for r in rows:
-                  small={k:r.get(k) for k in [
-                      'candidate_id','title','buyer','portal','notice_url','deadline','estimated_value','currency',
-                      'gpt_priority_score','review_stage','spm_post_dce_score','spm_fit_band','spm_fit_reasons',
-                      'spm_friction_signals','content_quality','gate_readiness','evidence_gate_coverage',
-                      'deadline_authority_status','deadline_conflict','source_dce_run_id','source_shard','review_key'
-                  ]}
-                  f.write(json.dumps(small,ensure_ascii=False,separators=(',',':'))+'\n')
-          print(json.dumps({'count':len(rows),'output':str(p),'index':str(idx)},indent=2))
+          out=pathlib.Path('control/gpt_web_uncapped_index.jsonl')
+          with out.open('w',encoding='utf-8') as f:
+            f.write(json.dumps({'_meta':meta},ensure_ascii=False,separators=(',',':'))+'\n')
+            for r in compact:
+              f.write(json.dumps(r,ensure_ascii=False,separators=(',',':'))+'\n')
+
+          pout=pathlib.Path('control/gpt_web_priority_uncapped.jsonl')
+          with pout.open('w',encoding='utf-8') as f:
+            f.write(json.dumps({'_meta':{**meta,'count':len(priority),'scope':'HOT_GOOD_MAYBE_ONLY'}},ensure_ascii=False,separators=(',',':'))+'\n')
+            for r in priority:
+              f.write(json.dumps(r,ensure_ascii=False,separators=(',',':'))+'\n')
+
+          pathlib.Path('control/gpt_web_uncapped_manifest.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(meta,ensure_ascii=False,indent=2))
           PY
-      - name: Persist compact batch
+      - name: Persist uncapped catalogs transactionally
         shell: bash
         run: |
+          set -euo pipefail
           git config user.name 'tender-engine-bot'
           git config user.email 'tender-engine-bot@users.noreply.github.com'
-          git add control/gpt_web_full_batch_compact.json control/gpt_web_full_batch_index.jsonl
+          git add control/gpt_web_uncapped_index.jsonl control/gpt_web_priority_uncapped.jsonl control/gpt_web_uncapped_manifest.json
           if git diff --cached --quiet; then
-            echo 'No compact batch change.'
+            echo 'Uncapped catalogs already current.'
             exit 0
           fi
-          git commit -m 'gpt-web: compact full pending batch [skip ci]'
-          for attempt in 1 2 3 4 5; do
+          git commit -m "gpt-web: persist uncapped full pending batch ${GITHUB_RUN_ID}"
+          for attempt in 1 2 3 4 5 6; do
             if git push origin HEAD:main; then exit 0; fi
             git fetch origin main
             git rebase origin/main || { git rebase --abort || true; sleep $((attempt*2)); continue; }
