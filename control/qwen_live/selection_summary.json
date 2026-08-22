@@ -1,22 +1,22 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-22T07:19:58+00:00",
+  "generated_at_utc": "2026-08-22T07:23:27+00:00",
   "source_run": "32327417448",
-  "state_rows": 33136,
+  "state_rows": 33241,
   "ledger_rows": 126459,
   "snapshot_rows": 126459,
   "blocked_ids": 32295,
   "durable_attempted_exact_versions_ignored": 14596,
-  "valid_exact_hash_current_unattempted": 6868,
-  "eligible_keep_for_dce": 4736,
-  "review_worthy_rejects_promoted_to_explore": 1376,
+  "valid_exact_hash_current_unattempted": 6956,
+  "eligible_keep_for_dce": 4818,
+  "review_worthy_rejects_promoted_to_explore": 1379,
   "stale_hash_ignored": 0,
   "missing_snapshot": 0,
-  "expired_ignored": 1195,
+  "expired_ignored": 1204,
   "selected": 160,
   "selection_decisions": {
-    "STRONG_FIT": 42,
-    "FIT": 57,
+    "STRONG_FIT": 44,
+    "FIT": 55,
     "MAYBE": 47,
     "REJECT_OBVIOUS": 14
   },
@@ -58,20 +58,20 @@
   "base_candidate_pool": 640,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "STRONG_FIT": 42,
-    "FIT": 74,
-    "MAYBE": 510,
+    "STRONG_FIT": 44,
+    "FIT": 75,
+    "MAYBE": 507,
     "REJECT_OBVIOUS": 14
   },
   "candidate_pool_lanes": {
-    "qwen-primary": 116,
+    "qwen-primary": 119,
     "qwen-open-world-explore": 192,
     "qwen-reject-audit": 128,
-    "qwen-elastic": 204
+    "qwen-elastic": 201
   },
   "code_prior": {
     "positive_code_rows_in_pool": 1,
-    "noncore_code_contradictions_in_pool": 24,
+    "noncore_code_contradictions_in_pool": 26,
     "positive_code_rows_selected": 1,
     "noncore_code_contradictions_selected": 2,
     "policy": "priority_only_never_drop_never_eligibility",
