@@ -1,7 +1,7 @@
 {
   "schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
-  "updated_at": "2026-08-22T13:20:07.489089+00:00",
-  "latest_source_dce_run_id": 32575392123,
+  "updated_at": "2026-08-22T14:50:58.560900+00:00",
+  "latest_source_dce_run_id": 32579878511,
   "review_queue": [
     {
       "candidate_id": "TED:515650-2026",
@@ -723,7 +723,7 @@
       "gpt_priority_score": 21,
       "upstream_signal": "DCE_REVIEW_READY",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
-      "inbox_live_source": "control/gpt_review_hot.json",
+      "inbox_live_source": "existing_inbox",
       "evidence_locator": {
         "dce_run_id": 32575392123,
         "shard": 0,
@@ -732,6 +732,124 @@
       },
       "upstream_review_lane": "SPM_PRIORITY",
       "inbox_lane": "GPT_PRIORITY"
+    },
+    {
+      "candidate_id": "WORLD-BANK:OP00463510",
+      "title": "Procurement of Printing & Supply of IEC Materials in newly constructed 150 Schools - Batch-2",
+      "buyer": null,
+      "portal": "WORLD_BANK",
+      "notice_url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00463510",
+      "deadline": "2026-08-29T00:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 80,
+      "priority_score": 80,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-29T00:00:00+00:00",
+        "notice_deadline_date": "2026-08-29",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 3,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "_notice_OP00463510.html ===== <p><strong>Country</strong>: Pakistan<br /><strong>Project Name</strong>: Sindh Early Learning Enhancement through Classroom Transformation (SELECT)</p><p><strong>Administrative Department</strong>: School Education &amp; Literacy Department (SE&amp;LD), Government of Sindh, Project Management and Implementation Unit (PMIU) at Reform Support Unit (RSU).</p><p><strong>Loan No./Credit No./ Grant No</strong>.: TF0B6208-PK</p><p><strong>Contract Title:</strong> <strong>PROCUREMENT OF PRINTING &amp; SUPPLY OF IEC MATERIALS IN NEWLY CONSTRUCTED 150 SCHOOLS - BATCH-2</strong> (Request for Quotations)</p><p><strong>STEP Reference No. <u>PK-RSU-SINDH-536121-GO-RFQ</u></strong></p><p>&nbsp;</p><ol><li>The Government of Islamic Republic of Pakistan Through Government of Sindh, has received financing from the World Bank toward the cost of the Sindh Early Learning Enhancement through Classroom Transformation (SELECT) project and intends to apply part of the proceeds toward payments under the contract for the <strong>PROCUREMENT OF PRINTING &amp; SUPPLY OF IEC MATERIALS IN NEWLY CONSTRUCTED 150 SCHOOLS - BATCH-2</strong><strong>.</strong></li><li>The Project Implementation Unit (PMIU) SELECT, Reform Support Unit (RSU), School Education &amp; Literacy Department (SE&amp;LD)",
+            "source": "files/world_bank_procurement_notice_OP00463510.html",
+            "source_url": "https://search.worldbank.org/api/procnotices?format=json&rows=25&qterm=OP00463510",
+            "source_sha256": "deb4b511817e7a9237fa8b7c2668aaf7fb6d035a5af9186c046ed8dd6ef8b1b4",
+            "source_kind": "text",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 41,
+            "corpus_end": 1350,
+            "match": "Reference"
+          }
+        ],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [
+          {
+            "text": "m Transformation (SELECT) project and intends to apply part of the proceeds toward payments under the contract for the <strong>PROCUREMENT OF PRINTING &amp; SUPPLY OF IEC MATERIALS IN NEWLY CONSTRUCTED 150 SCHOOLS - BATCH-2</strong><strong>.</strong></li><li>The Project Implementation Unit (PMIU) SELECT, Reform Support Unit (RSU), School Education &amp; Literacy Department (SE&amp;LD), Government of Sindh, is inviting sealed quotations for the <strong><u>PROCUREMENT OF PRINTING &amp; SUPPLY OF IEC MATERIALS IN NEWLY CONSTRUCTED 150 SCHOOLS - BATCH-2.</u></strong></li><li>Interested bidders are required to submit their quotations based on the specifications and terms and conditions outlined in the Request for Quotation (RFQ) document. The RFQ document can be obtained by downloading from the website https://rsu-sindh.gov.pk, free of cost, &nbsp;where the notice is also available.</li><li>Bidding will be conducted through the Request for Quotations procedure as specified in the World Bank &ldquo;Procurement Regulations for IPF Borrowers&rdquo; July 2016 [Revised Nov 2017 and August 2018].</li><li>Quotations must be delivered to the following address on <strong><u>29th August 2026 at 12:00 Noon, </u></strong>Late quotations will be rejected.</li><li>Submission of quotations in electronic format i",
+            "source": "files/world_bank_procurement_notice_OP00463510.html",
+            "source_url": "https://search.worldbank.org/api/procnotices?format=json&rows=25&qterm=OP00463510",
+            "source_sha256": "deb4b511817e7a9237fa8b7c2668aaf7fb6d035a5af9186c046ed8dd6ef8b1b4",
+            "source_kind": "text",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 963,
+            "corpus_end": 2276,
+            "match": "specification"
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "g>: Sindh Early Learning Enhancement through Classroom Transformation (SELECT)</p><p><strong>Administrative Department</strong>: School Education &amp; Literacy Department (SE&amp;LD), Government of Sindh, Project Management and Implementation Unit (PMIU) at Reform Support Unit (RSU).</p><p><strong>Loan No./Credit No./ Grant No</strong>.: TF0B6208-PK</p><p><strong>Contract Title:</strong> <strong>PROCUREMENT OF PRINTING &amp; SUPPLY OF IEC MATERIALS IN NEWLY CONSTRUCTED 150 SCHOOLS - BATCH-2</strong> (Request for Quotations)</p><p><strong>STEP Reference No. <u>PK-RSU-SINDH-536121-GO-RFQ</u></strong></p><p>&nbsp;</p><ol><li>The Government of Islamic Republic of Pakistan Through Government of Sindh, has received financing from the World Bank toward the cost of the Sindh Early Learning Enhancement through Classroom Transformation (SELECT) project and intends to apply part of the proceeds toward payments under the contract for the <strong>PROCUREMENT OF PRINTING &amp; SUPPLY OF IEC MATERIALS IN NEWLY CONSTRUCTED 150 SCHOOLS - BATCH-2</strong><strong>.</strong></li><li>The Project Implementation Unit (PMIU) SELECT, Reform Support Unit (RSU), School Education &amp; Literacy Department (SE&amp;LD), Government of Sindh, is inviting sealed quotations for the <strong><u>PROCUREMENT OF PRINTIN",
+            "source": "files/world_bank_procurement_notice_OP00463510.html",
+            "source_url": "https://search.worldbank.org/api/procnotices?format=json&rows=25&qterm=OP00463510",
+            "source_sha256": "deb4b511817e7a9237fa8b7c2668aaf7fb6d035a5af9186c046ed8dd6ef8b1b4",
+            "source_kind": "text",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 141,
+            "corpus_end": 1444,
+            "match": "sla"
+          }
+        ],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32579878511,
+      "source_shard": 1,
+      "hot_ready_at": "2026-08-22T14:50:56.202772+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 13,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY",
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "e57287249891b59d26859be78258a993944a430353c183a6f603f1de150b7aed",
+      "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
+      "gpt_priority_score": 13,
+      "upstream_signal": "DCE_REVIEW_READY",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32579878511,
+        "shard": 1,
+        "candidate_id": "WORLD-BANK:OP00463510",
+        "release_tag": null
+      },
+      "upstream_review_lane": "SPM_PRIORITY",
+      "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     }
   ],
   "pending_final_review": [
@@ -1455,7 +1573,7 @@
       "gpt_priority_score": 21,
       "upstream_signal": "DCE_REVIEW_READY",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
-      "inbox_live_source": "control/gpt_review_hot.json",
+      "inbox_live_source": "existing_inbox",
       "evidence_locator": {
         "dce_run_id": 32575392123,
         "shard": 0,
@@ -1464,6 +1582,124 @@
       },
       "upstream_review_lane": "SPM_PRIORITY",
       "inbox_lane": "GPT_PRIORITY"
+    },
+    {
+      "candidate_id": "WORLD-BANK:OP00463510",
+      "title": "Procurement of Printing & Supply of IEC Materials in newly constructed 150 Schools - Batch-2",
+      "buyer": null,
+      "portal": "WORLD_BANK",
+      "notice_url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00463510",
+      "deadline": "2026-08-29T00:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 80,
+      "priority_score": 80,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-29T00:00:00+00:00",
+        "notice_deadline_date": "2026-08-29",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 3,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [
+          {
+            "text": "_notice_OP00463510.html ===== <p><strong>Country</strong>: Pakistan<br /><strong>Project Name</strong>: Sindh Early Learning Enhancement through Classroom Transformation (SELECT)</p><p><strong>Administrative Department</strong>: School Education &amp; Literacy Department (SE&amp;LD), Government of Sindh, Project Management and Implementation Unit (PMIU) at Reform Support Unit (RSU).</p><p><strong>Loan No./Credit No./ Grant No</strong>.: TF0B6208-PK</p><p><strong>Contract Title:</strong> <strong>PROCUREMENT OF PRINTING &amp; SUPPLY OF IEC MATERIALS IN NEWLY CONSTRUCTED 150 SCHOOLS - BATCH-2</strong> (Request for Quotations)</p><p><strong>STEP Reference No. <u>PK-RSU-SINDH-536121-GO-RFQ</u></strong></p><p>&nbsp;</p><ol><li>The Government of Islamic Republic of Pakistan Through Government of Sindh, has received financing from the World Bank toward the cost of the Sindh Early Learning Enhancement through Classroom Transformation (SELECT) project and intends to apply part of the proceeds toward payments under the contract for the <strong>PROCUREMENT OF PRINTING &amp; SUPPLY OF IEC MATERIALS IN NEWLY CONSTRUCTED 150 SCHOOLS - BATCH-2</strong><strong>.</strong></li><li>The Project Implementation Unit (PMIU) SELECT, Reform Support Unit (RSU), School Education &amp; Literacy Department (SE&amp;LD)",
+            "source": "files/world_bank_procurement_notice_OP00463510.html",
+            "source_url": "https://search.worldbank.org/api/procnotices?format=json&rows=25&qterm=OP00463510",
+            "source_sha256": "deb4b511817e7a9237fa8b7c2668aaf7fb6d035a5af9186c046ed8dd6ef8b1b4",
+            "source_kind": "text",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 41,
+            "corpus_end": 1350,
+            "match": "Reference"
+          }
+        ],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [
+          {
+            "text": "m Transformation (SELECT) project and intends to apply part of the proceeds toward payments under the contract for the <strong>PROCUREMENT OF PRINTING &amp; SUPPLY OF IEC MATERIALS IN NEWLY CONSTRUCTED 150 SCHOOLS - BATCH-2</strong><strong>.</strong></li><li>The Project Implementation Unit (PMIU) SELECT, Reform Support Unit (RSU), School Education &amp; Literacy Department (SE&amp;LD), Government of Sindh, is inviting sealed quotations for the <strong><u>PROCUREMENT OF PRINTING &amp; SUPPLY OF IEC MATERIALS IN NEWLY CONSTRUCTED 150 SCHOOLS - BATCH-2.</u></strong></li><li>Interested bidders are required to submit their quotations based on the specifications and terms and conditions outlined in the Request for Quotation (RFQ) document. The RFQ document can be obtained by downloading from the website https://rsu-sindh.gov.pk, free of cost, &nbsp;where the notice is also available.</li><li>Bidding will be conducted through the Request for Quotations procedure as specified in the World Bank &ldquo;Procurement Regulations for IPF Borrowers&rdquo; July 2016 [Revised Nov 2017 and August 2018].</li><li>Quotations must be delivered to the following address on <strong><u>29th August 2026 at 12:00 Noon, </u></strong>Late quotations will be rejected.</li><li>Submission of quotations in electronic format i",
+            "source": "files/world_bank_procurement_notice_OP00463510.html",
+            "source_url": "https://search.worldbank.org/api/procnotices?format=json&rows=25&qterm=OP00463510",
+            "source_sha256": "deb4b511817e7a9237fa8b7c2668aaf7fb6d035a5af9186c046ed8dd6ef8b1b4",
+            "source_kind": "text",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 963,
+            "corpus_end": 2276,
+            "match": "specification"
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "g>: Sindh Early Learning Enhancement through Classroom Transformation (SELECT)</p><p><strong>Administrative Department</strong>: School Education &amp; Literacy Department (SE&amp;LD), Government of Sindh, Project Management and Implementation Unit (PMIU) at Reform Support Unit (RSU).</p><p><strong>Loan No./Credit No./ Grant No</strong>.: TF0B6208-PK</p><p><strong>Contract Title:</strong> <strong>PROCUREMENT OF PRINTING &amp; SUPPLY OF IEC MATERIALS IN NEWLY CONSTRUCTED 150 SCHOOLS - BATCH-2</strong> (Request for Quotations)</p><p><strong>STEP Reference No. <u>PK-RSU-SINDH-536121-GO-RFQ</u></strong></p><p>&nbsp;</p><ol><li>The Government of Islamic Republic of Pakistan Through Government of Sindh, has received financing from the World Bank toward the cost of the Sindh Early Learning Enhancement through Classroom Transformation (SELECT) project and intends to apply part of the proceeds toward payments under the contract for the <strong>PROCUREMENT OF PRINTING &amp; SUPPLY OF IEC MATERIALS IN NEWLY CONSTRUCTED 150 SCHOOLS - BATCH-2</strong><strong>.</strong></li><li>The Project Implementation Unit (PMIU) SELECT, Reform Support Unit (RSU), School Education &amp; Literacy Department (SE&amp;LD), Government of Sindh, is inviting sealed quotations for the <strong><u>PROCUREMENT OF PRINTIN",
+            "source": "files/world_bank_procurement_notice_OP00463510.html",
+            "source_url": "https://search.worldbank.org/api/procnotices?format=json&rows=25&qterm=OP00463510",
+            "source_sha256": "deb4b511817e7a9237fa8b7c2668aaf7fb6d035a5af9186c046ed8dd6ef8b1b4",
+            "source_kind": "text",
+            "source_provenance_match": "SHA256",
+            "provenance_strength": "SOURCE_URL_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 141,
+            "corpus_end": 1444,
+            "match": "sla"
+          }
+        ],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32579878511,
+      "source_shard": 1,
+      "hot_ready_at": "2026-08-22T14:50:56.202772+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 13,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "review_lane": "SPM_PRIORITY",
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "e57287249891b59d26859be78258a993944a430353c183a6f603f1de150b7aed",
+      "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
+      "gpt_priority_score": 13,
+      "upstream_signal": "DCE_REVIEW_READY",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32579878511,
+        "shard": 1,
+        "candidate_id": "WORLD-BANK:OP00463510",
+        "release_tag": null
+      },
+      "upstream_review_lane": "SPM_PRIORITY",
+      "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     }
   ],
   "window_selection": {
@@ -1471,35 +1707,41 @@
     "authenticity_target": 20,
     "low_surveillance_target": 20,
     "selected_by_lane": {
-      "GPT_PRIORITY": 1
+      "GPT_PRIORITY": 1,
+      "LOW_PORTAL_SURVEILLANCE": 1
     },
     "selected_by_stage": {
-      "BUSINESS_GATES": 1
+      "BUSINESS_GATES": 2
     },
     "selected_by_band": {
-      "MAYBE": 1
+      "MAYBE": 1,
+      "LOW": 1
     },
     "selected_by_portal": {
-      "TED": 1
+      "TED": 1,
+      "WORLD_BANK": 1
     }
   },
   "counts": {
-    "pending_gpt_web_review": 1,
+    "pending_gpt_web_review": 2,
     "reviewed_ticks_total": 506,
     "excluded_already_reviewed": 0,
     "excluded_already_in_final_bank": 0,
-    "pending_before_visible_cap": 1,
+    "pending_before_visible_cap": 2,
     "pending_by_stage": {
-      "BUSINESS_GATES": 1
+      "BUSINESS_GATES": 2
     },
     "pending_by_inbox_lane": {
-      "GPT_PRIORITY": 1
+      "GPT_PRIORITY": 1,
+      "LOW_PORTAL_SURVEILLANCE": 1
     },
     "pending_by_fit_band": {
-      "MAYBE": 1
+      "MAYBE": 1,
+      "LOW": 1
     },
     "pending_by_portal": {
-      "TED": 1
+      "TED": 1,
+      "WORLD_BANK": 1
     }
   },
   "review_contract": "This file is only the visible GPT Web work window. It uses 75% priority, 12.5% DCE-authenticity repair, and 12.5% portal-diverse LOW surveillance with elastic fill. The durable uncapped backlog remains control/gpt_review_index.json; no candidate is deleted by this visible cap.",
