@@ -1,74 +1,14 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32544270227,
-  "total_inbox_rows": 6,
-  "dce_authenticity_rows": 3,
-  "portal_counts": {
-    "GENERIC_PUBLIC_PAGE": 1,
-    "TED": 1,
-    "US_SAM": 1
-  },
-  "status_counts": {
-    "UNKNOWN_RETRIEVED_DOCUMENT": 3
-  },
-  "reason_counts": {
-    "NON_AUTHORITATIVE": 3
-  },
+  "latest_source_dce_run_id": 32546478081,
+  "total_inbox_rows": 0,
+  "dce_authenticity_rows": 0,
+  "portal_counts": {},
+  "status_counts": {},
+  "reason_counts": {},
   "method_counts": {},
-  "recovery_opportunities": [
-    {
-      "portal": "GENERIC_PUBLIC_PAGE",
-      "blocked": 1,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 1
-      }
-    },
-    {
-      "portal": "TED",
-      "blocked": 1,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 1
-      }
-    },
-    {
-      "portal": "US_SAM",
-      "blocked": 1,
-      "likely_public_recovery_target": 0,
-      "reason_counts": {
-        "NON_AUTHORITATIVE": 1
-      }
-    }
-  ],
-  "samples_by_reason": {
-    "NON_AUTHORITATIVE": [
-      {
-        "candidate_id": "IT-PVL:55084be0-de78-487b-8c78-40f1afd57422",
-        "portal": "GENERIC_PUBLIC_PAGE",
-        "title": "SUA_Valenzano Trasporto Scolastico",
-        "buyer": "COMUNE DI VALENZANO",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/55084be0-de78-487b-8c78-40f1afd57422?ricercaArchivio=false"
-      },
-      {
-        "candidate_id": "TED:579186-2026",
-        "portal": "TED",
-        "title": "Norway – IT services: consulting, software development, Internet and support – Licence partner (LSP) for Microsoft - qualification",
-        "buyer": "Mattilsynet",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://ted.europa.eu/en/notice/-/detail/579186-2026"
-      },
-      {
-        "candidate_id": "US-SAM:842bc2f113cf4e7e91e2cb3514b35e60",
-        "portal": "US_SAM",
-        "title": "Announcement for Upcoming 2027 NSRP R&D Project Solicitations",
-        "buyer": "DEPT OF DEFENSE",
-        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
-        "notice_url": "https://sam.gov/opp/842bc2f113cf4e7e91e2cb3514b35e60/view"
-      }
-    ]
-  },
+  "recovery_opportunities": [],
+  "samples_by_reason": {},
   "safety": {
     "diagnostic_only": true,
     "mutates_inbox": false,
