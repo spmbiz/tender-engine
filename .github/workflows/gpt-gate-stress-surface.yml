@@ -39,11 +39,12 @@ jobs:
           import json, os
           from datetime import datetime, timezone
           p={
-            'schema':'GPT_GATE_STRESS_STATUS_V1',
+            'schema':'GPT_GATE_STRESS_STATUS_V2_DEDICATED_BRANCH',
             'run_id':int(os.environ['GITHUB_RUN_ID']),
             'status':'RUNNING',
             'started_at':datetime.now(timezone.utc).isoformat(),
             'head_sha':os.environ.get('GITHUB_SHA'),
+            'surface_ref':'gpt-stress-current',
           }
           open('control/gpt_gate_stress_status.json','w',encoding='utf-8').write(json.dumps(p,indent=2)+'\n')
           PY
@@ -142,41 +143,25 @@ jobs:
           def clean(v, limit):
               s=re.sub(r'\s+',' ',str(v or '')).strip().replace('\t',' ')
               return s[:limit]
-          out=[]
-          out.append('rank\tcandidate_id\ttitle\tbuyer\tdeadline\tvalue\tcurrency\tband\treasons\tscope_dce\tterm_value_dce\tdeep_batch')
+          out=['rank\tcandidate_id\ttitle\tbuyer\tdeadline\tvalue\tcurrency\tband\treasons\tscope_dce\tterm_value_dce\tdeep_batch']
           for i,x in enumerate(rows,1):
-              value=x.get('estimated_value')
-              fields=[
-                  i, clean(x.get('candidate_id'),180), clean(x.get('title'),260), clean(x.get('buyer'),180),
-                  clean(x.get('deadline'),80), clean(value,40), clean(x.get('currency'),20), clean(x.get('spm_fit_band'),30),
-                  clean(','.join(str(y) for y in (x.get('spm_fit_reasons') or [])),160), clean(x.get('scope_dce'),500),
-                  clean(x.get('term_value_dce'),300), clean(x.get('deep_batch_hint'),40),
-              ]
+              fields=[i,clean(x.get('candidate_id'),180),clean(x.get('title'),260),clean(x.get('buyer'),180),clean(x.get('deadline'),80),clean(x.get('estimated_value'),40),clean(x.get('currency'),20),clean(x.get('spm_fit_band'),30),clean(','.join(str(y) for y in (x.get('spm_fit_reasons') or [])),160),clean(x.get('scope_dce'),500),clean(x.get('term_value_dce'),300),clean(x.get('deep_batch_hint'),40)]
               out.append('\t'.join(map(str,fields)))
           (root/'catalog.tsv').write_text('\n'.join(out)+'\n',encoding='utf-8')
           print(f'catalog rows={len(rows)}')
           PY
 
-      - name: Persist stress surface
+      - name: Persist exhaustive surface on contention-free branch
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'tender-engine-bot'
           git config user.email 'tender-engine-bot@users.noreply.github.com'
           git add -A control/gpt_gate_stress_batches
-          if git diff --cached --quiet; then
-            echo 'Stress surface already current.'
-            exit 0
-          fi
-          git commit -m "stress: persist exhaustive gate surface ${GITHUB_RUN_ID}"
-          for n in 1 2 3 4; do
-            if git push origin HEAD:main; then
-              exit 0
-            fi
-            git pull --rebase origin main
-            sleep "$((n * 2))"
-          done
-          exit 1
+          git commit -m "stress: persist exhaustive gate surface ${GITHUB_RUN_ID}" || true
+          # This branch is an immutable-ish working surface pointer, not the live transactional main.
+          # Force-updating it is intentional: consumers always read the latest completed exhaustive snapshot.
+          git push --force origin HEAD:refs/heads/gpt-stress-current
 
       - name: Persist terminal stress status
         if: always()
@@ -192,26 +177,23 @@ jobs:
           python - <<'PY'
           import json, os
           from datetime import datetime, timezone
-          status=str(os.environ.get('JOB_STATUS') or 'unknown').upper()
           p={
-            'schema':'GPT_GATE_STRESS_STATUS_V1',
+            'schema':'GPT_GATE_STRESS_STATUS_V2_DEDICATED_BRANCH',
             'run_id':int(os.environ['GITHUB_RUN_ID']),
-            'status':status,
+            'status':str(os.environ.get('JOB_STATUS') or 'unknown').upper(),
             'finished_at':datetime.now(timezone.utc).isoformat(),
             'head_sha':os.environ.get('GITHUB_SHA'),
+            'surface_ref':'gpt-stress-current',
+            'contract':'Large exhaustive evidence surface persists on gpt-stress-current so high-frequency main writes cannot starve it.'
           }
-          try:
-              m=json.load(open('control/gpt_gate_stress_batches/manifest.json',encoding='utf-8'))
-              p['manifest']={
-                'business_gates_in_index':m.get('business_gates_in_index'),
-                'emitted_candidates':m.get('emitted_candidates'),
-                'raw_dce_rows_missing':m.get('raw_dce_rows_missing'),
-                'conservation_pass':m.get('conservation_pass'),
-              }
-          except Exception:
-              pass
           open('control/gpt_gate_stress_status.json','w',encoding='utf-8').write(json.dumps(p,indent=2)+'\n')
           PY
           git add control/gpt_gate_stress_status.json
           git commit -m "stress: mark gate review ${JOB_STATUS} ${GITHUB_RUN_ID}" || exit 0
-          git push origin HEAD:main || true
+          for n in 1 2 3 4 5 6 7 8; do
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort || true; sleep $((n*2)); continue; }
+            if git push origin HEAD:main; then exit 0; fi
+            sleep $((n*2))
+          done
+          exit 0
