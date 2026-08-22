@@ -1,7 +1,9 @@
 {
   "schema": "GPT_GATE_STRESS_TRIGGER_V1",
-  "requested_at": "2026-08-22-v3-final",
+  "requested_at": "2026-08-22-v4-contention-free",
   "scope": "ALL current unreviewed BUSINESS_GATES from durable gpt_review_index",
   "require_full_dce_conservation": true,
-  "reason": "Final launch after exact run+shard recovery and uncapped catalog fixes. Do not use the hot window as workload truth."
+  "surface_ref": "gpt-stress-current",
+  "review_ref": "gpt-review-current",
+  "reason": "Final contention-free exhaustive launch. Recover every exact pending DCE shard, enforce 1:1 conservation, persist the large evidence surface off main, then derive priority and preserved-low review batches."
 }
