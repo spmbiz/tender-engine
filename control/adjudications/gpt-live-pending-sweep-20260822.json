@@ -1,0 +1,66 @@
+{
+  "schema": "GPT_DCE_ADJUDICATION_V1",
+  "created_at": "2026-08-22T10:32:00Z",
+  "source_dce_run_id": 32454041762,
+  "persist_to_final_bank": true,
+  "doctrine": "Only authoritative DCE evidence may resolve mandatory gates. Missing or unattributed evidence remains UNKNOWN and cannot be treated as PASS.",
+  "results": [
+    {
+      "candidate_id": "TED:578395-2026",
+      "title": "France – Graphic design services – ACCORD CADRE RELATIF A LA CONCEPTION DE SUPPORTS DE COMMUNICATION – 3 LOTS",
+      "buyer": "LIMOGES METROPOLE - Communauté urbaine",
+      "deadline": "2026-09-30T02:00:00+00:00",
+      "classification": "YELLOW",
+      "final_score": 80,
+      "evidence_quality": "SUBSTANTIVE_DCE_PRESENT_BUT_LEGACY_PROVENANCE_UNRESOLVED",
+      "deadline_authority": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+      "mandatory_gate_statuses": {
+        "scope_fit": "STRONG_NATIVE_GRAPHIC_DESIGN_COMMUNICATION_SCOPE",
+        "deadline": "RESOLVED",
+        "turnover_financial": "UNKNOWN_UNATTRIBUTED_COMPACT_EVIDENCE",
+        "references_experience": "UNKNOWN_UNATTRIBUTED_COMPACT_EVIDENCE",
+        "certifications_partner": "UNKNOWN_UNATTRIBUTED_COMPACT_EVIDENCE",
+        "insurance_bonds": "UNKNOWN_UNATTRIBUTED_COMPACT_EVIDENCE",
+        "submission": "DEADLINE_RESOLVED_OTHER_SUBMISSION_GATES_REQUIRE_SOURCE_ARTIFACT"
+      },
+      "blockers": [],
+      "unknowns": [
+        "Exact lot-level financial-capacity threshold from source-attributed DCE",
+        "Exact professional/reference minimums per lot",
+        "Any insurance or administrative eligibility threshold not source-attributed in the current compact evidence"
+      ],
+      "why": "Excellent SPM-fit three-lot communication-design framework and the inbox marks it native/gate-ready, with a consistent authoritative deadline. However the current review pack exposes legacy compact evidence without document path/SHA provenance. Under the pipeline contract those missing source attributions cannot be promoted to PASS, so GREEN is not defensible yet.",
+      "action": "PRIORITY_DEEP_VERIFY_SOURCE_ARTIFACT_THEN_PROMOTE_IF_GATES_CLEAR",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/578395-2026"
+    },
+    {
+      "candidate_id": "TED:579225-2026",
+      "title": "Slovenia – IT services: consulting, software development, Internet and support – Operativno spremljanje stanja izvajanje GJPS JPP – sledenje vozil",
+      "buyer": "Družba za upravljanje javnega potniškega prometa, d. o. o.",
+      "deadline": "2026-08-28T10:00:00+02:00",
+      "classification": "YELLOW",
+      "final_score": 72,
+      "evidence_quality": "SUBSTANTIVE_DCE_PRESENT_BUT_LEGACY_PROVENANCE_UNRESOLVED",
+      "deadline_authority": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "mandatory_gate_statuses": {
+        "scope_fit": "DIRECT_SOFTWARE_IT_SERVICES_FIT",
+        "deadline": "NOTICE_DATE_PRESENT_DCE_AUTHORITY_UNRESOLVED",
+        "turnover_financial": "UNKNOWN_UNATTRIBUTED_COMPACT_EVIDENCE",
+        "references_experience": "UNKNOWN_UNATTRIBUTED_COMPACT_EVIDENCE",
+        "certifications_partner": "UNKNOWN_UNATTRIBUTED_COMPACT_EVIDENCE",
+        "staffing_team": "UNKNOWN_UNATTRIBUTED_COMPACT_EVIDENCE",
+        "submission": "UNKNOWN_REQUIRES_SOURCE_ARTIFACT"
+      },
+      "blockers": [],
+      "unknowns": [
+        "Authoritative tender deadline reconciliation",
+        "Exact financial and prior-experience thresholds",
+        "Any named technical certifications, staffing or local-language requirements",
+        "Submission and contracting eligibility details"
+      ],
+      "why": "The scope is directly relevant software/IT work and was recall-promoted as native SPM gate-ready, but the current pack does not provide source-attributed legacy evidence and the DCE deadline itself is not parsed authoritatively. Missing gates remain UNKNOWN, so this cannot be GREEN yet.",
+      "action": "URGENT_DEEP_VERIFY_BEFORE_2026_08_28_THEN_PROMOTE_OR_DROP",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/579225-2026"
+    }
+  ]
+}
