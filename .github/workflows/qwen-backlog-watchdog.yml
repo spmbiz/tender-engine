@@ -26,7 +26,10 @@ concurrency:
 env:
   QWEN_PER_SHARD: '480'
   QWEN_SEMANTIC_MIN_CONTROL_PLANE_SHA: '7aa7dcff7de9122800632193f558095df8e05f0d'
-  QWEN_SEMANTIC_MIN_CREATED_AT: '2026-08-22T00:13:48Z'
+  # Rollout epoch for the simplified singleton/single-writer pipeline. Any
+  # semantic generation created before this repair must yield the lane so the
+  # corrected runtime becomes live immediately after merge.
+  QWEN_SEMANTIC_MIN_CREATED_AT: '2026-08-22T03:27:00Z'
 
 jobs:
   watchdog:
@@ -42,7 +45,7 @@ jobs:
           python-version: '3.12'
 
       - id: epoch
-        name: Purge pre-hardening semantic generations without compare API
+        name: Purge pre-repair semantic generations without compare API
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -69,7 +72,7 @@ jobs:
           fi
           echo 'purged=true' >> "$GITHUB_OUTPUT"
           for run_id in "${ids[@]}"; do
-            echo "Cancelling pre-hardening semantic generation $run_id"
+            echo "Cancelling pre-repair semantic generation $run_id"
             gh api --method POST "repos/${REPO}/actions/runs/${run_id}/cancel" >/dev/null 2>&1 || true
           done
 
