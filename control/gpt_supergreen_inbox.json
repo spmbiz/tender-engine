@@ -1,6 +1,6 @@
 {
   "schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
-  "updated_at": "2026-08-22T11:46:36.421616+00:00",
+  "updated_at": "2026-08-22T11:47:03.492614+00:00",
   "latest_source_dce_run_id": 32571126517,
   "review_queue": [
     {
@@ -122,28 +122,96 @@
       },
       "source_dce_run_id": 32571126517,
       "source_shard": 0,
-      "hot_ready_at": "2026-08-22T11:46:33.864220+00:00",
+      "hot_ready_at": "2026-08-22T11:47:03.319542+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 12,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32571126517,
+        "shard": 0,
+        "candidate_id": "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
+        "release_tag": "dce-harvest-32571126517"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 73370,
+        "documents_indexed": 11,
+        "documents_with_text": 9,
+        "source_urls": [
+          "https://riigihanked.riik.ee/rhr-web/#/procurement/10717844/documents?group=B"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "puhastuse",
+            "selgitamiseks",
+            "tarbijakeskseks",
+            "teavituskampaania",
+            "veeringluse"
+          ],
+          "hits": [
+            "puhastuse",
+            "selgitamiseks",
+            "tarbijakeskseks",
+            "teavituskampaania",
+            "veeringluse"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 5,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "366addd56329c024583ca9443a4a61d756bee44448cf68606cd1f0103b26d7e4",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 12,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32571126517,
         "shard": 0,
         "candidate_id": "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
-        "release_tag": null
+        "release_tag": "dce-harvest-32571126517"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     }
   ],
@@ -267,28 +335,96 @@
       },
       "source_dce_run_id": 32571126517,
       "source_shard": 0,
-      "hot_ready_at": "2026-08-22T11:46:33.864220+00:00",
+      "hot_ready_at": "2026-08-22T11:47:03.319542+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 12,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32571126517,
+        "shard": 0,
+        "candidate_id": "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
+        "release_tag": "dce-harvest-32571126517"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 73370,
+        "documents_indexed": 11,
+        "documents_with_text": 9,
+        "source_urls": [
+          "https://riigihanked.riik.ee/rhr-web/#/procurement/10717844/documents?group=B"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "puhastuse",
+            "selgitamiseks",
+            "tarbijakeskseks",
+            "teavituskampaania",
+            "veeringluse"
+          ],
+          "hits": [
+            "puhastuse",
+            "selgitamiseks",
+            "tarbijakeskseks",
+            "teavituskampaania",
+            "veeringluse"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 5,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "366addd56329c024583ca9443a4a61d756bee44448cf68606cd1f0103b26d7e4",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 12,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32571126517,
         "shard": 0,
         "candidate_id": "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
-        "release_tag": null
+        "release_tag": "dce-harvest-32571126517"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     }
   ],
@@ -313,7 +449,7 @@
     "pending_gpt_web_review": 1,
     "reviewed_ticks_total": 503,
     "excluded_already_reviewed": 0,
-    "excluded_already_in_final_bank": 0,
+    "excluded_already_in_final_bank": 9,
     "pending_before_visible_cap": 1,
     "pending_by_stage": {
       "BUSINESS_GATES": 1
