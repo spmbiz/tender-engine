@@ -2,14 +2,12 @@
 from __future__ import annotations
 
 import argparse
-import base64
 import datetime as dt
 import gzip
 import hashlib
 import json
 import os
 import re
-import subprocess
 import time
 import urllib.request
 from collections import Counter
@@ -38,8 +36,8 @@ F_CODE = {
 PROMPT_VERSION = "qwen-batch-high-recall-business-fit-v2"
 CLASSIFIER_VERSION = "qwen3-4b-q4km-batch-selfheal-v1"
 SCHEMA = "QWEN_NOTICE_BATCH_SELFHEAL_V1"
-SUMMARY_SCHEMA = "QWEN_NOTICE_BATCH_SELFHEAL_SUMMARY_V1"
-PROGRESS_SCHEMA = "QWEN_NOTICE_BATCH_LIVE_PROGRESS_V1"
+SUMMARY_SCHEMA = "QWEN_NOTICE_BATCH_SELFHEAL_SUMMARY_V2_THROUGHPUT"
+PROGRESS_SCHEMA = "QWEN_NOTICE_BATCH_LIVE_PROGRESS_V2_THROUGHPUT"
 
 PHYSICAL_GOODS = re.compile(
     r"\b(parts?|spares?|equipment|supplies?|vehicle|truck|lorry|lkw|microscopes?|filters?|"
@@ -53,11 +51,6 @@ HEAVY_ONSITE = re.compile(
     r"\b(construction|civil works?|installation work|hvac|heating|ventilation|"
     r"air[- ]conditioning|mold (?:mitigation|remediation|abatement)|chillers?|"
     r"building works?|architect led design team)\b", re.I
-)
-DIRECT_DIGITAL = re.compile(
-    r"\b(website|web ?app|web portal|software|saas|digital platform|application development|"
-    r"mobile app|animation|video production|graphic design|content creation|transcription|"
-    r"cms|workflow automation|e[- ]learning|online training|data processing)\b", re.I
 )
 PERSONAL_SERVICE = re.compile(r"\bpersonal services? contract\b", re.I)
 
@@ -239,18 +232,20 @@ def deterministic_guard(decoded: dict[str, Any], row: dict[str, Any]) -> tuple[d
     regulated = bool(REGULATED.search(title)) or bool(REGULATED.search(text[:1800]))
     heavy = bool(HEAVY_ONSITE.search(title)) or bool(HEAVY_ONSITE.search(text[:1800]))
     personal = bool(PERSONAL_SERVICE.search(title)) or bool(PERSONAL_SERVICE.search(text[:1000]))
-    info_only = bool(re.search(r"(industry day|sources sought|request for information|special notice|award notice|contract award notice)", title, re.I))
-    hard_personnel = bool(re.search(r"(aviation security officer|armed security|security guard|guard services?|physician|nurse|medical staffing)", text, re.I))
-    patient_transport = bool(re.search(r"(non[- ]?emergent patient transportation|patient transport|ambulance services?)", text, re.I))
-    core = bool(re.search(r"(website|web ?app|web portal|application development|mobile app|animation|video production|graphic design|content creation|copywriting|editorial|proofreading|translation|transcription|printing?|brochures?|leaflets?|signage|promotional goods?|digitization|digitisation|scanning|document management|e[- ]learning|training content|training materials?|media monitoring|social media|communications strategy|digital marketing|market research|research services?|surveys?|data processing|data entry|workflow automation|cms|hosting|web maintenance)", text, re.I))
-    strong_core = bool(re.search(r"(website|web ?app|web portal|application development|mobile app|animation|video production|graphic design|content creation|translation|transcription|printing?|digitization|digitisation|scanning|e[- ]learning|media monitoring|social media|market research|surveys?)", text, re.I))
+    info_only = bool(re.search(r"\b(industry day|sources sought|request for information|special notice|award notice|contract award notice)\b", title, re.I))
+    hard_personnel = bool(re.search(r"\b(aviation security officer|armed security|security guard|guard services?|physician|nurse|medical staffing)\b", text, re.I))
+    patient_transport = bool(re.search(r"\b(non[- ]?emergent patient transportation|patient transport|ambulance services?)\b", text, re.I))
+    core = bool(re.search(r"\b(website|web ?app|web portal|application development|mobile app|animation|video production|graphic design|content creation|copywriting|editorial|proofreading|translation|transcription|printing?|brochures?|leaflets?|signage|promotional goods?|digitization|digitisation|scanning|document management|e[- ]learning|training content|training materials?|media monitoring|social media|communications strategy|digital marketing|market research|research services?|surveys?|data processing|data entry|workflow automation|cms|hosting|web maintenance)\b", text, re.I))
+    strong_core = bool(re.search(r"\b(website|web ?app|web portal|application development|mobile app|animation|video production|graphic design|content creation|translation|transcription|printing?|digitization|digitisation|scanning|e[- ]learning|media monitoring|social media|market research|surveys?)\b", text, re.I))
     deadline_raw = n.get("deadline") or n.get("deadline_utc")
     deadline = None
     if deadline_raw:
         try:
             deadline = dt.datetime.fromisoformat(str(deadline_raw).replace("Z", "+00:00"))
-            if deadline.tzinfo is None: deadline = deadline.replace(tzinfo=dt.timezone.utc)
-        except Exception: deadline = None
+            if deadline.tzinfo is None:
+                deadline = deadline.replace(tzinfo=dt.timezone.utc)
+        except Exception:
+            deadline = None
     if deadline is not None and deadline < dt.datetime.now(dt.timezone.utc):
         out.update(classification="REJECT_OBVIOUS", lean_attractiveness="LOW", delivery_mode="UNCLEAR", survival_decision="DROP", dce_eligible=False)
         actions.append("expired_deadline_drop")
@@ -259,22 +254,30 @@ def deterministic_guard(decoded: dict[str, Any], row: dict[str, Any]) -> tuple[d
         actions.append("information_only_not_dce")
     if (personal and hard_personnel) or patient_transport or (personal and not core):
         out.update(classification="REJECT_OBVIOUS", lean_attractiveness="LOW", delivery_mode="UNCLEAR", survival_decision="DROP", dce_eligible=False)
-        if (personal or hard_personnel) and "LICENSED_PERSONNEL" not in out["friction_flags"]: out["friction_flags"].append("LICENSED_PERSONNEL")
+        if (personal or hard_personnel) and "LICENSED_PERSONNEL" not in out["friction_flags"]:
+            out["friction_flags"].append("LICENSED_PERSONNEL")
         actions.append("personal_or_hard_service_drop")
     if regulated and out["survival_decision"] != "DROP":
         out.update(classification="MAYBE", lean_attractiveness="LOW", delivery_mode="BROKER_RESELL", dce_eligible=False)
-        if "REGULATED_GOODS" not in out["friction_flags"]: out["friction_flags"].append("REGULATED_GOODS")
+        if "REGULATED_GOODS" not in out["friction_flags"]:
+            out["friction_flags"].append("REGULATED_GOODS")
         out["needs_gpt_review"] = True
         actions.append("regulated_keep_no_dce")
     if physical and not core and out["survival_decision"] != "DROP":
-        if out["classification"] in {"STRONG_FIT", "FIT"}: out["classification"] = "MAYBE"; actions.append("physical_fit_to_maybe")
+        if out["classification"] in {"STRONG_FIT", "FIT"}:
+            out["classification"] = "MAYBE"
+            actions.append("physical_fit_to_maybe")
         out["delivery_mode"] = "BROKER_RESELL"
-        if out["lean_attractiveness"] == "HIGH": out["lean_attractiveness"] = "MEDIUM"
+        if out["lean_attractiveness"] == "HIGH":
+            out["lean_attractiveness"] = "MEDIUM"
     if heavy and not core and out["survival_decision"] != "DROP":
-        if out["classification"] in {"STRONG_FIT", "FIT"}: out["classification"] = "MAYBE"; actions.append("heavy_fit_to_maybe")
+        if out["classification"] in {"STRONG_FIT", "FIT"}:
+            out["classification"] = "MAYBE"
+            actions.append("heavy_fit_to_maybe")
         out["delivery_mode"] = "SUBCONTRACTABLE"
         out["lean_attractiveness"] = "LOW"
-        if "ON_SITE_SPECIALIST" not in out["friction_flags"]: out["friction_flags"].append("ON_SITE_SPECIALIST")
+        if "ON_SITE_SPECIALIST" not in out["friction_flags"]:
+            out["friction_flags"].append("ON_SITE_SPECIALIST")
         out["needs_gpt_review"] = True
     hard_friction = bool({"LICENSED_PERSONNEL", "SECURITY_CLEARANCE", "REGULATED_GOODS"} & set(out["friction_flags"]))
     if out["classification"] == "STRONG_FIT":
@@ -292,10 +295,12 @@ def deterministic_guard(decoded: dict[str, Any], row: dict[str, Any]) -> tuple[d
         elif hard_friction:
             out["classification"] = "MAYBE"
             actions.append("hard_friction_fit_to_maybe")
-    if out["classification"] == "REJECT_OBVIOUS" and out["survival_decision"] == "KEEP": out["dce_eligible"] = False
+    if out["classification"] == "REJECT_OBVIOUS" and out["survival_decision"] == "KEEP":
+        out["dce_eligible"] = False
     out["business_calibration_version"] = "spm-business-fit-v2"
     out["novelty_or_unusual_flag"] = bool(out.get("unusual_or_novel", out.get("novelty_or_unusual_flag", False)))
     return out, actions
+
 
 def atomic_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -309,17 +314,17 @@ def main() -> None:
     ap.add_argument("--queue", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--summary", required=True)
-    ap.add_argument("--progress", default=None, help="Live JSON checkpoint rewritten after every completed request")
+    ap.add_argument("--progress", default=None, help="Local live JSON checkpoint rewritten after every completed request")
     ap.add_argument("--batch-size", type=int, required=True)
     ap.add_argument("--sample-size", type=int, default=48)
     ap.add_argument("--server", default="http://127.0.0.1:8080/v1/chat/completions")
     ap.add_argument("--model", default="Qwen/Qwen3-4B-GGUF:Q4_K_M")
-    ap.add_argument("--description-chars", type=int, default=500)
-    ap.add_argument("--timeout", type=int, default=75)
+    ap.add_argument("--description-chars", type=int, default=1200)
+    ap.add_argument("--timeout", type=int, default=30)
     ap.add_argument("--max-tokens", type=int, default=1100)
     ap.add_argument("--startup-seconds", type=float, default=0.0)
     ap.add_argument("--source-ledger-generation", required=True)
-    ap.add_argument("--max-runtime-seconds", type=int, default=1200)
+    ap.add_argument("--max-runtime-seconds", type=int, default=7200)
     args = ap.parse_args()
     if args.batch_size < 1 or args.batch_size > 64:
         raise SystemExit("batch-size must be 1..64")
@@ -342,95 +347,10 @@ def main() -> None:
     final: dict[str, dict[str, Any]] = {}
     row_meta: dict[str, dict[str, Any]] = {}
     sample_by_id = {cid(row): row for row in sample}
-    live_release_tag = f"qwen-live-progress-{run_id}" if os.environ.get("GITHUB_ACTIONS") == "true" and run_id != "local" else None
-    live_release_repo = os.environ.get("GITHUB_REPOSITORY")
-    live_release_ready = False
-    live_auth_env: dict[str, str] | None = None
 
     def emit(event: str, **fields: Any) -> None:
-        payload = {
-            "event": event,
-            "worker": worker_id,
-            "run_id": run_id,
-            "at_utc": now_utc(),
-            **fields,
-        }
+        payload = {"event": event, "worker": worker_id, "run_id": run_id, "at_utc": now_utc(), **fields}
         print("QWEN_PROGRESS " + json.dumps(payload, ensure_ascii=False, separators=(",", ":")), flush=True)
-
-    def github_auth_env() -> dict[str, str] | None:
-        nonlocal live_auth_env
-        if live_auth_env is not None:
-            return live_auth_env
-        env = os.environ.copy()
-        if env.get("GH_TOKEN"):
-            live_auth_env = env
-            return env
-        try:
-            header = subprocess.check_output(
-                ["git", "config", "--local", "--get", "http.https://github.com/.extraheader"],
-                text=True, stderr=subprocess.DEVNULL, timeout=5,
-            ).strip()
-            match = re.search(r"basic\s+(\S+)", header, flags=re.I)
-            if not match:
-                return None
-            decoded = base64.b64decode(match.group(1)).decode("utf-8", errors="ignore")
-            token = decoded.split(":", 1)[1] if ":" in decoded else ""
-            if not token:
-                return None
-            env["GH_TOKEN"] = token
-            live_auth_env = env
-            return env
-        except Exception:
-            return None
-
-    def ensure_live_release() -> bool:
-        nonlocal live_release_ready
-        if live_release_ready:
-            return True
-        if not live_release_tag or not live_release_repo:
-            return False
-        env = github_auth_env()
-        if not env:
-            return False
-        view = subprocess.run(
-            ["gh", "release", "view", live_release_tag, "--repo", live_release_repo],
-            env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15, check=False,
-        )
-        if view.returncode != 0:
-            create = subprocess.run(
-                ["gh", "release", "create", live_release_tag, "--repo", live_release_repo,
-                 "--target", os.environ.get("GITHUB_SHA", "main"),
-                 "--title", f"Qwen Live Progress {run_id}",
-                 "--notes", "Externally readable per-worker Qwen checkpoints; assets are replaced after each checkpoint."],
-                env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=25, check=False,
-            )
-            if create.returncode != 0:
-                view = subprocess.run(
-                    ["gh", "release", "view", live_release_tag, "--repo", live_release_repo],
-                    env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15, check=False,
-                )
-                if view.returncode != 0:
-                    return False
-        live_release_ready = True
-        return True
-
-    def publish_external_checkpoint(event: str) -> None:
-        if not progress_path.exists() or not ensure_live_release():
-            return
-        env = github_auth_env()
-        if not env:
-            return
-        try:
-            cp = subprocess.run(
-                ["gh", "release", "upload", live_release_tag, str(progress_path), "--clobber", "--repo", live_release_repo],
-                env=env, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, timeout=30, check=False,
-            )
-            if cp.returncode == 0:
-                emit("EXTERNAL_CHECKPOINT_PUBLISHED", checkpoint_event=event, asset=progress_path.name, release_tag=live_release_tag)
-            else:
-                emit("EXTERNAL_CHECKPOINT_PUBLISH_FAIL", checkpoint_event=event, asset=progress_path.name, release_tag=live_release_tag, returncode=cp.returncode, stderr_tail=(cp.stderr or "")[-300:])
-        except Exception as exc:
-            emit("EXTERNAL_CHECKPOINT_PUBLISH_FAIL", checkpoint_event=event, asset=progress_path.name, release_tag=live_release_tag, error=type(exc).__name__)
 
     def build_record(candidate: str) -> dict[str, Any] | None:
         row = sample_by_id.get(candidate)
@@ -438,10 +358,8 @@ def main() -> None:
             return None
         decoded = final[candidate]
         meta = row_meta.get(candidate) or {
-            "parse_error": "missing_after_selfheal",
-            "effective_batch_size": 1,
-            "self_heal_depth": 0,
-            "recovered_after_split": False,
+            "parse_error": "missing_after_selfheal", "effective_batch_size": 1,
+            "self_heal_depth": 0, "recovered_after_split": False,
         }
         return {
             "schema": SCHEMA,
@@ -469,7 +387,9 @@ def main() -> None:
             fh.flush()
             os.fsync(fh.fileno())
         tmp.replace(out_path)
-        decisions = Counter(r["classification"] for r in records)
+        valid = sum(1 for r in records if not r.get("parse_error"))
+        fallback = len(records) - valid
+        decisions = Counter(r["classification"] for r in records if not r.get("parse_error"))
         live = {
             "schema": PROGRESS_SCHEMA,
             "run_id": run_id,
@@ -478,6 +398,8 @@ def main() -> None:
             "event": event,
             "sample_total": len(sample),
             "resolved": len(records),
+            "valid_completed": valid,
+            "fallback_rows": fallback,
             "remaining": len(sample) - len(records),
             "request_attempts": len(attempts),
             "failed_attempts": sum(1 for x in attempts if x["status"] == "FAIL"),
@@ -490,8 +412,7 @@ def main() -> None:
             "updated_at_utc": now_utc(),
         }
         atomic_json(progress_path, live)
-        publish_external_checkpoint(event)
-        emit("CHECKPOINT", resolved=live["resolved"], remaining=live["remaining"], attempts=live["request_attempts"], failures=live["failed_attempts"], splits=split_events, decisions=live["decision_counts"])
+        emit("CHECKPOINT", resolved=len(records), valid=valid, fallback=fallback, remaining=live["remaining"], attempts=live["request_attempts"], failures=live["failed_attempts"], splits=split_events)
 
     emit("START", sample_total=len(sample), batch_size=args.batch_size, timeout_seconds=args.timeout, max_runtime_seconds=args.max_runtime_seconds, startup_seconds=args.startup_seconds)
     persist_progress("START")
@@ -507,18 +428,15 @@ def main() -> None:
                 candidate = cid(row)
                 final[candidate] = decode_item(None)
                 row_meta[candidate] = {
-                    "parse_error": "runtime_budget_exhausted",
-                    "effective_batch_size": 1,
-                    "self_heal_depth": depth,
-                    "recovered_after_split": depth > 0,
+                    "parse_error": "runtime_budget_exhausted", "effective_batch_size": 1,
+                    "self_heal_depth": depth, "recovered_after_split": depth > 0,
                 }
                 singleton_fallbacks += 1
             emit("RUNTIME_FALLBACK", depth=depth, batch_size=len(batch), ids=expected, elapsed_seconds=round(elapsed, 3))
             persist_progress("RUNTIME_FALLBACK", expected)
             return
 
-        attempt_no = len(attempts) + 1
-        emit("REQUEST", attempt=attempt_no, depth=depth, batch_size=len(batch), ids=expected)
+        emit("REQUEST", attempt=len(attempts) + 1, depth=depth, batch_size=len(batch), ids=expected)
         t0 = time.monotonic()
         err = None
         items = None
@@ -530,14 +448,8 @@ def main() -> None:
                 args.server,
                 {
                     "model": args.model,
-                    "messages": [
-                        {"role": "system", "content": SYSTEM},
-                        {"role": "user", "content": prompt(batch, args.description_chars)},
-                    ],
-                    "temperature": 0.0,
-                    "top_p": 0.8,
-                    "max_tokens": dynamic_tokens,
-                    "stream": False,
+                    "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": prompt(batch, args.description_chars)}],
+                    "temperature": 0.0, "top_p": 0.8, "max_tokens": dynamic_tokens, "stream": False,
                 },
                 args.timeout,
             )
@@ -555,13 +467,9 @@ def main() -> None:
 
         latency = round(time.monotonic() - t0, 3)
         attempt = {
-            "requested_batch_size": len(batch),
-            "depth": depth,
-            "status": "PASS" if not err else "FAIL",
-            "error": err,
-            "latency_seconds": latency,
-            "usage": usage,
-            "raw_chars": len(raw_text),
+            "requested_batch_size": len(batch), "depth": depth,
+            "status": "PASS" if not err else "FAIL", "error": err,
+            "latency_seconds": latency, "usage": usage, "raw_chars": len(raw_text),
         }
         attempts.append(attempt)
         emit("RESPONSE", attempt=len(attempts), depth=depth, batch_size=len(batch), status=attempt["status"], error=err, latency_seconds=latency, raw_chars=len(raw_text), usage=usage)
@@ -571,17 +479,14 @@ def main() -> None:
                 split_events += 1
                 mid = len(batch) // 2
                 emit("SPLIT", attempt=len(attempts), depth=depth, batch_size=len(batch), left=mid, right=len(batch) - mid, reason=err, split_events=split_events)
-                persist_progress("SPLIT", expected)
                 run_batch(batch[:mid], depth + 1, initial_size)
                 run_batch(batch[mid:], depth + 1, initial_size)
                 return
             candidate = expected[0]
             final[candidate] = decode_item(None)
             row_meta[candidate] = {
-                "parse_error": err,
-                "effective_batch_size": 1,
-                "self_heal_depth": depth,
-                "recovered_after_split": False,
+                "parse_error": err, "effective_batch_size": 1,
+                "self_heal_depth": depth, "recovered_after_split": False,
             }
             singleton_fallbacks += 1
             emit("SINGLETON_FALLBACK", candidate=candidate, depth=depth, error=err, singleton_fallbacks=singleton_fallbacks)
@@ -589,7 +494,6 @@ def main() -> None:
             return
 
         by_id = {str(x.get("i") or x.get("id") or "").strip(): x for x in items or []}
-        batch_decisions = []
         for row in batch:
             candidate = cid(row)
             decoded = decode_item(by_id[candidate])
@@ -598,20 +502,10 @@ def main() -> None:
             recovered = depth > 0
             recovered_rows += int(recovered)
             row_meta[candidate] = {
-                "parse_error": None,
-                "effective_batch_size": len(batch),
-                "self_heal_depth": depth,
-                "recovered_after_split": recovered,
+                "parse_error": None, "effective_batch_size": len(batch),
+                "self_heal_depth": depth, "recovered_after_split": recovered,
                 "deterministic_guard_actions": guard_actions,
             }
-            batch_decisions.append({
-                "id": candidate,
-                "classification": decoded["classification"],
-                "lean": decoded["lean_attractiveness"],
-                "route": decoded["delivery_mode"],
-                "review": decoded["needs_gpt_review"],
-            })
-        emit("BATCH_OUTPUT", attempt=len(attempts), depth=depth, batch_size=len(batch), decisions=batch_decisions)
         persist_progress("BATCH_OUTPUT", expected)
 
     top_batches = (len(sample) + args.batch_size - 1) // args.batch_size
@@ -619,10 +513,8 @@ def main() -> None:
         batch = sample[start:start + args.batch_size]
         emit("TOP_BATCH_START", batch_index=batch_index, top_batches=top_batches, batch_size=len(batch), resolved=len(final))
         run_batch(batch, 0, args.batch_size)
-        resolved = len(final)
-        notice_text = f"worker={worker_id} batch={batch_index}/{top_batches} resolved={resolved}/{len(sample)} attempts={len(attempts)} failures={sum(1 for x in attempts if x['status']=='FAIL')} splits={split_events}"
-        print(f"::notice title=Qwen live progress::{notice_text}", flush=True)
-        emit("TOP_BATCH_DONE", batch_index=batch_index, top_batches=top_batches, resolved=resolved, total=len(sample))
+        valid_now = sum(1 for c in final if not (row_meta.get(c) or {}).get("parse_error"))
+        print(f"::notice title=Qwen live progress::worker={worker_id} batch={batch_index}/{top_batches} resolved={len(final)}/{len(sample)} valid={valid_now} attempts={len(attempts)} failures={sum(1 for x in attempts if x['status']=='FAIL')} splits={split_events}", flush=True)
 
     records: list[dict[str, Any]] = []
     with out_path.open("w", encoding="utf-8") as fh:
@@ -631,10 +523,8 @@ def main() -> None:
             if candidate not in final:
                 final[candidate] = decode_item(None)
                 row_meta[candidate] = {
-                    "parse_error": "missing_after_selfheal",
-                    "effective_batch_size": 1,
-                    "self_heal_depth": 0,
-                    "recovered_after_split": False,
+                    "parse_error": "missing_after_selfheal", "effective_batch_size": 1,
+                    "self_heal_depth": 0, "recovered_after_split": False,
                 }
             record = build_record(candidate)
             if record is None:
@@ -646,10 +536,11 @@ def main() -> None:
 
     elapsed = time.monotonic() - started
     ids = [x["canonical_notice_id"] for x in records]
-    decision_counts = Counter(x["classification"] for x in records)
-    lean_counts = Counter(x["lean_attractiveness"] for x in records)
+    valid_records = [x for x in records if not x.get("parse_error")]
+    fallback_records = [x for x in records if x.get("parse_error")]
+    decision_counts = Counter(x["classification"] for x in valid_records)
+    lean_counts = Counter(x["lean_attractiveness"] for x in valid_records)
     effective_counts = Counter(str(x.get("effective_batch_size")) for x in records)
-    parse_errors = sum(1 for x in records if x.get("parse_error"))
     summary = {
         "schema": SUMMARY_SCHEMA,
         "classifier_model": args.model,
@@ -659,7 +550,9 @@ def main() -> None:
         "worker": worker_id,
         "run_id": run_id,
         "sample_requested": args.sample_size,
-        "sample_completed": len(records),
+        "sample_resolved": len(records),
+        "sample_completed": len(valid_records),
+        "sample_fallback": len(fallback_records),
         "unique_ids": len(set(ids)),
         "initial_batch_size": args.batch_size,
         "request_attempts": len(attempts),
@@ -667,59 +560,38 @@ def main() -> None:
         "split_events": split_events,
         "singleton_fallbacks": singleton_fallbacks,
         "recovered_rows_after_split": recovered_rows,
-        "parse_or_fallback_rows": parse_errors,
+        "parse_or_fallback_rows": len(fallback_records),
         "effective_batch_size_counts": dict(sorted(effective_counts.items(), key=lambda kv: int(kv[0]))),
         "startup_seconds": args.startup_seconds,
         "inference_seconds": round(elapsed, 3),
-        "seconds_per_notice": round(elapsed / len(records), 3) if records else None,
-        "notices_per_second": round(len(records) / elapsed, 4) if elapsed and records else None,
+        "seconds_per_valid_notice": round(elapsed / len(valid_records), 3) if valid_records else None,
+        "valid_notices_per_second": round(len(valid_records) / elapsed, 4) if elapsed and valid_records else 0.0,
+        "resolved_notices_per_second": round(len(records) / elapsed, 4) if elapsed and records else 0.0,
         "decision_counts": dict(sorted(decision_counts.items())),
         "lean_attractiveness_counts": dict(sorted(lean_counts.items())),
         "row_conservation_pass": len(records) == len(sample) == len(set(ids)),
         "attempts": attempts,
         "live_observability": {
             "structured_stdout_per_request": True,
-            "batch_decisions_logged": True,
             "incremental_raw_jsonl_checkpoint": str(out_path),
             "incremental_progress_json": str(progress_path),
             "atomic_checkpoint_rewrites": True,
-            "github_notice_per_top_batch": True,
-            "external_release_checkpoint": bool(live_release_tag and live_release_repo),
-            "external_release_tag": live_release_tag,
-            "external_release_asset": progress_path.name,
+            "synchronous_github_io_in_hot_path": False,
+            "guarded_external_checkpoint_owned_by_wrapper": True,
         },
         "data_safety": {
             "shadow_only": True,
             "drops_or_deletes_notices": False,
             "automatic_rejection_enabled": False,
             "failed_batch_recursively_splits": True,
-            "singleton_failure_fallback": "MAYBE+UNKNOWN+needs_gpt_review",
+            "singleton_failure_fallback": "MAYBE+UNKNOWN+needs_gpt_review+parse_error_not_mergeable",
         },
         "updated_at_utc": now_utc(),
     }
     summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    atomic_json(progress_path, {
-        "schema": PROGRESS_SCHEMA,
-        "run_id": run_id,
-        "worker": worker_id,
-        "source_ledger_generation": args.source_ledger_generation,
-        "event": "COMPLETE",
-        "sample_total": len(sample),
-        "resolved": len(records),
-        "remaining": 0,
-        "request_attempts": len(attempts),
-        "failed_attempts": summary["failed_attempts"],
-        "split_events": split_events,
-        "singleton_fallbacks": singleton_fallbacks,
-        "decision_counts": dict(sorted(decision_counts.items())),
-        "elapsed_seconds": round(elapsed, 3),
-        "updated_at_utc": now_utc(),
-    })
-    publish_external_checkpoint("COMPLETE")
-    emit("COMPLETE", resolved=len(records), total=len(sample), elapsed_seconds=round(elapsed, 3), seconds_per_notice=summary["seconds_per_notice"], failures=summary["failed_attempts"], splits=split_events, singleton_fallbacks=singleton_fallbacks, decisions=summary["decision_counts"])
+    emit("DONE", resolved=len(records), valid=len(valid_records), fallback=len(fallback_records), elapsed_seconds=round(elapsed, 3), valid_notices_per_second=summary["valid_notices_per_second"])
     if not summary["row_conservation_pass"]:
         raise SystemExit("row conservation failed")
-    print(json.dumps(summary, ensure_ascii=False, indent=2), flush=True)
 
 
 if __name__ == "__main__":
