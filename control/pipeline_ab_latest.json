@@ -4,19 +4,15 @@
   "status": "FAIL",
   "errors": [
     {
+      "check": "capacity_ab",
+      "error": "AssertionError(\"idle capacity regressed current={'allowed': 4, 'report': {'active_commitments': {'gws': 0, 'tenders': 0}, 'active_total': 0, 'admission_room_after_qwen_reservation': 4, 'allowed': 4, 'borrowed_idle_slots_after_admission': 0, 'capacity': 20, 'dce_backfill_cap': None, 'demand': {'gws': 0, 'hospitality': 0, 'tenders_effective': 100, 'tenders_remote': 100}, 'existing_qwen_semantic_active': 0, 'existing_tender_active': 0, 'existing_tender_general_active': 0, 'global_room_after_protection': 20, 'mode': 'active-slot-fair-share-admission', 'physical_free': 20, 'policy_fallback': 'Tender floor remains protected while idle capacity may burst up to the configured max; GWS demand keeps its reservation.', 'preemption': 'none; idle borrowing ends naturally as current jobs complete', 'queue_rule': 'queued sibling jobs reserve fair-share capacity; Qwen backlog reserves semantic Tender room; only active jobs consume physical slots', 'queued_backlog': {}, 'queued_qwen_semantic': 0, 'queued_tender_backlog': 0, 'qwen_missing_reserved': 16, 'qwen_remaining': 89752, 'qwen_semantic_reservation_target': 16, 'requested': 60, 'requested_after_qwen_backfill_cap': 60, 'semantic_reservation_rule': 'non-Qwen Tender work cannot consume the missing Qwen semantic floor while semantic backlog remains; existing jobs are never preempted', 'sibling_missing_reserved': 0, 'sibling_targets': {'gws': 0, 'hospitality': 0}, 'sublane': 'tender-general', 'tender_floor': 10, 'tender_max': 20}} baseline={'allowed': 10, 'report': {'active_commitments': {'gws': 0, 'tenders': 0}, 'active_total': 0, 'allowed': 10, 'capacity': 20, 'demand': {'gws': 0, 'hospitality': 0, 'tenders_effective': 100, 'tenders_remote': 100}, 'existing_tender_active': 0, 'global_room_after_protection': 20, 'mode': 'personal-10-10-tender-admission', 'policy_fallback': '10 tenders (Qwen included) + 10 GWS; Hospitality fanout paused while on personal 20-slot capacity', 'preemption': 'none; admission control only', 'queue_rule': 'queued jobs signal demand; only active jobs consume physical runner capacity', 'queued_backlog': {}, 'queued_tender_backlog': 0, 'requested': 60, 'sibling_missing_reserved': 0, 'sibling_targets': {'gws': 0, 'hospitality': 0}, 'sublane': 'tender-general', 'tender_max': 10}}\")"
+    },
+    {
       "check": "workflow_contract",
       "error": "AssertionError(\"automatic actual Qwen preemption remains: ['qwen-backlog-watchdog.yml']\")"
     }
   ],
   "checks": {
-    "capacity_ab": {
-      "baseline_idle_allowed": 10,
-      "current_idle_allowed": 20,
-      "baseline_gws_demand_allowed": 10,
-      "current_gws_demand_allowed": 10,
-      "current_with_6_active_gws_allowed": 10,
-      "current_preauthorized_999_allowed": 20
-    },
     "synthetic_shard_replay": {
       "baseline_selected_80x10": 800,
       "current_selected_80x10": 800,
@@ -83,70 +79,70 @@
               "path": "qwen-shadow-AB-shard-000-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 33456,
-              "sha256": "c333a6191406917c5438d889bb7842f57c43f1716f18c77a5990ead1d4136d19"
+              "sha256": "081b57318bebac8e1701354d1377f7973df3ab2a0fbe176e871aa1f67acde0bc"
             },
             {
               "shard": 1,
               "path": "qwen-shadow-AB-shard-001-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 29567,
-              "sha256": "20072ce8c9a31c440e5f20733766b4a273d437909b6fb755028f969c100f65f9"
+              "sha256": "89d7520b9d58e07ea96a3d152ba3cf005b89f237a1a2a35983a3d6eabec95ee5"
             },
             {
               "shard": 2,
               "path": "qwen-shadow-AB-shard-002-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 34302,
-              "sha256": "1873cd76b8671db832c4e0523696b4cee77f9993c7330db2b0ebd14083b43ad7"
+              "sha256": "41503a559b625a440fa2c67af9dc7245e58e84f418fbbf93ac211b76b92f63b4"
             },
             {
               "shard": 3,
               "path": "qwen-shadow-AB-shard-003-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 37006,
-              "sha256": "81a1dd965aabe43579b7c7e20d6f88fa6dda72952e685c52012c5de05aafcf5f"
+              "sha256": "15a711235c68046366a3b1f120df067d1f5c34b5e69237700bffdd77de6badd7"
             },
             {
               "shard": 4,
               "path": "qwen-shadow-AB-shard-004-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 36900,
-              "sha256": "d5aa63f9c7131c8c182b80ef4a6c501de53c0ed54ba4ec2bdef0a23e9b917728"
+              "sha256": "d3540ccd4f13806c59ace356de28d177cd9d3d10c9a51debc6079a6d3bad60b1"
             },
             {
               "shard": 5,
               "path": "qwen-shadow-AB-shard-005-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 34034,
-              "sha256": "fe67b651c5470945849d06ff821943aafb1e842a674d6d184af6f11aaa46c851"
+              "sha256": "cdb28696f3c62da8f217ef7519925173dbc185d7690f01884caa9955ba15652b"
             },
             {
               "shard": 6,
               "path": "qwen-shadow-AB-shard-006-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 28766,
-              "sha256": "969a86096172f635f92311f8de20f3be7fc85ef5fa7a5ccdab7587b136a866f5"
+              "sha256": "5129fd7b36500b1d513c8aeb52656393439a3c91c4d8faeb150742a2521d2067"
             },
             {
               "shard": 7,
               "path": "qwen-shadow-AB-shard-007-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 37916,
-              "sha256": "b723cbf656a4820bdf5df0c530b83fb0a259ea7ebaeacd1156a5027644891ba8"
+              "sha256": "473ee529b7f2bb46291df22dec3cb3e68b365d592784b22fe6cdd519aed409b5"
             },
             {
               "shard": 8,
               "path": "qwen-shadow-AB-shard-008-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 37195,
-              "sha256": "36f61eaf60bb4ee1f1b4d408692442bedcde59f47ffbe5dfd816c236add5c245"
+              "sha256": "f5315a4cb978a3754bbc5a4e1ccad30bcdae7b9a64ee2f594c1b1ad8833ce508"
             },
             {
               "shard": 9,
               "path": "qwen-shadow-AB-shard-009-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 33462,
-              "sha256": "6efe60059a2a923fec9a757dd5b8f3f0b7d7a3cd8e858bb3e0190bfc972bcf6e"
+              "sha256": "9dc04f7d335985c837de956d5174086610afda333ef34f14551384f38fb303b0"
             }
           ],
           "safety": {
@@ -199,70 +195,70 @@
               "path": "qwen-shadow-AB-shard-000-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 33456,
-              "sha256": "b87ff59f449cd50f83d896a01058082f6c867c87f2c82f4981c3c5c5cc0e4285"
+              "sha256": "e4277b40bb4a114815afbca44ffd628fdbd1063b0909719a9b55bb5a7f2762f5"
             },
             {
               "shard": 1,
               "path": "qwen-shadow-AB-shard-001-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 29567,
-              "sha256": "86e5843edc9e85ed2b91085f7fb81e09d645018bd6a99218446e7b4278dcb63c"
+              "sha256": "a5d7efc98e48f5c5e358ee8a15195944c69567c14cbad758697e8a68e89ec814"
             },
             {
               "shard": 2,
               "path": "qwen-shadow-AB-shard-002-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 34302,
-              "sha256": "536bc1c6d33b112b12946096cde44a5387a117ef534618fc2820bc1b26fbc45b"
+              "sha256": "946dda947d86f939d5e9b7fe36a62f172f2f48d772000db1193f5a2aa8803714"
             },
             {
               "shard": 3,
               "path": "qwen-shadow-AB-shard-003-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 37006,
-              "sha256": "00cb4aee935c3902300b024d1fb3f36265fba3106814b9d7d84853f38dbbd4e2"
+              "sha256": "24c3cde2e9466fc493052c239c5f00dff5d2ae01e68fc65250ce14a3491ffcd9"
             },
             {
               "shard": 4,
               "path": "qwen-shadow-AB-shard-004-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 36900,
-              "sha256": "57a3d44aa5515866edd0dc584aa4e5861f20772ec6637d1c47c648545b30f694"
+              "sha256": "5bce0e6cd29eb07f59a9b046acdd9029854546ecdb1c14dd62d7701e8097bef0"
             },
             {
               "shard": 5,
               "path": "qwen-shadow-AB-shard-005-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 34034,
-              "sha256": "2d37326fa5a9fb010a5c4ace066ff65f1a3c5a5e695f8a718af642ce33570e09"
+              "sha256": "2501cb202634fca9fe53ddead70c25ee88482469404151b8f8886578799d9090"
             },
             {
               "shard": 6,
               "path": "qwen-shadow-AB-shard-006-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 28766,
-              "sha256": "863f9311f2c64a7fb0dd8a6834d7e80a8447aa7a5c012486b6c11ddc8d7650e6"
+              "sha256": "f8bfbf895db29e9a3b17b84e3cafcd00813a164a31f6c1718ffa8acba537b7e6"
             },
             {
               "shard": 7,
               "path": "qwen-shadow-AB-shard-007-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 37916,
-              "sha256": "24e7b812b732c15107db68d60e1438f446e80b1d113eee46e7db034252e3eebe"
+              "sha256": "da3bbe0599fc08364112753ffe8f9b81538d3538f3d2baca6c021e0eced1c9f9"
             },
             {
               "shard": 8,
               "path": "qwen-shadow-AB-shard-008-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 37195,
-              "sha256": "17efc75bf456c4ec226c1e3ff3a910d71d322195c048f4f3105aef861b97ddfa"
+              "sha256": "fc63a6845dc001b9b3506b086a470d5d143b5753c7985eea3892a4a79ed01ae1"
             },
             {
               "shard": 9,
               "path": "qwen-shadow-AB-shard-009-of-010.jsonl.gz",
               "rows": 80,
               "bytes": 33462,
-              "sha256": "581b9c35cf07d044a9cd9b5c49ecb68fdc5bb9f416135f99a16e0b7dc34b55b4"
+              "sha256": "a045189c3692827d33933cec311f957b14a07b76e1553a3b25dbc2250000551c"
             }
           ],
           "safety": {
@@ -315,140 +311,140 @@
               "path": "qwen-shadow-AB-shard-000-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 240651,
-              "sha256": "f1845c59266572b86af2da6dd79d7d3df70ba554a2c670c31b5339069c89b273"
+              "sha256": "0190ebeb627f4761ff983be83c31b60a059b085dd870d091c96338027cb5edb4"
             },
             {
               "shard": 1,
               "path": "qwen-shadow-AB-shard-001-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 233531,
-              "sha256": "60cc2d459326d677bc0ee62002451e764980baca0443ccb78355fa313f63d471"
+              "sha256": "7c2bef1fe70c8e08eca708290875cdce17227191a3afda3527ee6550dfb530f1"
             },
             {
               "shard": 2,
               "path": "qwen-shadow-AB-shard-002-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 259656,
-              "sha256": "5ffe67019e1bd33b2f5663adbdabf0abe0c520aa452aa571127550a600efa2ba"
+              "sha256": "10961895662c43c0c04a17f1c5538c8f4773fa474c4989c69312c6c6cae7e5fd"
             },
             {
               "shard": 3,
               "path": "qwen-shadow-AB-shard-003-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 238452,
-              "sha256": "12f74316ea1c5da937dc7da6a90b29299a614f2843039402044fe5b64f347cb7"
+              "sha256": "197a6042ce127717e9a15d116b56c19688a0bf001412d48484da393dcdbafd6e"
             },
             {
               "shard": 4,
               "path": "qwen-shadow-AB-shard-004-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 269311,
-              "sha256": "605badab0290379c47fd3117ff5b9fa9e7581448820c0139176a497301d22e8f"
+              "sha256": "ee4b1ff41d66715d14662054921a10452773597a7467ea56ae6181570c71b634"
             },
             {
               "shard": 5,
               "path": "qwen-shadow-AB-shard-005-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 237071,
-              "sha256": "a68304a1824257a443341a120caf5a4e30cc0f92b98fcfdb1278baffcd003b5d"
+              "sha256": "11203072b8d456c401f7f1054c7d4b5b590e72c2981bfd2dc74093d4bcaa7004"
             },
             {
               "shard": 6,
               "path": "qwen-shadow-AB-shard-006-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 233049,
-              "sha256": "211a28d42eabad13b8f427a2faa9d34f786c517dc6718ab4d8fc7f13433f0154"
+              "sha256": "d07dc52dda07eb70c9a3fd6cece4140c05c846e1e0333e1f2fcc78a7bdcf6ed6"
             },
             {
               "shard": 7,
               "path": "qwen-shadow-AB-shard-007-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 241728,
-              "sha256": "a55efd4bc1ceed1252454f110f38b3d1c7ca2364351e1bb082838b5b902fc951"
+              "sha256": "1bab89a4470d8f6f94a5810a712bb514c746ceed467cbd844b7176d48b66fb8d"
             },
             {
               "shard": 8,
               "path": "qwen-shadow-AB-shard-008-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 238729,
-              "sha256": "7db99c40ae4fd83bf6b4fa06554558523645484e5427c9daf32ddc318165eede"
+              "sha256": "fe3433eb6b094c095f185e62c5076373ab9fbb3a6d9a4056d994092609816611"
             },
             {
               "shard": 9,
               "path": "qwen-shadow-AB-shard-009-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 272409,
-              "sha256": "99936b332643253aab72ddef52a2dc8bdad0b2e914abc3727835146e8a4f145a"
+              "sha256": "a3d1e30c1a2345961490fed09121d286d048930f1330e86db78e923b9b1528b9"
             },
             {
               "shard": 10,
               "path": "qwen-shadow-AB-shard-010-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 251152,
-              "sha256": "8de3173acb2fa3a3fb897960ed236b0dcb62308ba521376f950e84747f2842d6"
+              "sha256": "0616800e7d583a84d4bbc41b222d4e75d561fcf92ab64501d691877bf18d6832"
             },
             {
               "shard": 11,
               "path": "qwen-shadow-AB-shard-011-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 249341,
-              "sha256": "210e1b70b2ae921f778df84269458babd870e4655e30a4680641de4ab567ee9f"
+              "sha256": "837ce14dc1e4c7fb7f40ccbbcb95e89c1daf2f63b4c21836d933f39bafd75d00"
             },
             {
               "shard": 12,
               "path": "qwen-shadow-AB-shard-012-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 245375,
-              "sha256": "3a35d8779d2332d4f918f7639dbb95f5a845aac9d23d46499660e9e971376a7e"
+              "sha256": "392c5ccd9cdf94d1689147ef6df19b1737def61b9a5b5754dbc9a65ec1231f4f"
             },
             {
               "shard": 13,
               "path": "qwen-shadow-AB-shard-013-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 243957,
-              "sha256": "1d8525aacfe4849eb4761a52a45a76306276ae3bb5c84600de76fd9e4437cb79"
+              "sha256": "2e70b09c0bc930deccf1fd28f73d7ef2603622013f51423afa597bb756b954bc"
             },
             {
               "shard": 14,
               "path": "qwen-shadow-AB-shard-014-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 250842,
-              "sha256": "2e5689067523218e1c8d2edf4c6da841c32588c89c9106cf21450068beaaa9e0"
+              "sha256": "05f041ad1523a4d586156db7bb7601067f06bd68a1019fb6528fc53a9bfb8d14"
             },
             {
               "shard": 15,
               "path": "qwen-shadow-AB-shard-015-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 219905,
-              "sha256": "ab945043d57499ee760d2192a34bc7bbcd4377c887838aaa3fb48456d8898823"
+              "sha256": "a4e95999d1d08e1d081b6a4dfa74a95c1806d7694f3d54daad226086281472a9"
             },
             {
               "shard": 16,
               "path": "qwen-shadow-AB-shard-016-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 268088,
-              "sha256": "f312c9c5a8792c637ae6e49653def46f7d53c8b59da274c29ed291412cf66e27"
+              "sha256": "21e47ad11bd5ae0a74d3dbc611f1996e071dba85ca6750c0f52a832bcc6e5997"
             },
             {
               "shard": 17,
               "path": "qwen-shadow-AB-shard-017-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 273108,
-              "sha256": "1a0e9fbd5fd73ef866f7a46c21718e017ba2912979dcdece90b5a01fbe9ff6ab"
+              "sha256": "05ff3a278f154a2cffffd5c1158e23d836e39fdf5f20d669b7bc0d6f9c29c6b0"
             },
             {
               "shard": 18,
               "path": "qwen-shadow-AB-shard-018-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 230627,
-              "sha256": "93b177dbcf2330cedcedaa4d1d1eb6d7c2a4154a0b8e91ecb9f414be7a83c19f"
+              "sha256": "fb793aacd90f85ee4e4d1bf14561a94d5b6f30b33052c7b635164cfb0fafc0b9"
             },
             {
               "shard": 19,
               "path": "qwen-shadow-AB-shard-019-of-020.jsonl.gz",
               "rows": 480,
               "bytes": 254872,
-              "sha256": "7616d045f03283cae7b5ed40c30fac14762ba64980f13974fcd53370fce2f2bb"
+              "sha256": "ed14cf7db6d27219dc68099ab15c810d7c57571ddcaed8616a336e8400b14fcf"
             }
           ],
           "safety": {
@@ -467,10 +463,10 @@
       "same_bound_current_only": []
     },
     "current_targeted_tests": {
-      "pytest": "................                                                         [100%]\n16 passed in 0.19s",
+      "pytest": "....................                                                     [100%]\n20 passed in 0.35s",
       "route_smoke": "{'route_cases': 10, 'status': 'ok'}"
     }
   },
-  "head_sha": "34623a8741e8de024b417d36eabf076181bdccd7",
-  "workflow_run_id": "32549454990"
+  "head_sha": "38e332708564eb457957b3e56ec321831bd23327",
+  "workflow_run_id": "32550693577"
 }
