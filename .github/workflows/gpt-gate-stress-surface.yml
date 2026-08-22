@@ -51,7 +51,7 @@ jobs:
           git commit -m "stress: mark gate review running ${GITHUB_RUN_ID}" || true
           git push origin HEAD:main || true
 
-      - name: Recover every DCE generation referenced by current BUSINESS_GATES
+      - name: Recover exact DCE shards referenced by current BUSINESS_GATES
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -59,25 +59,56 @@ jobs:
           set -euo pipefail
           rm -rf /tmp/gpt-gate-stress-releases
           mkdir -p /tmp/gpt-gate-stress-releases
-          python - <<'PY' >/tmp/gate-runs.txt
+          python - <<'PY'
           import json
           p=json.load(open('control/gpt_review_index.json',encoding='utf-8'))
           rows=[x for x in p.get('items',[]) if isinstance(x,dict) and str(x.get('review_stage') or '').upper()=='BUSINESS_GATES' and bool(x.get('gate_readiness'))]
-          runs=sorted({int(x.get('source_dce_run_id') or 0) for x in rows if int(x.get('source_dce_run_id') or 0)})
           if not rows:
               raise SystemExit('No BUSINESS_GATES rows in durable review index')
-          for r in runs:
-              print(r)
+          pairs=sorted({(int(x.get('source_dce_run_id') or 0), int(x.get('source_shard') or 0)) for x in rows if int(x.get('source_dce_run_id') or 0)})
+          with open('/tmp/gate-pairs.tsv','w',encoding='utf-8') as f:
+              for run_id, shard in pairs:
+                  f.write(f'{run_id}\t{shard}\n')
+          runs=sorted({r for r,_ in pairs})
+          with open('/tmp/gate-runs.txt','w',encoding='utf-8') as f:
+              for r in runs:
+                  f.write(f'{r}\n')
+          print(json.dumps({'business_gate_rows':len(rows),'exact_run_shard_pairs':len(pairs),'release_runs':len(runs)},indent=2))
           PY
-          echo "Required DCE generations: $(wc -l </tmp/gate-runs.txt)"
           while read -r run_id; do
             [ -n "$run_id" ] || continue
-            mkdir -p "/tmp/gpt-gate-stress-releases/$run_id"
-            gh release download "dce-harvest-$run_id" \
-              --pattern 'fast-adjudication-shard-*.jsonl' \
-              --dir "/tmp/gpt-gate-stress-releases/$run_id"
+            dir="/tmp/gpt-gate-stress-releases/$run_id"
+            mkdir -p "$dir"
+            mapfile -t shards < <(awk -F '\t' -v r="$run_id" '$1==r {print $2}' /tmp/gate-pairs.tsv | sort -n -u)
+            args=()
+            for shard in "${shards[@]}"; do
+              args+=(--pattern "fast-adjudication-shard-${shard}.jsonl")
+            done
+            ok=0
+            for attempt in 1 2 3 4 5 6 7 8; do
+              if gh release download "dce-harvest-$run_id" "${args[@]}" --dir "$dir" --skip-existing; then
+                ok=1
+                break
+              fi
+              echo "release download retry run=$run_id attempt=$attempt" >&2
+              sleep "$((attempt * 12))"
+            done
+            [ "$ok" -eq 1 ] || { echo "Unable to recover release dce-harvest-$run_id after retries" >&2; exit 1; }
+            sleep 1
           done </tmp/gate-runs.txt
-          echo "Recovered shard files: $(find /tmp/gpt-gate-stress-releases -type f -name 'fast-adjudication-shard-*.jsonl' | wc -l)"
+          python - <<'PY'
+          from pathlib import Path
+          missing=[]
+          for line in Path('/tmp/gate-pairs.tsv').read_text().splitlines():
+              run_id,shard=line.split('\t')
+              p=Path('/tmp/gpt-gate-stress-releases')/run_id/f'fast-adjudication-shard-{shard}.jsonl'
+              if not p.is_file() or p.stat().st_size==0:
+                  missing.append(f'{run_id}:{shard}')
+          print(f'exact_shards_expected={len(Path("/tmp/gate-pairs.tsv").read_text().splitlines())} missing={len(missing)}')
+          if missing:
+              print('missing_pairs=',missing[:100])
+              raise SystemExit(2)
+          PY
 
       - name: Build exhaustive evidence surface and enforce conservation
         run: |
