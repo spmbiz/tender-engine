@@ -1,0 +1,48 @@
+{
+  "schema": "GPT_DCE_ADJUDICATION_V1",
+  "source_dce_run_id": 32568452706,
+  "created_at": "2026-08-22T11:13:00Z",
+  "persist_to_final_bank": true,
+  "results": [
+    {
+      "candidate_id": "US-SAM:5974a1901b8c49799aa86e0d6b352055",
+      "title": "Call for Solutions: Fog Tester Analysis Software Application",
+      "buyer": "DEPT OF DEFENSE",
+      "deadline": "2026-09-04T20:00:00+00:00",
+      "classification": "YELLOW",
+      "final_score": 78,
+      "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "deadline_authority": "NOTICE_DATE_FOUND_BUT_UNLABELLED_IN_DCE_REVIEW_REQUIRED",
+      "blockers": [],
+      "unknowns": [
+        "Federal/SAM/CAGE eligibility and any foreign-entity participation constraints are not conclusively resolved in the exposed DCE evidence.",
+        "Authoritative submission deadline remains semantically unresolved.",
+        "SPM must be able to satisfy DoD software-assurance deliverables including SAST, SCA, SBOM, ASD STIG checklist, remediation/POA&M and source/build reproducibility.",
+        "OCI analysis and any Phase 2 requirements must be reviewed before bid commitment."
+      ],
+      "why": "Direct custom software fit: standalone Windows image-analysis application, Python/.NET/LabVIEW accepted, data analysis, calibration logic and source-code delivery. It is commercially interesting, but DoD software-assurance and bidder-eligibility gates remain material UNKNOWNs.",
+      "action": "HIGH_PRIORITY_VERIFY_US_ELIGIBILITY_DEADLINE_AND_SWA_THEN_BID",
+      "notice_url": "https://sam.gov/opp/5974a1901b8c49799aa86e0d6b352055/view"
+    },
+    {
+      "candidate_id": "US-SAM:7a9f7abad2cb447f9e4ce601e7cfe773",
+      "title": "Inventory Management Software",
+      "buyer": "DEPT OF DEFENSE",
+      "deadline": "2026-08-26T19:30:00+00:00",
+      "classification": "YELLOW",
+      "final_score": 81,
+      "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "deadline_authority": "UNLABELLED_DCE_DEADLINE_CONFLICT_REVIEW_REQUIRED",
+      "blockers": [],
+      "unknowns": [
+        "Federal/SAM/CAGE and any set-aside or foreign-entity eligibility constraints need final confirmation.",
+        "Past-performance minimums and scoring thresholds must be resolved from the solicitation instructions.",
+        "Local ATO, DISA STIG and ongoing IAVA/security-patch obligations must be demonstrably supportable.",
+        "Authoritative proposal deadline requires final reconciliation."
+      ],
+      "why": "Very strong direct software scope: custom development is explicitly allowed, requirement is software/support only, localized to one team with roughly 10 users and up to 100k items, CSV migration, business-hours support, no 24/7 requirement and no post-UAT consulting requirement. Security and federal eligibility keep it below GREEN for now.",
+      "action": "URGENT_VERIFY_FEDERAL_ELIGIBILITY_PAST_PERFORMANCE_STIG_AND_DEADLINE",
+      "notice_url": "https://sam.gov/opp/7a9f7abad2cb447f9e4ce601e7cfe773/view"
+    }
+  ]
+}
