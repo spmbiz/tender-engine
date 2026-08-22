@@ -1,0 +1,48 @@
+name: GPT Bulk Prefilter Preview
+
+on:
+  workflow_run:
+    workflows: ["GPT Gate Stress Surface"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gpt-bulk-prefilter-preview
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build conservative exhaustive preview
+        run: |
+          set -euo pipefail
+          python pipeline/gpt_bulk_prefilter.py \
+            --root control/gpt_gate_stress_batches \
+            --out control/gpt_bulk_prefilter_preview.json
+      - name: Persist preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add control/gpt_bulk_prefilter_preview.json
+          git commit -m "gpt: persist exhaustive low prefilter preview ${GITHUB_RUN_ID}" || exit 0
+          for n in 1 2 3 4 5; do
+            if git push origin HEAD:main; then exit 0; fi
+            git pull --rebase origin main || { git rebase --abort || true; }
+            sleep "$((n*2))"
+          done
+          exit 1
