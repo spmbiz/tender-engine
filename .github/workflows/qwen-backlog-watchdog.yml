@@ -26,10 +26,10 @@ concurrency:
 
 env:
   QWEN_PER_SHARD: '96'
-  # Controlled rollout epoch: semantic generations predating the guarded live
-  # checkpoint merge cannot own the lane. This forces exactly one replacement
-  # that actually contains the worker-side checkpoint publisher.
-  QWEN_SEMANTIC_MIN_CONTROL_PLANE_SHA: '25853942e513f5538733efc9faf102dcd13212bf'
+  # Controlled rollout epoch: semantic generations predating the GitHub API
+  # rate-limit hardening cannot own the lane. This forces exactly one replacement
+  # that contains throttled checkpoint publication and non-fatal release mirroring.
+  QWEN_SEMANTIC_MIN_CONTROL_PLANE_SHA: '7aa7dcff7de9122800632193f558095df8e05f0d'
 
 jobs:
   watchdog:
