@@ -17,13 +17,26 @@ on:
       - 'tests/test_freshness_conveyor.py'
       - 'tests/test_global_admission_preauthorized.py'
       - 'control/pipeline_ab_trigger.json'
+  pull_request:
+    paths:
+      - '.github/workflows/pipeline-ab-regression.yml'
+      - 'pipeline/pipeline_ab_regression.py'
+      - 'pipeline/pipeline_ab_regression_v2.py'
+      - 'pipeline/pipeline_ab_regression_v3.py'
+      - 'pipeline/global_admission.py'
+      - 'pipeline/build_qwen_shadow_shards.py'
+      - 'pipeline/materialize_dce_selection.py'
+      - 'pipeline/dce_batch_worker.py'
+      - 'pipeline/dce_worker_v*.py'
+      - 'tests/test_freshness_conveyor.py'
+      - 'tests/test_global_admission_preauthorized.py'
 
 permissions:
   actions: read
   contents: write
 
 concurrency:
-  group: pipeline-ab-regression
+  group: pipeline-ab-regression-${{ github.event.pull_request.number || 'main' }}
   cancel-in-progress: false
 
 jobs:
@@ -89,7 +102,7 @@ jobs:
           retention-days: 14
 
       - name: Persist latest A/B report transactionally
-        if: always()
+        if: always() && github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
