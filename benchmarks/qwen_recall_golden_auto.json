@@ -1,9 +1,9 @@
 {
   "schema": "QWEN_RECALL_CALIBRATION_CORPUS_V1",
-  "generated_at": "2026-08-19T18:58:25+00:00",
-  "case_count": 39,
-  "positive_recall_cases": 38,
-  "frozen_input_cases": 39,
+  "generated_at": "2026-08-22T10:32:34+00:00",
+  "case_count": 41,
+  "positive_recall_cases": 40,
+  "frozen_input_cases": 41,
   "missing_input_candidate_ids": [
     "IE:8623183",
     "IE:8670172",
@@ -1468,6 +1468,100 @@
           ]
         },
         "calibration_input_frozen_at": "2026-08-19T10:24:45+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:578395-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:578395-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 80,
+        "why": "Excellent SPM-fit three-lot communication-design framework and the inbox marks it native/gate-ready, with a consistent authoritative deadline. However the current review pack exposes legacy compact evidence without document path/SHA provenance. Under the pipeline contract those missing source attributions cannot be promoted to PASS, so GREEN is not defensible yet.",
+        "action": "PRIORITY_DEEP_VERIFY_SOURCE_ARTIFACT_THEN_PROMOTE_IF_GATES_CLEAR",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT_BUT_LEGACY_PROVENANCE_UNRESOLVED",
+        "provenance_file": "control/adjudications/gpt-live-pending-sweep-20260822.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:578395-2026",
+        "material_fields_hash": "0916ab8aa6d57320f6cdc452a4781f5925fdc66585a0fedb56fbc48bafb5f065",
+        "notice": {
+          "candidate_id": "TED:578395-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": "FRA",
+          "buyer": "LIMOGES METROPOLE - Communauté urbaine",
+          "title": "France – Graphic design services – ACCORD CADRE RELATIF A LA CONCEPTION DE SUPPORTS DE COMMUNICATION – 3 LOTS",
+          "description": "ACCORD CADRE RELATIF A LA CONCEPTION DE SUPPORTS DE COMMUNICATION – 3 LOTS",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-21+02:00",
+          "deadline": "2026-09-30T02:00:00+00:00",
+          "deadline_utc": "2026-09-30T02:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/578395-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-22T10:32:34+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:579225-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:579225-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 72,
+        "why": "The scope is directly relevant software/IT work and was recall-promoted as native SPM gate-ready, but the current pack does not provide source-attributed legacy evidence and the DCE deadline itself is not parsed authoritatively. Missing gates remain UNKNOWN, so this cannot be GREEN yet.",
+        "action": "URGENT_DEEP_VERIFY_BEFORE_2026_08_28_THEN_PROMOTE_OR_DROP",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT_BUT_LEGACY_PROVENANCE_UNRESOLVED",
+        "provenance_file": "control/adjudications/gpt-live-pending-sweep-20260822.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:579225-2026",
+        "material_fields_hash": "b76f0f5a05dd14ca65463c9ce54e06bf1ba2d26152733fe92e142fa0ed3cdbc1",
+        "notice": {
+          "candidate_id": "TED:579225-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": "SVN",
+          "buyer": "Družba za upravljanje javnega potniškega prometa, d. o. o.",
+          "title": "Slovenia – IT services: consulting, software development, Internet and support – Operativno spremljanje stanja izvajanje GJPS JPP – sledenje vozil",
+          "description": "Operativno spremljanje stanja izvajanje GJPS JPP – sledenje vozil",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-21+02:00",
+          "deadline": "2026-08-28T10:00:00+02:00",
+          "deadline_utc": "2026-08-28T08:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/579225-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-22T10:32:34+00:00"
       }
     },
     {
