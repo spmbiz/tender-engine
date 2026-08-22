@@ -1,59 +1,27 @@
 {
   "schema": "GPT_INBOX_HEALTH_V4_FAIR_SHARE_PROVENANCE",
-  "updated_at": "2026-08-22T10:47:02.448837+00:00",
+  "updated_at": "2026-08-22T11:20:51.477021+00:00",
   "inbox_schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
   "latest_source_dce_run_id": 32568452706,
   "counts": {
-    "pending_gpt_web_review": 12,
-    "reviewed_ticks_total": 487,
+    "pending_gpt_web_review": 0,
+    "reviewed_ticks_total": 499,
     "excluded_already_reviewed": 0,
-    "excluded_already_in_final_bank": 0,
-    "pending_before_visible_cap": 12,
-    "pending_by_stage": {
-      "BUSINESS_GATES": 9,
-      "DCE_AUTHENTICITY": 3
-    },
-    "pending_by_inbox_lane": {
-      "GPT_PRIORITY": 6,
-      "DCE_AUTHENTICITY_REPAIR": 3,
-      "LOW_PORTAL_SURVEILLANCE": 3
-    },
-    "pending_by_fit_band": {
-      "GOOD": 2,
-      "MAYBE": 4,
-      "LOW": 6
-    },
-    "pending_by_portal": {
-      "US_SAM": 6,
-      "GENERIC_PUBLIC_PAGE": 2,
-      "PL_EZAMOWIENIA": 1,
-      "SCOTLAND_PCS": 3
-    }
+    "excluded_already_in_final_bank": 24,
+    "pending_before_visible_cap": 0,
+    "pending_by_stage": {},
+    "pending_by_inbox_lane": {},
+    "pending_by_fit_band": {},
+    "pending_by_portal": {}
   },
   "window_selection": {
     "priority_target": 120,
     "authenticity_target": 20,
     "low_surveillance_target": 20,
-    "selected_by_lane": {
-      "GPT_PRIORITY": 6,
-      "DCE_AUTHENTICITY_REPAIR": 3,
-      "LOW_PORTAL_SURVEILLANCE": 3
-    },
-    "selected_by_stage": {
-      "BUSINESS_GATES": 9,
-      "DCE_AUTHENTICITY": 3
-    },
-    "selected_by_band": {
-      "GOOD": 2,
-      "MAYBE": 4,
-      "LOW": 6
-    },
-    "selected_by_portal": {
-      "US_SAM": 6,
-      "GENERIC_PUBLIC_PAGE": 2,
-      "PL_EZAMOWIENIA": 1,
-      "SCOTLAND_PCS": 3
-    }
+    "selected_by_lane": {},
+    "selected_by_stage": {},
+    "selected_by_band": {},
+    "selected_by_portal": {}
   },
   "review_bank_count": 17,
   "review_bank_schema": "GPT_REVIEW_HOT_V7_FAIR_SHARE",
@@ -82,25 +50,25 @@
       "SCOTLAND_PCS": 3
     }
   },
-  "review_index_count": 3828,
+  "review_index_count": 3816,
   "review_index_counts": {
-    "pending_total_uncapped": 3828,
+    "pending_total_uncapped": 3816,
     "by_stage": {
-      "DCE_AUTHENTICITY": 1160,
-      "BUSINESS_GATES": 2668
+      "DCE_AUTHENTICITY": 1157,
+      "BUSINESS_GATES": 2659
     },
     "by_spm_fit_band": {
-      "GOOD": 66,
-      "MAYBE": 184,
-      "LOW": 3578
+      "GOOD": 64,
+      "MAYBE": 180,
+      "LOW": 3572
     },
     "rich_hot_window_target": 160,
-    "overflow_beyond_hot_160": 3668,
+    "overflow_beyond_hot_160": 3656,
     "cross_portal_duplicates_collapsed": 0
   },
-  "true_pending_before_hot_cap": 3828,
-  "overflow_beyond_hot_160": 3668,
-  "assistant_read_batch_count": 2,
+  "true_pending_before_hot_cap": 3816,
+  "overflow_beyond_hot_160": 3656,
+  "assistant_read_batch_count": 0,
   "assistant_read_batch_size": 10,
   "assistant_read_batch_schema": "GPT_WEB_READ_BATCH_MANIFEST_V3_PROVENANCE_REFRESH",
   "provenance_overrides_applied_in_window": 0,
