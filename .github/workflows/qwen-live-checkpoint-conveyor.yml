@@ -90,11 +90,6 @@ jobs:
           [[ "$source_run" =~ ^[0-9]+$ ]] || { echo 'invalid source generation' >&2; exit 1; }
 
           tag="qwen-live-progress-$rid"
-          if ! gh release view "$tag" >/dev/null 2>&1; then
-            echo 'usable=false' >> "$GITHUB_OUTPUT"
-            echo "No live progress release for Qwen run $rid yet."
-            exit 0
-          fi
           assets="$(gh release view "$tag" --json assets --jq '.assets[].name' 2>/dev/null || true)"
           checkpoint_count="$(grep -Ec '^qwen-live-.*-guarded-checkpoint\.jsonl$' <<< "$assets" || true)"
           if [ "$checkpoint_count" -eq 0 ]; then
@@ -213,8 +208,9 @@ jobs:
           fi
           echo "Live checkpoint merge: novel=$novel accepted=$accepted state=$state_rows remaining=$remaining"
 
-      - name: Publish cumulative checkpoint state
+      - name: Publish cumulative checkpoint state mirror
         if: steps.select.outputs.usable == 'true' && steps.merge.outputs.changed == 'true'
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
           RID: ${{ steps.select.outputs.rid }}
@@ -223,12 +219,25 @@ jobs:
         run: |
           set -euo pipefail
           notes="source_run=$SOURCE_RUN qwen_run=$RID writer=qwen-live-checkpoint-conveyor-v1 authoritative=false exact_hash_merge=true live_checkpoints=true"
-          if gh release view "$INCREMENTAL_RELEASE" >/dev/null 2>&1; then
-            gh release edit "$INCREMENTAL_RELEASE" --notes "$notes"
-          else
-            gh release create "$INCREMENTAL_RELEASE" --target main --title 'Qwen Incremental State Latest' --notes "$notes"
+          retry_cmd() {
+            local label="$1"; shift
+            local delays=(0 10 30 60)
+            local out rc
+            for delay in "${delays[@]}"; do
+              [ "$delay" -eq 0 ] || sleep "$delay"
+              set +e
+              out="$("$@" 2>&1)"; rc=$?
+              set -e
+              if [ "$rc" -eq 0 ]; then return 0; fi
+              echo "::warning::${label} failed rc=${rc}: ${out: -400}"
+            done
+            return 1
+          }
+          if ! retry_cmd 'incremental release metadata' gh release edit "$INCREMENTAL_RELEASE" --notes "$notes"; then
+            echo '::warning::Incremental release mirror unavailable; main summary will still be persisted and next checkpoint cycle will reconstruct from durable source/checkpoint assets.'
+            exit 1
           fi
-          gh release upload "$INCREMENTAL_RELEASE" \
+          retry_cmd 'incremental release assets' gh release upload "$INCREMENTAL_RELEASE" \
             work/publish/qwen-incremental-state-latest.jsonl.gz \
             work/publish/qwen-classification-remaining-latest.jsonl.gz \
             work/publish/classification_summary.json --clobber
@@ -266,7 +275,8 @@ jobs:
           PY
           persist_file() {
             local path="$1" file="$2" message="$3" sha
-            for attempt in 1 2 3 4 5 6; do
+            for delay in 0 5 15 30 60 120; do
+              [ "$delay" -eq 0 ] || sleep "$delay"
               sha="$(gh api "repos/${REPO}/contents/${path}?ref=main" --jq '.sha' 2>/dev/null || true)"
               TARGET="$path" FILE="$file" SHA="$sha" MESSAGE="$message" python - <<'PY'
           import base64,json,os
@@ -276,8 +286,8 @@ jobs:
           Path('/tmp/checkpoint-content.json').write_text(json.dumps(body),encoding='utf-8')
           PY
               if gh api --method PUT "repos/${REPO}/contents/${path}" --input /tmp/checkpoint-content.json >/dev/null 2>&1; then return 0; fi
-              sleep "$((attempt*2))"
             done
+            echo "Failed to persist ${path} after bounded backoff" >&2
             return 1
           }
           persist_file control/qwen_live/classification_summary.json work/publish/classification_summary.json "qwen: persist live guarded checkpoint classification ${GITHUB_RUN_ID}"
@@ -293,4 +303,5 @@ jobs:
           echo "- novel checkpoint rows: ${{ steps.merge.outputs.novel }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- accepted checkpoint rows: ${{ steps.merge.outputs.accepted }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- remaining queue: ${{ steps.merge.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
+          echo '- release mirroring is best-effort; durable main summary persistence continues through release rate limits.' >> "$GITHUB_STEP_SUMMARY"
           echo '- no semantic dispatch, no DCE dispatch, and no final-artifact authority is changed by this workflow.' >> "$GITHUB_STEP_SUMMARY"

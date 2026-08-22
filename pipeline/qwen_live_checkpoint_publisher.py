@@ -21,7 +21,11 @@ except ImportError:  # package/test execution
 
 
 CHECKPOINT_SUFFIX = "-guarded-checkpoint.jsonl"
-DEFAULT_INTERVAL_SECONDS = 20.0
+# 20 seconds across 15-20 workers can burn thousands of GitHub Release API
+# operations per hour. Two minutes is still effectively live for the conveyor,
+# while leaving a large safety margin under installation rate limits.
+DEFAULT_INTERVAL_SECONDS = 120.0
+_ENSURED_RELEASES: set[tuple[str, str]] = set()
 
 
 def _arg_value(argv: list[str], name: str) -> str | None:
@@ -161,6 +165,11 @@ def _github_auth_env() -> dict[str, str] | None:
 
 
 def _ensure_release(tag: str, repo: str, env: dict[str, str]) -> bool:
+    # A worker publishes many checkpoints to the same release. Do not spend an
+    # extra REST request proving the release exists before every upload.
+    key = (repo, tag)
+    if key in _ENSURED_RELEASES:
+        return True
     view = subprocess.run(
         ["gh", "release", "view", tag, "--repo", repo],
         env=env,
@@ -170,6 +179,7 @@ def _ensure_release(tag: str, repo: str, env: dict[str, str]) -> bool:
         check=False,
     )
     if view.returncode == 0:
+        _ENSURED_RELEASES.add(key)
         return True
     create = subprocess.run(
         [
@@ -185,6 +195,7 @@ def _ensure_release(tag: str, repo: str, env: dict[str, str]) -> bool:
         check=False,
     )
     if create.returncode == 0:
+        _ENSURED_RELEASES.add(key)
         return True
     retry = subprocess.run(
         ["gh", "release", "view", tag, "--repo", repo],
@@ -194,7 +205,10 @@ def _ensure_release(tag: str, repo: str, env: dict[str, str]) -> bool:
         timeout=15,
         check=False,
     )
-    return retry.returncode == 0
+    if retry.returncode == 0:
+        _ENSURED_RELEASES.add(key)
+        return True
+    return False
 
 
 def upload_checkpoint(path: Path, *, run_id: str, repo: str) -> bool:
@@ -206,34 +220,37 @@ def upload_checkpoint(path: Path, *, run_id: str, repo: str) -> bool:
     tag = f"qwen-live-progress-{run_id}"
     if not _ensure_release(tag, repo, env):
         return False
-    try:
-        proc = subprocess.run(
-            ["gh", "release", "upload", tag, str(path), "--clobber", "--repo", repo],
-            env=env,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.PIPE,
-            text=True,
-            timeout=30,
-            check=False,
-        )
-    except Exception as exc:
-        print(
-            "QWEN_GUARDED_CHECKPOINT_UPLOAD_FAIL "
-            + json.dumps({"error": type(exc).__name__, "asset": path.name}, separators=(",", ":")),
-            flush=True,
-        )
-        return False
-    if proc.returncode != 0:
-        print(
-            "QWEN_GUARDED_CHECKPOINT_UPLOAD_FAIL "
-            + json.dumps(
-                {"returncode": proc.returncode, "asset": path.name, "stderr_tail": (proc.stderr or "")[-300:]},
-                separators=(",", ":"),
-            ),
-            flush=True,
-        )
-        return False
-    return True
+    last_stderr = ""
+    for attempt, delay in enumerate((0, 5, 15), start=1):
+        if delay:
+            time.sleep(delay)
+        try:
+            proc = subprocess.run(
+                ["gh", "release", "upload", tag, str(path), "--clobber", "--repo", repo],
+                env=env,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=30,
+                check=False,
+            )
+        except Exception as exc:
+            last_stderr = type(exc).__name__
+            continue
+        if proc.returncode == 0:
+            return True
+        last_stderr = (proc.stderr or "")[-500:]
+        # A quota exhaustion will not recover in milliseconds. The bounded
+        # backoff above avoids a hot retry loop while allowing transient 5xx/409s.
+    print(
+        "QWEN_GUARDED_CHECKPOINT_UPLOAD_FAIL "
+        + json.dumps(
+            {"asset": path.name, "attempts": 3, "stderr_tail": last_stderr[-300:]},
+            separators=(",", ":"),
+        ),
+        flush=True,
+    )
+    return False
 
 
 def publish_once(
@@ -349,7 +366,8 @@ def run_with_live_checkpoints(main_fn: Callable[[], None], argv: list[str] | Non
         interval = float(os.environ.get("QWEN_CHECKPOINT_UPLOAD_INTERVAL_SECONDS") or DEFAULT_INTERVAL_SECONDS)
     except Exception:
         interval = DEFAULT_INTERVAL_SECONDS
-    interval = max(5.0, min(120.0, interval))
+    # Fail safe against an accidental config that recreates an API hammer.
+    interval = max(60.0, min(300.0, interval))
     stop = threading.Event()
     thread = threading.Thread(
         target=_publisher_loop,
