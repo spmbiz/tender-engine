@@ -1,6 +1,6 @@
 {
   "schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
-  "updated_at": "2026-08-22T14:51:21.917642+00:00",
+  "updated_at": "2026-08-22T14:51:27.206051+00:00",
   "latest_source_dce_run_id": 32579878511,
   "review_queue": [
     {
@@ -709,29 +709,688 @@
       },
       "source_dce_run_id": 32575392123,
       "source_shard": 0,
-      "hot_ready_at": "2026-08-22T13:20:04.714345+00:00",
+      "hot_ready_at": "2026-08-22T14:51:26.999298+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 21,
       "spm_fit_band": "MAYBE",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32575392123,
+        "shard": 0,
+        "candidate_id": "TED:515650-2026",
+        "release_tag": "dce-harvest-32575392123"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "TED:515650-2026",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 179266,
+        "documents_indexed": 7,
+        "documents_with_text": 7,
+        "source_urls": [
+          "https://www.meinauftrag.rib.de/public/publications/603754",
+          "https://my.vergabeplattform.berlin.de/remote/download.php?k=beb2f7012fdb03e7ef9e70662eb2ce1b",
+          "https://my.vergabeplattform.berlin.de/remote/download.php?k=67ca8637c8bcf13e60d2b9fc061256f9",
+          "https://my.vergabeplattform.berlin.de/remote/download.php?k=758f5fee7d013f2b77eecf7c51a4d9f4",
+          "https://my.vergabeplattform.berlin.de/remote/download.php?k=beb2f7012fdb03e7ef9e70662eb2ce1b&down"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "Leistungsbeschreibung",
+          "Vergabeunterlagen",
+          "Zuschlagskriterien",
+          "Eignungskriterien",
+          "Angebotsfrist",
+          "Preisblatt"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "berlin",
+            "drucksystem",
+            "germany",
+            "itdz",
+            "machinery",
+            "printing"
+          ],
+          "hits": [
+            "berlin",
+            "drucksystem",
+            "itdz"
+          ],
+          "ratio": 0.5
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 37,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
       "review_lane": "SPM_PRIORITY",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "22acc0ab454c6c6a13703ff52926beaea6c4942cdb73e406b190c729069fce33",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 21,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
-      "inbox_live_source": "existing_inbox",
+      "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32575392123,
         "shard": 0,
         "candidate_id": "TED:515650-2026",
-        "release_tag": null
+        "release_tag": "dce-harvest-32575392123"
       },
       "upstream_review_lane": "SPM_PRIORITY",
       "inbox_lane": "GPT_PRIORITY"
+    },
+    {
+      "candidate_id": "TED:578894-2026",
+      "title": "Austria – Photocopying and offset printing equipment – MFP-Rahmenvereinbarung (Multifunktionsdrucker)",
+      "buyer": "Stadt Wels",
+      "portal": "TED",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/578894-2026",
+      "deadline": "2026-08-26T08:00:00+02:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 80,
+      "priority_score": 80,
+      "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+      "gate_readiness": false,
+      "deadline_authority": {},
+      "deadline_authority_status": "MISSING",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 0,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32575392123,
+      "source_shard": 0,
+      "hot_ready_at": "2026-08-22T14:51:26.999298+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 10,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "upstream_classification": "YELLOW",
+      "review_stage": "DCE_AUTHENTICITY",
+      "dce_authenticity_review_required": true,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32575392123,
+        "shard": 0,
+        "candidate_id": "TED:578894-2026",
+        "release_tag": "dce-harvest-32575392123"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "TED:578894-2026",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DCE_CONTENT_UNVERIFIED",
+        "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "gate_readiness": false,
+        "text_chars": 17700,
+        "documents_indexed": 2,
+        "documents_with_text": 2,
+        "source_urls": [
+          "https://wels.vemap.com/sw-classic/files/Datenschutzrechtliche_Hinweise.pdf"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [
+          "Datenschutzrechtliche_Hinweise.pdf"
+        ],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "austria",
+            "equipment",
+            "multifunktionsdrucker",
+            "offset",
+            "photocopying",
+            "printing",
+            "rahmenvereinbarung"
+          ],
+          "hits": [
+            "austria"
+          ],
+          "ratio": 0.1429
+        },
+        "reasons": [
+          "download_succeeded_but_authoritative_dce_content_not_proven"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 0,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": false
+      },
+      "procedure_aliases": [],
+      "review_lane": "DCE_AUTHENTICITY_REPAIR",
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "1fd1ad4b648064caf46f3a589f3887baff13924f80e88ed7ec981edf94f37d21",
+      "recommended_gpt_action": "GPT_WEB_VERIFY_DCE_AUTHENTICITY",
+      "gpt_priority_score": 10,
+      "upstream_signal": "YELLOW",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32575392123,
+        "shard": 0,
+        "candidate_id": "TED:578894-2026",
+        "release_tag": "dce-harvest-32575392123"
+      },
+      "upstream_review_lane": "DCE_AUTHENTICITY_REPAIR",
+      "inbox_lane": "DCE_AUTHENTICITY_REPAIR"
+    },
+    {
+      "candidate_id": "US-SAM:08a05cf5f1434384b559b7b0c336d24e",
+      "title": "AN/BYG-1 Applications",
+      "buyer": "DEPT OF DEFENSE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/opp/08a05cf5f1434384b559b7b0c336d24e/view",
+      "deadline": "2026-10-19T20:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 82,
+      "priority_score": 82,
+      "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+      "gate_readiness": false,
+      "deadline_authority": {},
+      "deadline_authority_status": "MISSING",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 0,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32571748480,
+      "source_shard": 1,
+      "hot_ready_at": "2026-08-22T14:51:26.999298+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 10,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "upstream_classification": "YELLOW",
+      "review_stage": "DCE_AUTHENTICITY",
+      "dce_authenticity_review_required": true,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32571748480,
+        "shard": 1,
+        "candidate_id": "US-SAM:08a05cf5f1434384b559b7b0c336d24e",
+        "release_tag": "dce-harvest-32571748480"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "US-SAM:08a05cf5f1434384b559b7b0c336d24e",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DCE_CONTENT_UNVERIFIED",
+        "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "gate_readiness": false,
+        "text_chars": 5501,
+        "documents_indexed": 3,
+        "documents_with_text": 3,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/954/95449cd16f6949e2ac3ff80580c9d26f.xlsx?response-content-disposition=attachment%3B%20filename%3DOfferors%2BQuestion%2BSubmittal%2BForm.xlsx&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260822T115954Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260822%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=599800fc28ef42fbf85c3a795e261065439f105816f00b1930e84ec6aa7c8e02"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [
+          "Terms_of_Use_Agreement.docx"
+        ],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "REQUEST FOR PROPOSAL"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "applications"
+          ],
+          "hits": [],
+          "ratio": 0.0
+        },
+        "reasons": [
+          "download_succeeded_but_authoritative_dce_content_not_proven"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 0,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": false
+      },
+      "procedure_aliases": [
+        "sam_opp:08a05cf5f1434384b559b7b0c336d24e"
+      ],
+      "review_lane": "DCE_AUTHENTICITY_REPAIR",
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "b06a096eef7b9e90e1d240f2fd897bb73809657a0db0c42cf77c7b00566ce39e",
+      "recommended_gpt_action": "GPT_WEB_VERIFY_DCE_AUTHENTICITY",
+      "gpt_priority_score": 10,
+      "upstream_signal": "YELLOW",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32571748480,
+        "shard": 1,
+        "candidate_id": "US-SAM:08a05cf5f1434384b559b7b0c336d24e",
+        "release_tag": "dce-harvest-32571748480"
+      },
+      "upstream_review_lane": "DCE_AUTHENTICITY_REPAIR",
+      "inbox_lane": "DCE_AUTHENTICITY_REPAIR"
+    },
+    {
+      "candidate_id": "EE-RHR:dec2736a-b53e-4c3a-916b-ca191ff87528",
+      "title": "Vahendusplatvorm jäätmejaamades korduskasutuse edendamiseks",
+      "buyer": "Mittetulundusühing Eesti Jäätmehoolduskeskus",
+      "portal": "EE_RHR",
+      "notice_url": "https://riigihanked.riik.ee/rhr-web/#/procurement/10096649/general-info",
+      "deadline": "2026-09-04T09:00:00+00:00",
+      "estimated_value": 97500.0,
+      "currency": "EUR",
+      "preliminary_score": 82,
+      "priority_score": 82,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-09-04T09:00:00+00:00",
+        "notice_deadline_date": "2026-09-04",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 7,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [
+          {
+            "text": "<cbc:ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">EVIDENCE_IDENTIFIER</cbc:ValueDataTypeCode> </cac:TenderingCriterionProperty> </cac:SubsidiaryTenderingCriterionPropertyGroup> </cac:TenderingCriterionPropertyGroup> </cac:TenderingCriterion> <cac:TenderingCriterion> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">5a8dea31-5db9-4e03-862b-07810aa6a7fd</cbc:ID> <cbc:CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">CRITERION.OTHER.EO_DATA.CONTRIBUTIONS_CERTIFICATES</cbc:CriterionTypeCode> <cbc:Name>Ettevõtja kinnitused maksude tasumise kohta</cbc:Name> <cbc:Description languageID=\"ET\">Kas ettevõtja saab esitada tõendi sotsiaalkindlustusmaksete ja maksude tasumise kohta või esitada teabe, mis võimaldaks avaliku sektori hankijal või võrgustiku sektori hankijal saada sellise teabe otse ükskõik millise liikmesriigi tasuta andmebaasist?</cbc:Description> <cac:Legislation> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">c753a2c5-59e6-4970-b6eb-27224e96bf76</cbc:ID> <cbc:Title languageID=\"ET\"/> <cbc:Descripti",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 253147,
+            "corpus_end": 254458,
+            "match": "CERTIFICATE"
+          }
+        ],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [
+          {
+            "text": "<cbc:ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">EVIDENCE_IDENTIFIER</cbc:ValueDataTypeCode> </cac:TenderingCriterionProperty> </cac:SubsidiaryTenderingCriterionPropertyGroup> </cac:TenderingCriterionPropertyGroup> </cac:TenderingCriterion> <cac:TenderingCriterion> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">72c0c4b1-ca50-4667-9487-461f3eed4ed7</cbc:ID> <cbc:CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">CRITERION.OTHER.EO_DATA.SUBCONTRACTS_WITH_THIRD_PARTIES</cbc:CriterionTypeCode> <cbc:Name>Teave nende allhankijate kohta, kelle näitajatele ettevõtja ei tugine</cbc:Name> <cbc:Description languageID=\"ET\">Kas ettevõtja kavatseb sõlmida lepingu mis tahes osa kohta allhanke kolmanda isikuga?</cbc:Description> <cac:Legislation> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">c753a2c5-59e6-4970-b6eb-27224e96bf76</cbc:ID> <cbc:Title languageID=\"ET\"/> <cbc:Description languageID=\"ET\"/> <cac:Language> <cbc:LocaleCode listID=\"LanguageCodeEU\" listAgencyName=\"E",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 242551,
+            "corpus_end": 243862,
+            "match": "SUBCONTRACT"
+          }
+        ],
+        "deliverables_scope": [
+          {
+            "text": "===== FILE: files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\"?> <QualificationApplicationRequest xmlns:ext=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\" xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:QualificationApplicationRequest-2\" xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:efac=\"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1\" xmlns:efbc=\"http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1\" xmlns:efext=\"http://data.europa.eu/p27/eforms-ubl-extensions/1\"> <cbc:UBLVersionID schemeAgencyID=\"OASIS-UBL-TC\">2.2</cbc:UBLVersionID> <cbc:CustomizationID schemeAgencyID=\"CEN-BII\"",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 0,
+            "corpus_end": 834,
+            "match": "specification"
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "onID=\"2.0.2\">CRITERION.EXCLUSION.CONVICTIONS.PARTICIPATION_IN_CRIMINAL_ORGANISATION</cbc:CriterionTypeCode> <cbc:Name>Osalemine kuritegelikus organisatsioonis</cbc:Name> <cbc:Description languageID=\"ET\">Kas ettevõtja ise või tema haldus-, juht- või järelevalveorgani liige või isik, kellel on volitused seda ettevõtjat esindada, tema nimel otsuseid teha või teda kontrollida, on lõpliku süüdimõistva kohtuotsusega süüdi mõistetud kuritegelikus organisatsioonis osalemise eest kõige rohkem viimase viie aasta jooksul või kehtib süüdimõistvas kohtuotsuses sätestatud kõrvalejäämise kohustus endiselt?</cbc:Description> <cac:Legislation> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">c753a2c5-59e6-4970-b6eb-27224e96bf76</cbc:ID> <cbc:Title languageID=\"ET\">RHS § 95 lg 1 p 1 \"keda või kelle haldus-, juhtimis- või järelevalveorgani liiget, prokuristi või muud isikut, kellel on volitus seda ettevõtjat esindada, tema nimel otsuseid teha või teda kontrollida, on karistatud kuritegelikus ühenduses osalemise eest\". Kui hankemenetlusest kõrvaldamise alus esineb, võib ettevõtja soovi korral esitada tõendeid selle kohta, et ta on võtnud meetmeid oma usaldusväärsuse taastamiseks. Heastamise võimalus on ettevõtjal juh",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 4003,
+            "corpus_end": 5306,
+            "match": "sla"
+          },
+          {
+            "text": "esindada, tema nimel otsuseid teha või teda kontrollida, on karistatud kuritegelikus ühenduses osalemise eest\". Kui hankemenetlusest kõrvaldamise alus esineb, võib ettevõtja soovi korral esitada tõendeid selle kohta, et ta on võtnud meetmeid oma usaldusväärsuse taastamiseks. Heastamise võimalus on ettevõtjal juhul, kui tegemist on rahvusvahelist piirmäära ületava hankega või hankija on selle hanke alusdokumentides ette näinud.</cbc:Description> <cac:Language> <cbc:LocaleCode listID=\"LanguageCodeEU\" listAgencyName=\"EU-COM-GROW\" listVersionID=\"2.0.2\">ET</cbc:LocaleCode> </cac:Language> </cac:Legislation> <cac:TenderingCriterionPropertyGroup> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">7c637c0c-7703-4389-ba52-02997a055bd7</cbc:ID> <cbc:PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">ON*</cbc:PropertyGroupTypeCode> <cac:TenderingCriterionProperty> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">8a42266c5fb24e32ff421942459d66ac-1.1</cbc:ID> <cbc:Description languageID=\"ET\">Mis on Teie vastus?</cbc:Description> <cbc:",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 5625,
+            "corpus_end": 6928,
+            "match": "sla"
+          },
+          {
+            "text": "TypeCode> <cbc:Name>Korruptsioon</cbc:Name> <cbc:Description languageID=\"ET\">Kas ettevõtja ise või tema haldus-, juht- või järelevalveorgani liige või isik, kellel on volitused seda ettevõtjat esindada, tema nimel otsuseid teha või teda kontrollida, on lõpliku süüdimõistva kohtuotsusega süüdi mõistetud korruptsiooni eest kõige rohkem viimase viie aasta jooksul või kehtib süüdimõistvas kohtuotsuses sätestatud kõrvalejäämise kohustus endiselt? See kõrvalejätmise alus hõlmab ka korruptsiooni avaliku sektori hankija (võrgustiku sektori hankija) või ettevõtja riigi õiguses sätestatud määratluses.</cbc:Description> <cac:Legislation> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">c753a2c5-59e6-4970-b6eb-27224e96bf76</cbc:ID> <cbc:Title languageID=\"ET\">RHS § 95 lg 1 p 1 ja lg 2 \"keda või kelle haldus-, juhtimis- või järelevalveorgani liiget, prokuristi või muud isikut, kellel on volitus seda ettevõtjat esindada, tema nimel otsuseid teha või teda kontrollida, on karistatud aususe kohustuse rikkumise või korruptiivse teo eest\". Kui hankemenetlusest kõrvaldamise alus esineb, võib ettevõtja soovi korral esitada tõendeid selle kohta, et ta on võtnud meetmeid oma usaldusväärsuse taastamiseks. Heastamise võim",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 15038,
+            "corpus_end": 16341,
+            "match": "sla"
+          },
+          {
+            "text": "a nimel otsuseid teha või teda kontrollida, on karistatud aususe kohustuse rikkumise või korruptiivse teo eest\". Kui hankemenetlusest kõrvaldamise alus esineb, võib ettevõtja soovi korral esitada tõendeid selle kohta, et ta on võtnud meetmeid oma usaldusväärsuse taastamiseks. Heastamise võimalus on ettevõtjal juhul, kui tegemist on rahvusvahelist piirmäära ületava hankega või hankija on selle hanke alusdokumentides ette näinud.</cbc:Description> <cac:Language> <cbc:LocaleCode listID=\"LanguageCodeEU\" listAgencyName=\"EU-COM-GROW\" listVersionID=\"2.0.2\">ET</cbc:LocaleCode> </cac:Language> </cac:Legislation> <cac:TenderingCriterionPropertyGroup> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">7c637c0c-7703-4389-ba52-02997a055bd7</cbc:ID> <cbc:PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">ON*</cbc:PropertyGroupTypeCode> <cac:TenderingCriterionProperty> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">94bafa958a57a2f5fa7af1f5c03b1e54-1.1</cbc:ID> <cbc:Description languageID=\"ET\">Mis on Teie vastus?</cbc:Description> <cbc:",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 16704,
+            "corpus_end": 18007,
+            "match": "sla"
+          }
+        ],
+        "term_value": [
+          {
+            "text": "===== FILE: files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\"?> <QualificationApplicationRequest xmlns:ext=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\" xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:QualificationApplicationRequest-2\" xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:efac=\"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1\" xmlns:efbc=\"http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1\" xmlns:efext=\"http://data.europa.eu/p27/eforms-ubl-extensions/1\"> <cbc:UBLVersionID schemeAgencyID=\"OASIS-UBL-TC\">2.2</cbc:UBLVersionID> <cbc:CustomizationID schemeAgencyID=\"CEN-BII\" schemeVersionID=\"3.0\">urn:www.c",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 0,
+            "corpus_end": 865,
+            "match": "Extension"
+          },
+          {
+            "text": "D_v2.0_laiendatud.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\"?> <QualificationApplicationRequest xmlns:ext=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\" xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:QualificationApplicationRequest-2\" xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:efac=\"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1\" xmlns:efbc=\"http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1\" xmlns:efext=\"http://data.europa.eu/p27/eforms-ubl-extensions/1\"> <cbc:UBLVersionID schemeAgencyID=\"OASIS-UBL-TC\">2.2</cbc:UBLVersionID> <cbc:CustomizationID schemeAgencyID=\"CEN-BII\" schemeVersionID=\"3.0\">urn:www.cenbii.eu:transaction:biitrdm070:ver3.0</cbc:CustomizationID> <cbc:ProfileID schemeAgencyID=\"CEN-BII\" schemeVersionID=\"2.0\">4.1</cbc:ProfileID> <cbc:ID schemeAgencyID=\"RHR\">ae36efa0-f8ac-4690-b394-7604f4dc3dcd</cbc:ID> <cbc:CopyIndicator>false</cbc:CopyIndicator> <cbc:UUID schemeID=\"ISO/IEC 9834-8:2008\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"4\">0fddbf2d-1e33-4267-b04f-52b59b72ccb6</cbc:UUID> <cbc:ContractFolderID schemeAgencyID=\"RHR\">308114</cbc:ContractFold",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 44,
+            "corpus_end": 1353,
+            "match": "extension"
+          }
+        ],
+        "award_criteria": [],
+        "forms_signatures": [
+          {
+            "text": "===== FILE: files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\"?> <QualificationApplicationRequest xmlns:ext=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\" xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:QualificationApplicationRequest-2\" xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:efac=\"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1\" xmlns:efbc=\"http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1\" xmlns:efext=\"http://data.europa.eu/p27/eforms-ubl-e",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 0,
+            "corpus_end": 695,
+            "match": "ESPD"
+          },
+          {
+            "text": "N</cbc:TypeCode> <cbc:ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">EVIDENCE_IDENTIFIER</cbc:ValueDataTypeCode> </cac:TenderingCriterionProperty> </cac:SubsidiaryTenderingCriterionPropertyGroup> </cac:TenderingCriterionPropertyGroup> </cac:TenderingCriterion> </QualificationApplicationRequest> ===== FILE: files/files_unpacked/308114_hankepass_taiendavate_selgitustega.pdf ===== 1 / 21 Koostatud 25.03.2026 16:07:28 https://riigihanked.riik.ee/rhr-web/#/procurement/10096649/general-info HANKEPASS Hankepass ehk Euroopa ühtne hankedokument (ESPD) on ettevõtja enda kinnitus, mis on esialgne tõend ametiasutuste või kolmandate isikute poolt väljastatavate tõendite asemel. Käesolev PDF vormingus registri poolt koostatud dokument on selgitava iseloomuga ja sisaldab hankija sätestatud tingimusi, ettevõtjalt oodatavate vastuste vormingu vaadet ja registri poolt lisatud viiteid RHS-ile. Käesolev dokument ei ole ette nähtud täitmiseks vaid tingimustega tutvumiseks. Ettevõtja täidab hankepassi elektrooniliselt infosüsteemis või ESPD teenuses. I OSA: HANKE JA HANKIJAGA SEOTUD TEAVE Teave avaldamise kohta Teate number ELTs: - ELT URL: Riigi ametlik teataja: 308114 Kui Euroopa Liidu Teataj",
+            "source": "files/files_unpacked/308114_hankepass_taiendavate_selgitustega.pdf",
+            "source_url": null,
+            "source_sha256": "b5035fa176016280ee699ef0c0e5e7db8de2dc416a5eb343e742201960a10d9c",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 269361,
+            "corpus_end": 270665,
+            "match": "ESPD"
+          },
+          {
+            "text": "taType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">EVIDENCE_IDENTIFIER</cbc:ValueDataTypeCode> </cac:TenderingCriterionProperty> </cac:SubsidiaryTenderingCriterionPropertyGroup> </cac:TenderingCriterionPropertyGroup> </cac:TenderingCriterion> </QualificationApplicationRequest> ===== FILE: files/files_unpacked/308114_hankepass_taiendavate_selgitustega.pdf ===== 1 / 21 Koostatud 25.03.2026 16:07:28 https://riigihanked.riik.ee/rhr-web/#/procurement/10096649/general-info HANKEPASS Hankepass ehk Euroopa ühtne hankedokument (ESPD) on ettevõtja enda kinnitus, mis on esialgne tõend ametiasutuste või kolmandate isikute poolt väljastatavate tõendite asemel. Käesolev PDF vormingus registri poolt koostatud dokument on selgitava iseloomuga ja sisaldab hankija sätestatud tingimusi, ettevõtjalt oodatavate vastuste vormingu vaadet ja registri poolt lisatud viiteid RHS-ile. Käesolev dokument ei ole ette nähtud täitmiseks vaid tingimustega tutvumiseks. Ettevõtja täidab hankepassi elektrooniliselt infosüsteemis või ESPD teenuses. I OSA: HANKE JA HANKIJAGA SEOTUD TEAVE Teave avaldamise kohta Teate number ELTs: - ELT URL: Riigi ametlik teataja: 308114 Kui Euroopa Liidu Teatajas hankekuulutust avaldatud ei ole või kui selle avaldamist ei nõuta, peab avali",
+            "source": "files/files_unpacked/308114_hankepass_taiendavate_selgitustega.pdf",
+            "source_url": null,
+            "source_sha256": "b5035fa176016280ee699ef0c0e5e7db8de2dc416a5eb343e742201960a10d9c",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 269439,
+            "corpus_end": 270745,
+            "match": "mandat"
+          },
+          {
+            "text": "1 Koostatud 25.03.2026 16:07:28 https://riigihanked.riik.ee/rhr-web/#/procurement/10096649/general-info HANKEPASS Hankepass ehk Euroopa ühtne hankedokument (ESPD) on ettevõtja enda kinnitus, mis on esialgne tõend ametiasutuste või kolmandate isikute poolt väljastatavate tõendite asemel. Käesolev PDF vormingus registri poolt koostatud dokument on selgitava iseloomuga ja sisaldab hankija sätestatud tingimusi, ettevõtjalt oodatavate vastuste vormingu vaadet ja registri poolt lisatud viiteid RHS-ile. Käesolev dokument ei ole ette nähtud täitmiseks vaid tingimustega tutvumiseks. Ettevõtja täidab hankepassi elektrooniliselt infosüsteemis või ESPD teenuses. I OSA: HANKE JA HANKIJAGA SEOTUD TEAVE Teave avaldamise kohta Teate number ELTs: - ELT URL: Riigi ametlik teataja: 308114 Kui Euroopa Liidu Teatajas hankekuulutust avaldatud ei ole või kui selle avaldamist ei nõuta, peab avaliku sektori hankija või võrgustiku sektori hankija ise teabe esitama, et hankemenetlust saaks üheselt identifitseerida (nt viide siseriikliku avaldamise kohta). Hankija andmed Ametlik nimi: Mittetulundusühing Eesti Jäätmehoolduskeskus (80195414) Riik: Eesti Hankija aadress: Pärnu tn 58 Hankija veebiaadress: http://www.ejhk.ee E-posti aadress: Info@ejhk.ee 2 / 21 Koostatud 25.03.2026 16:07:28 https://riigihank",
+            "source": "files/files_unpacked/308114_hankepass_taiendavate_selgitustega.pdf",
+            "source_url": null,
+            "source_sha256": "b5035fa176016280ee699ef0c0e5e7db8de2dc416a5eb343e742201960a10d9c",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 269854,
+            "corpus_end": 271158,
+            "match": "ESPD"
+          }
+        ],
+        "submission": [],
+        "ip_data_security": [
+          {
+            "text": "used • Lisaleht, kuhu on võimalik lisada KOV-i puudutavat jäätmeinfot ja teemakohaseid teenuseid. C. Administraatori vaade (KOV tasandil): • Ülevaade kõigist jäätmejaamadest/korduskasutuspunktidest, lisaks eraldiseisvad pakkumised omavalitsuste kaupa. • Kasutajate haldus • Sündmuste logi • Statistika eksport (CSV, PDF) • Platvormi sisu ja kasutustingimuste haldus Tehnilised nõuded • Veebipõhine platvorm, mis on kasutatav mobiilis, tahvlis, arvutis • Keeled: eesti keel (võimalus lisada vene, inglise) • Ligipääsetav nägemispuudega inimestele • Autentimine: kasutajatele valikuline, haldajatele kohustuslik • Andmekaitse: vastavus GDPR nõuetele • Serveri asukoht: EL (soovitavalt Eesti pilveteenus) • Andmete varundus ja turvalisus peab olema tagatud • Liidestatavus potentsiaalsete väliste süsteemidega (nt KOV infosüsteemid, X- tee) Visuaal ja kasutajakogemus • Visuaalselt puhas ja lihtne disain (selged kategooriad) • Kiire laadimine, minimaalsed klõpsud • Kujundus peab olema minimalistlik ja toetama jätkusuutlikkuse ja ringmajanduse sõnumit, aga värvilahenduses ei tohi domineerida roheline värv. ===== FILE: files/portal_page.txt ===== Alla Üles Riigihangete Register Päise valikud Sisene Juurdepääsetavus In English Peanavigatsioon Avaleht Otsing E-kataloog A",
+            "source": "files/files_unpacked/Tehniline kirjeldus platvormile.pdf",
+            "source_url": null,
+            "source_sha256": "05c2302fe31a3018e9d281a7bbd249012eca06151efb089e199d1a1fb5f5d157",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 336425,
+            "corpus_end": 337729,
+            "match": "GDPR"
+          }
+        ]
+      },
+      "source_dce_run_id": 32571748480,
+      "source_shard": 0,
+      "hot_ready_at": "2026-08-22T14:51:26.999298+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 17,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32571748480,
+        "shard": 0,
+        "candidate_id": "EE-RHR:dec2736a-b53e-4c3a-916b-ca191ff87528",
+        "release_tag": "dce-harvest-32571748480"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "EE-RHR:dec2736a-b53e-4c3a-916b-ca191ff87528",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 340732,
+        "documents_indexed": 8,
+        "documents_with_text": 7,
+        "source_urls": [
+          "https://riigihanked.riik.ee/rhr-web/#/procurement/10096649/documents?group=B"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "edendamiseks",
+            "jäätmejaamades",
+            "korduskasutuse",
+            "vahendusplatvorm"
+          ],
+          "hits": [
+            "edendamiseks",
+            "jäätmejaamades",
+            "korduskasutuse",
+            "vahendusplatvorm"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 14,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "4680fa5d57188295ac9d23ded6ec3cf8c479b78090226d5a9073f1989ce04300",
+      "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
+      "gpt_priority_score": 17,
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32571748480,
+        "shard": 0,
+        "candidate_id": "EE-RHR:dec2736a-b53e-4c3a-916b-ca191ff87528",
+        "release_tag": "dce-harvest-32571748480"
+      },
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
+      "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     },
     {
       "candidate_id": "PL-BZP:08defec9-4a1d-f4f3-b346-0300019cc6cf",
@@ -954,7 +1613,8 @@
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
+      "procedure_aliases": [],
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "a4b49b690337b655563e54ea273c6423b308eb099777ad9226c5052bf1ce7757",
@@ -969,7 +1629,7 @@
         "candidate_id": "PL-BZP:08defec9-4a1d-f4f3-b346-0300019cc6cf",
         "release_tag": null
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     },
     {
@@ -1066,28 +1726,311 @@
       },
       "source_dce_run_id": 32579878511,
       "source_shard": 1,
-      "hot_ready_at": "2026-08-22T14:50:56.202772+00:00",
+      "hot_ready_at": "2026-08-22T14:51:26.999298+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 13,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32579878511,
+        "shard": 1,
+        "candidate_id": "WORLD-BANK:OP00463510",
+        "release_tag": "dce-harvest-32579878511"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "WORLD-BANK:OP00463510",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 2825,
+        "documents_indexed": 1,
+        "documents_with_text": 1,
+        "source_urls": [
+          "https://search.worldbank.org/api/procnotices?format=json&rows=25&qterm=OP00463510"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "batch",
+            "constructed",
+            "materials",
+            "newly",
+            "printing",
+            "schools",
+            "supply"
+          ],
+          "hits": [
+            "batch",
+            "constructed",
+            "materials",
+            "newly",
+            "printing",
+            "schools",
+            "supply"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 3,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "e57287249891b59d26859be78258a993944a430353c183a6f603f1de150b7aed",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 13,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32579878511,
         "shard": 1,
         "candidate_id": "WORLD-BANK:OP00463510",
-        "release_tag": null
+        "release_tag": "dce-harvest-32579878511"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
+      "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
+    },
+    {
+      "candidate_id": "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
+      "title": "Teavituskampaania veeringluse ja -puhastuse tarbijakeskseks selgitamiseks",
+      "buyer": "AKTSIASELTS TALLINNA VESI",
+      "portal": "EE_RHR",
+      "notice_url": "https://riigihanked.riik.ee/rhr-web/#/procurement/10717844/general-info",
+      "deadline": "2026-09-02T08:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 82,
+      "priority_score": 82,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-09-02T08:00:00+00:00",
+        "notice_deadline_date": "2026-09-02",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 2,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "stutellimuse numbri, mille alusel Teenus on osutatud ning Teenuse üleandmise-vastuvõtmise akti kuupäeva ja numbri, millel toodud Teenuse eest arve esitatakse. 8.4. Täitja esitab arve osutatud Teenuse eest elektrooniliselt e-arvete operaatori vahendusel, kes on ära toodud Tellija äriregistri B-kaardil. E-arve peab vastama Eesti e-arve standardile. Tellija maksetähtaeg on 28 kalendripäeva arvates arve kuupäevast, seejuures arve peab jõudma Tellija e- arvete operaatorini viie kalendripäeva jooksul. Kõik muu arvetesse puutuv (nt üleandmise-vastuvõtmise aktid) tuleb saata e-posti aadressile: arved@tvesi.ee. Juhul, kui Täitja ei ole Eesti resident, esitab ta ka arve elektrooniliselt eelpool toodud e-posti aadressil. 8.5. Arve esitamine mittenõuetekohasel viisil või mittenõuetekohase arve esitamine Täitja poolt vabastab Tellija tasumise kohustusest kuni nõuetekohaselt esitatud nõuetekohase arve saamiseni. 8.6. Lepingu alusel makstavate summade tasumine loetakse teostatuks vastava summa laekumisega poole pangakontole, kusjuures summat tasuv pool ei vastuta summa tasumisega hilinemise eest juhul, kui pank mitteõiguspäraselt viivitab vastava ülekande tegemisega. 9. TEENUSE MUUDATUSED JA LISATEENUSED: 9.1. Teenuse muudatused: 9.1.1. Tellijal on õigus vajadusel nõuda",
+            "source": "files/files_unpacked/Teenuse osutamise leping_unpacked/Lisa 1 Teenuse osutamise üldtingimused.pdf",
+            "source_url": null,
+            "source_sha256": "4d6965dfa267845e53c32bdc85d1a4a564204968a19bb18c5ed4e45ccf28fe9b",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 38057,
+            "corpus_end": 39365,
+            "match": "resident"
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [
+          {
+            "text": "l tuginetud, peab asendav alltöövõtja vastama vähemalt samaväärsetele näitajatele, mille osas tugineti. Tellijal on õigus kontrollida lisanduva alltöövõtja kvalifikatsiooni ning kõrvaldamise aluste puudumist, sh keelduda alltöövõtja kooskõlastamisest ja nõuda tema asendamist vastavalt riigihangete seaduses sätestatule; 3.1.6.2. lisanduv alltöövõtja kooskõlastatakse Tellija kontaktisikuga kirjalikku taasesitamist võimaldavalt ning Tellijal on õigus lisanduvat alltöövõtjat kontrollida vastavalt eelmises punktis toodule; 3.1.7. ilma Tellija eelneva kirjaliku nõusolekuta mitte andma Lepingust tulenevaid Täitja õigusi ja kohustusi üle kolmandatele isikutele. Tellijal on õigus keelduda vastavasisulise nõusoleku andmisest; 3.1.8. tagama oma ja alltöövõtjate töötajate olmetingimuste vastavuse õigusaktidega kehtestatud nõuetele; 3.1.9. kaitsma ja mitte ohtu seadma inimeste elu ja tervist, vara, mainet ja keskkonda. Täitja vastutab ise oma vara valve eest ning kohustub võtma tarvitusele kõik abinõud Tellija poolt temale usaldatud vara säilimise tagamiseks ja kandma vastutust igasuguse nimetatud vara kaotsimineku või kahjustamise eest; 3.1.10. tegutsema Teenuse osutamisel vastavuses Tellija keskkonnapoliitikaga ja kontrollima olulistest keskkonnaaspektidest tulenevat negatii",
+            "source": "files/files_unpacked/Teenuse osutamise leping_unpacked/Lisa 1 Teenuse osutamise üldtingimused.pdf",
+            "source_url": null,
+            "source_sha256": "4d6965dfa267845e53c32bdc85d1a4a564204968a19bb18c5ed4e45ccf28fe9b",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 25949,
+            "corpus_end": 27255,
+            "match": "mandat"
+          },
+          {
+            "text": "ise aktile allakirjutamist ja ekspertiisi kulude hüvitamist (v.a Teenuse osas, milles tuvastati puudused). Eksperdi valik kooskõlastatakse eelnevalt Tellijaga. 7.5. Täiendavate tööde, teenuste ja toimingute eest, mis tulenevad osutatud Teenuse mittevastavuste likvideerimisest, Tellija tasu ei maksa. Nimetatud tegevused kohustub Täitja teostama omal kulul. Juhul, kui Täitja ei ole Tellija nõudmisest hoolimata eelnimetatud mittevastavusi kõrvaldanud, on Tellijal õigus pärast täitmiseks antud täiendava tähtaja soovitud tulemusteta möödumist (loobumata õigusest kasutada teisi õiguskaitsevahendeid) kõrvaldada mittevastavused ise või kolmandate isikute abiga, millega seonduvad kulud peab Täitja Tellijale hüvitama. 7.6. Tellijal on õigus lasta Teenus või selle osa üle vaadata kolmandatel isikutel (ekspertidel), sh tellida Teenusele või selle osale ekspertiis. Juhul, kui selle tulemusel selgub, et Teenus või selle osa ei vasta nõuetele, on Tellijal õigus Teenuse või selle osa üleandmisest-vastuvõtmisest keelduda. Kolmandate isikute kaasamisel pikeneb punktis 7.3. nimetatud Tellijapoolne ülevaatusperiood sama perioodi võrra, kui Tellija ei teavita Töövõtjat pikemast tähtajast. 8. ARVELDUSED 8.1. Tellija tasub Täitjale esitatavate arvete alusel tegelikult osutatud Teenus",
+            "source": "files/files_unpacked/Teenuse osutamise leping_unpacked/Lisa 1 Teenuse osutamise üldtingimused.pdf",
+            "source_url": null,
+            "source_sha256": "4d6965dfa267845e53c32bdc85d1a4a564204968a19bb18c5ed4e45ccf28fe9b",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 36365,
+            "corpus_end": 37671,
+            "match": "mandat"
+          },
+          {
+            "text": "t Tellijaga. 7.5. Täiendavate tööde, teenuste ja toimingute eest, mis tulenevad osutatud Teenuse mittevastavuste likvideerimisest, Tellija tasu ei maksa. Nimetatud tegevused kohustub Täitja teostama omal kulul. Juhul, kui Täitja ei ole Tellija nõudmisest hoolimata eelnimetatud mittevastavusi kõrvaldanud, on Tellijal õigus pärast täitmiseks antud täiendava tähtaja soovitud tulemusteta möödumist (loobumata õigusest kasutada teisi õiguskaitsevahendeid) kõrvaldada mittevastavused ise või kolmandate isikute abiga, millega seonduvad kulud peab Täitja Tellijale hüvitama. 7.6. Tellijal on õigus lasta Teenus või selle osa üle vaadata kolmandatel isikutel (ekspertidel), sh tellida Teenusele või selle osale ekspertiis. Juhul, kui selle tulemusel selgub, et Teenus või selle osa ei vasta nõuetele, on Tellijal õigus Teenuse või selle osa üleandmisest-vastuvõtmisest keelduda. Kolmandate isikute kaasamisel pikeneb punktis 7.3. nimetatud Tellijapoolne ülevaatusperiood sama perioodi võrra, kui Tellija ei teavita Töövõtjat pikemast tähtajast. 8. ARVELDUSED 8.1. Tellija tasub Täitjale esitatavate arvete alusel tegelikult osutatud Teenuse eest. 8.2. Täitjal ei ole õigust esitada arvet enne, kui Teenus või selle osa on Tellija poolt vastu võetud. Tellijal ei teki makse tasumise k",
+            "source": "files/files_unpacked/Teenuse osutamise leping_unpacked/Lisa 1 Teenuse osutamise üldtingimused.pdf",
+            "source_url": null,
+            "source_sha256": "4d6965dfa267845e53c32bdc85d1a4a564204968a19bb18c5ed4e45ccf28fe9b",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 36513,
+            "corpus_end": 37819,
+            "match": "mandat"
+          },
+          {
+            "text": "Tellija nõudmisest hoolimata eelnimetatud mittevastavusi kõrvaldanud, on Tellijal õigus pärast täitmiseks antud täiendava tähtaja soovitud tulemusteta möödumist (loobumata õigusest kasutada teisi õiguskaitsevahendeid) kõrvaldada mittevastavused ise või kolmandate isikute abiga, millega seonduvad kulud peab Täitja Tellijale hüvitama. 7.6. Tellijal on õigus lasta Teenus või selle osa üle vaadata kolmandatel isikutel (ekspertidel), sh tellida Teenusele või selle osale ekspertiis. Juhul, kui selle tulemusel selgub, et Teenus või selle osa ei vasta nõuetele, on Tellijal õigus Teenuse või selle osa üleandmisest-vastuvõtmisest keelduda. Kolmandate isikute kaasamisel pikeneb punktis 7.3. nimetatud Tellijapoolne ülevaatusperiood sama perioodi võrra, kui Tellija ei teavita Töövõtjat pikemast tähtajast. 8. ARVELDUSED 8.1. Tellija tasub Täitjale esitatavate arvete alusel tegelikult osutatud Teenuse eest. 8.2. Täitjal ei ole õigust esitada arvet enne, kui Teenus või selle osa on Tellija poolt vastu võetud. Tellijal ei teki makse tasumise kohustust enne, kui talle on esitatud vastav arve Teenuse eest, mis on tema poolt üleandmise- vastuvõtmise akti allkirjastamisega vastu võetud. 8.3. Täitja on kohustatud Tellijale esitatud arvel näitama ära Tellija kontaktisiku nime, ostutel",
+            "source": "files/files_unpacked/Teenuse osutamise leping_unpacked/Lisa 1 Teenuse osutamise üldtingimused.pdf",
+            "source_url": null,
+            "source_sha256": "4d6965dfa267845e53c32bdc85d1a4a564204968a19bb18c5ed4e45ccf28fe9b",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 36757,
+            "corpus_end": 38063,
+            "match": "mandat"
+          }
+        ],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32571126517,
+      "source_shard": 0,
+      "hot_ready_at": "2026-08-22T14:51:26.999298+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 12,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32571126517,
+        "shard": 0,
+        "candidate_id": "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
+        "release_tag": "dce-harvest-32571126517"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 73370,
+        "documents_indexed": 11,
+        "documents_with_text": 9,
+        "source_urls": [
+          "https://riigihanked.riik.ee/rhr-web/#/procurement/10717844/documents?group=B"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "puhastuse",
+            "selgitamiseks",
+            "tarbijakeskseks",
+            "teavituskampaania",
+            "veeringluse"
+          ],
+          "hits": [
+            "puhastuse",
+            "selgitamiseks",
+            "tarbijakeskseks",
+            "teavituskampaania",
+            "veeringluse"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 5,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "366addd56329c024583ca9443a4a61d756bee44448cf68606cd1f0103b26d7e4",
+      "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
+      "gpt_priority_score": 12,
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32571126517,
+        "shard": 0,
+        "candidate_id": "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
+        "release_tag": "dce-harvest-32571126517"
+      },
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     }
   ],
@@ -1798,29 +2741,688 @@
       },
       "source_dce_run_id": 32575392123,
       "source_shard": 0,
-      "hot_ready_at": "2026-08-22T13:20:04.714345+00:00",
+      "hot_ready_at": "2026-08-22T14:51:26.999298+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 21,
       "spm_fit_band": "MAYBE",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32575392123,
+        "shard": 0,
+        "candidate_id": "TED:515650-2026",
+        "release_tag": "dce-harvest-32575392123"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "TED:515650-2026",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 179266,
+        "documents_indexed": 7,
+        "documents_with_text": 7,
+        "source_urls": [
+          "https://www.meinauftrag.rib.de/public/publications/603754",
+          "https://my.vergabeplattform.berlin.de/remote/download.php?k=beb2f7012fdb03e7ef9e70662eb2ce1b",
+          "https://my.vergabeplattform.berlin.de/remote/download.php?k=67ca8637c8bcf13e60d2b9fc061256f9",
+          "https://my.vergabeplattform.berlin.de/remote/download.php?k=758f5fee7d013f2b77eecf7c51a4d9f4",
+          "https://my.vergabeplattform.berlin.de/remote/download.php?k=beb2f7012fdb03e7ef9e70662eb2ce1b&down"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "Leistungsbeschreibung",
+          "Vergabeunterlagen",
+          "Zuschlagskriterien",
+          "Eignungskriterien",
+          "Angebotsfrist",
+          "Preisblatt"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "berlin",
+            "drucksystem",
+            "germany",
+            "itdz",
+            "machinery",
+            "printing"
+          ],
+          "hits": [
+            "berlin",
+            "drucksystem",
+            "itdz"
+          ],
+          "ratio": 0.5
+        },
+        "reasons": [
+          "multiple_authoritative_procurement_markers_detected"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 37,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
       "review_lane": "SPM_PRIORITY",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "22acc0ab454c6c6a13703ff52926beaea6c4942cdb73e406b190c729069fce33",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 21,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
-      "inbox_live_source": "existing_inbox",
+      "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32575392123,
         "shard": 0,
         "candidate_id": "TED:515650-2026",
-        "release_tag": null
+        "release_tag": "dce-harvest-32575392123"
       },
       "upstream_review_lane": "SPM_PRIORITY",
       "inbox_lane": "GPT_PRIORITY"
+    },
+    {
+      "candidate_id": "TED:578894-2026",
+      "title": "Austria – Photocopying and offset printing equipment – MFP-Rahmenvereinbarung (Multifunktionsdrucker)",
+      "buyer": "Stadt Wels",
+      "portal": "TED",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/578894-2026",
+      "deadline": "2026-08-26T08:00:00+02:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 80,
+      "priority_score": 80,
+      "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+      "gate_readiness": false,
+      "deadline_authority": {},
+      "deadline_authority_status": "MISSING",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 0,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32575392123,
+      "source_shard": 0,
+      "hot_ready_at": "2026-08-22T14:51:26.999298+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 10,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "upstream_classification": "YELLOW",
+      "review_stage": "DCE_AUTHENTICITY",
+      "dce_authenticity_review_required": true,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32575392123,
+        "shard": 0,
+        "candidate_id": "TED:578894-2026",
+        "release_tag": "dce-harvest-32575392123"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "TED:578894-2026",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DCE_CONTENT_UNVERIFIED",
+        "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "gate_readiness": false,
+        "text_chars": 17700,
+        "documents_indexed": 2,
+        "documents_with_text": 2,
+        "source_urls": [
+          "https://wels.vemap.com/sw-classic/files/Datenschutzrechtliche_Hinweise.pdf"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [
+          "Datenschutzrechtliche_Hinweise.pdf"
+        ],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "austria",
+            "equipment",
+            "multifunktionsdrucker",
+            "offset",
+            "photocopying",
+            "printing",
+            "rahmenvereinbarung"
+          ],
+          "hits": [
+            "austria"
+          ],
+          "ratio": 0.1429
+        },
+        "reasons": [
+          "download_succeeded_but_authoritative_dce_content_not_proven"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 0,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": false
+      },
+      "procedure_aliases": [],
+      "review_lane": "DCE_AUTHENTICITY_REPAIR",
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "1fd1ad4b648064caf46f3a589f3887baff13924f80e88ed7ec981edf94f37d21",
+      "recommended_gpt_action": "GPT_WEB_VERIFY_DCE_AUTHENTICITY",
+      "gpt_priority_score": 10,
+      "upstream_signal": "YELLOW",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32575392123,
+        "shard": 0,
+        "candidate_id": "TED:578894-2026",
+        "release_tag": "dce-harvest-32575392123"
+      },
+      "upstream_review_lane": "DCE_AUTHENTICITY_REPAIR",
+      "inbox_lane": "DCE_AUTHENTICITY_REPAIR"
+    },
+    {
+      "candidate_id": "US-SAM:08a05cf5f1434384b559b7b0c336d24e",
+      "title": "AN/BYG-1 Applications",
+      "buyer": "DEPT OF DEFENSE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/opp/08a05cf5f1434384b559b7b0c336d24e/view",
+      "deadline": "2026-10-19T20:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 82,
+      "priority_score": 82,
+      "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+      "gate_readiness": false,
+      "deadline_authority": {},
+      "deadline_authority_status": "MISSING",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 0,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32571748480,
+      "source_shard": 1,
+      "hot_ready_at": "2026-08-22T14:51:26.999298+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 10,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "upstream_classification": "YELLOW",
+      "review_stage": "DCE_AUTHENTICITY",
+      "dce_authenticity_review_required": true,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32571748480,
+        "shard": 1,
+        "candidate_id": "US-SAM:08a05cf5f1434384b559b7b0c336d24e",
+        "release_tag": "dce-harvest-32571748480"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "US-SAM:08a05cf5f1434384b559b7b0c336d24e",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DCE_CONTENT_UNVERIFIED",
+        "content_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "gate_readiness": false,
+        "text_chars": 5501,
+        "documents_indexed": 3,
+        "documents_with_text": 3,
+        "source_urls": [
+          "https://iae-fbo-attachments.s3.amazonaws.com/fbo/files/954/95449cd16f6949e2ac3ff80580c9d26f.xlsx?response-content-disposition=attachment%3B%20filename%3DOfferors%2BQuestion%2BSubmittal%2BForm.xlsx&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260822T115954Z&X-Amz-SignedHeaders=host&X-Amz-Expires=9&X-Amz-Credential=AKIAY3LPYEEXZ5J7ESLR%2F20260822%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=599800fc28ef42fbf85c3a795e261065439f105816f00b1930e84ec6aa7c8e02"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [
+          "Terms_of_Use_Agreement.docx"
+        ],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [
+          "REQUEST FOR PROPOSAL"
+        ],
+        "candidate_title_overlap": {
+          "tokens": [
+            "applications"
+          ],
+          "hits": [],
+          "ratio": 0.0
+        },
+        "reasons": [
+          "download_succeeded_but_authoritative_dce_content_not_proven"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 0,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": false
+      },
+      "procedure_aliases": [
+        "sam_opp:08a05cf5f1434384b559b7b0c336d24e"
+      ],
+      "review_lane": "DCE_AUTHENTICITY_REPAIR",
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "b06a096eef7b9e90e1d240f2fd897bb73809657a0db0c42cf77c7b00566ce39e",
+      "recommended_gpt_action": "GPT_WEB_VERIFY_DCE_AUTHENTICITY",
+      "gpt_priority_score": 10,
+      "upstream_signal": "YELLOW",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32571748480,
+        "shard": 1,
+        "candidate_id": "US-SAM:08a05cf5f1434384b559b7b0c336d24e",
+        "release_tag": "dce-harvest-32571748480"
+      },
+      "upstream_review_lane": "DCE_AUTHENTICITY_REPAIR",
+      "inbox_lane": "DCE_AUTHENTICITY_REPAIR"
+    },
+    {
+      "candidate_id": "EE-RHR:dec2736a-b53e-4c3a-916b-ca191ff87528",
+      "title": "Vahendusplatvorm jäätmejaamades korduskasutuse edendamiseks",
+      "buyer": "Mittetulundusühing Eesti Jäätmehoolduskeskus",
+      "portal": "EE_RHR",
+      "notice_url": "https://riigihanked.riik.ee/rhr-web/#/procurement/10096649/general-info",
+      "deadline": "2026-09-04T09:00:00+00:00",
+      "estimated_value": 97500.0,
+      "currency": "EUR",
+      "preliminary_score": 82,
+      "priority_score": 82,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-09-04T09:00:00+00:00",
+        "notice_deadline_date": "2026-09-04",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 7,
+      "evidence_by_gate": {
+        "entity_geography": [],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [
+          {
+            "text": "<cbc:ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">EVIDENCE_IDENTIFIER</cbc:ValueDataTypeCode> </cac:TenderingCriterionProperty> </cac:SubsidiaryTenderingCriterionPropertyGroup> </cac:TenderingCriterionPropertyGroup> </cac:TenderingCriterion> <cac:TenderingCriterion> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">5a8dea31-5db9-4e03-862b-07810aa6a7fd</cbc:ID> <cbc:CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">CRITERION.OTHER.EO_DATA.CONTRIBUTIONS_CERTIFICATES</cbc:CriterionTypeCode> <cbc:Name>Ettevõtja kinnitused maksude tasumise kohta</cbc:Name> <cbc:Description languageID=\"ET\">Kas ettevõtja saab esitada tõendi sotsiaalkindlustusmaksete ja maksude tasumise kohta või esitada teabe, mis võimaldaks avaliku sektori hankijal või võrgustiku sektori hankijal saada sellise teabe otse ükskõik millise liikmesriigi tasuta andmebaasist?</cbc:Description> <cac:Legislation> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">c753a2c5-59e6-4970-b6eb-27224e96bf76</cbc:ID> <cbc:Title languageID=\"ET\"/> <cbc:Descripti",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 253147,
+            "corpus_end": 254458,
+            "match": "CERTIFICATE"
+          }
+        ],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [
+          {
+            "text": "<cbc:ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">EVIDENCE_IDENTIFIER</cbc:ValueDataTypeCode> </cac:TenderingCriterionProperty> </cac:SubsidiaryTenderingCriterionPropertyGroup> </cac:TenderingCriterionPropertyGroup> </cac:TenderingCriterion> <cac:TenderingCriterion> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">72c0c4b1-ca50-4667-9487-461f3eed4ed7</cbc:ID> <cbc:CriterionTypeCode listID=\"CriteriaTypeCode\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">CRITERION.OTHER.EO_DATA.SUBCONTRACTS_WITH_THIRD_PARTIES</cbc:CriterionTypeCode> <cbc:Name>Teave nende allhankijate kohta, kelle näitajatele ettevõtja ei tugine</cbc:Name> <cbc:Description languageID=\"ET\">Kas ettevõtja kavatseb sõlmida lepingu mis tahes osa kohta allhanke kolmanda isikuga?</cbc:Description> <cac:Legislation> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">c753a2c5-59e6-4970-b6eb-27224e96bf76</cbc:ID> <cbc:Title languageID=\"ET\"/> <cbc:Description languageID=\"ET\"/> <cac:Language> <cbc:LocaleCode listID=\"LanguageCodeEU\" listAgencyName=\"E",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 242551,
+            "corpus_end": 243862,
+            "match": "SUBCONTRACT"
+          }
+        ],
+        "deliverables_scope": [
+          {
+            "text": "===== FILE: files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\"?> <QualificationApplicationRequest xmlns:ext=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\" xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:QualificationApplicationRequest-2\" xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:efac=\"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1\" xmlns:efbc=\"http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1\" xmlns:efext=\"http://data.europa.eu/p27/eforms-ubl-extensions/1\"> <cbc:UBLVersionID schemeAgencyID=\"OASIS-UBL-TC\">2.2</cbc:UBLVersionID> <cbc:CustomizationID schemeAgencyID=\"CEN-BII\"",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 0,
+            "corpus_end": 834,
+            "match": "specification"
+          }
+        ],
+        "sla_onsite": [
+          {
+            "text": "onID=\"2.0.2\">CRITERION.EXCLUSION.CONVICTIONS.PARTICIPATION_IN_CRIMINAL_ORGANISATION</cbc:CriterionTypeCode> <cbc:Name>Osalemine kuritegelikus organisatsioonis</cbc:Name> <cbc:Description languageID=\"ET\">Kas ettevõtja ise või tema haldus-, juht- või järelevalveorgani liige või isik, kellel on volitused seda ettevõtjat esindada, tema nimel otsuseid teha või teda kontrollida, on lõpliku süüdimõistva kohtuotsusega süüdi mõistetud kuritegelikus organisatsioonis osalemise eest kõige rohkem viimase viie aasta jooksul või kehtib süüdimõistvas kohtuotsuses sätestatud kõrvalejäämise kohustus endiselt?</cbc:Description> <cac:Legislation> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">c753a2c5-59e6-4970-b6eb-27224e96bf76</cbc:ID> <cbc:Title languageID=\"ET\">RHS § 95 lg 1 p 1 \"keda või kelle haldus-, juhtimis- või järelevalveorgani liiget, prokuristi või muud isikut, kellel on volitus seda ettevõtjat esindada, tema nimel otsuseid teha või teda kontrollida, on karistatud kuritegelikus ühenduses osalemise eest\". Kui hankemenetlusest kõrvaldamise alus esineb, võib ettevõtja soovi korral esitada tõendeid selle kohta, et ta on võtnud meetmeid oma usaldusväärsuse taastamiseks. Heastamise võimalus on ettevõtjal juh",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 4003,
+            "corpus_end": 5306,
+            "match": "sla"
+          },
+          {
+            "text": "esindada, tema nimel otsuseid teha või teda kontrollida, on karistatud kuritegelikus ühenduses osalemise eest\". Kui hankemenetlusest kõrvaldamise alus esineb, võib ettevõtja soovi korral esitada tõendeid selle kohta, et ta on võtnud meetmeid oma usaldusväärsuse taastamiseks. Heastamise võimalus on ettevõtjal juhul, kui tegemist on rahvusvahelist piirmäära ületava hankega või hankija on selle hanke alusdokumentides ette näinud.</cbc:Description> <cac:Language> <cbc:LocaleCode listID=\"LanguageCodeEU\" listAgencyName=\"EU-COM-GROW\" listVersionID=\"2.0.2\">ET</cbc:LocaleCode> </cac:Language> </cac:Legislation> <cac:TenderingCriterionPropertyGroup> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">7c637c0c-7703-4389-ba52-02997a055bd7</cbc:ID> <cbc:PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">ON*</cbc:PropertyGroupTypeCode> <cac:TenderingCriterionProperty> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">8a42266c5fb24e32ff421942459d66ac-1.1</cbc:ID> <cbc:Description languageID=\"ET\">Mis on Teie vastus?</cbc:Description> <cbc:",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 5625,
+            "corpus_end": 6928,
+            "match": "sla"
+          },
+          {
+            "text": "TypeCode> <cbc:Name>Korruptsioon</cbc:Name> <cbc:Description languageID=\"ET\">Kas ettevõtja ise või tema haldus-, juht- või järelevalveorgani liige või isik, kellel on volitused seda ettevõtjat esindada, tema nimel otsuseid teha või teda kontrollida, on lõpliku süüdimõistva kohtuotsusega süüdi mõistetud korruptsiooni eest kõige rohkem viimase viie aasta jooksul või kehtib süüdimõistvas kohtuotsuses sätestatud kõrvalejäämise kohustus endiselt? See kõrvalejätmise alus hõlmab ka korruptsiooni avaliku sektori hankija (võrgustiku sektori hankija) või ettevõtja riigi õiguses sätestatud määratluses.</cbc:Description> <cac:Legislation> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">c753a2c5-59e6-4970-b6eb-27224e96bf76</cbc:ID> <cbc:Title languageID=\"ET\">RHS § 95 lg 1 p 1 ja lg 2 \"keda või kelle haldus-, juhtimis- või järelevalveorgani liiget, prokuristi või muud isikut, kellel on volitus seda ettevõtjat esindada, tema nimel otsuseid teha või teda kontrollida, on karistatud aususe kohustuse rikkumise või korruptiivse teo eest\". Kui hankemenetlusest kõrvaldamise alus esineb, võib ettevõtja soovi korral esitada tõendeid selle kohta, et ta on võtnud meetmeid oma usaldusväärsuse taastamiseks. Heastamise võim",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 15038,
+            "corpus_end": 16341,
+            "match": "sla"
+          },
+          {
+            "text": "a nimel otsuseid teha või teda kontrollida, on karistatud aususe kohustuse rikkumise või korruptiivse teo eest\". Kui hankemenetlusest kõrvaldamise alus esineb, võib ettevõtja soovi korral esitada tõendeid selle kohta, et ta on võtnud meetmeid oma usaldusväärsuse taastamiseks. Heastamise võimalus on ettevõtjal juhul, kui tegemist on rahvusvahelist piirmäära ületava hankega või hankija on selle hanke alusdokumentides ette näinud.</cbc:Description> <cac:Language> <cbc:LocaleCode listID=\"LanguageCodeEU\" listAgencyName=\"EU-COM-GROW\" listVersionID=\"2.0.2\">ET</cbc:LocaleCode> </cac:Language> </cac:Legislation> <cac:TenderingCriterionPropertyGroup> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">7c637c0c-7703-4389-ba52-02997a055bd7</cbc:ID> <cbc:PropertyGroupTypeCode listID=\"PropertyGroupType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">ON*</cbc:PropertyGroupTypeCode> <cac:TenderingCriterionProperty> <cbc:ID schemeID=\"CriteriaTaxonomy\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"2.0.2\">94bafa958a57a2f5fa7af1f5c03b1e54-1.1</cbc:ID> <cbc:Description languageID=\"ET\">Mis on Teie vastus?</cbc:Description> <cbc:",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 16704,
+            "corpus_end": 18007,
+            "match": "sla"
+          }
+        ],
+        "term_value": [
+          {
+            "text": "===== FILE: files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\"?> <QualificationApplicationRequest xmlns:ext=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\" xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:QualificationApplicationRequest-2\" xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:efac=\"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1\" xmlns:efbc=\"http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1\" xmlns:efext=\"http://data.europa.eu/p27/eforms-ubl-extensions/1\"> <cbc:UBLVersionID schemeAgencyID=\"OASIS-UBL-TC\">2.2</cbc:UBLVersionID> <cbc:CustomizationID schemeAgencyID=\"CEN-BII\" schemeVersionID=\"3.0\">urn:www.c",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 0,
+            "corpus_end": 865,
+            "match": "Extension"
+          },
+          {
+            "text": "D_v2.0_laiendatud.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\"?> <QualificationApplicationRequest xmlns:ext=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\" xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:QualificationApplicationRequest-2\" xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:efac=\"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1\" xmlns:efbc=\"http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1\" xmlns:efext=\"http://data.europa.eu/p27/eforms-ubl-extensions/1\"> <cbc:UBLVersionID schemeAgencyID=\"OASIS-UBL-TC\">2.2</cbc:UBLVersionID> <cbc:CustomizationID schemeAgencyID=\"CEN-BII\" schemeVersionID=\"3.0\">urn:www.cenbii.eu:transaction:biitrdm070:ver3.0</cbc:CustomizationID> <cbc:ProfileID schemeAgencyID=\"CEN-BII\" schemeVersionID=\"2.0\">4.1</cbc:ProfileID> <cbc:ID schemeAgencyID=\"RHR\">ae36efa0-f8ac-4690-b394-7604f4dc3dcd</cbc:ID> <cbc:CopyIndicator>false</cbc:CopyIndicator> <cbc:UUID schemeID=\"ISO/IEC 9834-8:2008\" schemeAgencyID=\"EU-COM-GROW\" schemeVersionID=\"4\">0fddbf2d-1e33-4267-b04f-52b59b72ccb6</cbc:UUID> <cbc:ContractFolderID schemeAgencyID=\"RHR\">308114</cbc:ContractFold",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 44,
+            "corpus_end": 1353,
+            "match": "extension"
+          }
+        ],
+        "award_criteria": [],
+        "forms_signatures": [
+          {
+            "text": "===== FILE: files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml ===== <?xml version=\"1.0\" encoding=\"UTF-8\"?> <QualificationApplicationRequest xmlns:ext=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\" xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:QualificationApplicationRequest-2\" xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:efac=\"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1\" xmlns:efbc=\"http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1\" xmlns:efext=\"http://data.europa.eu/p27/eforms-ubl-e",
+            "source": "files/files_unpacked/308114_ESPD_v2.0_laiendatud.xml",
+            "source_url": null,
+            "source_sha256": "afe9e7dad081e9502505b56ad647a7e4bb98a58c2a2c9af9611ed110ec46ea66",
+            "source_kind": "text",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": true,
+            "corpus_start": 0,
+            "corpus_end": 695,
+            "match": "ESPD"
+          },
+          {
+            "text": "N</cbc:TypeCode> <cbc:ValueDataTypeCode listID=\"ResponseDataType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">EVIDENCE_IDENTIFIER</cbc:ValueDataTypeCode> </cac:TenderingCriterionProperty> </cac:SubsidiaryTenderingCriterionPropertyGroup> </cac:TenderingCriterionPropertyGroup> </cac:TenderingCriterion> </QualificationApplicationRequest> ===== FILE: files/files_unpacked/308114_hankepass_taiendavate_selgitustega.pdf ===== 1 / 21 Koostatud 25.03.2026 16:07:28 https://riigihanked.riik.ee/rhr-web/#/procurement/10096649/general-info HANKEPASS Hankepass ehk Euroopa ühtne hankedokument (ESPD) on ettevõtja enda kinnitus, mis on esialgne tõend ametiasutuste või kolmandate isikute poolt väljastatavate tõendite asemel. Käesolev PDF vormingus registri poolt koostatud dokument on selgitava iseloomuga ja sisaldab hankija sätestatud tingimusi, ettevõtjalt oodatavate vastuste vormingu vaadet ja registri poolt lisatud viiteid RHS-ile. Käesolev dokument ei ole ette nähtud täitmiseks vaid tingimustega tutvumiseks. Ettevõtja täidab hankepassi elektrooniliselt infosüsteemis või ESPD teenuses. I OSA: HANKE JA HANKIJAGA SEOTUD TEAVE Teave avaldamise kohta Teate number ELTs: - ELT URL: Riigi ametlik teataja: 308114 Kui Euroopa Liidu Teataj",
+            "source": "files/files_unpacked/308114_hankepass_taiendavate_selgitustega.pdf",
+            "source_url": null,
+            "source_sha256": "b5035fa176016280ee699ef0c0e5e7db8de2dc416a5eb343e742201960a10d9c",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 269361,
+            "corpus_end": 270665,
+            "match": "ESPD"
+          },
+          {
+            "text": "taType\" listAgencyID=\"EU-COM-GROW\" listVersionID=\"2.0.2\">EVIDENCE_IDENTIFIER</cbc:ValueDataTypeCode> </cac:TenderingCriterionProperty> </cac:SubsidiaryTenderingCriterionPropertyGroup> </cac:TenderingCriterionPropertyGroup> </cac:TenderingCriterion> </QualificationApplicationRequest> ===== FILE: files/files_unpacked/308114_hankepass_taiendavate_selgitustega.pdf ===== 1 / 21 Koostatud 25.03.2026 16:07:28 https://riigihanked.riik.ee/rhr-web/#/procurement/10096649/general-info HANKEPASS Hankepass ehk Euroopa ühtne hankedokument (ESPD) on ettevõtja enda kinnitus, mis on esialgne tõend ametiasutuste või kolmandate isikute poolt väljastatavate tõendite asemel. Käesolev PDF vormingus registri poolt koostatud dokument on selgitava iseloomuga ja sisaldab hankija sätestatud tingimusi, ettevõtjalt oodatavate vastuste vormingu vaadet ja registri poolt lisatud viiteid RHS-ile. Käesolev dokument ei ole ette nähtud täitmiseks vaid tingimustega tutvumiseks. Ettevõtja täidab hankepassi elektrooniliselt infosüsteemis või ESPD teenuses. I OSA: HANKE JA HANKIJAGA SEOTUD TEAVE Teave avaldamise kohta Teate number ELTs: - ELT URL: Riigi ametlik teataja: 308114 Kui Euroopa Liidu Teatajas hankekuulutust avaldatud ei ole või kui selle avaldamist ei nõuta, peab avali",
+            "source": "files/files_unpacked/308114_hankepass_taiendavate_selgitustega.pdf",
+            "source_url": null,
+            "source_sha256": "b5035fa176016280ee699ef0c0e5e7db8de2dc416a5eb343e742201960a10d9c",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 269439,
+            "corpus_end": 270745,
+            "match": "mandat"
+          },
+          {
+            "text": "1 Koostatud 25.03.2026 16:07:28 https://riigihanked.riik.ee/rhr-web/#/procurement/10096649/general-info HANKEPASS Hankepass ehk Euroopa ühtne hankedokument (ESPD) on ettevõtja enda kinnitus, mis on esialgne tõend ametiasutuste või kolmandate isikute poolt väljastatavate tõendite asemel. Käesolev PDF vormingus registri poolt koostatud dokument on selgitava iseloomuga ja sisaldab hankija sätestatud tingimusi, ettevõtjalt oodatavate vastuste vormingu vaadet ja registri poolt lisatud viiteid RHS-ile. Käesolev dokument ei ole ette nähtud täitmiseks vaid tingimustega tutvumiseks. Ettevõtja täidab hankepassi elektrooniliselt infosüsteemis või ESPD teenuses. I OSA: HANKE JA HANKIJAGA SEOTUD TEAVE Teave avaldamise kohta Teate number ELTs: - ELT URL: Riigi ametlik teataja: 308114 Kui Euroopa Liidu Teatajas hankekuulutust avaldatud ei ole või kui selle avaldamist ei nõuta, peab avaliku sektori hankija või võrgustiku sektori hankija ise teabe esitama, et hankemenetlust saaks üheselt identifitseerida (nt viide siseriikliku avaldamise kohta). Hankija andmed Ametlik nimi: Mittetulundusühing Eesti Jäätmehoolduskeskus (80195414) Riik: Eesti Hankija aadress: Pärnu tn 58 Hankija veebiaadress: http://www.ejhk.ee E-posti aadress: Info@ejhk.ee 2 / 21 Koostatud 25.03.2026 16:07:28 https://riigihank",
+            "source": "files/files_unpacked/308114_hankepass_taiendavate_selgitustega.pdf",
+            "source_url": null,
+            "source_sha256": "b5035fa176016280ee699ef0c0e5e7db8de2dc416a5eb343e742201960a10d9c",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 269854,
+            "corpus_end": 271158,
+            "match": "ESPD"
+          }
+        ],
+        "submission": [],
+        "ip_data_security": [
+          {
+            "text": "used • Lisaleht, kuhu on võimalik lisada KOV-i puudutavat jäätmeinfot ja teemakohaseid teenuseid. C. Administraatori vaade (KOV tasandil): • Ülevaade kõigist jäätmejaamadest/korduskasutuspunktidest, lisaks eraldiseisvad pakkumised omavalitsuste kaupa. • Kasutajate haldus • Sündmuste logi • Statistika eksport (CSV, PDF) • Platvormi sisu ja kasutustingimuste haldus Tehnilised nõuded • Veebipõhine platvorm, mis on kasutatav mobiilis, tahvlis, arvutis • Keeled: eesti keel (võimalus lisada vene, inglise) • Ligipääsetav nägemispuudega inimestele • Autentimine: kasutajatele valikuline, haldajatele kohustuslik • Andmekaitse: vastavus GDPR nõuetele • Serveri asukoht: EL (soovitavalt Eesti pilveteenus) • Andmete varundus ja turvalisus peab olema tagatud • Liidestatavus potentsiaalsete väliste süsteemidega (nt KOV infosüsteemid, X- tee) Visuaal ja kasutajakogemus • Visuaalselt puhas ja lihtne disain (selged kategooriad) • Kiire laadimine, minimaalsed klõpsud • Kujundus peab olema minimalistlik ja toetama jätkusuutlikkuse ja ringmajanduse sõnumit, aga värvilahenduses ei tohi domineerida roheline värv. ===== FILE: files/portal_page.txt ===== Alla Üles Riigihangete Register Päise valikud Sisene Juurdepääsetavus In English Peanavigatsioon Avaleht Otsing E-kataloog A",
+            "source": "files/files_unpacked/Tehniline kirjeldus platvormile.pdf",
+            "source_url": null,
+            "source_sha256": "05c2302fe31a3018e9d281a7bbd249012eca06151efb089e199d1a1fb5f5d157",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 336425,
+            "corpus_end": 337729,
+            "match": "GDPR"
+          }
+        ]
+      },
+      "source_dce_run_id": 32571748480,
+      "source_shard": 0,
+      "hot_ready_at": "2026-08-22T14:51:26.999298+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 17,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32571748480,
+        "shard": 0,
+        "candidate_id": "EE-RHR:dec2736a-b53e-4c3a-916b-ca191ff87528",
+        "release_tag": "dce-harvest-32571748480"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "EE-RHR:dec2736a-b53e-4c3a-916b-ca191ff87528",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 340732,
+        "documents_indexed": 8,
+        "documents_with_text": 7,
+        "source_urls": [
+          "https://riigihanked.riik.ee/rhr-web/#/procurement/10096649/documents?group=B"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "edendamiseks",
+            "jäätmejaamades",
+            "korduskasutuse",
+            "vahendusplatvorm"
+          ],
+          "hits": [
+            "edendamiseks",
+            "jäätmejaamades",
+            "korduskasutuse",
+            "vahendusplatvorm"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 14,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "4680fa5d57188295ac9d23ded6ec3cf8c479b78090226d5a9073f1989ce04300",
+      "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
+      "gpt_priority_score": 17,
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32571748480,
+        "shard": 0,
+        "candidate_id": "EE-RHR:dec2736a-b53e-4c3a-916b-ca191ff87528",
+        "release_tag": "dce-harvest-32571748480"
+      },
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
+      "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     },
     {
       "candidate_id": "PL-BZP:08defec9-4a1d-f4f3-b346-0300019cc6cf",
@@ -2043,7 +3645,8 @@
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
+      "procedure_aliases": [],
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "a4b49b690337b655563e54ea273c6423b308eb099777ad9226c5052bf1ce7757",
@@ -2058,7 +3661,7 @@
         "candidate_id": "PL-BZP:08defec9-4a1d-f4f3-b346-0300019cc6cf",
         "release_tag": null
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     },
     {
@@ -2155,28 +3758,311 @@
       },
       "source_dce_run_id": 32579878511,
       "source_shard": 1,
-      "hot_ready_at": "2026-08-22T14:50:56.202772+00:00",
+      "hot_ready_at": "2026-08-22T14:51:26.999298+00:00",
       "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
       "spm_post_dce_score": 13,
       "spm_fit_band": "LOW",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
-      "review_lane": "SPM_PRIORITY",
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32579878511,
+        "shard": 1,
+        "candidate_id": "WORLD-BANK:OP00463510",
+        "release_tag": "dce-harvest-32579878511"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "WORLD-BANK:OP00463510",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 2825,
+        "documents_indexed": 1,
+        "documents_with_text": 1,
+        "source_urls": [
+          "https://search.worldbank.org/api/procnotices?format=json&rows=25&qterm=OP00463510"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "batch",
+            "constructed",
+            "materials",
+            "newly",
+            "printing",
+            "schools",
+            "supply"
+          ],
+          "hits": [
+            "batch",
+            "constructed",
+            "materials",
+            "newly",
+            "printing",
+            "schools",
+            "supply"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 3,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
       "review_state": "PENDING_GPT_WEB",
       "review_tick": false,
       "review_key": "e57287249891b59d26859be78258a993944a430353c183a6f603f1de150b7aed",
       "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
       "gpt_priority_score": 13,
-      "upstream_signal": "DCE_REVIEW_READY",
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
       "inbox_live_source": "control/gpt_review_hot.json",
       "evidence_locator": {
         "dce_run_id": 32579878511,
         "shard": 1,
         "candidate_id": "WORLD-BANK:OP00463510",
-        "release_tag": null
+        "release_tag": "dce-harvest-32579878511"
       },
-      "upstream_review_lane": "SPM_PRIORITY",
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
+      "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
+    },
+    {
+      "candidate_id": "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
+      "title": "Teavituskampaania veeringluse ja -puhastuse tarbijakeskseks selgitamiseks",
+      "buyer": "AKTSIASELTS TALLINNA VESI",
+      "portal": "EE_RHR",
+      "notice_url": "https://riigihanked.riik.ee/rhr-web/#/procurement/10717844/general-info",
+      "deadline": "2026-09-02T08:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "preliminary_score": 82,
+      "priority_score": 82,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "gate_readiness": true,
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-09-02T08:00:00+00:00",
+        "notice_deadline_date": "2026-09-02",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 0,
+          "corpus_contexts": 0,
+          "unique_contexts": 0
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "deadline_authority_status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+      "deadline_resolved": false,
+      "evidence_gate_coverage": 2,
+      "evidence_by_gate": {
+        "entity_geography": [
+          {
+            "text": "stutellimuse numbri, mille alusel Teenus on osutatud ning Teenuse üleandmise-vastuvõtmise akti kuupäeva ja numbri, millel toodud Teenuse eest arve esitatakse. 8.4. Täitja esitab arve osutatud Teenuse eest elektrooniliselt e-arvete operaatori vahendusel, kes on ära toodud Tellija äriregistri B-kaardil. E-arve peab vastama Eesti e-arve standardile. Tellija maksetähtaeg on 28 kalendripäeva arvates arve kuupäevast, seejuures arve peab jõudma Tellija e- arvete operaatorini viie kalendripäeva jooksul. Kõik muu arvetesse puutuv (nt üleandmise-vastuvõtmise aktid) tuleb saata e-posti aadressile: arved@tvesi.ee. Juhul, kui Täitja ei ole Eesti resident, esitab ta ka arve elektrooniliselt eelpool toodud e-posti aadressil. 8.5. Arve esitamine mittenõuetekohasel viisil või mittenõuetekohase arve esitamine Täitja poolt vabastab Tellija tasumise kohustusest kuni nõuetekohaselt esitatud nõuetekohase arve saamiseni. 8.6. Lepingu alusel makstavate summade tasumine loetakse teostatuks vastava summa laekumisega poole pangakontole, kusjuures summat tasuv pool ei vastuta summa tasumisega hilinemise eest juhul, kui pank mitteõiguspäraselt viivitab vastava ülekande tegemisega. 9. TEENUSE MUUDATUSED JA LISATEENUSED: 9.1. Teenuse muudatused: 9.1.1. Tellijal on õigus vajadusel nõuda",
+            "source": "files/files_unpacked/Teenuse osutamise leping_unpacked/Lisa 1 Teenuse osutamise üldtingimused.pdf",
+            "source_url": null,
+            "source_sha256": "4d6965dfa267845e53c32bdc85d1a4a564204968a19bb18c5ed4e45ccf28fe9b",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 38057,
+            "corpus_end": 39365,
+            "match": "resident"
+          }
+        ],
+        "turnover_financial": [],
+        "references_experience": [],
+        "certifications_partner": [],
+        "staffing_team": [],
+        "insurance_bonds": [],
+        "subcontracting_consortium": [],
+        "deliverables_scope": [],
+        "sla_onsite": [],
+        "term_value": [],
+        "award_criteria": [],
+        "forms_signatures": [
+          {
+            "text": "l tuginetud, peab asendav alltöövõtja vastama vähemalt samaväärsetele näitajatele, mille osas tugineti. Tellijal on õigus kontrollida lisanduva alltöövõtja kvalifikatsiooni ning kõrvaldamise aluste puudumist, sh keelduda alltöövõtja kooskõlastamisest ja nõuda tema asendamist vastavalt riigihangete seaduses sätestatule; 3.1.6.2. lisanduv alltöövõtja kooskõlastatakse Tellija kontaktisikuga kirjalikku taasesitamist võimaldavalt ning Tellijal on õigus lisanduvat alltöövõtjat kontrollida vastavalt eelmises punktis toodule; 3.1.7. ilma Tellija eelneva kirjaliku nõusolekuta mitte andma Lepingust tulenevaid Täitja õigusi ja kohustusi üle kolmandatele isikutele. Tellijal on õigus keelduda vastavasisulise nõusoleku andmisest; 3.1.8. tagama oma ja alltöövõtjate töötajate olmetingimuste vastavuse õigusaktidega kehtestatud nõuetele; 3.1.9. kaitsma ja mitte ohtu seadma inimeste elu ja tervist, vara, mainet ja keskkonda. Täitja vastutab ise oma vara valve eest ning kohustub võtma tarvitusele kõik abinõud Tellija poolt temale usaldatud vara säilimise tagamiseks ja kandma vastutust igasuguse nimetatud vara kaotsimineku või kahjustamise eest; 3.1.10. tegutsema Teenuse osutamisel vastavuses Tellija keskkonnapoliitikaga ja kontrollima olulistest keskkonnaaspektidest tulenevat negatii",
+            "source": "files/files_unpacked/Teenuse osutamise leping_unpacked/Lisa 1 Teenuse osutamise üldtingimused.pdf",
+            "source_url": null,
+            "source_sha256": "4d6965dfa267845e53c32bdc85d1a4a564204968a19bb18c5ed4e45ccf28fe9b",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 25949,
+            "corpus_end": 27255,
+            "match": "mandat"
+          },
+          {
+            "text": "ise aktile allakirjutamist ja ekspertiisi kulude hüvitamist (v.a Teenuse osas, milles tuvastati puudused). Eksperdi valik kooskõlastatakse eelnevalt Tellijaga. 7.5. Täiendavate tööde, teenuste ja toimingute eest, mis tulenevad osutatud Teenuse mittevastavuste likvideerimisest, Tellija tasu ei maksa. Nimetatud tegevused kohustub Täitja teostama omal kulul. Juhul, kui Täitja ei ole Tellija nõudmisest hoolimata eelnimetatud mittevastavusi kõrvaldanud, on Tellijal õigus pärast täitmiseks antud täiendava tähtaja soovitud tulemusteta möödumist (loobumata õigusest kasutada teisi õiguskaitsevahendeid) kõrvaldada mittevastavused ise või kolmandate isikute abiga, millega seonduvad kulud peab Täitja Tellijale hüvitama. 7.6. Tellijal on õigus lasta Teenus või selle osa üle vaadata kolmandatel isikutel (ekspertidel), sh tellida Teenusele või selle osale ekspertiis. Juhul, kui selle tulemusel selgub, et Teenus või selle osa ei vasta nõuetele, on Tellijal õigus Teenuse või selle osa üleandmisest-vastuvõtmisest keelduda. Kolmandate isikute kaasamisel pikeneb punktis 7.3. nimetatud Tellijapoolne ülevaatusperiood sama perioodi võrra, kui Tellija ei teavita Töövõtjat pikemast tähtajast. 8. ARVELDUSED 8.1. Tellija tasub Täitjale esitatavate arvete alusel tegelikult osutatud Teenus",
+            "source": "files/files_unpacked/Teenuse osutamise leping_unpacked/Lisa 1 Teenuse osutamise üldtingimused.pdf",
+            "source_url": null,
+            "source_sha256": "4d6965dfa267845e53c32bdc85d1a4a564204968a19bb18c5ed4e45ccf28fe9b",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 36365,
+            "corpus_end": 37671,
+            "match": "mandat"
+          },
+          {
+            "text": "t Tellijaga. 7.5. Täiendavate tööde, teenuste ja toimingute eest, mis tulenevad osutatud Teenuse mittevastavuste likvideerimisest, Tellija tasu ei maksa. Nimetatud tegevused kohustub Täitja teostama omal kulul. Juhul, kui Täitja ei ole Tellija nõudmisest hoolimata eelnimetatud mittevastavusi kõrvaldanud, on Tellijal õigus pärast täitmiseks antud täiendava tähtaja soovitud tulemusteta möödumist (loobumata õigusest kasutada teisi õiguskaitsevahendeid) kõrvaldada mittevastavused ise või kolmandate isikute abiga, millega seonduvad kulud peab Täitja Tellijale hüvitama. 7.6. Tellijal on õigus lasta Teenus või selle osa üle vaadata kolmandatel isikutel (ekspertidel), sh tellida Teenusele või selle osale ekspertiis. Juhul, kui selle tulemusel selgub, et Teenus või selle osa ei vasta nõuetele, on Tellijal õigus Teenuse või selle osa üleandmisest-vastuvõtmisest keelduda. Kolmandate isikute kaasamisel pikeneb punktis 7.3. nimetatud Tellijapoolne ülevaatusperiood sama perioodi võrra, kui Tellija ei teavita Töövõtjat pikemast tähtajast. 8. ARVELDUSED 8.1. Tellija tasub Täitjale esitatavate arvete alusel tegelikult osutatud Teenuse eest. 8.2. Täitjal ei ole õigust esitada arvet enne, kui Teenus või selle osa on Tellija poolt vastu võetud. Tellijal ei teki makse tasumise k",
+            "source": "files/files_unpacked/Teenuse osutamise leping_unpacked/Lisa 1 Teenuse osutamise üldtingimused.pdf",
+            "source_url": null,
+            "source_sha256": "4d6965dfa267845e53c32bdc85d1a4a564204968a19bb18c5ed4e45ccf28fe9b",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 36513,
+            "corpus_end": 37819,
+            "match": "mandat"
+          },
+          {
+            "text": "Tellija nõudmisest hoolimata eelnimetatud mittevastavusi kõrvaldanud, on Tellijal õigus pärast täitmiseks antud täiendava tähtaja soovitud tulemusteta möödumist (loobumata õigusest kasutada teisi õiguskaitsevahendeid) kõrvaldada mittevastavused ise või kolmandate isikute abiga, millega seonduvad kulud peab Täitja Tellijale hüvitama. 7.6. Tellijal on õigus lasta Teenus või selle osa üle vaadata kolmandatel isikutel (ekspertidel), sh tellida Teenusele või selle osale ekspertiis. Juhul, kui selle tulemusel selgub, et Teenus või selle osa ei vasta nõuetele, on Tellijal õigus Teenuse või selle osa üleandmisest-vastuvõtmisest keelduda. Kolmandate isikute kaasamisel pikeneb punktis 7.3. nimetatud Tellijapoolne ülevaatusperiood sama perioodi võrra, kui Tellija ei teavita Töövõtjat pikemast tähtajast. 8. ARVELDUSED 8.1. Tellija tasub Täitjale esitatavate arvete alusel tegelikult osutatud Teenuse eest. 8.2. Täitjal ei ole õigust esitada arvet enne, kui Teenus või selle osa on Tellija poolt vastu võetud. Tellijal ei teki makse tasumise kohustust enne, kui talle on esitatud vastav arve Teenuse eest, mis on tema poolt üleandmise- vastuvõtmise akti allkirjastamisega vastu võetud. 8.3. Täitja on kohustatud Tellijale esitatud arvel näitama ära Tellija kontaktisiku nime, ostutel",
+            "source": "files/files_unpacked/Teenuse osutamise leping_unpacked/Lisa 1 Teenuse osutamise üldtingimused.pdf",
+            "source_url": null,
+            "source_sha256": "4d6965dfa267845e53c32bdc85d1a4a564204968a19bb18c5ed4e45ccf28fe9b",
+            "source_kind": "pdf",
+            "source_provenance_match": null,
+            "provenance_strength": "DOCUMENT_HASH_ATTRIBUTED",
+            "raw_machine_format": false,
+            "corpus_start": 36757,
+            "corpus_end": 38063,
+            "match": "mandat"
+          }
+        ],
+        "submission": [],
+        "ip_data_security": []
+      },
+      "source_dce_run_id": 32571126517,
+      "source_shard": 0,
+      "hot_ready_at": "2026-08-22T14:51:26.999298+00:00",
+      "review_contract": "Gate-ready authoritative DCE evidence pack from the current DCE generation. Unknown is never PASS. FINAL_SUPER_GREEN requires every mandatory gate resolved and authoritative deadline reconciliation.",
+      "spm_post_dce_score": 12,
+      "spm_fit_band": "LOW",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "review_stage": "BUSINESS_GATES",
+      "dce_authenticity_review_required": false,
+      "finalization_allowed": false,
+      "artifact_locator": {
+        "dce_run_id": 32571126517,
+        "shard": 0,
+        "candidate_id": "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
+        "release_tag": "dce-harvest-32571126517"
+      },
+      "evidence_quality_summary": {
+        "contract": "DCE_EVIDENCE_QUALITY_V2",
+        "candidate_id": "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "derived_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "gate_readiness": true,
+        "text_chars": 73370,
+        "documents_indexed": 11,
+        "documents_with_text": 9,
+        "source_urls": [
+          "https://riigihanked.riik.ee/rhr-web/#/procurement/10717844/documents?group=B"
+        ],
+        "all_source_files_notice_only": false,
+        "official_khmdhs_provenance": {
+          "matched": false,
+          "reason": "not_gr_khmdhs"
+        },
+        "official_placsp_provenance": {
+          "matched": false,
+          "reason": "not_es_placsp"
+        },
+        "official_za_ocds_provenance": {
+          "matched": false,
+          "reason": "not_za_etenders"
+        },
+        "generic_filename_hits": [],
+        "access_guide_hits": [],
+        "interest_required_hits": [],
+        "substantive_marker_hits": [],
+        "candidate_title_overlap": {
+          "tokens": [
+            "puhastuse",
+            "selgitamiseks",
+            "tarbijakeskseks",
+            "teavituskampaania",
+            "veeringluse"
+          ],
+          "hits": [
+            "puhastuse",
+            "selgitamiseks",
+            "tarbijakeskseks",
+            "teavituskampaania",
+            "veeringluse"
+          ],
+          "ratio": 1.0
+        },
+        "reasons": [
+          "strong_candidate_specificity_in_retrieved_text"
+        ],
+        "rule": "DOWNLOADED_PUBLIC is transport success only. Gate review requires semantic candidate specificity or exact trusted official attachment provenance; publication notice PDFs are never promoted. Provenance proves authority, not eligibility, and mandatory-gate UNKNOWN remains UNKNOWN."
+      },
+      "evidence_provenance_summary": {
+        "attributed_snippets": 5,
+        "unattributed_snippets": 0,
+        "all_review_snippets_attributed": true
+      },
+      "procedure_aliases": [],
+      "review_lane": "LOW_PORTAL_SURVEILLANCE",
+      "review_state": "PENDING_GPT_WEB",
+      "review_tick": false,
+      "review_key": "366addd56329c024583ca9443a4a61d756bee44448cf68606cd1f0103b26d7e4",
+      "recommended_gpt_action": "GPT_WEB_REVIEW_NOW",
+      "gpt_priority_score": 12,
+      "upstream_signal": "MODEL_REVIEW_REQUIRED",
+      "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
+      "inbox_live_source": "control/gpt_review_hot.json",
+      "evidence_locator": {
+        "dce_run_id": 32571126517,
+        "shard": 0,
+        "candidate_id": "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
+        "release_tag": "dce-harvest-32571126517"
+      },
+      "upstream_review_lane": "LOW_PORTAL_SURVEILLANCE",
       "inbox_lane": "LOW_PORTAL_SURVEILLANCE"
     }
   ],
@@ -2186,40 +4072,48 @@
     "low_surveillance_target": 20,
     "selected_by_lane": {
       "GPT_PRIORITY": 1,
-      "LOW_PORTAL_SURVEILLANCE": 2
+      "DCE_AUTHENTICITY_REPAIR": 2,
+      "LOW_PORTAL_SURVEILLANCE": 4
     },
     "selected_by_stage": {
-      "BUSINESS_GATES": 3
+      "BUSINESS_GATES": 5,
+      "DCE_AUTHENTICITY": 2
     },
     "selected_by_band": {
       "MAYBE": 1,
-      "LOW": 2
+      "LOW": 6
     },
     "selected_by_portal": {
-      "TED": 1,
+      "TED": 2,
+      "US_SAM": 1,
+      "EE_RHR": 2,
       "PL_EZAMOWIENIA": 1,
       "WORLD_BANK": 1
     }
   },
   "counts": {
-    "pending_gpt_web_review": 3,
+    "pending_gpt_web_review": 7,
     "reviewed_ticks_total": 506,
     "excluded_already_reviewed": 0,
-    "excluded_already_in_final_bank": 0,
-    "pending_before_visible_cap": 3,
+    "excluded_already_in_final_bank": 7,
+    "pending_before_visible_cap": 7,
     "pending_by_stage": {
-      "BUSINESS_GATES": 3
+      "BUSINESS_GATES": 5,
+      "DCE_AUTHENTICITY": 2
     },
     "pending_by_inbox_lane": {
       "GPT_PRIORITY": 1,
-      "LOW_PORTAL_SURVEILLANCE": 2
+      "DCE_AUTHENTICITY_REPAIR": 2,
+      "LOW_PORTAL_SURVEILLANCE": 4
     },
     "pending_by_fit_band": {
       "MAYBE": 1,
-      "LOW": 2
+      "LOW": 6
     },
     "pending_by_portal": {
-      "TED": 1,
+      "TED": 2,
+      "US_SAM": 1,
+      "EE_RHR": 2,
       "PL_EZAMOWIENIA": 1,
       "WORLD_BANK": 1
     }
