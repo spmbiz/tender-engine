@@ -32343,16 +32343,28 @@
     "US-SAM:4c0a5c0264034a2a98a00c0cbf3954b1",
     "US-SAM:7ccdc433f5ad4015830fe4d643c09787",
     "US-SAM:697b6234abad4843b178e07a25b276a2",
-    "US-SAM:24cf3d9e3c6840e7a0cfa5294b51959f",
-    "US-SAM:1191b93ad4504df4af630cc8952cfe4b"
+    "US-SAM:24cf3d9e3c6840e7a0cfa5294b51959f"
   ],
   "last_discovery_dispatch_at": "2026-08-22T16:29:35.964208+00:00",
   "last_circleci_tick_at": "2026-08-14T21:41:04.485184+00:00",
-  "updated_at": "2026-08-22T17:33:21.257214+00:00",
+  "updated_at": "2026-08-22T17:51:43.504588+00:00",
   "enabled": true,
   "mode": "maximum",
   "active_discovery_run_id": "32584871007",
-  "pending_dce_batch": null,
+  "pending_dce_batch": {
+    "candidate_ids": [
+      "US-SAM:1191b93ad4504df4af630cc8952cfe4b",
+      "US-SAM:8066b9b17c294ae3af1acf36da4aa6c2",
+      "US-SAM:26ee3d1a6dea48d09f6ddf994d564548",
+      "US-SAM:4d0e16cf3ceb4ad3b99e545b3604d245"
+    ],
+    "source_run": "32584871007",
+    "selection_path": "queues/auto_selection_32588999962.jsonl",
+    "queue_commit_sha": "b7228293b891b3e896995d8348bbf7bab4e86093",
+    "commit_message": "Autonomous DCE batch 32588999962 from discovery 32584871007",
+    "dispatched_at": "2026-08-22T17:51:43.504588+00:00",
+    "max_parallel": 13
+  },
   "legacy_dispatched_candidate_ids": [
     "TED:545556-2026",
     "TED:543796-2026",
@@ -33563,9 +33575,7 @@
     "32571126517"
   ],
   "last_orphan_reconcile_at": "2026-08-22T17:33:21.257214+00:00",
-  "dce_retry_after": {
-    "US-SAM:1191b93ad4504df4af630cc8952cfe4b": "2026-08-22T17:38:21.257214+00:00"
-  },
+  "dce_retry_after": {},
   "dce_retry_attempts": {
     "TED:565210-2026": 2,
     "US-SAM:777a5ae3a7d447ef941a1dbebe2a454d": 2,
