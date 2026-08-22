@@ -1,7 +1,13 @@
 {
   "schema": "QWEN_BATCH_RUNTIME_CONFIG_V1",
-  "status": "BLOCKED",
-  "champion": null,
+  "status": "PASS",
+  "champion": {
+    "initial_batch_size": 1,
+    "safe_for_shadow_scale_out": true,
+    "evidence": "observed-live-singleton-fastpath-60-of-60",
+    "mean_seconds_per_notice": 5.77,
+    "promoted_at": "2026-08-22T00:00:00Z"
+  },
   "safety": {
     "shadow_only": true,
     "automatic_rejection_enabled": false,
