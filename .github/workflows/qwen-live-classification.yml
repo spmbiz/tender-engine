@@ -80,21 +80,46 @@ jobs:
           test -s input/notice-classification-queue-latest.jsonl.gz
           test -s input/live-open-tenders-latest.jsonl.gz
           test -s input/snapshot-manifest-latest.json
-          if gh release view qwen-classification-state-latest >/dev/null 2>&1; then
-            assets="$(gh release view qwen-classification-state-latest --json assets --jq '.assets[].name')"
-            if grep -Fxq qwen-classification-state-latest.jsonl.gz <<< "$assets"; then
-              gh release download qwen-classification-state-latest \
-                --pattern qwen-classification-state-latest.jsonl.gz \
-                --dir previous --clobber
-            fi
-          fi
-          if [ ! -s previous/qwen-classification-state-latest.jsonl.gz ]; then
-            python - <<'PY'
-          import gzip
-          with gzip.open('previous/qwen-classification-state-latest.jsonl.gz','wt',encoding='utf-8') as f:
-              pass
+
+          # Prefer the most complete downloadable semantic state. A failed final
+          # release mirror must not force the next pass back to stale/empty state.
+          mkdir -p previous/candidates
+          gh release download qwen-incremental-state-latest \
+            --pattern qwen-incremental-state-latest.jsonl.gz \
+            --dir previous/candidates --clobber >/dev/null 2>&1 || true
+          gh release download qwen-classification-state-latest \
+            --pattern qwen-classification-state-latest.jsonl.gz \
+            --dir previous/candidates --clobber >/dev/null 2>&1 || true
+          python - <<'PY'
+          import gzip, json
+          from pathlib import Path
+
+          candidates=[]
+          for p in Path('previous/candidates').glob('*.jsonl.gz'):
+              try:
+                  with gzip.open(p,'rt',encoding='utf-8') as f:
+                      rows=sum(1 for line in f if line.strip())
+                  candidates.append((rows,p))
+              except Exception:
+                  pass
+          if candidates:
+              rows,p=max(candidates,key=lambda x:(x[0],x[1].name.startswith('qwen-classification-state')))
+              Path('previous/qwen-classification-state-latest.jsonl.gz').write_bytes(p.read_bytes())
+              print(f'Using previous Qwen state {p.name} rows={rows}')
+          else:
+              expected=0
+              summary=Path('control/qwen_live/classification_summary.json')
+              if summary.exists():
+                  try:
+                      expected=int(json.loads(summary.read_text(encoding='utf-8')).get('state_rows_after_merge') or 0)
+                  except Exception:
+                      expected=0
+              if expected > 0:
+                  raise SystemExit(f'FAIL_CLOSED: semantic state releases unavailable while main records {expected} classified rows')
+              with gzip.open('previous/qwen-classification-state-latest.jsonl.gz','wt',encoding='utf-8') as f:
+                  pass
+              print('No prior semantic state exists; initialized empty state.')
           PY
-          fi
 
       - id: plan
         name: Prioritize fresh notices, admit fair-share capacity and create bounded shards
@@ -398,26 +423,55 @@ jobs:
               f.write(f"remaining={after}\naccepted={accepted}\nstate_rows={s['state_rows_after_merge']}\n")
           PY
 
-      - name: Publish durable Qwen state
+      - name: Preserve aggregate state independently of GitHub Releases
+        if: steps.merge.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-live-aggregate-state-${{ github.run_id }}
+          path: publish/
+          if-no-files-found: error
+          retention-days: 14
+
+      - id: mirror
+        name: Mirror aggregate state to stable release with bounded backoff
+        if: steps.merge.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          set -euo pipefail
+          set -u -o pipefail
           source_run='${{ needs.plan.outputs.source_run }}'
-          immutable="qwen-classification-state-${source_run}-${GITHUB_RUN_ID}"
-          gh release view "$immutable" >/dev/null 2>&1 || gh release create "$immutable" --target main \
-            --title "Qwen classification state ${source_run}/${GITHUB_RUN_ID}" \
-            --notes 'Shadow-safe semantic notice classification. Exact material hash required; DCE remains authoritative; no notice is deleted.'
-          gh release upload "$immutable" publish/* --clobber
+          stable='qwen-classification-state-latest'
+          notes="source_run=${source_run} run=${GITHUB_RUN_ID} state_rows=${{ steps.merge.outputs.state_rows }} remaining=${{ steps.merge.outputs.remaining }} accepted_this_pass=${{ steps.merge.outputs.accepted }} admitted_workers=${{ needs.plan.outputs.allowed_workers }}"
 
-          stable=qwen-classification-state-latest
-          gh release view "$stable" >/dev/null 2>&1 || gh release create "$stable" --target main \
-            --title 'Qwen Classification State — LATEST' \
-            --notes 'Stable pointer to exact-hash Qwen semantic state.'
-          gh release edit "$stable" --title "Qwen Classification State — LATEST (${source_run}/${GITHUB_RUN_ID})" \
-            --notes "source_run=${source_run} run=${GITHUB_RUN_ID} state_rows=${{ steps.merge.outputs.state_rows }} remaining=${{ steps.merge.outputs.remaining }} accepted_this_pass=${{ steps.merge.outputs.accepted }} admitted_workers=${{ needs.plan.outputs.allowed_workers }}"
-          gh release upload "$stable" publish/* --clobber
+          retry_cmd() {
+            local label="$1"; shift
+            local delays=(0 15 45 120)
+            local rc=1 out=''
+            for delay in "${delays[@]}"; do
+              [ "$delay" -eq 0 ] || sleep "$delay"
+              out="$("$@" 2>&1)"; rc=$?
+              if [ "$rc" -eq 0 ]; then return 0; fi
+              echo "::warning::${label} failed rc=${rc}: ${out: -400}"
+            done
+            return "$rc"
+          }
+
+          # qwen-classification-state-latest already exists in production. Avoid
+          # per-pass immutable releases: they doubled API traffic and had no reader.
+          if ! retry_cmd 'stable release metadata update' gh release edit "$stable" \
+              --title "Qwen Classification State — LATEST (${source_run}/${GITHUB_RUN_ID})" \
+              --notes "$notes"; then
+            echo 'mirror=deferred' >> "$GITHUB_OUTPUT"
+            echo '::warning::Stable release mirror deferred after bounded retries; aggregate artifact and shard artifacts remain durable.'
+            exit 0
+          fi
+          if ! retry_cmd 'stable release asset upload' gh release upload "$stable" publish/* --clobber; then
+            echo 'mirror=deferred' >> "$GITHUB_OUTPUT"
+            echo '::warning::Stable release upload deferred after bounded retries; conveyor can reconstruct from preserved artifacts.'
+            exit 0
+          fi
+          echo 'mirror=ok' >> "$GITHUB_OUTPUT"
 
       - name: End-to-end summary
         if: always()
@@ -429,5 +483,7 @@ jobs:
           echo "- accepted this pass: ${{ steps.merge.outputs.accepted }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- remaining exact-hash queue: ${{ steps.merge.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- cumulative classified state rows: ${{ steps.merge.outputs.state_rows }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- stable release mirror: ${{ steps.mirror.outputs.mirror || 'not-run' }}" >> "$GITHUB_STEP_SUMMARY"
+          echo '- Aggregate state is always preserved as an Actions artifact before the best-effort release mirror.' >> "$GITHUB_STEP_SUMMARY"
           echo '- Qwen persistence is delegated to the continuous conveyor; continuation is delegated to the backlog watchdog.' >> "$GITHUB_STEP_SUMMARY"
           echo '- safety: no semantic result is a final bid verdict; authoritative DCE remains the truth gate.' >> "$GITHUB_STEP_SUMMARY"
