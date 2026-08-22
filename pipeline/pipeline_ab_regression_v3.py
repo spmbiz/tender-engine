@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import tempfile
 from pathlib import Path
@@ -20,15 +21,11 @@ def current_dce_worker(repo: Path) -> dict[str, Any]:
     matches = re.findall(r"pipeline/(dce_worker_v(\d+)\.py)", text)
     if not matches:
         raise AssertionError("production DCE batch worker does not reference a versioned dce_worker_vN.py")
-    # The executable command must resolve to one unambiguous latest worker.
     versions = sorted({(name, int(version)) for name, version in matches}, key=lambda x: x[1])
     name, version = versions[-1]
     worker_path = repo / "pipeline" / name
     if not worker_path.is_file():
         raise AssertionError(f"production DCE worker target does not exist: {worker_path}")
-    # v15 intentionally layers on the complete v14 resolver stack. Future versions
-    # may do the same, but the orchestration A/B must report reality rather than a
-    # frozen literal version. Resolver quality itself is gated by DCE Rollback A/B.
     return {
         "worker": name,
         "version": version,
@@ -64,29 +61,72 @@ def main() -> None:
             report["errors"].append({"check": name, "error": repr(exc)})
 
     def capacity_check():
-        base_idle = ab.capacity_scenario(baseline, remote_gws=0, active_gws=0)
-        cur_idle = ab.capacity_scenario(current, remote_gws=0, active_gws=0)
-        base_gws = ab.capacity_scenario(baseline, remote_gws=10, active_gws=0)
-        cur_gws = ab.capacity_scenario(current, remote_gws=10, active_gws=0)
-        cur_active = ab.capacity_scenario(current, remote_gws=10, active_gws=6)
-        cur_pre = ab.preauthorized_scenario(current)
+        # Capacity A/B must be deterministic and must distinguish two intentional
+        # production modes: normal idle borrowing and Qwen-backlog reservation.
+        old_backlog = os.environ.get("QWEN_BACKLOG_REMAINING")
+        old_workflow = os.environ.get("GITHUB_WORKFLOW")
+        try:
+            os.environ["QWEN_BACKLOG_REMAINING"] = "0"
+            os.environ["GITHUB_WORKFLOW"] = "Tender General Maintenance"
+            base_idle = ab.capacity_scenario(baseline, remote_gws=0, active_gws=0)
+            cur_idle = ab.capacity_scenario(current, remote_gws=0, active_gws=0)
+            base_gws = ab.capacity_scenario(baseline, remote_gws=10, active_gws=0)
+            cur_gws = ab.capacity_scenario(current, remote_gws=10, active_gws=0)
+            cur_active = ab.capacity_scenario(current, remote_gws=10, active_gws=6)
+            cur_pre = ab.preauthorized_scenario(current)
+
+            os.environ["QWEN_BACKLOG_REMAINING"] = "90000"
+            os.environ["GITHUB_WORKFLOW"] = "Tender General Maintenance"
+            reserved_general = ab.capacity_scenario(current, remote_gws=0, active_gws=0)
+
+            os.environ["GITHUB_WORKFLOW"] = "Qwen Live Notice Classification"
+            reserved_qwen = ab.capacity_scenario(current, remote_gws=0, active_gws=0)
+            reserved_qwen_with_gws = ab.capacity_scenario(current, remote_gws=10, active_gws=0)
+        finally:
+            if old_backlog is None:
+                os.environ.pop("QWEN_BACKLOG_REMAINING", None)
+            else:
+                os.environ["QWEN_BACKLOG_REMAINING"] = old_backlog
+            if old_workflow is None:
+                os.environ.pop("GITHUB_WORKFLOW", None)
+            else:
+                os.environ["GITHUB_WORKFLOW"] = old_workflow
+
         if not 0 <= int(cur_idle["allowed"]) <= 20:
             raise AssertionError(cur_idle)
         if int(cur_idle["allowed"]) < int(base_idle["allowed"]):
-            raise AssertionError(f"idle capacity regressed current={cur_idle} baseline={base_idle}")
+            raise AssertionError(f"idle capacity regressed without Qwen backlog current={cur_idle} baseline={base_idle}")
         if int(cur_gws["allowed"]) > 10:
             raise AssertionError(f"current steals GWS reservation: {cur_gws}")
         if int(cur_active["allowed"]) + 6 > 20:
             raise AssertionError(f"physical capacity overcommit: {cur_active}")
         if int(cur_pre["allowed"]) > 20:
             raise AssertionError(f"preauthorized hard cap violated: {cur_pre}")
+
+        target = int(reserved_general["report"].get("qwen_semantic_reservation_target") or 0)
+        if target != 16:
+            raise AssertionError(f"90k Qwen backlog must reserve 16 slots: {reserved_general}")
+        if int(reserved_general["allowed"]) > 20 - target:
+            raise AssertionError(f"generic Tender work consumes Qwen reservation: {reserved_general}")
+        if int(reserved_qwen["allowed"]) < target:
+            raise AssertionError(f"Qwen semantic lane cannot consume its reservation: {reserved_qwen}")
+        if int(reserved_qwen["allowed"]) > 20:
+            raise AssertionError(f"Qwen semantic lane exceeds physical capacity: {reserved_qwen}")
+        if int(reserved_qwen_with_gws["allowed"]) > 10:
+            raise AssertionError(f"Qwen reservation steals demanded GWS fair-share: {reserved_qwen_with_gws}")
+
         return {
             "baseline_idle_allowed": base_idle["allowed"],
-            "current_idle_allowed": cur_idle["allowed"],
+            "current_idle_no_qwen_backlog_allowed": cur_idle["allowed"],
             "baseline_gws_demand_allowed": base_gws["allowed"],
             "current_gws_demand_allowed": cur_gws["allowed"],
             "current_with_6_active_gws_allowed": cur_active["allowed"],
             "current_preauthorized_999_allowed": cur_pre["allowed"],
+            "qwen_backlog_test": 90000,
+            "qwen_reservation_target": target,
+            "generic_tender_allowed_with_qwen_reservation": reserved_general["allowed"],
+            "qwen_semantic_allowed_with_reservation": reserved_qwen["allowed"],
+            "qwen_semantic_allowed_with_gws_demand": reserved_qwen_with_gws["allowed"],
         }
 
     def workflow_contract():
