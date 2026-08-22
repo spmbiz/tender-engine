@@ -1,16 +1,534 @@
 {
   "schema": "GPT_LIVE_BUSINESS_REVIEW_BATCH_V1",
-  "generated_at": "2026-08-22T04:05:15.914016+00:00",
-  "source_inbox_updated_at": "2026-08-22T04:03:57.308678+00:00",
-  "latest_source_dce_run_id": 32550613010,
-  "unreviewed_gate_ready_total": 0,
-  "selected": 0,
+  "generated_at": "2026-08-22T04:45:14.608984+00:00",
+  "source_inbox_updated_at": "2026-08-22T04:43:23.286807+00:00",
+  "latest_source_dce_run_id": 32552379983,
+  "unreviewed_gate_ready_total": 5,
+  "selected": 5,
   "skipped": {
-    "wrong_stage": 0,
+    "wrong_stage": 2,
     "not_gate_ready": 0,
     "already_final": 0,
     "already_reviewed": 0
   },
-  "items": [],
+  "items": [
+    {
+      "candidate_id": "US-SAM:ba7b294fbf0f4c74aed11b74170383e8",
+      "review_key": "d3a20a5c9b75ba80e5d1d057c8306003b7336b1b195b784a8d71d378967fc633",
+      "title": "Financial Management - Financial Improvement Audit Remediation (FIAR)",
+      "buyer": "DEPT OF DEFENSE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/opp/ba7b294fbf0f4c74aed11b74170383e8/view",
+      "notice_deadline": "2026-08-31T06:00:00+00:00",
+      "best_submission_deadline": "2026-08-31T06:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "source_dce_run_id": 32550107242,
+      "source_shard": 1,
+      "spm_post_dce_score": 23,
+      "pipeline_priority": 47,
+      "rank_reasons": [
+        "native_spm_scope",
+        "staffing",
+        "authoritative_gate_ready"
+      ],
+      "gate_burden_signals": [
+        "staffing"
+      ],
+      "deadline_authority": {
+        "status": "UNLABELLED_DCE_DEADLINE_CONFLICT_REVIEW_REQUIRED",
+        "conflict": true,
+        "notice_deadline_raw": "2026-08-31T06:00:00+00:00",
+        "notice_deadline_date": "2026-08-31",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [
+          "2018-08-28",
+          "2018-09-14",
+          "2024-04-30",
+          "2024-06-01",
+          "2026-03-31"
+        ],
+        "labelled_evidence": [],
+        "evidence": [
+          {
+            "date": "2026-03-31",
+            "match": "2026-03-31",
+            "context": "rovide any additional documentation over the variance. | Air Force General Fund | True | AFIPACAP-504 | AF-5515\nAF-5263 | Lack of Operating Materials and Supplies Repair Allowance | GF-FIN-2018-034(R5) | SAF/FM | Open | 2026-03-31 00:00:00 | Although the Air Force asserts that DOD FMR Volume 4 Chapter 4 Paragraph 040303.D is the basis for valuing Air Force held for repair OM&S, the Air Force does not report a repair allowance for Held for Repair "
+          },
+          {
+            "date": "2018-08-28",
+            "match": "August 28, 2018",
+            "context": "l statement note.  The Air Force does not report Inventory and Related Property net of an allowance for repairs on the balance sheet.EY requested an update for the Air Force’s held for repair OM&S accounting policies on August 28, 2018 but had not received a response by September 14, 2018. | Air Force General Fund | True | AFIPACAP-2885 | AF-5109\nAF-5246 | Trading Partner Adj\ns recorded in FY 2019 and FY 2020 due to the PRV rebaseline in FY 2019o A ba"
+          },
+          {
+            "date": "2018-09-14",
+            "match": "September 14, 2018",
+            "context": "ventory and Related Property net of an allowance for repairs on the balance sheet.EY requested an update for the Air Force’s held for repair OM&S accounting policies on August 28, 2018 but had not received a response by September 14, 2018. | Air Force General Fund | True | AFIPACAP-2885 | AF-5109\nAF-5246 | Trading Partner Adj\ns recorded in FY 2019 and FY 2020 due to the PRV rebaseline in FY 2019o A batch file processing error between NexGen-IT and DEAMS "
+          },
+          {
+            "date": "2024-04-30",
+            "match": "2024-04-30",
+            "context": "orce General Fund | True | AFIPACAP-13238 | AF-5528\nAF-5806 | Lack of a sufficient analysis governing the appropriate accounting treatment of BRAC E&DL liabilities funded by TI-97 | GF-FIN-2021-005(R2) | SAF/FM | Open | 2024-04-30 00:00:00 | Based on inquiries made in FY20, and high-level testing procedures, as well as current year inquiries and additional information obtained, EY identified that the funding and project costs remain under departm"
+          },
+          {
+            "date": "2024-06-01",
+            "match": "2024-06-01",
+            "context": "of accounting.  | Air Force General Fund | True | AFIPACAP-13911 | AF-5747\nAF-5681 | Further Evaluation Needed in Determining the Net Realizable Value of Military Equipment Assets | GF-FIN-2021-006(R2) | SAF/FM | Open | 2024-06-01 00:00:00 | DAF has not sufficiently evaluated the materiality, and if appropriate, developed policies on the related accounting treatment for the following:1.Estimated salvage/residual value at time of acquisition— Depr"
+          }
+        ],
+        "context_stats": {
+          "gate_contexts": 24,
+          "corpus_contexts": 19,
+          "unique_contexts": 34
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "evidence": {
+        "entity_geography": [
+          "ment related to the NIMMS OM&S Process | WCF-FIN-2023-011 | AFMC/FM | Open | 2024-12-13 00:00:00 | EY identified the following internal control deficiencies within the NIMMS OM&S assessable unit (AU), sorted into the categories detailed above:Design Deficiency► Design Deficiency #1: DAF KC 4.8.700 (OMS-KC1): When parts are available in the Y-Store, DLA personnel will print the NIMMS Direct Issue Document and check the Storage Location for availability of the material. If the material is available as requested, the ",
+          "a DFAS employee is performing a secondary review and approving JVs over $1 billion from all WCF systems on behalf of USAF. WCF-FIN-2018-006 | Lack of Standard Operating Procedure (SOPs) and lack of precision in management review controls over Contract Authority | SAF/FM | Closed | During the planning phase, EY reviewed the Contract Authority narrative and conducted a walkthrough with the SAF/FMBOR personnel about the process by which the working capital fund receives funding. EY also walked through the process over"
+        ],
+        "turnover_financial": [
+          "ry good when 95% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is satisfactory when 90% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is marginal when 80 to 89% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is unacceptable when < 80% of qualified personnel are on the job at the start of the ",
+          "s previously negotiated by the CO. | Performance is satisfactory when 90% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is marginal when 80 to 89% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is unacceptable when < 80% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. Maintain stable key personnel workforce "
+        ],
+        "references_experience": [
+          "an 10 date extensions for the year. | Performance is satisfactory when current progress is within 10% of planned AAP tasks which the AU is responsible AND there are less than 20 date extensions for the year. | Performance is marginal when current progress is within 15% of planned AAP tasks which the AU is responsible AND there are less than 20 date extensions for the year. | Performance is unacceptable when current progress is greater than 20% behind planned AAP tasks which the AU is responsible AND there are more ",
+          "arterly Q1 ~ 1/24 Q2 ~ 4/03 Q3 ~ 6/26 Q4 ~ 10/02 | A-123 | Email to govt POCs | As required by OUSD(C) SOA Handbook Draft Self Identified Deficiencies (SIDs) | PWS Section 2.1a.3 | As required | A-123 | Email to govt POCs | Certification Statement Call Letter | PWS Section 2.1a.3 | Annual, Q1 | A-123 | Email to govt POCs | Annual RMIC Training | PWS Section 2.1a.4 | Annually, Q1 | A-123 | Posted to MyLearning | Modules 1 - 5 are posted to MyLearning. Module 0 is presented live twice to accomodate the organizations "
+        ],
+        "certifications_partner": [
+          "there are more than 20 date extensions for the year. ===== FILE: files/Appendix_B_Deliverables.xlsx ===== [SHEET Deliverables] Deliverable | Reference | Due Date/Frequency | AU | Delivery | Updates/Notes Updated A-123 Publications (AFPD, AFI, RMIC Playbook/DAFMAN) | PWS Section 2.1a.1 | Annually, Q1 | A-123 | Email to govt POCs | Quarterly Statement of Assurance Submission Packages | PWS Section 2.1a.2 & 2.1a.6.3 | Quarterly Q1 ~ 1/24 Q2 ~ 4/03 Q3 ~ 6/26 Q4 ~ 10/02 | A-123 | Email to govt POCs | As required by OUSD",
+          "rdance with a mutually agreed upon schedule, Demonstration and UAT | A-123 | | Automated initiation of fraud control assessment to populate OUSD(C) Template | PWS Paragraph 2.1.1 | In accordance with a mutually agreed upon schedule, Demonstration and UAT | A-123 | | Automated data quality control assessments and population of the OUSD(C) data quality testing and reporting template | PWS Paragraph 2.1.1 | In accordance with a mutually agreed upon schedule, Demonstration and UAT | A-123 | | User training, and configu"
+        ],
+        "staffing_team": [
+          "unless previously negotiated by the CO. | Performance is very good when 95% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is satisfactory when 90% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is marginal when 80 to 89% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is unacceptable when < 80%",
+          "f qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is satisfactory when 90% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is marginal when 80 to 89% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is unacceptable when < 80% of qualified personnel are on the job at the start of the contract, unless p"
+        ],
+        "insurance_bonds": [
+          "formance is marginal when current progress is within 15% of planned AAP tasks which the AU is responsible AND there are less than 20 date extensions for the year. | Performance is unacceptable when current progress is greater than 20% behind planned AAP tasks which the AU is responsible AND there are more than 20 date extensions for the year. ===== FILE: files/Appendix_B_Deliverables.xlsx ===== [SHEET Deliverables] Deliverable | Reference | Due Date/Frequency | AU | Delivery | Updates/Notes Updated A-123 Publicatio",
+          "ection 17.1 | Within 10 days of contract award | All | Via email to COR | [SHEET Potential RFP Deliverables ] Deliverable | Reference | Due Date/Frequency | AU | Delivery | Updates/Notes Management/Staffing Plan | Request for Proposal | All plans listed at left will be submitted as part of the Proposal, and will be incorporated into the contract. | | · All documents shall be delivered IAW the criteria established in the ID/IQ RFP Technical Criteria · The OCI Plan shall also be submitted IAW RFP/contract section 4, "
+        ],
+        "subcontracting_consortium": [
+          "ction 4, paragraph 4a-6 | The Contractor shall provide any changes or updates to the Government PMO (CO, Program Manager, Quality Assurance Manager (QAM)) and COR prior to Contractor implementation. Transition Plan | Request for Proposal | All plans listed at left will be submitted as part of the Proposal, and will be incorporated into the contract. | | · All documents shall be delivered IAW the criteria established in the ID/IQ RFP Technical Criteria | The Contractor shall provide any changes or updates to the Gov",
+          "rt of the Proposal, and will be incorporated into the contract. | | · All documents shall be delivered IAW the criteria established in the ID/IQ RFP Technical Criteria | The Contractor shall provide any changes or updates to the Government PMO (CO, Program Manager, Quality Assurance Manager (QAM)) and COR prior to Contractor implementation. Small Business SubcontractingPlan | Request for Proposal | All plans listed at left will be submitted as part of the Proposal, and will be incorporated into the contract. | | · "
+        ],
+        "deliverables_scope": [
+          "to position vacancies or unqualified personnel. | Performance is marginal when key personnel vacancies are filled with qualified personnel within 30 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is no mission impact due to position vacancies or unqualified personnel. | Performance is unacceptable when key personnel vacancies are not filled with qualified personnel within 30 calendar days of vacancy, unless approved in writing or otherwise directed in adva",
+          "Performance is marginal when key personnel vacancies are filled with qualified personnel within 30 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is no mission impact due to position vacancies or unqualified personnel. | Performance is unacceptable when key personnel vacancies are not filled with qualified personnel within 30 calendar days of vacancy, unless approved in writing or otherwise directed in advance by the CO, AND there is mission impact due to "
+        ],
+        "sla_onsite": [
+          "Assessment Summary | PWS Section 2.1b.5.2 | Annually | WCF Service Provider | Email to Government POCs | Service Provider PCM Updates | PWS Section 2.1b.5.3 | Annually | WCF Service Provider | Email to Government POCs | Service Provider CEM | PWS Section 2.1b.5.3 | Annually | WCF Service Provider | Email to Government POCs | Correspondence with Service Providers on Corrective Actions | PWS Section 2.1b.5.4 | As required | WCF Service Provider | Email to Government POCs | Audit Support MOUs | PWS Section 2.1b.5.5 | ",
+          "| Service Provider CEM | PWS Section 2.1b.5.3 | Annually | WCF Service Provider | Email to Government POCs | Correspondence with Service Providers on Corrective Actions | PWS Section 2.1b.5.4 | As required | WCF Service Provider | Email to Government POCs | Audit Support MOUs | PWS Section 2.1b.5.5 | Annually | WCF Service Provider | Email to Government POCs | Trip Report | PWS Section 24.5 | Following official travel, the Contractor shall prepare a trip report detailing the purpose of the trip, the individuals con"
+        ],
+        "term_value": [
+          "quire rework | Performance is very good when 95% of deliverables are received on time AND do not require rework | Performance is satisfactory when 90% of deliverables are received on time AND do not require rework | Performance is marginal when 85% of deliverables are received on time AND do not require rework | Performance is unacceptable when less than 85% of deliverables are received on time OR greater than 15% require rework Maintain schedule and meet major milestones | Performance is excellent when current pro",
+          "re received on time AND do not require rework | Performance is marginal when 85% of deliverables are received on time AND do not require rework | Performance is unacceptable when less than 85% of deliverables are received on time OR greater than 15% require rework Maintain schedule and meet major milestones | Performance is excellent when current progress is within 5% of planned Audit Acceleration Plan (AAP) tasks which the AU is responsible AND there are less than 10 date extensions for the year. | Performance is "
+        ],
+        "award_criteria": [
+          "roject Plan (development) | PWS Section 5.9.1 | Annually | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | Feedback/Revisions for Draft Acct Policy Data Calls | PWS Section 5.9.2 | As Required | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | Tracking system/tool to identify responsible Air Force policy implementation owners | PWS Section 5.9.3 | Weekly | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | https://fasab.gov/accounting-standards/ https://"
+        ],
+        "forms_signatures": [
+          "===== FILE: files/Appendix_A_Service_Summary.xlsx ===== [SHEET Service Summary ] Performance Objective | Performance Threshold Provide qualified people at TO start | Performance is excellent when 100% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is very good when 95% of qualified personnel are on the job at the start of the contract, unless previously negotiated by the CO. | Performance is satisfactory when 90% of qualified personnel are o",
+          "re is mission impact due to position vacancies or unqualified personnel. Develop and submit all required deliverables | Performance is excellent when 98% of deliverables are received on time AND do not require rework | Performance is very good when 95% of deliverables are received on time AND do not require rework | Performance is satisfactory when 90% of deliverables are received on time AND do not require rework | Performance is marginal when 85% of deliverables are received on time AND do not require rework | Pe"
+        ],
+        "submission": [
+          "er monitoring activities. Deliverable: Service Provider Working Group Slides 2.1a.7.3. The contractor shall collect System and Organization Control (SOC) 1 Reports and Bridge Letters from OUSD (C) and upload them to SharePoint in appropriate folders, marking CUI as necessary, within three business days of receipt. The contractor shall distribute SOC reports and Bridge Letters to stakeholders within five business days of receipt. The contractor shall maintain a SOC Reports and Bridge Letters Tracker of all reports e",
+          "e contractor shall work toward the goal of establishing eGRC as the central repository for all third-party risk assessments by the end of the contract period. This systematic integration enhances third-party risk management capabilities and data centralization, supporting clean audit opinion requirements by providing a comprehensive, auditable repository for all service provider risk assessment documentation. Deliverable: eGRC quarterly progress reports, Automated Service Provider deliverables (Development) 2.1a.7."
+        ],
+        "ip_data_security": [
+          "emediation plans (development) | PWS Section 5.9.3 | As Required | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | White paper template for gap analysis documentation (development) | PWS Section 5.9.3 | As Required | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | OUSD FMPR Tool Tracker | PWS Section 5.9.3 | Weekly | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | Policies and procedures for oversight of accounting standard implementation (developmen",
+          "nnel | OUSD FMPR Tool Tracker | PWS Section 5.9.3 | Weekly | FRPG | Email to govt lead and post to applicable FMFA Teams Channel | Policies and procedures for oversight of accounting standard implementation (development) | PWS Section 5.9.4 | Quarterly, or as needed when developed | FRPG | Maintained on Sharepoint | Templates for documenting ownership and implementation (development) | PWS Section 5.9.4 | Quarterly, or as needed when developed | FRPG | Maintained on Sharepoint | Unimplemented Standards Tracker | PW"
+        ]
+      },
+      "finality": "COMPACT_REVIEW_INPUT_NOT_A_VERDICT"
+    },
+    {
+      "candidate_id": "UK_PCS_OCDS:rls-28-AUG562550",
+      "review_key": "2bfd9936a0a63547b8103e1cb819f3d9484ac1dc72703e726a642eca27988a82",
+      "title": "CT1483 Letter Distribution and Installation",
+      "buyer": "The City of Edinburgh Council",
+      "portal": "SCOTLAND_PCS",
+      "notice_url": "https://www.publiccontractsscotland.gov.uk/NoticeDownload/Download.aspx",
+      "notice_deadline": "2026-09-17T12:00:00+00:00",
+      "best_submission_deadline": "2026-09-17T12:00:00+00:00",
+      "estimated_value": 180000.0,
+      "currency": "GBP",
+      "source_dce_run_id": 32550613010,
+      "source_shard": 0,
+      "spm_post_dce_score": 14,
+      "pipeline_priority": 45,
+      "rank_reasons": [
+        "native_spm_scope",
+        "authoritative_gate_ready"
+      ],
+      "gate_burden_signals": [],
+      "deadline_authority": {
+        "status": "NOTICE_DATE_FOUND_BUT_UNLABELLED_IN_DCE_REVIEW_REQUIRED",
+        "conflict": true,
+        "notice_deadline_raw": "2026-09-17T12:00:00+00:00",
+        "notice_deadline_date": "2026-09-17",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [
+          "2013-05-09",
+          "2026-08-18",
+          "2026-09-17"
+        ],
+        "labelled_evidence": [],
+        "evidence": [
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \n\nhe postbox and you will receive an onscreen \nconfirmation of your unique response ID. You will also receive an e-mail confirming "
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "e note: Your response has been submitted after the postbox deadline and \nmay not be\nsponse \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "--------------------------------------  ------------------ \n  \n The postbox will not be unlocked until the deadline has passed. The awarding authority \nwill \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": " \n  \n The postbox will not be unlocked until the deadline has passed. The awarding authority \nwill contact you in due course with the results of the competition.  \n  \n Response Details - \n  \n Reference: 159 \n  Received: 09 May 2013 13:23 \n  \n Your Contact Details - \n  \n    Name: DWD plant hire \n Address: Cardiff \n Contact: John Cardiff \n   Email: info@dwdpl\nire \n Address: Cardiff \n Contact: John Cardiff \n   Email: info@dwdplanthireltd.com \n  \n Com"
+          },
+          {
+            "date": "2026-08-18",
+            "match": "18/08/2026",
+            "context": "ion\nFull Notice Text\nFurther Info\nContact Info\nCoding\nTitle:\tCT1483 Letter Distribution and Installation\nReference No:\tAUG562550\nOCID:\tocds-r6ebe6-0000826170\nPublished by:\tThe City of Edinburgh Council\nPublication Date:\t18/08/2026\nDeadline Date:\t17/09/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\tThe City of Edinburgh Council Print Services team "
+          },
+          {
+            "date": "2026-09-17",
+            "match": "17/09/2026",
+            "context": "er Info\nContact Info\nCoding\nTitle:\tCT1483 Letter Distribution and Installation\nReference No:\tAUG562550\nOCID:\tocds-r6ebe6-0000826170\nPublished by:\tThe City of Edinburgh Council\nPublication Date:\t18/08/2026\nDeadline Date:\t17/09/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\tThe City of Edinburgh Council Print Services team wishes to appoint a suppli"
+          },
+          {
+            "date": "2026-08-18",
+            "match": "18/08/2026",
+            "context": "ion\nFull Notice Text\nFurther Info\nContact Info\nCoding\nTitle:\tCT1483 Letter Distribution and Installation\nReference No:\tAUG562550\nOCID:\tocds-r6ebe6-0000826170\nPublished by:\tThe City of Edinburgh Council\nPublication Date:\t18/08/2026\nDeadline Date:\t17/09/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\tThe City of Edinburgh Council Print Services team "
+          },
+          {
+            "date": "2026-09-17",
+            "match": "17/09/2026",
+            "context": "er Info\nContact Info\nCoding\nTitle:\tCT1483 Letter Distribution and Installation\nReference No:\tAUG562550\nOCID:\tocds-r6ebe6-0000826170\nPublished by:\tThe City of Edinburgh Council\nPublication Date:\t18/08/2026\nDeadline Date:\t17/09/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\tThe City of Edinburgh Council Print Services team wishes to appoint a suppli"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": " \n  \n The postbox will not be unlocked until the deadline has passed. The awarding authority \nwill contact you in due course with the results of the competition.  \n  \n Response Details - \n  \n Reference: 159 \n  Received: 09 May 2013 13:23 \n  \n Your Contact Details - \n  \n    Name: DWD plant hire \n Address: Cardiff \n Contact: John Cardiff \n   Email: info@dwdplanthireltd.com \n  \n Comments - \n                                         Supplier User Guide"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "ease contact the buyer for clarification.” \n \n \n \nConfirmation of late electronic response \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nRef: MAY045421 \nTitle: Plant hire \nAuthority: The Bay improvements \nDeadline: 09 May 2013 \n  \nYour response to the above notice has been successfully submitted to the Submission \nPostbox and allocated the reference 159. Details of your submission and documents \nuploaded are recorded below. \n  \n--------------"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": " \n  \n The postbox will not be unlocked until the deadline has passed. The awarding authority \nwill contact you in due course with the results of the competition.  \n  \n Response Details - \n  \n Reference: 159 \n  Received: 09 May 2013 13:23 \n  \n Your Contact Details - \n  \n    Name: DWD plant hire \n Address: Cardiff \n Contact: John Cardiff \n   Email: info@dwdplanthireltd.com \n  \n Comments - \n                                         Supplier User Guide"
+          },
+          {
+            "date": "2013-05-09",
+            "match": "09 May 2013",
+            "context": "her they accept or reject any late submission. You should provide the reference of your late response to the \nbuyer in any discussion on thi\n of the competition.  \n  \n Response Details - \n  \n Reference: 159 \n  Received: 09 May 2013 13:23 \n  \n Your Contact Details - \n  \n    Name: DWD plant hire \n Address: Cardiff \n Contact: John Cardiff \n   Email: info@dwdplanthireltd.com \n  \n Comments - \n                                         Supplier User Guide"
+          },
+          {
+            "date": "2026-08-18",
+            "match": "18/08/2026",
+            "context": "ion\nFull Notice Text\nFurther Info\nContact Info\nCoding\nTitle:\tCT1483 Letter Distribution and Installation\nReference No:\tAUG562550\nOCID:\tocds-r6ebe6-0000826170\nPublished by:\tThe City of Edinburgh Council\nPublication Date:\t18/08/2026\nDeadline Date:\t17/09/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\tThe City of Edinburgh Council Print Services team "
+          },
+          {
+            "date": "2026-09-17",
+            "match": "17/09/2026",
+            "context": "er Info\nContact Info\nCoding\nTitle:\tCT1483 Letter Distribution and Installation\nReference No:\tAUG562550\nOCID:\tocds-r6ebe6-0000826170\nPublished by:\tThe City of Edinburgh Council\nPublication Date:\t18/08/2026\nDeadline Date:\t17/09/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\tThe City of Edinburgh Council Print Services team wishes to appoint a suppli"
+          },
+          {
+            "date": "2026-08-18",
+            "match": "18/08/2026",
+            "context": "ion\nFull Notice Text\nFurther Info\nContact Info\nCoding\nTitle:\tCT1483 Letter Distribution and Installation\nReference No:\tAUG562550\nOCID:\tocds-r6ebe6-0000826170\nPublished by:\tThe City of Edinburgh Council\nPublication Date:\t18/08/2026\nDeadline Date:\t17/09/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\tThe City of Edinburgh Council Print Services team "
+          },
+          {
+            "date": "2026-09-17",
+            "match": "17/09/2026",
+            "context": "er Info\nContact Info\nCoding\nTitle:\tCT1483 Letter Distribution and Installation\nReference No:\tAUG562550\nOCID:\tocds-r6ebe6-0000826170\nPublished by:\tThe City of Edinburgh Council\nPublication Date:\t18/08/2026\nDeadline Date:\t17/09/2026\nDeadline Time:\t12:00\nNotice Type:\t02 Contract Notice (below FTS threshold or call offs of any value)\nHas Documents:\tYes\nHas SPD:\tYes\nAbstract:\tThe City of Edinburgh Council Print Services team wishes to appoint a suppli"
+          }
+        ],
+        "context_stats": {
+          "gate_contexts": 52,
+          "corpus_contexts": 21,
+          "unique_contexts": 45
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "evidence": {
+        "references_experience": [
+          "as usual to the postbox and you will receive an onscreen confirmation of your unique response ID. You will also receive an e-mail confirming the response. Both will include the message “Please note: Your response has been submitted after the postbox deadline and may not be accepted by the buyer. Please contact the buyer for clarification.” Confirmation of late electronic response Ref: MAY045421 Title: Plant hire Authority: The Bay improvements Deadline: 09 May 2013 Your response to the above notice has been success",
+          "to the Submission Postbox and allocated the reference 159. Details of your submission and documents uploaded are recorded below. ------------------------------------------------------------------------------ Please note: Your response has been submitted after the postbox deadline and may not be accepted by the buyer. Please contact the buyer for clarification. ----------------------------------------------------------- ------------------ The postbox will not be unlocked until the deadline has passed. The awarding a"
+        ],
+        "submission": [
+          "..... ........ 3 Postbox Response Creation ................................ ................................ ................................ ............ 7 Late Postbox Submissions................................ ................................ ................................ ............. 12 Supplier User Guide - Postbox Page | 3 What is the Postbox? The Postbox is an online submission facility which allows buyers to receive responses from suppliers electronically in a secure environment. Responses are submitte",
+          "Supplier Control Panel. Supplier Control Panel It can also be accessed by clicking the “Go to Postbox” button when viewing the notice in your interest list or Quick Quote list. Supplier User Guide - Postbox Page | 4 Notice Details – Interest List The Response Workspace is provided in two tabs – Notice Response List and Dispatched List. The Notice Response List shows all the current notices – contract notices, stage 2 notices, quick quotes – associated with your registration, which have the Postbox option activated."
+        ],
+        "ip_data_security": [
+          "20) Further Instructions The Buyer has attached further instructions with this notice. Please read these carefully and take the necessary action(s). Record your interest Postbox Q & A Additional Documents Record your interest in this notice and you will be automatically sent clarifications and deadline date changes etc. Please note that recording your interest does not automatically enter you into the tender process for this notice, you still have to submit your response by the deadline stated. To record an interes"
+        ]
+      },
+      "finality": "COMPACT_REVIEW_INPUT_NOT_A_VERDICT"
+    },
+    {
+      "candidate_id": "TED:579225-2026",
+      "review_key": "4cdd993569c573b109278aa1852e4c4d741cc42a29ab94e1e59a237b76d0b8fb",
+      "title": "Slovenia – IT services: consulting, software development, Internet and support – Operativno spremljanje stanja izvajanje GJPS JPP – sledenje vozil",
+      "buyer": "Družba za upravljanje javnega potniškega prometa, d. o. o.",
+      "portal": "TED",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/579225-2026",
+      "notice_deadline": "2026-08-28T10:00:00+02:00",
+      "best_submission_deadline": "2026-08-28T10:00:00+02:00",
+      "estimated_value": null,
+      "currency": null,
+      "source_dce_run_id": 32454041762,
+      "source_shard": null,
+      "spm_post_dce_score": null,
+      "pipeline_priority": 31,
+      "rank_reasons": [
+        "native_spm_scope",
+        "partner_route_available",
+        "authoritative_gate_ready"
+      ],
+      "gate_burden_signals": [],
+      "deadline_authority": null,
+      "evidence": {
+        "entity_geography": [
+          "orruption, by a conviction rendered at the most five years ago or in which an exclusion period set out directly in the conviction continues to be applicable? As defined in Article 3 of the Convention on the fight against corruption involving officials of the European Communities or officials of Member States of the European Union, OJ C 195, 25.6.19"
+        ],
+        "references_experience": [
+          "datum podpisa): | IZVAJALEC: Naziv izvajalca Navedba podpisnika | NAROČNIK: Družba za upravljanje javnega potniškega prometa, d.o.o. Miran Sečki direktor PONUDNIK/IZDAJATELJ MENICE | PONUDNIK/IZDAJATELJ MENICE Naziv in sedež | Zakoniti zastopnik oz. pooblaščenec | | NAROČNIKA Naziv in sedež | DUJPP, d.o.o. Reška cesta 2 6230 Postojna Poslovni račun"
+        ],
+        "certifications_partner": [
+          "59e6f3ef-15cd-4e21-82ac-ea497ccd44e2 ONFALSE a907d49e-dbf4-4dcd-b1f9-8908923d6c7f Will the economic operator be able to provide a certificate with regard to the payment of social security contributions and taxes or provide information enabling the contracting authority or contracting entity to obtaining it directly by accessing a national database"
+        ],
+        "subcontracting_consortium": [
+          "gCriterion> 612a1625-118d-4ea4-a6db-413184e7c0a8 CRITERION.SELECTION.TECHNICAL_PROFESSIONAL_ABILITY.MANAGEMENT.SUBCONTRACTING_PROPORTION Subcontracting proportion The economic operator intends possibly to subcontract the following proportion (i.e. percentage) of the contract. Please note that if the economic operator has decided to subcontract a pa"
+        ],
+        "deliverables_scope": [
+          "ov naročnika) v skladu z GDPR. Implementirani varnostni mehanizmi proti vdoru, napadom za zavrnitev storitve (ang. DOS), preobremenitvi sistema ipd. Opozorilno obvestilo administratorjem v primeru varnostnega incidenta. Uvoz podatkov Sistem mora omogočati uvoz voznih redov ter surovih ali standardiziranih podatkov iz različnih zunanjih sistemov, ki"
+        ],
+        "sla_onsite": [
+          "ivanje podatkov v realnem času o lokacijah vozil, dogodkih in drugih indikatorjih iz sistema. Varen dostop izključno preko varnega, naključno generiranega in upravljanega API-ključa. Nadzor delovanja sistema in obveščanje Sistem mora omogočati spremljanje lastnega delovanja, zaznavo napak in avtomatsko obveščanje administratorjev ob izpadu ali napa"
+        ],
+        "term_value": [
+          "da je na podlagi našega naročila, zgoraj navedeni izvajalec kvalitetno, pravočasno in skladno s pogodbenimi določili izvedel navedeno referenčno delo. Potrdilo dajemo na prošnjo izvajalca in velja izključno za potrebe pri njegovem kandidiranju za pridobitev predmetnega naročila. | Podpis in žig naročnika referenčnega posla: ===== FILE: files/_istop"
+        ],
+        "forms_signatures": [
+          "predložijo kot sestavni del ponudbe in ki izvirajo od ponudnika, morajo biti opremljeni s podpisom osebe, ki ima polno pooblastilo za zastopanje ponudnika. Naročnik si pridržuje pravico, da kadarkoli v postopku preverjanja ponudbe zahteva predložitev originalnih izvodov ali overjenih kopij. Ponudnik prevzema vse stroške, vezane na pripravo, izdelav"
+        ],
+        "ip_data_security": [
+          "ikacije Pri sistemu za spremljanje podatkov v realnem času in upravljanje podatkov javnega potniškega prometa pričakujemo izpolnjene naslednje tehnične zahteve za zagotavljanje varnosti, zanesljivosti, povezljivosti in dolgoročno razširljivost rešitve. Varnost uporabe in dostopa do informacijske rešitve Sistem mora zagotavljati varno avtentikacijo,"
+        ],
+        "payment_tax": [
+          "tyGroup> 59e6f3ef-15cd-4e21-82ac-ea497ccd44e2 ONFALSE a907d49e-dbf4-4dcd-b1f9-8908923d6c7f Will the economic operator be able to provide a certificate with regard to the payment of social security contributions and taxes or provide information enabling the contracting authority or contracting entity to obtaining it directly by accessing a national"
+        ]
+      },
+      "finality": "COMPACT_REVIEW_INPUT_NOT_A_VERDICT"
+    },
+    {
+      "candidate_id": "US-SAM:d9f8b0b232ab4b22b47f9dc3eca09ac8",
+      "review_key": "7c82b829c94b9ba691c1cd0e1dbba5506df656bb09f2226b533cd2d5e5d5badf",
+      "title": "CARC Paint Coating",
+      "buyer": "DEPT OF DEFENSE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/opp/d9f8b0b232ab4b22b47f9dc3eca09ac8/view",
+      "notice_deadline": "2026-08-27T20:00:00+00:00",
+      "best_submission_deadline": "2026-08-27T20:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "source_dce_run_id": 32552379983,
+      "source_shard": 1,
+      "spm_post_dce_score": 23,
+      "pipeline_priority": 29,
+      "rank_reasons": [
+        "staffing",
+        "authoritative_gate_ready"
+      ],
+      "gate_burden_signals": [
+        "staffing"
+      ],
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "notice_deadline_raw": "2026-08-27T20:00:00+00:00",
+        "notice_deadline_date": "2026-08-27",
+        "authoritative_submission_date": null,
+        "submission_deadline_candidates": [],
+        "query_deadline_candidates": [],
+        "dce_deadline_candidates": [],
+        "labelled_evidence": [],
+        "evidence": [],
+        "context_stats": {
+          "gate_contexts": 5,
+          "corpus_contexts": 3,
+          "unique_contexts": 6
+        },
+        "rule": "Only dates locally attached to tender/bid/quotation submission or requests-to-participate language can automatically resolve bid timing. Query/clarification dates are never accepted as submission deadlines. Missing/ambiguous submission evidence remains review-required before FINAL_SUPER_GREEN."
+      },
+      "evidence": {
+        "entity_geography": [
+          "s Set-Aside. (Deviation 2026- O0038) Utilization of Small Business Concerns. (Deviation 2026- 02 SEC I O0038) Child Labor-Cooperation with Authorities and Remedies. 2026-(Deviation 2026-O0038) Convict Labor. (Deviation 2026-O0038) 2026- 02 SEC I Equal Opportunity for Veterans. (Deviation 2026-O0038) 2026-02 SEC I Equal Opportunity for Workers with Disabilities. (Deviation 2026- 2026-O0038) Employment Reports on Veterans. (Deviation 2026-O0038) 2026-02 SEC I Notification of Employee Rights Under the National Labor R",
+          "d Representation (Feb 2026) (Deviation 2026-O0038) (a) Definitions. As used in this provision- Foreign person means any person other than a United States person. Specified Federal procurement payment means any payment made pursuant to a contract with a foreign contracting party that is for goods, manufactured or produced, or services provided in a foreign country that is not a party to an international procurement agreement with the United States. For purposes of the prior sentence, a foreign country does not inclu"
+        ],
+        "references_experience": [
+          "===== FILE: files/Attachment_0002_-_Clauses_Incorporated_by_Reference.pdf ===== Page 1 of 14 2022 2016 O0038) 2026-O0038) (Alternate I) W912CH26QA057 CLAUSES INCORPORATED BY REFERENCE CLAUSE NO ALT NO/ DEV NO CLAUSE TITLE YEAR- MO SECTION 252.203-7000 Requirements Relating to Compensation of Former DoD Officials. 2011-09 SEC I 252.203-7002 Requirement to Inform Employees of Whistleblower Rights. 2022-12 SEC I 252.203-7005 252.204-7008 252.204-7012 Representation Relating to Compensation of Former DoD -09 SEC K Offi",
+          "Incident Reporting. 252.204-7018 Prohibition on the Acquisition of Covered Defense Telecommunications Equipment or Services. 2023-01 SEC I 252.204-7023 Reporting Requirements for Contracted Services – Basic 2021-7 SEC I 252.204-7024 Notice on the Use of the Supplier Performance Risk System. 2023-03 SEC L 252.205-7000 Provision of Information to Cooperative Agreement Holders. 2024-10 SEC I 252.223-7008 Prohibition of Hexavalent Chromium. 2023-01 SEC I 252.225-7001 Buy American and Balance of Payments Program. 2024-0"
+        ],
+        "certifications_partner": [
+          "Preference for Certain Domestic Commodities. 2022-04 SEC I 252.225-7055 Representation Regarding Business Operations with the Maduro Regime. 252.225-7056 Prohibition Regarding Business Operations with the Maduro Regime. 252.225-7059 Prohibition on Certain Procurements from the Xinjiang Uyghur Autonomous Region-Representation. 252.225-7060 Prohibition on Certain Procurements from the Xinjiang Uyghur Autonomous Region. 252.226-7001 Utilization of Indian Organizations, Indian-Owned Economic Enterprises, and Native Haw",
+          "I Discrimination by Federal Contractors. 2026- (Deviation 2026-O0040, Revision 1) Sustainable Products. (Deviation 2026-O0038) 2026-02 SEC I Encouraging Contractor Policies to Ban Text Messaging While 2024- Driving. Tax on Certain Foreign Procurements. (Deviation 2026-O0038) 2026-02 SEC I 52.232-33 Payment by Electronic Funds Transfer-System for Award Management. 52.232-40 Providing Accelerated Payments to Small Business Subcontractors. 52.233-3 Protest after Award. (Deviation 2026-O0038) 52.233-4 Applicable Law fo"
+        ],
+        "staffing_team": [
+          "is authorized to perform the following functions: assure that the Contractor performs the technical requirements of the contract, perform inspections necessary in connection with contract performance, maintain written and oral communications with the Contractor concerning technical aspects of the contract, issue written interpretations of technical requirements, including Government drawings, designs, specifications, monitor Contractor's performance and notifies both the Contracting Officer and Contractor of any de",
+          "sure that the Contractor performs the technical requirements of the contract, perform inspections necessary in connection with contract performance, maintain written and oral communications with the Contractor concerning technical aspects of the contract, issue written interpretations of technical requirements, including Government drawings, designs, specifications, monitor Contractor's performance and notifies both the Contracting Officer and Contractor of any deficiencies, coordinate availability of Government pr"
+        ],
+        "insurance_bonds": [
+          "and track maintenance of all Government Provided Equipment / Materials; (g) How the Contractor will identify, investigate, and correct any non-conforming performance and prevent similar deficiencies in the future; and (h) How the Contractor will file and save all Quality Control related documents for the life of the contract plus 5 years. 1.5.1.1 The Contractor shall inform the COR of issues or potential issues that might affect the performance no later than the next working day of identifying those issues. Verbal ",
+          "gate, and correct any non-conforming performance and prevent similar deficiencies in the future; and (h) How the Contractor will file and save all Quality Control related documents for the life of the contract plus 5 years. 1.5.1.1 The Contractor shall inform the COR of issues or potential issues that might affect the performance no later than the next working day of identifying those issues. Verbal reports shall be followed by an electronic mail submission to the COR documenting the issues. 1.5.2 Quality Assurance"
+        ],
+        "subcontracting_consortium": [
+          "uarding Covered Defense Information and Cyber Incident Reporting. 252.204-7018 Prohibition on the Acquisition of Covered Defense Telecommunications Equipment or Services. 2023-01 SEC I 252.204-7023 Reporting Requirements for Contracted Services – Basic 2021-7 SEC I 252.204-7024 Notice on the Use of the Supplier Performance Risk System. 2023-03 SEC L 252.205-7000 Provision of Information to Cooperative Agreement Holders. 2024-10 SEC I 252.223-7008 Prohibition of Hexavalent Chromium. 2023-01 SEC I 252.225-7001 Buy Am",
+          "ion of Indian Organizations, Indian-Owned Economic Enterprises, and Native Hawaiian Small Business Concerns. 252 232-7003 Electronic Submission of Payment Requests and Receiving 52 203-11 Certification and Disclosure Regarding Payments to Influence 2024-09 SEC K Certain Federal Transactions. Prohibition on Contracting with Entities that Require Certain 52.203-18 Internal Confidentiality Agreements or Statements- 2017-01 SEC L Representation. 52.203-19 Prohibition on Requiring Certain Internal Confidentiality Agreem"
+        ],
+        "deliverables_scope": [
+          "===== FILE: files/Attachment_0002_-_Clauses_Incorporated_by_Reference.pdf ===== Page 1 of 14 2022 2016 O0038) 2026-O0038) (Alternate I) W912CH26QA057 CLAUSES INCORPORATED BY REFERENCE CLAUSE NO ALT NO/ DEV NO CLAUSE TITLE YEAR- MO SECTION 252.203-7000 Requirements Relating to Compensation of Former DoD Officials. 2011-09 SEC I 252.203-7002 Requirement to Inform Employees of Whistleblower Rights. 2022-12 SEC I 252.203-7005 252.204-7008 252.204-7012 Representation Relating to Compensation of Former DoD -09 SEC K Offi",
+          "USE TITLE YEAR- MO SECTION 252.203-7000 Requirements Relating to Compensation of Former DoD Officials. 2011-09 SEC I 252.203-7002 Requirement to Inform Employees of Whistleblower Rights. 2022-12 SEC I 252.203-7005 252.204-7008 252.204-7012 Representation Relating to Compensation of Former DoD -09 SEC K Officials. Compliance with Safeguarding Covered Defense Information -10 SEC K Controls. Safeguarding Covered Defense Information and Cyber Incident Reporting. 252.204-7018 Prohibition on the Acquisition of Covered De"
+        ],
+        "sla_onsite": [
+          "52.223-23 52.226-8 52.229-12 Notice of Total Small Business Set-Aside. (Deviation 2026- O0038) Utilization of Small Business Concerns. (Deviation 2026- 02 SEC I O0038) Child Labor-Cooperation with Authorities and Remedies. 2026-(Deviation 2026-O0038) Convict Labor. (Deviation 2026-O0038) 2026- 02 SEC I Equal Opportunity for Veterans. (Deviation 2026-O0038) 2026-02 SEC I Equal Opportunity for Workers with Disabilities. (Deviation 2026- 2026-O0038) Employment Reports on Veterans. (Deviation 2026-O0038) 2026-02 SEC I ",
+          "If the work is not written in the contract, the COR is not authorized to request new work. The COR is authorized to perform the following functions: assure that the Contractor performs the technical requirements of the contract, perform inspections necessary in connection with contract performance, maintain written and oral communications with the Contractor concerning technical aspects of the contract, issue written interpretations of technical requirements, including Government drawings, designs, specifications, "
+        ],
+        "award_criteria": [
+          "ting the \"Web Based Training\" link on the WAWF home page at https://wawf.eb.mil/ (e) WAWF methods of document submission. Document submissions may be via web entry, Electronic Data Interchange, or File Transfer Protocol. Page 6 of 14 (f) WAWF payment instructions. The Contractor shall use the following information when submitting payment requests and receiving reports in WAWF for this contract or task or delivery order: (1) Document type. The Contractor shall submit payment requests using the following document typ"
+        ],
+        "forms_signatures": [
+          "cover sheet Ship To Code M900000 Ship From Code N/A Mark For Code N/A_ Service Approver (DoDAAC) N/A Service Acceptor (DoDAAC) N/A Accept at Other DoDAAC N/A LPO DoDAAC N/A DCAA Auditor DoDAAC N/A Other DoDAAC(s) N/A_ (4) Payment request. The Contractor shall ensure a payment request includes documentation appropriate to the type of payment request in accordance with the payment clause, contract financing clause, or Federal Acquisition Regulation 52.216-7, Allowable Cost and Payment, as applicable. (5) Receiving re",
+          "ithin 60 to 120 days prior to the end of the fifth year of the contract; and (ii) Within 60 to 120 days prior to the date specified in the contract for exercising any option thereafter. (c) If the Contractor represented its status as any of the small business concerns identified at 19.000(a)(3) prior to award of this contract, the Contractor shall rerepresent its size and socioeconomic status according to paragraph (f) of this clause or, if applicable, paragraph (h) of this clause, for the NAICS code assigned to an"
+        ],
+        "submission": [
+          "Qualifying Country Sources as Subcontractors. 2022-03 SEC I 252.225-7012 Preference for Certain Domestic Commodities. 2022-04 SEC I 252.225-7055 Representation Regarding Business Operations with the Maduro Regime. 252.225-7056 Prohibition Regarding Business Operations with the Maduro Regime. 252.225-7059 Prohibition on Certain Procurements from the Xinjiang Uyghur Autonomous Region-Representation. 252.225-7060 Prohibition on Certain Procurements from the Xinjiang Uyghur Autonomous Region. 252.226-7001 Utilization o",
+          "type\" means the type of payment request or receiving report available for creation in Wide Area WorkFlow (WAWF). \"Local processing office (LPO)\" is the office responsible for payment certification when payment certification is done external to the entitlement system. \"Payment request\" and \"receiving report\" are defined in the clause at 252.232-7003, Electronic Submission of Payment Requests and Receiving Reports. (b) Electronic invoicing. The WAWF system provides the method to electronically process vendor payment "
+        ],
+        "ip_data_security": [
+          "_-_Clauses_Incorporated_by_Reference.pdf ===== Page 1 of 14 2022 2016 O0038) 2026-O0038) (Alternate I) W912CH26QA057 CLAUSES INCORPORATED BY REFERENCE CLAUSE NO ALT NO/ DEV NO CLAUSE TITLE YEAR- MO SECTION 252.203-7000 Requirements Relating to Compensation of Former DoD Officials. 2011-09 SEC I 252.203-7002 Requirement to Inform Employees of Whistleblower Rights. 2022-12 SEC I 252.203-7005 252.204-7008 252.204-7012 Representation Relating to Compensation of Former DoD -09 SEC K Officials. Compliance with Safeguardi",
+          "iate authority. Small business concern— (1) Means a concern, including its affiliates, that is independently owned and operated, not dominant in its field of operation, and qualified as a small business under the criteria in 13 CFR part 121 and the size standard in paragraph (d) of this clause. (2) Affiliates, as used in this definition, means business concerns, one of whom directly or indirectly controls or has the power to control the others, or a third party or parties control or have the power to control the ot"
+        ]
+      },
+      "finality": "COMPACT_REVIEW_INPUT_NOT_A_VERDICT"
+    },
+    {
+      "candidate_id": "TED:578395-2026",
+      "review_key": "bb01424f6fd57d8e778803ac6fedc16a1300f43e9fef252be93dd38af0d85f04",
+      "title": "France – Graphic design services – ACCORD CADRE RELATIF A LA CONCEPTION DE SUPPORTS DE COMMUNICATION – 3 LOTS",
+      "buyer": "LIMOGES METROPOLE - Communauté urbaine",
+      "portal": "TED",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/578395-2026",
+      "notice_deadline": "2026-09-30T02:00:00+00:00",
+      "best_submission_deadline": "2026-09-30T02:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "source_dce_run_id": 32454041762,
+      "source_shard": null,
+      "spm_post_dce_score": null,
+      "pipeline_priority": 27,
+      "rank_reasons": [
+        "native_spm_scope",
+        "authoritative_gate_ready"
+      ],
+      "gate_burden_signals": [],
+      "deadline_authority": null,
+      "evidence": {
+        "entity_geography": [
+          "arché public ou une concession dont le montant est égal ou supérieur aux seuils européens avec : des opérateurs économiques établis en Russie des opérateurs de nationalité russe des opérateurs détenus majoritairement de manière directe ou indirecte par une entité établie en Russie des opérateurs économiques agissant pour le compte de l’un d’eux L’i"
+        ],
+        "turnover_financial": [
+          "Il est inscrit sur le registre professionnel ou le registre de commerce pertinent de l'Etat membre dans lequel il est établi : Réponse : Les acheteurs peuvent-ils accéder gratuitement à ces informations par internet ? Réponse : Adresse : Code : Autorité : B. Capacité économique et financière Chiffre d'affaires annuel général Son chiffre d'affaires"
+        ],
+        "references_experience": [
+          "ifs aux nantissements et cessions de créances : Le Responsable de la Direction des Finances de Limoges Métropole – Communauté Urbaine Ordonnateur : Monsieur le Président de Limoges Métropole - Communauté Urbaine Comptable assignataire des paiements : Monsieur le Trésorier du Service Gestion Comptable (SGC) de Limoges et amendes Imputation budgétair"
+        ],
+        "certifications_partner": [
+          "iger un mémoire justificatif explicatif comportant 50 pages maximum hors annexes. Le mémoire justificatif et explicatif devra comporter les éléments suivants : 1- La description des moyens techniques du candidat pour réaliser la prestation 2- La description des moyens humains du candidat pour réaliser la prestation 3- Le processus de conception dét"
+        ],
+        "staffing_team": [
+          "banderoles et oriflammes ; - Visuels destinés à l’insertion publicitaire (presse papier et digitale) et à l’affichage ; - Webdesign (site internet, application) ; - Animations de type motion design. Lot n° 2 : photographies de promotion, d'information, d’événementiel et vidéos - Prise de photographies de promotion , d’information ou d’év énementiel"
+        ],
+        "insurance_bonds": [
+          "nitial. Le remboursement de l’avance s’effectue par précompte sur les sommes dues ultérieurement au titulaire à titre d’acompte ou de solde. Une avance peut être versée, sur leur demande, aux sous-traitants bénéficiaires du paiement direct suivant les mêmes dispositions que celles applicables au titulaire du marché, avec les particularités détaillé"
+        ],
+        "subcontracting_consortium": [
+          "aitants payés directement, les noms de ces sous-traitants et les conditions de paiement des contrats de sous-traitance ; le montant des prestations sous-traitées indiqué dans chaque annexe constitue le montant maximal de la créance que le sous-traitant concerné pourra présenter en nantissement ou céder. Chaque annexe constitue une demande d’accepta"
+        ],
+        "deliverables_scope": [
+          "e ces sous-traitants et les conditions de paiement des contrats de sous-traitance ; le montant des prestations sous-traitées indiqué dans chaque annexe constitue le montant maximal de la créance que le sous-traitant concerné pourra présenter en nantissement ou céder. Chaque annexe constitue une demande d’acceptation du sous-traitant concerné et d’a"
+        ],
+        "sla_onsite": [
+          "votre réponse : Indiquer les raisons autorisant néanmoins à remplir les obligations du contrat. Ces données ne sont pas nécessaires si l'exclusion d'opérateurs économiques est obligatoire en vertu de la législation nationale, sans possibilité de dérogation dans les cas où l'opérateur est malgré tout en mesure de remplir le contrat : Les acheteurs p"
+        ],
+        "term_value": [
+          "RTITION DES PRESTATIONS S’agissant d’un accord-cadre, la répartition ci-après des prestations entre co-traitants est réalisée par type de prestations à chaque bon de commande. Aussi les montants ou pourcentage de répartition sont donnés uniquement à titre indicatif et ne sont pas contractuels. ACCORD CADRE RELATIF A LA CONCEPTION DE SUPPORTS DE COM"
+        ],
+        "award_criteria": [
+          "capacités professionnelles, techniques et financières. 7.2 - Attribution des accords-cadres Le jugement des offres sera effectué dans les conditions prévues aux articles R. 2152 -1 et R. 2152 -2 du Code de la Commande Publique et donnera lieu à un classement des offres. L'attention des candidats est attirée sur le fait que toute offre irrégulière p"
+        ],
+        "forms_signatures": [
+          "ec / sans question posée Avec / sans dépôt Avec / sans message échangé Consultations clôturées Recherche avancée Annonces Consultations en cours Recherche rapide Toutes les consultations Recherche avancée Recherche d'une procédure restreinte Annonces d'information ou d'attribution Toutes les annonces d'information Toutes les annonces d'attribution"
+        ],
+        "submission": [
+          "- Adresses supplémentaires et points de contact Pour tout renseignement complémentaire concernant cette consultation, les candidats devront faire parvenir au plus tard 10 jours avant la date limite de réception des offres (DLRO) , une demande écrite. Les candidats transmettront obligatoirement leur demande par l'intermédiaire du profil d'acheteur d"
+        ],
+        "ip_data_security": [
+          "ractère personnel pour le compte de Limoges Métropole (responsable de traitement), en qualité de sous-traitant au sens du RGPD. Les supports informatiques et documents fournis par le pouvoir adjudicateur au titulaire du marché restent la propriété du pouvoir adjudicateur. Les données contenues dans ces supports et documents sont strictement couvert"
+        ],
+        "payment_tax": [
+          "xécuter par des sous-traitants payés directement, les noms de ces sous-traitants et les conditions de paiement des contrats de sous-traitance ; le montant des prestations sous-traitées indiqué dans chaque annexe constitue le montant maximal de la créance que le sous-traitant concerné pourra présenter en nantissement ou céder. Chaque annexe constitu"
+        ]
+      },
+      "finality": "COMPACT_REVIEW_INPUT_NOT_A_VERDICT"
+    }
+  ],
   "contract": "Compact dynamic input for final business adjudication. It never creates a verdict, never upgrades UNKNOWN to PASS, and never bypasses authoritative DCE or final-verdict guards."
 }
