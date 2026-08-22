@@ -182,3 +182,42 @@ def test_apply_state_valid_exact_contract_satisfies_existing_queue():
     assert out_ledger[0]["needs_reclassification"] is False
     assert audit["exact_hash_applied"] == 1
     assert audit["queue_satisfied_from_state"] == 1
+
+
+def test_semantically_current_legacy_guard_provenance_is_migrated_once():
+    legacy = state_row(
+        post_guard_schema=None,
+        post_guard_notice_context_used=None,
+        post_guard_context_source=None,
+    )
+    first_state, first_remaining, first_summary = merge_state.merge(
+        [ledger_row()],
+        [],
+        [legacy],
+        [],
+        target_version=VERSION,
+        accepted_at=NOW,
+        snapshot_rows=[snapshot_notice()],
+    )
+    assert first_remaining == []
+    assert len(first_state) == 1
+    migrated = first_state[0]
+    assert migrated["post_guard_schema"].startswith(merge_state.EXACT_POST_GUARD_PREFIX)
+    assert migrated["post_guard_notice_context_used"] is True
+    assert migrated["post_guard_context_source"] == "merge_legacy_state_audit"
+    assert migrated["legacy_post_guard_provenance_migrated_at"] == NOW
+    assert first_summary["stats"]["previous_legacy_guard_provenance_migrated"] == 1
+
+    second_state, second_remaining, second_summary = merge_state.merge(
+        [ledger_row()],
+        [],
+        first_state,
+        [],
+        target_version=VERSION,
+        accepted_at=NOW,
+        snapshot_rows=[snapshot_notice()],
+    )
+    assert second_remaining == []
+    assert len(second_state) == 1
+    assert second_summary["stats"].get("previous_legacy_guard_audited", 0) == 0
+    assert second_summary["stats"].get("previous_legacy_guard_provenance_migrated", 0) == 0
