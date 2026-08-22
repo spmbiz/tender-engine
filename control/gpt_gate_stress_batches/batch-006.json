@@ -1,308 +1,244 @@
 {
   "schema": "GPT_GATE_STRESS_BATCH_V1",
-  "generated_at": "2026-08-18T16:03:54.227814+00:00",
+  "generated_at": "2026-08-22T12:09:40.223623+00:00",
   "batch_index": 6,
   "start_rank": 61,
   "end_rank": 70,
   "count": 10,
   "items": [
     {
-      "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165449-2026-08-13",
-      "title": "5/2/1/1 2026-2027/151",
-      "buyer": "National - Department of Agriculture",
-      "portal": "ZA_ETENDERS",
-      "notice_url": "https://ocds-api.etenders.gov.za/api/OCDSReleases/release/ocds-9t57fa-165449",
-      "deadline": "2026-08-21T11:00:00+00:00",
-      "estimated_value": 0.0,
-      "currency": "ZAR",
+      "candidate_id": "TED:569744-2026",
+      "title": "Croatia – Telecommunications services – ELEKTRONIČKE KOMUNIKACIJSKE USLUGE U POKRETNOJ MREŽI",
+      "buyer": "GRAD ZAGREB",
+      "portal": "TED",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/569744-2026",
+      "deadline": "2026-08-31T10:00:00+02:00",
+      "estimated_value": 3015329.7,
+      "currency": "EUR",
       "review_stage": "BUSINESS_GATES",
       "gate_readiness": true,
       "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-      "evidence_gate_coverage": 12,
-      "spm_post_dce_score": 23,
+      "evidence_gate_coverage": 2,
+      "spm_post_dce_score": 28,
       "spm_fit_band": "MAYBE",
-      "spm_fit_reasons": [],
+      "spm_fit_reasons": [
+        "communications"
+      ],
       "spm_friction_signals": [],
       "upstream_classification": "MODEL_REVIEW_REQUIRED",
       "deadline_authority": {
-        "status": "NOTICE_DATE_FOUND_BUT_UNLABELLED_IN_DCE_REVIEW_REQUIRED",
-        "conflict": true,
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
+        "authoritative_submission_date": null
+      },
+      "evidence_quality": {
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "documents_with_text": 2,
+        "text_chars": 8122
+      },
+      "gate_evidence": {
+        "sla_onsite": {
+          "text": "===== FILE: files/portal_page.txt ===== Elektronički oglasnik javne nabave Republike Hrvatske koristi \"kolačiće\" (\"cookies\"). Postavke kolačića mogu se kontrolirati i konfigurirati u vašem web-pregledniku. Za nastavak korištenja EOJN RH potrebno je kliknuti na \"Slažem se\". Slažem se Skočite na glavni sadržaj Nabava Koncesije HRV | ENG EOJN RH Planovi nabave…",
+          "source": null
+        },
+        "forms_signatures": {
+          "text": "novi nabave Planovi nabave Planovi središnje nabave Sve planirane nabave Istraživanja tržišta Istraživanja tržišta Objave Prethodna savjetovanja Savjetovanja Objave Postupci Sve nabave Javna nabava Jednostavna nabava Obnova Dinamički sustavi nabave Sustavi kvalifikacije Objave Sve objave Jednostavna nabava Obnova Odluke Odluke o odabiru Odluke o sklapanju o…",
+          "source": null
+        }
+      },
+      "raw_dce_row_found": true,
+      "artifact_locator": {
+        "dce_run_id": 32123828524,
+        "shard": 21,
+        "candidate_id": "TED:569744-2026",
+        "release_tag": "dce-harvest-32123828524"
+      },
+      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
+      "_deep_batch_hint": "batch-006.json"
+    },
+    {
+      "candidate_id": "TED:570646-2026",
+      "title": "Latvia – Public relations services – Sociālās kampaņas “neJAUCIES svešās darīšanās” izstrāde",
+      "buyer": "Valsts izglītības attīstības aģentūra",
+      "portal": "TED",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/570646-2026",
+      "deadline": "2026-09-07T10:00:00+02:00",
+      "estimated_value": null,
+      "currency": null,
+      "review_stage": "BUSINESS_GATES",
+      "gate_readiness": true,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "evidence_gate_coverage": 0,
+      "spm_post_dce_score": 28,
+      "spm_fit_band": "MAYBE",
+      "spm_fit_reasons": [
+        "public-relations"
+      ],
+      "spm_friction_signals": [],
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "deadline_authority": {
+        "status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+        "conflict": false,
+        "authoritative_submission_date": "2026-09-07"
+      },
+      "evidence_quality": {
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "documents_with_text": 2,
+        "text_chars": 8338
+      },
+      "gate_evidence": {},
+      "raw_dce_row_found": true,
+      "artifact_locator": {
+        "dce_run_id": 32123828524,
+        "shard": 6,
+        "candidate_id": "TED:570646-2026",
+        "release_tag": "dce-harvest-32123828524"
+      },
+      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
+      "_deep_batch_hint": "batch-006.json"
+    },
+    {
+      "candidate_id": "TED:536997-2026",
+      "title": "Latvia – Public relations services – Sabiedrības izglītošana par sociālo darbu, sociālā darba speciālistu ieguldījumu un sociālā darba profesijas izvēli",
+      "buyer": "Labklājības ministrija",
+      "portal": "TED",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/536997-2026",
+      "deadline": "2026-09-03T02:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "review_stage": "BUSINESS_GATES",
+      "gate_readiness": true,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "evidence_gate_coverage": 0,
+      "spm_post_dce_score": 28,
+      "spm_fit_band": "MAYBE",
+      "spm_fit_reasons": [
+        "public-relations"
+      ],
+      "spm_friction_signals": [],
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "deadline_authority": {
+        "status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+        "conflict": false,
+        "authoritative_submission_date": "2026-09-03"
+      },
+      "evidence_quality": {
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "documents_with_text": 4,
+        "text_chars": 36298
+      },
+      "gate_evidence": {},
+      "raw_dce_row_found": true,
+      "artifact_locator": {
+        "dce_run_id": 32349068366,
+        "shard": 31,
+        "candidate_id": "TED:536997-2026",
+        "release_tag": "dce-harvest-32349068366"
+      },
+      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
+      "_deep_batch_hint": "batch-006.json"
+    },
+    {
+      "candidate_id": "GR-KHMDHS:26PROC019640022",
+      "title": "ΠΡΟΣΚΛΗΣΗ ΠΙΝ ΣΤΗΝ «ONE DIGITAL SERVICES A.E.»",
+      "buyer": "ΠΕΡΙΦΕΡΕΙΑ ΙΟΝΙΩΝ ΝΗΣΩΝ",
+      "portal": "GR_KHMDHS",
+      "notice_url": "https://cerpp.eprocurement.gov.gr/upgkimdis/unprotected/home.xhtml?referenceNumber=26PROC019640022",
+      "deadline": "2026-08-26T14:00:00+00:00",
+      "estimated_value": 5000.0,
+      "currency": "EUR",
+      "review_stage": "BUSINESS_GATES",
+      "gate_readiness": true,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "evidence_gate_coverage": 0,
+      "spm_post_dce_score": 27,
+      "spm_fit_band": "MAYBE",
+      "spm_fit_reasons": [
+        "digital-services"
+      ],
+      "spm_friction_signals": [],
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "deadline_authority": {
+        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
+        "conflict": false,
         "authoritative_submission_date": null
       },
       "evidence_quality": {
         "raw_status": "DOWNLOADED_PUBLIC",
         "content_quality": "SUBSTANTIVE_DCE_PRESENT",
         "documents_with_text": 1,
-        "text_chars": 60134
+        "text_chars": 25185
       },
-      "gate_evidence": {
-        "entity_geography": {
-          "text": "unloaded in the specified store or depot or on the specified site in compliance with the conditions of the contract or order, the supplier bearing all risks and charges involved until the supplies are so delivered and a valid receipt is obtained. 1.11 \"Dumping\" occurs when a private enterprise abroad market its goods on own initiative in the RSA at lower pr…",
-          "source": null
-        },
-        "references_experience": {
-          "text": "icable law 31. Notices 32. Taxes and duties 33. National Industrial Participation Programme (NIPP) 34. Prohibition of restrictive practices Page 4 of 31 3 General Conditions of Contract 1. Definitions 1. The following terms shall be interpreted as indicated: 1.1 “Closing time” means the date and hour specified in the b idding documents for the receipt of bi…",
-          "source": null
-        },
-        "certifications_partner": {
-          "text": "OTE TO THE DEPARTMENT OF AGRICULTURE _____________________________________________________________________________ RFQ NO: 5/2/1/1 2026-2027/151 CLOSING TIME: 11H00 CLOSING DATE: 21 AUGUST 2026 QUOTATIONS RECEIVED AFTER THE CL OSING DATE AND TIME AS RULE WILL NOT BE ACCEPTED FOR CONSIDERATION _________________________________________________________________…",
-          "source": null
-        },
-        "insurance_bonds": {
-          "text": "• The General Conditions of Contract will form part of all bid documents and may not be amended. • Special Conditions of Contract (SCC) relevant to a specific bid, should be compiled separately for every bid (if (applicable) and will supplement the General Conditions of Contract. Whenever there is a conflict, the provisions in the SCC shall prevail. Page 3 …",
-          "source": null
-        },
-        "subcontracting_consortium": {
-          "text": "to a specific bid, should be compiled separately for every bid (if (applicable) and will supplement the General Conditions of Contract. Whenever there is a conflict, the provisions in the SCC shall prevail. Page 3 of 31 2 TABLE OF CLAUSES 1. Definitions 2. Application 3. General 4. Standards 5. Use of contract documents and information; inspection 6. Patent…",
-          "source": null
-        },
-        "deliverables_scope": {
-          "text": "L EXTENSION REFORM. CLOSING DATE: 21 AUGUST 2026 @ 11:00 TECHNICAL ENQUIRIES : Ms Fezeka Matebeni TEL : 012 337 9372/078 824 9942 EMAIL: FezekaMa@nda.gov.za / MotshidisiS@nda.gov.za QUOTATION RELATED ENQUIRIES : Ms. Mmatheo Ranamane TEL : (012) 312 8377/8401 EMAIL: MmtheoR@nda.gov.za / QueenethM@nda.gov.za NB: QUOTATIONS MUST BE SUBMITTED TO: Department of …",
-          "source": null
-        },
-        "sla_onsite": {
-          "text": "OVE PARTICULARS MAY RENDER THE QUOTATION INVALID. SIGNATURE OF BIDDER: …………………………………………… CAPACITY UNDER WHICH THIS SERVICE PROVIDER IS SIGNED: …………………………………………… (Proof of authority must be submitted e.g., company resolution) DATE: …………………………………………... Page 18 of 31 SBD4 BIDDER’S DISCLOSURE 1. PURPOSE OF THE FORM Any person (natural or juristic) may make an o…",
-          "source": null
-        },
-        "term_value": {
-          "text": "===== FILE: files/5-2-1-1-2026-2027-151.pdf ===== LA 1.2 5/2/1/1 2026-2027/151 APPOINTMENT OF A SERVICE PROVIDER TO DESIGN, LAYOUT AND PRINTING OF THE FIVE -YEAR REPORT (2019/20 -2023/24) ON THE NATIONAL POLICY ON EXTENSION AND ADVISORY SERVICES AT THE DEPARTMENT OF AGRICULTURE: DIRECTORATE: NATIONAL EXTENSION REFORM. CLOSING DATE: 21 AUGUST 2026 @ 11:00 TE…",
-          "source": null
-        },
-        "award_criteria": {
-          "text": "9372/078 824 9942 EMAIL: FezekaMa@nda.gov.za / MotshidisiS@nda.gov.za QUOTATION RELATED ENQUIRIES : Ms. Mmatheo Ranamane TEL : (012) 312 8377/8401 EMAIL: MmtheoR@nda.gov.za / QueenethM@nda.gov.za NB: QUOTATIONS MUST BE SUBMITTED TO: Department of Agriculture 600 Lillian Ngoyi Berea Park Pretoria NB: QUOTATIONS MUST BE DEPOSITED IN THE QUOTATION BOX AT RECEP…",
-          "source": null
-        },
-        "forms_signatures": {
-          "text": "ion for insolvency 27. Settlement of disputes 28. Limitation of liability 29. Governing language 30. Applicable law 31. Notices 32. Taxes and duties 33. National Industrial Participation Programme (NIPP) 34. Prohibition of restrictive practices Page 4 of 31 3 General Conditions of Contract 1. Definitions 1. The following terms shall be interpreted as indica…",
-          "source": null
-        },
-        "submission": {
-          "text": "===== FILE: files/5-2-1-1-2026-2027-151.pdf ===== LA 1.2 5/2/1/1 2026-2027/151 APPOINTMENT OF A SERVICE PROVIDER TO DESIGN, LAYOUT AND PRINTING OF THE FIVE -YEAR REPORT (2019/20 -2023/24) ON THE NATIONAL POLICY ON EXTENSION AND ADVISORY SERVICES AT THE DEPARTMENT OF AGRICULTURE: DIRECTORATE: NATIONAL EXTENSION REFORM. CLOSING DATE: 21 AUGUST 2026 @ 11:00 TE…",
-          "source": null
-        },
-        "ip_data_security": {
-          "text": "tration document. 2.11 The Department will use the Central Supplier Database and documents submitted by the tenderer to verify the points claimed for specific goals. 2.12 Specific goals for the tender and points claimed are indicated per the table below. (Note to organs of state: Where either the 90/10 or 80/20 preference point system is applicable, corresp…",
-          "source": null
-        }
-      },
+      "gate_evidence": {},
       "raw_dce_row_found": true,
       "artifact_locator": {
-        "dce_run_id": 32145247355,
-        "shard": 1,
-        "candidate_id": "ZA_ETENDERS_OCDS:ocds-9t57fa-165449-2026-08-13",
-        "release_tag": "dce-harvest-32145247355"
+        "dce_run_id": 32213968608,
+        "shard": 45,
+        "candidate_id": "GR-KHMDHS:26PROC019640022",
+        "release_tag": "dce-harvest-32213968608"
       },
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
       "_deep_batch_hint": "batch-006.json"
     },
     {
-      "candidate_id": "TED:571876-2026",
-      "title": "Ireland – Business services: law, marketing, consulting, recruitment, printing and security – Multi Supplier Framework Agreement for the provision of Services related to the Receipt and Investigation of Protected Disclosures (THR081F)",
-      "buyer": "The Office of Government Procurement",
+      "candidate_id": "TED:575741-2026",
+      "title": "Latvia – Public relations services – Satura nodrošināšana latviešu un angļu valodā inovāciju un tehnoloģiju portālā Labs of Latvia",
+      "buyer": "Latvijas Investīciju un attīstības aģentūra",
       "portal": "TED",
-      "notice_url": "https://ted.europa.eu/en/notice/-/detail/571876-2026",
-      "deadline": "2026-08-28T12:00:00+01:00",
-      "estimated_value": 2200000.0,
-      "currency": "EUR",
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/575741-2026",
+      "deadline": "2026-09-21T02:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
       "review_stage": "BUSINESS_GATES",
       "gate_readiness": true,
       "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-      "evidence_gate_coverage": 14,
-      "spm_post_dce_score": 22,
+      "evidence_gate_coverage": 0,
+      "spm_post_dce_score": 24,
       "spm_fit_band": "MAYBE",
-      "spm_fit_reasons": [],
-      "spm_friction_signals": [],
-      "upstream_classification": "MODEL_REVIEW_REQUIRED",
-      "deadline_authority": {
-        "status": "DCE_AUTHORITATIVE_SUBMISSION_DATE_OVERRIDES_NOTICE_METADATA",
-        "conflict": false,
-        "authoritative_submission_date": "2026-09-08"
-      },
-      "evidence_quality": {
-        "raw_status": "DOWNLOADED_PUBLIC",
-        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-        "documents_with_text": 127,
-        "text_chars": 3516880
-      },
-      "gate_evidence": {
-        "entity_geography": {
-          "text": "rsidR=\"00AF73B5\" w14:paraId=\"4511E5E7\" w14:textId=\"77777777\" w:rsidTr=\"00034850\"><w:trPr><w:trHeight w:val=\"1350\"/><w:jc w:val=\"center\"/></w:trPr><w:tc><w:tcPr><w:tcW w:w=\"2693\" w:type=\"dxa\"/><w:vMerge/><w:vAlign w:val=\"center\"/><w:hideMark/></w:tcPr><w:p w14:paraId=\"3A1E13CC\" w14:textId=\"77777777\" w:rsidR=\"00AF73B5\" w:rsidRDefault=\"00AF73B5\"><w:pPr><w:rPr>…",
-          "source": null
-        },
-        "turnover_financial": {
-          "text": "tion 2022/576 or any subsequent amendments to same). I understand and acknowledge that the provision of inaccurate or misleading information in this declaration may lead to my business/firm/company/partnership being excluded from participation in this or future tenders, and I make this solemn declaration conscientiously believing the same to be true and by …",
-          "source": null
-        },
-        "references_experience": {
-          "text": "ase=\"dms:DateTime\"/> </xsd:simpleType> </xsd:element> <xsd:element name=\"eDocs_FileStatus\" ma:index=\"5\" ma:displayName=\"Status\" ma:default=\"Live\" ma:format=\"Dropdown\" ma:indexed=\"true\" ma:internalName=\"eDocs_FileStatus\"> <xsd:simpleType> <xsd:restriction base=\"dms:Choice\"> <xsd:enumeration value=\"Live\"/> <xsd:enumeration value=\"Archived\"/> <xsd:enumeration …",
-          "source": null
-        },
-        "certifications_partner": {
-          "text": ") listed below. Name | Skill Category | | | | | Biographical Details- Key Account Manager | Biographical Details- Key Account Manager | Biographical Details- Key Account Manager | Biographical Details- Key Account Manager Name | | | Position in Firm | | | Role | | | No. of Years’ Experience | | | | | | Qualification Details: Educational/Professional/Trainin…",
-          "source": null
-        },
-        "staffing_team": {
-          "text": "s of the referee must include: • Client organisation name; • Client referee information (Client name, address, contact information); • Anonymised particulars of the investigation, including outcomes; • Relevance of example to the requirements of Appendix 1 to the RFT; Date in which the Case or confidential recipient services commenced; • Date of completion …",
-          "source": null
-        },
-        "insurance_bonds": {
-          "text": "rm that all prices quoted in our Tender will remain valid for the period of time commencing from the Tender Deadline specified at paragraph 2.10.3 of the RFT. | We confirm that all prices quoted in our Tender will remain valid for the period of time commencing from the Tender Deadline specified at paragraph 2.10.3 of the RFT. | We confirm that all prices qu…",
-          "source": null
-        },
-        "subcontracting_consortium": {
-          "text": "fer upon it undue advantages in respect of the Competition; or negligently provided misleading information that may have a material influence on decisions concerning exclusion, selection or award. [Click here and insert name of entity] does not come within the category of prohibited economic operators identified in Regulation (EU) No 833/2014 of 31 July 201…",
-          "source": null
-        },
-        "deliverables_scope": {
-          "text": "d regime File Associated :<8854371_Contract notice - general directive, standard regime.pdf > ===== FILE: files/1337_8854371_unpacked/1_THR081F- Tender Response Document Part C - Pricing Schedule.docx ===== Multi Supplier Framework Agreement for the provision of Services related to the Receipt and Investigation of Protected Disclosures (THR081F) Tender Resp…",
-          "source": null
-        },
-        "sla_onsite": {
-          "text": "that may be required under the proposed Framework Agreement. No guarantee is given regarding any minimum number of hours or level of Services that may be required under the proposed Framework Agreement and any Services Contract. Tenderers must not make any alterations to the Pricing Schedule. Tenderers must complete the pricing schedule in the prescribed fo…",
-          "source": null
-        },
-        "term_value": {
-          "text": "ion 6(2) PD Act) | € | 200 | € - | | Lot 3 Total: | Lot 3 Total: | | Cost Score | = | Lowest Total Cost Submitted under the Framework Lot | x | Maximum Number of Marks Available (600 Marks) Cost Score | = | Total Cost under evaluation under the Framework Lot | x | Maximum Number of Marks Available (600 Marks) ===== FILE: files/1337_8854371_unpacked/1_THR081…",
-          "source": null
-        },
-        "award_criteria": {
-          "text": "e tick the relevant box) Instructions Please refer to Appendix 2 of the RFT. This Pricing Schedule must be fully completed by the Tenderer for each Lot applied for. No undertaking is given regarding any minimum volume of Services that may be required under the proposed Framework Agreement. No guarantee is given regarding any minimum number of hours or level…",
-          "source": null
-        },
-        "forms_signatures": {
-          "text": "===== FILE: files/1337_8854371_unpacked/1337_8854371.pdf ===== List of Contract Documents #Addenda ID N/A Status Final Title THR081F- Tender Response Document Part C - Pricing Schedule File Associated :<1_THR081F- Tender Response Document Part C - Pricing Schedule.docx > #Addenda ID N/A Status Final Title THR081F- Tender Response Document Part B - Qualitati…",
-          "source": null
-        },
-        "submission": {
-          "text": "provided in the dedicated response areas for each question will be used for the evaluation of that question. Information provided elsewhere will NOT be assessed unless otherwise stated. As such, Tenderers must ensure to include only relevant information in the applicable response areas below. Tenders not in this response format will NOT be considered. Tende…",
-          "source": null
-        },
-        "ip_data_security": {
-          "text": "onts w:ascii=\"Calibri\" w:hAnsi=\"Calibri\" w:cs=\"Calibri\"/><w:b/><w:bCs/><w:sz w:val=\"23\"/><w:szCs w:val=\"23\"/></w:rPr></w:pPr><w:sdt><w:sdtPr><w:rPr><w:rStyle w:val=\"Style2\"/></w:rPr><w:id w:val=\"853690521\"/><w:placeholder><w:docPart w:val=\"54123F5F765E494D88E76D7BD4D88A4E\"/></w:placeholder><w:showingPlcHdr/><w:dropDownList><w:listItem w:value=\"Please choose…",
-          "source": null
-        }
-      },
-      "raw_dce_row_found": true,
-      "artifact_locator": {
-        "dce_run_id": 32123828524,
-        "shard": 17,
-        "candidate_id": "TED:571876-2026",
-        "release_tag": "dce-harvest-32123828524"
-      },
-      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
-      "_deep_batch_hint": "batch-006.json"
-    },
-    {
-      "candidate_id": "IE:8860090",
-      "title": "Website and App Accessibility Audit Solution",
-      "buyer": "Department of Housing Local Government and Heritage",
-      "portal": "IRELAND_ETENDERS",
-      "notice_url": "https://www.etenders.gov.ie/epps/cft/prepareViewCfTWS.do?resourceId=8860090",
-      "deadline": "2026-09-18T12:00:00+01:00",
-      "estimated_value": 350000.0,
-      "currency": "EUR",
-      "review_stage": "BUSINESS_GATES",
-      "gate_readiness": true,
-      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-      "evidence_gate_coverage": 14,
-      "spm_post_dce_score": 22,
-      "spm_fit_band": "MAYBE",
-      "spm_fit_reasons": [],
+      "spm_fit_reasons": [
+        "public-relations"
+      ],
       "spm_friction_signals": [],
       "upstream_classification": "MODEL_REVIEW_REQUIRED",
       "deadline_authority": {
         "status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
         "conflict": false,
-        "authoritative_submission_date": "2026-09-18"
+        "authoritative_submission_date": "2026-09-21"
       },
       "evidence_quality": {
         "raw_status": "DOWNLOADED_PUBLIC",
         "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-        "documents_with_text": 18,
-        "text_chars": 943618
+        "documents_with_text": 4,
+        "text_chars": 36207
       },
-      "gate_evidence": {
-        "entity_geography": {
-          "text": "dit Platform Tender procedure: Open procedure Tender Deadline 12:00 (noon) 18th September 2026 2 Contents Part 1: Introduction Part 2: Instructions to Tenderers Part 3: Selection and Award Criteria Appendix 1: Requirements and Specifications Appendix 2: Pricing Schedule Appendix 3: Tenderer’s Statement Appendix 4: Declaration as to Personal Circumstances of…",
-          "source": null
-        },
-        "turnover_financial": {
-          "text": "ue of the Services Contract) does not come within the category of prohibited economic operators identified in Regulation (EU) No 833/2014 of 31 July 2014 (as amended by EU Regulation 2022/576) then, it shall be excluded from further participation in this Competition unless it replaces the Subcontractor with one which meets all relevant requirements of this …",
-          "source": null
-        },
-        "references_experience": {
-          "text": "lic Office Acts 1995 and 2001, copies of which are available at www.irishstatutebook.ie. The Contracting Authority will, at its absolute discretion, decide on the appropriate course of action, which may in appropriate circumstances include eliminating a Tenderer from this Competition or terminating any Services Contract entered into by a Tenderer. Tenderers…",
-          "source": null
-        },
-        "certifications_partner": {
-          "text": "or, in the case of policies with an aggregate limit of indemnity, any outstanding claims, which could have a material adverse impact on the level of coverage specified above. A formal confirmation from the Tenderer's insurance company or broker to this effect will be requested from the successful Tenderer(s) prior to the award of (and shall be a condition o…",
-          "source": null
-        },
-        "staffing_team": {
-          "text": "the Contracting Authority between [insert date] and [insert date] (the “Submission Clarifications”). The Submission (including the Submission Clarifications) is hereby incorporated by reference into this Agreement. 1. This Agreement consists of the following documents, and in the case of conflict of wording, in the following order of priority: i. This Agree…",
-          "source": null
-        },
-        "insurance_bonds": {
-          "text": "ies at [insert relevant addresses] shall be organised on [date] between the hours of [x and y]. Tenderers wishing to make an appointment to avail of this opportunity must confirm their attendance by contacting [name of person] at [insert email address] by [insert date and time]. Attendance at the Contracting Authority’s premises will be subject to complianc…",
-          "source": null
-        },
-        "subcontracting_consortium": {
-          "text": "s including name, title, telephone number, postal address, facsimile number and e-mail address of the nominated entity authorised to represent the Tenderer and to whom all communications shall be directed and accepted until this Competition has been completed or terminated. Correspondence from any other person will NOT be accepted, acknowledged or responded…",
-          "source": null
-        },
-        "deliverables_scope": {
-          "text": "===== FILE: files/2192_8860090_unpacked/1_Website and App Accessibility RFT Final.pdf ===== Request for Tenders dated 17th August 2026 for the provision of Website and App Accessibility Audit Platform Tender procedure: Open procedure Tender Deadline 12:00 (noon) 18th September 2026 2 Contents Part 1: Introduction Part 2: Instructions to Tenderers Part 3: Se…",
-          "source": null
-        },
-        "sla_onsite": {
-          "text": "re the Tender Deadline, to update or amend the information contained in this document and/or to extend the Tender Deadline. Participating Tenderers will be informed of any such amendment or extension through the eTenders website. 2.7.5 Tenderers should ensure that they register their interest in this Competition, by clicking on the “Accept” button on www.et…",
-          "source": null
-        },
-        "term_value": {
-          "text": "ach Lot will result in a separate contract. [Insert description of Lots and any rules / instructions in relation to Lots] 1.4 This public procurement competition (the “Competition”) will be conducted in accordance with the open procedure under the European Union (Award of Public Authority Contracts) Regulations 2016 (Statutory Instrument 284 of 2016) (the “…",
-          "source": null
-        },
-        "award_criteria": {
-          "text": "===== FILE: files/2192_8860090_unpacked/1_Website and App Accessibility RFT Final.pdf ===== Request for Tenders dated 17th August 2026 for the provision of Website and App Accessibility Audit Platform Tender procedure: Open procedure Tender Deadline 12:00 (noon) 18th September 2026 2 Contents Part 1: Introduction Part 2: Instructions to Tenderers Part 3: Se…",
-          "source": null
-        },
-        "forms_signatures": {
-          "text": "===== FILE: files/2192_8860090_unpacked/1_Website and App Accessibility RFT Final.pdf ===== Request for Tenders dated 17th August 2026 for the provision of Website and App Accessibility Audit Platform Tender procedure: Open procedure Tender Deadline 12:00 (noon) 18th September 2026 2 Contents Part 1: Introduction Part 2: Instructions to Tenderers Part 3: Se…",
-          "source": null
-        },
-        "submission": {
-          "text": "===== FILE: files/2192_8860090_unpacked/1_Website and App Accessibility RFT Final.pdf ===== Request for Tenders dated 17th August 2026 for the provision of Website and App Accessibility Audit Platform Tender procedure: Open procedure Tender Deadline 12:00 (noon) 18th September 2026 2 Contents Part 1: Introduction Part 2: Instructions to Tenderers Part 3: Se…",
-          "source": null
-        },
-        "ip_data_security": {
-          "text": "ferred bidder status by the Contracting Authority shall not give rise to any enforceable rights by the Tenderer. The Contracting Authority may cancel this Competition at any time prior to a formal written Services Contract being executed by or on behalf of the Contracting Authority. The award of a Services Contract does not confer exclusivity on the success…",
-          "source": null
-        }
-      },
+      "gate_evidence": {},
       "raw_dce_row_found": true,
       "artifact_locator": {
-        "dce_run_id": 32123828524,
-        "shard": 10,
-        "candidate_id": "IE:8860090",
-        "release_tag": "dce-harvest-32123828524"
+        "dce_run_id": 32357205269,
+        "shard": 13,
+        "candidate_id": "TED:575741-2026",
+        "release_tag": "dce-harvest-32357205269"
       },
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
       "_deep_batch_hint": "batch-006.json"
     },
     {
-      "candidate_id": "TED:559457-2026",
-      "title": "Malta – Medical equipments, pharmaceuticals and personal care products – CT3011/2026 - TENDER FOR THE SUPPLY OF QTY THREE (3) SKELETAL DIRECT DIGITAL, DUAL DETECTOR X-RAY SYSTEMS FOR THE GOZO GENERAL HOSPITAL AND FOR THE EMERGENCY DEPT. MATER DEI HOSPITAL",
-      "buyer": "Department of Contracts",
+      "candidate_id": "TED:536941-2026",
+      "title": "Ireland – World wide web (www) site design services – Provision of Website Design, Development, Hosting, Maintenance and Digital Resource Portal Services – Primary Mathematics Hub",
+      "buyer": "An Chomhairle um Oideachas Gaeltachta agus Gaelscolaiochta",
       "portal": "TED",
-      "notice_url": "https://ted.europa.eu/en/notice/-/detail/559457-2026",
-      "deadline": "2026-09-11T09:30:00+02:00",
-      "estimated_value": 1708983.0,
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/536941-2026",
+      "deadline": "2026-08-24T01:00:00+00:00",
+      "estimated_value": 200000.0,
       "currency": "EUR",
       "review_stage": "BUSINESS_GATES",
       "gate_readiness": true,
       "content_quality": "SUBSTANTIVE_DCE_PRESENT",
       "evidence_gate_coverage": 14,
-      "spm_post_dce_score": 22,
+      "spm_post_dce_score": 23,
       "spm_fit_band": "MAYBE",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
@@ -315,91 +251,188 @@
       "evidence_quality": {
         "raw_status": "DOWNLOADED_PUBLIC",
         "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-        "documents_with_text": 61,
-        "text_chars": 2311676
+        "documents_with_text": 6,
+        "text_chars": 61162
       },
       "gate_evidence": {
         "entity_geography": {
-          "text": "Bid Form. We also confirm that we assume full and sole responsibility for the application of and abidance by all relevant standards, laws and regulations applicable to and in any way regulating the supplies to be executed under this contract.]]></label> <value/> <relevant-doc/> <options> <option value=\"1\"><![CDATA[I agree]]></option> </options> </criterion>…",
-          "source": null
+          "text": "pproach to reviewing existing toolkit code; integration methodology; browser and device compatibility; file-based save-and-share mechanism; testing approach; technical limitations or dependencies; documentation and handover. 12.4 Authoring Platform proposed authoring platform; integration approach; publishing workflow; editorial permissions; version control…",
+          "source": "files/28191_8763289_unpacked/1_Tender - Primary Mathematics Hub.docx"
         },
         "turnover_financial": {
-          "text": "t. Version 4.8 – Above Threshold eProcurement Document 5 EU based Importers Status (Medical devices (including active implantable medical devices), in vitro diagnostic medical devices and/or personal protective equipment) A bidder, either on his/her own capacity, or through subcontracting, must meet the requirements of the applicable regulations (Medical De…",
-          "source": null
+          "text": "d Criteria, Requirements and Specifications, Terms and Conditions of the Services Contract, we hereby agree and declare the following: 1. We understand the nature and extent of the Services required to be delivered as described in Requirements and Specifications of the RFT. 2. We accept all of the Terms and Conditions of the Services Contract, as set out in…",
+          "source": "files/28191_8763289_unpacked/1_Tender - Primary Mathematics Hub.docx"
         },
         "references_experience": {
-          "text": "espd=\"1\" id=\"1786071838677\" show-on=\"1\" size=\"2048\" type=\"text\" included-in-evaluation=\"0\" mandatory=\"0\" uuid=\"005eb9ed-1347-4ca3-bb29-9bc0db64e1ab_7c637c0c-7703-4389-ba52-02997a055bd7_url\" parent-uuid=\"005eb9ed-1347-4ca3-bb29-9bc0db64e1ab_7c637c0c-7703-4389-ba52-02997a055bd7_infoElectronicallyAnswer\" pos=\"3\" level=\"4\"> <label><![CDATA[URL]]></label> <value…",
-          "source": null
+          "text": "relevant expertise. Support and Maintenance Plan Details of ongoing maintenance, service levels, response times and included support. Training and Documentation Plan Details of proposed training, user guides and technical documentation. Risk Management Plan Identification of key risks and proposed mitigation measures. Accessibility, Security and Data Protec…",
+          "source": "files/28191_8763289_unpacked/1_Tender - Primary Mathematics Hub.docx"
         },
         "certifications_partner": {
-          "text": "prevail. ALL BIDDERS ARE TO NOTE THAT PHOTOS SUBMITTED AS MANUFACTURER‘S TECHNICAL LITERATURE SHALL NOT SUFFICE AND ACCORDINGLY THESE MUST BE DULY ACCOMPANIED BY THE RESPECTIVE DETAILED MANUFACTURER‘S TECHNICAL LITERATURE. The submission shall be in a structured form and is to be in the same sequence as listed hereunder for ease of reference and evaluation.…",
-          "source": null
+          "text": "clearly indicate how the requirements will be met. Phase 1: Establishment of Dedicated Website and Enhanced Toolkit Functionality 7.1 Phase 1 Objective The objective of Phase 1 is to establish a dedicated Mathematics website for Irish-medium schools in the Republic of Ireland and to create toolkits so that teachers can prepare, save and share activities eff…",
+          "source": "files/28191_8763289_unpacked/1_Tender - Primary Mathematics Hub.docx"
         },
         "staffing_team": {
-          "text": "on 4.8 – Above Threshold eProcurement Document 13 shall be subject to conformity in all respects to all contractual obligations, specifications , and conditions on the date of the ‘physical receipt/acceptance’ of the ordered goods to the satisfaction of the Head of Department or his/her representative. Payments will be subject to any deductions to which the…",
-          "source": null
+          "text": "of the proposed solution. Tenderer Profile Details of the organisation or project team, including relevant experience. Understanding of the Requirement Evidence of understanding of the technical, educational, curriculum and Irish-language context. Proposed Technical Solution Details of website architecture, hosting, CMS, toolkit integration, save-and-share …",
+          "source": "files/28191_8763289_unpacked/1_Tender - Primary Mathematics Hub.docx"
         },
         "insurance_bonds": {
-          "text": "the Exclusion and Blacklisting Criteria as per these Instructions to Tenderers. Furthermore, if the sub - contractor is relied upon by the Contractor to meet the standards established i n the Version 4.8 – Above Threshold eProcurement Document 6 selection criteria, apart from submitting the relevant commitments in writing, such reliance will be evaluated to…",
-          "source": null
+          "text": "ecurity updates; bug fixes; CMS support; authoring platform support; agreed minor enhancements; response times; escalation procedures; annual review meetings; support reporting. Tenderers must clearly distinguish between: services included in the tender price; optional additional services; out-of-scope development requiring separate quotation. 16. Project M…",
+          "source": "files/28191_8763289_unpacked/1_Tender - Primary Mathematics Hub.docx"
         },
         "subcontracting_consortium": {
-          "text": "rejudice the obligations of the Central Government Authority/SPD/Contracting Authority in terms of the Act.]]></label> <value/> <relevant-doc/> <options> <option value=\"1\"><![CDATA[Agreed]]></option> </options> </criterion> <section id=\"178607187556111\" level=\"3\" pos=\"4\"> <label>Power of Attorney (If Applicable)</label> <criterion level=\"4\" pos=\"1\" id=\"1786…",
-          "source": null
+          "text": "IABILITY 17.1 The Contractor shall be liable for loss or damage arising from negligence, breach of contract, breach of statutory duty or misconduct. 17.2 Neither party shall be liable for indirect or consequential losses except where prohibited by law. 17.3 Nothing in this Agreement excludes liability for: Fraud. Death or personal injury caused by negligenc…",
+          "source": "files/28191_8763289_unpacked/2_Primary Mathematics Hub Terms and Conditions and Confidentiality_EN.docx"
         },
         "deliverables_scope": {
-          "text": "on> </options> <formula type=\"list\"> <score option-value=\"1\">100</score> <score option-value=\"2\">0</score> </formula> </criterion> <criterion mandatory=\"1\" included-in-evaluation=\"0\" type=\"file\" id=\"17860718636984\" level=\"2\" pos=\"3\"> <label>Kindly attach the Technical Literature in Maltese or English regarding the product being offered.</label> <value/> </c…",
-          "source": null
+          "text": "maintenance and phased enhancement of a dedicated Mathematics website and digital mathematics resource portal for Irish-medium and Gaeltacht primary schools in the Republic of Ireland. The successful tenderer will be required to deliver the project over a four-year period. The contract will include the initial establishment of a dedicated Mathematics websit…",
+          "source": "files/28191_8763289_unpacked/1_Tender - Primary Mathematics Hub.docx"
         },
         "sla_onsite": {
-          "text": "oc/> <auto-score/> <options> <option value=\"1\"><![CDATA[Agreed]]></option> </options> </criterion> <criterion level=\"3\" pos=\"2\" id=\"17860718755619\" mandatory=\"1\" included-in-evaluation=\"0\" type=\"list\" appearance=\"check\" multiple=\"1\" size=\"2\"> <label>We note that we take full responsibility to submit the electronic documentation required well before the tend…",
-          "source": null
+          "text": "uirements The project will be delivered in four phases. Tenderers must respond to each phase and clearly indicate how the requirements will be met. Phase 1: Establishment of Dedicated Website and Enhanced Toolkit Functionality 7.1 Phase 1 Objective The objective of Phase 1 is to establish a dedicated Mathematics website for Irish-medium schools in the Repub…",
+          "source": "files/28191_8763289_unpacked/1_Tender - Primary Mathematics Hub.docx"
         },
         "term_value": {
-          "text": "R THE GOZO GENERAL HOSPITAL AND FOR THE EMERGENCY DEPT. MATER DEI HOSPITAL Description: CT3011/2026 ­ TENDER FOR THE SUPPLY OF QTY THREE (3) SKELETAL DIRECT DIGITAL, DUAL DETECTOR X­RAY SYSTEMS FOR THE GOZO GENERAL HOSPITAL AND FOR THE EMERGENCY DEPT. MATER DEI HOSPITAL 5.1.1 Purpose Main nature of the contract: Supplies Main classification (cpv): 33000000 …",
-          "source": null
+          "text": "tics website, enhancement of existing digital mathematics toolkits, creation of a downloadable resource library, development of a wider Irish-language mathematics portal and provision of ongoing technical support, maintenance and documentation. This Request for Tender sets out the background, scope, requirements, deliverables, evaluation criteria and submis…",
+          "source": "files/28191_8763289_unpacked/1_Tender - Primary Mathematics Hub.docx"
         },
         "award_criteria": {
-          "text": "Dynamics S.A. Town: Athens Postcode: 15125 Country subdivision (NUTS): Βόρειος Τομέας Αθηνών (EL301) Country: Greece Email: eproc­esender@eurodyn.com Telephone: +30 2108094500 Roles of this organisation: TED eSender Notice information Notice identifier/version: cdfdee31­c3be­4ffe­ae69­0ed02855c534 ­ 01 Form type: Competition Notice type: Contract or concess…",
-          "source": null
+          "text": "ncement of a dedicated Mathematics website and digital mathematics resource portal for Irish-medium and Gaeltacht primary schools in the Republic of Ireland. The successful tenderer will be required to deliver the project over a four-year period. The contract will include the initial establishment of a dedicated Mathematics website, enhancement of existing …",
+          "source": "files/28191_8763289_unpacked/1_Tender - Primary Mathematics Hub.docx"
         },
         "forms_signatures": {
-          "text": "MATER DEI HOSPITAL Procedure identifier: 40f6fa18­173f­4a4b­be31­4aaea5501430 Type of procedure: Open The procedure is accelerated: no 2.1.1 Purpose Main nature of the contract: Supplies Main classification (cpv): 33000000 Medical equipments, pharmaceuticals and personal care products Additional classification (cpv): 33100000 Medical equipments 2.1.2 Place …",
-          "source": null
+          "text": "ecurity and performance testing; ongoing maintenance, support, updates and minor enhancements; future-readiness review and preparation of a Platform Readiness Report. 7. Phased Requirements The project will be delivered in four phases. Tenderers must respond to each phase and clearly indicate how the requirements will be met. Phase 1: Establishment of Dedic…",
+          "source": "files/28191_8763289_unpacked/1_Tender - Primary Mathematics Hub.docx"
         },
         "submission": {
-          "text": "documents Languages in which the procurement documents are officially available: English Languages in which the procurement documents (or their parts) are unofficially available: English Address of the procurement documents: https://www.etenders.gov.mt/epps/cft/listContractDocuments.do? resourceId=13994209 5.1.12 Terms of procurement Terms of submission: El…",
-          "source": null
+          "text": "eeds. 12.6 Data Protection and Privacy Tenderers must describe: whether personal data will be collected or processed; how the solution will minimise personal data collection; cookie and analytics arrangements; privacy notices or consent requirements; security measures for any administrative accounts; how the proposed no-login pupil workflow reduces data pro…",
+          "source": "files/28191_8763289_unpacked/1_Tender - Primary Mathematics Hub.docx"
         },
         "ip_data_security": {
-          "text": "ption Actions N/A CT3011/2026 - TENDER DOCUMENT Tender Document.pdf N/A CT3011/2026 - TENDER FORMS TENDER FORMS.zip N/A Tender Structure XML - Cycle 1 c4t_13994209_1.xml N/A N/A Full ESPD request (National criteria) espdRequest-13994209.xml N/A Extended ESPD request espdRequest-13994209.xml N/A ESPD request pdf espdRequest-13994209.pdf DOWNLOAD ZIP FILE Pub…",
-          "source": null
+          "text": "===== FILE: files/28191_8763289_unpacked/1_Tender - Primary Mathematics Hub.docx ===== Request for Tender Provision of Website Design, Development, Hosting, Maintenance and Digital Resource Portal Services – Primary Mathematics Hub 1. Introduction An Chomhairle um Oideachas Gaeltachta agus Gaelscolaíochta, hereafter referred to as COGG, invites suitably qua…",
+          "source": "files/28191_8763289_unpacked/1_Tender - Primary Mathematics Hub.docx"
         }
       },
       "raw_dce_row_found": true,
       "artifact_locator": {
-        "dce_run_id": 32106912628,
-        "shard": 13,
-        "candidate_id": "TED:559457-2026",
-        "release_tag": "dce-harvest-32106912628"
+        "dce_run_id": 32213968608,
+        "shard": 46,
+        "candidate_id": "TED:536941-2026",
+        "release_tag": "dce-harvest-32213968608"
       },
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
       "_deep_batch_hint": "batch-006.json"
     },
     {
-      "candidate_id": "TED:570031-2026",
-      "title": "Ireland – Software implementation services – 0050 - The Provision and Implementation of a Contract Lifecycle Management System",
-      "buyer": "An Post_391",
+      "candidate_id": "TED:520122-2026",
+      "title": "Ireland – Software implementation services – Request for Tenders for the provision of the Development, Implementation and Support of a Regulatory Information and Data Management System to AHBRA",
+      "buyer": "Approved Housing Bodies Regulatory Authority",
       "portal": "TED",
-      "notice_url": "https://ted.europa.eu/en/notice/-/detail/570031-2026",
-      "deadline": "2026-09-04T12:00:00+01:00",
-      "estimated_value": 0.0,
+      "notice_url": "https://ted.europa.eu/en/notice/-/detail/520122-2026",
+      "deadline": "2026-08-28T01:00:00+00:00",
+      "estimated_value": 270000.0,
       "currency": "EUR",
       "review_stage": "BUSINESS_GATES",
       "gate_readiness": true,
       "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-      "evidence_gate_coverage": 13,
-      "spm_post_dce_score": 22,
+      "evidence_gate_coverage": 14,
+      "spm_post_dce_score": 23,
+      "spm_fit_band": "MAYBE",
+      "spm_fit_reasons": [],
+      "spm_friction_signals": [],
+      "upstream_classification": "MODEL_REVIEW_REQUIRED",
+      "deadline_authority": {
+        "status": "CONSISTENT_AUTHORITATIVE_SUBMISSION_DATE",
+        "conflict": false,
+        "authoritative_submission_date": "2026-08-28"
+      },
+      "evidence_quality": {
+        "raw_status": "DOWNLOADED_PUBLIC",
+        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "documents_with_text": 9,
+        "text_chars": 302234
+      },
+      "gate_evidence": {
+        "entity_geography": {
+          "text": "e: 15:00hrs, 18 August 2026 Tender Deadline: 15:00hrs, 28 August 2026 2 Contents Part 1: Introduction Part 2: Instructions to Tenderers Part 3: Selection and Award Criteria Appendix 1: Requirements and Specifications Appendix 2: Pricing Schedule Appendix 3: Tenderer’s Statement Appendix 4: Declaration as to Personal Circumstances of Tenderer Appendix 5: Ser…",
+          "source": "files/110056_8722129_unpacked/1_RFT - AHB Data Management System to AHBRA 24072026.pdf"
+        },
+        "turnover_financial": {
+          "text": "(i) a Declaration in the form attached at Appendix 4; 13 (ii) evidence to the effect that measures taken by the entity concerned are sufficient to demonstrate its reliability despite the existence of a relevant Exclusion Ground; (iii) in the case of the Prime Contractor and any Subcontractor on whose capacity the Prime Contractor relies, all or any of the s…",
+          "source": "files/110056_8722129_unpacked/1_RFT - AHB Data Management System to AHBRA 24072026.pdf"
+        },
+        "references_experience": {
+          "text": "in Public Office Acts 1995 and 2001, copies of which are available at www.irishstatutebook.ie. The Contracting Authority will, at its absolute discretion, decide on the appropriate course of action, which may in appropriate circumstances include eliminating a Tenderer from this Competition or terminating any Services Contract entered into by a Tenderer. 2.1…",
+          "source": "files/110056_8722129_unpacked/1_RFT - AHB Data Management System to AHBRA 24072026.pdf"
+        },
+        "certifications_partner": {
+          "text": "se of policies with an aggregate limit of indemnity, any outstanding claims, which could have a material adverse impact on the level of coverage specified above. A formal confirmation from the Tenderer's insurance company or broker to this effect will be requested from the successful Tenderer(s) prior to the award of (and shall be a condition of) any Servic…",
+          "source": "files/110056_8722129_unpacked/1_RFT - AHB Data Management System to AHBRA 24072026.pdf"
+        },
+        "staffing_team": {
+          "text": "cale, scope and complexity to those detailed in Appendix 1 below in the last five (5) years. For the avoidance of doubt , both examples must include demonstrable evidence that the Tenderer was engaged in the provision of services which are similar to those required in this RFT. Supporting Documents Required: Tenderer must provide the contract examples in th…",
+          "source": "files/110056_8722129_unpacked/1_RFT - AHB Data Management System to AHBRA 24072026.pdf"
+        },
+        "insurance_bonds": {
+          "text": "information to confirm the Tenders have been prepared independently. The Contracting Authority will, at its absolute discretion, decide on the appropriate course of action, which may in appropriate circumstances include eliminating a Tenderer from this Competition or any Mini -Competition or terminating any Framework Agreement or Services Contract entered i…",
+          "source": "files/110056_8722129_unpacked/1_RFT - AHB Data Management System to AHBRA 24072026.pdf"
+        },
+        "subcontracting_consortium": {
+          "text": "pendix 3. Tenderers may not amend the Services Contract. 2.4 ACCEPTANCE OF RFT REQUIREMENTS Each Tenderer is required to accept the provisions of this RFT. ALL TENDERERS MUST RETURN, with their Tender, a scanned signed copy of the Tenderer’s Statement, as set out in Appendix 3, printed on the Tenderer’s letterhead. The Contracting Authority must be able to …",
+          "source": "files/110056_8722129_unpacked/1_RFT - AHB Data Management System to AHBRA 24072026.pdf"
+        },
+        "deliverables_scope": {
+          "text": "===== FILE: files/110056_8722129_unpacked/110056_8722129.pdf ===== List of Contract Documents #Addenda ID N/A Status Final Title 01. RFT - AHB Data Management System to AHBRA 24072026 File Associated :<1_RFT - AHB Data Management System to AHBRA 24072026.pdf > #Addenda ID N/A Status Final Title 03. Appendix 1 Requirements and Specifications - AHB Data Manag…",
+          "source": "files/110056_8722129_unpacked/110056_8722129.pdf"
+        },
+        "sla_onsite": {
+          "text": "time before the Tender Deadline, to update or amend the information contained in this document and/or to extend the Tender Deadline. Participating Tenderers will be informed of any such amendment or exten sion through the eTenders website. 2.7.5 Tenderers should ensure that they register their interest in this Competition, by clicking on the “Accept” button…",
+          "source": "files/110056_8722129_unpacked/1_RFT - AHB Data Management System to AHBRA 24072026.pdf"
+        },
+        "term_value": {
+          "text": "ns management, an AHB web portal and bespoke data management and analytics. 1.3 Not Used. 1.4 This public procurement competition (the “Competition”) will be conducted in accordance with the open procedure under the European Union (Award of Public Authority Contracts) Regulations 2016 (Statutory Instrument 284 of 2016) (the “Regulations”). Any contract that…",
+          "source": "files/110056_8722129_unpacked/1_RFT - AHB Data Management System to AHBRA 24072026.pdf"
+        },
+        "award_criteria": {
+          "text": "Associated :<8722129_Contract notice - general directive, standard regime.pdf > ===== FILE: files/110056_8722129_unpacked/1_RFT - AHB Data Management System to AHBRA 24072026.pdf ===== Request for Tenders dated 24 July 2026 for the provision of the Development, Implementation and Support of a Regulatory Information and Data Management System to AHBRA Tender…",
+          "source": "files/110056_8722129_unpacked/1_RFT - AHB Data Management System to AHBRA 24072026.pdf"
+        },
+        "forms_signatures": {
+          "text": "===== FILE: files/110056_8722129_unpacked/110056_8722129.pdf ===== List of Contract Documents #Addenda ID N/A Status Final Title 01. RFT - AHB Data Management System to AHBRA 24072026 File Associated :<1_RFT - AHB Data Management System to AHBRA 24072026.pdf > #Addenda ID N/A Status Final Title 03. Appendix 1 Requirements and Specifications - AHB Data Manag…",
+          "source": "files/110056_8722129_unpacked/110056_8722129.pdf"
+        },
+        "submission": {
+          "text": "<6_TRD - AHB Data Management System to AHBRA v2 18082026.docx > List of Notices #Addenda ID 1 Status Published Title Contract notice - general directive, standard regime File Associated :<8722129_Contract notice - general directive, standard regime.pdf > ===== FILE: files/110056_8722129_unpacked/1_RFT - AHB Data Management System to AHBRA 24072026.pdf =====…",
+          "source": "files/110056_8722129_unpacked/1_RFT - AHB Data Management System to AHBRA 24072026.pdf"
+        },
+        "ip_data_security": {
+          "text": "er status by the Contracting Authority shall not give rise to any enforceable rights by the Tenderer. The Contracting Authority may cancel this Competition at any time prior to a formal written Services Contract being executed by or on behalf of the Contracting Authority. The award of a Services Contract does not confer exclusivity on the successful Tendere…",
+          "source": "files/110056_8722129_unpacked/1_RFT - AHB Data Management System to AHBRA 24072026.pdf"
+        }
+      },
+      "raw_dce_row_found": true,
+      "artifact_locator": {
+        "dce_run_id": 32213968608,
+        "shard": 15,
+        "candidate_id": "TED:520122-2026",
+        "release_tag": "dce-harvest-32213968608"
+      },
+      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
+      "_deep_batch_hint": "batch-006.json"
+    },
+    {
+      "candidate_id": "US-SAM:e7ed0ac5740e4de5bfe70b7ced3698ea",
+      "title": "Communications, Network, Engineering, Cybersecurity, and Information Technology Services (CNECTS), aka \"Connects\"",
+      "buyer": "DEPT OF DEFENSE",
+      "portal": "US_SAM",
+      "notice_url": "https://sam.gov/opp/e7ed0ac5740e4de5bfe70b7ced3698ea/view",
+      "deadline": "2026-12-23T21:00:00+00:00",
+      "estimated_value": null,
+      "currency": null,
+      "review_stage": "BUSINESS_GATES",
+      "gate_readiness": true,
+      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "evidence_gate_coverage": 14,
+      "spm_post_dce_score": 23,
       "spm_fit_band": "MAYBE",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
@@ -407,92 +440,96 @@
       "deadline_authority": {
         "status": "DCE_AUTHORITATIVE_SUBMISSION_DATE_OVERRIDES_NOTICE_METADATA",
         "conflict": false,
-        "authoritative_submission_date": "2026-09-17"
+        "authoritative_submission_date": "2026-02-23"
       },
       "evidence_quality": {
         "raw_status": "DOWNLOADED_PUBLIC",
         "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-        "documents_with_text": 32,
-        "text_chars": 1770505
+        "documents_with_text": 20,
+        "text_chars": 1099296
       },
       "gate_evidence": {
         "entity_geography": {
-          "text": "y banking. The Group operates several subsidiary and associated businesses, such as Post Insurance, Air Business and the Prize Bond Company, in Ireland and the United Kingdom. It also runs the GPO Witness History centre. The entire of this document, including all of the Sections, clauses, and paragraphs and the questionnaire set out herein and any attachmen…",
-          "source": null
+          "text": "al Positioning Accuracy Standards. PART 4: Standards for Architecture, Engineering, Construction (A/E/C) and Facility Management http://www.fgdc.gov/standards | M | NEMA TC-2 | Electrical Polyvinyl Chloride (PVC) Tubing and Conduit | M | TIA-606-B | Administration Standard for Telecommunications Infrastructure | M | TIA-568-C | Commercial Building Telecommu…",
+          "source": "files/1._BOS-IT_PWS_-_7_Oct_24_282_29.docx"
         },
         "turnover_financial": {
-          "text": "Where there is any change or proposed change in the details concerning any sub-contractor or sub-contracting arrangements that has been notified to AN POST by the Applicant, such a change must be notified in writing to AN POST. Reliance on Resources If any Applicant, including an Applicant consisting of a consortium or group of members however constituted, …",
-          "source": null
+          "text": "on NIPRNET. Hotlist The contractor will compile a Trouble Ticket Hotlist up to three times per five-day work week on Mondays, Wednesdays, and Fridays, at the discretion of the 21 CS/CC. These Hotlists shall be sent to all 21 CS Flight Leads and Senior Leadership. This notification email will include all pertinent data on all currently open High Priority tic…",
+          "source": "files/1._BOS-IT_PWS_-_7_Oct_24_282_29.docx"
         },
         "references_experience": {
-          "text": "ion of a Contract Lifecycle Management System - PQQ (PDF) File Associated :<2_0050 - Contract Lifecycle Management (CLM) - Pre-Qualification Questionnaire.pdf > #Addenda ID N/A Status Final Title Tender Structure XML - Cycle 1 File Associated :<3_c4t_8859243_1.xml > List of Notices #Addenda ID 1 Status Published Title Contract notice - sectoral directive, s…",
-          "source": null
+          "text": "===== FILE: files/0._CNECTS_RFI_231_2C_Consolidation_-_31_Jul_25.docx ===== SAM.gov Reference Number: FA251827RCNECTS Date: 31 July 2025 Subject: Request for Information (RFI) to explore the feasibility of consolidating four requirements under a single contract Project: Communications, Network, Engineering, Cybersecurity, and Information Technology Services…",
+          "source": "files/0._CNECTS_RFI_231_2C_Consolidation_-_31_Jul_25.docx"
         },
         "certifications_partner": {
-          "text": "osure could cause significant harm to the interests of AN POST, its customers and stakeholders and/or damage or impede the effectiveness of Information Security within AN POST, information that is personally identifiable, sensitive, customer, commercially confidential, technical configurations or any information of a highly sensitive nature relating to AN P…",
-          "source": null
+          "text": "hich runs 1 October through 30 September. While inputs may be reported any time during the FY, all data shall be reported no later than 31 October of each calendar year. Personnel Management Staffing. Personnel management shall include: Staffing with qualified workforce. A bachelor degree is not required for an employee to be qualified. Full staffing to ens…",
+          "source": "files/1._BOS-IT_PWS_-_7_Oct_24_282_29.docx"
+        },
+        "staffing_team": {
+          "text": "ule, performance and customer satisfaction? Can a small business effectively perform all four requirements if they are combined? Please explain your reasoning. If you believe small businesses cannot effectively perform the combined requirement, how can the Government make it more suitable for small business? If the Government decides to combine these requir…",
+          "source": "files/0._CNECTS_RFI_231_2C_Consolidation_-_31_Jul_25.docx"
         },
         "insurance_bonds": {
-          "text": "ed office at General Post Office, O’Connell Street, Dublin 1, Ireland is the Contracting Authority in respect of the competition the subject of this Procurement Process and this Pre-Qualification Questionnaire. AN POST operates in the postal sector and is a utility and its procurement procedures are governed by the Utilities Directive (2014/25/EU) of the Eu…",
-          "source": null
+          "text": "S-IT-IT PWS requirements. The contractor’s furnished materials and equipment shall include vehicles, vehicle fuel, tools, custodial supplies, office administrative supplies and equipment, and any other supplies and materials not furnished by the Government, which the contractor believes necessary to perform these requirements. Government Management Team (GM…",
+          "source": "files/1._BOS-IT_PWS_-_7_Oct_24_282_29.docx"
         },
         "subcontracting_consortium": {
-          "text": "o systems. Secure Software Development Lifecycle processes – Integrate security into all phases of software development. User access management – unique user accounts, role-based access and regular access reviews (at least bi-annually). Data loss prevention controls – implement tools and policies to monitor and prevent unauthorised data transfers. Malware p…",
-          "source": null
+          "text": "icipate by combining these requirements, and what solutions would you propose to mitigate them? How would combining these requirements affect schedule, performance and customer satisfaction? Can a small business effectively perform all four requirements if they are combined? Please explain your reasoning. If you believe small businesses cannot effectively p…",
+          "source": "files/0._CNECTS_RFI_231_2C_Consolidation_-_31_Jul_25.docx"
         },
         "deliverables_scope": {
-          "text": "ractor” means such person(s) firm(s) company(ies) partnership(s) corporation (s) with whom a Contract is entered into by AN POST to provide the Services (as defined below). The Contractor will be the prime Contractor and shall be responsible in total for any/all the work of its sub-contractor(s) and for their acts and omissions as if they were the Contracto…",
-          "source": null
+          "text": "===== FILE: files/0._CNECTS_RFI_231_2C_Consolidation_-_31_Jul_25.docx ===== SAM.gov Reference Number: FA251827RCNECTS Date: 31 July 2025 Subject: Request for Information (RFI) to explore the feasibility of consolidating four requirements under a single contract Project: Communications, Network, Engineering, Cybersecurity, and Information Technology Services…",
+          "source": "files/0._CNECTS_RFI_231_2C_Consolidation_-_31_Jul_25.docx"
         },
         "sla_onsite": {
-          "text": "to ISO27001 standard (or equivalent), along with maintaining and supporting policies and standards in the areas of: Access Control Remote Access Vulnerability Management Patch Management User Access Management Data Loss Prevention Logging & Auditing Incident Response and Management Encryption and Key Management AN POST reserves the right to seek evidence of…",
-          "source": null
+          "text": "rience delays entering and/or exiting the base due to exercises, increased security, base closure or late reporting due to weather conditions. Anticipate exercises on a quarterly basis. In all cases, ensure mission essential work center coverage while exercising operational risk management with contractor employees. Contractor Manpower Reporting Report ALL …",
+          "source": "files/1._BOS-IT_PWS_-_7_Oct_24_282_29.docx"
         },
         "term_value": {
-          "text": "gy and contractual structure will be confirmed in the ITT documentation. B. Scope of the Opportunity The anticipated scope may include some, or all, of the following areas: B.1 CLM System Capability Candidates should be able to demonstrate experience in providing, implementing or supporting CLM solutions that may include capabilities such as: contract reque…",
-          "source": null
+          "text": "f the Infrastructure systems and deliver a plan for technical refresh on an annual basis (See Appendix A). The plan shall include End of Life/End of Service (EOL/EOS) dates and recommended equipment replacements that integrates with existing equipment. Asset Management Perform Government asset management activities (i.e., IT Control Officer, Government prov…",
+          "source": "files/1._BOS-IT_PWS_-_7_Oct_24_282_29.docx"
         },
         "award_criteria": {
-          "text": "how candidates can support future flexibility and improvement but does not intend to mandate a specific innovation pathway at PQQ stage. The requirements contained in this notice are indicative only, are not exhaustive and are subject to change in line with the business needs and ongoing operational requirements of AN POST. Full Specifications of the requir…",
-          "source": null
+          "text": "rform BOS-IT-IT PWS requirements. The contractor’s furnished materials and equipment shall include vehicles, vehicle fuel, tools, custodial supplies, office administrative supplies and equipment, and any other supplies and materials not furnished by the Government, which the contractor believes necessary to perform these requirements. Government Management …",
+          "source": "files/2._Cheyenne_Mountain_SFS_21_CS_Communications_Contract_-_31_Jul_25.docx"
         },
         "forms_signatures": {
-          "text": "subsequent Invitation to Tender (ITT) stage. The detailed requirements, delivery model, evaluation methodology and contractual structure will be confirmed in the ITT documentation. B. Scope of the Opportunity The anticipated scope may include some, or all, of the following areas: B.1 CLM System Capability Candidates should be able to demonstrate experience …",
-          "source": null
+          "text": "cations from, satellite systems. Establishments providing Internet services or Voice over Internet protocol (VoIP) services via client-supplied telecommunications connections are also included in this industry. Establishments in this industry do not operate as telecommunications carriers. Do you believe these requirements can be effectively combined into on…",
+          "source": "files/2._Cheyenne_Mountain_SFS_21_CS_Communications_Contract_-_31_Jul_25.docx"
         },
         "submission": {
-          "text": "Successful Tenderer(s) to verify its tax cleared position online. Procedural Requirements The Questionnaire must be completed in the prescribed form. Failure to provide the requested information, omission of supporting documentation and the provision of incomplete or misleading information may result in exclusion from the Procurement Process. A summary of t…",
-          "source": null
+          "text": "ho have the required security clearance at the beginning of the period(s) of performance and throughout the life of the contract. Also, all employees who will require a privileged network account (aka admin account) will need to have the proper DoD 8140 certification at the beginning of the period(s) of performance and throughout the life of the contract. R…",
+          "source": "files/1._BOS-IT_PWS_-_7_Oct_24_282_29.docx"
         },
         "ip_data_security": {
-          "text": "have experience integrating CLM or comparable solutions with enterprise platforms, which may include ERP, procurement, finance, identity and access management, document management, e-signature, CRM, risk, compliance or reporting systems. Specific integration requirements will be confirmed at ITT stage. D.4 Data Migration and Information Governance Candidate…",
-          "source": null
+          "text": "===== FILE: files/0._CNECTS_RFI_231_2C_Consolidation_-_31_Jul_25.docx ===== SAM.gov Reference Number: FA251827RCNECTS Date: 31 July 2025 Subject: Request for Information (RFI) to explore the feasibility of consolidating four requirements under a single contract Project: Communications, Network, Engineering, Cybersecurity, and Information Technology Services…",
+          "source": "files/0._CNECTS_RFI_231_2C_Consolidation_-_31_Jul_25.docx"
         }
       },
       "raw_dce_row_found": true,
       "artifact_locator": {
-        "dce_run_id": 32123828524,
-        "shard": 14,
-        "candidate_id": "TED:570031-2026",
-        "release_tag": "dce-harvest-32123828524"
+        "dce_run_id": 32490836570,
+        "shard": 1,
+        "candidate_id": "US-SAM:e7ed0ac5740e4de5bfe70b7ced3698ea",
+        "release_tag": "dce-harvest-32490836570"
       },
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
       "_deep_batch_hint": "batch-006.json"
     },
     {
-      "candidate_id": "US-SAM:5c1a2f71d8794e7dbdb025c48d76b401",
-      "title": "F108--Restoration & Remediation Emergency Flood Response Services",
-      "buyer": "VETERANS AFFAIRS, DEPARTMENT OF",
+      "candidate_id": "US-SAM:c54fba3430a64b20b00e9497324778f4",
+      "title": "SV0222-26 DLP Printer",
+      "buyer": "JUSTICE, DEPARTMENT OF",
       "portal": "US_SAM",
-      "notice_url": "https://sam.gov/opp/5c1a2f71d8794e7dbdb025c48d76b401/view",
-      "deadline": "2026-08-19T16:00:00+00:00",
+      "notice_url": "https://sam.gov/opp/c54fba3430a64b20b00e9497324778f4/view",
+      "deadline": "2026-08-28T18:00:00+00:00",
       "estimated_value": null,
       "currency": null,
       "review_stage": "BUSINESS_GATES",
       "gate_readiness": true,
       "content_quality": "SUBSTANTIVE_DCE_PRESENT",
       "evidence_gate_coverage": 13,
-      "spm_post_dce_score": 22,
+      "spm_post_dce_score": 23,
       "spm_fit_band": "MAYBE",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
@@ -505,180 +542,87 @@
       "evidence_quality": {
         "raw_status": "DOWNLOADED_PUBLIC",
         "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-        "documents_with_text": 77,
-        "text_chars": 1585832
+        "documents_with_text": 5,
+        "text_chars": 123604
       },
       "gate_evidence": {
         "entity_geography": {
-          "text": "xact duplicate copies of the Department of Labor's official poster. (c) The required text of the employee notice referred to in this clause is located at Appendix A, Subpart A, 29 CFR Part 471. (d) The Contractor must comply with all provisions of the employee notice and related rules, regulations, and orders of the Secretary of Labor. (e) In the event that…",
-          "source": null
+          "text": "tion, terms of any expressed warranty, price and any discount terms. Offer must include acknowledgment of all amendments, if any. THE FOLLOWING INFORMATION IS REQUIRED TO BE COMPLETED BY THE OFFEROR: SAM UNIQUE ENTITY NUMBER:_______________________________________ VENDOR'S POINT OF CONTACT: _____________________________________ VENDOR'S TELEPHONE NUMBER: __…",
+          "source": "files/1620000386_DLP_Printer.pdf"
         },
         "references_experience": {
-          "text": "x0000_s1194\" type=\"#_x0000_t202\" style=\"height:201;left:290;mso-position-horizontal-relative:page;mso-position-vertical-relative:page;position:absolute;top:6775;width:11150\" filled=\"f\" stroked=\"f\"><v:textbox inset=\"0,0,0,0\"><w:txbxContent><w:p><w:pPr><w:spacing w:before=\"0\" w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\" /><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAns…",
-          "source": null
+          "text": "SV0222-26 9B. DATED (SEE ITEM 11) 08/19/2026 CODE 11. THIS ITEM ONLY APPLIES TO AMENDMENT OF SOLICITATIONS The above numbered solicitation is amended as set forth in Item 14. The hour and the date specified for receipt of Offers is extended is not extended. Offers must acknowledge receipt of this amendment prior to the hour and date specified in the solicit…",
+          "source": "files/10_SV0222-26_Amendment_0003_Q_and_A_and_Extension_8-28-2026.pdf"
         },
         "certifications_partner": {
-          "text": ". Records relating to appeals under the disputes clause or to litigation or the settlement of claims arising under or relating to this contract shall be made available until such appeals, litigation, or claims are finally resolved. (3) As used in this clause, records include books, documents, accounting procedures and practices, and other data, regardless o…",
-          "source": null
+          "text": "including action for noncompliance. Such necessary changes in language may be made as shall be appropriate to identify properly the parties and their undertakings. (End of clause) 52.222-36, Equal Opportunity for Workers with Disabilities (July 2026) 52.222-37, Employment Reports on Veterans (July 2026) 52.222-40, Notification of Employee Rights Under the N…",
+          "source": "files/1620000386_DLP_Printer.pdf"
         },
         "staffing_team": {
-          "text": "able, support BPA holders occupying collocated space with their Government program customer should identify their workspace area with their name and company affiliation. B.19 TRAVEL REIMBURSEMENT The Government will reimburse the cost of travel required in conjunction with performance of orders issued under this contract. Reimbursement for travel is limited…",
-          "source": null
+          "text": "ceipt of the notification. In the case the Contractor is unable to notify the Contracting Officer, then the Contractor should notify the Contract Officer’s Representative (COR). Contractors must complete the separation checklist with the Contracting Officer or COR by returning all Government-furnished property including, but not limited to, computer equipme…",
+          "source": "files/1620000386_DLP_Printer.pdf"
         },
         "insurance_bonds": {
-          "text": "ted from the termination. The Contractor shall not be required to comply with the cost accounting standards or contract cost principles for this purpose. This paragraph does not give the Government any right to audit the Contractor's records. The Contractor shall not be paid for any work performed or costs incurred which reasonably could have been avoided. …",
-          "source": null
+          "text": "OTHER THAN OFFEROR OR RESPONDENT ____________________ _______________________ ____________________ _______________________ 52.222-18, Certification Regarding Knowledge of Child Labor for Listed End Products (July 2026) 52.240-90, Security Prohibitions and Exclusions Representations and Certifications (July 2026) 52.252-1 Solicitation Provisions Incorporated…",
+          "source": "files/1620000386_DLP_Printer.pdf"
         },
         "subcontracting_consortium": {
-          "text": "wer hours than set forth in the individual order, the total order shall be adjusted to reflect the actual number of hours expended and the final order price. In no case will the final price exceed the ceiling price of the order. g. Notwithstanding any other provision, the BPA holder shall maintain sufficient accounting records for verification of the hours …",
-          "source": null
+          "text": "r the contractor has knowledge that any actual or potential situation is delaying or threatens to delay the timely delivery/performance of this contract, the contractor must immediately notify the Field Administrative Contracting Officers at UNICOR Cumberland or in writing, giving pertinent details. This information will not be construed as a waiver by the …",
+          "source": "files/1620000386_DLP_Printer.pdf"
         },
         "deliverables_scope": {
-          "text": "ervices to be performed. To enhance flexibility and to allow the BPA holder to determine the optimum labor mix for the order the BPA holder may without notice to the Government, increase or decrease the number of hours for each category specified in the individual order by no more than 1%. These adjustments are allowable only to the extent that the ceiling …",
-          "source": null
+          "text": "1502 Solicitation is issued as a one-time purchase, firm fixed price procurement. Questions pertaining to this solicitation will only be addressed in writing via email to: Wesley.newell2@usdoj.gov. For a list, description and total estimated quantities of all items, refer to Section B. Vendors shall submit signed and dated offers by email to: Wesley.Newell2…",
+          "source": "files/1620000386_DLP_Printer.pdf"
         },
         "sla_onsite": {
-          "text": "give the Contractor a preliminary written notice of its intent to extend at least 10 days before the BPA expires. The preliminary notice does not commit the Government to an extension. b. If the Government exercises this option, the extended BPA shall be considered to include this option provision. B.6 SEGREGATION OF COSTS a. The \"Payments under Time-and-Ma…",
-          "source": null
+          "text": "ĖĺĲϙŜôŘŽĖèôŜ ťēÍťϙſĖīīϙæôϙŕŘĺŽĖîôîϟ x ēĖŜϙſĺŪīîϙĖĲèīŪîôϙēÍŘîſÍŘôϙĖĲŜťÍīīÍťĖĺĲϠϙŜôťŪŕϠϙèĺĲƱČŪŘÍťĖĺĲϠϙƱĲôϙťŪĲĖĲČϠ èÍīĖæŘÍťĖĺĲϠϙÍĲîϙÍϙîĺèŪıôĲťôîϙŗŪÍīĖťƅϙèĺĲťŘĺīϙŘôŽĖôſϙĺċϙťēôϙēÍŘîſÍŘôϙĖĲŜťÍīīÍťĖĺĲ after setup and testing. x ēĖŜϙſĺŪīîϙĖĲèīŪîôϙŜĺċťſÍŘôϙĖĲŜťÍīīÍťĖĺĲϠϙèĺĲƱČŪŘÍťĖĺĲϠϙÍĲîϙťôŜťĖĲČϟ x ēĖŜϙſĺŪīîϙĖĲèīŪîôϙèĺīīÍæĺŘÍťĖĺĲϙſĖťēϙbI iϙŜťÍƯϙĺĲϙťôŜťĖĲČϙÍĲîϙť…",
+          "source": "files/1620000386_DLP_Printer.pdf"
         },
         "term_value": {
-          "text": "===== FILE: files/36C24126Q0724_0001.docx ===== CONTINUATION PAGE Amendment #1 ===== FILE: files/36C24126Q0724_0001_unpacked/[Content_Types].xml ===== ﻿<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-packag…",
-          "source": null
+          "text": "===== FILE: files/10_SV0222-26_Amendment_0003_Q_and_A_and_Extension_8-28-2026.pdf ===== PAGE OF PAGES AMENDMENT OF SOLICITATION/ MODIFICATION OF CONTRACT 1. CONTRACT ID CODE 10A. MODIFICATION OF CONTRACT/ORDER NO. 10B. DATED (SEE ITEM 13) FACILITY CODE X (x) 3. EFFECTIVE DATE 08/19/2026 4. REQUISITION/PURCHASE REQ. NO. 1 2 CODE 2. AMENDMENT/MODIFICATION NO.…",
+          "source": "files/10_SV0222-26_Amendment_0003_Q_and_A_and_Extension_8-28-2026.pdf"
         },
         "award_criteria": {
-          "text": "v:textbox></v:shape><v:shape id=\"_x0000_s1311\" type=\"#_x0000_t202\" style=\"height:216;left:266;mso-position-horizontal-relative:page;mso-position-vertical-relative:page;position:absolute;top:12195;width:11937\" filled=\"f\" stroked=\"f\"><v:textbox inset=\"0,0,0,0\"><w:txbxContent><w:p><w:pPr><w:spacing w:before=\"0\" w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\" /><w:r…",
-          "source": null
+          "text": "-*- *)/-\u001a /*-@ \u0011\u000f5 @0)#/ @./\u001a/ .@* @\u001a( -# \u001a@\u0001\u0010 \u0011\u0015\u000f\u0007)\u000e\b)\u0006\u000e \u0013\u0006\u0012 )\u000e \b \u0006\u0007\u000f\u0003) \u0011\u000e7 @)\u001a( @\u001a) @/#/' @* @.# ) -@\u0001\u0014\u001a) !) \"') \u001a0/!*-$4 @ *-@'* \u001a'@- +-* 0 /#*)@ +- 1#*0.@ #/$*)@$.@)*/@0.\u001a\u001b' @ 4356\u0010\u0019\"\u0019\u001b # \u0004\b\u0005\u0004 \u0005 \u0006 \u0007 \u0001\u0002\u0002\u0003 \u0001- 1 @\u0010 \u0010\u000e\u000f\u0010\u0002@ +<:>8<;7:9@7?@ .\u001a@\u0005 \u001a-@\u0001\u0012\u0015@ -\u0002@\u0013\u0011 \u0010\u000f\u0010@ 1 of 34 XX 34 SV0222-26 Digital License Plate Printer SAM.gov Solicitation Posting: 08/03/2026 Qu…",
+          "source": "files/1620000386_DLP_Printer.pdf"
         },
         "forms_signatures": {
-          "text": "TION OF CONTRACT</w:t></w:r></w:p></w:txbxContent></v:textbox></v:shape><v:shape id=\"_x0000_s1238\" type=\"#_x0000_t202\" style=\"height:152;left:1274;mso-position-horizontal-relative:page;mso-position-vertical-relative:page;position:absolute;top:14793;width:2042\" filled=\"f\" stroked=\"f\"><v:textbox inset=\"0,0,0,0\"><w:txbxContent><w:p><w:pPr><w:spacing w:before=\"…",
-          "source": null
+          "text": "r where feasible.) A0002: This Amendment includes vendor submitted questions and Unicor’s answers; this amendment also extends the deadline for submissions to 8/28/2026 at 2PM EST. See Attachment A. Except as provided herein, all terms and conditions of the document referenced in Item 9A or 10A, as heretofore changed, remains unchanged and in full force and…",
+          "source": "files/10_SV0222-26_Amendment_0003_Q_and_A_and_Extension_8-28-2026.pdf"
         },
         "submission": {
-          "text": "before award is made and the Contracting Officer determines that accepting the late offer would not unduly delay the acquisition. However, a late modification of an otherwise successful offer that makes its terms more favorable to the Government will be considered at any time it is received and may be accepted. (3) If an emergency or unanticipated event int…",
-          "source": null
+          "text": "ation and this amendment, and is received prior to the opening hour and date specified. 12. ACCOUNTING AND APPROPRIATION DATA (If required) 13. THIS ITEM APPLIES ONLY TO MODIFICATIONS OF CONTRACTS/ORDERS, IT MODIFIES THE CONTRACT/ORDER NO. AS DESCRIBED IN ITEM 14. E. IMPORTANT : Contractor is not X is required to sign this document and return 1 copies to th…",
+          "source": "files/10_SV0222-26_Amendment_0003_Q_and_A_and_Extension_8-28-2026.pdf"
         },
         "ip_data_security": {
-          "text": "(3) Notify the Contracting Officer when the occurrence is over. (g) Invoice. The Government will handle invoices according to the Prompt Payment Act (31 U.S.C. 3903) and 5 CFR part 1315. The Contractor shall submit invoices to the address designated in the contract to receive invoices. An invoice must include the information required by 5 CFR part 1315.9(b)…",
-          "source": null
+          "text": "llows operators to manage and monitor print jobs, get printer status, control printer functions and complete printer maintenance tasks. o Windows-based User Interface. 8 of 34 All console software (where a user must be logged in) must be configured and tested for functionality with non- elevated privileges. The software must function without local or networ…",
+          "source": "files/1620000386_DLP_Printer.pdf"
         }
       },
       "raw_dce_row_found": true,
       "artifact_locator": {
-        "dce_run_id": 32129565430,
-        "shard": 7,
-        "candidate_id": "US-SAM:5c1a2f71d8794e7dbdb025c48d76b401",
-        "release_tag": "dce-harvest-32129565430"
+        "dce_run_id": 32522894299,
+        "shard": 1,
+        "candidate_id": "US-SAM:c54fba3430a64b20b00e9497324778f4",
+        "release_tag": "dce-harvest-32522894299"
       },
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
       "_deep_batch_hint": "batch-006.json"
     },
     {
-      "candidate_id": "US-SAM:6fe0639a50b8403ba7c62f23bf348b55",
-      "title": "INL_RFQ-PR16095134 - NEGOTIATION AND SITUATION MANAGEMENT TECHNOLOGY EQUIPMENT - BOG",
-      "buyer": "STATE, DEPARTMENT OF",
+      "candidate_id": "US-SAM:d9c0343d687b4bc3af87e4ddb4431467",
+      "title": "Fire & Emergency Medical Services Records Management System (FEMSRMS) BASE + 4 Option Years",
+      "buyer": "NATIONAL AERONAUTICS AND SPACE ADMINISTRATION",
       "portal": "US_SAM",
-      "notice_url": "https://sam.gov/opp/6fe0639a50b8403ba7c62f23bf348b55/view",
-      "deadline": "2026-09-01T21:00:00+00:00",
+      "notice_url": "https://sam.gov/opp/d9c0343d687b4bc3af87e4ddb4431467/view",
+      "deadline": "2026-08-24T19:00:00+00:00",
       "estimated_value": null,
       "currency": null,
       "review_stage": "BUSINESS_GATES",
       "gate_readiness": true,
       "content_quality": "SUBSTANTIVE_DCE_PRESENT",
       "evidence_gate_coverage": 13,
-      "spm_post_dce_score": 22,
-      "spm_fit_band": "MAYBE",
-      "spm_fit_reasons": [],
-      "spm_friction_signals": [],
-      "upstream_classification": "MODEL_REVIEW_REQUIRED",
-      "deadline_authority": {
-        "status": "UNLABELLED_DCE_DEADLINE_CONFLICT_REVIEW_REQUIRED",
-        "conflict": true,
-        "authoritative_submission_date": null
-      },
-      "evidence_quality": {
-        "raw_status": "DOWNLOADED_PUBLIC",
-        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-        "documents_with_text": 2,
-        "text_chars": 152183
-      },
-      "gate_evidence": {
-        "entity_geography": {
-          "text": "tice. This announcement constitutes the only solicitation; quotations are being req uested by this notice alone, and a written solicitation will not be issued. The resultant purchase order will be awarded using Simplified Acquisition Procedures in accordance with FAR 12. The U.S. Government intends to award a purchase order if the responsive quote is techni…",
-          "source": null
-        },
-        "references_experience": {
-          "text": "GNER (Type or print) 30c. DATE SIGNED 31a. UNITED STATES OF AMERICA (SIGNATURE OF CONTRACTING OFFICER) 31b. NAME OF CONTRACTING OFFICER (Type or print) 31c. DATE SIGNED AUTHORIZED FOR LOCAL REPRODUCTION PREVIOUS EDITION IS NOT USABLE STANDARD FORM 1449 (REV. 2/2012) Prescribed by GSA - FAR (48 CFR) 53.212 10. THIS ACQUISITION IS UNRESTRICTED OR NAICS: SIZE …",
-          "source": null
-        },
-        "certifications_partner": {
-          "text": "ted to the American Embassy are exclusive, and any disclosure may result in disqualification from the processes. If anyone outside our team requests information, report it immediately. Transparency and ethics are fundamental to our procurement processes, ensuring equal opportunities for all participants. Page 1 of 56 SBU - CONTRACTING AND ACQUISITIONS PR160…",
-          "source": null
-        },
-        "staffing_team": {
-          "text": "2.1). RCA port. i. Covert camera video selector: One (1) video selector switch with five (5) selectable camera positions, including: - One (1) position displaying all covert cameras. - One (1) position dedicated to each individual covert camera installed on the Throw Phone (item 2.1). j. Headsets: The console shall include: - One (1) dual-ear over-ear aviat…",
-          "source": null
-        },
-        "insurance_bonds": {
-          "text": "RFQ Number: PR16095134 Page 2 of 56 U.S. DEPARTMENT of STATE Embajada de los Estados Unidos de América Carrera 45 # 24B- 27 - (+57601) 275.2000 - Bogotá D.C. – Colombia co.usembassy.gov SBU - CONTRACTING AND ACQUISITIONS SECTION 1 – THE SCHEDULE Continuation to SF-1449, RFQ Number PR16095134, Schedule, Block 11 1.0 TYPE OF CONTRACT This is a firm -fixed- pr…",
-          "source": null
-        },
-        "subcontracting_consortium": {
-          "text": "nstances where the work is to be performed in the US where the foreign person will have access to export-controlled technical data or software. RFQ Number: PR16095134 Page 10 of 56 U.S. DEPARTMENT of STATE Embajada de los Estados Unidos de América Carrera 45 # 24B- 27 - (+57601) 275.2000 - Bogotá D.C. – Colombia co.usembassy.gov SBU - CONTRACTING AND ACQUIS…",
-          "source": null
-        },
-        "deliverables_scope": {
-          "text": "ORDER NUMBER 5. SOLICITATION NUMBER 6. SOLICITATION ISSUE DATE 7. FOR SOLICITATION INFORMATION CALL: a. NAME b. TELEPHONE NUMBER (No collect calls) 8. OFFER DUE DATE/ LOCAL TIME 9. ISSUED BY 13b. RATING 14. METHOD OF SOLICITATION CODE 15. DELIVER TO 16. ADMINISTERED BY CODE 18a. PAYMENT WILL BE MADE BY CODE17a. CONTRACTOR/ OFFEROR CODEFACILITY CODE CODE TEL…",
-          "source": null
-        },
-        "sla_onsite": {
-          "text": "NG AND ACQUISITIONS determines that the product has a defect covered under the warranty, vendor must replace it. INL is not responsible for any transportation charges. Replacement products must be in new condition. The vendor must guarantee, through a certification, that the manufacturer’s representative is able to provide support within Colombia, at least …",
-          "source": null
-        },
-        "term_value": {
-          "text": "actor, require the Contractor to stop all, or any part, of the work called for by this contract for a period of 90 days after the order is delivered to the Contractor, and for any f urther period to which the parties may agree. The order shall be specifically identified as a stop -work order issued under this clause. Upon receipt of the order, the Contracto…",
-          "source": null
-        },
-        "award_criteria": {
-          "text": "Government no later than August 21, 2026, at 16:00 hours (Bogota, Colombia). This is a combined syn opsis/solicitation prepared in accord ance with the format in FAR Subpart 12.20 2, as supplemented with additional information included in this notice. This announcement constitutes the only solicitation; quotations are being req uested by this notice alone, …",
-          "source": null
-        },
-        "forms_signatures": {
-          "text": "O. 3. AWARD/EFFECTIVE DATE 4. ORDER NUMBER 5. SOLICITATION NUMBER 6. SOLICITATION ISSUE DATE 7. FOR SOLICITATION INFORMATION CALL: a. NAME b. TELEPHONE NUMBER (No collect calls) 8. OFFER DUE DATE/ LOCAL TIME 9. ISSUED BY 13b. RATING 14. METHOD OF SOLICITATION CODE 15. DELIVER TO 16. ADMINISTERED BY CODE 18a. PAYMENT WILL BE MADE BY CODE17a. CONTRACTOR/ OFFE…",
-          "source": null
-        },
-        "submission": {
-          "text": "award is made and the Contracting Officer determines that accepting the late offer would not unduly delay the acquisition. However, a late modification of an otherwise successful offer that makes its terms more favorable to the Government will be considered at any time it is received and may be accepted. (3) If an emergency or unanticipated event interrupts…",
-          "source": null
-        },
-        "ip_data_security": {
-          "text": "tify the Contracting Officer when the occurrence is over. (g) Invoice. The Government will handle invoices according to the Prompt Payment Act (31 U.S.C. 3903) and 5 CFR part 1315. The Contractor shall submit invoices to the address designated in the contract to receive invoices. An invoice must include the information required by 5 CFR part 1315.9(b). (h) …",
-          "source": null
-        }
-      },
-      "raw_dce_row_found": true,
-      "artifact_locator": {
-        "dce_run_id": 32123828524,
-        "shard": 15,
-        "candidate_id": "US-SAM:6fe0639a50b8403ba7c62f23bf348b55",
-        "release_tag": "dce-harvest-32123828524"
-      },
-      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
-      "_deep_batch_hint": "batch-006.json"
-    },
-    {
-      "candidate_id": "US-SAM:54764ad67d6d4cd9a6bfc5cc06eeb26f",
-      "title": "TEGUC-Physical Messaging Campaign Development and Execution",
-      "buyer": "STATE, DEPARTMENT OF",
-      "portal": "US_SAM",
-      "notice_url": "https://sam.gov/opp/54764ad67d6d4cd9a6bfc5cc06eeb26f/view",
-      "deadline": "2026-09-03T16:00:00+00:00",
-      "estimated_value": null,
-      "currency": null,
-      "review_stage": "BUSINESS_GATES",
-      "gate_readiness": true,
-      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-      "evidence_gate_coverage": 13,
-      "spm_post_dce_score": 22,
+      "spm_post_dce_score": 23,
       "spm_fit_band": "MAYBE",
       "spm_fit_reasons": [],
       "spm_friction_signals": [],
@@ -692,246 +636,68 @@
         "raw_status": "DOWNLOADED_PUBLIC",
         "content_quality": "SUBSTANTIVE_DCE_PRESENT",
         "documents_with_text": 2,
-        "text_chars": 87400
+        "text_chars": 633143
       },
       "gate_evidence": {
         "entity_geography": {
-          "text": "mance; monthly virtual check in meetings with PDS staff for the remainder of the period of performance. . 10 SECTION 2 - CONTRACT CLAUSES 52.212-4 CONTRACT TERMS AND CONDITIONS – COMMERCIAL ITEMS (JAN 2026) IS INCORPORATED BY REFERENCE. (SEE SF-1449, BLOCK 27A) “None” ADD THE FOLLOWING CLAUSE IN FULL TEXT: 52.229-12 TAX ON CERTAIN FOREIGN PROCUREMENTS—NOTIC…",
-          "source": null
-        },
-        "turnover_financial": {
-          "text": "VALUE ADDED TAX. Value Added Tax (VAT) is not applicable to this contract and shall not be included in the CLIN rates or Invoices because the U.S. Embassy has a tax exemption certificate from the host government. 6 CONTINUATION TO SF-1449, RFQ NUMBER 19H08026R0006 SCHEDULE OF SUPPLIES/SERVICES, BLOCK 20 DESCRIPTION/SPECIFICATIONS/WORK STATEMENT I. SCOPE OF …",
-          "source": null
+          "text": "there is a requirement for any printing, and/or any duplicating/copying in excess of that described in paragraph (c) of the clause. NASA Federal Acquisition Regulation Supplement Part 1809 – Contractor Qualifications _____________________________________________________________________________ 2026 Edition 1809 PART 1809 CONTRACTOR QUALIFICATIONS Revisions …",
+          "source": "files/NFS.pdf"
         },
         "references_experience": {
-          "text": "unicipality Contractor reports, press clippings Quality of content Messages must be culturally appropriate and aligned to Embassy messaging goals Embassy PDS review and approval prior to publication Technical specifications All products are direct-to- household, culturally appropriate physical items Embassy technical review Responsiveness to feedback Contra…",
-          "source": null
+          "text": "non-regulatory requirements will be included in the NFS Companion Guide. Contracting officers are to adhere to procurement class deviations and companion guide updates, as issued by NASA HQs Office of Procurement. Last modified on July 23, 2026, through PCD 26-03B. Office of Procurement NASA Federal Acquisition Regulation Supplement ________________________…",
+          "source": "files/NFS.pdf"
         },
         "certifications_partner": {
-          "text": "ubmitted electronically to TGUBids@state.gov . Please name subject of your email RFP 19H08026R0006 - Quotation Enclosed – Company Name” . It is important to make sure the submission is made in specific size and format; in MS-Word 2007/2010 or MS- Excel 2007/2010 or Adobe Acrobat (pdf) file format. The file size must not exceed 30MB. If the file size should …",
-          "source": null
+          "text": "World Trade Organization (WTO) Government Procurement Agreement (WTO GPA) country end product at FAR 25.003 applies. Subpart 1825.1—Buy American—Supplies 1825.103 Exceptions. (a)Public interest. (1) NASA has determined it inconsistent with the public interest to apply restrictions of the Buy American statute to the acquisition of Canadian end products with …",
+          "source": "files/NFS.pdf"
         },
         "staffing_team": {
-          "text": "ly appropriate and aligned to Embassy messaging goals Embassy PDS review and approval prior to publication Technical specifications All products are direct-to- household, culturally appropriate physical items Embassy technical review Responsiveness to feedback Contractor incorporates Embassy feedback within 3 business days Embassy monitoring of revisions Ev…",
-          "source": null
+          "text": "gs are used, cost control must be no less than 25 percent of the total weighted evaluation factors. The predominant consideration of the cost control evaluation should be a measurement of the contractor's performance against the negotiated estimated cost of the contract. This estimated cost may include the value of undefinitized change orders when appropria…",
+          "source": "files/NFS.pdf"
         },
         "insurance_bonds": {
-          "text": "quired under this contract, the Government will pay the Contractor a firm-fixed price for performing the following Physical Messaging Campaign. I. PERFORMANCE WORK STATEMENT A. The purpose of this firm-fixed-price purchase order is to conduct Physical Messaging Campaign Development and Execution to publicize safe, official repatriation mechanisms in target …",
-          "source": null
+          "text": "d Bidding. PART 1815 Contracting by Negotiation. PART 1816 Types of Contracts. PART 1817 Special Contracting Methods. PART 1818 Reserved. SUBCHAPTER D - SOCIOECONOMIC PROGRAMS PART 1819 Small Business Programs. PART 1822 Application of Labor Laws to Government Acquisitions. PART 1823 Reserved. PART 1824 Protection of Privacy and Freedom of Information. PART…",
+          "source": "files/NFS.pdf"
         },
         "subcontracting_consortium": {
-          "text": ") o Baseline data collection in target communities and delivery of baseline report. o Comprehensive plan with objectives, audiences, channels, planned physical media types, timeline, and metrics. 3 Month 0002 Physical Media Design and Partnership Development (Month 3-4) o Physical media design(s) for embassy approval. o Confirmed relationships with micro-lo…",
-          "source": null
+          "text": "ions 1803.900 Scope of subpart. This subpart applies to NASA instead of FAR subpart 3.9. (a) This subpart implements 10 U.S.C. 4701 as amended by section 846 of the National Defense Authorization Act for Fiscal Year 2008 (Pub. L. 110-181), section 842 of the National Defense Authorization Act for Fiscal Year 2009 (Pub. L. 110-417), and section 827 of the Na…",
+          "source": "files/NFS.pdf"
         },
         "deliverables_scope": {
-          "text": "in target communities across Honduras. The price listed below shall include all labor, materials, overhead, and profit. In consideration of satisfactory performance of all scheduled services required under this contract, the Government will pay the Contractor a firm-fixed price for performing the following Physical Messaging Campaign. I. PERFORMANCE WORK ST…",
-          "source": null
+          "text": "===== FILE: files/NFS.pdf ===== National Aeronautics and Space Administration NASA FAR Supplement The NFS contains regulatory requirements which are issued as Chapter 18 of Title 48, Code of Federal Regulations. This is an interim NFS which incorporates text issued in recent procurement class deviations (PCDs) which revise the NFS for consistency with the R…",
+          "source": "files/NFS.pdf"
         },
         "sla_onsite": {
-          "text": "2023) 52.203-19 PROHIBITION ON REQUIRING CERTAIN INTERNAL CONFIDENTIALITY AGREEMENTS OR STATEMENTS.( Jan 2017) 52.204-13 SYSTEM FOR AWARD MANAGEMENT MAINTENANCE (JAN 2026) 52.209-6 PROTECTING THE GOVERNMENT'S INTEREST WHEN SUBCONTRACTING WITH CONTRACTORS DEBARRED, SUSPENDED, PROPOSED FOR DEBARMENT, OR VOLUNTARILY EXCLUDED (JAN 2026) 52.209-10 PROHIBITION ON…",
-          "source": null
+          "text": "osals. 1815.108-70 Release of proposal information. (a) NASA personnel participating in any way in the evaluation may not reveal any information concerning the evaluation to anyone not also participating, and then only to the extent that the information is required in connection with the evaluation. When non-NASA personnel participate, they must be instruct…",
+          "source": "files/NFS.pdf"
         },
         "term_value": {
-          "text": "usehold, culturally appropriate physical items Embassy technical review Responsiveness to feedback Contractor incorporates Embassy feedback within 3 business days Embassy monitoring of revisions Evaluation Criteria • Technical Approach (40%) – Demonstrated ability to produce and deploy compelling, culturally relevant physical media content. • Past Performan…",
-          "source": null
+          "text": "d expenses (including attorneys' fees and expert witnesses' fees) that were reasonably incurred by the complainant for, or in connection with, bringing the complaint regarding the reprisal, as determined by the head of the Agency. NASA Federal Acquisition Regulation Supplement Part 1803 – Improper Business Practices and Personal Conflicts of Interest ______…",
+          "source": "files/NFS.pdf"
         },
         "award_criteria": {
-          "text": "ctive Offeror: Subject: Request for Proposal number 19H08026R0006 - Physical Messaging Campaign Development and Execution The United States Embassy in Tegucigalpa is issuing this Request for Proposal (RFP) for Physical Messaging Campaign Development and Execution. If you would like to submit a proposal, follow the instructions in Section 3 of the solicitati…",
-          "source": null
+          "text": "ppeals. SUBCHAPTER F - SPECIAL CATEGORIES OF CONTRACTING PART 1834 Major System Acquisition. PART 1835 Research and Development Contracting. PART 1836 Construction and Architect-Engineer Contracts. PART 1837 Service Contracting. PART 1839 Reserved. PART 1840 Information Security and Supply Chain Security PART 1841 Reserved. SUBCHAPTER G - CONTRACT MANAGEMEN…",
+          "source": "files/NFS.pdf"
         },
         "forms_signatures": {
-          "text": "- Quotation Enclosed – Company Name” . It is important to make sure the submission is made in specific size and format; in MS-Word 2007/2010 or MS- Excel 2007/2010 or Adobe Acrobat (pdf) file format. The file size must not exceed 30MB. If the file size should exceed the 30MB, the submission must be made in separate files and attached to separate emails with…",
-          "source": null
+          "text": "gh a competitive process; (iv) Existing or potential customers for the good or service other than the United States Government have been specifically identified; (v) The long-term viability of the venture is not dependent upon a continued Government market or other non-reimbursable Government support; and (vi) Private capital is at risk in the venture. (d) …",
+          "source": "files/NFS.pdf"
         },
         "submission": {
-          "text": "ade and the Contracting Officer determines that accepting the late offer would not unduly delay the acquisition. However, a late modification of an otherwise successful offer that makes its 22 terms more favorable to the Government will be considered at any time it is received and may be accepted. (3) If an emergency or unanticipated event interrupts normal…",
-          "source": null
-        }
-      },
-      "raw_dce_row_found": true,
-      "artifact_locator": {
-        "dce_run_id": 32123828524,
-        "shard": 1,
-        "candidate_id": "US-SAM:54764ad67d6d4cd9a6bfc5cc06eeb26f",
-        "release_tag": "dce-harvest-32123828524"
-      },
-      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
-      "_deep_batch_hint": "batch-006.json"
-    },
-    {
-      "candidate_id": "US-SAM:3aa9e3bd99b54cf0acee15ec3d67db42",
-      "title": "FIRE AND SECURITY ALARM PANAL REPLACEMENT AT VALLE",
-      "buyer": "INTERIOR, DEPARTMENT OF THE",
-      "portal": "US_SAM",
-      "notice_url": "https://sam.gov/opp/3aa9e3bd99b54cf0acee15ec3d67db42/view",
-      "deadline": "2026-09-11T16:00:00+00:00",
-      "estimated_value": null,
-      "currency": null,
-      "review_stage": "BUSINESS_GATES",
-      "gate_readiness": true,
-      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-      "evidence_gate_coverage": 12,
-      "spm_post_dce_score": 22,
-      "spm_fit_band": "MAYBE",
-      "spm_fit_reasons": [],
-      "spm_friction_signals": [],
-      "upstream_classification": "MODEL_REVIEW_REQUIRED",
-      "deadline_authority": {
-        "status": "NOTICE_DATE_FOUND_BUT_UNLABELLED_IN_DCE_REVIEW_REQUIRED",
-        "conflict": true,
-        "authoritative_submission_date": null
-      },
-      "evidence_quality": {
-        "raw_status": "DOWNLOADED_PUBLIC",
-        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-        "documents_with_text": 18,
-        "text_chars": 593364
-      },
-      "gate_evidence": {
-        "entity_geography": {
-          "text": "in the System for Award Management, which can be accessed via https://www.sam.gov (see 52.204-7). (End of provision) RFO FAR 52.209-13 - Violation of Arms Control Treaties or Agreements-Certification (Deviation MAY 2026) (a) This provision does not apply to acquisitions at or below the simplified acquisition threshold or to acquisitions of commercial produc…",
-          "source": null
-        },
-        "references_experience": {
-          "text": "nited States is a participating state. The determinations are described in the most recent unclassified annual report provided to Congress pursuant to section 403 of the Arms Control and Disarmament Act (22 U.S.C. 2593a). The report is available at https://www.state.gov/bureaus-offices/under-secretary-for-arms-control-and-international-security-affairs/bure…",
-          "source": null
-        },
-        "certifications_partner": {
-          "text": "===== FILE: files/Attachment_1_-_Wage_Determination_WD_15-5791_Rev_32.pdf ===== ===== FILE: files/Attachment_2_-_Quote_Submission_Package_140P4226Q0047.docx ===== SOLICITATION 140P4226Q0047: ATTACHMENT 2 QUOTE SUBMISSION PACKAGE VAFO: Security Upgrades INSTRUCTIONS: The following forms may be used to prepare quotes for the subject solicitation as applicable…",
-          "source": null
-        },
-        "insurance_bonds": {
-          "text": "tractor shall report all other accidents to the Contracting Officer as soon as possible and assist the Contracting Officer and other officials as required in the investigation of the accident. 3. The COR will provide the numbers for the rescue services to the contractor upon award. C.11 FIRE PREVENTION AND PROTECTION •Any accidental fire starts shall be rep…",
-          "source": null
-        },
-        "subcontracting_consortium": {
-          "text": "requirements of the Government. Therefore, the technical quote must present sufficient information to reflect a thorough understanding of the requirements and a detailed description of the techniques, procedures, and program for achieving the objectives of the Statement of Work and any additional documentation included through attachments. a. Technical Capa…",
-          "source": null
-        },
-        "deliverables_scope": {
-          "text": "===== FILE: files/Attachment_1_-_Wage_Determination_WD_15-5791_Rev_32.pdf ===== ===== FILE: files/Attachment_2_-_Quote_Submission_Package_140P4226Q0047.docx ===== SOLICITATION 140P4226Q0047: ATTACHMENT 2 QUOTE SUBMISSION PACKAGE VAFO: Security Upgrades INSTRUCTIONS: The following forms may be used to prepare quotes for the subject solicitation as applicable…",
-          "source": null
-        },
-        "sla_onsite": {
-          "text": "O FAR 52.209-7 – Information Regarding Responsibility Matters (DEVIATION MAY 2026) (a) Definitions. As used in this provision— Administrative proceeding means a non-judicial process that is adjudicatory in nature in order to make a determination of fault or liability (e.g., Securities and Exchange Commission Administrative Proceedings, Civilian Board of Con…",
-          "source": null
-        },
-        "term_value": {
-          "text": "the IRS may publish a revenue ruling, which is an official interpretation by the IRS of the Internal Revenue Code, related statutes, tax treaties, and regulations. A revenue ruling is the conclusion of the IRS on how the law is applied to a specific set of facts. For questions relating to the interpretation of the IRS regulations go to https://www.irs.gov/h…",
-          "source": null
-        },
-        "award_criteria": {
-          "text": "st of my knowledge that the information provided herein/above is true. Company Name: _______________________________ Representative’s Name: _________________________________ Representative’s Signature: _______________________________ Relevant Experience Questionnaire READ CAREFULLY: The purpose of this form is for the offeror to list of three (3) projects p…",
-          "source": null
-        },
-        "forms_signatures": {
-          "text": "anding of the requirements and a detailed description of the techniques, procedures, and program for achieving the objectives of the Statement of Work and any additional documentation included through attachments. a. Technical Capability. This section of the technical quote should clearly describe the offeror's proposed approach to performing the requiremen…",
-          "source": null
-        },
-        "submission": {
-          "text": "he acquisition. However, a late modification of an otherwise successful offer that makes its terms more favorable to the Government will be considered at any time it is received and may be accepted. (3) If an emergency or unanticipated event interrupts normal Government processes so that offers cannot be received at the Government office designated for rece…",
-          "source": null
+          "text": "mission. NASA must account for and report assets in accordance with 31 U.S.C. 3512 and 31 U.S.C. 3515, Federal Accounting Standards, and Office of Management and Budget (OMB) instructions. Since contractors maintain NASA’s official records for its assets in their possession, NASA must obtain periodic data from those records to meet these requirements (e.g.,…",
+          "source": "files/NFS.pdf"
         },
         "ip_data_security": {
-          "text": "has two locations, Park Administration Building and the HQ Train Station that are in need of upgraded fire and security alarm panels to ensure they are up to date and within the required codes. C.3 SUMMARY OF WORK The Statement of Work (SOW) requires the contractor to perform upgrades to one (1) fire alarm system and one (1) security system at Valley Forge …",
-          "source": null
+          "text": "Reserved. PART 1814 Sealed Bidding. PART 1815 Contracting by Negotiation. PART 1816 Types of Contracts. PART 1817 Special Contracting Methods. PART 1818 Reserved. SUBCHAPTER D - SOCIOECONOMIC PROGRAMS PART 1819 Small Business Programs. PART 1822 Application of Labor Laws to Government Acquisitions. PART 1823 Reserved. PART 1824 Protection of Privacy and Fre…",
+          "source": "files/NFS.pdf"
         }
       },
       "raw_dce_row_found": true,
       "artifact_locator": {
-        "dce_run_id": 32136570899,
+        "dce_run_id": 32396373660,
         "shard": 1,
-        "candidate_id": "US-SAM:3aa9e3bd99b54cf0acee15ec3d67db42",
-        "release_tag": "dce-harvest-32136570899"
-      },
-      "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
-      "_deep_batch_hint": "batch-006.json"
-    },
-    {
-      "candidate_id": "US-SAM:440811a924f6493098c3bba6c8cc351f",
-      "title": "6515--PureSteel Mobile Soaking Station RFQ SDVOSB for the Hines VAMC",
-      "buyer": "VETERANS AFFAIRS, DEPARTMENT OF",
-      "portal": "US_SAM",
-      "notice_url": "https://sam.gov/opp/440811a924f6493098c3bba6c8cc351f/view",
-      "deadline": "2026-08-25T04:59:00+00:00",
-      "estimated_value": null,
-      "currency": null,
-      "review_stage": "BUSINESS_GATES",
-      "gate_readiness": true,
-      "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-      "evidence_gate_coverage": 12,
-      "spm_post_dce_score": 21,
-      "spm_fit_band": "MAYBE",
-      "spm_fit_reasons": [],
-      "spm_friction_signals": [],
-      "upstream_classification": "MODEL_REVIEW_REQUIRED",
-      "deadline_authority": {
-        "status": "UNKNOWN_NO_DCE_DEADLINE_PARSED",
-        "conflict": false,
-        "authoritative_submission_date": null
-      },
-      "evidence_quality": {
-        "raw_status": "DOWNLOADED_PUBLIC",
-        "content_quality": "SUBSTANTIVE_DCE_PRESENT",
-        "documents_with_text": 46,
-        "text_chars": 1939281
-      },
-      "gate_evidence": {
-        "entity_geography": {
-          "text": "of Defense for the collection of specialized national intelligence through reconnaissance programs; (8) The intelligence elements of the Army, the Navy, the Air Force, the Marine Corps, the Coast Guard, the Federal Bureau of Investigation, the Drug Enforcement Administration, and the Department of Energy; (9) The Bureau of Intelligence and Research of the D…",
-          "source": null
-        },
-        "references_experience": {
-          "text": "king wheels 5. Period of Performance (See Contract) 6. Place of Performance Hines VAMC Sterile Processing Department Hines, IL 60141 7. Contractor Responsibilities All installation and in-services 8. Government Furnished Property (GFP) None. 9. Points of Contact Government POC: TBD Contractor POC: [Insert name, title, contact info] B.8 PRICE/COST SCHEDULE I…",
-          "source": null
-        },
-        "certifications_partner": {
-          "text": "of payments by accessing VIS at: https://www.vis.fsc.va.gov/login.aspx?ReturnUrl=%2fDefault.aspx INVOICES: Invoices shall be submitted in arrears: a. Quarterly _______ b. Semi-Annually _______ c. Other X Upon Acceptance GOVERNMENT INVOICE ADDRESS: All invoices from the contractor shall be mailed to the following address: DEPARTMENT OF VETERANS AFFAIRS FINAN…",
-          "source": null
-        },
-        "insurance_bonds": {
-          "text": "ted from the termination. The Contractor shall not be required to comply with the cost accounting standards or contract cost principles for this purpose. This paragraph does not give the Government any right to audit the Contractor's records. The Contractor shall not be paid for any work performed or costs incurred which reasonably could have been avoided. …",
-          "source": null
-        },
-        "subcontracting_consortium": {
-          "text": "to the Government upon— (1) Delivery of the supplies to a carrier, if transportation is f.o.b. origin; or (2) Delivery of the supplies to the Government at the destination specified in the contract, if transportation is f.o.b. destination. (k) Taxes. The contract price includes all applicable Federal, State, and local taxes and duties. (l) Termination for t…",
-          "source": null
-        },
-        "deliverables_scope": {
-          "text": "tps://www.vis.fsc.va.gov/login.aspx?ReturnUrl=%2fDefault.aspx INVOICES: Invoices shall be submitted in arrears: a. Quarterly _______ b. Semi-Annually _______ c. Other X Upon Acceptance GOVERNMENT INVOICE ADDRESS: All invoices from the contractor shall be mailed to the following address: DEPARTMENT OF VETERANS AFFAIRS FINANCIAL SERVICES CENTER PO BOX 149971 …",
-          "source": null
-        },
-        "sla_onsite": {
-          "text": "| Date 52.203-17 | CONTRACTOR EMPLOYEE WHISTLEBLOWER RIGHTS | NOV 2023 52.203-19 | PROHIBITION ON REQUIRING CERTAIN INTERNAL CONFIDENTIALITY AGREEMENTS OR STATEMENTS | JAN 2017 52.204-13 | SYSTEM FOR AWARD MANAGEMENT—MAINTENANCE (DEVIATION) | NOV 2025 52.209-10 | PROHIBITION ON CONTRACTING WITH INVERTED DOMESTIC CORPORATIONS | NOV 2015 52.219-28 | POSTAWARD…",
-          "source": null
-        },
-        "term_value": {
-          "text": "N INTERNAL CONFIDENTIALITY AGREEMENTS OR STATEMENTS—REPRESENTATION | JAN 2017 52.204-7 | SYSTEM FOR AWARD MANAGEMENT—REGISTRATION (DEVIATION) | NOV 2025 52.225-18 | PLACE OF MANUFACTURE | AUG 2018 852.215-72 | NOTICE OF INTENT TO RE-SOLICIT | OCT 2019 | | Listed end product | Listed countries of origin | | | | | Line Item No. | Country of origin | Exceeds 5…",
-          "source": null
-        },
-        "award_criteria": {
-          "text": "w:line=\"240\" w:lineRule=\"auto\"/><w:rPr><w:rFonts w:ascii=\"Courier New\" w:hAnsi=\"Courier New\" w:cs=\"Courier New\"/><w:sz w:val=\"15\"/><w:szCs w:val=\"15\"/></w:rPr></w:pPr></w:p></w:txbxContent></v:textbox></v:shape><w10:wrap anchorx=\"page\" anchory=\"page\"/></v:group></w:pict></w:r></w:p><w:p w14:paraId=\"50D7227C\" w14:textId=\"77777777\" w:rsidR=\"00FB53AD\" w:rsidRD…",
-          "source": null
-        },
-        "forms_signatures": {
-          "text": "r better ergonomics D. Materials must be durable E. Sinks must be deep and wide enough for soaking instruments trays for reprocessing (34\" X 22\" X 9\") F. Must have a simple draining system G. Must be able to hold water for soaking H. Must have a station to hold the enzymatic solutions I Must have locking wheels 5. Period of Performance (See Contract) 6. Pla…",
-          "source": null
-        },
-        "submission": {
-          "text": "___ (E-Mail Address) ________________________________ (SAM UEI Number) B. GOVERNMENT: Matthew Hohl, CONTRACTING SPECIALIST DEPARTMENT OF VETERANS AFFAIRS GREAT LAKES ACQUISITION CENTER 115 S. 84TH ST., SUITE 100 MILWAUKEE WI 53214-1476 PHONE NUMBER: 414-844-4816 EMAIL: Matthew.Hohl@VA.GOV B.2 CONTRACTOR REMITTANCE ADDRESS All payments by the Government to t…",
-          "source": null
-        },
-        "ip_data_security": {
-          "text": "B.6 SECURITY & PRIVACY CONTROL The Certification & Accreditation (C&A) requirements of VHA Handbook 6500.6 do not apply to this requirement; therefore, a Security Accreditation package is not required. No C&A or MOU/ISA is required. Sensitive information exposure as part of this contract involves applicable security controls within the facility as part of t…",
-          "source": null
-        }
-      },
-      "raw_dce_row_found": true,
-      "artifact_locator": {
-        "dce_run_id": 32123828524,
-        "shard": 1,
-        "candidate_id": "US-SAM:440811a924f6493098c3bba6c8cc351f",
-        "release_tag": "dce-harvest-32123828524"
+        "candidate_id": "US-SAM:d9c0343d687b4bc3af87e4ddb4431467",
+        "release_tag": "dce-harvest-32396373660"
       },
       "finality": "NOT_A_VERDICT_ASSISTANT_MUST_ADJUDICATE",
       "_deep_batch_hint": "batch-006.json"
