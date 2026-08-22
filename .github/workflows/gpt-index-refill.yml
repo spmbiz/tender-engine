@@ -1,0 +1,87 @@
+name: GPT Index Refill
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["GPT Inbox Live Refresh"]
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/refill_gpt_hot_from_index.py'
+      - '.github/workflows/gpt-index-refill.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gpt-index-refill
+  cancel-in-progress: true
+
+jobs:
+  refill:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Refill GPT Web surface only when drained
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          need="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          def load(p):
+              try: return json.loads(Path(p).read_text(encoding='utf-8'))
+              except Exception: return {}
+          manifest=load('control/gpt_web_read_batches/manifest.json')
+          index=load('control/gpt_review_index.json')
+          visible=int(manifest.get('rich_window_count') or 0)
+          pending=int((index.get('counts') or {}).get('pending_total_uncapped') or index.get('count') or 0)
+          print(1 if visible == 0 and pending > 0 else 0)
+          PY
+          )"
+          if [ "$need" != "1" ]; then
+            echo 'GPT Web surface still populated or uncapped index empty; no refill needed.'
+            exit 0
+          fi
+
+          python pipeline/refill_gpt_hot_from_index.py \
+            --index control/gpt_review_index.json \
+            --final-bank control/final_supergreen_bank.json \
+            --review-ledger control/gpt_web_review_ledger.json \
+            --out control/gpt_review_hot.json \
+            --recovery-root /tmp/gpt-index-refill \
+            --max-items 160 \
+            --max-release-downloads 80
+
+          git config user.name 'tender-engine-bot'
+          git config user.email 'tender-engine-bot@users.noreply.github.com'
+          git add control/gpt_review_hot.json
+          if git diff --cached --quiet; then
+            echo 'Refill produced no durable change.'
+            exit 0
+          fi
+          git commit -m "inbox: refill GPT Web hot window from uncapped index ${GITHUB_RUN_ID}"
+          for n in 1 2 3 4 5 6; do
+            if git pull --rebase origin main && git push origin HEAD:main; then
+              exit 0
+            fi
+            git rebase --abort >/dev/null 2>&1 || true
+            if [ "$n" -eq 6 ]; then
+              exit 1
+            fi
+            sleep "$((n * 2))"
+          done
