@@ -1,0 +1,62 @@
+{
+  "schema": "GPT_DCE_ADJUDICATION_V1",
+  "source_dce_run_id": 32550107242,
+  "created_at": "2026-08-22T11:13:00Z",
+  "persist_to_final_bank": true,
+  "results": [
+    {
+      "candidate_id": "US-SAM:ba7b294fbf0f4c74aed11b74170383e8",
+      "title": "Financial Management - Financial Improvement Audit Remediation (FIAR)",
+      "buyer": "DEPT OF DEFENSE",
+      "deadline": "2026-08-31T06:00:00+00:00",
+      "classification": "RED",
+      "final_score": 14,
+      "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "deadline_authority": "UNLABELLED_DCE_DEADLINE_CONFLICT_REVIEW_REQUIRED",
+      "blockers": [
+        "Requirement is a large-scale DoD financial-management/audit-remediation services program with extensive staffing, recurring deliverables and key-personnel performance thresholds.",
+        "The service summary expects approximately 90% of qualified personnel on the job at contract start for satisfactory performance and requires management, transition, OCI and subcontracting plans."
+      ],
+      "unknowns": ["Authoritative proposal deadline still requires semantic reconciliation."],
+      "why": "This is enterprise audit-remediation consulting with heavy staffing and compliance obligations, not a lean SPM delivery scope.",
+      "action": "DROP_HEAVY_DOD_STAFFING_AUDIT_PROGRAM",
+      "notice_url": "https://sam.gov/opp/ba7b294fbf0f4c74aed11b74170383e8/view"
+    },
+    {
+      "candidate_id": "IT-PVL:f6163df5-1bb9-4187-b718-6aeec074f2bd",
+      "title": "Procedura aperta per l’affidamento di lavori per la realizzazione e messa in servizio dello Stralcio II - condotte sottomarine Colonnella e Rodella",
+      "buyer": "HERATECH S.R.L.",
+      "deadline": "2026-09-02T13:00:00+00:00",
+      "classification": "RED",
+      "final_score": 1,
+      "evidence_quality": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+      "deadline_authority": "MISSING",
+      "blockers": [
+        "EUR 22.78m physical civil/marine works procurement for construction and commissioning of submarine pipelines.",
+        "Scope is fundamentally outside digital, creative, AI and lean brokerable service delivery."
+      ],
+      "unknowns": [],
+      "why": "Obvious construction false positive. The retrieved compact evidence is also mostly a generic ANAC platform manual rather than substantive tender gates.",
+      "action": "DROP_MAJOR_MARINE_CONSTRUCTION",
+      "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/f6163df5-1bb9-4187-b718-6aeec074f2bd?ricercaArchivio=false"
+    },
+    {
+      "candidate_id": "IT-PVL:acc642c6-c759-439e-b520-112b30824622",
+      "title": "LAVORI di SOMMA URGENZA da DISSESTO IDROGEOLOGICO in Via delle Alpi e Piazza Indipendenza del Comune di Pontecorvo",
+      "buyer": "COMUNE DI PONTECORVO",
+      "deadline": null,
+      "classification": "RED",
+      "final_score": 1,
+      "evidence_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+      "deadline_authority": "MISSING",
+      "blockers": [
+        "Physical emergency hydrogeological/civil works procurement valued around EUR 411k.",
+        "Scope is outside SPM digital/creative/AI delivery and requires local construction execution."
+      ],
+      "unknowns": [],
+      "why": "Obvious construction false positive with no meaningful SPM delivery path.",
+      "action": "DROP_CIVIL_WORKS",
+      "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/acc642c6-c759-439e-b520-112b30824622?ricercaArchivio=false"
+    }
+  ]
+}
