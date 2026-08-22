@@ -74,9 +74,11 @@ jobs:
           ! grep -q 'gh workflow run qwen-live-classification.yml' .github/workflows/qwen-live-recovery-drainer.yml
           grep -q "default: '480'" .github/workflows/qwen-live-classification.yml
           grep -q "QWEN_OPERATIONAL_ROWS_PER_SHARD: '480'" .github/workflows/qwen-live-classification.yml
+          grep -q "QWEN_RICH_MIN_CONTEXT_CHARS: '2200'" .github/workflows/qwen-live-classification.yml
+          grep -q "QWEN_TRANSPORT_RETRIES: '0'" .github/workflows/qwen-live-classification.yml
           grep -q 'fallback=1' .github/workflows/qwen-live-classification.yml
           grep -q -- '--timeout 30' .github/workflows/qwen-live-classification.yml
-          grep -q -- '--description-chars 1200' .github/workflows/qwen-live-classification.yml
+          grep -q -- '--description-chars 2200' .github/workflows/qwen-live-classification.yml
           grep -q 'group: qwen-live-state-writer' .github/workflows/qwen-live-conveyor.yml
           grep -q 'cancel-in-progress: false' .github/workflows/qwen-live-conveyor.yml
 
