@@ -1,9 +1,9 @@
 {
   "schema": "QWEN_RECALL_CALIBRATION_CORPUS_V1",
-  "generated_at": "2026-08-22T11:20:14+00:00",
-  "case_count": 44,
-  "positive_recall_cases": 43,
-  "frozen_input_cases": 44,
+  "generated_at": "2026-08-22T11:20:36+00:00",
+  "case_count": 47,
+  "positive_recall_cases": 46,
+  "frozen_input_cases": 47,
   "missing_input_candidate_ids": [
     "IE:8623183",
     "IE:8670172",
@@ -204,6 +204,53 @@
           "carry_forward_previous_source_run": 32225601083
         },
         "calibration_input_frozen_at": "2026-08-19T10:24:45+00:00"
+      }
+    },
+    {
+      "candidate_id": "PL-BZP:08deffac-1cd8-bab3-b346-03000188e0e6",
+      "label": "DCE/GPT positive (YELLOW): PL-BZP:08deffac-1cd8-bab3-b346-03000188e0e6",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 76,
+        "why": "The scope title is an excellent creative/media-campaign fit, but the current pack is not gate-ready. It cannot be promoted to GREEN from title semantics alone.",
+        "action": "PRIORITY_RECOVER_AUTHENTIC_TENDER_PACK_AND_DEEP_REVIEW",
+        "evidence_quality": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "provenance_file": "control/adjudications/gpt-web-live-sweep-20260822-run-32560652323.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "PL-BZP:08deffac-1cd8-bab3-b346-03000188e0e6",
+        "material_fields_hash": "1f66bae7d887d413183b558df4c71177dcb6ccd12e0d6a45f2fedb810c9f5753",
+        "notice": {
+          "candidate_id": "PL-BZP:08deffac-1cd8-bab3-b346-03000188e0e6",
+          "source_family": "PL",
+          "source": "PL_BZP",
+          "country": "PL",
+          "buyer": "Instytut Psychiatrii i Neurologii",
+          "title": "Opracowanie spójnej koncepcji kreatywnej i realizacja kampanii medialnej dotyczącej profilaktyki zachowań samobójczych",
+          "description": "<html><head><meta charset=\"UTF-8\"><style>body { font-family: \"Calibri\", sans-serif; } span.normal { font-weight: 400 } .text-center { text-align: center } .bg-light { background-color: #F2F2F2 } * { box-sizing: border-box } .h1, h1 { font-size: 1.75rem } .h3, h3 { font-size: 11pt; font-weight: 700; margin-bottom: 1.25rem } .h1, h1 { font-size: 11pt; font-family: \"Arial\",sans-serif; } .h2, h2 { font-size: 12pt; font-family: \"Arial\",sans-serif; font-weight: bold; margin-bottom: 1.25rem } .p-3 { border: solid windowtext 1.0pt; background: #BFBFBF; padding: 0cm 5.4pt 0cm 5.4pt; } .mb-0 { margin-bottom: 0 !important } .mb-1 { margin-bottom: .5rem !important } .mb-2 { margin-bottom: 1rem !important } .mb-3 { margin-bottom: 1.5rem !important } .mb-4 { margin-bottom: 2rem !important } .mb-5 { margin-bottom: 2.5rem !important } .mb-6 { margin-bottom: 3rem !important } .mb-7 { margin-bottom: 3.5rem !important } .mb-8 { margin-bottom: 4rem !important } .mb-9 { margin-bottom: 4.5rem !important } .mb-10 { margin-bottom: 5rem !important } .mb-auto { margin-bottom: auto !important } </style></head><body><header hidden><table style=\"border-bottom: 1px solid black; width:100%\"><tr><td>Ogłoszenie nr 2026/BZP 00403053 z dnia 2026-08-21</td></tr></table></header><main><!-- Version 1.0.0 --><style type=\"text/css\"> .normal { color: black; } h1.title { }</style> <h1 class=\"text-center mt-5 mb-5\">Ogłoszenie o zamówieniu<br/> Usługi<br/> Opracowanie spójnej koncepcji kreatywnej i realizacja kampanii medialnej dotyczącej profilaktyki zachowań samobójczych </h1> <h2 class=\"bg-light p-3 mt-4\">SEKCJA I - ZAMAWIAJĄCY</h2> <h3 class=\"mb-0\">1.1.) Rola zamawiającego</h3> <p class=\"mb-0\">Postępowanie prowadzone jest samodzielnie przez zamawiającego</p> <h3 class=\"mb-0\">1.2.) Nazwa zamawiającego: <span class=\"normal\">Instytut Psychiatrii i Neurologii</span></h3> <h3 class=\"mb-0\">1.4) Krajowy Numer Identyfikacyjny: <span class=\"normal\">REGON 000288509</span></h3><h3 class=\"mb-0\">1.5) Adres zamawiającego </h3> <h3 class=\"mb-0\">1.5.1.) Ulica: <span class=\"normal\">Sobieskiego 9</span></h3> <h3 class=\"mb-0\">1.5.2.) Miejscowość: <span class=\"normal\">Warszawa</span></h3> <h3 class=\"mb-0\">1.5.3.) Kod pocztowy: <span class=\"normal\">02-957</span></h3> <h3 class=\"mb-0\">1.5.4.) Województwo: <span class=\"normal\">mazowieckie</span></h3> <h3 class=\"mb-0\">1.5.5.) Kraj: <span class=\"normal\">Polska</span></h3> <h3 class=\"mb-0\">1.5.6.) Lokalizacja NUTS 3: <span class=\"normal\">PL911 - Miasto Warszawa</span></h3> <h3 class=\"mb-0\">1.5.9.) Adres poczty elektronicznej: <span class=\"normal\">afijalkowska@ipin.edu.pl</span></h3> <h3 class=\"mb-0\">1.5.10.) Adres strony internetowej zamawiającego: <span class=\"normal\">https://www.ipin.edu.pl</span></h3> <h3 class=\"mb-0\"> 1.6.) Rodzaj zamawiającego: <span class=\"normal\">Zamawiający publiczny - osoba prawna, o której mowa w art. 4 pkt 3 ustawy (podmiot prawa publicznego)</span> </h3> <h3 class=\"mb-0\"> 1.7.) Przedmiot działalności zamawiającego: <span class=\"normal\">Zdrowie</span> </h3> <h2 class=\"bg-light p-3 mt-4\">SEKCJA II – INFORMACJE PODSTAWOWE</h2> <h3 class=\"mb-0\">2.1.) Ogłoszenie dotyczy: </h3> <p class=\"mb-0\"> Zamówienia publicznego </p> <h3 class=\"mb-0\">2.2.) Ogłoszenie dotyczy usług społecznych i innych szczególnych usług: <span class=\"normal\">Nie</span></h3> <h3 class=\"mb-0\">2.3.) Nazwa zamówienia albo umowy ramowej: </h3> <p class=\"mb-0\"> Opracowanie spójnej koncepcji kreatywnej i realizacja kampanii medialnej dotyczącej profilaktyki zachowań samobójczych </p> <h3 class=\"mb-0\">2.4.) Identyfikator postępowania: <span class=\"normal\">ocds-148610-5b8028c9-c2cd-4332-aef9-0539d3b5640d</span></h3> <h3 class=\"mb-0\">2.5.) Numer ogłoszenia: <span class=\"normal\">2026/BZP 00403053</span></h3> <h3 class=\"mb-0\">2.6.) Wersja ogłoszenia: <span class=\"normal\">01</span></h3> <h3 class=\"mb-0\">2.7.) Data ogłoszenia: <span class=\"normal\">2026-08-21</span></h3> <h3 class=\"mb-0\">2.8.) Zamówienie albo umowa ramowa zostały ujęte w planie postępowań: <span class=\"normal\">Nie</span></h3> <h3 class=\"mb-0\">2.11.) O udzielenie zamówienia mogą ubiegać się wyłącznie wykonawcy, o których mowa w art. 94 ustawy: <span class=\"normal\">Nie</span></h3> <h3 class=\"mb-0\">2.14.) Czy zamówienie albo umowa ramowa dotyczy projektu lub programu współfinansowanego ze środków Unii Europejskiej: <span class=\"normal\">Nie</span></h3> <h3 class=\"mb-0\">2.16.) Tryb udzielenia zamówienia wraz z podstawą prawną</h3> <p class=\"mb-0\"> Zamówienie udzielane jest w trybie podstawowym na podstawie: art. 275 pkt 2 ustawy </p> <h2 class=\"bg-light p-3 mt-4\">SEKCJA III – UDOSTĘPNIANIE DOKUMENTÓW ZAMÓWIENIA I KOMUNIKACJA</h2> <h3 class=\"mb-0\">3.1.) Adres strony internetowej prowadzonego postępowania</h3> https://ipin.ezamawiajacy.pl/pn/ipin/demand/314141/notice/public/details <h3 class=\"mb-0\">3.2.) Zamawiający zastrzega dostęp do dokumentów zamówienia: <span class=\"normal\">Nie</span></h3> <h3 class=\"mb-0\">3.4.) Wykonawcy zobowiązani są do składania ofert, wniosków o dopuszczenie do udziału w postępowaniu, oświadczeń oraz innych dokumentów wyłącznie przy użyciu środków komunikacji elektronicznej: <span class=\"normal\">Tak</span></h3> <h3 class=\"mb-0\">3.5.) Informacje o środkach komunikacji elektronicznej, przy użyciu których zamawiający będzie komunikował się z wykonawcami - adres strony internetowej: <span class=\"normal\">Postępowanie prowadzone jest przy użyciu środków komunikacji elektronicznej.<br/>Komunikacja między Zamawiającym a Wykonawcami odbywa się przy użyciu Platformy zakupowej znajdującej się pod adresem:<br/>https://ipin.ezamawiajacy.pl.</span></h3> <h3 class=\"mb-0\">3.6.) Wymagania techniczne i organizacyjne dotyczące korespondencji elektronicznej: <span class=\"normal\">1. Postępowanie prowadzone jest przy użyciu środków komunikacji elektronicznej. Komunikacja między Zamawiającym a Wykonawcami odbywa się przy użyciu Platformy zakupowej znajdującej się pod adresem: https://ipin.ezamawiajacy.pl.<br/>2. Korzystanie z platformy jest bezpłatne. Zgłoszenie do postępowania wymaga zalogowania wykonawcy do Systemu na subdomenie https://oneplace.marketplanet.pl<br/>3. Przed założeniem konta na Platformie zakupowej eZamawiający należy zapoznać się z „Instrukcją dla wykonawcy – Instrukcją użytkownika” opublikowaną w zakładce Baza Wiedzy pod adresem: https://ipin.ezamawiajacy.pl<br/>4. W Instrukcji dla wykonawcy zawarte są między innymi informacje dotyczące: rejestracji użytkownika, konfiguracji stanowiska pod<br/>podpis, systemowych formularzy, przegotowania oferty, składania ofert, wycofania ofert, załączenia JEDZ i innych plików, itp.<br/>Szczegółowe wymagania opisane są w cz. XVI SWZ.</span></h3> <h3 class=\"mb-0\">3.8.) Zamawiający wymaga sporządzenia i przedstawienia ofert przy użyciu narzędzi elektronicznego modelowania danych budowlanych lub innych podobnych narzędzi, które nie są ogólnie dostępne: <span class=\"normal\">Nie</span></h3> <h3 class=\"mb-0\">3.12.) Oferta - katalog elektroniczny: <span class=\"normal\">Nie dotyczy</span></h3> <h3 class=\"mb-0\">3.14.) Języki, w jakich mogą być sporządzane dokumenty składane w postępowaniu: </h3> <p class=\"mb-0\">polski</p> <h3 class=\"mb-0\">3.15.) RODO (obowiązek informacyjny): <span class=\"normal\">Zgodnie z art. 13 ust. 1 i 2 rozporządzenia Parlamentu Europejskiego i Rady (UE) 2016/679 z dnia 27 kwietnia 2016 r. w sprawie ochrony osób fizycznych w związku z przetwarzaniem danych osobowych i w sprawie swobodnego przepływu takich danych oraz uchylenia dyrektywy 95/46/WE (Dz.U.UE.L.2016.119.1), zwanego dalej „RODO”, informujemy, że:<br/>1. Administratorem przetwarzającym Pani(a) dane osobowe jest Instytut Psychiatrii i Neurologii, przy ul. Sobieskiego 9, 02-957<br/>Warszawa, (adres poczty elektronicznej: ipin@ipin.edu.pl).<br/>2. W Instytucie Psychiatrii i Neurologii wyznaczony został Inspektor Ochrony Danych, adres: Sobieskiego 9, 02-957 Warszawa, adres poczty elektronicznej: iod@ipin.edu.pl.<br/>Szczegółowe informacje zawiera XXXIV część SWZ.</span></h3> <h2 class=\"bg-light p-3",
+          "cpv_or_category": "79341400-0 (Usługi prowadzenia kampanii reklamowych),79340000-9 (Usługi reklamowe i marketingowe)",
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-21T17:46:21.638048+00:00",
+          "deadline": "2026-09-01T09:00:00+00:00",
+          "deadline_utc": "2026-09-01T09:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "1.1.2",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ezamowienia.gov.pl/mo-client-board/bzp/notice-details/id/08deffac-1cd8-bab3-b346-03000188e0e6"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-22T11:20:36+00:00"
       }
     },
     {
@@ -1565,6 +1612,55 @@
       }
     },
     {
+      "candidate_id": "UK_PCS_OCDS:rls-28-AUG562550",
+      "label": "DCE/GPT positive (YELLOW): UK_PCS_OCDS:rls-28-AUG562550",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 56,
+        "why": "Potentially brokerable physical-services opportunity at GBP 180k, but it is not a direct digital fit and the current evidence is too thin to establish a viable subcontracting route or mandatory gates.",
+        "action": "RECOVER_CONTRACT_PACK_AND_ONLY_CONTINUE_IF_LOCAL_PARTNER_ROUTE_IS_CLEAN",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT_BUT_TENDER_GATES_UNRESOLVED",
+        "provenance_file": "control/adjudications/gpt-web-live-sweep-20260822-run-32550613010.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "UK_PCS_OCDS:rls-28-AUG562550",
+        "material_fields_hash": "55293400cdaffea3396a7f4f627fb1ed756ff389ae8c4fa1510a31290749f247",
+        "notice": {
+          "candidate_id": "UK_PCS_OCDS:rls-28-AUG562550",
+          "source_family": "UK_PCS_OCDS",
+          "source": "UK_PCS_OCDS",
+          "country": "GB",
+          "buyer": "The City of Edinburgh Council",
+          "title": "CT1483 Letter Distribution and Installation",
+          "description": "The City of Edinburgh Council Print Services team wishes to appoint a supplier to support with two key areas of work: - The distribution of 'door drop' mailings; and - The installation and removal of lamppost wraps.",
+          "cpv_or_category": "[\"64112000\"]",
+          "estimated_value": 180000.0,
+          "currency": "GBP",
+          "publication_date": "2026-08-18T00:00:00+00:00",
+          "deadline": "2026-09-17T12:00:00+00:00",
+          "deadline_utc": "2026-09-17T12:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "http://www.publiccontractsscotland.gov.uk",
+            "https://www.publiccontractsscotland.gov.uk/NoticeDownload/Download.aspx",
+            "https://www.publiccontractsscotland.gov.uk/search/show/search_view.aspx?ID=AUG562550"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-22T11:20:36+00:00"
+      }
+    },
+    {
       "candidate_id": "UK_PCS_OCDS:rls-7-AUG562839",
       "label": "DCE/GPT positive (YELLOW): UK_PCS_OCDS:rls-7-AUG562839",
       "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
@@ -1611,6 +1707,55 @@
           ]
         },
         "calibration_input_frozen_at": "2026-08-22T11:19:47+00:00"
+      }
+    },
+    {
+      "candidate_id": "UK_PCS_OCDS:rls-84-AUG561571",
+      "label": "DCE/GPT positive (YELLOW): UK_PCS_OCDS:rls-84-AUG561571",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 70,
+        "why": "Brand positioning and audience development is a native creative/strategy fit and the GBP 10k size is lean, but the pack does not prove the mandatory gates. Unknown is not PASS.",
+        "action": "RECOVER_BRIEF_AND_FAST_TRACK_CREATIVE_REVIEW",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT_BUT_TENDER_GATES_UNRESOLVED",
+        "provenance_file": "control/adjudications/gpt-web-live-sweep-20260822-run-32559253485.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "UK_PCS_OCDS:rls-84-AUG561571",
+        "material_fields_hash": "942a4ed7fed59319f7011425f14a9446c1a66f543c26e83d3f5ddf70921302d3",
+        "notice": {
+          "candidate_id": "UK_PCS_OCDS:rls-84-AUG561571",
+          "source_family": "UK_PCS_OCDS",
+          "source": "UK_PCS_OCDS",
+          "country": "GB",
+          "buyer": "Tweed Forum",
+          "title": "River Tweed Trail, Brand Positioning and Audience Development",
+          "description": "The DT team is seeking specialist support to refine and articulate the RTT visitor proposition, develop clear visitor-focused positioning, and identify the target audiences whose motivations, values and interests most closely align with the Trail experience. The appointed consultant/agency will be expected to define the RTT's USP, drawing on its distinctive combination of landscapes, heritage, culture, communities and cross-border identity spanning Scotland and England. This should establish a compelling and differentiated position within the walking and cycling tourism market.",
+          "cpv_or_category": "[\"79342000\"]",
+          "estimated_value": 10000.0,
+          "currency": "GBP",
+          "publication_date": "2026-08-04T00:00:00+00:00",
+          "deadline": "2026-09-09T17:00:00+00:00",
+          "deadline_utc": "2026-09-09T17:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "http://www.publiccontractsscotland.gov.uk",
+            "https://www.publiccontractsscotland.gov.uk/NoticeDownload/Download.aspx",
+            "https://www.publiccontractsscotland.gov.uk/search/show/search_view.aspx?ID=AUG561571"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-22T11:20:36+00:00"
       }
     },
     {
