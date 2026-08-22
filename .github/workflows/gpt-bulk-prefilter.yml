@@ -33,6 +33,7 @@ jobs:
             --root control/gpt_gate_stress_batches \
             --out control/gpt_bulk_prefilter_preview.json \
             --priority-out-dir control/gpt_priority_deep_batches \
+            --priority-digest-dir control/gpt_priority_review_digest \
             --preserved-out-dir control/gpt_preserved_low_deep_batches
       - name: Persist preview and review batches
         shell: bash
@@ -40,7 +41,7 @@ jobs:
           set -euo pipefail
           git config user.name 'tender-engine-bot'
           git config user.email 'tender-engine-bot@users.noreply.github.com'
-          git add control/gpt_bulk_prefilter_preview.json control/gpt_priority_deep_batches control/gpt_preserved_low_deep_batches
+          git add control/gpt_bulk_prefilter_preview.json control/gpt_priority_deep_batches control/gpt_priority_review_digest control/gpt_preserved_low_deep_batches
           git commit -m "gpt: persist exhaustive low prefilter preview ${GITHUB_RUN_ID}" || exit 0
           for n in 1 2 3 4 5; do
             if git push origin HEAD:main; then exit 0; fi
