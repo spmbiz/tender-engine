@@ -1,34 +1,34 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-22T07:55:11+00:00",
+  "generated_at_utc": "2026-08-22T08:13:06+00:00",
   "source_run": "32327417448",
-  "state_rows": 33967,
+  "state_rows": 34309,
   "ledger_rows": 126459,
   "snapshot_rows": 126459,
-  "blocked_ids": 32299,
+  "blocked_ids": 32297,
   "durable_attempted_exact_versions_ignored": 14596,
-  "valid_exact_hash_current_unattempted": 7544,
-  "eligible_keep_for_dce": 5342,
-  "review_worthy_rejects_promoted_to_explore": 1402,
+  "valid_exact_hash_current_unattempted": 7808,
+  "eligible_keep_for_dce": 5577,
+  "review_worthy_rejects_promoted_to_explore": 1417,
   "stale_hash_ignored": 0,
   "missing_snapshot": 0,
-  "expired_ignored": 1245,
+  "expired_ignored": 1258,
   "selected": 160,
   "selection_decisions": {
-    "STRONG_FIT": 53,
-    "FIT": 46,
+    "STRONG_FIT": 57,
+    "FIT": 40,
     "MAYBE": 47,
-    "REJECT_OBVIOUS": 14
+    "REJECT_OBVIOUS": 16
   },
   "selection_survival": {
-    "KEEP": 157,
-    "DROP": 3
+    "KEEP": 158,
+    "DROP": 2
   },
   "selection_lanes": {
     "qwen-primary-coded": 80,
     "qwen-explore-coded": 48,
-    "qwen-reject-audit-coded": 14,
-    "qwen-elastic-coded": 18
+    "qwen-reject-audit-coded": 16,
+    "qwen-elastic-coded": 16
   },
   "selection_freshness": {
     "historical_backfill": 160
@@ -58,20 +58,20 @@
   "base_candidate_pool": 640,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "STRONG_FIT": 53,
-    "FIT": 91,
-    "MAYBE": 482,
-    "REJECT_OBVIOUS": 14
+    "STRONG_FIT": 57,
+    "FIT": 94,
+    "MAYBE": 473,
+    "REJECT_OBVIOUS": 16
   },
   "candidate_pool_lanes": {
-    "qwen-primary": 144,
+    "qwen-primary": 151,
     "qwen-open-world-explore": 192,
     "qwen-reject-audit": 128,
-    "qwen-elastic": 176
+    "qwen-elastic": 169
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
-    "noncore_code_contradictions_in_pool": 16,
+    "noncore_code_contradictions_in_pool": 19,
     "positive_code_rows_selected": 0,
     "noncore_code_contradictions_selected": 2,
     "policy": "priority_only_never_drop_never_eligibility",
