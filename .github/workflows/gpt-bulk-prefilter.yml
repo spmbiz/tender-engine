@@ -26,19 +26,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Build conservative exhaustive preview
+      - name: Build conservative exhaustive preview and explicit deep batches
         run: |
           set -euo pipefail
           python pipeline/gpt_bulk_prefilter.py \
             --root control/gpt_gate_stress_batches \
-            --out control/gpt_bulk_prefilter_preview.json
-      - name: Persist preview
+            --out control/gpt_bulk_prefilter_preview.json \
+            --priority-out-dir control/gpt_priority_deep_batches \
+            --preserved-out-dir control/gpt_preserved_low_deep_batches
+      - name: Persist preview and review batches
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'tender-engine-bot'
           git config user.email 'tender-engine-bot@users.noreply.github.com'
-          git add control/gpt_bulk_prefilter_preview.json
+          git add control/gpt_bulk_prefilter_preview.json control/gpt_priority_deep_batches control/gpt_preserved_low_deep_batches
           git commit -m "gpt: persist exhaustive low prefilter preview ${GITHUB_RUN_ID}" || exit 0
           for n in 1 2 3 4 5; do
             if git push origin HEAD:main; then exit 0; fi
