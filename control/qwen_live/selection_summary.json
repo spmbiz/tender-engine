@@ -1,33 +1,32 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-22T04:01:01+00:00",
+  "generated_at_utc": "2026-08-22T04:02:54+00:00",
   "source_run": "32327417448",
-  "state_rows": 27434,
+  "state_rows": 27464,
   "ledger_rows": 126459,
   "snapshot_rows": 126459,
-  "blocked_ids": 32262,
-  "durable_attempted_exact_versions_ignored": 14350,
-  "valid_exact_hash_current_unattempted": 2610,
-  "eligible_keep_for_dce": 936,
-  "review_worthy_rejects_promoted_to_explore": 1195,
+  "blocked_ids": 32282,
+  "durable_attempted_exact_versions_ignored": 14495,
+  "valid_exact_hash_current_unattempted": 2477,
+  "eligible_keep_for_dce": 801,
+  "review_worthy_rejects_promoted_to_explore": 1196,
   "stale_hash_ignored": 0,
   "missing_snapshot": 0,
-  "expired_ignored": 801,
+  "expired_ignored": 802,
   "selected": 160,
   "selection_decisions": {
-    "STRONG_FIT": 2,
     "FIT": 4,
-    "MAYBE": 152,
+    "MAYBE": 154,
     "REJECT_OBVIOUS": 2
   },
   "selection_survival": {
     "KEEP": 160
   },
   "selection_lanes": {
-    "qwen-primary-coded": 6,
+    "qwen-primary-coded": 4,
     "qwen-explore-coded": 48,
     "qwen-reject-audit-coded": 2,
-    "qwen-elastic-coded": 104
+    "qwen-elastic-coded": 106
   },
   "selection_freshness": {
     "historical_backfill": 160
@@ -57,22 +56,21 @@
   "base_candidate_pool": 640,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "STRONG_FIT": 2,
     "FIT": 4,
-    "MAYBE": 632,
+    "MAYBE": 634,
     "REJECT_OBVIOUS": 2
   },
   "candidate_pool_lanes": {
-    "qwen-primary": 6,
+    "qwen-primary": 4,
     "qwen-open-world-explore": 192,
     "qwen-reject-audit": 128,
-    "qwen-elastic": 314
+    "qwen-elastic": 316
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
-    "noncore_code_contradictions_in_pool": 112,
+    "noncore_code_contradictions_in_pool": 129,
     "positive_code_rows_selected": 0,
-    "noncore_code_contradictions_selected": 0,
+    "noncore_code_contradictions_selected": 27,
     "policy": "priority_only_never_drop_never_eligibility",
     "candidate_pool_multiplier": 4
   }
