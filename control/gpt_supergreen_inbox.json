@@ -1,7 +1,7 @@
 {
   "schema": "GPT_WEB_REVIEW_INBOX_V3_FAIR_SHARE",
-  "updated_at": "2026-08-22T11:47:03.492614+00:00",
-  "latest_source_dce_run_id": 32571126517,
+  "updated_at": "2026-08-22T12:00:00.459932+00:00",
+  "latest_source_dce_run_id": 32571748480,
   "review_queue": [
     {
       "candidate_id": "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
@@ -204,7 +204,7 @@
       "gpt_priority_score": 12,
       "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
-      "inbox_live_source": "control/gpt_review_hot.json",
+      "inbox_live_source": "existing_inbox",
       "evidence_locator": {
         "dce_run_id": 32571126517,
         "shard": 0,
@@ -417,7 +417,7 @@
       "gpt_priority_score": 12,
       "upstream_signal": "MODEL_REVIEW_REQUIRED",
       "finality": "NOT_A_VERDICT_GPT_WEB_MUST_REVIEW",
-      "inbox_live_source": "control/gpt_review_hot.json",
+      "inbox_live_source": "existing_inbox",
       "evidence_locator": {
         "dce_run_id": 32571126517,
         "shard": 0,
@@ -449,7 +449,7 @@
     "pending_gpt_web_review": 1,
     "reviewed_ticks_total": 503,
     "excluded_already_reviewed": 0,
-    "excluded_already_in_final_bank": 9,
+    "excluded_already_in_final_bank": 0,
     "pending_before_visible_cap": 1,
     "pending_by_stage": {
       "BUSINESS_GATES": 1
