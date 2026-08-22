@@ -1,7 +1,7 @@
 {
   "schema": "GPT_GATE_STRESS_TRIGGER_V1",
-  "requested_at": "2026-08-22",
+  "requested_at": "2026-08-22-v2",
   "scope": "ALL current unreviewed BUSINESS_GATES from durable gpt_review_index",
   "require_full_dce_conservation": true,
-  "reason": "User requires exhaustive adjudication of the full durable backlog; regenerate every referenced DCE generation and emit every candidate, not only the hot window."
+  "reason": "Execute exhaustive adjudication surface after exact-shard recovery fix; no hot-window cap."
 }
