@@ -1,0 +1,63 @@
+{
+  "schema": "GPT_DCE_ADJUDICATION_V1",
+  "source_dce_run_id": 32557566063,
+  "created_at": "2026-08-22T11:13:00Z",
+  "persist_to_final_bank": true,
+  "results": [
+    {
+      "candidate_id": "US-SAM:6a5733050b7746f1a856f06a54ce1421",
+      "title": "Benchtop Spectroradiometer System with Flexible Microscope Probes and SDK",
+      "buyer": "HEALTH AND HUMAN SERVICES, DEPARTMENT OF",
+      "deadline": "2026-08-27T16:00:00+00:00",
+      "classification": "RED",
+      "final_score": 18,
+      "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "deadline_authority": "NOTICE_DATE_FOUND_BUT_UNLABELLED_IN_DCE_REVIEW_REQUIRED",
+      "blockers": [
+        "Core requirement is supply of a calibrated high-precision physical spectroradiometer, microscope probes and associated equipment, not a standalone software-development service.",
+        "Quotation must demonstrate point-by-point compliance with hardware salient characteristics, delivery and calibration requirements."
+      ],
+      "unknowns": ["Current amended quotation deadline still needs final semantic reconciliation."],
+      "why": "The SDK is incidental to a specialized scientific-hardware procurement. This is not a lean SPM digital delivery opportunity.",
+      "action": "DROP_SPECIALIZED_HARDWARE_PROCUREMENT",
+      "notice_url": "https://sam.gov/opp/6a5733050b7746f1a856f06a54ce1421/view"
+    },
+    {
+      "candidate_id": "US-SAM:858f27c3161842dd9ebff5e412cefe2f",
+      "title": "FY26 Psychological Assessment Tools",
+      "buyer": "DEPT OF DEFENSE",
+      "deadline": "2026-09-04T17:00:00+00:00",
+      "classification": "RED",
+      "final_score": 4,
+      "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+      "deadline_authority": "UNLABELLED_DCE_DEADLINE_CONFLICT_REVIEW_REQUIRED",
+      "blockers": [
+        "Authoritative justification states consideration is limited to NCS Pearson proprietary assessments and that only NCS Pearson can fulfill the requirement.",
+        "Other vendors cannot supply the required proprietary content and alternatives are not acceptable substitutes."
+      ],
+      "unknowns": [],
+      "why": "This is a brand-name/sole-source proprietary assessment procurement, not an open SPM opportunity.",
+      "action": "DROP_SOLE_SOURCE_PEARSON",
+      "notice_url": "https://sam.gov/opp/858f27c3161842dd9ebff5e412cefe2f/view"
+    },
+    {
+      "candidate_id": "UK_PCS_OCDS:rls-7-AUG562839",
+      "title": "ITT Details - Industrial Investment Marketing Strategy and Materials",
+      "buyer": "Forth Green Freeport Operating Ltd",
+      "deadline": "2026-09-09T16:00:00+00:00",
+      "classification": "YELLOW",
+      "final_score": 72,
+      "evidence_quality": "SUBSTANTIVE_DCE_PRESENT_BUT_TENDER_GATES_UNRESOLVED",
+      "deadline_authority": "NOTICE_DATE_FOUND_BUT_UNLABELLED_IN_DCE_REVIEW_REQUIRED",
+      "blockers": [],
+      "unknowns": [
+        "Actual ITT qualification, reference and insurance gates are not exposed in the current compact evidence.",
+        "The current DCE is dominated by generic PCS postbox guidance rather than the substantive marketing brief.",
+        "Authoritative submission deadline needs final reconciliation."
+      ],
+      "why": "The title and GBP 80k value indicate a potentially strong strategy/content/materials opportunity, but the current evidence pack does not prove the mandatory gates. Unknown is not PASS.",
+      "action": "RECOVER_SUBSTANTIVE_ITT_AND_REVIEW_IMMEDIATELY",
+      "notice_url": "https://www.publiccontractsscotland.gov.uk/NoticeDownload/Download.aspx"
+    }
+  ]
+}
