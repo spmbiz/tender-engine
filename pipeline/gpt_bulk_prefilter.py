@@ -24,6 +24,11 @@ FATAL_FRICTIONS = {
     "market-research-not-solicitation","market-research-only","sources-sought",
     "SOLE_SOURCE_OR_OEM","SOURCES_SOUGHT_OR_RFI",
 }
+GATES=(
+    'entity_geography','turnover_financial','references_experience','certifications_partner',
+    'staffing_team','insurance_bonds','subcontracting_consortium','deliverables_scope',
+    'sla_onsite','term_value','award_criteria','forms_signatures','submission','ip_data_security'
+)
 
 
 def load_deep(root: Path) -> list[dict[str,Any]]:
@@ -35,13 +40,54 @@ def load_deep(root: Path) -> list[dict[str,Any]]:
     return rows
 
 
+def _strings(v:Any) -> list[str]:
+    if isinstance(v,str): return [v]
+    if isinstance(v,list):
+        out=[]
+        for x in v: out.extend(_strings(x))
+        return out
+    if isinstance(v,dict):
+        preferred=[]
+        for k in ('text','snippet','evidence','context','match','notes','status'):
+            if k in v: preferred.extend(_strings(v.get(k)))
+        return preferred or [json.dumps(v,ensure_ascii=False,separators=(',',':'))]
+    return []
+
+
+def clip(v:Any,n:int=700) -> str:
+    s=' | '.join(' '.join(x.split()) for x in _strings(v) if str(x).strip())
+    return s[:n]
+
+
+def gate_map(row:dict[str,Any]) -> dict[str,Any]:
+    for key in ('gate_evidence','evidence_by_gate','gate_evidence_candidates','gate_snippets'):
+        v=row.get(key)
+        if isinstance(v,dict):
+            for nested in ('categories','gate_evidence','evidence_by_gate','gate_evidence_candidates'):
+                if isinstance(v.get(nested),dict): return v[nested]
+            return v
+    return {}
+
+
 def text(row: dict[str,Any]) -> str:
-    parts=[str(row.get('title') or '')]
-    gates=row.get('gate_evidence') if isinstance(row.get('gate_evidence'),dict) else {}
-    for gate in ('deliverables_scope','term_value','staffing_team','certifications_partner','references_experience','turnover_financial','sla_onsite'):
-        item=gates.get(gate)
-        if isinstance(item,dict): parts.append(str(item.get('text') or ''))
-    return ' '.join(parts)
+    g=gate_map(row)
+    return ' '.join([str(row.get('title') or '')]+[clip(g.get(k),1600) for k in ('deliverables_scope','term_value','staffing_team','certifications_partner','references_experience','turnover_financial','sla_onsite')])
+
+
+def digest_row(r:dict[str,Any]) -> dict[str,Any]:
+    g=gate_map(r)
+    loc=r.get('artifact_locator') if isinstance(r.get('artifact_locator'),dict) else {}
+    da=r.get('deadline_authority') if isinstance(r.get('deadline_authority'),dict) else {}
+    return {
+        'candidate_id':r.get('candidate_id'),'title':r.get('title'),'buyer':r.get('buyer'),'portal':r.get('portal'),
+        'notice_url':r.get('notice_url'),'deadline':r.get('deadline'),'estimated_value':r.get('estimated_value'),'currency':r.get('currency'),
+        'spm_fit_band':r.get('spm_fit_band'),'spm_post_dce_score':r.get('spm_post_dce_score'),'spm_fit_reasons':r.get('spm_fit_reasons') or [],
+        'spm_friction_signals':r.get('spm_friction_signals') or [],'deadline_authority_status':r.get('deadline_authority_status'),
+        'authoritative_submission_date':da.get('authoritative_submission_date'),'deadline_conflict':bool(da.get('conflict')),
+        'source_dce_run_id':loc.get('dce_run_id') or r.get('source_dce_run_id'),'source_shard':loc.get('shard') if loc else r.get('source_shard'),
+        'deep_batch_hint':r.get('_deep_batch_hint'),'evidence_gate_coverage':r.get('evidence_gate_coverage'),
+        'gates':{k:clip(g.get(k),700) for k in GATES},
+    }
 
 
 def write_batches(rows:list[dict[str,Any]], out_dir:Path, schema:str, batch_size:int=10) -> None:
@@ -49,9 +95,7 @@ def write_batches(rows:list[dict[str,Any]], out_dir:Path, schema:str, batch_size
     out_dir.mkdir(parents=True,exist_ok=True)
     files=[]
     for start in range(0,len(rows),batch_size):
-        chunk=rows[start:start+batch_size]
-        idx=start//batch_size
-        name=f'batch-{idx:03d}.json'
+        chunk=rows[start:start+batch_size]; idx=start//batch_size; name=f'batch-{idx:03d}.json'
         body={'schema':schema,'batch_index':idx,'start_rank':start+1,'end_rank':start+len(chunk),'count':len(chunk),'items':chunk,'instruction':'Assistant must explicitly adjudicate every row from authoritative DCE evidence. Unknown never PASS.'}
         (out_dir/name).write_text(json.dumps(body,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
         files.append({'file':name,'start_rank':start+1,'end_rank':start+len(chunk),'count':len(chunk)})
@@ -63,71 +107,40 @@ def main() -> None:
     ap.add_argument('--root',default='control/gpt_gate_stress_batches')
     ap.add_argument('--out',default='control/gpt_bulk_prefilter_preview.json')
     ap.add_argument('--priority-out-dir',default='control/gpt_priority_deep_batches')
+    ap.add_argument('--priority-digest-dir',default='control/gpt_priority_review_digest')
     ap.add_argument('--preserved-out-dir',default='control/gpt_preserved_low_deep_batches')
-    args=ap.parse_args()
-    root=Path(args.root)
+    args=ap.parse_args(); root=Path(args.root)
     manifest=json.loads((root/'manifest.json').read_text(encoding='utf-8'))
-    if not manifest.get('conservation_pass'):
-        raise SystemExit('refuse bulk prefilter without stress conservation PASS')
-    rows=load_deep(root)
-    expected=int(manifest.get('business_gates_in_index') or 0)
-    if len(rows)!=expected:
-        raise SystemExit(f'row conservation mismatch rows={len(rows)} expected={expected}')
+    if not manifest.get('conservation_pass'): raise SystemExit('refuse bulk prefilter without stress conservation PASS')
+    rows=load_deep(root); expected=int(manifest.get('business_gates_in_index') or 0)
+    if len(rows)!=expected: raise SystemExit(f'row conservation mismatch rows={len(rows)} expected={expected}')
 
-    red=[]; preserve=[]; priority_rows=[]; preserved_low_rows=[]
-    reasons=Counter(); bands=Counter()
+    red=[]; preserve=[]; priority_rows=[]; preserved_low_rows=[]; reasons=Counter(); bands=Counter()
     for r in rows:
         cid=str(r.get('candidate_id') or '').strip()
         if not cid: continue
-        band=str(r.get('spm_fit_band') or 'UNKNOWN').upper()
-        bands[band]+=1
+        band=str(r.get('spm_fit_band') or 'UNKNOWN').upper(); bands[band]+=1
         if band in {'HOT','GOOD','MAYBE'}:
-            priority_rows.append(r)
-            preserve.append({'candidate_id':cid,'reason':'priority-deep-review','band':band,'deep_batch_hint':r.get('_deep_batch_hint')})
-            continue
-        fr={str(x) for x in (r.get('spm_friction_signals') or [])}
-        fatal=sorted(fr & FATAL_FRICTIONS)
+            priority_rows.append(r); preserve.append({'candidate_id':cid,'reason':'priority-deep-review','band':band,'deep_batch_hint':r.get('_deep_batch_hint')}); continue
+        fr={str(x) for x in (r.get('spm_friction_signals') or [])}; fatal=sorted(fr & FATAL_FRICTIONS)
         if fatal:
-            red.append({'candidate_id':cid,'title':r.get('title'),'buyer':r.get('buyer'),'source_dce_run_id':(r.get('artifact_locator') or {}).get('dce_run_id'),'source_shard':(r.get('artifact_locator') or {}).get('shard'),'classification':'RED','final_score':5,'why':'fatal-procurement-friction:' + ','.join(fatal),'blockers':fatal,'bulk_rule':'FATAL_FRICTION'})
-            reasons['FATAL_FRICTION']+=1
-            continue
+            red.append({'candidate_id':cid,'title':r.get('title'),'buyer':r.get('buyer'),'source_dce_run_id':(r.get('artifact_locator') or {}).get('dce_run_id'),'source_shard':(r.get('artifact_locator') or {}).get('shard'),'classification':'RED','final_score':5,'why':'fatal-procurement-friction:' + ','.join(fatal),'blockers':fatal,'bulk_rule':'FATAL_FRICTION'}); reasons['FATAL_FRICTION']+=1; continue
         blob=text(r)
         if LEAN.search(blob):
-            preserved_low_rows.append(r)
-            preserve.append({'candidate_id':cid,'reason':'lean-native-or-brokerable-signal','band':band,'deep_batch_hint':r.get('_deep_batch_hint')})
-            continue
+            preserved_low_rows.append(r); preserve.append({'candidate_id':cid,'reason':'lean-native-or-brokerable-signal','band':band,'deep_batch_hint':r.get('_deep_batch_hint')}); continue
         hit=None
         for code,rx in HARD_PHYSICAL:
             m=rx.search(blob)
             if m: hit=(code,' '.join(m.group(0).split())[:220]); break
         if hit:
-            code,match=hit
-            red.append({'candidate_id':cid,'title':r.get('title'),'buyer':r.get('buyer'),'source_dce_run_id':(r.get('artifact_locator') or {}).get('dce_run_id'),'source_shard':(r.get('artifact_locator') or {}).get('shard'),'classification':'RED','final_score':5,'why':f'Proven non-lean physical prime scope: {code}.','blockers':[code],'matched_scope':match,'bulk_rule':'HARD_PHYSICAL_NON_LEAN'})
-            reasons['HARD_PHYSICAL_NON_LEAN']+=1
-            continue
-        preserved_low_rows.append(r)
-        preserve.append({'candidate_id':cid,'reason':'ambiguous-low-needs-review','band':band,'deep_batch_hint':r.get('_deep_batch_hint')})
+            code,match=hit; red.append({'candidate_id':cid,'title':r.get('title'),'buyer':r.get('buyer'),'source_dce_run_id':(r.get('artifact_locator') or {}).get('dce_run_id'),'source_shard':(r.get('artifact_locator') or {}).get('shard'),'classification':'RED','final_score':5,'why':f'Proven non-lean physical prime scope: {code}.','blockers':[code],'matched_scope':match,'bulk_rule':'HARD_PHYSICAL_NON_LEAN'}); reasons['HARD_PHYSICAL_NON_LEAN']+=1; continue
+        preserved_low_rows.append(r); preserve.append({'candidate_id':cid,'reason':'ambiguous-low-needs-review','band':band,'deep_batch_hint':r.get('_deep_batch_hint')})
 
     write_batches(priority_rows,Path(args.priority_out_dir),'GPT_PRIORITY_DEEP_REVIEW_V1',10)
+    write_batches([digest_row(r) for r in priority_rows],Path(args.priority_digest_dir),'GPT_PRIORITY_14_GATE_DIGEST_V1',5)
     write_batches(preserved_low_rows,Path(args.preserved_out_dir),'GPT_PRESERVED_LOW_DEEP_REVIEW_V1',10)
-
-    payload={
-        'schema':'GPT_BULK_PREFILTER_PREVIEW_V2',
-        'generated_at':datetime.now(timezone.utc).isoformat(),
-        'source_stress_manifest':manifest,
-        'business_gate_rows':len(rows),
-        'bulk_red_count':len(red),
-        'priority_deep_review_count':len(priority_rows),
-        'preserved_low_deep_review_count':len(preserved_low_rows),
-        'preserved_for_explicit_review_count':len(preserve),
-        'band_counts':dict(bands),
-        'bulk_red_reason_counts':dict(reasons),
-        'bulk_red':red,
-        'preserved':preserve,
-        'applied_to_ledger':False,
-        'contract':'Conservative assistant-authored prefilter. HOT/GOOD/MAYBE and every lean-native/brokerable or ambiguous LOW are emitted into explicit full-evidence deep batches. Only explicit fatal procurement frictions or proven hard physical non-lean scopes may be bulk RED. Preview does not mutate ledger.'
-    }
+    payload={'schema':'GPT_BULK_PREFILTER_PREVIEW_V3','generated_at':datetime.now(timezone.utc).isoformat(),'source_stress_manifest':manifest,'business_gate_rows':len(rows),'bulk_red_count':len(red),'priority_deep_review_count':len(priority_rows),'priority_digest_batch_count':(len(priority_rows)+4)//5,'preserved_low_deep_review_count':len(preserved_low_rows),'preserved_for_explicit_review_count':len(preserve),'band_counts':dict(bands),'bulk_red_reason_counts':dict(reasons),'bulk_red':red,'preserved':preserve,'applied_to_ledger':False,'contract':'Conservative assistant-authored prefilter. HOT/GOOD/MAYBE and every lean-native/brokerable or ambiguous LOW are preserved for explicit review. Priority rows also receive a compact digest of all 14 mandatory gates; full deep packs remain available for ambiguity. Only fatal procurement friction or proven hard physical non-lean scope may bulk RED. Preview does not mutate ledger.'}
     Path(args.out).write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-    print(json.dumps({k:payload[k] for k in ('business_gate_rows','bulk_red_count','priority_deep_review_count','preserved_low_deep_review_count','band_counts','bulk_red_reason_counts')},indent=2))
+    print(json.dumps({k:payload[k] for k in ('business_gate_rows','bulk_red_count','priority_deep_review_count','priority_digest_batch_count','preserved_low_deep_review_count','band_counts','bulk_red_reason_counts')},indent=2))
 
 if __name__=='__main__': main()
