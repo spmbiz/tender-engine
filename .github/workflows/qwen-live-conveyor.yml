@@ -19,9 +19,10 @@ permissions:
   contents: write
   actions: write
 
+# Single writer for qwen-incremental-state-latest and the durable live summary.
 concurrency:
-  group: qwen-live-continuous-conveyor
-  cancel-in-progress: true
+  group: qwen-live-state-writer
+  cancel-in-progress: false
 
 env:
   QWEN_CLASSIFIER_VERSION: qwen3-4b-q4km-batch-selfheal-v1
@@ -30,7 +31,7 @@ env:
 jobs:
   conveyor:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,170 +42,207 @@ jobs:
           python-version: '3.12'
 
       - id: select
-        name: Select active semantic generation and discover completed artifacts
+        name: Select semantic generation and immutable input
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p work/run work/results work/base work/publish control/qwen_live queues
-
-          # Active inference always wins. Only a completed SUCCESS is eligible as
-          # fallback. A newer cancelled/failed generation must never mask an older
-          # healthy in-progress run (the bug that stalled incremental ingestion).
-          runs_json="$(gh run list --workflow qwen-live-classification.yml --limit 20 --json databaseId,status,conclusion,createdAt)"
-          active_rid="$(jq -r '([.[] | select(.status=="in_progress")] | sort_by(.createdAt) | reverse | .[0].databaseId) // empty' <<< "$runs_json")"
-          success_rid="$(jq -r '([.[] | select(.status=="completed" and .conclusion=="success")] | sort_by(.createdAt) | reverse | .[0].databaseId) // empty' <<< "$runs_json")"
+          mkdir -p work/run work/base work/checkpoints work/results work/publish control/qwen_live queues
+          runs_json="$(gh run list --workflow qwen-live-classification.yml --limit 30 --json databaseId,status,conclusion,createdAt,event)"
+          active_rid="$(jq -r '([.[] | select(.status=="in_progress" and .event=="workflow_dispatch")] | sort_by(.createdAt) | reverse | .[0].databaseId) // empty' <<< "$runs_json")"
+          success_rid="$(jq -r '([.[] | select(.status=="completed" and .conclusion=="success" and .event=="workflow_dispatch")] | sort_by(.createdAt) | reverse | .[0].databaseId) // empty' <<< "$runs_json")"
           rid="${active_rid:-$success_rid}"
           if ! [[ "$rid" =~ ^[0-9]+$ ]]; then
             echo 'usable=false' >> "$GITHUB_OUTPUT"
-            echo 'No active or successful Qwen generation with reusable artifacts.'
+            echo 'No active/successful controller-authorized semantic generation.'
             exit 0
           fi
 
           if ! gh run download "$rid" -n "qwen-live-input-$rid" -D work/run; then
-            echo "Selected Qwen run $rid has no input artifact; fail closed and retry next cycle." >&2
             echo 'usable=false' >> "$GITHUB_OUTPUT"
+            echo "Qwen run $rid has no immutable input artifact yet."
             exit 0
           fi
-
           manifest="$(find work/run -type f -name snapshot-manifest-latest.json -print -quit)"
           ledger="$(find work/run -type f -name notice-intelligence-ledger-latest.jsonl.gz -print -quit)"
           queue="$(find work/run -type f -name notice-classification-queue-latest.jsonl.gz -print -quit)"
           snapshot="$(find work/run -type f -name live-open-tenders-latest.jsonl.gz -print -quit)"
-          [ -n "$manifest" ] && [ -n "$ledger" ] && [ -n "$queue" ] && [ -n "$snapshot" ] || { echo 'Qwen input transport incomplete' >&2; exit 1; }
+          [ -n "$manifest" ] && [ -n "$ledger" ] && [ -n "$queue" ] && [ -n "$snapshot" ] || { echo 'Incomplete Qwen input transport' >&2; exit 1; }
           source_run="$(MANIFEST="$manifest" python - <<'PY'
           import json,os
           print(json.load(open(os.environ['MANIFEST'],encoding='utf-8')).get('source_discovery_run') or '')
           PY
           )"
-          [[ "$source_run" =~ ^[0-9]+$ ]] || { echo 'Cannot resolve source run from Qwen input'; exit 1; }
+          [[ "$source_run" =~ ^[0-9]+$ ]] || { echo 'Invalid semantic source run' >&2; exit 1; }
 
-          # Never merge an obsolete semantic generation over a newer stable state.
           stable_body="$(gh release view qwen-classification-state-latest --json body --jq '.body' 2>/dev/null || true)"
           stable_source="$(grep -oE 'source_run=[0-9]+' <<< "$stable_body" | head -n1 | cut -d= -f2 || true)"
           if [[ "$stable_source" =~ ^[0-9]+$ ]] && [ "$stable_source" -gt "$source_run" ]; then
-            echo "Selected Qwen source $source_run is obsolete versus stable $stable_source; not ingesting it."
             echo 'usable=false' >> "$GITHUB_OUTPUT"
+            echo "Selected source $source_run is obsolete versus stable $stable_source."
             exit 0
           fi
 
-          # Read the latest marker from main rather than trusting the checkout.
-          if gh api "repos/${REPO}/contents/control/qwen_live/incremental_processed.json?ref=main" --jq '.content' 2>/dev/null | tr -d '\n' | base64 -d > work/marker.json 2>/dev/null; then
-            :
-          else
-            printf '%s\n' '{"schema":"QWEN_INCREMENTAL_SHARDS_V1","processed":{}}' > work/marker.json
+          if gh api "repos/${REPO}/contents/control/qwen_live/incremental_processed.json?ref=main" --jq '.content' 2>/dev/null | tr -d '\n' | base64 -d > work/marker.json 2>/dev/null; then :; else
+            printf '%s\n' '{"schema":"QWEN_INCREMENTAL_SHARDS_V2","processed":{}}' > work/marker.json
           fi
 
           gh api "repos/${REPO}/actions/runs/${rid}/artifacts?per_page=100" \
             --jq '.artifacts[] | select(.expired==false) | .name' \
-            | grep "^qwen-live-result-.*-${rid}$" | sort > work/all-artifacts.txt || true
-          RID="$rid" MARKER=work/marker.json ALL=work/all-artifacts.txt OUT=work/new-artifacts.txt python - <<'PY'
+            | grep "^qwen-live-result-.*-${rid}$" | sort > work/all-final-artifacts.txt || true
+          RID="$rid" MARKER=work/marker.json ALL=work/all-final-artifacts.txt OUT=work/new-final-artifacts.txt python - <<'PY'
           import json,os
           from pathlib import Path
           try:d=json.loads(Path(os.environ['MARKER']).read_text(encoding='utf-8'))
           except Exception:d={}
           done=set(((d.get('processed') or {}).get(str(os.environ['RID'])) or []))
-          names=[x.strip() for x in Path(os.environ['ALL']).read_text(encoding='utf-8').splitlines() if x.strip()]
+          names=[x.strip() for x in Path(os.environ['ALL']).read_text().splitlines() if x.strip()]
           Path(os.environ['OUT']).write_text(''.join(x+'\n' for x in names if x not in done),encoding='utf-8')
           PY
-          new_count="$(grep -cve '^\s*$' work/new-artifacts.txt || true)"
+          final_count="$(grep -cve '^\s*$' work/new-final-artifacts.txt || true)"
 
-          echo "usable=true" >> "$GITHUB_OUTPUT"
+          echo 'usable=true' >> "$GITHUB_OUTPUT"
           echo "rid=$rid" >> "$GITHUB_OUTPUT"
           echo "source_run=$source_run" >> "$GITHUB_OUTPUT"
-          echo "new_count=$new_count" >> "$GITHUB_OUTPUT"
           echo "ledger=$ledger" >> "$GITHUB_OUTPUT"
           echo "queue=$queue" >> "$GITHUB_OUTPUT"
           echo "snapshot=$snapshot" >> "$GITHUB_OUTPUT"
-          echo "Selected Qwen run=$rid source=$source_run new_completed_artifacts=$new_count"
+          echo "final_count=$final_count" >> "$GITHUB_OUTPUT"
 
-      - id: merge
-        name: Cumulatively merge completed semantic artifacts
+      - id: collect
+        name: Collect novel guarded rows from checkpoints and final artifacts
         if: steps.select.outputs.usable == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
           RID: ${{ steps.select.outputs.rid }}
           SOURCE_RUN: ${{ steps.select.outputs.source_run }}
-          LEDGER: ${{ steps.select.outputs.ledger }}
-          QUEUE: ${{ steps.select.outputs.queue }}
         shell: bash
         run: |
           set -euo pipefail
-
-          # A conveyor-owned release makes incremental state cumulative across
-          # separate 5-minute workflow invocations. It never overwrites the
-          # authoritative aggregate release written by Qwen Live Classification.
+          base='work/base/qwen-state-base.jsonl.gz'
           inc_body="$(gh release view "$INCREMENTAL_RELEASE" --json body --jq '.body' 2>/dev/null || true)"
           inc_source="$(grep -oE 'source_run=[0-9]+' <<< "$inc_body" | head -n1 | cut -d= -f2 || true)"
           inc_run="$(grep -oE 'qwen_run=[0-9]+' <<< "$inc_body" | head -n1 | cut -d= -f2 || true)"
-          base='work/base/qwen-state-base.jsonl.gz'
           if [ "$inc_source" = "$SOURCE_RUN" ] && [ "$inc_run" = "$RID" ]; then
-            gh release download "$INCREMENTAL_RELEASE" \
-              --pattern qwen-incremental-state-latest.jsonl.gz \
-              --dir work/base --clobber
+            gh release download "$INCREMENTAL_RELEASE" --pattern qwen-incremental-state-latest.jsonl.gz --dir work/base --clobber
             mv work/base/qwen-incremental-state-latest.jsonl.gz "$base"
-            echo "Using cumulative incremental state for qwen_run=$RID source=$SOURCE_RUN"
           else
-            gh release download qwen-classification-state-latest \
-              --pattern qwen-classification-state-latest.jsonl.gz \
-              --dir work/base --clobber
+            gh release download qwen-classification-state-latest --pattern qwen-classification-state-latest.jsonl.gz --dir work/base --clobber
             mv work/base/qwen-classification-state-latest.jsonl.gz "$base"
-            echo "Starting incremental state from authoritative stable release."
           fi
           test -s "$base"
 
-          result_args=()
-          if [ '${{ steps.select.outputs.new_count }}' != '0' ]; then
+          # Guarded live checkpoints are the only external worker heartbeat. They
+          # contain only exact-context post-guarded rows and are safe to ingest.
+          tag="qwen-live-progress-$RID"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release download "$tag" --pattern 'qwen-live-*-guarded-checkpoint.jsonl' --dir work/checkpoints --clobber >/dev/null 2>&1 || true
+          fi
+
+          if [ '${{ steps.select.outputs.final_count }}' != '0' ]; then
             while IFS= read -r name; do
               [ -n "$name" ] || continue
               mkdir -p "work/results/$name"
               gh run download "$RID" -n "$name" -D "work/results/$name"
-            done < work/new-artifacts.txt
-            while IFS= read -r f; do result_args+=(--results "$f"); done < <(find work/results -type f -name 'qwen-live-*-guarded.jsonl' -size +0c | sort)
-            [ "${#result_args[@]}" -gt 0 ] || { echo 'New result artifacts contained no guarded JSONL' >&2; exit 1; }
+            done < work/new-final-artifacts.txt
+          fi
+
+          BASE="$base" ROOT=work OUT=work/novel-results.jsonl python - <<'PY'
+          import gzip,json,os
+          from pathlib import Path
+          def cid(r):
+              n=r.get('notice') if isinstance(r.get('notice'),dict) else {}
+              return str(r.get('canonical_notice_id') or r.get('candidate_id') or r.get('id') or n.get('candidate_id') or n.get('i') or '').strip()
+          def mh(r): return str(r.get('input_material_fields_hash') or r.get('material_fields_hash') or '').strip()
+          known=set()
+          with gzip.open(os.environ['BASE'],'rt',encoding='utf-8') as f:
+              for raw in f:
+                  raw=raw.strip()
+                  if raw:
+                      r=json.loads(raw); known.add((cid(r),mh(r)))
+          files=list(Path(os.environ['ROOT']).glob('checkpoints/qwen-live-*-guarded-checkpoint.jsonl'))
+          files+=list(Path(os.environ['ROOT']).glob('results/**/qwen-live-*-guarded.jsonl'))
+          rows=[]
+          for p in sorted(files):
+              for lineno,raw in enumerate(p.read_text(encoding='utf-8').splitlines(),1):
+                  raw=raw.strip()
+                  if not raw: continue
+                  r=json.loads(raw); key=(cid(r),mh(r))
+                  if not key[0] or not key[1]: raise SystemExit(f'missing id/hash {p}:{lineno}')
+                  if key in known: continue
+                  rows.append(r)
+          Path(os.environ['OUT']).write_text(''.join(json.dumps(r,ensure_ascii=False,separators=(',',':'))+'\n' for r in rows),encoding='utf-8')
+          print(json.dumps({'known_state_keys':len(known),'candidate_files':len(files),'novel_rows_including_equivalent_duplicates':len(rows)},sort_keys=True))
+          PY
+          novel="$(grep -cve '^\s*$' work/novel-results.jsonl || true)"
+          echo "novel=$novel" >> "$GITHUB_OUTPUT"
+          echo "base=$base" >> "$GITHUB_OUTPUT"
+
+      - id: merge
+        name: Merge only when novel semantic rows exist
+        if: steps.select.outputs.usable == 'true'
+        env:
+          LEDGER: ${{ steps.select.outputs.ledger }}
+          QUEUE: ${{ steps.select.outputs.queue }}
+          SNAPSHOT: ${{ steps.select.outputs.snapshot }}
+          BASE: ${{ steps.collect.outputs.base }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ '${{ steps.collect.outputs.novel }}' = '0' ]; then
+            cp "$BASE" work/publish/qwen-incremental-state-latest.jsonl.gz
+            current='control/qwen_live/classification_summary.json'
+            if [ -s "$current" ]; then cp "$current" work/publish/classification_summary.json; else printf '%s\n' '{}' > work/publish/classification_summary.json; fi
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            echo 'accepted=0' >> "$GITHUB_OUTPUT"
+            echo "remaining=$(python -c "import json;d=json.load(open('work/publish/classification_summary.json'));print(int(d.get('remaining_classification_queue') or 0))")" >> "$GITHUB_OUTPUT"
+            echo "state_rows=$(python -c "import json;d=json.load(open('work/publish/classification_summary.json'));print(int(d.get('state_rows_after_merge') or 0))")" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
           python pipeline/merge_qwen_classification_state.py \
             --ledger "$LEDGER" \
             --classification-queue "$QUEUE" \
-            --previous-state "$base" \
-            "${result_args[@]}" \
+            --previous-state "$BASE" \
+            --snapshot "$SNAPSHOT" \
+            --results work/novel-results.jsonl \
             --target-classifier-version "$QWEN_CLASSIFIER_VERSION" \
             --state-out work/publish/qwen-incremental-state-latest.jsonl.gz \
             --queue-out work/publish/qwen-classification-remaining-latest.jsonl.gz \
             --summary-out work/publish/classification_summary.json
-
-          state_rows="$(python -c "import json;print(json.load(open('work/publish/classification_summary.json'))['state_rows_after_merge'])")"
-          remaining="$(python -c "import json;print(json.load(open('work/publish/classification_summary.json'))['remaining_classification_queue'])")"
-          accepted="$(python -c "import json;print(int(json.load(open('work/publish/classification_summary.json')).get('stats',{}).get('results_accepted',0)))")"
+          accepted="$(python -c "import json;d=json.load(open('work/publish/classification_summary.json'));print(int((d.get('stats') or {}).get('results_accepted') or 0))")"
+          remaining="$(python -c "import json;d=json.load(open('work/publish/classification_summary.json'));print(int(d['remaining_classification_queue']))")"
+          state_rows="$(python -c "import json;d=json.load(open('work/publish/classification_summary.json'));print(int(d['state_rows_after_merge']))")"
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+          echo "accepted=$accepted" >> "$GITHUB_OUTPUT"
           echo "remaining=$remaining" >> "$GITHUB_OUTPUT"
           echo "state_rows=$state_rows" >> "$GITHUB_OUTPUT"
-          echo "accepted=$accepted" >> "$GITHUB_OUTPUT"
-          echo "Incremental semantic merge: state=$state_rows remaining=$remaining newly_accepted=$accepted"
 
-          if [ '${{ steps.select.outputs.new_count }}' != '0' ]; then
-            RID="$RID" MARKER=work/marker.json NAMES=work/new-artifacts.txt python - <<'PY'
+      - name: Advance final-artifact marker after successful collection
+        if: steps.select.outputs.usable == 'true' && steps.select.outputs.final_count != '0'
+        env:
+          RID: ${{ steps.select.outputs.rid }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RID="$RID" MARKER=work/marker.json NAMES=work/new-final-artifacts.txt python - <<'PY'
           import json,os
           from pathlib import Path
           p=Path(os.environ['MARKER'])
           try:d=json.loads(p.read_text(encoding='utf-8'))
-          except Exception:d={'schema':'QWEN_INCREMENTAL_SHARDS_V1','processed':{}}
-          proc=d.setdefault('processed',{})
-          rid=str(os.environ['RID'])
-          cur=set(proc.get(rid) or [])
-          cur.update(x.strip() for x in Path(os.environ['NAMES']).read_text(encoding='utf-8').splitlines() if x.strip())
+          except Exception:d={'schema':'QWEN_INCREMENTAL_SHARDS_V2','processed':{}}
+          proc=d.setdefault('processed',{}); rid=str(os.environ['RID']); cur=set(proc.get(rid) or [])
+          cur.update(x.strip() for x in Path(os.environ['NAMES']).read_text().splitlines() if x.strip())
           proc[rid]=sorted(cur)
           keys=sorted(proc,key=lambda x:int(x) if str(x).isdigit() else 0,reverse=True)
-          d['processed']={k:proc[k] for k in keys[:12]}
+          d['processed']={k:proc[k] for k in keys[:8]}
           p.write_text(json.dumps(d,indent=2,sort_keys=True)+'\n',encoding='utf-8')
           PY
-          fi
 
-      - name: Publish cumulative incremental state in conveyor-owned release
-        if: steps.select.outputs.usable == 'true' && steps.select.outputs.new_count != '0'
+      - name: Publish cumulative semantic state
+        if: steps.select.outputs.usable == 'true' && steps.merge.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           RID: ${{ steps.select.outputs.rid }}
@@ -212,19 +250,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          notes="source_run=$SOURCE_RUN qwen_run=$RID writer=qwen-live-continuous-conveyor-v2 authoritative=false exact_hash_merge=true"
-          if gh release view "$INCREMENTAL_RELEASE" >/dev/null 2>&1; then
-            gh release edit "$INCREMENTAL_RELEASE" --notes "$notes"
-          else
-            gh release create "$INCREMENTAL_RELEASE" --target main --title 'Qwen Incremental State Latest' --notes "$notes"
-          fi
+          notes="source_run=$SOURCE_RUN qwen_run=$RID writer=qwen-live-unified-conveyor-v3 authoritative=false exact_hash_merge=true"
+          if gh release view "$INCREMENTAL_RELEASE" >/dev/null 2>&1; then gh release edit "$INCREMENTAL_RELEASE" --notes "$notes"; else gh release create "$INCREMENTAL_RELEASE" --target main --title 'Qwen Incremental State Latest' --notes "$notes"; fi
           gh release upload "$INCREMENTAL_RELEASE" \
             work/publish/qwen-incremental-state-latest.jsonl.gz \
             work/publish/qwen-classification-remaining-latest.jsonl.gz \
             work/publish/classification_summary.json --clobber
 
       - id: selection
-        name: Refresh Qwen-ranked DCE selection from cumulative semantic state
+        name: Refresh DCE selection from the single cumulative state
         if: steps.select.outputs.usable == 'true'
         env:
           SOURCE_RUN: ${{ steps.select.outputs.source_run }}
@@ -246,10 +280,9 @@ jobs:
             --summary work/publish/selection_summary.json \
             --source-run "$SOURCE_RUN" \
             --limit 160
-          selected="$(python -c "import json;print(int(json.load(open('work/publish/selection_summary.json')).get('selected') or 0))")"
-          echo "selected=$selected" >> "$GITHUB_OUTPUT"
+          echo "selected=$(python -c "import json;print(int(json.load(open('work/publish/selection_summary.json')).get('selected') or 0))")" >> "$GITHUB_OUTPUT"
 
-      - name: Persist incremental summaries, selection and marker transactionally
+      - name: Persist durable summaries and selection
         if: steps.select.outputs.usable == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -258,51 +291,46 @@ jobs:
         run: |
           set -euo pipefail
           persist_file() {
-            local path="$1" file="$2" message="$3" sha payload
-            for attempt in 1 2 3 4 5 6; do
+            local path="$1" file="$2" message="$3" sha
+            for delay in 0 2 5 10 20; do
+              [ "$delay" -eq 0 ] || sleep "$delay"
               sha="$(gh api "repos/${REPO}/contents/${path}?ref=main" --jq '.sha' 2>/dev/null || true)"
               TARGET="$path" FILE="$file" SHA="$sha" MESSAGE="$message" python - <<'PY'
           import base64,json,os
           from pathlib import Path
-          p={'message':os.environ['MESSAGE'],'content':base64.b64encode(Path(os.environ['FILE']).read_bytes()).decode(),'branch':'main'}
-          if os.environ.get('SHA','').strip():p['sha']=os.environ['SHA'].strip()
-          Path('/tmp/content-payload.json').write_text(json.dumps(p),encoding='utf-8')
+          b={'message':os.environ['MESSAGE'],'content':base64.b64encode(Path(os.environ['FILE']).read_bytes()).decode(),'branch':'main'}
+          if os.environ.get('SHA','').strip(): b['sha']=os.environ['SHA'].strip()
+          Path('/tmp/qwen-put.json').write_text(json.dumps(b),encoding='utf-8')
           PY
-              if gh api --method PUT "repos/${REPO}/contents/${path}" --input /tmp/content-payload.json >/dev/null 2>&1; then return 0; fi
-              sleep "$((attempt*2))"
+              gh api --method PUT "repos/${REPO}/contents/${path}" --input /tmp/qwen-put.json >/dev/null 2>&1 && return 0
             done
-            echo "Failed to persist $path" >&2
-            return 1
+            echo "Failed to persist $path" >&2; return 1
           }
-          persist_file control/qwen_live/classification_summary.json work/publish/classification_summary.json "qwen: persist cumulative incremental classification ${GITHUB_RUN_ID}"
-          persist_file control/qwen_live/selection_summary.json work/publish/selection_summary.json "qwen: persist cumulative incremental selection ${GITHUB_RUN_ID}"
-          persist_file queues/qwen_live_selection_latest.jsonl work/publish/qwen_live_selection_latest.jsonl "qwen: persist cumulative live selection ${GITHUB_RUN_ID}"
-          persist_file control/qwen_live/incremental_processed.json work/marker.json "qwen: persist cumulative artifact marker ${GITHUB_RUN_ID}"
+          if [ '${{ steps.merge.outputs.changed }}' = 'true' ]; then
+            persist_file control/qwen_live/classification_summary.json work/publish/classification_summary.json "qwen: persist unified classification ${GITHUB_RUN_ID}"
+          fi
+          persist_file control/qwen_live/selection_summary.json work/publish/selection_summary.json "qwen: persist unified selection ${GITHUB_RUN_ID}"
+          persist_file queues/qwen_live_selection_latest.jsonl work/publish/qwen_live_selection_latest.jsonl "qwen: persist unified live selection ${GITHUB_RUN_ID}"
+          if [ '${{ steps.select.outputs.final_count }}' != '0' ]; then
+            persist_file control/qwen_live/incremental_processed.json work/marker.json "qwen: persist unified artifact marker ${GITHUB_RUN_ID}"
+          fi
 
-      - name: Semantic continuation is owned by the canonical controller
-        shell: bash
-        run: |
-          echo 'No semantic worker is dispatched from the conveyor.'
-          echo 'Qwen Backlog Watchdog is the single semantic dispatch owner.'
-
-      - name: Dispatch bounded DCE only after semantic lane is protected
+      - name: Wake bounded DCE after semantic publication
         if: steps.select.outputs.usable == 'true' && steps.selection.outputs.selected != '0'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          set -euo pipefail
-          gh workflow run dce-queue-drainer.yml --ref main
-          echo "DCE drainer woken after semantic checkpoint; central admission applies the Qwen-backlog cap."
+          gh workflow run dce-queue-drainer.yml --ref main || true
 
       - name: Summary
         if: always()
         run: |
-          echo '### Qwen continuous conveyor v2' >> "$GITHUB_STEP_SUMMARY"
-          echo "- selected Qwen run: ${{ steps.select.outputs.rid }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- source generation: ${{ steps.select.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- newly discovered result artifacts: ${{ steps.select.outputs.new_count }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- cumulative state rows: ${{ steps.merge.outputs.state_rows }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- classification queue remaining: ${{ steps.merge.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- DCE selection rows: ${{ steps.selection.outputs.selected }}" >> "$GITHUB_STEP_SUMMARY"
-          echo '- active run preferred; only completed/success is a fallback; cancelled/failed runs cannot mask healthy inference.' >> "$GITHUB_STEP_SUMMARY"
+          echo '### Qwen unified conveyor' >> "$GITHUB_STEP_SUMMARY"
+          echo "- qwen run: ${{ steps.select.outputs.rid }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- source: ${{ steps.select.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- novel guarded rows: ${{ steps.collect.outputs.novel }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- accepted: ${{ steps.merge.outputs.accepted }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- remaining: ${{ steps.merge.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- DCE selection: ${{ steps.selection.outputs.selected }}" >> "$GITHUB_STEP_SUMMARY"
+          echo '- one state writer; no checkpoint-vs-final writer race; no no-op semantic merge.' >> "$GITHUB_STEP_SUMMARY"

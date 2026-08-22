@@ -6,13 +6,13 @@ on:
       per_shard:
         description: Maximum notices classified by each worker in this pass
         required: false
-        default: '96'
+        default: '480'
       auto_continue:
         description: Retained for compatibility; semantic controller owns continuation
         required: false
         default: 'true'
       dce_limit:
-        description: Retained for compatibility; recovery drainer owns DCE handoff
+        description: Retained for compatibility; conveyor owns DCE handoff
         required: false
         default: '160'
 
@@ -21,19 +21,18 @@ permissions:
   contents: write
 
 concurrency:
-  group: qwen-live-notice-classification-${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success' && format('noop-{0}', github.run_id) || 'active' }}
-  # Never preempt a semantic pass because code or generated state changed on main.
-  # A later trigger queues behind the active generation and picks up the newest code.
+  group: qwen-live-notice-classification-active
   cancel-in-progress: false
 
 env:
   QWEN_WORKERS_REQUESTED: '20'
-  QWEN_BATCH_SIZE: '8'
+  QWEN_OPERATIONAL_ROWS_PER_SHARD: '480'
   QWEN_CLASSIFIER_VERSION: 'qwen3-4b-q4km-batch-selfheal-v1'
+  QWEN_RICH_MIN_CONTEXT_CHARS: '2200'
+  QWEN_TRANSPORT_RETRIES: '0'
 
 jobs:
   plan:
-    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     outputs:
@@ -49,7 +48,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Download current ledger, matching immutable snapshot and previous exact-hash Qwen state
+      - name: Download current ledger, exact snapshot and previous semantic state
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -76,13 +75,7 @@ jobs:
           mv "input/live-open-tenders-${source_run}.jsonl.gz" input/live-open-tenders-latest.jsonl.gz
           mv "input/snapshot-manifest-${source_run}.json" input/snapshot-manifest-latest.json
           echo "LEDGER_SOURCE_RUN=$source_run" >> "$GITHUB_ENV"
-          test -s input/notice-intelligence-ledger-latest.jsonl.gz
-          test -s input/notice-classification-queue-latest.jsonl.gz
-          test -s input/live-open-tenders-latest.jsonl.gz
-          test -s input/snapshot-manifest-latest.json
 
-          # Prefer the most complete downloadable semantic state. A failed final
-          # release mirror must not force the next pass back to stale/empty state.
           mkdir -p previous/candidates
           gh release download qwen-incremental-state-latest \
             --pattern qwen-incremental-state-latest.jsonl.gz \
@@ -93,7 +86,6 @@ jobs:
           python - <<'PY'
           import gzip, json
           from pathlib import Path
-
           candidates=[]
           for p in Path('previous/candidates').glob('*.jsonl.gz'):
               try:
@@ -105,57 +97,47 @@ jobs:
           if candidates:
               rows,p=max(candidates,key=lambda x:(x[0],x[1].name.startswith('qwen-classification-state')))
               Path('previous/qwen-classification-state-latest.jsonl.gz').write_bytes(p.read_bytes())
-              print(f'Using previous Qwen state {p.name} rows={rows}')
+              print(f'Using previous semantic state {p.name} rows={rows}')
           else:
               expected=0
               summary=Path('control/qwen_live/classification_summary.json')
               if summary.exists():
-                  try:
-                      expected=int(json.loads(summary.read_text(encoding='utf-8')).get('state_rows_after_merge') or 0)
-                  except Exception:
-                      expected=0
+                  try: expected=int(json.loads(summary.read_text(encoding='utf-8')).get('state_rows_after_merge') or 0)
+                  except Exception: expected=0
               if expected > 0:
-                  raise SystemExit(f'FAIL_CLOSED: semantic state releases unavailable while main records {expected} classified rows')
-              with gzip.open('previous/qwen-classification-state-latest.jsonl.gz','wt',encoding='utf-8') as f:
+                  raise SystemExit(f'FAIL_CLOSED: semantic releases unavailable while main records {expected} rows')
+              with gzip.open('previous/qwen-classification-state-latest.jsonl.gz','wt',encoding='utf-8'):
                   pass
-              print('No prior semantic state exists; initialized empty state.')
           PY
 
       - id: plan
-        name: Prioritize fresh notices, admit fair-share capacity and create bounded shards
-        shell: bash
+        name: Build one bounded high-throughput semantic wave
         env:
           GH_TOKEN: ${{ github.token }}
-          REQUESTED_PER_SHARD: ${{ github.event.inputs.per_shard || '96' }}
+          REQUESTED_PER_SHARD: ${{ github.event.inputs.per_shard || '480' }}
+        shell: bash
         run: |
           set -euo pipefail
           source_run="$LEDGER_SOURCE_RUN"
-          manifest_run="$(python - <<'PY'
-          import json
-          print(json.load(open('input/snapshot-manifest-latest.json',encoding='utf-8'))['source_discovery_run'])
-          PY
-          )"
-          [ "$manifest_run" = "$source_run" ] || { echo "Ledger/snapshot generation mismatch: ledger=$source_run snapshot=$manifest_run" >&2; exit 1; }
+          manifest_run="$(python -c "import json;print(json.load(open('input/snapshot-manifest-latest.json'))['source_discovery_run'])")"
+          [ "$manifest_run" = "$source_run" ] || { echo "Ledger/snapshot mismatch: ledger=$source_run snapshot=$manifest_run" >&2; exit 1; }
 
           python pipeline/merge_qwen_classification_state.py \
             --ledger input/notice-intelligence-ledger-latest.jsonl.gz \
             --classification-queue input/notice-classification-queue-latest.jsonl.gz \
             --previous-state previous/qwen-classification-state-latest.jsonl.gz \
+            --snapshot input/live-open-tenders-latest.jsonl.gz \
             --target-classifier-version "$QWEN_CLASSIFIER_VERSION" \
             --state-out previous/qwen-state-current.jsonl.gz \
             --queue-out input/qwen-work-queue.jsonl.gz \
             --summary-out input/qwen-prefilter-summary.json
 
-          remaining="$(python - <<'PY'
-          import json
-          print(json.load(open('input/qwen-prefilter-summary.json'))['remaining_classification_queue'])
-          PY
-          )"
+          remaining="$(python -c "import json;print(json.load(open('input/qwen-prefilter-summary.json'))['remaining_classification_queue'])")"
           per_shard="$(python - <<'PY'
           import os
-          try: n=int(os.environ.get('REQUESTED_PER_SHARD') or 96)
-          except Exception: n=96
-          print(max(16,min(96,n)))
+          try: n=int(os.environ.get('REQUESTED_PER_SHARD') or 480)
+          except Exception: n=480
+          print(max(16,min(480,n)))
           PY
           )"
 
@@ -172,66 +154,71 @@ jobs:
           if [ "$remaining" = '0' ]; then allowed=0; fi
 
           if [ "$allowed" -gt 0 ]; then
-            python pipeline/build_qwen_shadow_shards.py \
+            REQUESTED_PER_SHARD="$per_shard" python pipeline/build_qwen_shadow_shards.py \
               --input input/qwen-work-queue.jsonl.gz \
               --out-dir shards \
               --source-run "$source_run" \
               --shards "$allowed" \
               --manifest-out input/qwen-live-shard-manifest.json
           else
-            printf '{"source_run":"%s","shards":0,"reason":"no_admitted_capacity_or_empty_queue"}\n' "$source_run" > input/qwen-live-shard-manifest.json
+            printf '%s\n' "{\"source_run\":\"$source_run\",\"shards\":0,\"reason\":\"no_admitted_capacity_or_empty_queue\"}" > input/qwen-live-shard-manifest.json
           fi
 
           matrix="$(ALLOWED="$allowed" python - <<'PY'
           import json,os
-          n=int(os.environ['ALLOWED'])
-          padded=f'{n:03d}'
+          n=int(os.environ['ALLOWED']); padded=f'{n:03d}'
           print(json.dumps({'include':[{'shard':i,'shard_count_padded':padded} for i in range(n)]},separators=(',',':')))
           PY
           )"
           batch_size="$(python - <<'PY'
           import json
           from pathlib import Path
-          fallback=8
-          p=Path('control/qwen_batch_runtime_config.json')
-          try:
-              cfg=json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
-          except Exception:
-              cfg={}
+          fallback=1
+          try: cfg=json.loads(Path('control/qwen_batch_runtime_config.json').read_text(encoding='utf-8'))
+          except Exception: cfg={}
           champ=cfg.get('champion') if cfg.get('status') == 'PASS' else None
           if isinstance(champ,dict) and champ.get('safe_for_shadow_scale_out'):
               try: n=int(champ.get('initial_batch_size') or fallback)
               except Exception: n=fallback
-          else:
-              n=fallback
-          print(max(1,min(32,n)))
+          else: n=fallback
+          print(max(1,min(16,n)))
           PY
           )"
-          echo "batch_size=$batch_size" >> "$GITHUB_OUTPUT"
+
           echo "source_run=$source_run" >> "$GITHUB_OUTPUT"
           echo "remaining=$remaining" >> "$GITHUB_OUTPUT"
           echo "per_shard=$per_shard" >> "$GITHUB_OUTPUT"
           echo "allowed_workers=$allowed" >> "$GITHUB_OUTPUT"
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "batch_size=$batch_size" >> "$GITHUB_OUTPUT"
           cat input/qwen-live-shard-manifest.json
 
-      - name: Upload immutable input transport for this pass
+      - name: Upload control-plane input for conveyors and aggregate
         uses: actions/upload-artifact@v4
         with:
           name: qwen-live-input-${{ github.run_id }}
           path: |
             input/
             previous/
-            shards/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Upload worker-only shards
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-live-shards-${{ github.run_id }}
+          path: shards/
+          compression-level: 0
           retention-days: 7
           if-no-files-found: error
 
       - name: Plan summary
         run: |
           echo "Source discovery: ${{ steps.plan.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Exact-hash queue remaining before this pass: ${{ steps.plan.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Workers admitted: ${{ steps.plan.outputs.allowed_workers }}; max notices/worker: ${{ steps.plan.outputs.per_shard }}; batch size: ${{ steps.plan.outputs.batch_size }}" >> "$GITHUB_STEP_SUMMARY"
-          echo 'Continuous conveyor owns durable Qwen publication; backlog watchdog owns continuation.' >> "$GITHUB_STEP_SUMMARY"
+          echo "Queue remaining: ${{ steps.plan.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Workers: ${{ steps.plan.outputs.allowed_workers }}; rows/worker: ${{ steps.plan.outputs.per_shard }}; batch: ${{ steps.plan.outputs.batch_size }}" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Workers download shards only; ledger/snapshot/state are not replicated to every runner.' >> "$GITHUB_STEP_SUMMARY"
 
   classify:
     needs: plan
@@ -241,7 +228,7 @@ jobs:
       max-parallel: ${{ fromJSON(needs.plan.outputs.allowed_workers) }}
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    timeout-minutes: 125
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -249,27 +236,25 @@ jobs:
           python-version: '3.12'
       - uses: actions/download-artifact@v4
         with:
-          name: qwen-live-input-${{ github.run_id }}
+          name: qwen-live-shards-${{ github.run_id }}
           path: work
 
       - id: shard
-        name: Resolve shard and row count
+        name: Resolve this worker shard
         shell: bash
         run: |
           set -euo pipefail
-          idx='${{ matrix.shard }}'
-          printf -v padded '%03d' "$idx"
-          shard="$(find work/shards -type f -name "qwen-shadow-${{ needs.plan.outputs.source_run }}-shard-${padded}-of-${{ matrix.shard_count_padded }}.jsonl.gz" -print -quit)"
+          idx='${{ matrix.shard }}'; printf -v padded '%03d' "$idx"
+          shard="$(find work -type f -name "qwen-shadow-${{ needs.plan.outputs.source_run }}-shard-${padded}-of-${{ matrix.shard_count_padded }}.jsonl.gz" -print -quit)"
           test -n "$shard"
           rows="$(python - "$shard" <<'PY'
           import gzip,sys
-          with gzip.open(sys.argv[1],'rt',encoding='utf-8') as f:
-              print(sum(1 for line in f if line.strip()))
+          with gzip.open(sys.argv[1],'rt',encoding='utf-8') as f: print(sum(1 for line in f if line.strip()))
           PY
           )"
           echo "path=$shard" >> "$GITHUB_OUTPUT"
           echo "rows=$rows" >> "$GITHUB_OUTPUT"
-          if [ "$rows" -gt 0 ]; then echo 'has_work=true' >> "$GITHUB_OUTPUT"; else echo 'has_work=false' >> "$GITHUB_OUTPUT"; fi
+          [ "$rows" -gt 0 ] && echo 'has_work=true' >> "$GITHUB_OUTPUT" || echo 'has_work=false' >> "$GITHUB_OUTPUT"
 
       - name: Cache Qwen GGUF
         if: steps.shard.outputs.has_work == 'true'
@@ -310,18 +295,18 @@ jobs:
           set -euo pipefail
           start="$(date +%s)"
           "$LLAMA_SERVER" -hf Qwen/Qwen3-4B-GGUF:Q4_K_M \
-            --host 127.0.0.1 --port 8080 --jinja -c 8192 -t 4 > qwen-server.log 2>&1 &
+            --host 127.0.0.1 --port 8080 --jinja -c 4096 -t 4 > qwen-server.log 2>&1 &
           echo $! > qwen-server.pid
-          ready=0
           for i in $(seq 1 180); do
-            if curl -fsS http://127.0.0.1:8080/health >/dev/null 2>&1; then ready=1; break; fi
+            if curl -fsS http://127.0.0.1:8080/health >/dev/null 2>&1; then
+              echo "QWEN_STARTUP_SECONDS=$(($(date +%s)-start))" >> "$GITHUB_ENV"; exit 0
+            fi
             kill -0 "$(cat qwen-server.pid)" >/dev/null 2>&1 || { tail -200 qwen-server.log; exit 1; }
             sleep 3
           done
-          [ "$ready" = 1 ] || { tail -200 qwen-server.log; exit 1; }
-          echo "QWEN_STARTUP_SECONDS=$(($(date +%s)-start))" >> "$GITHUB_ENV"
+          tail -200 qwen-server.log; exit 1
 
-      - name: Classify bounded shard with recursive self-healing
+      - name: Classify shard on validated singleton fast path
         if: steps.shard.outputs.has_work == 'true'
         shell: bash
         run: |
@@ -334,15 +319,16 @@ jobs:
             --batch-size '${{ needs.plan.outputs.batch_size }}' \
             --sample-size '${{ needs.plan.outputs.per_shard }}' \
             --source-ledger-generation '${{ needs.plan.outputs.source_run }}' \
-            --description-chars 500 \
-            --timeout 75 \
-            --max-tokens 1100 \
-            --max-runtime-seconds 7800 \
+            --description-chars 2200 \
+            --timeout 30 \
+            --max-tokens 900 \
+            --max-runtime-seconds 7200 \
             --startup-seconds "$QWEN_STARTUP_SECONDS"
           python pipeline/qwen_notice_post_guard.py \
             --input "qwen-live-${idx}-raw.jsonl" \
             --output "qwen-live-${idx}-guarded.jsonl" \
-            --summary "qwen-live-${idx}-guard-summary.json"
+            --summary "qwen-live-${idx}-guard-summary.json" \
+            --queue '${{ steps.shard.outputs.path }}'
 
       - name: Stop model
         if: always() && steps.shard.outputs.has_work == 'true'
@@ -350,25 +336,25 @@ jobs:
         run: |
           [ -s qwen-server.pid ] && kill "$(cat qwen-server.pid)" >/dev/null 2>&1 || true
 
-      - name: Create empty conserved output for an empty shard
+      - name: Create conserved empty output
         if: steps.shard.outputs.has_work != 'true'
         shell: bash
         run: |
           idx='${{ matrix.shard }}'
           : > "qwen-live-${idx}-guarded.jsonl"
-          printf '{"rows":0,"empty_shard":true}\n' > "qwen-live-${idx}-summary.json"
+          printf '%s\n' '{"sample_resolved":0,"sample_completed":0,"sample_fallback":0,"empty_shard":true}' > "qwen-live-${idx}-summary.json"
 
-      - name: Upload shard results immediately
+      - name: Upload worker result
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: qwen-live-result-${{ matrix.shard }}-${{ github.run_id }}
           path: |
             qwen-live-${{ matrix.shard }}-guarded.jsonl
-            qwen-live-${{ matrix.shard }}-raw.jsonl
             qwen-live-${{ matrix.shard }}-summary.json
             qwen-live-${{ matrix.shard }}-guard-summary.json
             qwen-server.log
+          compression-level: 0
           if-no-files-found: warn
           retention-days: 14
 
@@ -386,8 +372,7 @@ jobs:
         with:
           name: qwen-live-input-${{ github.run_id }}
           path: work
-
-      - name: Download all completed shard outputs
+      - name: Download completed worker outputs
         if: needs.plan.outputs.remaining != '0' && needs.plan.outputs.allowed_workers != '0'
         uses: actions/download-artifact@v4
         with:
@@ -396,7 +381,7 @@ jobs:
           merge-multiple: true
 
       - id: merge
-        name: Hash-safe merge and prove monotonic queue progress
+        name: Hash-safe aggregate merge
         shell: bash
         run: |
           set -euo pipefail
@@ -407,6 +392,7 @@ jobs:
             --ledger work/input/notice-intelligence-ledger-latest.jsonl.gz \
             --classification-queue work/input/notice-classification-queue-latest.jsonl.gz \
             --previous-state work/previous/qwen-state-current.jsonl.gz \
+            --snapshot work/input/live-open-tenders-latest.jsonl.gz \
             "${result_args[@]}" \
             --target-classifier-version "$QWEN_CLASSIFIER_VERSION" \
             --state-out publish/qwen-classification-state-latest.jsonl.gz \
@@ -418,72 +404,43 @@ jobs:
           before=int(s['input_queue_rows']); after=int(s['remaining_classification_queue'])
           accepted=int((s.get('stats') or {}).get('results_accepted') or 0)
           if after > before: raise SystemExit(f'queue grew unexpectedly: {before}->{after}')
-          print(json.dumps({'before':before,'after':after,'accepted':accepted,'classified_fraction':s['classified_fraction_of_ledger']},indent=2))
           with open(os.environ['GITHUB_OUTPUT'],'a') as f:
               f.write(f"remaining={after}\naccepted={accepted}\nstate_rows={s['state_rows_after_merge']}\n")
+          print(json.dumps({'before':before,'after':after,'accepted':accepted},indent=2))
           PY
 
-      - name: Preserve aggregate state independently of GitHub Releases
+      - name: Preserve aggregate state artifact
         if: steps.merge.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: qwen-live-aggregate-state-${{ github.run_id }}
           path: publish/
-          if-no-files-found: error
+          compression-level: 0
           retention-days: 14
+          if-no-files-found: error
 
       - id: mirror
-        name: Mirror aggregate state to stable release with bounded backoff
+        name: Mirror aggregate to stable release
         if: steps.merge.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -u -o pipefail
-          source_run='${{ needs.plan.outputs.source_run }}'
           stable='qwen-classification-state-latest'
-          notes="source_run=${source_run} run=${GITHUB_RUN_ID} state_rows=${{ steps.merge.outputs.state_rows }} remaining=${{ steps.merge.outputs.remaining }} accepted_this_pass=${{ steps.merge.outputs.accepted }} admitted_workers=${{ needs.plan.outputs.allowed_workers }}"
-
-          retry_cmd() {
-            local label="$1"; shift
-            local delays=(0 15 45 120)
-            local rc=1 out=''
-            for delay in "${delays[@]}"; do
-              [ "$delay" -eq 0 ] || sleep "$delay"
-              out="$("$@" 2>&1)"; rc=$?
-              if [ "$rc" -eq 0 ]; then return 0; fi
-              echo "::warning::${label} failed rc=${rc}: ${out: -400}"
-            done
-            return "$rc"
-          }
-
-          # qwen-classification-state-latest already exists in production. Avoid
-          # per-pass immutable releases: they doubled API traffic and had no reader.
-          if ! retry_cmd 'stable release metadata update' gh release edit "$stable" \
-              --title "Qwen Classification State — LATEST (${source_run}/${GITHUB_RUN_ID})" \
-              --notes "$notes"; then
-            echo 'mirror=deferred' >> "$GITHUB_OUTPUT"
-            echo '::warning::Stable release mirror deferred after bounded retries; aggregate artifact and shard artifacts remain durable.'
-            exit 0
-          fi
-          if ! retry_cmd 'stable release asset upload' gh release upload "$stable" publish/* --clobber; then
-            echo 'mirror=deferred' >> "$GITHUB_OUTPUT"
-            echo '::warning::Stable release upload deferred after bounded retries; conveyor can reconstruct from preserved artifacts.'
-            exit 0
-          fi
+          notes="source_run=${{ needs.plan.outputs.source_run }} run=${GITHUB_RUN_ID} state_rows=${{ steps.merge.outputs.state_rows }} remaining=${{ steps.merge.outputs.remaining }} accepted_this_pass=${{ steps.merge.outputs.accepted }}"
+          retry_cmd() { local label="$1"; shift; for delay in 0 15 45 120; do [ "$delay" -eq 0 ] || sleep "$delay"; "$@" && return 0; done; echo "::warning::$label deferred"; return 1; }
+          retry_cmd 'stable metadata' gh release edit "$stable" --title "Qwen Classification State — LATEST (${{ needs.plan.outputs.source_run }}/${GITHUB_RUN_ID})" --notes "$notes" || { echo 'mirror=deferred' >> "$GITHUB_OUTPUT"; exit 0; }
+          retry_cmd 'stable assets' gh release upload "$stable" publish/* --clobber || { echo 'mirror=deferred' >> "$GITHUB_OUTPUT"; exit 0; }
           echo 'mirror=ok' >> "$GITHUB_OUTPUT"
 
-      - name: End-to-end summary
+      - name: Summary
         if: always()
-        shell: bash
         run: |
-          echo "### Qwen live mainline" >> "$GITHUB_STEP_SUMMARY"
-          echo "- source discovery: ${{ needs.plan.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- queue before pass: ${{ needs.plan.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- accepted this pass: ${{ steps.merge.outputs.accepted }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- remaining exact-hash queue: ${{ steps.merge.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- cumulative classified state rows: ${{ steps.merge.outputs.state_rows }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- stable release mirror: ${{ steps.mirror.outputs.mirror || 'not-run' }}" >> "$GITHUB_STEP_SUMMARY"
-          echo '- Aggregate state is always preserved as an Actions artifact before the best-effort release mirror.' >> "$GITHUB_STEP_SUMMARY"
-          echo '- Qwen persistence is delegated to the continuous conveyor; continuation is delegated to the backlog watchdog.' >> "$GITHUB_STEP_SUMMARY"
-          echo '- safety: no semantic result is a final bid verdict; authoritative DCE remains the truth gate.' >> "$GITHUB_STEP_SUMMARY"
+          echo '### Qwen live mainline' >> "$GITHUB_STEP_SUMMARY"
+          echo "- source: ${{ needs.plan.outputs.source_run }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- accepted: ${{ steps.merge.outputs.accepted }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- remaining: ${{ steps.merge.outputs.remaining }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- state rows: ${{ steps.merge.outputs.state_rows }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- stable mirror: ${{ steps.mirror.outputs.mirror || 'not-run' }}" >> "$GITHUB_STEP_SUMMARY"
+          echo '- final bid truth still requires DCE; semantic routing never auto-approves a bid.' >> "$GITHUB_STEP_SUMMARY"

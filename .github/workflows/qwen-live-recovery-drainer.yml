@@ -1,42 +1,20 @@
-name: Qwen Live Recovery Drainer
+name: Qwen Live Recovery Drainer (Retired)
 
+# Retained as an audit marker. qwen-live-conveyor.yml has its own five-minute
+# schedule and classification-completion trigger; qwen-backlog-watchdog.yml owns
+# semantic recovery directly. A third workflow that only woke both was redundant.
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: ["Qwen Live Notice Classification"]
-    types: [completed]
-  schedule:
-    - cron: '*/10 * * * *'
 
 permissions:
-  actions: write
   contents: read
 
-concurrency:
-  group: qwen-live-recovery-drainer
-  cancel-in-progress: true
-
 jobs:
-  recover:
+  retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 2
     steps:
-      - name: Wake canonical incremental merger and semantic controller
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          # This workflow deliberately owns NO Qwen state writes. Previously it
-          # could overwrite a newer conveyor incremental summary with an older
-          # stable-release summary. It is now only a redundant recovery wake.
-          gh workflow run qwen-live-conveyor.yml --ref main || true
-          gh workflow run qwen-backlog-watchdog.yml --ref main || true
-          echo 'Recovery wake sent to conveyor + semantic controller.'
-
-      - name: Summary
-        run: |
-          echo '### Qwen recovery safety net' >> "$GITHUB_STEP_SUMMARY"
-          echo '- state writer: Qwen Live Continuous Conveyor only' >> "$GITHUB_STEP_SUMMARY"
-          echo '- semantic dispatch owner: Qwen Backlog Watchdog only' >> "$GITHUB_STEP_SUMMARY"
-          echo '- this workflow performs no classification-summary or selection writes' >> "$GITHUB_STEP_SUMMARY"
+      - run: |
+          echo 'QWEN_RECOVERY_DRAINER_RETIRED'
+          echo 'Conveyor schedule owns ingestion; backlog watchdog owns semantic recovery.'
+          echo 'No workflow dispatch or state write occurs here.'

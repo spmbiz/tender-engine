@@ -12,12 +12,12 @@ from pathlib import Path
 from typing import Any
 
 SCHEMA='QWEN_SHADOW_INPUT_V1'
-MANIFEST_SCHEMA='QWEN_SHADOW_SHARD_MANIFEST_V3'
-# Keep automatic semantic passes short enough to publish durable results frequently.
-# Dispatchers may still request a larger per_shard value, but live requests inherit
-# REQUESTED_PER_SHARD and are clamped here to this operational bound. Rows not reached
-# remain in the canonical residual queue and are picked up by the next pass.
-DEFAULT_OPERATIONAL_MAX_ROWS_PER_SHARD=96
+MANIFEST_SCHEMA='QWEN_SHADOW_SHARD_MANIFEST_V4'
+# A 480-row shard at the validated singleton rate stays comfortably inside the
+# workflow timeout while amortizing runner/model startup across far more useful
+# work. The workflow request remains authoritative and rows not selected remain
+# in the canonical residual queue.
+DEFAULT_OPERATIONAL_MAX_ROWS_PER_SHARD=480
 DEFAULT_FRESH_HOURS=24
 
 
@@ -81,8 +81,6 @@ def shard_for(candidate_id:str,count:int)->int:
 
 
 def stable_priority(candidate_id:str)->bytes:
-    # Stable tie-breaker inside the same freshness class. This preserves
-    # deterministic progress across repeated bounded passes.
     return hashlib.sha256(('qwen-live:'+candidate_id).encode('utf-8')).digest()
 
 
@@ -97,13 +95,6 @@ def _parse_ts(value:object):
 
 
 def freshness_rank(row:dict[str,Any],*,now:datetime|None=None,fresh_hours:int=DEFAULT_FRESH_HOURS)->int:
-    """0=materially NEW/UPDATED, 1=recent unseen carryover, 2=historical backfill.
-
-    NEW/UPDATED is authoritative for the current ledger generation. A notice that
-    was NEW on the previous generation becomes UNCHANGED on the next one if Qwen
-    did not reach it yet, so first_seen_at keeps it in the fresh lane for a bounded
-    period instead of immediately burying it behind the historical backlog.
-    """
     reason=str(row.get('queue_reason') or '').upper()
     if reason in {'NEW','UPDATED'}:
         return 0
@@ -151,10 +142,6 @@ def main():
     if fresh_hours<1 or fresh_hours>168:
         raise SystemExit('QWEN fresh hours must be 1..168')
 
-    # An explicit CLI cap is authoritative for standalone tooling/tests. Live
-    # workflow requests come through REQUESTED_PER_SHARD and are additionally
-    # clamped to the operational cap so a single long runner cannot hold an
-    # entire large pass hostage before persistence.
     if a.max_rows_per_shard is not None:
         requested_cap=int(a.max_rows_per_shard)
         cap=requested_cap
@@ -171,9 +158,6 @@ def main():
     out=Path(a.out_dir); out.mkdir(parents=True,exist_ok=True)
     paths=[out/f'qwen-shadow-{a.source_run}-shard-{i:03d}-of-{a.shards:03d}.jsonl.gz' for i in range(a.shards)]
 
-    # Validate the entire residual queue first. Nothing is removed from it. For a
-    # bounded pass, choose a deterministic slice independently per shard, but give
-    # current NEW/UPDATED and very recent unseen notices priority over backfill.
     buckets=[[] for _ in range(a.shards)]
     total=0; seen=set(); duplicate_ids=0; missing_ids=0
     now=datetime.now(timezone.utc)
@@ -241,7 +225,7 @@ def main():
             'drops_or_deletes_notices':False,
             'shards_are_derived':True,
             'automatic_rejection_enabled':False,
-            'live_requests_clamped_for_low_latency_persistence':True,
+            'live_requests_clamped_for_bounded_runtime':True,
             'fresh_notices_preempt_historical_backfill':True,
         }
     }

@@ -9,20 +9,13 @@ on:
       - 'tools/apply_qwen_control_plane_audit_v3.py'
       - '.github/workflows/qwen-live-classification.yml'
       - '.github/workflows/qwen-live-conveyor.yml'
+      - '.github/workflows/qwen-live-checkpoint-conveyor.yml'
+      - '.github/workflows/qwen-live-recovery-drainer.yml'
       - '.github/workflows/qwen-dce-triage.yml'
       - '.github/workflows/dce-fanout-v2.yml'
-      - '.github/workflows/qwen-dce-kick-now.yml'
       - '.github/workflows/qwen-batch-autotune-selfheal.yml'
       - '.github/workflows/pipeline-ab-live-canary-v2.yml'
       - '.github/workflows/qwen-backlog-watchdog.yml'
-      - '.github/workflows/qwen-backfill-kick.yml'
-      - '.github/workflows/qwen-live-recovery-drainer.yml'
-      - '.github/workflows/auto-dce-adjudication.yml'
-      - '.github/workflows/apply-qwen-core-hotfix.yml'
-      - '.github/workflows/apply-qwen-blockers-v2.yml'
-      - '.github/workflows/apply-qwen-final-hardening.yml'
-      - '.github/workflows/apply-qwen-throughput-boost.yml'
-      - '.github/workflows/apply-qwen-conveyor-selector-fix.yml'
       - '.github/workflows/apply-qwen-control-plane-audit-v3.yml'
   push:
     branches: [main]
@@ -31,11 +24,11 @@ on:
       - 'tools/apply_qwen_control_plane_audit_v3.py'
       - '.github/workflows/qwen-live-classification.yml'
       - '.github/workflows/qwen-live-conveyor.yml'
+      - '.github/workflows/qwen-live-checkpoint-conveyor.yml'
+      - '.github/workflows/qwen-live-recovery-drainer.yml'
       - '.github/workflows/qwen-dce-triage.yml'
       - '.github/workflows/dce-fanout-v2.yml'
-      - '.github/workflows/qwen-dce-kick-now.yml'
-      - '.github/workflows/qwen-batch-autotune-selfheal.yml'
-      - '.github/workflows/pipeline-ab-live-canary-v2.yml'
+      - '.github/workflows/qwen-backlog-watchdog.yml'
       - '.github/workflows/apply-qwen-control-plane-audit-v3.yml'
   workflow_dispatch:
 
@@ -43,7 +36,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: apply-qwen-control-plane-audit-v3-${{ github.event.pull_request.number || github.ref }}
+  group: apply-qwen-control-plane-audit-v4-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -59,52 +52,60 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Prove migration is canonical and idempotent
+      - name: Validate canonical control plane twice without mutation
         shell: bash
         run: |
           set -euo pipefail
           python tools/apply_qwen_control_plane_audit_v3.py
           python tools/apply_qwen_control_plane_audit_v3.py
+          git diff --exit-code
 
       - name: Run semantic-controller regression tests
         run: python -m unittest tests.test_qwen_semantic_controller -v
 
-      - name: Enforce control-plane invariants
+      - name: Enforce simplified semantic invariants
         shell: bash
         run: |
           set -euo pipefail
           git diff --check
 
-          # Semantic classification: exactly one production dispatch owner.
+          # One semantic dispatch owner and one incremental state writer.
           ! grep -q 'gh workflow run qwen-live-classification.yml' .github/workflows/qwen-live-conveyor.yml
-          ! grep -q 'qwen-live-classification.yml' .github/workflows/qwen-backfill-kick.yml
-          ! grep -q 'qwen-live-classification.yml' .github/workflows/qwen-live-recovery-drainer.yml
-          ! grep -q 'QWEN_WORKFLOW = "qwen-live-classification.yml"' pipeline/freshness_conveyor_watchdog.py
-          grep -q 'QWEN_CONTROLLER_WORKFLOW = "qwen-backlog-watchdog.yml"' pipeline/freshness_conveyor_watchdog.py
-          grep -q "default: '96'" .github/workflows/qwen-live-classification.yml
-          ! grep -q "default: '192'" .github/workflows/qwen-live-classification.yml
-          ! grep -q 'min(480,n)' .github/workflows/qwen-live-classification.yml
+          ! grep -q 'gh workflow run qwen-live-classification.yml' .github/workflows/qwen-live-recovery-drainer.yml
+          grep -q "default: '480'" .github/workflows/qwen-live-classification.yml
+          grep -q "QWEN_OPERATIONAL_ROWS_PER_SHARD: '480'" .github/workflows/qwen-live-classification.yml
+          grep -q "QWEN_RICH_MIN_CONTEXT_CHARS: '2200'" .github/workflows/qwen-live-classification.yml
+          grep -q "QWEN_TRANSPORT_RETRIES: '0'" .github/workflows/qwen-live-classification.yml
+          grep -q 'fallback=1' .github/workflows/qwen-live-classification.yml
+          grep -q -- '--timeout 30' .github/workflows/qwen-live-classification.yml
+          grep -q -- '--description-chars 2200' .github/workflows/qwen-live-classification.yml
+          grep -q 'group: qwen-live-state-writer' .github/workflows/qwen-live-conveyor.yml
+          grep -q 'cancel-in-progress: false' .github/workflows/qwen-live-conveyor.yml
 
-          # Qwen DCE: drainer is the only dispatch owner and workers share fleet admission.
-          ! grep -q 'workflows: \["DCE Fanout V2"\]' .github/workflows/qwen-dce-triage.yml
-          ! grep -q 'gh workflow run qwen-dce-triage.yml' .github/workflows/dce-fanout-v2.yml
-          ! grep -q 'gh workflow run qwen-dce-triage.yml' .github/workflows/auto-dce-adjudication.yml
-          grep -q 'gh workflow run qwen-dce-drainer.yml' .github/workflows/dce-fanout-v2.yml
-          grep -q 'gh workflow run qwen-dce-drainer.yml' .github/workflows/auto-dce-adjudication.yml
-          grep -q 'dynamic_tender_parallel' .github/workflows/qwen-dce-triage.yml
-          ! grep -q 'gh workflow run dce-fanout-v2.yml' .github/workflows/qwen-dce-kick-now.yml
-          grep -q 'gh workflow run qwen-dce-drainer.yml' .github/workflows/qwen-dce-kick-now.yml
+          # Duplicate Qwen state writers/recovery wakes are retired and manual-only.
           python - <<'PY'
           from pathlib import Path
-          p=Path('.github/workflows/qwen-dce-kick-now.yml')
-          trigger=p.read_text(encoding='utf-8').split('permissions:',1)[0]
-          assert 'workflow_dispatch:' in trigger
-          assert 'push:' not in trigger
-          assert 'schedule:' not in trigger
-          assert 'workflow_run:' not in trigger
+          for name,marker in (
+              ('qwen-live-checkpoint-conveyor.yml','QWEN_CHECKPOINT_CONVEYOR_RETIRED'),
+              ('qwen-live-recovery-drainer.yml','QWEN_RECOVERY_DRAINER_RETIRED'),
+          ):
+              text=Path('.github/workflows',name).read_text(encoding='utf-8')
+              trigger=text.split('permissions:',1)[0]
+              assert 'workflow_dispatch:' in trigger, name
+              assert 'schedule:' not in trigger, name
+              assert 'push:' not in trigger, name
+              assert 'workflow_run:' not in trigger, name
+              assert 'contents: write' not in text, name
+              assert marker in text, name
           PY
 
-          # CPU benchmarks are engineering-only while the semantic backlog drains.
+          # Qwen DCE remains behind shared admission and canonical drainer ownership.
+          ! grep -q 'workflows: \["DCE Fanout V2"\]' .github/workflows/qwen-dce-triage.yml
+          ! grep -q 'gh workflow run qwen-dce-triage.yml' .github/workflows/dce-fanout-v2.yml
+          grep -q 'gh workflow run qwen-dce-drainer.yml' .github/workflows/dce-fanout-v2.yml
+          grep -q 'dynamic_tender_parallel' .github/workflows/qwen-dce-triage.yml
+
+          # CPU benchmarking cannot steal production backfill slots automatically.
           python - <<'PY'
           from pathlib import Path
           for name in ('qwen-batch-autotune-selfheal.yml','pipeline-ab-live-canary-v2.yml'):
@@ -116,36 +117,4 @@ jobs:
               assert 'workflow_run:' not in trigger
           PY
 
-          # Legacy patch writers cannot resurrect obsolete control-plane code.
-          python - <<'PY'
-          from pathlib import Path
-          names=(
-              'apply-qwen-core-hotfix.yml',
-              'apply-qwen-blockers-v2.yml',
-              'apply-qwen-final-hardening.yml',
-              'apply-qwen-throughput-boost.yml',
-              'apply-qwen-conveyor-selector-fix.yml',
-          )
-          for name in names:
-              text=Path('.github/workflows',name).read_text(encoding='utf-8')
-              assert 'contents: write' not in text, name
-              assert 'push:' not in text.split('permissions:',1)[0], name
-              assert 'workflow_dispatch:' in text, name
-          PY
-
-          echo 'QWEN_CONTROL_PLANE_INVARIANTS_PASS'
-
-      - name: Reject unmaterialized migration drift
-        shell: bash
-        run: |
-          set -euo pipefail
-          # The patcher may diagnose exact legacy state, but CI never rewrites workflow
-          # refs. Any worktree mutation means the branch is not actually canonical.
-          git diff --exit-code -- \
-            .github/workflows/qwen-live-classification.yml \
-            .github/workflows/qwen-live-conveyor.yml \
-            .github/workflows/qwen-dce-triage.yml \
-            .github/workflows/dce-fanout-v2.yml \
-            .github/workflows/qwen-batch-autotune-selfheal.yml \
-            .github/workflows/pipeline-ab-live-canary-v2.yml
-          echo 'QWEN_CONTROL_PLANE_CANONICAL_NO_DIFF'
+          echo 'QWEN_CONTROL_PLANE_V4_INVARIANTS_PASS'
