@@ -1,9 +1,9 @@
 {
   "schema": "QWEN_RECALL_CALIBRATION_CORPUS_V1",
-  "generated_at": "2026-08-22T11:33:23+00:00",
-  "case_count": 47,
-  "positive_recall_cases": 46,
-  "frozen_input_cases": 47,
+  "generated_at": "2026-08-22T11:42:09+00:00",
+  "case_count": 50,
+  "positive_recall_cases": 49,
+  "frozen_input_cases": 50,
   "missing_input_candidate_ids": [
     "IE:8623183",
     "IE:8670172",
@@ -533,6 +533,147 @@
           ]
         },
         "calibration_input_frozen_at": "2026-08-19T10:24:45+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:522037-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:522037-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 76,
+        "why": "Strong EUR 1m regulated-software opportunity and the true tender deadline is 25 September, not the 11 September query date. Financial standing is framed as ability to pay debts rather than a numeric turnover floor, and non-resident tax evidence is contemplated. However three comparable case studies plus regulated-hosting/security evidence are material selection gates, so it cannot be GREEN without a proven partner/capability route.",
+        "action": "FIND_REGULATORY_SOFTWARE_PARTNER_OR_DROP_IF_REFERENCES_CANNOT_BE_MET",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-uncapped-good-sweep-20260822-run-32213968608.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:522037-2026",
+        "material_fields_hash": "86fb296e0b2cfcb28062e220098b955679260ae6001e85367af56dd7ac220ed4",
+        "notice": {
+          "candidate_id": "TED:522037-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": "IRL",
+          "buyer": "Health Products Regulatory Authority",
+          "title": "Ireland – IT services: consulting, software development, Internet and support – Request for Tenders for the Provision of Pharmacovigilance Safety Database and Case Management System",
+          "description": "The objective of this contract is to provide a pharmacovigilance solution for human medicines, migration of data from the existing legacy pharmacovigilance application, integration with external platforms, solution hosting and management, and application support and maintenance services to the HPRA.",
+          "cpv_or_category": null,
+          "estimated_value": 1000000.0,
+          "currency": "EUR",
+          "publication_date": "2026-07-28+02:00",
+          "deadline": "2026-09-11T12:00:00+01:00",
+          "deadline_utc": "2026-09-11T11:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/522037-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-22T11:42:09+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:522195-2026",
+      "label": "DCE/GPT positive (YELLOW): TED:522195-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 58,
+        "why": "The communications title is attractive, but the substantive participation pack contains hard personnel/reference evidence and the DCE deadline extraction is contaminated by legacy dates. This needs a capable German partner and deadline confirmation before it can be treated as actionable.",
+        "action": "PARTNER_ONLY_AND_RECONCILE_CURRENT_DEADLINE",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-uncapped-good-sweep-20260822-run-32213968608.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:522195-2026",
+        "material_fields_hash": "cabd681c435f5bb8442c909355c09ad270d0f56f053109e45254447179b2c495",
+        "notice": {
+          "candidate_id": "TED:522195-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": "DEU",
+          "buyer": "Ludwig-Maximilians-Universität München",
+          "title": "Germany – IT services: consulting, software development, Internet and support – Unterstützung der Öffentlichkeitsarbeit des attoworld-Teams",
+          "description": "Der Auftraggeber beabsichtigt, zur Unterstützung der Öffentlichkeitsarbeit des attoworld-Teams auf der Grundlage eines Rahmenvertrags Dienstleistungen in den Bereichen Web Development und Maintenance sowie PR-Assistenz zu vergeben.",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-07-28+02:00",
+          "deadline": "2026-08-27T10:00:00+02:00",
+          "deadline_utc": "2026-08-27T08:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "neg-w-call",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/522195-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-22T11:42:09+00:00"
+      }
+    },
+    {
+      "candidate_id": "TED:539679-2026",
+      "label": "DCE/GPT positive (GREEN): TED:539679-2026",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "GREEN",
+        "final_score": 86,
+        "why": "Live open CNRS software/database opportunity with authoritative 15 September 2026 noon deadline. DCE asks for turnover declarations but exposes no numeric minimum turnover threshold. It requests principal services/references rather than a fixed disqualifying reference count/value threshold, explicitly allows reliance on capacities of other economic operators with written commitment, and states companies under three years old may prove professional, technical and financial capacity by any means. Scope is directly software/data: database solutions, RDF graph imports, transversal visualisation/query tools and maintenance. No named mandatory vendor certification or hard local-incumbent restriction is established in the reviewed DCE.",
+        "action": "PRIORITY_PREPARE_BID_NOW",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-uncapped-good-sweep-20260822-run-32213968608.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "TED:539679-2026",
+        "material_fields_hash": "c2c56879b27506f7f764146c64fb15e37edd7284c0c39cee0f819faa209bf07e",
+        "notice": {
+          "candidate_id": "TED:539679-2026",
+          "source_family": "TED",
+          "source": "TED",
+          "country": "FRA",
+          "buyer": "CNRS Délégation Occitanie Est",
+          "title": "France – Miscellaneous software development services and computer systems – Acquisition de solutions informatiques de gestion de base de données",
+          "description": "La présente consultation concerne l’acquisition de solutions informatiques de gestion de base de données complète de la conception au déploiement pour : - La création d’un formulaire de saisie des registres des feux du XIXe siècle, - L’import des données saisies des feux du XIXe siècle dans le graphe RDF, - La création d’un outil de visualisation des registres des feux des XVIIIe et XIXe siècles, - La création d’un outil logiciel d’étiquetage automatique des textes (format texte, XML et XML-TEI) - L’import des données étiquetées dans le graphe RDF, - La création d’un outil de visualisation des registres d’assemblée et de comité, - La création d’un outil transversal de visualisation de l’ensemble des données (aussi bien qualitatives que quantitatives) du graphe RDF (recettes, dépenses et feux du XVIIIe siècle, recette et feux du XIXe siècle, comité et assemblée des XVIIIe et XIXe siècles, corpus de presse, mémoires et témoignages traités au Canada).",
+          "cpv_or_category": null,
+          "estimated_value": 140000.0,
+          "currency": "EUR",
+          "publication_date": "2026-08-04+02:00",
+          "deadline": "2026-09-15T02:00:00+00:00",
+          "deadline_utc": "2026-09-15T02:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://ted.europa.eu/en/notice/-/detail/539679-2026"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-22T11:42:09+00:00"
       }
     },
     {
