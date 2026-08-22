@@ -1,24 +1,24 @@
 {
   "schema": "QWEN_LIVE_DCE_SELECTION_SUMMARY_CODED_V2",
-  "generated_at_utc": "2026-08-22T10:31:09+00:00",
+  "generated_at_utc": "2026-08-22T10:48:08+00:00",
   "source_run": "32327417448",
-  "state_rows": 39323,
+  "state_rows": 39584,
   "ledger_rows": 126459,
   "snapshot_rows": 126459,
-  "blocked_ids": 32303,
+  "blocked_ids": 32307,
   "durable_attempted_exact_versions_ignored": 14594,
-  "valid_exact_hash_current_unattempted": 11762,
-  "eligible_keep_for_dce": 9165,
-  "review_worthy_rejects_promoted_to_explore": 1554,
+  "valid_exact_hash_current_unattempted": 11970,
+  "eligible_keep_for_dce": 9352,
+  "review_worthy_rejects_promoted_to_explore": 1563,
   "stale_hash_ignored": 0,
   "missing_snapshot": 0,
-  "expired_ignored": 1591,
+  "expired_ignored": 1605,
   "selected": 160,
   "selection_decisions": {
-    "STRONG_FIT": 91,
+    "STRONG_FIT": 88,
     "FIT": 2,
     "MAYBE": 46,
-    "REJECT_OBVIOUS": 21
+    "REJECT_OBVIOUS": 24
   },
   "selection_survival": {
     "KEEP": 157,
@@ -27,8 +27,8 @@
   "selection_lanes": {
     "qwen-primary-coded": 80,
     "qwen-explore-coded": 48,
-    "qwen-reject-audit-coded": 21,
-    "qwen-elastic-coded": 11
+    "qwen-reject-audit-coded": 24,
+    "qwen-elastic-coded": 8
   },
   "selection_freshness": {
     "historical_backfill": 160
@@ -58,16 +58,16 @@
   "base_candidate_pool": 640,
   "requested_final_limit": 160,
   "candidate_pool_decisions": {
-    "STRONG_FIT": 113,
-    "FIT": 170,
-    "MAYBE": 336,
-    "REJECT_OBVIOUS": 21
+    "STRONG_FIT": 114,
+    "FIT": 171,
+    "MAYBE": 331,
+    "REJECT_OBVIOUS": 24
   },
   "candidate_pool_lanes": {
-    "qwen-primary": 283,
+    "qwen-primary": 285,
     "qwen-open-world-explore": 192,
     "qwen-reject-audit": 128,
-    "qwen-elastic": 37
+    "qwen-elastic": 35
   },
   "code_prior": {
     "positive_code_rows_in_pool": 0,
