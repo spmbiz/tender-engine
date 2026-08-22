@@ -11,7 +11,10 @@ import qwen_notice_batch_selfheal_core as base
 
 RICH_PROMPT_VERSION = "qwen-batch-high-recall-business-fit-v3-rich"
 RICH_CLASSIFIER_VERSION = "qwen3-4b-q4km-batch-selfheal-v1"
-MIN_CONTEXT_CHARS = max(900, int(os.getenv("QWEN_RICH_MIN_CONTEXT_CHARS", "1200")))
+# Recall contract: preserve enough head/tail + eligibility/subcontract/lot/award
+# evidence. This is explicit in the workflow too; there is no hidden expansion
+# from a smaller advertised context budget.
+MIN_CONTEXT_CHARS = max(2200, int(os.getenv("QWEN_RICH_MIN_CONTEXT_CHARS", "2200")))
 MAX_FIELD_CHARS = max(120, int(os.getenv("QWEN_RICH_FIELD_CHARS", "320")))
 # Production runs the empirically validated singleton champion. A transport
 # failure should fail quickly and leave the row for the next pass rather than
