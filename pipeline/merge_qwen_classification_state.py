@@ -133,9 +133,17 @@ def has_exact_post_guard_provenance(row: dict[str, Any]) -> bool:
     return bool(row.get("post_guard_notice_context_used")) and str(row.get("post_guard_schema") or "").startswith(EXACT_POST_GUARD_PREFIX)
 
 
-def legacy_guard_drift(row: dict[str, Any], exact_context: dict[str, Any]) -> tuple[bool, list[str]]:
+def legacy_guard_audit(
+    row: dict[str, Any], exact_context: dict[str, Any]
+) -> tuple[dict[str, Any], bool, list[str]]:
+    """Audit a legacy row and return a provenance-complete replacement.
+
+    Semantically unchanged rows are persisted with exact-context post-guard
+    provenance, making the expensive full-snapshot audit a one-time migration.
+    """
     audited = current_post_guard(row, exact_context, context_source="merge_legacy_state_audit")
-    return semantic_signature(audited) != semantic_signature(row), list(audited.get("post_guard_actions") or [])
+    drifted = semantic_signature(audited) != semantic_signature(row)
+    return audited, drifted, list(audited.get("post_guard_actions") or [])
 
 
 def state_record(row: dict[str, Any], accepted_at: str) -> dict[str, Any]:
@@ -285,7 +293,7 @@ def merge(
             if exact_context is None:
                 stats["previous_legacy_guard_audit_context_missing"] += 1
             else:
-                drifted, actions = legacy_guard_drift(row, exact_context)
+                audited, drifted, actions = legacy_guard_audit(row, exact_context)
                 stats["previous_legacy_guard_audited"] += 1
                 if drifted:
                     legacy_guard_drift_ids.append(candidate)
@@ -294,6 +302,9 @@ def merge(
                     legacy_guard_drift_actions.update(actions or ["semantic_signature_changed"])
                     continue
                 stats["previous_legacy_guard_semantically_current"] += 1
+                audited["legacy_post_guard_provenance_migrated_at"] = accepted_at
+                row = audited
+                stats["previous_legacy_guard_provenance_migrated"] += 1
 
         state[candidate] = row
         stats["previous_carried"] += 1
@@ -413,6 +424,7 @@ def merge(
             "wrong_classifier_version_marks_classified": False,
             "stale_result_can_overwrite_updated_notice": False,
             "legacy_state_semantic_drift_is_requeued": True,
+            "legacy_semantically_current_state_is_provenance_migrated": True,
             "invalidated_state_without_residual_queue_is_synthesized_from_snapshot": True,
             "missing_snapshot_for_required_synthetic_requeue_fails_closed": True,
             "conflicting_valid_results_are_requeued": True,

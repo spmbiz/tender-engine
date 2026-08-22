@@ -21,7 +21,7 @@ DEFAULT_POLICY = {
 
 
 def _request(url: str):
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/2.2"})
+    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "tender-global-admission/2.3"})
     tok = os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")
     if tok:
         req.add_header("Authorization", f"Bearer {tok}")
@@ -48,7 +48,11 @@ def _global_state():
 
 def _classify(repo: str, name: str, path: str) -> str:
     blob = f"{name} {path}".lower()
-    if repo.lower().endswith("/tender-engine") or "tender" in blob or "dce" in blob:
+    if repo.lower().endswith("/tender-engine"):
+        if "qwen live notice classification" in blob or "qwen-live-classification" in blob:
+            return "qwen-semantic"
+        return "tenders"
+    if "tender" in blob or "dce" in blob:
         return "tenders"
     if "gws" in blob or "no-website" in blob or "no website" in blob:
         return "gws"
@@ -68,11 +72,12 @@ def _per_page(url: str, n: int = 100) -> str:
 
 
 def _repo_capacity_state(repo: str, ignore_run_id: str = "") -> tuple[Counter, Counter]:
-    """Return (active slots, queued jobs) by workload.
+    """Return (active slots, queued jobs) by workload/sublane.
 
     Queued jobs are demand signals, not physical occupancy. Active jobs consume
-    hosted-runner slots. Tender work may borrow sibling capacity only when the
-    fair-share reservation is not currently demanded; no active job is preempted.
+    hosted-runner slots. Qwen semantic work is tracked separately from generic
+    Tender/DCE work so a real semantic reservation can be enforced without
+    preempting already-running jobs.
     """
     active: Counter[str] = Counter()
     queued: Counter[str] = Counter()
@@ -206,15 +211,28 @@ def _dce_cap_for_qwen_backlog(remaining: int) -> int:
     return 10
 
 
+def _qwen_semantic_reservation_for_backlog(remaining: int, total: int) -> int:
+    """Return the desired non-preemptive semantic floor in hosted-runner slots."""
+    if remaining >= 50_000:
+        target = 16
+    elif remaining >= 20_000:
+        target = 14
+    elif remaining >= 5_000:
+        target = 10
+    elif remaining > 0:
+        target = 6
+    else:
+        target = 0
+    return min(max(0, int(total)), target)
+
+
 def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     requested = max(0, int(requested))
     requested_before_backfill_cap = requested
     qwen_remaining = _qwen_backlog_remaining()
     dce_backfill_cap = None
 
-    # During the one-time semantic backfill, DCE may keep progressing but cannot
-    # seize the fleet ahead of Qwen. This clamp lives in the shared admission
-    # layer, so forgotten/legacy dispatchers cannot bypass it by requesting 24/60.
+    # DCE remains alive during semantic backfill, but is deliberately thin.
     if _dce_lane() and not _spm_curated_fast_lane():
         dce_backfill_cap = _dce_cap_for_qwen_backlog(qwen_remaining)
         requested = min(requested, dce_backfill_cap)
@@ -230,8 +248,9 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
             "hard_cap": hard_cap,
             "qwen_remaining": qwen_remaining,
             "dce_backfill_cap": dce_backfill_cap,
+            "qwen_semantic_reservation_target": _qwen_semantic_reservation_for_backlog(qwen_remaining, hard_cap),
             "authority": "fleet_controller",
-            "reason": "controller already performed capacity admission; consume only the preapproved budget",
+            "reason": "controller already performed physical capacity admission; Qwen/DCE backlog caps remain enforced locally",
             "preemption": "none; consume only the controller-approved budget",
         }
 
@@ -246,6 +265,7 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
             "hard_cap": hard_cap,
             "qwen_remaining": qwen_remaining,
             "dce_backfill_cap": dce_backfill_cap,
+            "qwen_semantic_reservation_target": _qwen_semantic_reservation_for_backlog(qwen_remaining, hard_cap),
         }
 
     policy = _policy()
@@ -282,13 +302,18 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     tender_cfg = workloads.get("tenders") or {}
     tender_floor = min(total, max(0, int(tender_cfg.get("min_slots_when_demanding") or 10)))
     tender_max = min(total, max(tender_floor, int(tender_cfg.get("max_slots") or tender_floor or total)))
-    existing_tender_active = int(active.get("tenders", 0))
+    existing_qwen_semantic_active = int(active.get("qwen-semantic", 0))
+    existing_tender_general_active = int(active.get("tenders", 0))
+    existing_tender_active = existing_qwen_semantic_active + existing_tender_general_active
     tender_room = max(0, tender_max - existing_tender_active)
+    qwen_semantic_reservation_target = _qwen_semantic_reservation_for_backlog(qwen_remaining, total)
+    qwen_missing_reserved = max(0, qwen_semantic_reservation_target - existing_qwen_semantic_active)
 
     if _spm_curated_fast_lane():
         physical_free = max(0, total - active_total)
+        qwen_protected_free = max(0, physical_free - qwen_missing_reserved)
         cap = 3
-        allowed = min(requested, cap, physical_free, tender_room)
+        allowed = min(requested, cap, qwen_protected_free, tender_room)
         return allowed, {
             "mode": "spm-curated-free-slot-fast-lane",
             "capacity": total,
@@ -300,12 +325,18 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
             "queued_backlog": dict(queued),
             "active_total": active_total,
             "physical_free": physical_free,
+            "qwen_semantic_reservation_target": qwen_semantic_reservation_target,
+            "existing_qwen_semantic_active": existing_qwen_semantic_active,
+            "queued_qwen_semantic": int(queued.get("qwen-semantic", 0)),
+            "qwen_missing_reserved": qwen_missing_reserved,
+            "qwen_protected_free": qwen_protected_free,
             "existing_tender_active": existing_tender_active,
+            "existing_tender_general_active": existing_tender_general_active,
             "tender_room": tender_room,
             "selection_path": _workflow_selection_path(),
             "workflow": os.getenv("GITHUB_WORKFLOW") or "",
-            "preemption": "none; only currently free physical slots are consumed",
-            "reason": "GPT-curated SPM DCE shortlist receives bounded latency priority",
+            "preemption": "none; only currently free non-reserved slots are consumed",
+            "reason": "GPT-curated SPM DCE shortlist receives bounded latency priority without consuming missing Qwen semantic reservation",
         }
 
     sibling_targets = {
@@ -315,10 +346,16 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
     sibling_missing = sum(max(0, sibling_targets[w] - int(active.get(w, 0))) for w in sibling_targets)
     physical_free = max(0, total - active_total)
     global_room_after_protection = max(0, physical_free - sibling_missing)
+    semantic_lane = _semantic_qwen_lane()
+    admission_room_after_qwen_reservation = (
+        global_room_after_protection
+        if semantic_lane
+        else max(0, global_room_after_protection - qwen_missing_reserved)
+    )
 
     effective_tender_demand = max(tender_demand, requested + existing_tender_active)
     unmet_tender_demand = max(0, effective_tender_demand - existing_tender_active)
-    allowed = min(requested, global_room_after_protection, tender_room, unmet_tender_demand, tender_max)
+    allowed = min(requested, admission_room_after_qwen_reservation, tender_room, unmet_tender_demand, tender_max)
 
     borrowed_slots = max(0, existing_tender_active + allowed - tender_floor)
     report = {
@@ -327,7 +364,7 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
         "requested": requested_before_backfill_cap,
         "requested_after_qwen_backfill_cap": requested,
         "allowed": allowed,
-        "sublane": "qwen-semantic" if _semantic_qwen_lane() else ("qwen-related" if _qwen_live_streaming_lane() else "tender-general"),
+        "sublane": "qwen-semantic" if semantic_lane else ("qwen-related" if _qwen_live_streaming_lane() else "tender-general"),
         "qwen_remaining": qwen_remaining,
         "dce_backfill_cap": dce_backfill_cap,
         "active_commitments": dict(active),
@@ -343,13 +380,20 @@ def dynamic_tender_parallel(requested: int) -> tuple[int, dict]:
         "sibling_targets": sibling_targets,
         "sibling_missing_reserved": sibling_missing,
         "global_room_after_protection": global_room_after_protection,
+        "qwen_semantic_reservation_target": qwen_semantic_reservation_target,
+        "existing_qwen_semantic_active": existing_qwen_semantic_active,
+        "queued_qwen_semantic": int(queued.get("qwen-semantic", 0)),
+        "qwen_missing_reserved": qwen_missing_reserved,
+        "admission_room_after_qwen_reservation": admission_room_after_qwen_reservation,
         "existing_tender_active": existing_tender_active,
+        "existing_tender_general_active": existing_tender_general_active,
         "queued_tender_backlog": int(queued.get("tenders", 0)),
         "tender_floor": tender_floor,
         "tender_max": tender_max,
         "borrowed_idle_slots_after_admission": borrowed_slots,
         "preemption": "none; idle borrowing ends naturally as current jobs complete",
-        "queue_rule": "queued sibling jobs reserve fair-share capacity; only active jobs consume physical slots",
+        "queue_rule": "queued sibling jobs reserve fair-share capacity; Qwen backlog reserves semantic Tender room; only active jobs consume physical slots",
+        "semantic_reservation_rule": "non-Qwen Tender work cannot consume the missing Qwen semantic floor while semantic backlog remains; existing jobs are never preempted",
         "policy_fallback": "Tender floor remains protected while idle capacity may burst up to the configured max; GWS demand keeps its reservation.",
     }
     return allowed, report
