@@ -28,7 +28,7 @@ env:
   QWEN_WORKERS_REQUESTED: '20'
   QWEN_OPERATIONAL_ROWS_PER_SHARD: '480'
   QWEN_CLASSIFIER_VERSION: 'qwen3-4b-q4km-batch-selfheal-v1'
-  QWEN_RICH_MIN_CONTEXT_CHARS: '1200'
+  QWEN_RICH_MIN_CONTEXT_CHARS: '2200'
   QWEN_TRANSPORT_RETRIES: '0'
 
 jobs:
@@ -319,7 +319,7 @@ jobs:
             --batch-size '${{ needs.plan.outputs.batch_size }}' \
             --sample-size '${{ needs.plan.outputs.per_shard }}' \
             --source-ledger-generation '${{ needs.plan.outputs.source_run }}' \
-            --description-chars 1200 \
+            --description-chars 2200 \
             --timeout 30 \
             --max-tokens 900 \
             --max-runtime-seconds 7200 \
