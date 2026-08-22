@@ -64,8 +64,8 @@ jobs:
             --review-ledger control/gpt_web_review_ledger.json \
             --out control/gpt_review_hot.json \
             --recovery-root /tmp/gpt-index-refill \
-            --max-items 160 \
-            --max-release-downloads 24
+            --max-items 30 \
+            --max-release-downloads 4
 
           git config user.name 'tender-engine-bot'
           git config user.email 'tender-engine-bot@users.noreply.github.com'
