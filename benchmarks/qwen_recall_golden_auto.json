@@ -1,9 +1,9 @@
 {
   "schema": "QWEN_RECALL_CALIBRATION_CORPUS_V1",
-  "generated_at": "2026-08-22T10:32:34+00:00",
-  "case_count": 41,
-  "positive_recall_cases": 40,
-  "frozen_input_cases": 41,
+  "generated_at": "2026-08-22T11:19:47+00:00",
+  "case_count": 44,
+  "positive_recall_cases": 43,
+  "frozen_input_cases": 44,
   "missing_input_candidate_ids": [
     "IE:8623183",
     "IE:8670172",
@@ -1565,6 +1565,55 @@
       }
     },
     {
+      "candidate_id": "UK_PCS_OCDS:rls-7-AUG562839",
+      "label": "DCE/GPT positive (YELLOW): UK_PCS_OCDS:rls-7-AUG562839",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 72,
+        "why": "The title and GBP 80k value indicate a potentially strong strategy/content/materials opportunity, but the current evidence pack does not prove the mandatory gates. Unknown is not PASS.",
+        "action": "RECOVER_SUBSTANTIVE_ITT_AND_REVIEW_IMMEDIATELY",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT_BUT_TENDER_GATES_UNRESOLVED",
+        "provenance_file": "control/adjudications/gpt-web-live-sweep-20260822-run-32557566063.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "UK_PCS_OCDS:rls-7-AUG562839",
+        "material_fields_hash": "e682cdc1db4d68d2624e3dca74d049931f30a4152279e8cf7c6f0cb895285a0c",
+        "notice": {
+          "candidate_id": "UK_PCS_OCDS:rls-7-AUG562839",
+          "source_family": "UK_PCS_OCDS",
+          "source": "UK_PCS_OCDS",
+          "country": "GB",
+          "buyer": "Forth Green Freeport Operating Ltd",
+          "title": "ITT Details - Industrial Investment Marketing Strategy and Materials",
+          "description": "Forth Green Freeport Operating Ltd (FGF) is seeking proposals from suitably qualified organisations to produce an Industrial Investment Marketing Strategy & Materials. FGF is a not-for-profit company established to attract investment and deliver sustainable economic growth across Forth Green Freeport. Funded by our partner organisations, we work with companies to help them identify sites, access fiscal incentives, connect with key stakeholders and accelerate investment.",
+          "cpv_or_category": "[\"79342000\"]",
+          "estimated_value": 80000.0,
+          "currency": "GBP",
+          "publication_date": "2026-08-21T00:00:00+00:00",
+          "deadline": "2026-09-09T16:00:00+00:00",
+          "deadline_utc": "2026-09-09T16:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": "open",
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "http://www.publiccontractsscotland.gov.uk",
+            "https://www.publiccontractsscotland.gov.uk/NoticeDownload/Download.aspx",
+            "https://www.publiccontractsscotland.gov.uk/search/show/search_view.aspx?ID=AUG562839"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-22T11:19:47+00:00"
+      }
+    },
+    {
       "candidate_id": "US-SAM:3e996363f3f840c3b4bd786b9cdb985d",
       "label": "Aviation Security Officer personal-services control",
       "truth_kind": "MANUAL_POLICY_CONTROL",
@@ -1650,6 +1699,53 @@
           ]
         },
         "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "US-SAM:5974a1901b8c49799aa86e0d6b352055",
+      "label": "DCE/GPT positive (YELLOW): US-SAM:5974a1901b8c49799aa86e0d6b352055",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 78,
+        "why": "Direct custom software fit: standalone Windows image-analysis application, Python/.NET/LabVIEW accepted, data analysis, calibration logic and source-code delivery. It is commercially interesting, but DoD software-assurance and bidder-eligibility gates remain material UNKNOWNs.",
+        "action": "HIGH_PRIORITY_VERIFY_US_ELIGIBILITY_DEADLINE_AND_SWA_THEN_BID",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-live-sweep-20260822-run-32568452706.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "US-SAM:5974a1901b8c49799aa86e0d6b352055",
+        "material_fields_hash": "d60eccd1f4b300c46ccdd8ee61ca5744fd16fa465aec0975817891bee752ad79",
+        "notice": {
+          "candidate_id": "US-SAM:5974a1901b8c49799aa86e0d6b352055",
+          "source_family": "US_SAM",
+          "source": "US_SAM_BULK",
+          "country": "US",
+          "buyer": "DEPT OF DEFENSE",
+          "title": "Call for Solutions: Fog Tester Analysis Software Application",
+          "description": "U.S. Army Contracting Command, Aberdeen Proving Ground Natick Division Issuing Agency: U.S. Army Contracting Command-Aberdeen Proving Ground, Natick Division. Description of Program: U.S. Army Combat Capabilities Development Command � Soldier Center (DEVCOM-SC), Soldier Protection Directorate (SPD), Optical and Electromagnetic Materials Branch (OEMB) is seeking advancements in the development of a Fog Tester Analysis Software. Questions: Questions regarding this open call shall be submitted electronically via e-mail to Kaylie Silva kaylie.j.silva.civ@army.mil and Lyndon Jagroop lyndon.s.jagroop.civ@army.mil. The Call for Solutions document (.pdf), outlining the full problem statement and objectives can be found in the Attachments section of this posting. The Army Open Soliciation that this Call for Solutions is associated with can be found at https://sam.gov/workspace/contract/opp/5812d5d4d1ba481797f7fcbbfe774d46/view",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-19T00:00:00+00:00",
+          "deadline": "2026-09-04T20:00:00+00:00",
+          "deadline_utc": "2026-09-04T20:00:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": null,
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://sam.gov/opp/5974a1901b8c49799aa86e0d6b352055/view"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-22T11:19:47+00:00"
       }
     },
     {
@@ -1787,6 +1883,53 @@
           ]
         },
         "calibration_input_frozen_at": "2026-08-18T22:30:05+00:00"
+      }
+    },
+    {
+      "candidate_id": "US-SAM:7a9f7abad2cb447f9e4ce601e7cfe773",
+      "label": "DCE/GPT positive (YELLOW): US-SAM:7a9f7abad2cb447f9e4ce601e7cfe773",
+      "truth_kind": "DCE_GPT_ADJUDICATED_POSITIVE",
+      "expected": {
+        "must_not_reject": true,
+        "min_rank": "MAYBE"
+      },
+      "adjudication": {
+        "classification": "YELLOW",
+        "final_score": 81,
+        "why": "Very strong direct software scope: custom development is explicitly allowed, requirement is software/support only, localized to one team with roughly 10 users and up to 100k items, CSV migration, business-hours support, no 24/7 requirement and no post-UAT consulting requirement. Security and federal eligibility keep it below GREEN for now.",
+        "action": "URGENT_VERIFY_FEDERAL_ELIGIBILITY_PAST_PERFORMANCE_STIG_AND_DEADLINE",
+        "evidence_quality": "SUBSTANTIVE_DCE_PRESENT",
+        "provenance_file": "control/adjudications/gpt-web-live-sweep-20260822-run-32568452706.json",
+        "adjudication_schema": "GPT_DCE_ADJUDICATION_V1"
+      },
+      "input_envelope": {
+        "canonical_notice_id": "US-SAM:7a9f7abad2cb447f9e4ce601e7cfe773",
+        "material_fields_hash": "f104162c421a66e9015a3fa4fd609c111cfd54ef6382b97aeed164a4b4094bb4",
+        "notice": {
+          "candidate_id": "US-SAM:7a9f7abad2cb447f9e4ce601e7cfe773",
+          "source_family": "US_SAM",
+          "source": "US_SAM_BULK",
+          "country": "US",
+          "buyer": "DEPT OF DEFENSE",
+          "title": "Inventory Management Software",
+          "description": "Inventory Software Management for DEVCOM-SC: Inventory Software Management Technology replacing legacy that goes beyond traditional Warehouse Management System to drive employee engagement and efficiency through the supply chain. Inventory Platform which provides real time inventory fulfillment, quality control and traceability.Create a reliable implementation as well as accomplished within a 15 week deliverable.",
+          "cpv_or_category": null,
+          "estimated_value": null,
+          "currency": null,
+          "publication_date": "2026-08-21T00:00:00+00:00",
+          "deadline": "2026-08-26T19:30:00+00:00",
+          "deadline_utc": "2026-08-26T19:30:00+00:00",
+          "open_state": "OPEN_CONFIRMED_BY_DEADLINE",
+          "procedure": null,
+          "lots": null,
+          "notice_eligibility": null,
+          "award_criteria": null,
+          "subcontracting": null,
+          "urls": [
+            "https://sam.gov/opp/7a9f7abad2cb447f9e4ce601e7cfe773/view"
+          ]
+        },
+        "calibration_input_frozen_at": "2026-08-22T11:19:47+00:00"
       }
     },
     {
