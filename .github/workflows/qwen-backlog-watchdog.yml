@@ -83,17 +83,7 @@ jobs:
             echo "Cancelling pre-hardening semantic generation $run_id"
             gh api --method POST "repos/${REPO}/actions/runs/${run_id}/cancel" >/dev/null 2>&1 || true
           done
-          # Give GitHub a bounded window to release the semantic concurrency slot.
-          # The recovery step below still refuses to stack a duplicate if this lags.
-          for _ in $(seq 1 18); do
-            active_old="$(gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 100 \
-              --json databaseId,status --jq '[.[] | select(.status=="queued" or .status=="waiting" or .status=="pending" or .status=="requested" or .status=="in_progress") | .databaseId] | map(select(. as $id | $ARGS.positional | index($id))) | length' --args "${ids[@]}" 2>/dev/null || echo 1)"
-            if [ "$active_old" = '0' ]; then
-              echo 'Pre-hardening semantic cancellation fully propagated.'
-              break
-            fi
-            sleep 5
-          done
+          echo 'Pre-hardening cancellation requested; recovery owns propagation wait and duplicate prevention.'
 
       - id: inspect
         name: Inspect semantic lane with tested controller
