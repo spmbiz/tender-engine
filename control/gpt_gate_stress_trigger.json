@@ -1,7 +1,7 @@
 {
   "schema": "GPT_GATE_STRESS_TRIGGER_V1",
-  "requested_at": "2026-08-22-v2",
+  "requested_at": "2026-08-22-v3-final",
   "scope": "ALL current unreviewed BUSINESS_GATES from durable gpt_review_index",
   "require_full_dce_conservation": true,
-  "reason": "Execute exhaustive adjudication surface after exact-shard recovery fix; no hot-window cap."
+  "reason": "Final launch after exact run+shard recovery and uncapped catalog fixes. Do not use the hot window as workload truth."
 }
