@@ -27,9 +27,11 @@ concurrency:
 env:
   QWEN_PER_SHARD: '96'
   # Controlled rollout epoch: semantic generations predating the GitHub API
-  # rate-limit hardening cannot own the lane. This forces exactly one replacement
-  # that contains throttled checkpoint publication and non-fatal release mirroring.
+  # rate-limit hardening cannot own the lane. SHA ancestry is still checked by
+  # the controller, while the local timestamp cutoff below remains authoritative
+  # even when GitHub's compare API itself is rate-limited.
   QWEN_SEMANTIC_MIN_CONTROL_PLANE_SHA: '7aa7dcff7de9122800632193f558095df8e05f0d'
+  QWEN_SEMANTIC_MIN_CREATED_AT: '2026-08-22T00:13:48Z'
 
 jobs:
   watchdog:
@@ -44,11 +46,51 @@ jobs:
         with:
           python-version: '3.12'
 
+      - id: epoch
+        name: Purge pre-hardening semantic generations without compare API
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/qwen-watchdog
+          gh run list --repo "$REPO" --workflow qwen-live-classification.yml --limit 100 \
+            --json databaseId,status,createdAt,event,headSha > /tmp/qwen-watchdog/preflight-runs.json
+          mapfile -t ids < <(CUTOFF="$QWEN_SEMANTIC_MIN_CREATED_AT" python - <<'PY'
+          import datetime as dt,json,os
+          cutoff=dt.datetime.fromisoformat(os.environ['CUTOFF'].replace('Z','+00:00'))
+          active={'queued','waiting','pending','requested','in_progress'}
+          for row in json.load(open('/tmp/qwen-watchdog/preflight-runs.json',encoding='utf-8')):
+              if row.get('status') not in active:
+                  continue
+              try:
+                  created=dt.datetime.fromisoformat(str(row.get('createdAt') or '').replace('Z','+00:00'))
+              except Exception:
+                  continue
+              if created < cutoff:
+                  print(int(row['databaseId']))
+          PY
+          )
+          if [ "${#ids[@]}" -eq 0 ]; then
+            echo 'purged=false' >> "$GITHUB_OUTPUT"
+            echo 'No pre-hardening active semantic generation.'
+            exit 0
+          fi
+          echo 'purged=true' >> "$GITHUB_OUTPUT"
+          printf '%s\n' "${ids[@]}" > /tmp/qwen-watchdog/pre-epoch-cancelled.txt
+          for run_id in "${ids[@]}"; do
+            echo "Cancelling pre-hardening semantic generation $run_id"
+            gh api --method POST "repos/${REPO}/actions/runs/${run_id}/cancel" >/dev/null 2>&1 || true
+          done
+          echo 'Pre-hardening cancellation requested; recovery owns propagation wait and duplicate prevention.'
+
       - id: inspect
         name: Inspect semantic lane with tested controller
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
+          PRE_EPOCH_PURGED: ${{ steps.epoch.outputs.purged }}
         shell: bash
         run: |
           set -euo pipefail
@@ -57,12 +99,20 @@ jobs:
             --repo "$REPO" \
             --summary control/qwen_live/classification_summary.json \
             --out /tmp/qwen-watchdog/decision.json
-          echo "remaining=$(jq -r '.remaining' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
+          remaining="$(jq -r '.remaining' /tmp/qwen-watchdog/decision.json)"
+          need_dispatch="$(jq -r '.need_dispatch' /tmp/qwen-watchdog/decision.json)"
+          # A pre-epoch purge is an explicit rollout request. If backlog remains,
+          # force recovery even when the ancestry compare endpoint was rate-limited
+          # and the controller temporarily classified the cancelling run as unknown.
+          if [ "$PRE_EPOCH_PURGED" = 'true' ] && [ "$remaining" != '0' ]; then
+            need_dispatch=true
+          fi
+          echo "remaining=$remaining" >> "$GITHUB_OUTPUT"
           echo "ledger_source=$(jq -r '.ledger_source // "unknown"' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
           echo "semantic_source=$(jq -r '.semantic_source // "unknown"' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
           echo "source_gap=$(jq -r '.source_gap' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
           echo "cancel_count=$(jq -r '.cancel_count' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
-          echo "need_dispatch=$(jq -r '.need_dispatch' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
+          echo "need_dispatch=$need_dispatch" >> "$GITHUB_OUTPUT"
           echo "lane_covered=$(jq -r '.lane_covered' /tmp/qwen-watchdog/decision.json)" >> "$GITHUB_OUTPUT"
 
       - name: Purge stale, duplicate and queued semantic generations
@@ -134,6 +184,7 @@ jobs:
           echo "- stable semantic source: ${{ steps.inspect.outputs.semantic_source }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- newer ledger waiting: ${{ steps.inspect.outputs.source_gap }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- lane covered: ${{ steps.inspect.outputs.lane_covered }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- pre-hardening run purged locally: ${{ steps.epoch.outputs.purged }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- stale/duplicate runs cancelled: ${{ steps.inspect.outputs.cancel_count }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- replacement dispatched: ${{ steps.recover.outputs.dispatched }}" >> "$GITHUB_STEP_SUMMARY"
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
