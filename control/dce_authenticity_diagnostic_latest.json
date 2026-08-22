@@ -1,14 +1,49 @@
 {
   "schema": "DCE_AUTHENTICITY_BACKLOG_DIAGNOSTIC_V1",
-  "latest_source_dce_run_id": 32550107242,
-  "total_inbox_rows": 3,
-  "dce_authenticity_rows": 0,
-  "portal_counts": {},
-  "status_counts": {},
-  "reason_counts": {},
+  "latest_source_dce_run_id": 32552379983,
+  "total_inbox_rows": 7,
+  "dce_authenticity_rows": 2,
+  "portal_counts": {
+    "GENERIC_PUBLIC_PAGE": 2
+  },
+  "status_counts": {
+    "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED": 1,
+    "UNKNOWN_RETRIEVED_DOCUMENT": 1
+  },
+  "reason_counts": {
+    "NON_AUTHORITATIVE": 2
+  },
   "method_counts": {},
-  "recovery_opportunities": [],
-  "samples_by_reason": {},
+  "recovery_opportunities": [
+    {
+      "portal": "GENERIC_PUBLIC_PAGE",
+      "blocked": 2,
+      "likely_public_recovery_target": 0,
+      "reason_counts": {
+        "NON_AUTHORITATIVE": 2
+      }
+    }
+  ],
+  "samples_by_reason": {
+    "NON_AUTHORITATIVE": [
+      {
+        "candidate_id": "IT-PVL:f6163df5-1bb9-4187-b718-6aeec074f2bd",
+        "portal": "GENERIC_PUBLIC_PAGE",
+        "title": "Procedura aperta per l’affidamento di lavori per la realizzazione “a corpo” e la messa in servizio dello “Stralcio II” (realizzazione delle condotte sottomarine Colonnella e Rodella) dell’intervento denominato “Realizzazione dei sistemi impiantistici a servizio delle Fosse Colonnella 1, Colonnella 2 e Rodella nel Comune di Rimini (RN)”",
+        "buyer": "HERATECH S.R.L.",
+        "status": "SUBSTANTIVE_DCE_RELEVANCE_UNVERIFIED",
+        "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/f6163df5-1bb9-4187-b718-6aeec074f2bd?ricercaArchivio=false"
+      },
+      {
+        "candidate_id": "IT-PVL:acc642c6-c759-439e-b520-112b30824622",
+        "portal": "GENERIC_PUBLIC_PAGE",
+        "title": "LAVORI di SOMMA URGENZA da “DISSESTO IDROGEOLOGICO in Via delle Alpi e Piazza Indipendenza del Comune di Pontecorvo” – PNNR, Missione 2 –– Componente 4 – Investimento 2.2: Interventi per la resilienza, la valorizzazione del territorio e l’efficienza energetica dei comuni, finanziato dall’Unione europea – Next Generation EU. – CUP: B47H22000360001 - CIG: A03E290DFA",
+        "buyer": "COMUNE DI PONTECORVO",
+        "status": "UNKNOWN_RETRIEVED_DOCUMENT",
+        "notice_url": "https://pubblicitalegale.anticorruzione.it/bandi/acc642c6-c759-439e-b520-112b30824622?ricercaArchivio=false"
+      }
+    ]
+  },
   "safety": {
     "diagnostic_only": true,
     "mutates_inbox": false,
