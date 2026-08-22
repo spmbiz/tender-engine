@@ -32312,27 +32312,31 @@
     "US-SAM:7a9f7abad2cb447f9e4ce601e7cfe773",
     "US-SAM:5974a1901b8c49799aa86e0d6b352055",
     "CA:20260862-IRB",
-    "LT-CVP:9308328"
+    "LT-CVP:9308328",
+    "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
+    "PL-BZP:08deff70-ee2c-06ac-b346-0300010ce39c",
+    "DE-DOE:25734480:1",
+    "FR-BOAMP:26-82073"
   ],
   "last_discovery_dispatch_at": "2026-08-22T11:26:40.843805+00:00",
   "last_circleci_tick_at": "2026-08-14T21:41:04.485184+00:00",
-  "updated_at": "2026-08-22T11:44:21.760384+00:00",
+  "updated_at": "2026-08-22T11:58:22.184120+00:00",
   "enabled": true,
   "mode": "maximum",
-  "active_discovery_run_id": "32567436737",
+  "active_discovery_run_id": "32570301957",
   "pending_dce_batch": {
     "candidate_ids": [
-      "DE-DOE:25734480:1",
-      "EE-RHR:1e6d2c60-a239-4e50-9788-897a2cd1e47f",
-      "PL-BZP:08deff70-ee2c-06ac-b346-0300010ce39c",
-      "FR-BOAMP:26-82073"
+      "EE-RHR:dec2736a-b53e-4c3a-916b-ca191ff87528",
+      "US-SAM:08a05cf5f1434384b559b7b0c336d24e",
+      "US-SAM:7a691796b7584e308a425e0e33b8cb92",
+      "LT-CVP:9145038"
     ],
-    "source_run": "32567436737",
-    "selection_path": "queues/auto_selection_32571083244.jsonl",
-    "queue_commit_sha": "35153849b84ea4e74fac8a1a880e3b39df5b45ea",
-    "commit_message": "Autonomous DCE batch 32571083244 from discovery 32567436737",
-    "dispatched_at": "2026-08-22T11:44:21.760384+00:00",
-    "max_parallel": 6
+    "source_run": "32570301957",
+    "selection_path": "queues/auto_selection_32571706839.jsonl",
+    "queue_commit_sha": "f5d8c3af7c0325e4715a9d8781d6ddd0c7404f5e",
+    "commit_message": "Autonomous DCE batch 32571706839 from discovery 32570301957",
+    "dispatched_at": "2026-08-22T11:58:22.184120+00:00",
+    "max_parallel": 5
   },
   "legacy_dispatched_candidate_ids": [
     "TED:545556-2026",
@@ -33086,7 +33090,8 @@
     "32558225826",
     "32560186475",
     "32563030022",
-    "32565446968"
+    "32565446968",
+    "32567436737"
   ],
   "postprocessed_dce_runs": [
     "31884397916",
@@ -33158,7 +33163,8 @@
     "32559253485",
     "32560652323",
     "32567435075",
-    "32568452706"
+    "32568452706",
+    "32571126517"
   ],
   "processed_dce_runs": [
     "31983099605",
@@ -33523,7 +33529,10 @@
     "32058725878"
   ],
   "last_orphan_reconcile_at": "2026-08-22T11:44:21.760384+00:00",
-  "dce_retry_after": {},
+  "dce_retry_after": {
+    "DE-DOE:25734480:1": "2026-08-22T12:03:22.184120+00:00",
+    "FR-BOAMP:26-82073": "2026-08-22T12:03:22.184120+00:00"
+  },
   "dce_retry_attempts": {
     "TED:565210-2026": 2,
     "US-SAM:777a5ae3a7d447ef941a1dbebe2a454d": 2,
@@ -36132,6 +36141,8 @@
     "NO-DOFFIN:2026-113197": 1,
     "NO-DOFFIN:2026-113300": 1,
     "CA:20260862-IRB": 1,
-    "LT-CVP:9308328": 1
+    "LT-CVP:9308328": 1,
+    "DE-DOE:25734480:1": 1,
+    "FR-BOAMP:26-82073": 1
   }
 }
